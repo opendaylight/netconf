@@ -30,7 +30,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
@@ -132,14 +131,14 @@ public class NetconfCallHomeServerTest {
     public void verificationOfTheServerKeyShouldBeSuccessfulForServerIsAllowed() {
         // given
         ClientSessionImpl mockClientSession = mock(ClientSessionImpl.class);
-        Mockito.doReturn("test").when(mockClientSession).toString();
+        doReturn("test").when(mockClientSession).toString();
         SocketAddress mockSocketAddr = mock(SocketAddress.class);
         PublicKey mockPublicKey = mock(PublicKey.class);
 
-        Mockito.doReturn(true).when(mockAuth).isServerAllowed();
-        Mockito.doReturn("some-session-name").when(mockAuth).getSessionName();
-        Mockito.doReturn(mockAuth).when(mockCallHomeAuthProv).provideAuth(mockSocketAddr, mockPublicKey);
-        Mockito.doReturn(null).when(mockFactory).createIfNotExists(mockClientSession, mockAuth);
+        doReturn(true).when(mockAuth).isServerAllowed();
+        doReturn("some-session-name").when(mockAuth).getSessionName();
+        doReturn(mockAuth).when(mockCallHomeAuthProv).provideAuth(mockSocketAddr, mockPublicKey);
+        doReturn(null).when(mockFactory).createIfNotExists(mockClientSession, mockAuth);
 
         // expect
         assertFalse(instance.verifyServerKey(mockClientSession, mockSocketAddr, mockPublicKey));
@@ -153,9 +152,9 @@ public class NetconfCallHomeServerTest {
         SocketAddress mockSocketAddr = mock(SocketAddress.class);
         PublicKey mockPublicKey = mock(PublicKey.class);
 
-        Mockito.doReturn(false).when(mockAuth).isServerAllowed();
-        Mockito.doReturn(mockAuth).when(mockCallHomeAuthProv).provideAuth(mockSocketAddr, mockPublicKey);
-        Mockito.doReturn("").when(mockClientSession).toString();
+        doReturn(false).when(mockAuth).isServerAllowed();
+        doReturn(mockAuth).when(mockCallHomeAuthProv).provideAuth(mockSocketAddr, mockPublicKey);
+        doReturn("").when(mockClientSession).toString();
 
         // expect
         assertFalse(instance.verifyServerKey(mockClientSession, mockSocketAddr, mockPublicKey));
@@ -167,8 +166,8 @@ public class NetconfCallHomeServerTest {
         IoAcceptor mockAcceptor = mock(IoAcceptor.class);
         IoServiceFactory mockMinaFactory = mock(IoServiceFactory.class);
 
-        Mockito.doReturn(mockAcceptor).when(mockMinaFactory).createAcceptor(any(IoHandler.class));
-        Mockito.doNothing().when(mockAcceptor).bind(any(SocketAddress.class));
+        doReturn(mockAcceptor).when(mockMinaFactory).createAcceptor(any(IoHandler.class));
+        doNothing().when(mockAcceptor).bind(any(SocketAddress.class));
         instance = new NetconfCallHomeServer(
                 mockSshClient, mockCallHomeAuthProv, mockFactory, MOCK_ADDRESS, mockStatusRecorder, mockMinaFactory);
         // when

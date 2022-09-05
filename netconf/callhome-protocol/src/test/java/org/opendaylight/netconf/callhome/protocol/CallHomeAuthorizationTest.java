@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.callhome.protocol;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -32,12 +34,13 @@ public class CallHomeAuthorizationTest {
         assertFalse(auth.isServerAllowed());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void anAuthorizationOfRejectedCannotBeAppliedToASession() {
         // given
         CallHomeAuthorization auth = CallHomeAuthorization.rejected();
         // when
-        auth.applyTo(mock(ClientSession.class));
+        final var ex = assertThrows(IllegalStateException.class, () -> auth.applyTo(mock(ClientSession.class)));
+        assertEquals("Server is not allowed.", ex.getMessage());
     }
 
     @Test

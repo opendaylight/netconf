@@ -27,7 +27,6 @@ import java.net.InetSocketAddress;
 import java.security.PublicKey;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
@@ -71,30 +70,30 @@ public class CallHomeSessionContextTest {
 
         realFactory = new CallHomeSessionContext.Factory(mockNettyGroup, mockNegotiatior, subListener);
 
-        KeyExchange kexMock = Mockito.mock(KeyExchange.class);
-        Mockito.doReturn(kexMock).when(mockSession).getKex();
+        KeyExchange kexMock = mock(KeyExchange.class);
+        doReturn(kexMock).when(mockSession).getKex();
 
-        PublicKey keyMock = Mockito.mock(PublicKey.class);
-        Mockito.doReturn(keyMock).when(mockSession).getServerKey();
+        PublicKey keyMock = mock(PublicKey.class);
+        doReturn(keyMock).when(mockSession).getServerKey();
         IoReadFuture mockFuture = mock(IoReadFuture.class);
         IoInputStream mockIn = mock(IoInputStream.class);
-        Mockito.doReturn(mockFuture).when(mockIn).read(any(Buffer.class));
+        doReturn(mockFuture).when(mockIn).read(any(Buffer.class));
         IoOutputStream mockOut = mock(IoOutputStream.class);
 
-        Mockito.doReturn(mockIn).when(mockChannel).getAsyncOut();
-        Mockito.doReturn(mockOut).when(mockChannel).getAsyncIn();
+        doReturn(mockIn).when(mockChannel).getAsyncOut();
+        doReturn(mockOut).when(mockChannel).getAsyncIn();
 
-        Mockito.doReturn(true).when(mockAuth).isServerAllowed();
+        doReturn(true).when(mockAuth).isServerAllowed();
 
         IoSession ioSession = mock(IoSession.class);
-        Mockito.doReturn(ioSession).when(mockSession).getIoSession();
-        Mockito.doReturn(address).when(ioSession).getRemoteAddress();
-        Mockito.doReturn(null).when(mockSession).setAttribute(any(AttributeKey.class), any());
-        Mockito.doReturn(null).when(mockSession).getAttribute(any(AttributeKey.class));
-        Mockito.doReturn("testSession").when(mockSession).toString();
+        doReturn(ioSession).when(mockSession).getIoSession();
+        doReturn(address).when(ioSession).getRemoteAddress();
+        doReturn(null).when(mockSession).setAttribute(any(AttributeKey.class), any());
+        doReturn(null).when(mockSession).getAttribute(any(AttributeKey.class));
+        doReturn("testSession").when(mockSession).toString();
 
         doNothing().when(mockAuth).applyTo(mockSession);
-        Mockito.doReturn("test").when(mockAuth).getSessionName();
+        doReturn("test").when(mockAuth).getSessionName();
     }
 
     @Test
@@ -116,7 +115,7 @@ public class CallHomeSessionContextTest {
     public void anAuthorizeActionShouldApplyToTheBoundSession() throws IOException {
         instance = realFactory.createIfNotExists(mockSession, mockAuth);
         // when
-        Mockito.doReturn(null).when(mockSession).auth();
+        doReturn(null).when(mockSession).auth();
         instance.authorize();
         // then
         verify(mockAuth, times(1)).applyTo(mockSession);
@@ -127,10 +126,10 @@ public class CallHomeSessionContextTest {
         // given
         OpenFuture mockFuture = mock(OpenFuture.class);
         ChannelSubsystem mockChannelSubsystem = mock(ChannelSubsystem.class);
-        Mockito.doReturn(mockFuture).when(mockChannelSubsystem).open();
-        Mockito.doReturn(mockChannelSubsystem).when(mockSession).createSubsystemChannel(anyString());
+        doReturn(mockFuture).when(mockChannelSubsystem).open();
+        doReturn(mockChannelSubsystem).when(mockSession).createSubsystemChannel(anyString());
 
-        Mockito.doReturn(null).when(mockFuture).addListener(any(SshFutureListener.class));
+        doReturn(null).when(mockFuture).addListener(any(SshFutureListener.class));
         doNothing().when(mockChannelSubsystem).setStreaming(any(StreamingChannel.Streaming.class));
         instance = realFactory.createIfNotExists(mockSession, mockAuth);
         // when
@@ -150,18 +149,18 @@ public class CallHomeSessionContextTest {
                 any(CallHomeChannelActivator.class));
 
         ChannelFuture mockChanFuture = mock(ChannelFuture.class);
-        Mockito.doReturn(mockChanFuture).when(mockNettyGroup).register(any(Channel.class));
+        doReturn(mockChanFuture).when(mockNettyGroup).register(any(Channel.class));
 
-        Mockito.doReturn(mockNettyGroup).when(mockFactory).getNettyGroup();
-        Mockito.doReturn(mockChannelInitializer).when(mockFactory)
+        doReturn(mockNettyGroup).when(mockFactory).getNettyGroup();
+        doReturn(mockChannelInitializer).when(mockFactory)
                 .getChannelInitializer(any(NetconfClientSessionListener.class));
-        Mockito.doReturn(mockListener).when(mockFactory).getChannelOpenListener();
+        doReturn(mockListener).when(mockFactory).getChannelOpenListener();
 
         ChannelPipeline mockPipeline = mock(ChannelPipeline.class);
-        Mockito.doReturn(mockPipeline).when(mockMinaChannel).pipeline();
+        doReturn(mockPipeline).when(mockMinaChannel).pipeline();
 
         OpenFuture mockFuture = mock(OpenFuture.class);
-        Mockito.doReturn(true).when(mockFuture).isOpened();
+        doReturn(true).when(mockFuture).isOpened();
 
         instance = new TestableContext(mockSession, mockAuth, mockFactory, mockMinaChannel);
         SshFutureListener<OpenFuture> listener = instance.newSshFutureListener(mockChannel);
@@ -177,8 +176,8 @@ public class CallHomeSessionContextTest {
         // given
         instance = realFactory.createIfNotExists(mockSession, mockAuth);
         OpenFuture mockFuture = mock(OpenFuture.class);
-        Mockito.doReturn(false).when(mockFuture).isOpened();
-        Mockito.doReturn(new RuntimeException("test")).when(mockFuture).getException();
+        doReturn(false).when(mockFuture).isOpened();
+        doReturn(new RuntimeException("test")).when(mockFuture).getException();
 
         doReturn(null).when(mockSession).close(anyBoolean());
 

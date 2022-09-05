@@ -9,6 +9,7 @@ package org.opendaylight.netconf.callhome.protocol;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -23,7 +24,6 @@ import io.netty.channel.ChannelPromise;
 import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoInputStream;
@@ -42,22 +42,22 @@ public class MinaSshNettyChannelTest {
     public void setup() throws IOException {
         IoReadFuture mockFuture = mock(IoReadFuture.class);
         IoInputStream mockIn = mock(IoInputStream.class);
-        Mockito.doReturn(mockFuture).when(mockIn).read(any(Buffer.class));
+        doReturn(mockFuture).when(mockIn).read(any(Buffer.class));
         mockContext = mock(CallHomeSessionContext.class);
         mockSession = mock(ClientSession.class);
         mockChannel = mock(ClientChannel.class);
-        Mockito.doReturn(mockIn).when(mockChannel).getAsyncOut();
+        doReturn(mockIn).when(mockChannel).getAsyncOut();
 
         IoOutputStream mockOut = mock(IoOutputStream.class);
-        Mockito.doReturn(mockOut).when(mockChannel).getAsyncIn();
+        doReturn(mockOut).when(mockChannel).getAsyncIn();
 
         IoWriteFuture mockWrFuture = mock(IoWriteFuture.class);
-        Mockito.doReturn(false).when(mockOut).isClosed();
-        Mockito.doReturn(false).when(mockOut).isClosing();
-        Mockito.doReturn(mockWrFuture).when(mockOut).writeBuffer(any(Buffer.class));
-        Mockito.doReturn(null).when(mockWrFuture).addListener(any());
+        doReturn(false).when(mockOut).isClosed();
+        doReturn(false).when(mockOut).isClosing();
+        doReturn(mockWrFuture).when(mockOut).writeBuffer(any(Buffer.class));
+        doReturn(null).when(mockWrFuture).addListener(any());
 
-        Mockito.doReturn(mockFuture).when(mockFuture).addListener(Mockito.any());
+        doReturn(mockFuture).when(mockFuture).addListener(any());
 
         instance = new MinaSshNettyChannel(mockContext, mockSession, mockChannel);
     }
@@ -75,7 +75,7 @@ public class MinaSshNettyChannelTest {
     public void ourChannelHandlerShouldForwardWrites() throws Exception {
         ChannelHandler mockHandler = mock(ChannelHandler.class);
         ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
-        Mockito.doReturn(mockHandler).when(ctx).handler();
+        doReturn(mockHandler).when(ctx).handler();
         ChannelPromise promise = mock(ChannelPromise.class);
 
         // we would really like to just verify that the async handler write() was
@@ -84,8 +84,8 @@ public class MinaSshNettyChannelTest {
         // on the write promise that we use as a cheap way to tell that write()
         // got called. ick.
 
-        Mockito.doReturn(null).when(mockChannel).getAsyncIn();
-        Mockito.doReturn(null).when(promise).setFailure(any(Throwable.class));
+        doReturn(null).when(mockChannel).getAsyncIn();
+        doReturn(null).when(promise).setFailure(any(Throwable.class));
 
         // Need to reconstruct instance to pick up null async in above
         instance = new MinaSshNettyChannel(mockContext, mockSession, mockChannel);
