@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "729abce5daf7d7a82af6ac5ff11cde3b8fa8d66d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "487430c0_6187139f",
+        "filename": "netconf/mdsal-netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/SshProxyServer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-09-07T16:24:04Z",
+      "side": 1,
+      "message": "any particular reason we cannot use nioExecutor here?",
+      "range": {
+        "startLine": 202,
+        "startChar": 24,
+        "endLine": 202,
+        "endChar": 59
+      },
+      "revId": "729abce5daf7d7a82af6ac5ff11cde3b8fa8d66d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
