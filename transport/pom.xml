@@ -31,5 +31,6 @@
     <modules>
         <module>transport-api</module>
         <module>transport-tcp</module>
+        <module>transport-tls</module>
     </modules>
 </project>
