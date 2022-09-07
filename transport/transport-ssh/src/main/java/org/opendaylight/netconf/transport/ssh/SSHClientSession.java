@@ -1,0 +1,17 @@
+/*
+ * Copyright (c) 2022 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.netconf.transport.ssh;
+
+import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
+
+final class SSHClientSession extends ClientSessionImpl {
+    SSHClientSession(final ClientFactoryManager client, final TCPIoSession ioSession) throws Exception {
+        super(client, ioSession);
+    }
+}
