@@ -14,6 +14,7 @@ import io.netty.util.Timer;
 import java.util.Set;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 
 public class NetconfServerSessionNegotiatorFactoryBuilder {
     private Timer timer;
@@ -62,7 +63,8 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
     public NetconfServerSessionNegotiatorFactory build() {
         validate();
         return new NetconfServerSessionNegotiatorFactory(timer, aggregatedOpService, idProvider,
-                connectionTimeoutMillis, monitoringService, baseCapabilities);
+                connectionTimeoutMillis, monitoringService, baseCapabilities,
+                AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
 
