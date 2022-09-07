@@ -12,8 +12,10 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.util.Timer;
 import java.util.Set;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 
 public class NetconfServerSessionNegotiatorFactoryBuilder {
     private Timer timer;
@@ -22,6 +24,8 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
     private long connectionTimeoutMillis;
     private NetconfMonitoringService monitoringService;
     private Set<String> baseCapabilities;
+    private @NonNegative int maximumIncomingChunkSize =
+        AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
 
     public NetconfServerSessionNegotiatorFactoryBuilder() {
     }
@@ -58,13 +62,18 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
         return this;
     }
 
+    public NetconfServerSessionNegotiatorFactoryBuilder setMaximumIncomingChunkSize(
+            final @NonNegative int maximumIncomingChunkSize) {
+        checkArgument(maximumIncomingChunkSize > 0);
+        this.maximumIncomingChunkSize = maximumIncomingChunkSize;
+        return this;
+    }
 
     public NetconfServerSessionNegotiatorFactory build() {
         validate();
         return new NetconfServerSessionNegotiatorFactory(timer, aggregatedOpService, idProvider,
-                connectionTimeoutMillis, monitoringService, baseCapabilities);
+                connectionTimeoutMillis, monitoringService, baseCapabilities, maximumIncomingChunkSize);
     }
-
 
     private void validate() {
         requireNonNull(timer, "timer not initialized");
