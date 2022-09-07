@@ -134,6 +134,11 @@
                 <artifactId>transport-tcp</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-tls</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- YANG models -->
             <!-- RFC5277 NETCONF Event Notifications -->
