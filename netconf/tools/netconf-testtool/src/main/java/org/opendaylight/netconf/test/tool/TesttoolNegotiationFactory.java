@@ -18,6 +18,7 @@ import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +31,15 @@ public class TesttoolNegotiationFactory extends NetconfServerSessionNegotiatorFa
             final SessionIdProvider idProvider, final long connectionTimeoutMillis,
             final NetconfMonitoringService monitoringService) {
         super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService,
-            NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES);
+            NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES,
+            AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
     public TesttoolNegotiationFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
             final SessionIdProvider idProvider, final long connectionTimeoutMillis,
             final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
         super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis,
-            monitoringService, baseCapabilities);
+            monitoringService, baseCapabilities, AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
     @Override

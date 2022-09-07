@@ -15,6 +15,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -31,9 +32,10 @@ public final class NetconfServerSessionNegotiator
 
     NetconfServerSessionNegotiator(final NetconfHelloMessage hello, final long sessionId,
             final Promise<NetconfServerSession> promise, final Channel channel, final Timer timer,
-            final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis) {
+            final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis,
+            final @NonNegative int maximumIncomingChunkSize) {
         super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis,
-            DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
+            maximumIncomingChunkSize);
         this.sessionId = sessionId;
     }
 
