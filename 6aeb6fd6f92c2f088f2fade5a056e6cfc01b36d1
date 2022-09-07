@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e0cfeaa_8cb78cca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9127
+      },
+      "writtenOn": "2022-09-07T11:10:06Z",
+      "side": 1,
+      "message": "Modified the netconf-impl to leverage the max chunk size (NETCONF-888)",
+      "revId": "6aeb6fd6f92c2f088f2fade5a056e6cfc01b36d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
