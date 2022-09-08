@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6a8e1896_a136c5ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 7779
+      },
+      "writtenOn": "2022-09-08T10:48:15Z",
+      "side": 1,
+      "message": "nit: spelling.\nWhat is Teach here, I guess you mean use the chunk size as conveyed by device?",
+      "revId": "6aeb6fd6f92c2f088f2fade5a056e6cfc01b36d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1e0cfeaa_8cb78cca",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
