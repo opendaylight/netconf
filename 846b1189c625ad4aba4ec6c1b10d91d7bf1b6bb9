@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e5b35d4_1e5c56e1",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-09-08T18:10:44Z",
+      "side": 1,
+      "message": "use assertions instead",
+      "range": {
+        "startLine": 196,
+        "startChar": 8,
+        "endLine": 196,
+        "endChar": 35
+      },
+      "revId": "846b1189c625ad4aba4ec6c1b10d91d7bf1b6bb9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
