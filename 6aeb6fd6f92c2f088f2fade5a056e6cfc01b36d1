@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "83dd46ef_0967e43b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9127
+      },
+      "writtenOn": "2022-09-08T15:27:50Z",
+      "side": 1,
+      "message": "In Netconf-888, we have allowed the user to configure the maximum incoming chunk size value. To configure it, user need to set the property \"org.opendaylight.netconf.default.maximum.chunk.size\" in the system property. \n\nIn this patchset, I have modified the netconf-impl bundle to read that configured value.",
+      "parentUuid": "6a8e1896_a136c5ca",
+      "revId": "6aeb6fd6f92c2f088f2fade5a056e6cfc01b36d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1e0cfeaa_8cb78cca",
