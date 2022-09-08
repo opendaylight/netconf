@@ -39,6 +39,30 @@
       },
       "revId": "729abce5daf7d7a82af6ac5ff11cde3b8fa8d66d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b33330d_488b77c1",
+        "filename": "netconf/mdsal-netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/SshProxyServer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2022-09-08T10:29:18Z",
+      "side": 1,
+      "message": "I decided to create new executor because \n- nioExecutor is used to create AsynchronousChannelGroup and the new executor is used to execute resume read which is supposed to run in separate thread\n- also according to documentation of AsynchronousChannelGroup.withThreadPool \"The executor is intended to be used exclusively by the resulting asynchronous channel group.\"",
+      "parentUuid": "487430c0_6187139f",
+      "range": {
+        "startLine": 202,
+        "startChar": 24,
+        "endLine": 202,
+        "endChar": 59
+      },
+      "revId": "729abce5daf7d7a82af6ac5ff11cde3b8fa8d66d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
