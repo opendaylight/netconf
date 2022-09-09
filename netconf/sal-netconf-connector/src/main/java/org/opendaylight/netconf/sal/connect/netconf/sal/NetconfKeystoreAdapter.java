@@ -48,18 +48,14 @@ import org.slf4j.LoggerFactory;
 public final class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<Keystore> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfKeystoreAdapter.class);
 
-    private final InstanceIdentifier<Keystore> keystoreIid = InstanceIdentifier.create(Keystore.class);
-
-    private final DataBroker dataBroker;
     private final Map<String, KeyCredential> pairs = Collections.synchronizedMap(new HashMap<>());
     private final Map<String, PrivateKey> privateKeys = Collections.synchronizedMap(new HashMap<>());
     private final Map<String, TrustedCertificate> trustedCertificates = Collections.synchronizedMap(new HashMap<>());
 
     public NetconfKeystoreAdapter(final DataBroker dataBroker) {
-        this.dataBroker = dataBroker;
-
-        dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
-            keystoreIid), this);
+        dataBroker.registerDataTreeChangeListener(
+            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
+            this);
     }
 
     public Optional<KeyCredential> getKeypairFromId(final String keyId) {
