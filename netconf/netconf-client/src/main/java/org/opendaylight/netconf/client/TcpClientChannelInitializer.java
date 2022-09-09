@@ -11,9 +11,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
-import io.netty.channel.DefaultChannelPromise;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 
@@ -32,14 +31,14 @@ final class TcpClientChannelInitializer extends AbstractClientChannelInitializer
         //success only after successful negotiation.
         ch.pipeline().addFirst(new ChannelOutboundHandlerAdapter() {
             ChannelPromise connectPromise;
-            GenericFutureListener<Future<NetconfClientSession>> negotiationFutureListener;
+            FutureListener<NetconfClientSession> negotiationFutureListener;
 
             @Override
             public void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
                                 final SocketAddress localAddress,
                                 final ChannelPromise channelPromise) {
                 connectPromise = channelPromise;
-                ChannelPromise tcpConnectFuture = new DefaultChannelPromise(ch);
+                ChannelPromise tcpConnectFuture = ch.newPromise();
 
                 negotiationFutureListener = future -> {
                     if (future.isSuccess()) {
