@@ -10,23 +10,20 @@ package org.opendaylight.netconf.callhome.protocol.tls;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.concurrent.FutureListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 
-@SuppressWarnings("rawtypes")
-final class TlsAuthChannelInitializer extends ChannelInitializer {
-
+final class TlsAuthChannelInitializer extends ChannelInitializer<Channel> {
     private static final String SSL_HANDLER_CHANNEL_NAME = "sslHandler";
 
     private final SslHandlerFactory sslHandlerFactory;
-    private final GenericFutureListener listener;
+    private final FutureListener<Channel> listener;
 
-    TlsAuthChannelInitializer(final SslHandlerFactory sslHandlerFactory, final GenericFutureListener listener) {
+    TlsAuthChannelInitializer(final SslHandlerFactory sslHandlerFactory, final FutureListener<Channel> listener) {
         this.sslHandlerFactory = sslHandlerFactory;
         this.listener = listener;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void initChannel(final Channel ch) {
         final SslHandler sslHandler = sslHandlerFactory.createSslHandler();

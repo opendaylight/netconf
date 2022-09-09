@@ -12,12 +12,11 @@ import static java.util.Objects.requireNonNull;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import java.net.InetSocketAddress;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -67,45 +66,38 @@ public final class NetconfCallHomeTlsServer {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.SO_BACKLOG, maxConnections)
             .childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout)
-            .childHandler(new TlsAuthChannelInitializer(sslHandlerFactory, handshakeListener))
-            .bind();
-        bindFuture.addListener(bindListener);
-    }
-
-    GenericFutureListener<Future<Channel>> handshakeListener = new GenericFutureListener<>() {
-        @Override
-        public void operationComplete(final Future<Channel> future) throws Exception {
-            if (future.isSuccess()) {
-                LOG.debug("SSL handshake completed successfully, accepting connection...");
-                final Channel channel = future.get();
-                // If the ssl handshake was successful it is expected that session contains peer certificate(s)
-                final Certificate cert = channel.pipeline().get(SslHandler.class).engine().getSession()
-                    .getPeerCertificates()[0];
-                final PublicKey publicKey = cert.getPublicKey();
-                final Optional<String> deviceId = allowedDevicesMonitor.findDeviceIdByPublicKey(publicKey);
-                if (deviceId.isEmpty()) {
-                    LOG.error("Unable to identify connected device by provided certificate");
-                    channel.close();
+            .childHandler(new TlsAuthChannelInitializer(sslHandlerFactory, future -> {
+                if (future.isSuccess()) {
+                    LOG.debug("SSL handshake completed successfully, accepting connection...");
+                    final Channel channel = future.get();
+                    // If the ssl handshake was successful it is expected that session contains peer certificate(s)
+                    final Certificate cert = channel.pipeline().get(SslHandler.class).engine().getSession()
+                        .getPeerCertificates()[0];
+                    final PublicKey publicKey = cert.getPublicKey();
+                    final Optional<String> deviceId = allowedDevicesMonitor.findDeviceIdByPublicKey(publicKey);
+                    if (deviceId.isEmpty()) {
+                        LOG.error("Unable to identify connected device by provided certificate");
+                        channel.close();
+                    } else {
+                        final CallHomeTlsSessionContext tlsSessionContext = new CallHomeTlsSessionContext(
+                            deviceId.orElseThrow(), channel, sslHandlerFactory, subsystemListener);
+                        tlsSessionContext.openNetconfChannel(channel);
+                    }
                 } else {
-                    final CallHomeTlsSessionContext tlsSessionContext = new CallHomeTlsSessionContext(deviceId.get(),
-                        channel, sslHandlerFactory, subsystemListener);
-                    tlsSessionContext.openNetconfChannel(channel);
+                    LOG.debug("SSL handshake failed, rejecting connection...");
+                    future.get().close();
                 }
+            }))
+            .bind();
+        bindFuture.addListener((ChannelFutureListener) future -> {
+            if (future.isSuccess()) {
+                LOG.debug("Call-Home TLS server bind completed");
             } else {
-                LOG.debug("SSL handshake failed, rejecting connection...");
-                future.get().close();
+                LOG.error("Call-Home TLS server bind failed", future.cause());
             }
-        }
-    };
-
-    GenericFutureListener<ChannelFuture> bindListener = future -> {
-        if (future.isSuccess()) {
-            LOG.debug("Call-Home TLS server bind completed");
-        } else {
-            LOG.error("Call-Home TLS server bind failed", future.cause());
-        }
-        cf = future.channel().closeFuture().addListener(f -> stop());
-    };
+            cf = future.channel().closeFuture().addListener(f -> stop());
+        });
+    }
 
     public void stop() {
         LOG.debug("Stopping the Call-Home TLS server...");
