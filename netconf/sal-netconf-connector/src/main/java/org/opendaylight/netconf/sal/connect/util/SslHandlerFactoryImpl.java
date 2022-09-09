@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.util;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Sets;
@@ -15,7 +14,6 @@ import io.netty.handler.ssl.SslHandler;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.util.Collections;
 import java.util.Set;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -42,11 +40,11 @@ public final class SslHandlerFactoryImpl implements SslHandlerFactory {
 
     @Override
     public SslHandler createSslHandler() {
-        return createSslHandler(Collections.emptySet());
+        return createSslHandler(Set.of());
     }
 
     @Override
-    public SslHandler createSslHandler(Set<String> allowedKeys) {
+    public SslHandler createSslHandler(final Set<String> allowedKeys) {
         try {
             final KeyStore keyStore = keystoreAdapter.getJavaKeyStore(allowedKeys);
 
@@ -64,14 +62,14 @@ public final class SslHandlerFactoryImpl implements SslHandlerFactory {
 
             final String[] engineProtocols = engine.getSupportedProtocols();
             final String[] enabledProtocols;
-            if (specification != null) {
-                checkArgument(specification instanceof TlsCase, "Cannot get TLS specification from: %s", specification);
-
+            if (specification instanceof TlsCase tlsSpecification) {
                 final Set<String> protocols = Sets.newHashSet(engineProtocols);
-                protocols.removeAll(((TlsCase)specification).getTls().getExcludedVersions());
+                protocols.removeAll(tlsSpecification.getTls().getExcludedVersions());
                 enabledProtocols = protocols.toArray(new String[0]);
-            } else {
+            } else if (specification == null) {
                 enabledProtocols = engineProtocols;
+            } else {
+                throw new IllegalArgumentException("Cannot get TLS specification from: " + specification);
             }
 
             engine.setEnabledProtocols(enabledProtocols);
