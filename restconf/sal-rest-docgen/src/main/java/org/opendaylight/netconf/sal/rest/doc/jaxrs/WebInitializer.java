@@ -26,12 +26,12 @@ import org.opendaylight.yangtools.concepts.Registration;
 public class WebInitializer {
     private final Registration registration;
 
-    public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer, ServletSupport servletSupport,
-            Application webApp) throws ServletException {
+    public WebInitializer(final WebServer webServer,  final WebContextSecurer webContextSecurer,
+            final ServletSupport servletSupport, final Application webApp) throws ServletException {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("apidoc").supportsSessions(true)
             .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/swagger2/apis/*").addUrlPattern("/openapi3/apis/*").build())
-            .addResource(ResourceDetails.builder().name("/explorer").build());
+            .addResource(ResourceDetails.builder().name("/explorer/*").build());
 
         webContextSecurer.requireAuthentication(webContextBuilder, "/swagger2/*", "/openapi3/*");
 
