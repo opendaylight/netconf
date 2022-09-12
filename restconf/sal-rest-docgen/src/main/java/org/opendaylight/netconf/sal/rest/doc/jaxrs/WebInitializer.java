@@ -31,7 +31,7 @@ public class WebInitializer {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("apidoc").supportsSessions(true)
             .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/swagger2/apis/*").addUrlPattern("/openapi3/apis/*").build())
-            .addResource(ResourceDetails.builder().name("/explorer").build());
+            .addResource(ResourceDetails.builder().name("/explorer/*").alias("/explorer").build());
 
         webContextSecurer.requireAuthentication(webContextBuilder, "/swagger2/*", "/openapi3/*");
 
