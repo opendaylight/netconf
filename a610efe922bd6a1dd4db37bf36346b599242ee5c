@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc7828fd_34634123",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-09-12T15:58:02Z",
+      "side": 1,
+      "message": "Okay, the spec here is very fuzzy.",
+      "revId": "a610efe922bd6a1dd4db37bf36346b599242ee5c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
