@@ -23,7 +23,7 @@ import org.opendaylight.yangtools.concepts.Registration;
  *
  * @author Thomas Pantelis
  */
-public class WebInitializer {
+public final class WebInitializer implements AutoCloseable {
     private final Registration registration;
 
     public WebInitializer(final WebServer webServer,  final WebContextSecurer webContextSecurer,
@@ -38,6 +38,7 @@ public class WebInitializer {
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
 
+    @Override
     public void close() {
         registration.close();
     }
