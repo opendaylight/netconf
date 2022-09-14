@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.jaxrs;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
@@ -16,16 +17,12 @@ import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 public class ApiDocApplication extends Application {
     private final ApiDocService apiDocService;
 
-    public ApiDocApplication(ApiDocService apiDocService) {
-        this.apiDocService = apiDocService;
+    public ApiDocApplication(final ApiDocService apiDocService) {
+        this.apiDocService = requireNonNull(apiDocService);
     }
 
     @Override
     public Set<Object> getSingletons() {
-        Set<Object> singletons = new HashSet<>();
-        singletons.add(apiDocService);
-        singletons.add(new JaxbContextResolver());
-        singletons.add(new JacksonJaxbJsonProvider());
-        return singletons;
+        return Set.of(apiDocService, new JaxbContextResolver(), new JacksonJaxbJsonProvider());
     }
 }
