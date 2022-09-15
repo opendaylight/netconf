@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7b3457a_9aad9e7e",
+        "filename": "truststore/truststore-none/src/main/java/org/opendaylight/netconf/truststore/none/NoneKeystoreFeatureProvider.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 7779
+      },
+      "writtenOn": "2022-09-15T09:12:25Z",
+      "side": 1,
+      "message": "It shouldn\u0027t matter, but should this class be NoneTrustStoreFeatureProvider?",
+      "revId": "aaaeb08bbad4bf49d2fc5dd9ff01d5dbe0b77746",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
