@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2770629_7a2e3d75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-09-19T08:11:24Z",
+      "side": 1,
+      "message": "Can you tell me what are you trying to implement? Restconf monitoring, something else? This does not look to conform any RFC I know.\n\nInstead of adding new functionality I would prefer to fix existing one according to RFCs. For example: https://datatracker.ietf.org/doc/html/rfc8040#section-9.\n\nIn addition, this patch contains a lot of formatting and general coding mistakes.\n\nI would suggest to stop working on this patch/task and abandon it.",
+      "revId": "7e3786d5e6a2c7e6fdd6d7c0ad72be6f42eff97d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
