@@ -16,6 +16,98 @@
       "message": "LGTM as far as I am concerned",
       "revId": "7d7c126b4523a02a5ba09d9f24f5cd44745dc06c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "122b2401_5e7f7b6a",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-09-19T19:52:59Z",
+      "side": 1,
+      "message": "\"String\" makes assumptions that users have a java.lang.String identifier -- and all we are actually using it for is logging, which invokes a .toString() anyway.\n\nSo this needs to be an Object, with proper documentation as to what it really means. As we discussed \u0027nodeId\u0027 is a *very* bad name in that it is a layering violation (coming all the way from topology-based applications).",
+      "range": {
+        "startLine": 62,
+        "startChar": 18,
+        "endLine": 62,
+        "endChar": 31
+      },
+      "revId": "7d7c126b4523a02a5ba09d9f24f5cd44745dc06c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87c9009b_9fe3041f",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-09-19T19:52:59Z",
+      "side": 1,
+      "message": "please do not perform random reformats",
+      "range": {
+        "startLine": 73,
+        "startChar": 12,
+        "endLine": 73,
+        "endChar": 27
+      },
+      "revId": "7d7c126b4523a02a5ba09d9f24f5cd44745dc06c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1e7b9d3_7e06259b",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-09-19T19:52:59Z",
+      "side": 1,
+      "message": "this is optional, hence there should be a constructor which does *not* take it\nalso logging needs be updated to handle nulls reasonably",
+      "range": {
+        "startLine": 77,
+        "startChar": 20,
+        "endLine": 77,
+        "endChar": 29
+      },
+      "revId": "7d7c126b4523a02a5ba09d9f24f5cd44745dc06c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7feae7b9_c8784388",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-09-19T19:52:59Z",
+      "side": 1,
+      "message": "there is a ton of duplicated code just to a message differing in \"closed by client\" vs \"terminated by remote host\". Refactor accordingly.",
+      "range": {
+        "startLine": 218,
+        "startChar": 8,
+        "endLine": 220,
+        "endChar": 9
+      },
+      "revId": "7d7c126b4523a02a5ba09d9f24f5cd44745dc06c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
