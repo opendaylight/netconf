@@ -89,6 +89,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aea39e68_ca6ba206",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-09-19T19:53:51Z",
+      "side": 1,
+      "message": "and that will mean that the scope of this patch is going to be much smaller, as test tool and UTs will just use that constructor",
+      "parentUuid": "d1e7b9d3_7e06259b",
+      "range": {
+        "startLine": 77,
+        "startChar": 20,
+        "endLine": 77,
+        "endChar": 29
+      },
+      "revId": "7d7c126b4523a02a5ba09d9f24f5cd44745dc06c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7feae7b9_c8784388",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
         "patchSetId": 6
