@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b56ffbb6_0a1bef9f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-09-20T08:23:08Z",
+      "side": 1,
+      "message": "I suspected as much. As I mentioned on the TSC call, this really needs a tie-in with netconf code -- e.g. a test where the same model is used with outputs tested in these three tests and checking whether they translate to correct filter requests.",
+      "revId": "3ebaea6b979caf612be4005bbf4c7489c1c5fba0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dd1c90f9_5798ebfc",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/NetconfFieldsTranslator.java",
         "patchSetId": 8
