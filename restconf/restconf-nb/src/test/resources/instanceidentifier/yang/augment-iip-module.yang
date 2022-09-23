@@ -22,6 +22,21 @@ module augment-iip-module {
           }
         }
       }
+      choice patch-choice2 {
+        case patch-case11 {
+          choice patch-sub-choice11 {
+            case patch-sub-case11 {
+              choice patch-sub-sub-choice11 {
+                case patch-sub-sub-case11 {
+                  leaf case-leaf11 {
+                    type string;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
       leaf leaf1 {
         type string;
       }
