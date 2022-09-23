@@ -1,0 +1,33 @@
+<notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+    <eventTime>2022-09-22T19:12:43.454820324+02:00</eventTime>
+    <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
+        <data-change-event>
+            <path>
+                /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11
+            </path>
+            <operation>deleted</operation>
+        </data-change-event>
+        <data-change-event>
+            <path>
+                /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name
+            </path>
+            <operation>deleted</operation>
+        </data-change-event>
+        <data-change-event>
+            <path>
+                /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12
+            </path>
+            <operation>deleted</operation>
+        </data-change-event>
+        <data-change-event>
+            <path>/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:leaf1</path>
+            <operation>deleted</operation>
+        </data-change-event>
+        <data-change-event>
+            <path>
+                /instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice2/augment-instance-identifier-patch-module:patch-sub-choice11/augment-instance-identifier-patch-module:patch-sub-sub-choice11/augment-instance-identifier-patch-module:case-leaf11
+            </path>
+            <operation>deleted</operation>
+        </data-change-event>
+    </data-changed-notification>
+</notification>

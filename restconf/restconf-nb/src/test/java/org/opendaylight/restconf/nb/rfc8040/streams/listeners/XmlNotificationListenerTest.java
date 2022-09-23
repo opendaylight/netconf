@@ -212,6 +212,7 @@ public class XmlNotificationListenerTest {
             throws Exception {
         final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
                 schemaPathNotifi, "xml-stream", NotificationOutputTypeGrouping.NotificationOutputType.XML);
-        return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false, false).get();
+        return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false,
+                false, false).get();
     }
 }
