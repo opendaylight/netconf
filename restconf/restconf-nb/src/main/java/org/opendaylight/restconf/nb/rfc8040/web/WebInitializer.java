@@ -7,6 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.web;
 
+import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.DATA_SUBSCRIPTION;
+import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
+import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.BASE_URI_PATTERN;
+
 import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -24,9 +28,7 @@ import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.nb.rfc8040.DataStreamApplication;
 import org.opendaylight.restconf.nb.rfc8040.RestconfApplication;
 import org.opendaylight.restconf.nb.rfc8040.RootFoundApplication;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.concepts.Registration;
 
 /**
@@ -48,27 +50,24 @@ public class WebInitializer {
             .contextPath("/")
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
-                .addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/*")
+                .addUrlPattern("/" + BASE_URI_PATTERN + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(webApp).build())
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/notif/*")
+                .addUrlPattern("/" + BASE_URI_PATTERN + "/notif/*")
                 .servlet(servletSupport.createHttpServletBuilder(webAppNotif).build())
                 .name("notificationServlet")
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addAllUrlPatterns(List.of(
-                    RestconfConstants.BASE_URI_PATTERN + "/" + RestconfStreamsConstants.DATA_SUBSCRIPTION + "/*",
-                    RestconfConstants.BASE_URI_PATTERN + "/" + RestconfStreamsConstants.NOTIFICATION_STREAM + "/*"))
+                .addAllUrlPatterns(List.of("/" + BASE_URI_PATTERN +  "/" + DATA_SUBSCRIPTION + "/*",
+                        "/" + BASE_URI_PATTERN + "/" + NOTIFICATION_STREAM + "/*"))
                 .servlet(webSocketServlet)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern(".well-known/*")
-                .servlet(servletSupport.createHttpServletBuilder(
-                    new RootFoundApplication(RestconfConstants.BASE_URI_PATTERN))
-                    .build())
+                .addUrlPattern("/.well-known/*")
+                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(BASE_URI_PATTERN)).build())
                 .name("Rootfound")
                 .build())
 
@@ -79,7 +78,7 @@ public class WebInitializer {
                 .asyncSupported(true)
                 .build());
 
-        webContextSecurer.requireAuthentication(webContextBuilder, true, RestconfConstants.BASE_URI_PATTERN + "/*");
+        webContextSecurer.requireAuthentication(webContextBuilder, true, "/" + BASE_URI_PATTERN + "/*");
 
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
