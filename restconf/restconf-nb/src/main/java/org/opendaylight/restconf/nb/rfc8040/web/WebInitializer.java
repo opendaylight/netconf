@@ -48,24 +48,25 @@ public class WebInitializer {
             .contextPath("/")
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
-                .addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/*")
+                .addUrlPattern("/" + RestconfConstants.BASE_URI_PATTERN + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(webApp).build())
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/notif/*")
+                .addUrlPattern("/" + RestconfConstants.BASE_URI_PATTERN + "/notif/*")
                 .servlet(servletSupport.createHttpServletBuilder(webAppNotif).build())
                 .name("notificationServlet")
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
                 .addAllUrlPatterns(List.of(
-                    RestconfConstants.BASE_URI_PATTERN + "/" + RestconfStreamsConstants.DATA_SUBSCRIPTION + "/*",
-                    RestconfConstants.BASE_URI_PATTERN + "/" + RestconfStreamsConstants.NOTIFICATION_STREAM + "/*"))
+                    "/" + RestconfConstants.BASE_URI_PATTERN + "/" + RestconfStreamsConstants.DATA_SUBSCRIPTION + "/*",
+                    "/" + RestconfConstants.BASE_URI_PATTERN + "/" + RestconfStreamsConstants.NOTIFICATION_STREAM
+                    + "/*"))
                 .servlet(webSocketServlet)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern(".well-known/*")
+                .addUrlPattern("/well-known/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new RootFoundApplication(RestconfConstants.BASE_URI_PATTERN))
                     .build())
