@@ -52,8 +52,8 @@ public class SshProxyServer implements AutoCloseable {
             final IoServiceFactoryFactory serviceFactory) {
         this.minaTimerExecutor = minaTimerExecutor;
         this.clientGroup = clientGroup;
-        this.nioServiceWithPoolFactoryFactory = serviceFactory;
-        this.sshServer = SshServer.setUpDefaultServer();
+        nioServiceWithPoolFactoryFactory = serviceFactory;
+        sshServer = SshServer.setUpDefaultServer();
     }
 
     public SshProxyServer(final ScheduledExecutorService minaTimerExecutor,
@@ -179,10 +179,10 @@ public class SshProxyServer implements AutoCloseable {
     }
 
     private static final class NioServiceWithPoolFactoryFactory extends Nio2ServiceFactoryFactory {
-        private final ExecutorService nioExecutor;
+        private final ExecutorServiceFacade nioExecutor;
 
         NioServiceWithPoolFactoryFactory(final ExecutorService nioExecutor) {
-            this.nioExecutor = nioExecutor;
+            this.nioExecutor = new ExecutorServiceFacade(nioExecutor);
         }
 
         @Override
