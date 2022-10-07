@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.ForwardingExecutorService;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.nio.channels.AsynchronousChannelGroup;
@@ -188,7 +189,18 @@ public class SshProxyServer implements AutoCloseable {
         @Override
         public IoServiceFactory create(final FactoryManager manager) {
             try {
-                return new NioServiceWithPoolFactory(manager, AsynchronousChannelGroup.withThreadPool(nioExecutor));
+                return new NioServiceWithPoolFactory(manager, AsynchronousChannelGroup
+                        .withThreadPool(new ForwardingExecutorService() {
+                            @Override
+                            protected ExecutorService delegate() {
+                                return nioExecutor;
+                            }
+
+                            @Override
+                            public void shutdown() {
+                                // NO-OP
+                            }
+                        }));
             } catch (final IOException e) {
                 throw new RuntimeSshException("Failed to create channel group", e);
             }
