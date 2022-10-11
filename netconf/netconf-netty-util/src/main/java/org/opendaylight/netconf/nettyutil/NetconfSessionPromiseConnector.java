@@ -16,6 +16,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -24,18 +25,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
-final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromise<S> {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionPromise.class);
+final class NetconfSessionPromiseConnector {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionPromiseConnector.class);
     private final ReconnectStrategy strategy;
     private InetSocketAddress address;
     private final Bootstrap bootstrap;
 
+    private NetconfSessionPromise<NetconfSession> netconfSessionPromise;
+
     @GuardedBy("this")
     private Future<?> pending;
 
-    NetconfSessionPromise(final EventExecutor executor, final InetSocketAddress address,
-            final ReconnectStrategy strategy, final Bootstrap bootstrap) {
-        super(executor);
+    NetconfSessionPromiseConnector(final EventExecutor executor, final InetSocketAddress address,
+                                   final ReconnectStrategy strategy, final Bootstrap bootstrap) {
+        this.netconfSessionPromise = new NetconfSessionPromise<>(executor);
         this.strategy = requireNonNull(strategy);
         this.address = requireNonNull(address);
         this.bootstrap = requireNonNull(bootstrap);
@@ -48,7 +51,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
             timeout = strategy.getConnectTimeout();
         } catch (Exception e) {
             LOG.info("Connection to {} aborted due to strategy decision", address, e);
-            setFailure(e);
+            netconfSessionPromise.setFailure(e);
             return;
         }
 
@@ -62,30 +65,13 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
             connectFuture = bootstrap.connect(address);
         } catch (final Exception e) {
             LOG.info("Failed to connect to {}", address, e);
-            setFailure(e);
+            netconfSessionPromise.setFailure(e);
             return;
         }
 
         pending = connectFuture;
         // Add listener that attempts reconnect by invoking this method again.
         connectFuture.addListener((ChannelFutureListener) this::channelConnectComplete);
-    }
-
-    @Override
-    public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
-        if (super.cancel(mayInterruptIfRunning)) {
-            pending.cancel(mayInterruptIfRunning);
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public synchronized Promise<S> setSuccess(final S result) {
-        LOG.debug("Promise {} completed", this);
-        strategy.reconnectSuccessful();
-        return super.setSuccess(result);
     }
 
     // Triggered when a connection attempt is resolved.
@@ -102,7 +88,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
          * stop the notification arriving, so we have to close
          * the race here.
          */
-        if (isCancelled()) {
+        if (netconfSessionPromise.isCancelled()) {
             if (cf.isSuccess()) {
                 LOG.debug("Closing channel for cancelled promise {}", this);
                 cf.channel().close();
@@ -118,6 +104,9 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
         LOG.debug("Attempt to connect to {} failed", address, cf.cause());
 
         final Future<Void> rf = strategy.scheduleReconnect(cf.cause());
+
+        resetPromiseIfIsDone();
+
         pending = rf;
         rf.addListener(this::reconnectFutureComplete);
     }
@@ -135,12 +124,52 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
          * listener has not yet been notified -- if cancellation
          * happens at that point, we need to catch it here.
          */
-        if (!isCancelled()) {
+        if (!netconfSessionPromise.isCancelled()) {
             if (sf.isSuccess()) {
                 connect();
             } else {
-                setFailure(sf.cause());
+                netconfSessionPromise.setFailure(sf.cause());
             }
+        }
+    }
+    private void resetPromiseIfIsDone() {
+        if (netconfSessionPromise.isDone() && !netconfSessionPromise.isSuccess()) {
+            final var executor = netconfSessionPromise.getExecutor();
+            if (executor != null) {
+                netconfSessionPromise = new NetconfSessionPromise<>(executor);
+            }
+        }
+    }
+
+    public Promise<?> getNetconfSessionPromise() {
+        return netconfSessionPromise;
+    }
+
+    private class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromise<S> {
+
+        public NetconfSessionPromise(EventExecutor executor) {
+            super(executor);
+        }
+
+        @Override
+        public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
+            if (super.cancel(mayInterruptIfRunning)) {
+                pending.cancel(mayInterruptIfRunning);
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        public synchronized Promise<S> setSuccess(final S result) {
+            LOG.debug("Promise {} completed", this);
+            strategy.reconnectSuccessful();
+            return super.setSuccess(result);
+        }
+
+        public EventExecutor getExecutor() {
+            return executor();
         }
     }
 }

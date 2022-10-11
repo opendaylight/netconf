@@ -167,12 +167,12 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
     protected Future<S> createClient(final InetSocketAddress address, final ReconnectStrategy strategy,
             final PipelineInitializer<S> initializer) {
         final Bootstrap b = new Bootstrap();
-        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, strategy, b);
+        final NetconfSessionPromiseConnector p = new NetconfSessionPromiseConnector(executor, address, strategy, b);
         b.option(ChannelOption.SO_KEEPALIVE, true).handler(
                 new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(final SocketChannel ch) {
-                        initializer.initializeChannel(ch, p);
+                        initializer.initializeChannel(ch, (Promise<S>) p.getNetconfSessionPromise());
                     }
                 });
 
@@ -182,7 +182,7 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
 
         p.connect();
         LOG.debug("Client created.");
-        return p;
+        return (Promise<S>) p.getNetconfSessionPromise();
     }
 
     /**
@@ -193,19 +193,19 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
      */
     protected Future<S> createClient(final InetSocketAddress address, final ReconnectStrategy strategy,
             final Bootstrap bootstrap, final PipelineInitializer<S> initializer) {
-        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, strategy, bootstrap);
-
+        final NetconfSessionPromiseConnector p = new NetconfSessionPromiseConnector(executor, address, strategy,
+                bootstrap);
         bootstrap.handler(
                 new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(final SocketChannel ch) {
-                        initializer.initializeChannel(ch, p);
+                        initializer.initializeChannel(ch, (Promise<S>) p.getNetconfSessionPromise());
                     }
                 });
 
         p.connect();
         LOG.debug("Client created.");
-        return p;
+        return (Promise<S>) p.getNetconfSessionPromise();
     }
 
     /**
