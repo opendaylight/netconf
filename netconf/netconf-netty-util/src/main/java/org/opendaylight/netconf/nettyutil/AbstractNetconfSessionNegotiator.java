@@ -21,9 +21,9 @@ import io.netty.util.Timeout;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
@@ -83,9 +83,9 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         if (ifNegotiatedAlready()) {
             LOG.debug("Negotiation on channel {} already started", channel);
         } else {
-            final Optional<SslHandler> sslHandler = getSslHandler(channel);
-            if (sslHandler.isPresent()) {
-                sslHandler.get().handshakeFuture().addListener(future -> {
+            final var sslHandler = getSslHandler(channel);
+            if (sslHandler != null) {
+                sslHandler.handshakeFuture().addListener(future -> {
                     checkState(future.isSuccess(), "Ssl handshake was not successful");
                     LOG.debug("Ssl handshake complete");
                     start();
@@ -101,8 +101,8 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         return this.state != State.IDLE;
     }
 
-    private static Optional<SslHandler> getSslHandler(final Channel channel) {
-        return Optional.ofNullable(channel.pipeline().get(SslHandler.class));
+    private static @Nullable SslHandler getSslHandler(final Channel channel) {
+        return channel.pipeline().get(SslHandler.class);
     }
 
     public P getSessionPreferences() {
