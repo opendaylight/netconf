@@ -52,30 +52,20 @@ public class NetconfClientDispatcherImpl
 
     @Override
     public Future<NetconfClientSession> createClient(final NetconfClientConfiguration clientConfiguration) {
-        switch (clientConfiguration.getProtocol()) {
-            case TCP:
-                return createTcpClient(clientConfiguration);
-            case SSH:
-                return createSshClient(clientConfiguration);
-            case TLS:
-                return createTlsClient(clientConfiguration);
-            default:
-                throw new IllegalArgumentException("Unknown client protocol " + clientConfiguration.getProtocol());
-        }
+        return switch (clientConfiguration.getProtocol()) {
+            case TCP -> createTcpClient(clientConfiguration);
+            case SSH -> createSshClient(clientConfiguration);
+            case TLS -> createTlsClient(clientConfiguration);
+        };
     }
 
     @Override
     public ReconnectFuture createReconnectingClient(final NetconfReconnectingClientConfiguration clientConfiguration) {
-        switch (clientConfiguration.getProtocol()) {
-            case TCP:
-                return createReconnectingTcpClient(clientConfiguration);
-            case SSH:
-                return createReconnectingSshClient(clientConfiguration);
-            case TLS:
-                return createReconnectingTlsClient(clientConfiguration);
-            default:
-                throw new IllegalArgumentException("Unknown client protocol " + clientConfiguration.getProtocol());
-        }
+        return switch (clientConfiguration.getProtocol()) {
+            case TCP -> createReconnectingTcpClient(clientConfiguration);
+            case SSH -> createReconnectingSshClient(clientConfiguration);
+            case TLS -> createReconnectingTlsClient(clientConfiguration);
+        };
     }
 
     private Future<NetconfClientSession> createTcpClient(final NetconfClientConfiguration currentConfiguration) {
