@@ -23,6 +23,7 @@ import io.netty.util.concurrent.Promise;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -84,8 +85,8 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     private final L sessionListener;
     private final Timer timer;
 
+    @GuardedBy("this")
     private Timeout timeoutTask;
-
     @GuardedBy("this")
     private State state = State.IDLE;
 
@@ -149,15 +150,26 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         sendMessage(localHello);
 
         replaceHelloMessageOutboundHandler();
-        changeState(State.OPEN_WAIT);
 
-        timeoutTask = this.timer.newTimeout(this::timeoutExpired, connectionTimeoutMillis, TimeUnit.MILLISECONDS);
+        synchronized (this) {
+            lockedChangeState(State.OPEN_WAIT);
+
+            // Service the timeout on channel's eventloop, so that we do not get state transition problems
+            timeoutTask = timer.newTimeout(unused -> channel.eventLoop().execute(this::timeoutExpired),
+                connectionTimeoutMillis, TimeUnit.MILLISECONDS);
+        }
     }
 
-    private synchronized void timeoutExpired(final Timeout timeout) {
+    private synchronized void timeoutExpired() {
+        if (timeoutTask == null) {
+            // cancelTimeout() between expiry and execution on the loop
+            return;
+        }
+        timeoutTask = null;
+
         if (state != State.ESTABLISHED) {
-            LOG.debug("Connection timeout after {}, session backed by channel {} is in state {}", timeout, channel,
-                state);
+            LOG.debug("Connection timeout after {}ms, session backed by channel {} is in state {}",
+                connectionTimeoutMillis, channel, state);
 
             // Do not fail negotiation if promise is done or canceled
             // It would result in setting result of the promise second time and that throws exception
@@ -179,9 +191,10 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         }
     }
 
-    private void cancelTimeout() {
-        if (timeoutTask != null) {
-            timeoutTask.cancel();
+    private synchronized void cancelTimeout() {
+        if (timeoutTask != null && !timeoutTask.cancel()) {
+            // Late-coming cancel: make sure
+            timeoutTask = null;
         }
     }
 
@@ -253,6 +266,11 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     }
 
     private synchronized void changeState(final State newState) {
+        lockedChangeState(newState);
+    }
+
+    @Holding("this")
+    private void lockedChangeState(final State newState) {
         LOG.debug("Changing state from : {} to : {} for channel: {}", state, newState, channel);
         checkState(isStateChangePermitted(state, newState),
                 "Cannot change state from %s to %s for channel %s", state, newState, channel);
