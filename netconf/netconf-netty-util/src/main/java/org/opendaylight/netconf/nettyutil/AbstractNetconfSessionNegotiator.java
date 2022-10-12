@@ -151,13 +151,21 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         replaceHelloMessageOutboundHandler();
         changeState(State.OPEN_WAIT);
 
-        timeoutTask = this.timer.newTimeout(this::timeoutExpired, connectionTimeoutMillis, TimeUnit.MILLISECONDS);
+        // Service the timeout on channel's eventloop, so that we do not get state transition problems
+        timeoutTask = timer.newTimeout(unused -> channel.eventLoop().execute(this::timeoutExpired),
+            connectionTimeoutMillis, TimeUnit.MILLISECONDS);
     }
 
-    private synchronized void timeoutExpired(final Timeout timeout) {
+    private synchronized void timeoutExpired() {
+        if (timeoutTask == null) {
+            // cancelTimeout() between expiry and execution on the loop
+            return;
+        }
+        timeoutTask = null;
+
         if (state != State.ESTABLISHED) {
-            LOG.debug("Connection timeout after {}, session backed by channel {} is in state {}", timeout, channel,
-                state);
+            LOG.debug("Connection timeout after {}ms, session backed by channel {} is in state {}",
+                connectionTimeoutMillis, channel, state);
 
             // Do not fail negotiation if promise is done or canceled
             // It would result in setting result of the promise second time and that throws exception
@@ -179,9 +187,10 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         }
     }
 
-    private void cancelTimeout() {
-        if (timeoutTask != null) {
-            timeoutTask.cancel();
+    private synchronized void cancelTimeout() {
+        if (timeoutTask != null && !timeoutTask.cancel()) {
+            // Late-coming cancel: make sure
+            timeoutTask = null;
         }
     }
 
