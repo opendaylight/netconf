@@ -131,6 +131,7 @@ public class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
 
         captor.getValue().run(timeout);
+        channel.runPendingTasks();
         verify(closedDetector).close(any(), any());
     }
 
