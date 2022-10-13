@@ -16,26 +16,30 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 
 final class SshClientChannelInitializer extends AbstractClientChannelInitializer {
     private final AuthenticationHandler authenticationHandler;
-    private final NetconfSshClient sshClient;
+    private final @Nullable NetconfSshClient sshClient;
+    private final @Nullable String name;
 
     SshClientChannelInitializer(final AuthenticationHandler authHandler,
             final NetconfClientSessionNegotiatorFactory negotiatorFactory,
-            final NetconfClientSessionListener sessionListener, @Nullable final NetconfSshClient sshClient) {
+            final NetconfClientSessionListener sessionListener, final @Nullable NetconfSshClient sshClient,
+            final @Nullable String name) {
         super(negotiatorFactory, sessionListener);
         authenticationHandler = authHandler;
         this.sshClient = sshClient;
+        this.name = name;
     }
 
     SshClientChannelInitializer(final AuthenticationHandler authHandler,
             final NetconfClientSessionNegotiatorFactory negotiatorFactory,
             final NetconfClientSessionListener sessionListener) {
-        this(authHandler, negotiatorFactory, sessionListener, null);
+        this(authHandler, negotiatorFactory, sessionListener, null, null);
     }
 
     @Override
     public void initialize(final Channel ch, final Promise<NetconfClientSession> promise) {
         // ssh handler has to be the first handler in pipeline
-        ch.pipeline().addFirst(AsyncSshHandler.createForNetconfSubsystem(authenticationHandler, promise, sshClient));
+        var asyncHandler = AsyncSshHandler.createForNetconfSubsystem(authenticationHandler, promise, sshClient, name);
+        ch.pipeline().addFirst(asyncHandler);
         super.initialize(ch, promise);
     }
 }

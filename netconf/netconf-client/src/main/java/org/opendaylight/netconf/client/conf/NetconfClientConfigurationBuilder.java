@@ -39,6 +39,7 @@ public class NetconfClientConfigurationBuilder {
     private List<Uri> odlHelloCapabilities;
     private @NonNegative int maximumIncomingChunkSize =
         AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
+    private String name;
 
     protected NetconfClientConfigurationBuilder() {
     }
@@ -104,6 +105,12 @@ public class NetconfClientConfigurationBuilder {
     }
 
     @SuppressWarnings("checkstyle:hiddenField")
+    public NetconfClientConfigurationBuilder withName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withOdlHelloCapabilities(final List<Uri> odlHelloCapabilities) {
         this.odlHelloCapabilities = odlHelloCapabilities;
         return this;
@@ -161,9 +168,13 @@ public class NetconfClientConfigurationBuilder {
         return maximumIncomingChunkSize;
     }
 
+    final String getName() {
+        return name;
+    }
+
     public NetconfClientConfiguration build() {
         return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
                 sessionListener, reconnectStrategy, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities,
-                maximumIncomingChunkSize);
+                maximumIncomingChunkSize, name);
     }
 }

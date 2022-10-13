@@ -23,7 +23,6 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 
 public final class NetconfReconnectingClientConfiguration extends NetconfClientConfiguration {
-
     private final ReconnectStrategyFactory connectStrategyFactory;
 
     NetconfReconnectingClientConfiguration(final NetconfClientProtocol clientProtocol, final InetSocketAddress address,
@@ -36,9 +35,10 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
                                            final SslHandlerFactory sslHandlerFactory,
                                            final NetconfSshClient sshClient,
                                            final List<Uri> odlHelloCapabilities,
-                                           final @NonNegative int maximumIncomingChunkSize) {
+                                           final @NonNegative int maximumIncomingChunkSize,
+                                           final String name) {
         super(clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener, reconnectStrategy,
-                authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities, maximumIncomingChunkSize);
+                authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities, maximumIncomingChunkSize, name);
         this.connectStrategyFactory = connectStrategyFactory;
         validateReconnectConfiguration();
     }

@@ -41,7 +41,7 @@ public final class NetconfReconnectingClientConfigurationBuilder extends Netconf
         return new NetconfReconnectingClientConfiguration(getProtocol(), getAddress(), getConnectionTimeoutMillis(),
                 getAdditionalHeader(), getSessionListener(), getReconnectStrategy(), connectStrategyFactory,
                 getAuthHandler(), getSslHandlerFactory(), getSshClient(), getOdlHelloCapabilities(),
-                getMaximumIncomingChunkSize());
+                getMaximumIncomingChunkSize(), getName());
     }
 
     // Override setter methods to return subtype
@@ -97,6 +97,11 @@ public final class NetconfReconnectingClientConfigurationBuilder extends Netconf
     public NetconfReconnectingClientConfigurationBuilder withSshClient(
         final NetconfSshClient sshClient) {
         return (NetconfReconnectingClientConfigurationBuilder) super.withSshClient(sshClient);
+    }
+
+    @Override
+    public NetconfReconnectingClientConfigurationBuilder withName(final String name) {
+        return (NetconfReconnectingClientConfigurationBuilder) super.withName(name);
     }
 
     @Override

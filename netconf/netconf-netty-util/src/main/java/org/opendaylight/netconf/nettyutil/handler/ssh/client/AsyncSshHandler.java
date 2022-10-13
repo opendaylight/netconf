@@ -73,6 +73,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private final AuthenticationHandler authenticationHandler;
     private final Future<?> negotiationFuture;
     private final NetconfSshClient sshClient;
+    private final String name;
 
     // Initialized by connect()
     @GuardedBy("this")
@@ -85,11 +86,17 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     private volatile boolean disconnected;
 
-    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
-            final Future<?> negotiationFuture) {
+    private AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
+            final @Nullable Future<?> negotiationFuture, final @Nullable String name) {
         this.authenticationHandler = requireNonNull(authenticationHandler);
         this.sshClient = requireNonNull(sshClient);
         this.negotiationFuture = negotiationFuture;
+        this.name = name != null && !name.isBlank() ? name : "UNNAMED";
+    }
+
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
+            final @Nullable Future<?> negotiationFuture) {
+        this(authenticationHandler, sshClient, negotiationFuture, null);
     }
 
     /**
@@ -115,9 +122,10 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @return                      {@code AsyncSshHandler}
      */
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
-            final Future<?> negotiationFuture, final @Nullable NetconfSshClient sshClient) {
+            final Future<?> negotiationFuture, final @Nullable NetconfSshClient sshClient,
+            final @Nullable String name) {
         return new AsyncSshHandler(authenticationHandler, sshClient != null ? sshClient : DEFAULT_CLIENT,
-                negotiationFuture);
+                negotiationFuture, name);
     }
 
     @Override
@@ -128,7 +136,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     @Override
     public synchronized void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
             final SocketAddress localAddress, final ChannelPromise promise) throws IOException {
-        LOG.debug("SSH session connecting on channel {}. promise: {}", ctx.channel(), promise);
+        LOG.debug("{}: SSH session connecting on channel {}. promise: {}", name, ctx.channel(), promise);
         connectPromise = requireNonNull(promise);
 
         if (negotiationFuture != null) {
@@ -141,7 +149,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             negotiationFuture.addListener(negotiationFutureListener);
         }
 
-        LOG.debug("Starting SSH to {} on channel: {}", remoteAddress, ctx.channel());
+        LOG.debug("{}: Starting SSH to {} on channel: {}", name, remoteAddress, ctx.channel());
         sshClient.connect(authenticationHandler.getUsername(), remoteAddress)
             // FIXME: this is a blocking call, we should handle this with a concurrently-scheduled timeout. We do not
             //        have a Timer ready, so perhaps we should be using the event loop?
@@ -157,7 +165,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         }
 
         final var clientSession = connectFuture.getSession();
-        LOG.trace("SSH session {} created on channel: {}", clientSession, ctx.channel());
+        LOG.trace("{}: SSH session {} created on channel: {}", name, clientSession, ctx.channel());
         verify(clientSession instanceof NettyAwareClientSession, "Unexpected session %s", clientSession);
 
         final var localSession = (NettyAwareClientSession) clientSession;
@@ -182,11 +190,11 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             return;
         }
         if (disconnected) {
-            LOG.debug("Skipping SSH subsystem allocation, channel: {}", ctx.channel());
+            LOG.debug("{}: Skipping SSH subsystem allocation, channel: {}", name, ctx.channel());
             return;
         }
 
-        LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
+        LOG.debug("{}: SSH session authenticated on channel: {}, server version: {}", name, ctx.channel(),
             clientSession.getServerVersion());
 
         final OpenFuture openFuture;
@@ -212,11 +220,11 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             return;
         }
         if (disconnected) {
-            LOG.trace("Skipping activation, channel: {}", ctx.channel());
+            LOG.trace("{}: Skipping activation, channel: {}", name, ctx.channel());
             return;
         }
 
-        LOG.trace("SSH subsystem channel opened successfully on channel: {}", ctx.channel());
+        LOG.trace("{}: SSH subsystem channel opened successfully on channel: {}", name, ctx.channel());
         if (negotiationFuture == null) {
             connectPromise.setSuccess();
         }
@@ -228,7 +236,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     @Holding("this")
     private void onOpenFailure(final ChannelHandlerContext ctx, final Throwable cause) {
-        LOG.warn("Unable to setup SSH connection on channel: {}", ctx.channel(), cause);
+        LOG.warn("{}: Unable to setup SSH connection on channel: {}", name, ctx.channel(), cause);
 
         // If the promise is not yet done, we have failed with initial connect and set connectPromise to failure
         if (!connectPromise.isDone()) {
@@ -255,7 +263,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     // the channel's executor.
     @SuppressWarnings("checkstyle:IllegalCatch")
     private synchronized void safelyDisconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
-        LOG.trace("Closing SSH session on channel: {} with connect promise in state: {}", ctx.channel(),
+        LOG.trace("{}: Closing SSH session on channel: {} with connect promise in state: {}", name, ctx.channel(),
             connectPromise);
 
         // If we have already succeeded and the session was dropped after,
@@ -300,7 +308,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             // Disconnect has to be closed after inactive channel event was fired, because it interferes with it
             super.disconnect(ctx, ctx.newPromise());
         } catch (final Exception e) {
-            LOG.warn("Unable to cleanup all resources for channel: {}. Ignoring.", ctx.channel(), e);
+            LOG.warn("{}: Unable to cleanup all resources for channel: {}. Ignoring.", name, ctx.channel(), e);
         }
 
         if (channel != null) {
@@ -310,6 +318,6 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             channel = null;
         }
         promise.setSuccess();
-        LOG.debug("SSH session closed on channel: {}", ctx.channel());
+        LOG.debug("{}: SSH session closed on channel: {}", name, ctx.channel());
     }
 }
