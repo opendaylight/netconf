@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35a19e04_539dca46",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-10-13T13:27:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "122b2401_5e7f7b6a",
+      "range": {
+        "startLine": 62,
+        "startChar": 18,
+        "endLine": 62,
+        "endChar": 31
+      },
+      "revId": "7d7c126b4523a02a5ba09d9f24f5cd44745dc06c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87c9009b_9fe3041f",
@@ -54,6 +78,30 @@
       "writtenOn": "2022-09-19T19:52:59Z",
       "side": 1,
       "message": "please do not perform random reformats",
+      "range": {
+        "startLine": 73,
+        "startChar": 12,
+        "endLine": 73,
+        "endChar": 27
+      },
+      "revId": "7d7c126b4523a02a5ba09d9f24f5cd44745dc06c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed805807_3d7ccebe",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-10-13T13:27:50Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "87c9009b_9fe3041f",
       "range": {
         "startLine": 73,
         "startChar": 12,
@@ -111,6 +159,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1bb7321_49a5b213",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-10-13T13:27:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aea39e68_ca6ba206",
+      "range": {
+        "startLine": 77,
+        "startChar": 20,
+        "endLine": 77,
+        "endChar": 29
+      },
+      "revId": "7d7c126b4523a02a5ba09d9f24f5cd44745dc06c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7feae7b9_c8784388",
@@ -124,6 +196,30 @@
       "writtenOn": "2022-09-19T19:52:59Z",
       "side": 1,
       "message": "there is a ton of duplicated code just to a message differing in \"closed by client\" vs \"terminated by remote host\". Refactor accordingly.",
+      "range": {
+        "startLine": 218,
+        "startChar": 8,
+        "endLine": 220,
+        "endChar": 9
+      },
+      "revId": "7d7c126b4523a02a5ba09d9f24f5cd44745dc06c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9a8b271_cae63210",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-10-13T13:27:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7feae7b9_c8784388",
       "range": {
         "startLine": 218,
         "startChar": 8,

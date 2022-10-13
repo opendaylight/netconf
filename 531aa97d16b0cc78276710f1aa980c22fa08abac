@@ -16,6 +16,24 @@
       "message": "if we are dropping synchronized, it should be replaced by @Holding",
       "revId": "531aa97d16b0cc78276710f1aa980c22fa08abac",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a17976f1_239ae6c0",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-10-13T13:27:50Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "97c4608b_3f235758",
+      "revId": "531aa97d16b0cc78276710f1aa980c22fa08abac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
