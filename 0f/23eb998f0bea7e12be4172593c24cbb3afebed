@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng ODL
+Code-Review+2: Robert Varga <nite@hq.sk>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Thu, 13 Oct 2022 14:27:16 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/102668
+Project: netconf
+Branch: refs/heads/3.0.x
