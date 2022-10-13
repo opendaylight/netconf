@@ -193,7 +193,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
 
     private synchronized void cancelTimeout() {
         if (timeoutTask != null && !timeoutTask.cancel()) {
-            // Late-coming cancel: make sure
+            // Late-coming cancel: make sure the task does not actually run
             timeoutTask = null;
         }
     }
