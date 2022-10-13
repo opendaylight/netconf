@@ -43,6 +43,7 @@ public class NetconfClientConfiguration {
 
     private final List<Uri> odlHelloCapabilities;
     private final @NonNegative int maximumIncomingChunkSize;
+    private final Object id;
 
     NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address,
                                final Long connectionTimeoutMillis,
@@ -50,7 +51,8 @@ public class NetconfClientConfiguration {
                                final NetconfClientSessionListener sessionListener,
                                final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler,
                                final SslHandlerFactory sslHandlerFactory, final NetconfSshClient sshClient,
-                               final List<Uri> odlHelloCapabilities, final @NonNegative int maximumIncomingChunkSize) {
+                               final List<Uri> odlHelloCapabilities, final @NonNegative int maximumIncomingChunkSize,
+                               final Object id) {
         this.address = address;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.additionalHeader = additionalHeader;
@@ -62,7 +64,12 @@ public class NetconfClientConfiguration {
         this.sshClient = sshClient;
         this.odlHelloCapabilities = odlHelloCapabilities;
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
+        this.id = id;
         validateConfiguration();
+    }
+
+    public final Object getId() {
+        return id;
     }
 
     public final InetSocketAddress getAddress() {
