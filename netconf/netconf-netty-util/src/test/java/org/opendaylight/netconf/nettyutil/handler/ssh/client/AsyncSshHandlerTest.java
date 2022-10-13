@@ -154,6 +154,7 @@ public class AsyncSshHandlerTest {
         doReturn(channelConfig).when(channel).config();
         doReturn(1).when(channelConfig).getConnectTimeoutMillis();
         doReturn(connectFuture).when(connectFuture).verify(1,TimeUnit.MILLISECONDS);
+        doReturn("Default").when(sshClient).getAttribute(any());
     }
 
     @Test

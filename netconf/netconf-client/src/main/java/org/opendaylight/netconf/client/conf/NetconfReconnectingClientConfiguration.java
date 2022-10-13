@@ -36,9 +36,10 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
                                            final SslHandlerFactory sslHandlerFactory,
                                            final NetconfSshClient sshClient,
                                            final List<Uri> odlHelloCapabilities,
-                                           final @NonNegative int maximumIncomingChunkSize) {
+                                           final @NonNegative int maximumIncomingChunkSize,
+                                           final Object id) {
         super(clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener, reconnectStrategy,
-                authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities, maximumIncomingChunkSize);
+                authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities, maximumIncomingChunkSize, id);
         this.connectStrategyFactory = connectStrategyFactory;
         validateReconnectConfiguration();
     }
