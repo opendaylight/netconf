@@ -115,7 +115,6 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
             b.childOption(ChannelOption.TCP_NODELAY , true);
         }
         b.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-        customizeBootstrap(b);
 
         if (b.group() == null) {
             b.group(bossGroup, workerGroup);
@@ -131,28 +130,6 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
         final ChannelFuture f = b.bind(address);
         LOG.debug("Initiated server {} at {}.", f, address);
         return f;
-    }
-
-    /**
-     * Customize a server bootstrap before the server is created. This allows
-     * subclasses to assign non-default server options before the server is
-     * created.
-     *
-     * @param bootstrap Server bootstrap
-     */
-    protected void customizeBootstrap(final ServerBootstrap bootstrap) {
-        // The default is a no-op
-    }
-
-    /**
-     * Customize a client bootstrap before the connection is attempted. This
-     * allows subclasses to assign non-default options before the client is
-     * created.
-     *
-     * @param bootstrap Client bootstrap
-     */
-    protected void customizeBootstrap(final Bootstrap bootstrap) {
-        // The default is a no-op
     }
 
     /**
@@ -176,7 +153,6 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
                     }
                 });
 
-        customizeBootstrap(b);
         setWorkerGroup(b);
         setChannelFactory(b);
 
@@ -225,7 +201,6 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
 
         b.option(ChannelOption.SO_KEEPALIVE, true);
 
-        customizeBootstrap(b);
         setWorkerGroup(b);
         setChannelFactory(b);
 
