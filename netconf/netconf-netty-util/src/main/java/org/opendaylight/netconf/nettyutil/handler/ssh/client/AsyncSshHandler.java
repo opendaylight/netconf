@@ -102,20 +102,6 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
                 negotiationFuture);
     }
 
-    private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) throws IOException {
-        LOG.debug("Starting SSH to {} on channel: {}", address, ctx.channel());
-
-        final ConnectFuture sshConnectionFuture = sshClient.connect(authenticationHandler.getUsername(), address)
-               .verify(ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS);
-        sshConnectionFuture.addListener(future -> {
-            if (future.isConnected()) {
-                handleSshSessionCreated(future, ctx);
-            } else {
-                handleSshSetupFailure(ctx, future.getException());
-            }
-        });
-    }
-
     private synchronized void handleSshSessionCreated(final ConnectFuture future, final ChannelHandlerContext ctx) {
         try {
             LOG.trace("SSH session created on channel: {}", ctx.channel());
@@ -188,7 +174,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     @Override
     public synchronized void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
-                                     final SocketAddress localAddress, final ChannelPromise promise) throws Exception {
+            final SocketAddress localAddress, final ChannelPromise promise) throws IOException {
         LOG.debug("SSH session connecting on channel {}. promise: {}", ctx.channel(), promise);
         connectPromise = requireNonNull(promise);
 
@@ -201,7 +187,19 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             //complete connection promise with netconf negotiation future
             negotiationFuture.addListener(negotiationFutureListener);
         }
-        startSsh(ctx, remoteAddress);
+
+        LOG.debug("Starting SSH to {} on channel: {}", remoteAddress, ctx.channel());
+        final ConnectFuture sshConnectionFuture = sshClient.connect(authenticationHandler.getUsername(), remoteAddress)
+            // FIXME: this is a blocking call, we should handle this with a concurrently-scheduled timeout. We do not
+            //        have a Timer ready, so perhaps we should be using the event loop?
+            .verify(ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS);
+        sshConnectionFuture.addListener(future -> {
+            if (future.isConnected()) {
+                handleSshSessionCreated(future, ctx);
+            } else {
+                handleSshSetupFailure(ctx, future.getException());
+            }
+        });
     }
 
     @Override
