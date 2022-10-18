@@ -334,9 +334,9 @@ public class AsyncSshHandlerTest {
     }
 
     private static OpenFuture getSuccessOpenFuture() {
-        final OpenFuture failedOpenFuture = mock(OpenFuture.class);
-        doReturn(true).when(failedOpenFuture).isOpened();
-        return failedOpenFuture;
+        final OpenFuture openFuture = mock(OpenFuture.class);
+        doReturn(null).when(openFuture).getException();
+        return openFuture;
     }
 
     private static AuthFuture getSuccessAuthFuture() {
@@ -472,10 +472,9 @@ public class AsyncSshHandlerTest {
     }
 
     private static OpenFuture getFailedOpenFuture() {
-        final OpenFuture authFuture = mock(OpenFuture.class);
-        doReturn(false).when(authFuture).isOpened();
-        doReturn(new IllegalStateException()).when(authFuture).getException();
-        return authFuture;
+        final OpenFuture openFuture = mock(OpenFuture.class);
+        doReturn(new IllegalStateException()).when(openFuture).getException();
+        return openFuture;
     }
 
     @Test
