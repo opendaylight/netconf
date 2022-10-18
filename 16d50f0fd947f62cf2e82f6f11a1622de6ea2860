@@ -114,6 +114,29 @@
       },
       "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0f68311_bc687033",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfInvokeOperationsServiceImpl.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-10-18T17:45:01Z",
+      "side": 1,
+      "message": "misleadling alignment: method body vs. method parameters are visually the same block",
+      "range": {
+        "startLine": 73,
+        "startChar": 8,
+        "endLine": 73,
+        "endChar": 13
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
