@@ -32,6 +32,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelPromise;
+import io.netty.util.concurrent.EventExecutor;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -76,6 +77,8 @@ public class AsyncSshHandlerTest {
     private SocketAddress localAddress;
     @Mock
     private ChannelConfig channelConfig;
+    @Mock
+    private EventExecutor executor;
 
     private AsyncSshHandler asyncSshHandler;
 
@@ -136,6 +139,11 @@ public class AsyncSshHandlerTest {
         doReturn(ctx).when(ctx).fireChannelInactive();
         doReturn(mock(ChannelFuture.class)).when(ctx).disconnect(any(ChannelPromise.class));
         doReturn(getMockedPromise()).when(ctx).newPromise();
+        doReturn(executor).when(ctx).executor();
+        doAnswer(invocation -> {
+            invocation.getArgument(0, Runnable.class).run();
+            return null;
+        }).when(executor).execute(any());
     }
 
     private void stubChannel() {
