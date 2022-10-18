@@ -182,9 +182,12 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             return;
         }
 
-        openFuture.addListener(future -> onOpenComplete(future, ctx));
+        openFuture.addListener(future -> ctx.executor().execute(() -> onOpenComplete(future, ctx)));
     }
 
+    // This callback has to run on the channel's executor because it runs fireChannelActive(), which needs to be
+    // delivered synchronously. If we were to execute on some other thread we would end up delaying the event,
+    // potentially creating havoc in the pipeline.
     private synchronized void onOpenComplete(final OpenFuture openFuture, final ChannelHandlerContext ctx) {
         final var cause = openFuture.getException();
         if (cause != null) {
