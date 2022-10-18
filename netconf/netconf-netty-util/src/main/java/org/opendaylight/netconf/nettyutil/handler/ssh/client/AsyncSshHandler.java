@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
@@ -61,11 +63,13 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private final Future<?> negotiationFuture;
     private final NetconfSshClient sshClient;
 
-    private AsyncSshHandlerWriter sshWriteAsyncHandler;
+    // Initialized by connect()
+    @GuardedBy("this")
+    private ChannelPromise connectPromise;
 
+    private AsyncSshHandlerWriter sshWriteAsyncHandler;
     private NettyAwareChannelSubsystem channel;
     private ClientSession session;
-    private ChannelPromise connectPromise;
     private FutureListener<Object> negotiationFutureListener;
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
@@ -132,47 +136,39 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             .addListener(future -> onConnectComplete(future, ctx));
     }
 
-    private void onConnectComplete(final ConnectFuture future, final ChannelHandlerContext ctx) {
-        final var cause = future.getException();
+    private synchronized void onConnectComplete(final ConnectFuture connectFuture, final ChannelHandlerContext ctx) {
+        final var cause = connectFuture.getException();
         if (cause != null) {
             onOpenFailure(ctx, cause);
             return;
         }
 
-        final var clientSession = future.getSession();
+        final var clientSession = connectFuture.getSession();
         LOG.trace("SSH session {} created on channel: {}", clientSession, ctx.channel());
         verify(clientSession instanceof NettyAwareClientSession, "Unexpected session %s", clientSession);
-        onConnectComplete((NettyAwareClientSession) clientSession, ctx);
-    }
 
-    private synchronized void onConnectComplete(final NettyAwareClientSession clientSession,
-            final ChannelHandlerContext ctx) {
-        session = clientSession;
+        final var localSession = (NettyAwareClientSession) clientSession;
+        session = localSession;
 
         final AuthFuture authFuture;
         try {
-            authFuture = authenticationHandler.authenticate(clientSession);
+            authFuture = authenticationHandler.authenticate(localSession);
         } catch (final IOException e) {
             onOpenFailure(ctx, e);
             return;
         }
 
-        authFuture.addListener(future -> onAuthComplete(future, clientSession, ctx));
+        authFuture.addListener(future -> onAuthComplete(future, localSession, ctx));
     }
 
-    private void onAuthComplete(final AuthFuture future, final NettyAwareClientSession clientSession,
+    private synchronized void onAuthComplete(final AuthFuture authFuture, final NettyAwareClientSession clientSession,
             final ChannelHandlerContext ctx) {
-        final var cause = future.getException();
+        final var cause = authFuture.getException();
         if (cause != null) {
             onOpenFailure(ctx, new AuthenticationFailedException("Authentication failed", cause));
             return;
         }
 
-        onAuthComplete(clientSession, ctx);
-    }
-
-    private synchronized void onAuthComplete(final NettyAwareClientSession clientSession,
-            final ChannelHandlerContext ctx) {
         LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
             clientSession.getServerVersion());
 
@@ -189,19 +185,14 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         openFuture.addListener(future -> onOpenComplete(future, ctx));
     }
 
-    private void onOpenComplete(final OpenFuture future, final ChannelHandlerContext ctx) {
-        final var cause = future.getException();
+    private synchronized void onOpenComplete(final OpenFuture openFuture, final ChannelHandlerContext ctx) {
+        final var cause = openFuture.getException();
         if (cause != null) {
             onOpenFailure(ctx, cause);
             return;
         }
 
-        onOpenComplete(ctx);
-    }
-
-    private synchronized void onOpenComplete(final ChannelHandlerContext ctx) {
         LOG.trace("SSH subsystem channel opened successfully on channel: {}", ctx.channel());
-
         if (negotiationFuture == null) {
             connectPromise.setSuccess();
         }
@@ -211,7 +202,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         channel.onClose(() -> disconnect(ctx, ctx.newPromise()));
     }
 
-    private synchronized void onOpenFailure(final ChannelHandlerContext ctx, final Throwable cause) {
+    @Holding("this")
+    private void onOpenFailure(final ChannelHandlerContext ctx, final Throwable cause) {
         LOG.warn("Unable to setup SSH connection on channel: {}", ctx.channel(), cause);
 
         // If the promise is not yet done, we have failed with initial connect and set connectPromise to failure
