@@ -24,23 +24,19 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 
 public class SimpleNetconfClientSessionListenerTest {
-
     private Channel channel;
     private ChannelPromise channelFuture;
-    Set<String> caps;
     private NetconfHelloMessage helloMessage;
     private NetconfMessage message;
     private NetconfClientSessionListener sessionListener;
     private NetconfClientSession clientSession;
 
     @Before
-    public void setUp() throws NetconfDocumentedException {
+    public void setUp() {
         channel = mock(Channel.class);
         channelFuture = mock(ChannelPromise.class);
         mockEventLoop();
@@ -48,7 +44,7 @@ public class SimpleNetconfClientSessionListenerTest {
         doReturn(channelFuture).when(channel).writeAndFlush(any());
         doReturn(channelFuture).when(channel).writeAndFlush(any(), any(ChannelPromise.class));
         doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
-        caps = Sets.newSet("a", "b");
+        final var caps = Set.of("a", "b");
         helloMessage = NetconfHelloMessage.createServerHello(caps, 10);
         message = new NetconfMessage(helloMessage.getDocument());
         sessionListener = mock(NetconfClientSessionListener.class);
@@ -65,7 +61,7 @@ public class SimpleNetconfClientSessionListenerTest {
     }
 
     @Test
-    public void testSessionDown() throws Exception {
+    public void testSessionDown() {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
         final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
