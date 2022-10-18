@@ -218,7 +218,6 @@ public class AsyncSshHandlerTest {
         Futures.addCallback(stubAddListener(ioWriteFuture), new SuccessFutureListener<IoWriteFuture>() {
             @Override
             public void onSuccess(final SshFutureListener<IoWriteFuture> result) {
-                doReturn(false).when(ioWriteFuture).isWritten();
                 doReturn(new IllegalStateException()).when(ioWriteFuture).getException();
                 result.operationComplete(ioWriteFuture);
             }
@@ -407,7 +406,7 @@ public class AsyncSshHandlerTest {
     private static IoOutputStream getMockedIoOutputStream() throws IOException {
         final IoOutputStream mock = mock(IoOutputStream.class);
         final IoWriteFuture ioWriteFuture = mock(IoWriteFuture.class);
-        doReturn(true).when(ioWriteFuture).isWritten();
+        doReturn(null).when(ioWriteFuture).getException();
 
         Futures.addCallback(stubAddListener(ioWriteFuture), new SuccessFutureListener<IoWriteFuture>() {
             @Override
