@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
@@ -219,7 +220,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             connectPromise.setFailure(cause);
         }
 
-        disconnect(ctx, ctx.newPromise());
+        if (startDisconnect()) {
+            lockedDisconnect(ctx, ctx.newPromise());
+        }
     }
 
     @Override
@@ -229,15 +232,22 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     @Override
     public void disconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
-        if (isDisconnected.compareAndSet(false, true)) {
-            safelyDisconnect(ctx, promise);
+        if (startDisconnect()) {
+            synchronized (this) {
+                lockedDisconnect(ctx, promise);
+            }
         }
     }
 
+    private boolean startDisconnect() {
+        return isDisconnected.compareAndSet(false, true);
+    }
+
+    @Holding("this")
     @SuppressWarnings("checkstyle:IllegalCatch")
-    private synchronized void safelyDisconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
-        LOG.trace("Closing SSH session on channel: {} with connect promise in state: {}",
-                ctx.channel(), connectPromise);
+    private void lockedDisconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
+        LOG.trace("Closing SSH session on channel: {} with connect promise in state: {}", ctx.channel(),
+            connectPromise);
 
         // If we have already succeeded and the session was dropped after,
         // we need to fire inactive to notify reconnect logic
