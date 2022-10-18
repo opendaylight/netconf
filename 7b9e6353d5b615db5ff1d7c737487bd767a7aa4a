@@ -39,6 +39,29 @@
       },
       "revId": "7b9e6353d5b615db5ff1d7c737487bd767a7aa4a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49015f6a_cf61cc7b",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-10-18T18:04:01Z",
+      "side": 1,
+      "message": "sshClient is a shared resource (see DEFAULT_CLIENT), so this equates to leaking state -- where and how is this unset?",
+      "range": {
+        "startLine": 110,
+        "startChar": 8,
+        "endLine": 110,
+        "endChar": 55
+      },
+      "revId": "7b9e6353d5b615db5ff1d7c737487bd767a7aa4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
