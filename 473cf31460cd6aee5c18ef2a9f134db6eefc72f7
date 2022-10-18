@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02fdff2f_65a706b1",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/web/WebInitializer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-10-18T17:22:57Z",
+      "side": 0,
+      "message": "The path is .well-known, as per https://www.rfc-editor.org/rfc/rfc8040#section-1.5",
+      "range": {
+        "startLine": 68,
+        "startChar": 32,
+        "endLine": 68,
+        "endChar": 33
+      },
+      "revId": "473cf31460cd6aee5c18ef2a9f134db6eefc72f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
