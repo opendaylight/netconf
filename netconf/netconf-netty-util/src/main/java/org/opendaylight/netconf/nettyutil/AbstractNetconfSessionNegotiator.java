@@ -19,6 +19,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.Timeout;
 import io.netty.util.Timer;
+import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.index.qual.NonNegative;
@@ -146,9 +147,10 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         final NetconfHelloMessage helloMessage = this.sessionPreferences.getHelloMessage();
         LOG.debug("Session negotiation started with hello message {} on channel {}", helloMessage, channel);
 
-        channel.pipeline().addLast(NAME_OF_EXCEPTION_HANDLER, new ExceptionHandlingInboundChannelHandler());
+        // Send the message out, but to not run listeners just yet, as we have some more state transitions to go through
+        final var helloFuture = channel.writeAndFlush(localHello);
 
-        sendMessage(helloMessage);
+        channel.pipeline().addLast(NAME_OF_EXCEPTION_HANDLER, new ExceptionHandlingInboundChannelHandler());
 
         replaceHelloMessageOutboundHandler();
 
@@ -158,6 +160,19 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
             // Service the timeout on channel's eventloop, so that we do not get state transition problems
             timeoutTask = timer.newTimeout(unused -> channel.eventLoop().execute(this::timeoutExpired),
                 connectionTimeoutMillis, TimeUnit.MILLISECONDS);
+        }
+
+        // State transition completed, now run any additional processing
+        helloFuture.addListener(this::onHelloWriteComplete);
+    }
+
+    private void onHelloWriteComplete(final Future<?> future) {
+        final var cause = future.cause();
+        if (cause != null) {
+            LOG.info("Failed to send message {} on channel {}", localHello, channel, cause);
+            negotiationFailed(cause);
+        } else {
+            LOG.trace("Message {} sent to socket on channel {}", localHello, channel);
         }
     }
 
@@ -329,24 +344,6 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         LOG.debug("Negotiation on channel {} failed", channel, cause);
         channel.close();
         promise.setFailure(cause);
-    }
-
-    /**
-     * Send a message to peer and fail negotiation if it does not reach
-     * the peer.
-     *
-     * @param msg Message which should be sent.
-     */
-    protected void sendMessage(final NetconfMessage msg) {
-        channel.writeAndFlush(msg).addListener(f -> {
-            final var cause = f.cause();
-            if (cause != null) {
-                LOG.info("Failed to send message {} on channel {}", msg, channel, cause);
-                negotiationFailed(cause);
-            } else {
-                LOG.trace("Message {} sent to socket on channel {}", msg, channel);
-            }
-        });
     }
 
     @Override
