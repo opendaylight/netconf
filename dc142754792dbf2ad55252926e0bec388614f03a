@@ -84,6 +84,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "519a2b6e_13bfc6d6",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-10-18T22:03:23Z",
+      "side": 1,
+      "message": "without this field this class is completely stateless and hence thread-safe\n\nwith this field it is no longer the case -- so what is the safety model here?\n\nthat needs to be enforced and therefore this certainly cannot just be a naked field exposed to subclasses.",
+      "range": {
+        "startLine": 38,
+        "startChar": 4,
+        "endLine": 38,
+        "endChar": 51
+      },
+      "revId": "dc142754792dbf2ad55252926e0bec388614f03a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eca41a39_c6b5fe5c",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
         "patchSetId": 14
