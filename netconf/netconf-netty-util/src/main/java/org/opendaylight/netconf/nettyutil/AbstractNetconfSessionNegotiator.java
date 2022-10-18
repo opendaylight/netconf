@@ -341,11 +341,12 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
      *
      * @param msg Message which should be sent.
      */
-    protected final void sendMessage(final NetconfMessage msg) {
-        this.channel.writeAndFlush(msg).addListener(f -> {
-            if (!f.isSuccess()) {
-                LOG.info("Failed to send message {} on channel {}", msg, channel, f.cause());
-                negotiationFailed(f.cause());
+    protected void sendMessage(final NetconfMessage msg) {
+        channel.writeAndFlush(msg).addListener(f -> {
+            final var cause = f.cause();
+            if (cause != null) {
+                LOG.info("Failed to send message {} on channel {}", msg, channel, cause);
+                negotiationFailed(cause);
             } else {
                 LOG.trace("Message {} sent to socket on channel {}", msg, channel);
             }
