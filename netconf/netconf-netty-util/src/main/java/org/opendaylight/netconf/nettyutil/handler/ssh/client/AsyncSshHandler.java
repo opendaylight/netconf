@@ -103,18 +103,6 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
                 negotiationFuture);
     }
 
-    private synchronized void handleSshChanelOpened(final ChannelHandlerContext ctx) {
-        LOG.trace("SSH subsystem channel opened successfully on channel: {}", ctx.channel());
-
-        if (negotiationFuture == null) {
-            connectPromise.setSuccess();
-        }
-
-        sshWriteAsyncHandler = new AsyncSshHandlerWriter(channel.getAsyncIn());
-        ctx.fireChannelActive();
-        channel.onClose(() -> disconnect(ctx, ctx.newPromise()));
-    }
-
     private synchronized void handleSshSetupFailure(final ChannelHandlerContext ctx, final Throwable error) {
         LOG.warn("Unable to setup SSH connection on channel: {}", ctx.channel(), error);
 
@@ -219,7 +207,19 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             return;
         }
 
-        handleSshChanelOpened(ctx);
+        onOpenComplete(ctx);
+    }
+
+    private synchronized void onOpenComplete(final ChannelHandlerContext ctx) {
+        LOG.trace("SSH subsystem channel opened successfully on channel: {}", ctx.channel());
+
+        if (negotiationFuture == null) {
+            connectPromise.setSuccess();
+        }
+
+        sshWriteAsyncHandler = new AsyncSshHandlerWriter(channel.getAsyncIn());
+        ctx.fireChannelActive();
+        channel.onClose(() -> disconnect(ctx, ctx.newPromise()));
     }
 
     @Override
