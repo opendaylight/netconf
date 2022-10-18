@@ -91,6 +91,29 @@
       },
       "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "474b7ed8_34cb6ad5",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-10-18T17:43:03Z",
+      "side": 1,
+      "message": "err, no, restconf must not depend on this topology model! why would this even be needed?",
+      "range": {
+        "startLine": 65,
+        "startChar": 37,
+        "endLine": 65,
+        "endChar": 60
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
