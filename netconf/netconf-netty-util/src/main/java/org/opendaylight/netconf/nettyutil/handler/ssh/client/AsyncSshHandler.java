@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.SocketAddress;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
@@ -55,12 +56,13 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     public static final NetconfSshClient DEFAULT_CLIENT;
 
     static {
-        final NetconfSshClient c = new NetconfClientBuilder().build();
+        final var c = new NetconfClientBuilder().build();
         // Disable default timeouts from mina sshd
-        c.getProperties().put(CoreModuleProperties.AUTH_TIMEOUT.getName(), "0");
-        c.getProperties().put(CoreModuleProperties.IDLE_TIMEOUT.getName(), "0");
-        c.getProperties().put(CoreModuleProperties.NIO2_READ_TIMEOUT.getName(), "0");
-        c.getProperties().put(CoreModuleProperties.TCP_NODELAY.getName(), true);
+        final var zero = Duration.ofMillis(0);
+        CoreModuleProperties.AUTH_TIMEOUT.set(c, zero);
+        CoreModuleProperties.IDLE_TIMEOUT.set(c, zero);
+        CoreModuleProperties.NIO2_READ_TIMEOUT.set(c, zero);
+        CoreModuleProperties.TCP_NODELAY.set(c, true);
 
         // TODO make configurable, or somehow reuse netty threadpool
         c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
