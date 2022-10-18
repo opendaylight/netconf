@@ -189,17 +189,21 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         }
 
         LOG.debug("Starting SSH to {} on channel: {}", remoteAddress, ctx.channel());
-        final ConnectFuture sshConnectionFuture = sshClient.connect(authenticationHandler.getUsername(), remoteAddress)
+        sshClient.connect(authenticationHandler.getUsername(), remoteAddress)
             // FIXME: this is a blocking call, we should handle this with a concurrently-scheduled timeout. We do not
             //        have a Timer ready, so perhaps we should be using the event loop?
-            .verify(ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS);
-        sshConnectionFuture.addListener(future -> {
-            if (future.isConnected()) {
-                handleSshSessionCreated(future, ctx);
-            } else {
-                handleSshSetupFailure(ctx, future.getException());
-            }
-        });
+            .verify(ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS)
+            .addListener(future -> onConnectComplete(future, ctx));
+    }
+
+    private void onConnectComplete(final ConnectFuture future, final ChannelHandlerContext ctx) {
+        final var cause = future.getException();
+        if (cause != null) {
+            handleSshSetupFailure(ctx, cause);
+            return;
+        }
+
+        handleSshSessionCreated(future, ctx);
     }
 
     @Override

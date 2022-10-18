@@ -347,7 +347,7 @@ public class AsyncSshHandlerTest {
 
     private static ConnectFuture getSuccessConnectFuture(final ClientSession sshSession) {
         final ConnectFuture connectFuture = mock(ConnectFuture.class);
-        doReturn(true).when(connectFuture).isConnected();
+        doReturn(null).when(connectFuture).getException();
 
         doReturn(sshSession).when(connectFuture).getSession();
         return connectFuture;
@@ -490,7 +490,6 @@ public class AsyncSshHandlerTest {
 
     private static ConnectFuture getFailedConnectFuture() {
         final ConnectFuture connectFuture = mock(ConnectFuture.class);
-        doReturn(false).when(connectFuture).isConnected();
         doReturn(new IllegalStateException()).when(connectFuture).getException();
         return connectFuture;
     }
