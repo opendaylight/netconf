@@ -38,9 +38,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -63,8 +61,8 @@ public class NetconfClientSessionNegotiatorTest {
     private ChannelInboundHandlerAdapter channelInboundHandlerAdapter;
 
     @Before
-    public void setUp() throws Exception {
-        helloMessage = NetconfHelloMessage.createClientHello(Sets.newSet("exi:1.0"), Optional.empty());
+    public void setUp() {
+        helloMessage = NetconfHelloMessage.createClientHello(Set.of("exi:1.0"), Optional.empty());
         pipeline = mockChannelPipeline();
         future = mockChannelFuture();
         channel = mockChannel();
@@ -154,30 +152,25 @@ public class NetconfClientSessionNegotiatorTest {
     }
 
     @Test
-    public void testNetconfClientSessionNegotiator() throws NetconfDocumentedException {
+    public void testNetconfClientSessionNegotiator() throws Exception {
         Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
         negotiator.channelActive(null);
-        Set<String> caps = Sets.newSet("a", "b");
-        NetconfHelloMessage helloServerMessage = NetconfHelloMessage.createServerHello(caps, 10);
-        negotiator.handleMessage(helloServerMessage);
+        negotiator.handleMessage(NetconfHelloMessage.createServerHello(Set.of("a", "b"), 10));
         verify(promise).setSuccess(any());
     }
 
     @Test
     public void testNegotiatorWhenChannelActiveHappenAfterHandleMessage() throws Exception {
-        Promise promise = mock(Promise.class);
+        Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn(false).when(promise).isDone();
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
-        Set<String> caps = Sets.newSet("a", "b");
-        NetconfHelloMessage helloServerMessage = NetconfHelloMessage.createServerHello(caps, 10);
 
-        negotiator.handleMessage(helloServerMessage);
+        negotiator.handleMessage(NetconfHelloMessage.createServerHello(Set.of("a", "b"), 10));
         negotiator.channelActive(null);
-
         verify(promise).setSuccess(any());
     }
 
@@ -190,8 +183,6 @@ public class NetconfClientSessionNegotiatorTest {
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, exiMessage);
 
         negotiator.channelActive(null);
-        Set<String> caps = Sets.newSet("exi:1.0");
-        NetconfHelloMessage message = NetconfHelloMessage.createServerHello(caps, 10);
 
         doAnswer(invocationOnMock -> {
             channelInboundHandlerAdapter = invocationOnMock.getArgument(2);
@@ -200,7 +191,7 @@ public class NetconfClientSessionNegotiatorTest {
 
         ChannelHandlerContext handlerContext = mock(ChannelHandlerContext.class);
         doReturn(pipeline).when(handlerContext).pipeline();
-        negotiator.handleMessage(message);
+        negotiator.handleMessage(NetconfHelloMessage.createServerHello(Set.of("exi:1.0"), 10));
         Document expectedResult = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc-reply_ok.xml");
         channelInboundHandlerAdapter.channelRead(handlerContext, new NetconfMessage(expectedResult));
 
@@ -212,7 +203,7 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Test
     public void testNetconfClientSessionNegotiatorGetCached() throws Exception {
-        Promise promise = mock(Promise.class);
+        Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
