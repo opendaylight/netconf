@@ -179,10 +179,11 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
                 changeState(State.FAILED);
 
                 channel.close().addListener(future -> {
-                    if (future.isSuccess()) {
-                        LOG.debug("Channel {} closed: success", channel);
+                    final var cause = future.cause();
+                    if (cause != null) {
+                        LOG.warn("Channel {} closed: fail", channel, cause);
                     } else {
-                        LOG.warn("Channel {} closed: fail", channel);
+                        LOG.debug("Channel {} closed: success", channel);
                     }
                 });
             }
