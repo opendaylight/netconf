@@ -137,6 +137,52 @@
       },
       "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8deff029_9979ab5d",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractCommonSubscriber.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-10-18T17:48:44Z",
+      "side": 1,
+      "message": "we do not leak fields to subclasses, as therein lies madness",
+      "range": {
+        "startLine": 60,
+        "startChar": 4,
+        "endLine": 60,
+        "endChar": 13
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4bf203b_9748d064",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationListenerAdaptor.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-10-18T17:48:44Z",
+      "side": 1,
+      "message": "this is like 95% of super.close() ... why is this structured this way?",
+      "range": {
+        "startLine": 91,
+        "startChar": 29,
+        "endLine": 91,
+        "endChar": 34
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
