@@ -12,29 +12,20 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 
 public class NetconfHelloMessageTest {
-
-    Set<String> caps;
-
-    @Before
-    public void setUp() {
-        caps = Sets.newSet("cap1");
-    }
+    private final Set<String> caps = Set.of("cap1");
 
     @Test
     public void testConstructor() throws NetconfDocumentedException {
-        NetconfHelloMessageAdditionalHeader additionalHeader = new NetconfHelloMessageAdditionalHeader("name",
-                "host", "1", "transp", "id");
-        NetconfHelloMessage message = NetconfHelloMessage.createClientHello(caps, Optional.of(additionalHeader));
+        var additionalHeader = new NetconfHelloMessageAdditionalHeader("name", "host", "1", "transp", "id");
+        var message = NetconfHelloMessage.createClientHello(caps, Optional.of(additionalHeader));
         assertTrue(NetconfHelloMessage.isHelloMessage(message));
         assertEquals(Optional.of(additionalHeader), message.getAdditionalHeader());
 
-        NetconfHelloMessage serverMessage = NetconfHelloMessage.createServerHello(caps, 100L);
+        var serverMessage = NetconfHelloMessage.createServerHello(caps, 100L);
         assertTrue(NetconfHelloMessage.isHelloMessage(serverMessage));
     }
 }
