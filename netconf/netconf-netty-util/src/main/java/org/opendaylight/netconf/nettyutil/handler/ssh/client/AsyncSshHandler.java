@@ -103,17 +103,6 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
                 negotiationFuture);
     }
 
-    private synchronized void handleSshSetupFailure(final ChannelHandlerContext ctx, final Throwable error) {
-        LOG.warn("Unable to setup SSH connection on channel: {}", ctx.channel(), error);
-
-        // If the promise is not yet done, we have failed with initial connect and set connectPromise to failure
-        if (!connectPromise.isDone()) {
-            connectPromise.setFailure(error);
-        }
-
-        disconnect(ctx, ctx.newPromise());
-    }
-
     @Override
     public synchronized void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) {
         sshWriteAsyncHandler.write(ctx, msg, promise);
@@ -146,7 +135,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private void onConnectComplete(final ConnectFuture future, final ChannelHandlerContext ctx) {
         final var cause = future.getException();
         if (cause != null) {
-            handleSshSetupFailure(ctx, cause);
+            onOpenFailure(ctx, cause);
             return;
         }
 
@@ -164,7 +153,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         try {
             authFuture = authenticationHandler.authenticate(clientSession);
         } catch (final IOException e) {
-            handleSshSetupFailure(ctx, e);
+            onOpenFailure(ctx, e);
             return;
         }
 
@@ -175,7 +164,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             final ChannelHandlerContext ctx) {
         final var cause = future.getException();
         if (cause != null) {
-            handleSshSetupFailure(ctx, new AuthenticationFailedException("Authentication failed", cause));
+            onOpenFailure(ctx, new AuthenticationFailedException("Authentication failed", cause));
             return;
         }
 
@@ -193,7 +182,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             channel.setStreaming(ClientChannel.Streaming.Async);
             openFuture = channel.open();
         } catch (final IOException e) {
-            handleSshSetupFailure(ctx, e);
+            onOpenFailure(ctx, e);
             return;
         }
 
@@ -203,7 +192,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private void onOpenComplete(final OpenFuture future, final ChannelHandlerContext ctx) {
         final var cause = future.getException();
         if (cause != null) {
-            handleSshSetupFailure(ctx, cause);
+            onOpenFailure(ctx, cause);
             return;
         }
 
@@ -220,6 +209,17 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         sshWriteAsyncHandler = new AsyncSshHandlerWriter(channel.getAsyncIn());
         ctx.fireChannelActive();
         channel.onClose(() -> disconnect(ctx, ctx.newPromise()));
+    }
+
+    private synchronized void onOpenFailure(final ChannelHandlerContext ctx, final Throwable cause) {
+        LOG.warn("Unable to setup SSH connection on channel: {}", ctx.channel(), cause);
+
+        // If the promise is not yet done, we have failed with initial connect and set connectPromise to failure
+        if (!connectPromise.isDone()) {
+            connectPromise.setFailure(cause);
+        }
+
+        disconnect(ctx, ctx.newPromise());
     }
 
     @Override
