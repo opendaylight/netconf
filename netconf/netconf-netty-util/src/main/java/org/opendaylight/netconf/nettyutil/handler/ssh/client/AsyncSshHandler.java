@@ -102,28 +102,6 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
                 negotiationFuture);
     }
 
-    private synchronized void handleSshSessionCreated(final ConnectFuture future, final ChannelHandlerContext ctx) {
-        try {
-            LOG.trace("SSH session created on channel: {}", ctx.channel());
-
-            session = future.getSession();
-            verify(session instanceof NettyAwareClientSession, "Unexpected session %s", session);
-
-            final AuthFuture authenticateFuture = authenticationHandler.authenticate(session);
-            final NettyAwareClientSession localSession = (NettyAwareClientSession) session;
-            authenticateFuture.addListener(future1 -> {
-                if (future1.isSuccess()) {
-                    handleSshAuthenticated(localSession, ctx);
-                } else {
-                    handleSshSetupFailure(ctx, new AuthenticationFailedException("Authentication failed",
-                        future1.getException()));
-                }
-            });
-        } catch (final IOException e) {
-            handleSshSetupFailure(ctx, e);
-        }
-    }
-
     private synchronized void handleSshAuthenticated(final NettyAwareClientSession newSession,
             final ChannelHandlerContext ctx) {
         LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
@@ -203,7 +181,36 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             return;
         }
 
-        handleSshSessionCreated(future, ctx);
+        final var clientSession = future.getSession();
+        LOG.trace("SSH session {} created on channel: {}", clientSession, ctx.channel());
+        verify(clientSession instanceof NettyAwareClientSession, "Unexpected session %s", clientSession);
+        onConnectComplete((NettyAwareClientSession) clientSession, ctx);
+    }
+
+    private synchronized void onConnectComplete(final NettyAwareClientSession clientSession,
+            final ChannelHandlerContext ctx) {
+        session = clientSession;
+
+        final AuthFuture authFuture;
+        try {
+            authFuture = authenticationHandler.authenticate(clientSession);
+        } catch (final IOException e) {
+            handleSshSetupFailure(ctx, e);
+            return;
+        }
+
+        authFuture.addListener(future -> onAuthComplete(future, clientSession, ctx));
+    }
+
+    private void onAuthComplete(final AuthFuture future, final NettyAwareClientSession clientSession,
+            final ChannelHandlerContext ctx) {
+        final var cause = future.getException();
+        if (cause != null) {
+            handleSshSetupFailure(ctx, new AuthenticationFailedException("Authentication failed", cause));
+            return;
+        }
+
+        handleSshAuthenticated(clientSession, ctx);
     }
 
     @Override
