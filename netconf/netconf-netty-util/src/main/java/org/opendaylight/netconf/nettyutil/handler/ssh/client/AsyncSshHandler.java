@@ -24,6 +24,7 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.Authenticat
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
+import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.core.CoreModuleProperties;
 import org.slf4j.Logger;
@@ -100,26 +101,6 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             final Future<?> negotiationFuture, final @Nullable NetconfSshClient sshClient) {
         return new AsyncSshHandler(authenticationHandler, sshClient != null ? sshClient : DEFAULT_CLIENT,
                 negotiationFuture);
-    }
-
-    private synchronized void handleSshAuthenticated(final NettyAwareClientSession newSession,
-            final ChannelHandlerContext ctx) {
-        LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
-            newSession.getServerVersion());
-
-        try {
-            channel = newSession.createSubsystemChannel(SUBSYSTEM, ctx);
-            channel.setStreaming(ClientChannel.Streaming.Async);
-            channel.open().addListener(future -> {
-                if (future.isOpened()) {
-                    handleSshChanelOpened(ctx);
-                } else {
-                    handleSshSetupFailure(ctx, future.getException());
-                }
-            });
-        } catch (final IOException e) {
-            handleSshSetupFailure(ctx, e);
-        }
     }
 
     private synchronized void handleSshChanelOpened(final ChannelHandlerContext ctx) {
@@ -210,7 +191,35 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             return;
         }
 
-        handleSshAuthenticated(clientSession, ctx);
+        onAuthComplete(clientSession, ctx);
+    }
+
+    private synchronized void onAuthComplete(final NettyAwareClientSession clientSession,
+            final ChannelHandlerContext ctx) {
+        LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
+            clientSession.getServerVersion());
+
+        final OpenFuture openFuture;
+        try {
+            channel = clientSession.createSubsystemChannel(SUBSYSTEM, ctx);
+            channel.setStreaming(ClientChannel.Streaming.Async);
+            openFuture = channel.open();
+        } catch (final IOException e) {
+            handleSshSetupFailure(ctx, e);
+            return;
+        }
+
+        openFuture.addListener(future -> onOpenComplete(future, ctx));
+    }
+
+    private void onOpenComplete(final OpenFuture future, final ChannelHandlerContext ctx) {
+        final var cause = future.getException();
+        if (cause != null) {
+            handleSshSetupFailure(ctx, cause);
+            return;
+        }
+
+        handleSshChanelOpened(ctx);
     }
 
     @Override
