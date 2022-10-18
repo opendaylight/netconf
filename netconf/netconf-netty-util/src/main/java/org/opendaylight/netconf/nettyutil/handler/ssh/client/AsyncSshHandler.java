@@ -16,9 +16,10 @@ import io.netty.channel.ChannelPromise;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.Nullable;
@@ -37,6 +38,15 @@ import org.slf4j.LoggerFactory;
  */
 public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandler.class);
+    private static final VarHandle DISCONNECTED;
+
+    static {
+        try {
+            DISCONNECTED = MethodHandles.lookup().findVarHandle(AsyncSshHandler.class, "disconnected", boolean.class);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     public static final String SUBSYSTEM = "netconf";
 
@@ -58,7 +68,6 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         DEFAULT_CLIENT = c;
     }
 
-    private final AtomicBoolean isDisconnected = new AtomicBoolean();
     private final AuthenticationHandler authenticationHandler;
     private final Future<?> negotiationFuture;
     private final NetconfSshClient sshClient;
@@ -71,6 +80,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private NettyAwareChannelSubsystem channel;
     private ClientSession session;
     private FutureListener<Object> negotiationFutureListener;
+
+    private volatile boolean disconnected;
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
             final Future<?> negotiationFuture) {
@@ -168,6 +179,10 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             onOpenFailure(ctx, new AuthenticationFailedException("Authentication failed", cause));
             return;
         }
+        if (disconnected) {
+            LOG.debug("Skipping SSH subsystem allocation, channel: {}", ctx.channel());
+            return;
+        }
 
         LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
             clientSession.getServerVersion());
@@ -192,6 +207,10 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         final var cause = openFuture.getException();
         if (cause != null) {
             onOpenFailure(ctx, cause);
+            return;
+        }
+        if (disconnected) {
+            LOG.trace("Skipping activation, channel: {}", ctx.channel());
             return;
         }
 
@@ -224,7 +243,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     @Override
     public void disconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
-        if (isDisconnected.compareAndSet(false, true)) {
+        if (DISCONNECTED.compareAndSet(this, false, true)) {
             ctx.executor().execute(() -> safelyDisconnect(ctx, promise));
         }
     }
