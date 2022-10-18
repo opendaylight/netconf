@@ -341,7 +341,7 @@ public class AsyncSshHandlerTest {
 
     private static AuthFuture getSuccessAuthFuture() {
         final AuthFuture authFuture = mock(AuthFuture.class);
-        doReturn(true).when(authFuture).isSuccess();
+        doReturn(null).when(authFuture).getException();
         return authFuture;
     }
 
@@ -467,7 +467,6 @@ public class AsyncSshHandlerTest {
 
     private static AuthFuture getFailedAuthFuture() {
         final AuthFuture authFuture = mock(AuthFuture.class);
-        doReturn(false).when(authFuture).isSuccess();
         doReturn(new IllegalStateException()).when(authFuture).getException();
         return authFuture;
     }
