@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Netty SSH handler class. Acts as interface between Netty and SSH library.
  */
-public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
+public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandler.class);
 
     public static final String SUBSYSTEM = "netconf";
