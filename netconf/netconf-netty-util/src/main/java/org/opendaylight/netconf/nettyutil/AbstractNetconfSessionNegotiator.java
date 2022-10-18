@@ -161,9 +161,24 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
             return;
         }
 
+        // Catch any exceptions from this point on. Use a named class to ease debugging.
+        final class ExceptionHandlingInboundChannelHandler extends ChannelInboundHandlerAdapter {
+            @Override
+            public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
+                LOG.warn("An exception occurred during negotiation with {} on channel {}",
+                        channel.remoteAddress(), channel, cause);
+                // FIXME: this is quite suspect as it is competing with timeoutExpired() without synchronization
+                cancelTimeout();
+                negotiationFailed(cause);
+                changeState(State.FAILED);
+            }
+        }
+
         channel.pipeline().addLast(NAME_OF_EXCEPTION_HANDLER, new ExceptionHandlingInboundChannelHandler());
 
-        replaceHelloMessageOutboundHandler();
+        // Remove special outbound handler for hello message. Insert regular netconf xml message (en|de)coders.
+        replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
+            new NetconfMessageToXMLEncoder());
 
         synchronized (this) {
             lockedChangeState(State.OPEN_WAIT);
@@ -287,14 +302,6 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         }
     }
 
-    /**
-     * Remove special outbound handler for hello message. Insert regular netconf xml message (en|de)coders.
-     */
-    private void replaceHelloMessageOutboundHandler() {
-        replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
-                new NetconfMessageToXMLEncoder());
-    }
-
     private static ChannelHandler replaceChannelHandler(final Channel channel, final String handlerKey,
                                                         final ChannelHandler decoder) {
         return channel.pipeline().replace(handlerKey, handlerKey, decoder);
@@ -333,21 +340,6 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         }
         LOG.debug("Transition from {} to {} is not allowed", state, newState);
         return false;
-    }
-
-    /**
-     * Handler to catch exceptions in pipeline during negotiation.
-     */
-    private final class ExceptionHandlingInboundChannelHandler extends ChannelInboundHandlerAdapter {
-        @Override
-        public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
-            LOG.warn("An exception occurred during negotiation with {} on channel {}",
-                    channel.remoteAddress(), channel, cause);
-            // FIXME: this is quite suspect as it is competing with timeoutExpired() without synchronization
-            cancelTimeout();
-            negotiationFailed(cause);
-            changeState(State.FAILED);
-        }
     }
 
     protected final void negotiationSuccessful(final S session) {
