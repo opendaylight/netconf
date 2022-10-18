@@ -183,6 +183,29 @@
       },
       "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cc4a94a_bc7035e1",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-10-18T17:49:30Z",
+      "side": 1,
+      "message": "static state: NEVER EVER DO THIS",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 74
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
