@@ -98,19 +98,19 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
                 // window resize write would try to write the message on an already locked channelSession,
                 // while the pending write was in progress from the write callback
                 synchronized (asyncInLock) {
+                    final var cause = future.getException();
                     if (LOG.isTraceEnabled()) {
-                        LOG.trace(
-                            "Ssh write request finished on channel: {} with result: {}: and ex:{}, message: {}",
-                            ctx.channel(), future.isWritten(), future.getException(), byteBufToString(byteBufMsg));
+                        LOG.trace("Ssh write request finished on channel: {} message: {}", ctx.channel(),
+                            byteBufToString(byteBufMsg), cause);
                     }
 
                     // Notify success or failure
-                    if (future.isWritten()) {
-                        promise.setSuccess();
-                    } else {
+                    if (cause != null) {
                         LOG.warn("Ssh write request failed on channel: {} for message: {}", ctx.channel(),
-                                byteBufToString(byteBufMsg), future.getException());
-                        promise.setFailure(future.getException());
+                            byteBufToString(byteBufMsg), cause);
+                        promise.setFailure(cause);
+                    } else {
+                        promise.setSuccess();
                     }
 
                     //rescheduling message from queue after successfully sent
