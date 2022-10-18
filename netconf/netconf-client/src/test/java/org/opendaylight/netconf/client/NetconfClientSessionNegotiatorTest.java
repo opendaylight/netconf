@@ -38,7 +38,6 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
@@ -62,7 +61,7 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Before
     public void setUp() throws Exception {
-        helloMessage = NetconfHelloMessage.createClientHello(Sets.newSet("exi:1.0"), Optional.empty());
+        helloMessage = NetconfHelloMessage.createClientHello(Set.of("exi:1.0"), Optional.empty());
         pipeline = mockChannelPipeline();
         future = mockChannelFuture();
         channel = mockChannel();
@@ -158,9 +157,8 @@ public class NetconfClientSessionNegotiatorTest {
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
         negotiator.channelActive(null);
-        Set<String> caps = Sets.newSet("a", "b");
-        NetconfHelloMessage helloServerMessage = NetconfHelloMessage.createServerHello(caps, 10);
-        negotiator.handleMessage(helloServerMessage);
+        doReturn(null).when(future).cause();
+        negotiator.handleMessage(NetconfHelloMessage.createServerHello(Set.of("a", "b"), 10));
         verify(promise).setSuccess(any());
     }
 
@@ -170,10 +168,9 @@ public class NetconfClientSessionNegotiatorTest {
         doReturn(false).when(promise).isDone();
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
-        Set<String> caps = Sets.newSet("a", "b");
-        NetconfHelloMessage helloServerMessage = NetconfHelloMessage.createServerHello(caps, 10);
 
-        negotiator.handleMessage(helloServerMessage);
+        doReturn(null).when(future).cause();
+        negotiator.handleMessage(NetconfHelloMessage.createServerHello(Set.of("a", "b"), 10));
         negotiator.channelActive(null);
 
         verify(promise).setSuccess(any());
@@ -186,9 +183,9 @@ public class NetconfClientSessionNegotiatorTest {
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, exiMessage);
 
+        doReturn(null).when(future).cause();
         negotiator.channelActive(null);
-        Set<String> caps = Sets.newSet("exi:1.0");
-        NetconfHelloMessage message = NetconfHelloMessage.createServerHello(caps, 10);
+        NetconfHelloMessage message = NetconfHelloMessage.createServerHello(Set.of("exi:1.0"), 10);
 
         doAnswer(invocationOnMock -> {
             channelInboundHandlerAdapter = invocationOnMock.getArgument(2);
