@@ -158,6 +158,7 @@ public class NetconfClientSessionNegotiatorTest {
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
         negotiator.channelActive(null);
+        doReturn(null).when(future).cause();
         negotiator.handleMessage(NetconfHelloMessage.createServerHello(Set.of("a", "b"), 10));
         verify(promise).setSuccess(any());
     }
@@ -169,6 +170,7 @@ public class NetconfClientSessionNegotiatorTest {
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
+        doReturn(null).when(future).cause();
         negotiator.handleMessage(NetconfHelloMessage.createServerHello(Set.of("a", "b"), 10));
         negotiator.channelActive(null);
         verify(promise).setSuccess(any());
@@ -182,6 +184,7 @@ public class NetconfClientSessionNegotiatorTest {
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, exiMessage);
 
+        doReturn(null).when(future).cause();
         negotiator.channelActive(null);
 
         doAnswer(invocationOnMock -> {
