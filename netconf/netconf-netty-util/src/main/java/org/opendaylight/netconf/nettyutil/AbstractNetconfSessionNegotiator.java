@@ -130,9 +130,13 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         }
     }
 
-    protected final synchronized boolean ifNegotiatedAlready() {
+    protected final boolean ifNegotiatedAlready() {
         // Indicates whether negotiation already started
-        return this.state != State.IDLE;
+        return state() != State.IDLE;
+    }
+
+    private synchronized State state() {
+        return state;
     }
 
     private static @Nullable SslHandler getSslHandler(final Channel channel) {
@@ -377,6 +381,11 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
     public final void channelRead(final ChannelHandlerContext ctx, final Object msg) {
+        if (state() == State.FAILED) {
+            // We have already failed -- do not process any more messages
+            return;
+        }
+
         LOG.debug("Negotiation read invoked on channel {}", channel);
         try {
             handleMessage((NetconfHelloMessage) msg);
