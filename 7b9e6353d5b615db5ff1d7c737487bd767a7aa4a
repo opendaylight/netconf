@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0bc7de9_22381f79",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-10-18T17:18:51Z",
+      "side": 1,
+      "message": "also needs a manual rebase",
+      "revId": "7b9e6353d5b615db5ff1d7c737487bd767a7aa4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e101e22_4c1e4602",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-10-18T17:18:51Z",
+      "side": 1,
+      "message": "this should be a shared constant, also it should be imported as AttributeKey and it comes from AttributeRepository",
+      "range": {
+        "startLine": 78,
+        "startChar": 26,
+        "endLine": 78,
+        "endChar": 55
+      },
+      "revId": "7b9e6353d5b615db5ff1d7c737487bd767a7aa4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
