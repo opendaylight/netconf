@@ -16,26 +16,31 @@ import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 @Beta
+@Component
 @Singleton
 public final class DefaultBaseNetconfSchemas implements BaseNetconfSchemas {
     private final @NonNull BaseSchema withoutNotifications;
     private final @NonNull BaseSchema withNotifications;
 
     @Inject
-    public DefaultBaseNetconfSchemas(final YangParserFactory parserFactory) throws YangParserException {
+    @Activate
+    public DefaultBaseNetconfSchemas(@Reference final YangParserFactory parserFactory) throws YangParserException {
         withoutNotifications = new BaseSchema(withoutNotifications(parserFactory));
         withNotifications = new BaseSchema(withNotifications(parserFactory));
     }
 
     @Override
-    public @NonNull BaseSchema getBaseSchema() {
+    public BaseSchema getBaseSchema() {
         return withoutNotifications;
     }
 
     @Override
-    public @NonNull BaseSchema getBaseSchemaWithNotifications() {
+    public BaseSchema getBaseSchemaWithNotifications() {
         return withNotifications;
     }
 
