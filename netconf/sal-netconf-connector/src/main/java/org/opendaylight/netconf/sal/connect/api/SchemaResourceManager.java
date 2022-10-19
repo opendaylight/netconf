@@ -11,10 +11,13 @@ import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 
 @Beta
 @NonNullByDefault
 public interface SchemaResourceManager {
+
+    YangParserFactory getYangParserFactory();
 
     SchemaResourcesDTO getSchemaResources(NetconfNode node, Object nodeId);
 }

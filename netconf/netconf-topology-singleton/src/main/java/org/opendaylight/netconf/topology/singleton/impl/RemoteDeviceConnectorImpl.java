@@ -36,6 +36,7 @@ import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
+import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemasFactory;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
@@ -72,6 +73,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
+import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +115,11 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         requireNonNull(netconfNode.getHost());
         requireNonNull(netconfNode.getPort());
 
-        deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceHandler);
+        try {
+            deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceHandler);
+        } catch (YangParserException e) {
+            throw new IllegalStateException(e);
+        }
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
         final NetconfReconnectingClientConfiguration clientConfig =
@@ -148,7 +154,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     @VisibleForTesting
     NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-                                                 final RemoteDeviceHandler<NetconfSessionPreferences> deviceHandler) {
+                                                 final RemoteDeviceHandler<NetconfSessionPreferences> deviceHandler)
+            throws YangParserException {
         //setup default values since default value is not supported in mdsal
         final long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
                 ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis().toJava();
@@ -174,12 +181,15 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             final String yangLibUsername = node.getYangLibrary().getUsername();
             final String yangLigPassword = node.getYangLibrary().getPassword();
 
+            final LibraryModulesSchemasFactory schemasFactory = new LibraryModulesSchemasFactory(
+                    netconfTopologyDeviceSetup.getResourceManager().getYangParserFactory());
+
             final LibraryModulesSchemas libraryModulesSchemas;
             if (yangLibURL != null) {
                 if (yangLibUsername != null && yangLigPassword != null) {
-                    libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
+                    libraryModulesSchemas = schemasFactory.create(yangLibURL, yangLibUsername, yangLigPassword);
                 } else {
-                    libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL);
+                    libraryModulesSchemas = schemasFactory.create(yangLibURL);
                 }
 
                 for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry :

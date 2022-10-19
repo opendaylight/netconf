@@ -17,6 +17,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.parser.api.YangParserException;
+import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 
 /**
  * Default implementation resolving schemas QNames from netconf-state or from modules-state.
@@ -25,6 +27,12 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
     private static final QName RFC8525_YANG_LIBRARY_CAPABILITY = $YangModuleInfoImpl.getInstance().getName();
     private static final QName RFC7895_YANG_LIBRARY_CAPABILITY = RFC8525_YANG_LIBRARY_CAPABILITY
         .bindTo(QNameModule.create(RFC8525_YANG_LIBRARY_CAPABILITY.getNamespace(), Revision.of("2016-06-21"))).intern();
+
+    private final LibraryModulesSchemasFactory libSchemaFactory;
+
+    public NetconfStateSchemasResolverImpl(final YangParserFactory parserFactory) throws YangParserException {
+        libSchemaFactory = new LibraryModulesSchemasFactory(parserFactory);
+    }
 
     @Override
     public NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc,
@@ -36,7 +44,7 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
         }
         if (remoteSessionCapabilities.containsModuleCapability(RFC8525_YANG_LIBRARY_CAPABILITY)
                 || remoteSessionCapabilities.containsModuleCapability(RFC7895_YANG_LIBRARY_CAPABILITY)) {
-            return LibraryModulesSchemas.create(deviceRpc, id);
+            return libSchemaFactory.create(deviceRpc, id);
         }
 
         return NetconfStateSchemas.EMPTY;

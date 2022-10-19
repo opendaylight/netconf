@@ -12,32 +12,37 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Map;
+import java.util.ServiceLoader;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 
 public class LibraryModulesSchemasTest {
+    private static LibraryModulesSchemasFactory FACTORY;
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        FACTORY = new LibraryModulesSchemasFactory(
+            ServiceLoader.load(YangParserFactory.class).findFirst().orElseThrow());
+    }
 
     @Test
     public void testCreate() throws Exception {
         // test create from xml
-        LibraryModulesSchemas libraryModulesSchemas =
-                LibraryModulesSchemas.create(getClass().getResource("/yang-library.xml").toString());
-
+        final var libraryModulesSchemas = FACTORY.create(getClass().getResource("/yang-library.xml").toString());
         verifySchemas(libraryModulesSchemas);
 
         // test create from json
-        LibraryModulesSchemas libraryModuleSchemas =
-                LibraryModulesSchemas.create(getClass().getResource("/yang-library.json").toString());
-
+        final var libraryModuleSchemas = FACTORY.create(getClass().getResource("/yang-library.json").toString());
+        // FIXME: bad assert!
         verifySchemas(libraryModulesSchemas);
     }
 
-    private static void verifySchemas(final LibraryModulesSchemas libraryModulesSchemas) throws MalformedURLException {
-        final Map<SourceIdentifier, URL> resolvedModulesSchema = libraryModulesSchemas.getAvailableModels();
+    private static void verifySchemas(final LibraryModulesSchemas libraryModulesSchemas) throws Exception {
+        final var resolvedModulesSchema = libraryModulesSchemas.getAvailableModels();
         assertThat(resolvedModulesSchema.size(), is(3));
 
         assertTrue(resolvedModulesSchema.containsKey(new SourceIdentifier("module-with-revision", "2014-04-08")));
@@ -56,10 +61,8 @@ public class LibraryModulesSchemasTest {
 
     @Test
     public void testCreateInvalidModulesEntries() throws Exception {
-        LibraryModulesSchemas libraryModulesSchemas =
-                LibraryModulesSchemas.create(getClass().getResource("/yang-library-fail.xml").toString());
-
-        final Map<SourceIdentifier, URL> resolvedModulesSchema = libraryModulesSchemas.getAvailableModels();
+        final var resolvedModulesSchema = FACTORY.create(getClass().getResource("/yang-library-fail.xml").toString())
+            .getAvailableModels();
         assertThat(resolvedModulesSchema.size(), is(1));
 
         assertFalse(resolvedModulesSchema.containsKey(new SourceIdentifier("module-with-bad-url")));
@@ -72,8 +75,8 @@ public class LibraryModulesSchemasTest {
     @Test
     public void testCreateFromInvalidAll() throws Exception {
         // test bad yang lib url
-        LibraryModulesSchemas libraryModulesSchemas = LibraryModulesSchemas.create("ObviouslyBadUrl");
-        assertThat(libraryModulesSchemas.getAvailableModels(), is(Collections.emptyMap()));
+        final var libraryModulesSchemas = FACTORY.create("ObviouslyBadUrl");
+        assertThat(libraryModulesSchemas.getAvailableModels(), is(Map.of()));
 
         // TODO test also fail on json and xml parsing. But can we fail not on runtime exceptions?
     }

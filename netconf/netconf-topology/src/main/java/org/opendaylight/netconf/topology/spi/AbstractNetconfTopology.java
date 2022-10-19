@@ -44,6 +44,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
+import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemasFactory;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
@@ -80,6 +81,8 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
+import org.opendaylight.yangtools.yang.parser.api.YangParserException;
+import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +131,11 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     @Override
     public ListenableFuture<NetconfDeviceCapabilities> connectNode(final NodeId nodeId, final Node configNode) {
         LOG.info("Connecting RemoteDevice{{}} , with config {}", nodeId, hideCredentials(configNode));
-        return setupConnection(nodeId, configNode);
+        try {
+            return setupConnection(nodeId, configNode);
+        } catch (YangParserException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
@@ -160,7 +167,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected ListenableFuture<NetconfDeviceCapabilities> setupConnection(final NodeId nodeId,
-                                                                          final Node configNode) {
+                                                                          final Node configNode)
+            throws YangParserException {
         final NetconfNode netconfNode = configNode.augmentation(NetconfNode.class);
         final NetconfNodeAugmentedOptional nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
 
@@ -193,12 +201,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return future;
     }
 
-    protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node) {
+    protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node)
+            throws YangParserException {
         return createDeviceCommunicator(nodeId, node, null);
     }
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-            final NetconfNodeAugmentedOptional nodeOptional) {
+            final NetconfNodeAugmentedOptional nodeOptional) throws YangParserException {
         final RemoteDeviceId remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
 
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
@@ -229,7 +238,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
                 .build();
-            yanglibRegistrations = registerDeviceSchemaSources(remoteDeviceId, node, resources);
+
+            yanglibRegistrations = registerDeviceSchemaSources(remoteDeviceId, node, resources,
+                    schemaManager.getYangParserFactory());
         }
 
         final Optional<UserPreferences> userCapabilities = getUserCapabilities(node);
@@ -251,7 +262,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     private static List<SchemaSourceRegistration<?>> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
-            final NetconfNode node, final SchemaResourcesDTO resources) {
+            final NetconfNode node, final SchemaResourcesDTO resources, final YangParserFactory factory)
+            throws YangParserException {
         final YangLibrary yangLibrary = node.getYangLibrary();
         if (yangLibrary != null) {
             final Uri uri = yangLibrary.getYangLibraryUrl();
@@ -264,10 +276,11 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 final LibraryModulesSchemas schemas;
                 final String yangLibUsername = yangLibrary.getUsername();
                 final String yangLigPassword = yangLibrary.getPassword();
+                final LibraryModulesSchemasFactory schemasFactory = new LibraryModulesSchemasFactory(factory);
                 if (yangLibUsername != null && yangLigPassword != null) {
-                    schemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
+                    schemas = schemasFactory.create(yangLibURL, yangLibUsername, yangLigPassword);
                 } else {
-                    schemas = LibraryModulesSchemas.create(yangLibURL);
+                    schemas = schemasFactory.create(yangLibURL);
                 }
 
                 for (final Map.Entry<SourceIdentifier, URL> entry : schemas.getAvailableModels().entrySet()) {

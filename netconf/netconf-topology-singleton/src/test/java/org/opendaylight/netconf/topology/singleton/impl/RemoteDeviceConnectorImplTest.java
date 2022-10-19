@@ -57,6 +57,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 import scala.concurrent.duration.Duration;
 
@@ -155,7 +156,7 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testKeapAliveFacade() {
+    public void testKeapAliveFacade() throws YangParserException {
         final Credentials credentials = new LoginPasswordBuilder()
                 .setPassword("admin").setUsername("admin").build();
         final NetconfNode netconfNode = new NetconfNodeBuilder()

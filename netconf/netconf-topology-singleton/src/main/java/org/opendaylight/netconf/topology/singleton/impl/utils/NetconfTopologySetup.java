@@ -20,6 +20,7 @@ import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
 import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -45,6 +46,7 @@ public class NetconfTopologySetup {
     private final String privateKeyPassphrase;
     private final AAAEncryptionService encryptionService;
     private final BaseNetconfSchemas baseSchemas;
+    private final SchemaResourceManager resourceManager;
 
     NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         this.clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
@@ -65,6 +67,7 @@ public class NetconfTopologySetup {
         this.privateKeyPassphrase = builder.getPrivateKeyPassphrase();
         this.encryptionService = builder.getEncryptionService();
         this.baseSchemas = builder.getBaseSchemas();
+        this.resourceManager = builder.getResourceManager();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -139,6 +142,10 @@ public class NetconfTopologySetup {
         return baseSchemas;
     }
 
+    public SchemaResourceManager getResourceManager() {
+        return resourceManager;
+    }
+
     public static class NetconfTopologySetupBuilder {
         private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
         private DOMRpcProviderService rpcProviderRegistry;
@@ -158,6 +165,7 @@ public class NetconfTopologySetup {
         private String privateKeyPassphrase;
         private AAAEncryptionService encryptionService;
         private BaseNetconfSchemas baseSchemas;
+        private SchemaResourceManager resourceManager;
 
         public NetconfTopologySetupBuilder() {
 
@@ -290,6 +298,15 @@ public class NetconfTopologySetup {
                 final NetconfDevice.SchemaResourcesDTO schemaResourceDTO) {
             this.schemaResourceDTO = schemaResourceDTO;
             return this;
+        }
+
+        public NetconfTopologySetupBuilder setResourceManager(final SchemaResourceManager resourceManager) {
+            this.resourceManager = resourceManager;
+            return this;
+        }
+
+        public SchemaResourceManager getResourceManager() {
+            return resourceManager;
         }
 
         NetconfDevice.SchemaResourcesDTO getSchemaResourceDTO() {

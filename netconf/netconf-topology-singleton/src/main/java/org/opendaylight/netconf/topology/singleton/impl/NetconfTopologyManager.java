@@ -319,6 +319,7 @@ public class NetconfTopologyManager
                 .setTopologyId(topologyId)
                 .setNetconfClientDispatcher(clientDispatcher)
                 .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode, deviceId))
+                .setResourceManager(resourceManager)
                 .setIdleTimeout(writeTxIdleTimeout)
                 .setPrivateKeyPath(privateKeyPath)
                 .setPrivateKeyPassphrase(privateKeyPassphrase)
