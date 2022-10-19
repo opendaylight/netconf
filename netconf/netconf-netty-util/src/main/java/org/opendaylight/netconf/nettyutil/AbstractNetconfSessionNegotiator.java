@@ -297,10 +297,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         if (state == State.IDLE && newState == State.OPEN_WAIT) {
             return true;
         }
-        if (state == State.OPEN_WAIT && newState == State.ESTABLISHED) {
-            return true;
-        }
-        if (state == State.OPEN_WAIT && newState == State.FAILED) {
+        if (state == State.OPEN_WAIT && (newState == State.ESTABLISHED || newState == State.FAILED)) {
             return true;
         }
         LOG.debug("Transition from {} to {} is not allowed", state, newState);
