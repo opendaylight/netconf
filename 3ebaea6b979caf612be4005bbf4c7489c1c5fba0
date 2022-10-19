@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2804c079_10627ebf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9152
+      },
+      "writtenOn": "2022-10-19T11:56:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "def7cc6d_e5ddff10",
+      "revId": "3ebaea6b979caf612be4005bbf4c7489c1c5fba0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd1c90f9_5798ebfc",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-09-20T02:24:06Z",
       "side": 1,
       "message": "This still prevents selection of child nodes of a list if the list does not have a key, which seems to be valid fields expression.",
+      "revId": "3ebaea6b979caf612be4005bbf4c7489c1c5fba0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce94c0e9_d58e2ada",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/NetconfFieldsTranslator.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9152
+      },
+      "writtenOn": "2022-10-19T11:56:04Z",
+      "side": 1,
+      "message": "Start node is changed, so this is resolved.",
+      "parentUuid": "dd1c90f9_5798ebfc",
       "revId": "3ebaea6b979caf612be4005bbf4c7489c1c5fba0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
