@@ -21,10 +21,11 @@ import io.netty.util.Timeout;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardedBy;
-import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -58,6 +59,16 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     private static final String DEFAULT_MAXIMUM_CHUNK_SIZE_PROP = "org.opendaylight.netconf.default.maximum.chunk.size";
     private static final int DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT = 16 * 1024 * 1024;
 
+    private static final VarHandle STATE;
+
+    static {
+        try {
+            STATE = MethodHandles.lookup().findVarHandle(AbstractNetconfSessionNegotiator.class, "state", State.class);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
     /**
      * Default upper bound on the size of an individual chunk. This value can be controlled through
      * {@value #DEFAULT_MAXIMUM_CHUNK_SIZE_PROP} system property and defaults to
@@ -88,8 +99,8 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
 
     @GuardedBy("this")
     private Timeout timeoutTask;
-    @GuardedBy("this")
-    private State state = State.IDLE;
+
+    private volatile State state = State.IDLE;
 
     protected AbstractNetconfSessionNegotiator(final NetconfHelloMessage hello, final Promise<S> promise,
                                                final Channel channel, final Timer timer, final L sessionListener,
@@ -136,11 +147,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
 
     protected final boolean ifNegotiatedAlready() {
         // Indicates whether negotiation already started
-        return state() != State.IDLE;
-    }
-
-    private synchronized State state() {
-        return state;
+        return state != State.IDLE;
     }
 
     private static @Nullable SslHandler getSslHandler(final Channel channel) {
@@ -157,7 +164,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         final var helloCause = helloFuture.cause();
         if (helloCause != null) {
             LOG.warn("Failed to send negotiation proposal on channel {}", channel, helloCause);
-            failAndClose();
+            failAndClose(State.IDLE);
             return;
         }
 
@@ -170,7 +177,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
                 // FIXME: this is quite suspect as it is competing with timeoutExpired() without synchronization
                 cancelTimeout();
                 negotiationFailed(cause);
-                changeState(State.FAILED);
+                changeState(State.OPEN_WAIT, State.FAILED);
             }
         }
 
@@ -181,7 +188,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
             new NetconfMessageToXMLEncoder());
 
         synchronized (this) {
-            lockedChangeState(State.OPEN_WAIT);
+            changeState(State.IDLE, State.OPEN_WAIT);
 
             // Service the timeout on channel's eventloop, so that we do not get state transition problems
             timeoutTask = timer.newTimeout(unused -> channel.eventLoop().execute(this::timeoutExpired),
@@ -211,7 +218,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         }
         timeoutTask = null;
 
-        if (state != State.ESTABLISHED) {
+        if (state == State.OPEN_WAIT) {
             LOG.debug("Connection timeout after {}ms, session backed by channel {} is in state {}",
                 connectionTimeoutMillis, channel, state);
 
@@ -220,15 +227,15 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
             if (!promise.isDone() && !promise.isCancelled()) {
                 LOG.warn("Netconf session backed by channel {} was not established after {}", channel,
                     connectionTimeoutMillis);
-                failAndClose();
+                failAndClose(State.OPEN_WAIT);
             }
-        } else if (channel.isOpen()) {
+        } else if (state == State.ESTABLISHED && channel.isOpen()) {
             channel.pipeline().remove(NAME_OF_EXCEPTION_HANDLER);
         }
     }
 
-    private void failAndClose() {
-        changeState(State.FAILED);
+    private void failAndClose(final State expected) {
+        changeState(expected, State.FAILED);
         channel.close().addListener(this::onChannelClosed);
     }
 
@@ -256,7 +263,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
             insertChunkFramingToPipeline();
         }
 
-        changeState(State.ESTABLISHED);
+        changeState(State.OPEN_WAIT, State.ESTABLISHED);
         return getSession(sessionListener, channel, netconfMessage);
     }
 
@@ -307,16 +314,11 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         return channel.pipeline().replace(handlerKey, handlerKey, decoder);
     }
 
-    private synchronized void changeState(final State newState) {
-        lockedChangeState(newState);
-    }
-
-    @Holding("this")
-    private void lockedChangeState(final State newState) {
-        LOG.debug("Changing state from : {} to : {} for channel: {}", state, newState, channel);
-        checkState(isStateChangePermitted(state, newState),
-                "Cannot change state from %s to %s for channel %s", state, newState, channel);
-        this.state = newState;
+    private void changeState(final State expected, final State target) {
+        final var actual = STATE.compareAndExchange(this, expected, target);
+        checkState(actual == expected, "Expected state %s does not match actual %s, cannot transition to %s", expected,
+            actual, target);
+        LOG.debug("Changed state from : {} to : {} for channel: {}", expected, target, channel);
     }
 
     private static boolean containsBase11Capability(final Document doc) {
@@ -328,17 +330,6 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
                 return true;
             }
         }
-        return false;
-    }
-
-    private static boolean isStateChangePermitted(final State state, final State newState) {
-        if (state == State.IDLE && (newState == State.OPEN_WAIT || newState == State.FAILED)) {
-            return true;
-        }
-        if (state == State.OPEN_WAIT && (newState == State.ESTABLISHED || newState == State.FAILED)) {
-            return true;
-        }
-        LOG.debug("Transition from {} to {} is not allowed", state, newState);
         return false;
     }
 
@@ -369,7 +360,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
     public final void channelRead(final ChannelHandlerContext ctx, final Object msg) {
-        if (state() == State.FAILED) {
+        if (state == State.FAILED) {
             // We have already failed -- do not process any more messages
             return;
         }
