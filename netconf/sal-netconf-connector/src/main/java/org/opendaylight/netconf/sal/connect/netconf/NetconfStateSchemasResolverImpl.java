@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf;
 
+import static java.util.Objects.requireNonNull;
+
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -26,6 +28,12 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
     private static final QName RFC7895_YANG_LIBRARY_CAPABILITY = RFC8525_YANG_LIBRARY_CAPABILITY
         .bindTo(QNameModule.create(RFC8525_YANG_LIBRARY_CAPABILITY.getNamespace(), Revision.of("2016-06-21"))).intern();
 
+    private final LibraryModulesSchemaFactory libraryModulesSchemaFactory;
+
+    public NetconfStateSchemasResolverImpl(final LibraryModulesSchemaFactory libraryModulesSchemaFactory) {
+        this.libraryModulesSchemaFactory = requireNonNull(libraryModulesSchemaFactory);
+    }
+
     @Override
     public NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc,
             final NetconfSessionPreferences remoteSessionCapabilities,
@@ -36,7 +44,7 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
         }
         if (remoteSessionCapabilities.containsModuleCapability(RFC8525_YANG_LIBRARY_CAPABILITY)
                 || remoteSessionCapabilities.containsModuleCapability(RFC7895_YANG_LIBRARY_CAPABILITY)) {
-            return LibraryModulesSchemas.create(deviceRpc, id);
+            return libraryModulesSchemaFactory.createLibraryModulesSchema(deviceRpc, id);
         }
 
         return NetconfStateSchemas.EMPTY;

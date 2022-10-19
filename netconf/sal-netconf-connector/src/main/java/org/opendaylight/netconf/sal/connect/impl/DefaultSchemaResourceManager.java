@@ -19,6 +19,7 @@ import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
+import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemaFactory;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -51,6 +52,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
 
     @GuardedBy("this")
     private final Map<String, SchemaResourcesDTO> resources = new HashMap<>();
+    private final @NonNull LibraryModulesSchemaFactory libraryModulesSchemaFactory;
     private final @NonNull SchemaResourcesDTO defaultResources;
     private final YangParserFactory parserFactory;
     private final String defaultSubdirectory;
@@ -67,6 +69,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         this.parserFactory = requireNonNull(parserFactory);
         this.rootDirectory = requireNonNull(rootDirectory);
         this.defaultSubdirectory = requireNonNull(defaultSubdirectory);
+        libraryModulesSchemaFactory = new LibraryModulesSchemaFactory(parserFactory);
         defaultResources = createResources(defaultSubdirectory);
         LOG.info("Schema Resource Manager instantiated on {}/{}", rootDirectory, defaultSubdirectory);
     }
@@ -125,6 +128,6 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
 
         return new SchemaResourcesDTO(repository, repository,
             repository.createEffectiveModelContextFactory(SchemaContextFactoryConfiguration.getDefault()),
-            new NetconfStateSchemasResolverImpl());
+            new NetconfStateSchemasResolverImpl(libraryModulesSchemaFactory));
     }
 }
