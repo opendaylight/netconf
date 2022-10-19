@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
@@ -26,6 +27,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfig
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.SoftSchemaSourceCache;
+import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.ir.IRSchemaSource;
@@ -56,17 +58,20 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
     private final String defaultSubdirectory;
     private final String rootDirectory;
 
+    private final NetconfDeviceSchemasResolver stateSchemasResolver;
+
     @Activate
     @Inject
-    public DefaultSchemaResourceManager(@Reference final YangParserFactory parserFactory) {
+    public DefaultSchemaResourceManager(@Reference final YangParserFactory parserFactory) throws YangParserException {
         this(parserFactory, "cache", "schema");
     }
 
     public DefaultSchemaResourceManager(final YangParserFactory parserFactory, final String rootDirectory,
-            final String defaultSubdirectory) {
+            final String defaultSubdirectory) throws YangParserException {
         this.parserFactory = requireNonNull(parserFactory);
         this.rootDirectory = requireNonNull(rootDirectory);
         this.defaultSubdirectory = requireNonNull(defaultSubdirectory);
+        stateSchemasResolver = new NetconfStateSchemasResolverImpl(parserFactory);
         defaultResources = createResources(defaultSubdirectory);
         LOG.info("Schema Resource Manager instantiated on {}/{}", rootDirectory, defaultSubdirectory);
     }
@@ -125,6 +130,6 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
 
         return new SchemaResourcesDTO(repository, repository,
             repository.createEffectiveModelContextFactory(SchemaContextFactoryConfiguration.getDefault()),
-            new NetconfStateSchemasResolverImpl());
+            stateSchemasResolver);
     }
 }
