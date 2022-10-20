@@ -233,15 +233,25 @@ public class RestconfDataServiceImplTest {
                 .when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty());
         final Response response = dataService.readData(uriInfo);
+        final Response altResponse = dataService.readDataRoot(uriInfo);
         assertNotNull(response);
         assertEquals(200, response.getStatus());
+        assertNotNull(altResponse);
+        assertEquals(200, altResponse.getStatus());
 
         final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
         assertTrue(data instanceof ContainerNode);
+        final NormalizedNode altData = ((NormalizedNodePayload) altResponse.getEntity()).getData();
+        assertTrue(altData instanceof ContainerNode);
         final Collection<DataContainerChild> rootNodes = ((ContainerNode) data).body();
         assertEquals(1, rootNodes.size());
+        final Collection<DataContainerChild> altRootNodes = ((ContainerNode) altData).body();
+        assertEquals(1, altRootNodes.size());
         final Collection<DataContainerChild> allDataChildren = ((ContainerNode) rootNodes.iterator().next()).body();
         assertEquals(3, allDataChildren.size());
+        final Collection<DataContainerChild> altAllDataChildren = ((ContainerNode) altRootNodes.iterator().next())
+                .body();
+        assertEquals(3, altAllDataChildren.size());
     }
 
     private static ContainerNode wrapNodeByDataRootContainer(final DataContainerChild data) {
