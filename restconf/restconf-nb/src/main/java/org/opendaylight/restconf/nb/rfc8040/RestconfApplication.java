@@ -35,12 +35,11 @@ public class RestconfApplication extends AbstractRestconfApplication {
             final Configuration configuration) {
         super(databindProvider, mountPointService, List.of(
             streamSubscription,
-            new RestconfDataServiceImpl(databindProvider, dataBroker, mountPointService, streamSubscription,
-                actionService, configuration),
             new RestconfInvokeOperationsServiceImpl(rpcService),
-            new RestconfOperationsServiceImpl(databindProvider, mountPointService),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
-            new RestconfImpl(databindProvider)));
+            new RestconfImpl(databindProvider, new RestconfDataServiceImpl(databindProvider, dataBroker,
+                    mountPointService, streamSubscription, actionService, configuration),
+                    new RestconfOperationsServiceImpl(databindProvider, mountPointService))));
     }
 
     @Inject
