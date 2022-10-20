@@ -103,10 +103,6 @@ public class TCPClientServerTest {
             final var client = TCPClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
                 clientGrouping).get(2, TimeUnit.SECONDS);
             try {
-                assertThat(client.toString(), allOf(
-                    startsWith("TCPClient{listener=clientListener, state=TCPTransportChannel{channel=[id: 0x"),
-                    endsWith(":" + serverPort.getValue() + "]}}")));
-
                 verify(serverListener, timeout(500)).onTransportChannelEstablished(any());
                 final var serverTransports = serverCaptor.getAllValues();
                 assertEquals(1, serverTransports.size());
@@ -120,6 +116,10 @@ public class TCPClientServerTest {
                 assertThat(clientTransports.get(0).toString(), allOf(
                     startsWith("TCPTransportChannel{channel=[id: "),
                     endsWith(":" + serverPort.getValue() + "]}")));
+
+                assertThat(client.toString(), allOf(
+                    startsWith("TCPClient{listener=clientListener, state=TCPTransportChannel{channel=[id: 0x"),
+                    endsWith(":" + serverPort.getValue() + "]}}")));
             } finally {
                 client.shutdown().get(2, TimeUnit.SECONDS);
             }
