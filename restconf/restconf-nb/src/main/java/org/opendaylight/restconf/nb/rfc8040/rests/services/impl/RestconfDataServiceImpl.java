@@ -68,6 +68,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Restconf;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -80,6 +81,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -87,6 +89,7 @@ import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,6 +184,30 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     .entity(NormalizedNodePayload.ofReadData(instanceIdentifier, node, queryParams))
                     .build();
         }
+    }
+
+    // Maybe making this one public inside RestconfImpl not a bad idea
+    private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
+
+    @Override
+    public Response readDataRoot(UriInfo uriInfo) {
+        final EffectiveModelContext context = schemaContextHandler.get();
+
+        final SchemaInferenceStack stack = SchemaInferenceStack.of(context);
+        // FIXME: use rc:data instantiation once the stack supports it
+        stack.enterGrouping(Restconf.QNAME);
+        stack.enterDataTree(Restconf.QNAME);
+        stack.enterDataTree(YANG_LIBRARY_VERSION);
+
+
+        final var yLibVersion =  NormalizedNodePayload.of(InstanceIdentifierContext.ofStack(stack),
+                ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, Rfc8040.IetfYangLibrary.REVISION.toString()));
+
+        final var operationsJson = OperationsContent.JSON.bodyFor(schemaContextHandler.get());
+
+        // just readEntity(NormalizedNodePayload.class) doesn't work if you want to make it back into
+        // NormalizedNodePayload
+        return readData(uriInfo);
     }
 
     private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
