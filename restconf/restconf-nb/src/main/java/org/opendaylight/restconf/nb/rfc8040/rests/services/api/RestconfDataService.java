@@ -71,6 +71,26 @@ public interface RestconfDataService {
     Response readData(@Context UriInfo uriInfo);
 
     /**
+     * Get target data resource from data root.
+     *
+     * @param uriInfo
+     *            URI info
+     * @return {@link NormalizedNodePayload}
+     */
+    @GET
+    @Path("/")
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    default Response readDataRoot(@Context UriInfo uriInfo) {
+        return readData(uriInfo);
+    }
+
+    /**
      * Create or replace the target data resource.
      *
      * @param identifier
