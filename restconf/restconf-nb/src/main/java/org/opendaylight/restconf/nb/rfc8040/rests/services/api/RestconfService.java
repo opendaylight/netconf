@@ -10,7 +10,10 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
@@ -33,4 +36,19 @@ public interface RestconfService {
         MediaType.TEXT_XML
     })
     NormalizedNodePayload getLibraryVersion();
+
+    /**
+     * Get target data resource from data root.
+     * @return {@link NormalizedNodePayload}
+     */
+    @GET
+    @Path("/")
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    Response readDataRoot(@Context UriInfo uriInfo);
 }
