@@ -40,7 +40,10 @@ public class RestconfApplication extends AbstractRestconfApplication {
             new RestconfInvokeOperationsServiceImpl(rpcService),
             new RestconfOperationsServiceImpl(databindProvider, mountPointService),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
-            new RestconfImpl(databindProvider)));
+            // TODO update it later
+            new RestconfImpl(databindProvider, new RestconfDataServiceImpl(databindProvider, dataBroker,
+                    mountPointService, streamSubscription, actionService, configuration),
+                    new RestconfOperationsServiceImpl(databindProvider, mountPointService))));
     }
 
     @Inject
