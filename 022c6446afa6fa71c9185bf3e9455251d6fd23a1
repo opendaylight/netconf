@@ -16,6 +16,24 @@
       "message": "ehm..",
       "revId": "022c6446afa6fa71c9185bf3e9455251d6fd23a1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b179d148_828a4fd4",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfDataService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-10-20T13:06:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54fa3382_a0cb7a94",
+      "revId": "022c6446afa6fa71c9185bf3e9455251d6fd23a1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
