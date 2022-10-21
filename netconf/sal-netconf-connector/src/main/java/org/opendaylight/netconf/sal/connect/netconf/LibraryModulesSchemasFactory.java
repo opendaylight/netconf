@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.connect.netconf;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
@@ -45,6 +46,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
@@ -55,6 +57,7 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -136,7 +139,8 @@ public final class LibraryModulesSchemasFactory {
         }
     }
 
-    public LibraryModulesSchemas create(final NetconfDeviceRpc deviceRpc, final RemoteDeviceId deviceId) {
+    public LibraryModulesSchemas create(final NetconfDeviceRpc deviceRpc, final RemoteDeviceId deviceId,
+            final EffectiveModelContext context) {
         final DOMRpcResult moduleListNodeResult;
         try {
             moduleListNodeResult = deviceRpc.invokeRpc(NETCONF_GET_QNAME, Builders.containerBuilder()
@@ -161,7 +165,7 @@ public final class LibraryModulesSchemasFactory {
         }
 
         final Optional<DataContainerChild> modulesStateNode =
-                findModulesStateNode(moduleListNodeResult.getResult());
+                findModulesStateNode(moduleListNodeResult.getResult(), context);
         if (modulesStateNode.isPresent()) {
             final DataContainerChild node = modulesStateNode.get();
             checkState(node instanceof ContainerNode, "Expecting container containing schemas, but was %s", node);
@@ -212,16 +216,36 @@ public final class LibraryModulesSchemasFactory {
         return createFromURLConnection(connection);
     }
 
-    private static Optional<DataContainerChild> findModulesStateNode(final NormalizedNode result) {
+    private static Optional<DataContainerChild> findModulesStateNode(final NormalizedNode result,
+            final EffectiveModelContext context) {
         if (result == null) {
             return Optional.empty();
         }
-        final Optional<DataContainerChild> dataNode = ((DataContainerNode) result).findChildByArg(NETCONF_DATA_NODEID);
-        if (dataNode.isEmpty()) {
+        // FIXME: unchecked cast
+        final var rpcResultOpt = ((ContainerNode) result).findChildByArg(NETCONF_DATA_NODEID);
+        if (rpcResultOpt.isEmpty()) {
             return Optional.empty();
         }
 
-        return ((DataContainerNode) dataNode.get()).findChildByArg(MODULES_STATE_NID);
+        final var rpcResult = rpcResultOpt.get();
+        verify(rpcResult instanceof DOMSourceAnyxmlNode, "Unexpected result %s", rpcResult);
+
+        // Server may include additional data which we do not understand. Make sure we trim the input before we try
+        // to interpret it.
+        // FIXME: this is something NetconfUtil.transformDOMSourceToNormalizedNode(), and more generally, NormalizedNode
+        //        codecs should handle. We really want to a NormalizedNode tree which can be directly queried for known
+        //        things while completely ignoring XML content (and hence its semantics) of other elements.
+        final var filteredBody = NetconfStateSchemas.ietfMonitoringCopy(((DOMSourceAnyxmlNode) rpcResult).body());
+
+        final NormalizedNode dataNode;
+        try {
+            dataNode = NetconfUtil.transformDOMSourceToNormalizedNode(context, filteredBody).getResult();
+        } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
+            LOG.warn("Failed to transform {}", rpcResult, e);
+            return Optional.empty();
+        }
+
+        return ((DataContainerNode) dataNode).findChildByArg(MODULES_STATE_NID);
     }
 
     private LibraryModulesSchemas createFromURLConnection(final URLConnection connection) {

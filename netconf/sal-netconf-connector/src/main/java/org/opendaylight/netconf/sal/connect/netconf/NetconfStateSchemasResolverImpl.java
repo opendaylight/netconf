@@ -44,7 +44,7 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
         }
         if (remoteSessionCapabilities.containsModuleCapability(RFC8525_YANG_LIBRARY_CAPABILITY)
                 || remoteSessionCapabilities.containsModuleCapability(RFC7895_YANG_LIBRARY_CAPABILITY)) {
-            return libSchemaFactory.create(deviceRpc, id);
+            return libSchemaFactory.create(deviceRpc, id, schemaContext);
         }
 
         return NetconfStateSchemas.EMPTY;
