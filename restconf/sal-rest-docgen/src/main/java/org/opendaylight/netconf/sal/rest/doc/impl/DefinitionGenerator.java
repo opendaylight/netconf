@@ -209,15 +209,13 @@ public class DefinitionGenerator {
                         //add module name prefix to property name, when ServiceNow can process colons
                         properties.set(localName, childNodeProperties);
                     }
-                } else {
-                    if (node instanceof LeafSchemaNode) {
-                        /*
-                            Add module name prefix to property name, when ServiceNow can process colons(second parameter
-                            of processLeafNode).
-                         */
-                        processLeafNode((LeafSchemaNode) node, localName, properties, required, stack,
-                                definitions, definitionNames, oaversion);
-                    }
+                } else if (node instanceof LeafSchemaNode) {
+                    /*
+                        Add module name prefix to property name, when ServiceNow can process colons(second parameter
+                        of processLeafNode).
+                     */
+                    processLeafNode((LeafSchemaNode) node, localName, properties, required, stack,
+                            definitions, definitionNames, oaversion);
                 }
             }
             stack.exit();
@@ -482,55 +480,73 @@ public class DefinitionGenerator {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         for (final DataSchemaNode node : nodes) {
-            stack.enterSchemaTree(node.getQName());
             if (!isConfig || node.isConfiguration()) {
-                /*
-                    Add module name prefix to property name, when needed, when ServiceNow can process colons,
-                    use RestDocGenUtil#resolveNodesName for creating property name
-                 */
-                final String propertyName = node.getQName().getLocalName();
-                final ObjectNode property;
-                if (node instanceof LeafSchemaNode) {
-                    processLeafNode((LeafSchemaNode) node, propertyName, properties,
-                            required, stack, definitions, definitionNames, oaversion);
-                } else if (node instanceof AnyxmlSchemaNode) {
-                    processAnyXMLNode((AnyxmlSchemaNode) node, propertyName, properties,
-                            required);
-                } else if (node instanceof AnydataSchemaNode) {
-                    processAnydataNode((AnydataSchemaNode) node, propertyName, properties, required);
-                } else {
-                    if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                        property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
-                                definitionNames, isConfig, stack, oaversion);
-                        if (!isConfig) {
-                            processActionNodeContainer(node, parentName, definitions, definitionNames, stack,
-                                    oaversion);
-                        }
-                    } else if (node instanceof LeafListSchemaNode) {
-                        property = processLeafListNode((LeafListSchemaNode) node, stack, definitions,
-                                definitionNames, oaversion);
-
-                    } else if (node instanceof ChoiceSchemaNode) {
-                        for (final CaseSchemaNode variant : ((ChoiceSchemaNode) node).getCases()) {
-                            stack.enterSchemaTree(variant.getQName());
-                            processChoiceNode(variant.getChildNodes(), parentName, definitions, definitionNames,
-                                    isConfig, stack, properties, oaversion);
-                            stack.exit();
-                        }
-                        stack.exit();
-                        // FIXME dangerous statement here! Try to rework without continue.
-                        continue;
-                    } else {
-                        throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
-                    }
-                    properties.set(propertyName, property);
-                }
+                processChildNode(node, parentName, definitions, definitionNames, isConfig, stack, properties,
+                        oaversion);
             }
-            stack.exit();
         }
         parentNode.set(PROPERTIES_KEY, properties);
         setRequiredIfNotEmpty(parentNode, required);
         return properties;
+    }
+
+    private void processChildNode(
+            final DataSchemaNode node, final String parentName, final ObjectNode definitions,
+            final DefinitionNames definitionNames, final boolean isConfig,
+            final SchemaInferenceStack stack, final ObjectNode properties, final OAversion oaversion)
+            throws IOException {
+
+        stack.enterSchemaTree(node.getQName());
+
+        /*
+            Add module name prefix to property name, when needed, when ServiceNow can process colons,
+            use RestDocGenUtil#resolveNodesName for creating property name
+         */
+        final String name = node.getQName().getLocalName();
+
+        if (node instanceof LeafSchemaNode) {
+            processLeafNode((LeafSchemaNode) node, name, properties, JsonNodeFactory.instance.arrayNode(), stack,
+                    definitions, definitionNames, oaversion);
+
+        } else if (node instanceof AnyxmlSchemaNode) {
+            processAnyXMLNode((AnyxmlSchemaNode) node, name, properties, JsonNodeFactory.instance.arrayNode());
+
+        } else if (node instanceof AnydataSchemaNode) {
+            processAnydataNode((AnydataSchemaNode) node, name, properties, JsonNodeFactory.instance.arrayNode());
+
+        } else {
+
+            final ObjectNode property;
+            if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
+                property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
+                        definitionNames, isConfig, stack, oaversion);
+                if (!isConfig) {
+                    processActionNodeContainer(node, parentName, definitions, definitionNames, stack, oaversion);
+                }
+            } else if (node instanceof LeafListSchemaNode) {
+                property = processLeafListNode((LeafListSchemaNode) node, stack, definitions, definitionNames,
+                        oaversion);
+
+            } else if (node instanceof ChoiceSchemaNode) {
+                for (final CaseSchemaNode variant : ((ChoiceSchemaNode) node).getCases()) {
+                    stack.enterSchemaTree(variant.getQName());
+                    for (final DataSchemaNode childNode : variant.getChildNodes()) {
+                        processChildNode(childNode, parentName, definitions, definitionNames, isConfig, stack,
+                                properties, oaversion);
+                    }
+                    stack.exit();
+                }
+                property = null;
+
+            } else {
+                throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
+            }
+            if (property != null) {
+                properties.set(name, property);
+            }
+        }
+
+        stack.exit();
     }
 
     private ObjectNode processLeafListNode(final LeafListSchemaNode listNode, final SchemaInferenceStack stack,
@@ -549,60 +565,6 @@ public class DefinitionGenerator {
         props.put(DESCRIPTION_KEY, listNode.getDescription().orElse(""));
 
         return props;
-    }
-
-    private void processChoiceNode(
-            final Iterable<? extends DataSchemaNode> nodes, final String parentName, final ObjectNode definitions,
-            final DefinitionNames definitionNames, final boolean isConfig,
-            final SchemaInferenceStack stack, final ObjectNode properties, final OAversion oaversion)
-            throws IOException {
-        for (final DataSchemaNode node : nodes) {
-            stack.enterSchemaTree(node.getQName());
-            /*
-                Add module name prefix to property name, when needed, when ServiceNow can process colons,
-                use RestDocGenUtil#resolveNodesName for creating property name
-             */
-            final String name = node.getQName().getLocalName();
-            final ObjectNode property;
-
-            /*
-                Ignore mandatoriness(passing unreferenced arrayNode to process...Node), because choice produces multiple
-                properties
-             */
-            if (node instanceof LeafSchemaNode) {
-                processLeafNode((LeafSchemaNode) node, name, properties,
-                        JsonNodeFactory.instance.arrayNode(), stack, definitions, definitionNames, oaversion);
-            } else if (node instanceof AnyxmlSchemaNode) {
-                processAnyXMLNode((AnyxmlSchemaNode) node, name, properties,
-                        JsonNodeFactory.instance.arrayNode());
-            } else if (node instanceof AnydataSchemaNode) {
-                processAnydataNode((AnydataSchemaNode) node, name, properties,
-                        JsonNodeFactory.instance.arrayNode());
-            } else {
-                if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                    property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
-                            definitionNames, isConfig, stack, oaversion);
-                    if (!isConfig) {
-                        processActionNodeContainer(node, parentName, definitions, definitionNames, stack,
-                                oaversion);
-                    }
-                } else if (node instanceof LeafListSchemaNode) {
-                    property = processLeafListNode((LeafListSchemaNode) node, stack, definitions,
-                            definitionNames, oaversion);
-
-                } else if (node instanceof ChoiceSchemaNode) {
-                    for (final CaseSchemaNode variant : ((ChoiceSchemaNode) node).getCases()) {
-                        processChoiceNode(variant.getChildNodes(), parentName, definitions, definitionNames, isConfig,
-                                stack, properties, oaversion);
-                    }
-                    continue;
-                } else {
-                    throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
-                }
-                properties.set(name, property);
-            }
-            stack.exit();
-        }
     }
 
     private static void processElementCount(final Optional<ElementCountConstraint> constraint, final ObjectNode props) {
@@ -907,7 +869,7 @@ public class DefinitionGenerator {
     private static boolean isHexadecimalOrOctal(final RangeRestrictedTypeDefinition<?, ?> typeDef) {
         final Optional<?> optDefaultValue = typeDef.getDefaultValue();
         if (optDefaultValue.isPresent()) {
-            final String defaultValue = (String)optDefaultValue.get();
+            final String defaultValue = (String) optDefaultValue.get();
             return defaultValue.startsWith("0") || defaultValue.startsWith("-0");
         }
         return false;
