@@ -209,15 +209,13 @@ public class DefinitionGenerator {
                         //add module name prefix to property name, when ServiceNow can process colons
                         properties.set(localName, childNodeProperties);
                     }
-                } else {
-                    if (node instanceof LeafSchemaNode) {
-                        /*
-                            Add module name prefix to property name, when ServiceNow can process colons(second parameter
-                            of processLeafNode).
-                         */
-                        processLeafNode((LeafSchemaNode) node, localName, properties, required, stack,
-                                definitions, definitionNames, oaversion);
-                    }
+                } else if (node instanceof LeafSchemaNode) {
+                    /*
+                        Add module name prefix to property name, when ServiceNow can process colons(second parameter
+                        of processLeafNode).
+                     */
+                    processLeafNode((LeafSchemaNode) node, localName, properties, required, stack,
+                            definitions, definitionNames, oaversion);
                 }
             }
             stack.exit();
@@ -490,14 +488,13 @@ public class DefinitionGenerator {
                  */
                 final String propertyName = node.getQName().getLocalName();
                 final ObjectNode property;
-                if (node instanceof LeafSchemaNode) {
-                    processLeafNode((LeafSchemaNode) node, propertyName, properties,
-                            required, stack, definitions, definitionNames, oaversion);
-                } else if (node instanceof AnyxmlSchemaNode) {
-                    processAnyXMLNode((AnyxmlSchemaNode) node, propertyName, properties,
-                            required);
-                } else if (node instanceof AnydataSchemaNode) {
-                    processAnydataNode((AnydataSchemaNode) node, propertyName, properties, required);
+                if (node instanceof LeafSchemaNode leaf) {
+                    processLeafNode(leaf, propertyName, properties, required, stack, definitions, definitionNames,
+                            oaversion);
+                } else if (node instanceof AnyxmlSchemaNode anyxml) {
+                    processAnyXMLNode((AnyxmlSchemaNode) node, propertyName, properties, required);
+                } else if (node instanceof AnydataSchemaNode anydata) {
+                    processAnydataNode(anydata, propertyName, properties, required);
                 } else {
                     if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                         property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
@@ -506,12 +503,11 @@ public class DefinitionGenerator {
                             processActionNodeContainer(node, parentName, definitions, definitionNames, stack,
                                     oaversion);
                         }
-                    } else if (node instanceof LeafListSchemaNode) {
-                        property = processLeafListNode((LeafListSchemaNode) node, stack, definitions,
-                                definitionNames, oaversion);
+                    } else if (node instanceof LeafListSchemaNode leafList) {
+                        property = processLeafListNode(leafList, stack, definitions, definitionNames, oaversion);
 
-                    } else if (node instanceof ChoiceSchemaNode) {
-                        for (final CaseSchemaNode variant : ((ChoiceSchemaNode) node).getCases()) {
+                    } else if (node instanceof ChoiceSchemaNode choice) {
+                        for (final CaseSchemaNode variant : choice.getCases()) {
                             stack.enterSchemaTree(variant.getQName());
                             processChoiceNode(variant.getChildNodes(), parentName, definitions, definitionNames,
                                     isConfig, stack, properties, oaversion);
@@ -569,15 +565,13 @@ public class DefinitionGenerator {
                 Ignore mandatoriness(passing unreferenced arrayNode to process...Node), because choice produces multiple
                 properties
              */
-            if (node instanceof LeafSchemaNode) {
-                processLeafNode((LeafSchemaNode) node, name, properties,
-                        JsonNodeFactory.instance.arrayNode(), stack, definitions, definitionNames, oaversion);
-            } else if (node instanceof AnyxmlSchemaNode) {
-                processAnyXMLNode((AnyxmlSchemaNode) node, name, properties,
-                        JsonNodeFactory.instance.arrayNode());
-            } else if (node instanceof AnydataSchemaNode) {
-                processAnydataNode((AnydataSchemaNode) node, name, properties,
-                        JsonNodeFactory.instance.arrayNode());
+            if (node instanceof LeafSchemaNode leaf) {
+                processLeafNode(leaf, name, properties, JsonNodeFactory.instance.arrayNode(), stack, definitions,
+                        definitionNames, oaversion);
+            } else if (node instanceof AnyxmlSchemaNode anyxml) {
+                processAnyXMLNode(anyxml, name, properties, JsonNodeFactory.instance.arrayNode());
+            } else if (node instanceof AnydataSchemaNode anydata) {
+                processAnydataNode(anydata, name, properties, JsonNodeFactory.instance.arrayNode());
             } else {
                 if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                     property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
@@ -586,12 +580,11 @@ public class DefinitionGenerator {
                         processActionNodeContainer(node, parentName, definitions, definitionNames, stack,
                                 oaversion);
                     }
-                } else if (node instanceof LeafListSchemaNode) {
-                    property = processLeafListNode((LeafListSchemaNode) node, stack, definitions,
-                            definitionNames, oaversion);
+                } else if (node instanceof LeafListSchemaNode leafList) {
+                    property = processLeafListNode(leafList, stack, definitions, definitionNames, oaversion);
 
-                } else if (node instanceof ChoiceSchemaNode) {
-                    for (final CaseSchemaNode variant : ((ChoiceSchemaNode) node).getCases()) {
+                } else if (node instanceof ChoiceSchemaNode choice) {
+                    for (final CaseSchemaNode variant : choice.getCases()) {
                         processChoiceNode(variant.getChildNodes(), parentName, definitions, definitionNames, isConfig,
                                 stack, properties, oaversion);
                     }
@@ -725,8 +718,7 @@ public class DefinitionGenerator {
             putIfNonNull(property, TYPE_KEY, jsonType);
             if (leafTypeDef.getDefaultValue().isPresent()) {
                 final Object defaultValue = leafTypeDef.getDefaultValue().get();
-                if (defaultValue instanceof String) {
-                    final String stringDefaultValue = (String) defaultValue;
+                if (defaultValue instanceof String stringDefaultValue) {
                     if (leafTypeDef instanceof BooleanTypeDefinition) {
                         setDefaultValue(property, Boolean.valueOf(stringDefaultValue));
                     } else if (leafTypeDef instanceof DecimalTypeDefinition
