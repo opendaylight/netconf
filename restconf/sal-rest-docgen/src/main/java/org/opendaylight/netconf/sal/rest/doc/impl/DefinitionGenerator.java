@@ -585,8 +585,10 @@ public class DefinitionGenerator {
 
                 } else if (node instanceof ChoiceSchemaNode choice) {
                     for (final CaseSchemaNode variant : choice.getCases()) {
+                        stack.enterSchemaTree(variant.getQName());
                         processChoiceNode(variant.getChildNodes(), parentName, definitions, definitionNames, isConfig,
                                 stack, properties, oaversion);
+                        stack.exit();
                     }
                     continue;
                 } else {
