@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e661c93_c6f4174c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-10-24T15:00:24Z",
+      "side": 1,
+      "message": "In addition, we are getting something like \"all data\" when requesting \"/rests\" instead of expected ietf-restconf:restconf representation.",
+      "revId": "fb4f3fd45b813cc68c63179240976cbd644ff945",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c1b9bf7_b7a070e0",
