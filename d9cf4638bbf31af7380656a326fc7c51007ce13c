@@ -22,6 +22,30 @@
       },
       "revId": "d9cf4638bbf31af7380656a326fc7c51007ce13c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00d07149_07bba37b",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfInvokeOperationsServiceImpl.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-10-25T05:39:32Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "e768a2c2_f5ae041e",
+      "range": {
+        "startLine": 66,
+        "startChar": 8,
+        "endLine": 66,
+        "endChar": 12
+      },
+      "revId": "d9cf4638bbf31af7380656a326fc7c51007ce13c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

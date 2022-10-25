@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcc7bffa_19caabb8",
+        "filename": "restconf/restconf-common-models/src/main/yang/device-notification.yang",
+        "patchSetId": 21
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-10-25T05:39:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20ca2d87_36161036",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 14
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0721b51f_ca0dbbc6",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-10-18T17:30:08Z",
       "side": 1,
       "message": "urn:opendaylight:device:notification to be within proper OpenDaylight namespace",
+      "range": {
+        "startLine": 4,
+        "startChar": 15,
+        "endLine": 4,
+        "endChar": 34
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1aaf25bb_8b31aa24",
+        "filename": "restconf/restconf-common-models/src/main/yang/device-notification.yang",
+        "patchSetId": 21
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-10-25T05:39:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0721b51f_ca0dbbc6",
       "range": {
         "startLine": 4,
         "startChar": 15,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea2573b7_f93f3329",
+        "filename": "restconf/restconf-common-models/src/main/yang/device-notification.yang",
+        "patchSetId": 21
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-10-25T05:39:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b82d5c7_ea4aca4e",
+      "range": {
+        "startLine": 23,
+        "startChar": 14,
+        "endLine": 23,
+        "endChar": 48
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8a8fe3b5_437df8b1",
@@ -83,6 +155,30 @@
       "writtenOn": "2022-10-18T17:30:08Z",
       "side": 1,
       "message": "what does \"path\" mean in this context?\nIs this relative to some endpoint or is it a URL, or...?",
+      "range": {
+        "startLine": 29,
+        "startChar": 29,
+        "endLine": 29,
+        "endChar": 55
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80a8d029_c066bce1",
+        "filename": "restconf/restconf-common-models/src/main/yang/device-notification.yang",
+        "patchSetId": 21
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-10-25T05:39:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a8fe3b5_437df8b1",
       "range": {
         "startLine": 29,
         "startChar": 29,
@@ -116,6 +212,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc1d42ca_beea0473",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-10-25T05:39:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "474b7ed8_34cb6ad5",
+      "range": {
+        "startLine": 65,
+        "startChar": 37,
+        "endLine": 65,
+        "endChar": 60
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d0f68311_bc687033",
@@ -129,6 +249,30 @@
       "writtenOn": "2022-10-18T17:45:01Z",
       "side": 1,
       "message": "misleadling alignment: method body vs. method parameters are visually the same block",
+      "range": {
+        "startLine": 73,
+        "startChar": 8,
+        "endLine": 73,
+        "endChar": 13
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b257db33_74036911",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfInvokeOperationsServiceImpl.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-10-25T05:39:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0f68311_bc687033",
       "range": {
         "startLine": 73,
         "startChar": 8,
@@ -162,6 +306,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a12e9599_2cedbb1c",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractCommonSubscriber.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-10-25T05:39:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8deff029_9979ab5d",
+      "range": {
+        "startLine": 60,
+        "startChar": 4,
+        "endLine": 60,
+        "endChar": 13
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a4bf203b_9748d064",
@@ -185,6 +353,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b879e885_55db5a7a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationListenerAdaptor.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-10-25T05:39:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4bf203b_9748d064",
+      "range": {
+        "startLine": 91,
+        "startChar": 29,
+        "endLine": 91,
+        "endChar": 34
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cc4a94a_bc7035e1",
@@ -198,6 +390,30 @@
       "writtenOn": "2022-10-18T17:49:30Z",
       "side": 1,
       "message": "static state: NEVER EVER DO THIS",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 74
+      },
+      "revId": "16d50f0fd947f62cf2e82f6f11a1622de6ea2860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "031e095f_302e7345",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-10-25T05:39:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cc4a94a_bc7035e1",
       "range": {
         "startLine": 24,
         "startChar": 0,
