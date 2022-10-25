@@ -13,7 +13,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
@@ -66,7 +65,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
             return;
         }
         if (httpHeaders != null) {
-            for (final Map.Entry<String, Object> entry : context.getNewHeaders().entrySet()) {
+            for (var entry : context.getNewHeaders().entrySet()) {
                 httpHeaders.add(entry.getKey(), entry.getValue());
             }
         }
@@ -94,20 +93,18 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
         final RestconfNormalizedNodeWriter nnWriter;
         final SchemaNode schemaNode = pathContext.getSchemaNode();
 
-        if (schemaNode instanceof RpcDefinition) {
+        if (schemaNode instanceof RpcDefinition rpc) {
             // RpcDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit initial output
             // declaration.
-            final var rpc = (RpcDefinition) schemaNode;
             final var stack = SchemaInferenceStack.of(pathContext.getSchemaContext());
             stack.enterSchemaTree(rpc.getQName());
             stack.enterSchemaTree(rpc.getOutput().getQName());
 
             nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
-        } else if (schemaNode instanceof ActionDefinition) {
+        } else if (schemaNode instanceof ActionDefinition action) {
             // ActionDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit initial output
             // declaration.
-            final var action = (ActionDefinition) schemaNode;
             final var stack = pathContext.inference().toSchemaInferenceStack();
             stack.enterSchemaTree(action.getOutput().getQName());
 
@@ -124,15 +121,15 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
             }
             nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
 
-            if (data instanceof MapEntryNode) {
+            if (data instanceof MapEntryNode mapEntry) {
                 // Restconf allows returning one list item. We need to wrap it
                 // in map node in order to serialize it properly
                 nnWriter.write(ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
-                    .addChild((MapEntryNode) data)
+                    .addChild(mapEntry)
                     .build());
             } else if (isRoot) {
-                if (data instanceof ContainerNode && ((ContainerNode) data).isEmpty()) {
-                    writeEmptyDataNode(xmlWriter, data);
+                if (data instanceof ContainerNode container && container.isEmpty()) {
+                    writeEmptyDataNode(xmlWriter, container);
                 } else {
                     writeAndWrapInDataNode(xmlWriter, nnWriter, data);
                 }
@@ -166,7 +163,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
         }
     }
 
-    private static void writeEmptyDataNode(final XMLStreamWriter xmlWriter, final NormalizedNode data)
+    private static void writeEmptyDataNode(final XMLStreamWriter xmlWriter, final ContainerNode data)
             throws IOException {
         final QName nodeType = data.getIdentifier().getNodeType();
         final String namespace = nodeType.getNamespace().toString();
@@ -187,7 +184,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
         try {
             xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);
             xmlWriter.writeDefaultNamespace(namespace);
-            for (final NormalizedNode child : data.body()) {
+            for (var child : data.body()) {
                 nnWriter.write(child);
             }
             nnWriter.flush();

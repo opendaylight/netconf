@@ -19,7 +19,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -43,7 +42,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeS
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
-import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,11 +94,11 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
 
         while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
-            final Object childNode = ((DataContainerNode) result).body().iterator().next();
+            final var childNode = ((DataContainerNode) result).body().iterator().next();
             if (isPost) {
                 iiToDataList.add(result.getIdentifier());
             }
-            result = (NormalizedNode) childNode;
+            result = childNode;
         }
 
         if (isPost) {
@@ -108,15 +106,13 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
                 iiToDataList.add(new NodeIdentifier(result.getIdentifier().getNodeType()));
                 iiToDataList.add(result.getIdentifier());
             } else {
-                final List<? extends @NonNull EffectiveStatement<?, ?>> parentPath = parentSchema.statementPath();
+                final var parentPath = parentSchema.statementPath();
                 if (parentPath.isEmpty() || !(parentPath.get(parentPath.size() - 1) instanceof OperationDefinition)) {
                     iiToDataList.add(result.getIdentifier());
                 }
             }
-        } else {
-            if (result instanceof MapNode) {
-                result = Iterables.getOnlyElement(((MapNode) result).body());
-            }
+        } else if (result instanceof MapNode map) {
+            result = Iterables.getOnlyElement(map.body());
         }
 
         // FIXME: can result really be null?

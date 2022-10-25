@@ -30,7 +30,6 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -86,16 +85,13 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
             final NormalizedNode data, final DepthParam depth, final List<Set<QName>> fields) throws IOException {
         final SchemaNode schemaNode = context.getSchemaNode();
         final RestconfNormalizedNodeWriter nnWriter;
-        if (schemaNode instanceof RpcDefinition) {
-            final var rpc = (RpcDefinition) schemaNode;
+        if (schemaNode instanceof RpcDefinition rpc) {
             final var stack = SchemaInferenceStack.of(context.getSchemaContext());
             stack.enterSchemaTree(rpc.getQName());
             stack.enterSchemaTree(rpc.getOutput().getQName());
 
-            /*
-             * RpcDefinition is not supported as initial codec in JSONStreamWriter,
-             * so we need to emit initial output declaration..
-             */
+            // RpcDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit initial output
+            // declaration
             nnWriter = createNormalizedNodeWriter(
                     context,
                     stack.toInference(),
@@ -108,12 +104,9 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
             jsonWriter.beginObject();
             writeChildren(nnWriter, (ContainerNode) data);
             jsonWriter.endObject();
-        } else if (schemaNode instanceof ActionDefinition) {
-            /*
-             * ActionDefinition is not supported as initial codec in JSONStreamWriter,
-             * so we need to emit initial output declaration..
-             */
-            final var action = (ActionDefinition) schemaNode;
+        } else if (schemaNode instanceof ActionDefinition action) {
+            // ActionDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit initial output
+            // declaration
             final var stack = context.inference().toSchemaInferenceStack();
             stack.enterSchemaTree(action.getOutput().getQName());
 
@@ -131,11 +124,11 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
             }
             nnWriter = createNormalizedNodeWriter(context, stack.toInference(), jsonWriter, depth, fields);
 
-            if (data instanceof MapEntryNode) {
+            if (data instanceof MapEntryNode mapEntry) {
                 // Restconf allows returning one list item. We need to wrap it
                 // in map node in order to serialize it properly
                 nnWriter.write(ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
-                    .withChild((MapEntryNode) data)
+                    .withChild(mapEntry)
                     .build());
             } else {
                 nnWriter.write(data);
@@ -147,7 +140,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
 
     private static void writeChildren(final RestconfNormalizedNodeWriter nnWriter, final ContainerNode data)
             throws IOException {
-        for (final DataContainerChild child : data.body()) {
+        for (var child : data.body()) {
             nnWriter.write(child);
         }
     }

@@ -85,14 +85,14 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         DataSchemaNode schemaNode;
         final List<PathArgument> iiToDataList = new ArrayList<>();
         Inference inference;
-        if (schemaNodeContext instanceof OperationDefinition) {
-            schemaNode = ((OperationDefinition) schemaNodeContext).getInput();
+        if (schemaNodeContext instanceof OperationDefinition oper) {
+            schemaNode = oper.getInput();
 
             final var stack = pathContext.inference().toSchemaInferenceStack();
             stack.enterSchemaTree(schemaNode.getQName());
             inference = stack.toInference();
-        } else if (schemaNodeContext instanceof DataSchemaNode) {
-            schemaNode = (DataSchemaNode) schemaNodeContext;
+        } else if (schemaNodeContext instanceof DataSchemaNode data) {
+            schemaNode = data;
 
             final String docRootElm = doc.getDocumentElement().getLocalName();
             final XMLNamespace docRootNamespace = XMLNamespace.of(doc.getDocumentElement().getNamespaceURI());
@@ -149,8 +149,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             // the new XML parser always returns a MapNode with one MapEntryNode inside.
             // However, the old XML parser returned a MapEntryNode directly in this place.
             // Therefore we now have to extract the MapEntryNode from the parsed MapNode.
-            if (parsed instanceof MapNode) {
-                final MapNode mapNode = (MapNode) parsed;
+            if (parsed instanceof MapNode mapNode) {
                 // extracting the MapEntryNode
                 parsed = mapNode.body().iterator().next();
             }
