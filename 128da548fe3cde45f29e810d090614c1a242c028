@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "28b06ecf_17a3fc12",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-10-26T11:28:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce4bbace_ac6d8748",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "778d6142_c1032be9",
@@ -87,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91656068_1b1bb099",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/test-model-aug.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-10-26T11:28:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "633d9145_172f6ba7",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "312c48e3_5e278575",
@@ -100,6 +136,24 @@
       "writtenOn": "2022-10-26T08:13:03Z",
       "side": 1,
       "message": "The same here.",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f40406c_ff9366f8",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/test-model-aug.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-10-26T11:28:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "312c48e3_5e278575",
       "revId": "128da548fe3cde45f29e810d090614c1a242c028",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
