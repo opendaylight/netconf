@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce4bbace_ac6d8748",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-10-26T08:13:03Z",
+      "side": 1,
+      "message": "https://cbea.ms/git-commit/",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "778d6142_c1032be9",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-10-26T08:13:03Z",
+      "side": 1,
+      "message": "This does not follow general ODL code style - for example using `final` keyword.",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "effa1c22_bfb2a6e4",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-10-26T08:13:03Z",
+      "side": 1,
+      "message": "This looks suspicious. I am not sure. But anyway we were dealing with augmentations - I have no idea if it can help but, please try to study EffectiveAugmentationSchema in yangtools - how we can use it here.",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "633d9145_172f6ba7",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/test-model-aug.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-10-26T08:13:03Z",
+      "side": 1,
+      "message": "Not needed empty lines.",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "312c48e3_5e278575",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/test-model-aug.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-10-26T08:13:03Z",
+      "side": 1,
+      "message": "The same here.",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
