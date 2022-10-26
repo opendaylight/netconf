@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "af954866_3961ccd7",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-10-26T11:27:49Z",
+      "side": 1,
+      "message": "It can\u0027t be final since three rows bellow it should be modifiable",
+      "parentUuid": "778d6142_c1032be9",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "effa1c22_bfb2a6e4",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
         "patchSetId": 9
