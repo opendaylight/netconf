@@ -131,6 +131,28 @@ module toaster {
                      type string;
                  }
              }
+
+            case other {
+              description "2nd level choice";
+
+              choice scheduled {
+                case weekly {
+                  leaf weekly {
+                    type string;
+                  }
+                }
+                case monthly {
+                  leaf monthly {
+                    type string;
+                  }
+                }
+                case yearly {
+                  leaf yearly {
+                    type string;
+                  }
+                }
+              }
+            }
          }
 
       leaf toasterManufacturer {
