@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bd961f0_d20083c7",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-10-26T12:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af954866_3961ccd7",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "effa1c22_bfb2a6e4",
@@ -84,6 +102,24 @@
       "writtenOn": "2022-10-26T08:13:03Z",
       "side": 1,
       "message": "This looks suspicious. I am not sure. But anyway we were dealing with augmentations - I have no idea if it can help but, please try to study EffectiveAugmentationSchema in yangtools - how we can use it here.",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "599b8fa0_1bcefe39",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-10-26T12:05:09Z",
+      "side": 1,
+      "message": "I looked inside it and so far I think that, even if it is possible to to it through that, it will be same but over-complicated logic. \nMay be using Builders.augmentationBuilder() to parse data and get to child will do if you don\u0027t want it to be strait cast and avoid using [0] index? May be with some checks?\nI agree that it not a pretty code but it works. From this point I can improve it if I find better way. I\u0027ll left this comment open so add here more details/suggestions or just close it if that code will do.",
+      "parentUuid": "effa1c22_bfb2a6e4",
       "revId": "128da548fe3cde45f29e810d090614c1a242c028",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
