@@ -1,6 +1,24 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c140efe_e05269af",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyPipelineAwareChannelSubsystem.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-10-28T20:11:35Z",
+      "side": 1,
+      "message": "Can we get rid of this class somehow? It is very similar to another one (NettyAwareChannelSubsystem). Why in call-home do we need pipeline instead of context?",
+      "revId": "23f88e50829cf37bf7b58805bae078d69ae1128d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "3d8606d7_3bb1565b",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyPipelineAwareChannelSubsystem.java",
@@ -14,10 +32,10 @@
       "side": 1,
       "message": "Can we get rid of this class somehow? It is very similar to another one (NettyAwareChannelSubsystem). Why in call-home do we need pipeline instead of context?",
       "revId": "23f88e50829cf37bf7b58805bae078d69ae1128d",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "99408b97_fe233859",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyPipelineAwareChannelSubsystem.java",
@@ -32,8 +50,7 @@
       "message": "I have tried to do this in https://git.opendaylight.org/gerrit/c/netconf/+/94120/8. But there was issue with mutability",
       "parentUuid": "3d8606d7_3bb1565b",
       "revId": "23f88e50829cf37bf7b58805bae078d69ae1128d",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
