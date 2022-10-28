@@ -61,7 +61,7 @@ public final class NotificationListenerAdapter extends AbstractCommonSubscriber<
         final Optional<String> maybeOutput;
         try {
             maybeOutput = formatter().eventData(schemaHandler.get(), notification, now, getLeafNodesOnly(),
-                    isSkipNotificationData());
+                    isSkipNotificationData(), getChangedLeafNodesOnly());
         } catch (Exception e) {
             LOG.error("Failed to process notification {}", notification, e);
             return;
