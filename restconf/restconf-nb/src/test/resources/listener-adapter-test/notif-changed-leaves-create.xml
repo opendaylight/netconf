@@ -1,0 +1,39 @@
+<notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+    <eventTime>2022-09-22T19:10:05.841710747+02:00</eventTime>
+    <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
+        <data-change-event>
+            <path>
+                /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11
+            </path>
+            <data>
+                <my-leaf11 xmlns="instance:identifier:patch:module">Jed</my-leaf11>
+            </data>
+            <operation>created</operation>
+        </data-change-event>
+        <data-change-event>
+            <path>
+                /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name
+            </path>
+            <data>
+                <name xmlns="instance:identifier:patch:module">Althea</name>
+            </data>
+            <operation>created</operation>
+        </data-change-event>
+        <data-change-event>
+            <path>/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:leaf1</path>
+            <data>
+                <leaf1 xmlns="augment:instance:identifier:patch:module">AugmentLeaf</leaf1>
+            </data>
+            <operation>created</operation>
+        </data-change-event>
+        <data-change-event>
+            <path>
+                /instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice2/augment-instance-identifier-patch-module:patch-sub-choice11/augment-instance-identifier-patch-module:patch-sub-sub-choice11/augment-instance-identifier-patch-module:case-leaf11
+            </path>
+            <data>
+                <case-leaf11 xmlns="augment:instance:identifier:patch:module">ChoiceLeaf</case-leaf11>
+            </data>
+            <operation>created</operation>
+        </data-change-event>
+    </data-changed-notification>
+</notification>

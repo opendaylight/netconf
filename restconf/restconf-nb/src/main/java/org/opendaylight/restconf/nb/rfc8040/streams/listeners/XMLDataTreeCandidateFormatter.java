@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
 import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.SAL_REMOTE_NAMESPACE;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.DATA_CHANGED_NAMESPACE;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -46,18 +47,28 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
     @Override
     String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
-                      final Instant now, final boolean leafNodesOnly, final boolean skipData) throws Exception {
+                      final Instant now, final boolean leafNodesOnly, final boolean skipData,
+                      final boolean changedLeafNodesOnly) throws Exception {
         final var writer = new StringWriter();
-
+        boolean emptyDataChangeEvent;
         try {
             final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now);
 
             xmlStreamWriter.setDefaultNamespace(SAL_REMOTE_NAMESPACE);
             xmlStreamWriter.writeStartElement(SAL_REMOTE_NAMESPACE, DATA_CHANGED_NOTIFICATION_ELEMENT);
 
-            final var serializer = new XmlDataTreeCandidateSerializer(schemaContext, xmlStreamWriter);
-            for (var candidate : input) {
-                serializer.serialize(candidate, leafNodesOnly, skipData);
+            xmlStreamWriter.writeStartElement("eventTime");
+            xmlStreamWriter.writeCharacters(toRFC3339(now));
+            xmlStreamWriter.writeEndElement();
+
+            xmlStreamWriter.setDefaultNamespace(DATA_CHANGED_NAMESPACE);
+            xmlStreamWriter.writeStartElement(DATA_CHANGED_NAMESPACE, DATA_CHANGED_NOTIFICATION_ELEMENT);
+
+            final XmlDataTreeCandidateSerializer serializer =
+                    new XmlDataTreeCandidateSerializer(schemaContext, xmlStreamWriter);
+
+            for (final var candidate : input) {
+                serializer.serialize(candidate, leafNodesOnly, skipData, changedLeafNodesOnly);
             }
 
             // data-changed-notification
@@ -66,10 +77,11 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
             // notification
             xmlStreamWriter.writeEndElement();
             xmlStreamWriter.close();
+            emptyDataChangeEvent = serializer.getEmptyDataChangedEvent();
         } catch (XMLStreamException e) {
             throw new IOException("Failed to write notification content", e);
         }
 
-        return writer.toString();
+        return emptyDataChangeEvent ? null : writer.toString();
     }
 }

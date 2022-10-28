@@ -20,6 +20,9 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 final class XMLNotificationFormatter extends NotificationFormatter {
     private static final XMLNotificationFormatter INSTANCE = new XMLNotificationFormatter();
 
+    static final String DATA_CHANGED_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
+    static final String DATA_CHANGE_EVENT_ELEMENT = "data-change-event";
+
     static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory() {
         @Override
         public XMLNotificationFormatter getFormatter(final String xpathFilter) throws XPathExpressionException {
@@ -42,7 +45,8 @@ final class XMLNotificationFormatter extends NotificationFormatter {
 
     @Override
     String createText(final EffectiveModelContext schemaContext, final DOMNotification input, final Instant now,
-                      final boolean leafNodesOnly, final boolean skipData) throws IOException {
+                      final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly)
+            throws IOException {
         final var writer = new StringWriter();
 
         try {
