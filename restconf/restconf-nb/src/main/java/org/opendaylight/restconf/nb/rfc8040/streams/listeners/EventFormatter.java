@@ -68,12 +68,14 @@ abstract class EventFormatter<T> implements Immutable {
     }
 
     final Optional<String> eventData(final EffectiveModelContext schemaContext, final T input, final Instant now,
-                                     final boolean leafNodesOnly, final boolean skipData)
+                                     final boolean leafNodesOnly, final boolean skipData,
+                                     final boolean changedLeafNodesOnly)
             throws Exception {
         if (!filterMatches(schemaContext, input, now)) {
             return Optional.empty();
         }
-        return Optional.of(createText(schemaContext, input, now, leafNodesOnly, skipData));
+        return Optional.ofNullable(
+                createText(schemaContext, input, now, leafNodesOnly, skipData, changedLeafNodesOnly));
     }
 
     /**
@@ -94,11 +96,12 @@ abstract class EventFormatter<T> implements Immutable {
      * @param now time the event happened
      * @param leafNodesOnly option to include only leaves in the result
      * @param skipData option to skip data in the result, only paths would be included
+     * @param changedLeafNodesOnly  option to include only changed leaves in the result
      * @return String representation of the formatted data
      * @throws Exception if the underlying formatters fail to export the data to the requested format
      */
     abstract String createText(EffectiveModelContext schemaContext, T input, Instant now, boolean leafNodesOnly,
-                               boolean skipData) throws Exception;
+                               boolean skipData, boolean changedLeafNodesOnly) throws Exception;
 
     private boolean filterMatches(final EffectiveModelContext schemaContext, final T input, final Instant now)
             throws IOException {
