@@ -35,24 +35,26 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractWebsocketSerializer.class);
 
     private final EffectiveModelContext context;
+    private boolean emptyDataChangedEvent = true;
 
     AbstractWebsocketSerializer(final EffectiveModelContext context) {
         this.context = requireNonNull(context);
     }
 
-    public final void serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly, final boolean skipData)
+    public final void serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly, final boolean skipData,
+                                final boolean changedLeafNodesOnly)
             throws T {
-        if (leafNodesOnly) {
+        if (leafNodesOnly || changedLeafNodesOnly) {
             final Deque<PathArgument> path = new ArrayDeque<>();
             path.addAll(candidate.getRootPath().getPathArguments());
-            serializeLeafNodesOnly(path, candidate.getRootNode(), skipData);
+            serializeLeafNodesOnly(path, candidate.getRootNode(), skipData, changedLeafNodesOnly);
         } else {
             serializeData(candidate.getRootPath().getPathArguments(), candidate.getRootNode(), skipData);
         }
     }
 
     final void serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
-            final boolean skipData) throws T {
+            final boolean skipData, final boolean changedLeafNodesOnly) throws T {
         NormalizedNode node = null;
         switch (candidate.getModificationType()) {
             case UNMODIFIED:
@@ -61,13 +63,15 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
                         candidate);
                 break;
             case SUBTREE_MODIFIED:
-            case WRITE:
             case APPEARED:
-                node = candidate.getDataAfter().get();
+                node = candidate.getDataAfter().orElseThrow();
+                break;
+            case WRITE:
+                node = changedLeafNodesOnly && isNotUpdate(candidate) ? null : candidate.getDataAfter().orElseThrow();
                 break;
             case DELETE:
             case DISAPPEARED:
-                node = candidate.getDataBefore().get();
+                node = candidate.getDataBefore().orElseThrow();
                 break;
             default:
                 LOG.error("DataTreeCandidate modification has unknown type: {}", candidate.getModificationType());
@@ -84,7 +88,7 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
 
         for (DataTreeCandidateNode childNode : candidate.getChildNodes()) {
             path.add(childNode.getIdentifier());
-            serializeLeafNodesOnly(path, childNode, skipData);
+            serializeLeafNodesOnly(path, childNode, skipData, changedLeafNodesOnly);
             path.removeLast();
         }
     }
@@ -109,6 +113,11 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     abstract void serializeData(Inference parent, Collection<PathArgument> dataPath, DataTreeCandidateNode candidate,
         boolean skipData) throws T;
+
+    private static boolean isNotUpdate(DataTreeCandidateNode node) {
+        return node.getDataBefore().isPresent() && node.getDataAfter().isPresent()
+                && node.getDataBefore().get().body().equals(node.getDataAfter().get().body());
+    }
 
     abstract void serializePath(Collection<PathArgument> pathArguments) throws T;
 
@@ -167,5 +176,13 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
                 LOG.error("DataTreeCandidate modification has unknown type: {}", candidate.getModificationType());
                 throw new IllegalStateException("Unknown modification type");
         }
+    }
+
+    final synchronized boolean getEmptyDataChangedEvent() {
+        return this.emptyDataChangedEvent;
+    }
+
+    synchronized void setEmptyDataChangedEvent() {
+        this.emptyDataChangedEvent = false;
     }
 }

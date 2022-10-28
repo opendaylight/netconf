@@ -33,6 +33,7 @@ final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<E
     void serializeData(final Inference parent, final Collection<PathArgument> nodePath,
             final DataTreeCandidateNode candidate, final boolean skipData) throws Exception {
         NormalizedNodeStreamWriter nodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, parent);
+        setEmptyDataChangedEvent();
         xmlWriter.writeStartElement(DATA_CHANGE_EVENT_ELEMENT);
         serializePath(nodePath);
 

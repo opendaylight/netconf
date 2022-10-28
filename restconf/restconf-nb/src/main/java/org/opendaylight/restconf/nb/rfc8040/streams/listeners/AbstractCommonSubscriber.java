@@ -66,6 +66,7 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
     private Instant stop = null;
     private boolean leafNodesOnly = false;
     private boolean skipNotificationData = false;
+    private boolean changedLeafNodesOnly = false;
     private EventFormatter<T> formatter;
 
     AbstractCommonSubscriber(final QName lastQName, final String streamName, final P path,
@@ -151,6 +152,9 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
         final var skipData = params.skipNotificationData();
         skipNotificationData = skipData == null ? false : skipData.value();
 
+        final var changedLeafNodes = params.changedLeafNodesOnly();
+        changedLeafNodesOnly = changedLeafNodes == null ? false : changedLeafNodes.value();
+
         final var filter = params.filter();
         final String filterValue = filter == null ? null : filter.paramValue();
         if (filterValue != null && !filterValue.isEmpty()) {
@@ -175,6 +179,15 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
      */
     final boolean getLeafNodesOnly() {
         return leafNodesOnly;
+    }
+
+    /**
+     * Check whether this query should only notify about leaf node changes and report only changed nodes.
+     *
+     * @return true if this query should only notify about leaf node changes and report only changed nodes
+     */
+    final boolean getChangedLeafNodesOnly() {
+        return changedLeafNodesOnly;
     }
 
     /**
