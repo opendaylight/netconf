@@ -33,6 +33,24 @@
       "message": "@Robert Please it",
       "revId": "468ca09fe13c58b00a458369c81f78f3cd3651c7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16a40b13_3342a1c4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-11-02T14:57:12Z",
+      "side": 1,
+      "message": "*Please review it",
+      "parentUuid": "98001ad9_e586e847",
+      "revId": "468ca09fe13c58b00a458369c81f78f3cd3651c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
