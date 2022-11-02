@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.nio.channels.AsynchronousChannelGroup;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -91,19 +92,21 @@ public class SshProxyServer implements AutoCloseable {
         sshServer.setIoServiceFactoryFactory(nioServiceWithPoolFactoryFactory);
         sshServer.setScheduledExecutorService(minaTimerExecutor);
 
-        final int idleTimeout = sshProxyServerConfiguration.getIdleTimeout();
-        sshServer.getProperties().put(CoreModuleProperties.IDLE_TIMEOUT.getName(), String.valueOf(idleTimeout));
-        final String nioReadTimeout;
-        if (idleTimeout > 0) {
-            final long heartBeat = idleTimeout * 333333L;
+        final int idleTimeoutMillis = sshProxyServerConfiguration.getIdleTimeout();
+        final Duration idleTimeout = Duration.ofMillis(idleTimeoutMillis);
+        CoreModuleProperties.IDLE_TIMEOUT.set(sshServer, idleTimeout);
+
+        final Duration nioReadTimeout;
+        if (idleTimeoutMillis > 0) {
+            final long heartBeat = idleTimeoutMillis * 333333L;
             sshServer.setSessionHeartbeat(HeartbeatType.IGNORE, TimeUnit.NANOSECONDS, heartBeat);
-            nioReadTimeout = String.valueOf(idleTimeout + TimeUnit.SECONDS.toMillis(15L));
+            nioReadTimeout = Duration.ofMillis(idleTimeoutMillis + TimeUnit.SECONDS.toMillis(15L));
         } else {
-            nioReadTimeout = "0";
+            nioReadTimeout = Duration.ZERO;
         }
-        sshServer.getProperties().put(CoreModuleProperties.NIO2_READ_TIMEOUT.getName(), nioReadTimeout);
-        sshServer.getProperties().put(CoreModuleProperties.AUTH_TIMEOUT.getName(), String.valueOf(idleTimeout));
-        sshServer.getProperties().put(CoreModuleProperties.TCP_NODELAY.getName(), true);
+        CoreModuleProperties.NIO2_READ_TIMEOUT.set(sshServer, nioReadTimeout);
+        CoreModuleProperties.AUTH_TIMEOUT.set(sshServer, idleTimeout);
+        CoreModuleProperties.TCP_NODELAY.set(sshServer, Boolean.TRUE);
 
         final RemoteNetconfCommand.NetconfCommandFactory netconfCommandFactory =
                 new RemoteNetconfCommand.NetconfCommandFactory(clientGroup,
