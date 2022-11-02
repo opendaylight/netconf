@@ -51,6 +51,52 @@
       "parentUuid": "98001ad9_e586e847",
       "revId": "468ca09fe13c58b00a458369c81f78f3cd3651c7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b2f3366_31ce4ff1",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-02T23:47:10Z",
+      "side": 1,
+      "message": "this kinda sorta looks better, but does not address the underlying problem -- this is still a static singleton.\n\nThe point is: if we stop RESTCONF, without unloading this class, all state needs to be relinquished -- most notably the registration.",
+      "range": {
+        "startLine": 26,
+        "startChar": 58,
+        "endLine": 26,
+        "endChar": 112
+      },
+      "revId": "468ca09fe13c58b00a458369c81f78f3cd3651c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5816e5a_e069073a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-02T23:47:10Z",
+      "side": 1,
+      "message": "yeah, this does absolutely nothing: this is not a @Singleton",
+      "range": {
+        "startLine": 58,
+        "startChar": 4,
+        "endLine": 58,
+        "endChar": 15
+      },
+      "revId": "468ca09fe13c58b00a458369c81f78f3cd3651c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
