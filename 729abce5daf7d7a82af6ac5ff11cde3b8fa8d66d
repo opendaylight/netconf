@@ -63,6 +63,30 @@
       },
       "revId": "729abce5daf7d7a82af6ac5ff11cde3b8fa8d66d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e0b71c6_183f9fbb",
+        "filename": "netconf/mdsal-netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/SshProxyServer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-02T12:44:57Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7b33330d_488b77c1",
+      "range": {
+        "startLine": 202,
+        "startChar": 24,
+        "endLine": 202,
+        "endChar": 59
+      },
+      "revId": "729abce5daf7d7a82af6ac5ff11cde3b8fa8d66d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
