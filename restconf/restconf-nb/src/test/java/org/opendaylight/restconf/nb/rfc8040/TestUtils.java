@@ -48,10 +48,8 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapEntryNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -236,32 +234,21 @@ public final class TestUtils {
         return NodeIdentifierWithPredicates.of(QName.create(namespace, revision, localName), predicate);
     }
 
-    public static NormalizedNode prepareNormalizedNodeWithIetfInterfacesInterfacesData() throws ParseException {
+    public static MapEntryNode prepareNormalizedNodeWithIetfInterfacesInterfacesData() throws ParseException {
         final String ietfInterfacesDate = "2013-07-04";
         final String namespace = "urn:ietf:params:xml:ns:yang:ietf-interfaces";
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryNode =
-                ImmutableMapEntryNodeBuilder.create();
 
-        final Map<String, Object> predicates = new HashMap<>();
-        predicates.put("name", "eth0");
-
-        mapEntryNode.withNodeIdentifier(getNodeIdentifierPredicate("interface", namespace, ietfInterfacesDate,
-                predicates));
-        mapEntryNode
-                .withChild(new ImmutableLeafNodeBuilder<String>()
-                        .withNodeIdentifier(getNodeIdentifier("name", namespace, ietfInterfacesDate)).withValue("eth0")
-                        .build());
-        mapEntryNode.withChild(new ImmutableLeafNodeBuilder<String>()
-                .withNodeIdentifier(getNodeIdentifier("type", namespace, ietfInterfacesDate))
-                .withValue("ethernetCsmacd").build());
-        mapEntryNode.withChild(new ImmutableLeafNodeBuilder<Boolean>()
-                .withNodeIdentifier(getNodeIdentifier("enabled", namespace, ietfInterfacesDate))
-                .withValue(Boolean.FALSE).build());
-        mapEntryNode.withChild(new ImmutableLeafNodeBuilder<String>()
-                .withNodeIdentifier(getNodeIdentifier("description", namespace, ietfInterfacesDate))
-                .withValue("some interface").build());
-
-        return mapEntryNode.build();
+        return Builders.mapEntryBuilder()
+            .withNodeIdentifier(getNodeIdentifierPredicate("interface", namespace, ietfInterfacesDate,
+                Map.of("name", "eth0")))
+            .withChild(ImmutableNodes.leafNode(getNodeIdentifier("name", namespace, ietfInterfacesDate), "eth0"))
+            .withChild(ImmutableNodes.leafNode(getNodeIdentifier("type", namespace, ietfInterfacesDate),
+                "ethernetCsmacd"))
+            .withChild(ImmutableNodes.leafNode(getNodeIdentifier("enabled", namespace, ietfInterfacesDate),
+                Boolean.FALSE))
+            .withChild(ImmutableNodes.leafNode(getNodeIdentifier("description", namespace, ietfInterfacesDate),
+                "some interface"))
+            .build();
     }
 
     public static SchemaContextHandler newSchemaContextHandler(final EffectiveModelContext schemaContext) {

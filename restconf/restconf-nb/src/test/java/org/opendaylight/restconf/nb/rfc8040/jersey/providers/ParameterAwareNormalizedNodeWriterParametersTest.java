@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -136,9 +136,10 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
     @Test
     public void writeEmptyRootContainerTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, null);
+            writer, null, null);
 
-        parameterWriter.write(ImmutableContainerNodeBuilder.create()
-                .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build());
+        parameterWriter.write(Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME))
+            .build());
     }
 }

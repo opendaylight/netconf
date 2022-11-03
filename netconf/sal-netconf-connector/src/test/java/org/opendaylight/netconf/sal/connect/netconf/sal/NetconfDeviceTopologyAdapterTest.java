@@ -49,8 +49,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceTopologyAdapterTest {
@@ -166,8 +167,7 @@ public class NetconfDeviceTopologyAdapterTest {
                 .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
                 .node(netconfTestLeafQname).build();
 
-        NormalizedNode augmentNode = ImmutableLeafNodeBuilder.create().withValue(dataTestId)
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(netconfTestLeafQname)).build();
+        LeafNode augmentNode = ImmutableNodes.leafNode(netconfTestLeafQname, dataTestId);
 
         DOMDataTreeWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);

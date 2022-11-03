@@ -80,7 +80,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -245,10 +244,10 @@ public class RestconfDataServiceImplTest {
     }
 
     private static ContainerNode wrapNodeByDataRootContainer(final DataContainerChild data) {
-        return ImmutableContainerNodeBuilder.create()
-                .withNodeIdentifier(NodeIdentifier.create(SchemaContext.NAME))
-                .withChild(data)
-                .build();
+        return Builders.containerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(SchemaContext.NAME))
+            .withChild(data)
+            .build();
     }
 
     /**

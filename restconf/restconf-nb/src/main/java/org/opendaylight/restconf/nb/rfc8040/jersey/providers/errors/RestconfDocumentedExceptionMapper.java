@@ -42,12 +42,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableUnkeyedListEntryNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableUnkeyedListNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,9 +120,9 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * @return Built errors container.
      */
     private static ContainerNode buildErrorsContainer(final RestconfDocumentedException exception) {
-        return ImmutableContainerNodeBuilder.create()
+        return Builders.containerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(Errors.QNAME))
-            .withChild(ImmutableUnkeyedListNodeBuilder.create()
+            .withChild(Builders.unkeyedListBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
                 .withValue(exception.getErrors().stream()
                     .map(RestconfDocumentedExceptionMapper::createErrorEntry)
@@ -142,11 +139,10 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      */
     private static UnkeyedListEntryNode createErrorEntry(final RestconfError restconfError) {
         // filling in mandatory leafs
-        final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> entryBuilder =
-            ImmutableUnkeyedListEntryNodeBuilder.create()
-                .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
-                .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.getErrorType().elementBody()))
-                .withChild(ImmutableNodes.leafNode(ERROR_TAG_QNAME, restconfError.getErrorTag().elementBody()));
+        final var entryBuilder = Builders.unkeyedListEntryBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
+            .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.getErrorType().elementBody()))
+            .withChild(ImmutableNodes.leafNode(ERROR_TAG_QNAME, restconfError.getErrorTag().elementBody()));
 
         // filling in optional fields
         if (restconfError.getErrorMessage() != null) {
@@ -366,6 +362,6 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      */
     @VisibleForTesting
     void setHttpHeaders(final HttpHeaders httpHeaders) {
-        this.headers = httpHeaders;
+        headers = httpHeaders;
     }
 }

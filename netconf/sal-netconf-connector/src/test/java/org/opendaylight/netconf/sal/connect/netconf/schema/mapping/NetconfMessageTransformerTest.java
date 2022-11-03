@@ -93,7 +93,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -726,10 +725,10 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        ContainerNode payload = ImmutableContainerNodeBuilder.create()
-                .withNodeIdentifier(NodeIdentifier.create(QName.create(barInputQname, "input")))
-                .withChild(ImmutableNodes.leafNode(barInputQname, barInput))
-                .build();
+        ContainerNode payload = Builders.containerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(QName.create(barInputQname, "input")))
+            .withChild(ImmutableNodes.leafNode(barInputQname, barInput))
+            .build();
 
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 XYZZY_BAR_PATH, domDataTreeIdentifier, payload);
@@ -1170,14 +1169,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     private static ContainerNode initInputAction(final QName qname, final String value) {
-        return ImmutableContainerNodeBuilder.create()
+        return Builders.containerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(QName.create(qname, "input")))
             .withChild(ImmutableNodes.leafNode(qname, value))
             .build();
     }
 
     private static ContainerNode initEmptyInputAction(final QName qname) {
-        return ImmutableContainerNodeBuilder.create()
+        return Builders.containerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(QName.create(qname, "input")))
             .build();
     }

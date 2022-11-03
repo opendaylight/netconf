@@ -54,15 +54,14 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -122,10 +121,10 @@ public class RuntimeRpcTest {
                 .findFirst().orElse(null);
             final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(module, module.getNamespace(),
                 type.getLocalName());
-            final OutputSchemaNode outputSchemaNode = rpcDefinition.getOutput();
-            final ContainerNode node = ImmutableContainerNodeBuilder.create()
-                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(outputSchemaNode.getQName()))
-                    .withValue(children).build();
+            final ContainerNode node = Builders.containerBuilder()
+                    .withNodeIdentifier(new NodeIdentifier(rpcDefinition.getOutput().getQName()))
+                    .withValue(children)
+                    .build();
 
             return immediateFluentFuture(new DefaultDOMRpcResult(node));
         }
@@ -176,7 +175,7 @@ public class RuntimeRpcTest {
             return immediateFluentFuture(yangTextSchemaSource);
         }).when(sourceProvider).getSource(any(SourceIdentifier.class));
 
-        this.currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
+        currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
     }
 
     @After

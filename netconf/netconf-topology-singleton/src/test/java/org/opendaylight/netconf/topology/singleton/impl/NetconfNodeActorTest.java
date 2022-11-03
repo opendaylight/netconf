@@ -107,11 +107,10 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -489,8 +488,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         assertTrue(slaveDomRPCService instanceof ProxyDOMRpcService);
 
         final QName testQName = QName.create("", "TestQname");
-        final NormalizedNode outputNode = ImmutableContainerNodeBuilder.create()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(testQName))
+        final ContainerNode outputNode = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(testQName))
                 .withChild(ImmutableNodes.leafNode(testQName, "foo")).build();
         final RpcError rpcError = RpcResultBuilder.newError(ErrorType.RPC, null, "Rpc invocation failed.");
 
@@ -558,14 +557,13 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final QName testQName = QName.create("test", "2019-08-16", "TestActionQname");
         final Absolute schemaPath = Absolute.of(testQName);
 
-        final YangInstanceIdentifier yangIIdPath = YangInstanceIdentifier
-            .create(new YangInstanceIdentifier.NodeIdentifier(testQName));
+        final YangInstanceIdentifier yangIIdPath = YangInstanceIdentifier.create(new NodeIdentifier(testQName));
 
         final DOMDataTreeIdentifier domDataTreeIdentifier = new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL,
             yangIIdPath);
 
-        final ContainerNode outputNode = ImmutableContainerNodeBuilder.create()
-            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(testQName))
+        final ContainerNode outputNode = Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(testQName))
             .withChild(ImmutableNodes.leafNode(testQName, "foo")).build();
 
         // Action with no response output.
@@ -635,7 +633,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
         final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
         final ContainerNode NODE = Builders.containerBuilder()
-            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont")))
+            .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
             .build();
 
         final FluentFuture<Optional<Object>> result = immediateFluentFuture(Optional.of(NODE));

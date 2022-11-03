@@ -35,8 +35,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
@@ -117,10 +117,10 @@ final class CreateStreamUtil {
         final QName outputQname = QName.create(qname, "output");
         final QName streamNameQname = QName.create(qname, "stream-name");
 
-        final ContainerNode output = ImmutableContainerNodeBuilder.create()
-                .withNodeIdentifier(new NodeIdentifier(outputQname))
-                .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
-        return new DefaultDOMRpcResult(output);
+        return new DefaultDOMRpcResult(Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(outputQname))
+            .withChild(ImmutableNodes.leafNode(streamNameQname, streamName))
+            .build());
     }
 
     /**

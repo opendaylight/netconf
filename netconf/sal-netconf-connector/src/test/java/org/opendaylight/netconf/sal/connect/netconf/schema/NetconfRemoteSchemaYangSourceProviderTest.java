@@ -33,8 +33,7 @@ import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableAnyXmlNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.w3c.dom.Document;
@@ -77,9 +76,9 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         Document xmlDoc = UntrustedXML.newDocumentBuilder().newDocument();
         Element root = xmlDoc.createElement("data");
         root.setTextContent("module test {}");
-        return ImmutableContainerNodeBuilder.create()
+        return Builders.containerBuilder()
             .withNodeIdentifier(id)
-            .withChild(ImmutableAnyXmlNodeBuilder.create()
+            .withChild(Builders.anyXmlBuilder()
                 .withNodeIdentifier(childId)
                 .withValue(new DOMSource(root))
                 .build())
