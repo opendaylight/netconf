@@ -97,6 +97,52 @@
       },
       "revId": "468ca09fe13c58b00a458369c81f78f3cd3651c7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "befd16de_0b270dfd",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-03T01:34:09Z",
+      "side": 1,
+      "message": "use a proper catch",
+      "range": {
+        "startLine": 79,
+        "startChar": 4,
+        "endLine": 79,
+        "endChar": 48
+      },
+      "revId": "468ca09fe13c58b00a458369c81f78f3cd3651c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0022e6b_14bc37c2",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-03T01:34:09Z",
+      "side": 1,
+      "message": "when can this even happen?",
+      "range": {
+        "startLine": 91,
+        "startChar": 29,
+        "endLine": 91,
+        "endChar": 55
+      },
+      "revId": "468ca09fe13c58b00a458369c81f78f3cd3651c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
