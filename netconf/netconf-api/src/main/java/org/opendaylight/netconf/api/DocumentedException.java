@@ -118,7 +118,7 @@ public class DocumentedException extends Exception {
         ErrorSeverity errorSeverity = ErrorSeverity.ERROR;
         Map<String, String> errorInfo = null;
         String errorMessage = "";
-        String allErrorMessages = "";
+        StringBuilder allErrorMessages = new StringBuilder();
 
         Node rpcReply = fromDoc.getDocumentElement();
 
@@ -150,7 +150,7 @@ public class DocumentedException extends Exception {
                         errorSeverity = sev != null ? sev : ErrorSeverity.ERROR;
                     } else if (ERROR_MESSAGE.equals(rpcErrorChild.getLocalName())) {
                         errorMessage = rpcErrorChild.getTextContent();
-                        allErrorMessages = allErrorMessages + errorMessage;
+                        allErrorMessages.append(errorMessage);
                     } else if (ERROR_INFO.equals(rpcErrorChild.getLocalName())) {
                         errorInfo = parseErrorInfo(rpcErrorChild);
                     }
@@ -162,7 +162,7 @@ public class DocumentedException extends Exception {
             if (errorInfo == null) {
                 errorInfo = new HashMap<>();
             }
-            errorInfo.put("Multiple Errors Found", allErrorMessages);
+            errorInfo.put("Multiple Errors Found", allErrorMessages.toString());
         }
 
         return new DocumentedException(errorMessage, errorType, errorTag, errorSeverity, errorInfo);
