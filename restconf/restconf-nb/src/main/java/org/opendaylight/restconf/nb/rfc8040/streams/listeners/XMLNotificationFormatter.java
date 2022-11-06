@@ -11,10 +11,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Instant;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -44,36 +42,26 @@ final class XMLNotificationFormatter extends NotificationFormatter {
 
     @Override
     String createText(final EffectiveModelContext schemaContext, final DOMNotification input, final Instant now,
-                      final boolean leafNodesOnly, final boolean skipData)
-            throws IOException {
-        final StringWriter writer = new StringWriter();
+                      final boolean leafNodesOnly, final boolean skipData) throws IOException {
+        final var writer = new StringWriter();
+
         try {
-            final XMLStreamWriter xmlStreamWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(writer);
-            xmlStreamWriter.setDefaultNamespace(NOTIFICATION_NAMESPACE);
+            final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now);
+            final var nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlStreamWriter, schemaContext,
+                input.getType());
 
-            xmlStreamWriter.writeStartElement(NOTIFICATION_NAMESPACE, NOTIFICATION_ELEMENT);
-            xmlStreamWriter.writeDefaultNamespace(NOTIFICATION_NAMESPACE);
+            try (var nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter)) {
+                nnWriter.write(input.getBody());
+                nnWriter.flush();
 
-            xmlStreamWriter.writeStartElement("eventTime");
-            xmlStreamWriter.writeCharacters(toRFC3339(now));
-            xmlStreamWriter.writeEndElement();
-
-            final NormalizedNodeStreamWriter nnStreamWriter =
-                    XMLStreamNormalizedNodeStreamWriter.create(xmlStreamWriter, schemaContext, input.getType());
-
-            final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter);
-            nnWriter.write(input.getBody());
-            nnWriter.flush();
-
-            xmlStreamWriter.writeEndElement();
-            xmlStreamWriter.writeEndDocument();
-            xmlStreamWriter.flush();
-
-            nnWriter.close();
-
-            return writer.toString();
+                xmlStreamWriter.writeEndElement();
+                xmlStreamWriter.writeEndDocument();
+                xmlStreamWriter.flush();
+            }
         } catch (XMLStreamException e) {
             throw new IOException("Failed to write notification content", e);
         }
+
+        return writer.toString();
     }
 }

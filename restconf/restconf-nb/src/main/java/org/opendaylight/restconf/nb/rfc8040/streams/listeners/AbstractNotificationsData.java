@@ -153,15 +153,8 @@ abstract class AbstractNotificationsData {
      * @return element of {@link Document}
      */
     protected Element basePartDoc(final Document doc) {
-        final Element notificationElement = doc.createElementNS(
-            NotificationFormatter.NOTIFICATION_NAMESPACE, NotificationFormatter.NOTIFICATION_ELEMENT);
-
+        final var notificationElement = NotificationFormatter.createNotificationElement(doc);
         doc.appendChild(notificationElement);
-
-        final Element eventTimeElement = doc.createElement("eventTime");
-        eventTimeElement.setTextContent(toRFC3339(Instant.now()));
-        notificationElement.appendChild(eventTimeElement);
-
         return notificationElement;
     }
 

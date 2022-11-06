@@ -9,13 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
 import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.NOTIFICATION_ELEMENT;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.NOTIFICATION_NAMESPACE;
 import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.SAL_REMOTE_NAMESPACE;
 import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.XML_OUTPUT_FACTORY;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
@@ -47,11 +44,7 @@ abstract class DataTreeCandidateFormatter extends EventFormatter<Collection<Data
     @Override
     final void fillDocument(final Document doc, final EffectiveModelContext schemaContext,
             final Collection<DataTreeCandidate> input) throws IOException {
-        final Element notificationElement = doc.createElementNS(NOTIFICATION_NAMESPACE, NOTIFICATION_ELEMENT);
-        final Element eventTimeElement = doc.createElement("eventTime");
-        eventTimeElement.setTextContent(toRFC3339(Instant.now()));
-        notificationElement.appendChild(eventTimeElement);
-
+        final Element notificationElement = NotificationFormatter.createNotificationElement(doc);
         final Element notificationEventElement = doc.createElementNS(
             SAL_REMOTE_NAMESPACE, DATA_CHANGED_NOTIFICATION_ELEMENT);
 
