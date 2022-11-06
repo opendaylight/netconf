@@ -50,6 +50,10 @@
             <artifactId>aaa-filterchain</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.aaa</groupId>
+            <artifactId>aaa-shiro-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.aaa.web</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>

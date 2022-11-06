@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import java.util.Objects;
+import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
@@ -28,10 +29,17 @@ public final class JaxRsEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull String restconf;
     private final @NonNull String pingNamePrefix;
     private final int pingCorePoolSize;
+    private final boolean restconfLoggingEnabled;
+    private final boolean loggingHeadersEnabled;
+    private final boolean loggingQueryParametersEnabled;
+    private final boolean loggingBodyEnabled;
+    private final @NonNull Set<String> hiddenHttpHeaders;
 
     public JaxRsEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String restconf,
-            final String pingNamePrefix, final int pingCorePoolSize) {
+            final String pingNamePrefix, final int pingCorePoolSize, final boolean restconfLoggingEnabled,
+            final boolean loggingHeadersEnabled, final boolean loggingQueryParametersEnabled,
+            final boolean loggingBodyEnabled, final Set<String> hiddenHttpHeaders) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         if (restconf.endsWith("/")) {
             throw new IllegalArgumentException("restconf cannot end with '/'");
@@ -39,12 +47,17 @@ public final class JaxRsEndpointConfiguration extends EndpointConfiguration {
         this.restconf = restconf;
         this.pingNamePrefix = requireNonNull(pingNamePrefix);
         this.pingCorePoolSize = pingCorePoolSize;
+        this.restconfLoggingEnabled = restconfLoggingEnabled;
+        this.loggingHeadersEnabled = loggingHeadersEnabled;
+        this.loggingQueryParametersEnabled = loggingQueryParametersEnabled;
+        this.loggingBodyEnabled = loggingBodyEnabled;
+        this.hiddenHttpHeaders = Set.copyOf(hiddenHttpHeaders);
     }
 
     public JaxRsEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String restconf) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis, restconf,
-            DEFAULT_NAME_PREFIX, DEFAULT_CORE_POOL_SIZE);
+            DEFAULT_NAME_PREFIX, DEFAULT_CORE_POOL_SIZE, false, false, false, false, Set.of());
     }
 
     /**
@@ -64,10 +77,57 @@ public final class JaxRsEndpointConfiguration extends EndpointConfiguration {
         return pingCorePoolSize;
     }
 
+    /**
+     * Enabled RESTCONF audit logs.
+     *
+     * @return {@code true}: turned on RESTCONF audit logs; {@code false}: RESTCONF audit logs are
+     *     turned off irrespective of other settings
+     */
+    public boolean restconfLoggingEnabled() {
+        return restconfLoggingEnabled;
+    }
+
+    /**
+     * Including all HTTP headers in output logs.
+     *
+     * @return logs include all HTTP headers (both requests and responses)
+     */
+    public boolean loggingHeadersEnabled() {
+        return loggingHeadersEnabled;
+    }
+
+    /**
+     * Including all request query parameters in output logs.
+     *
+     * @return {@code true}: logs include all query parameters
+     */
+    public boolean loggingQueryParametersEnabled() {
+        return loggingQueryParametersEnabled;
+    }
+
+    /**
+     * Logging full HTTP request/response body.
+     *
+     * @return {@code true}: logs include request/response body
+     */
+    public boolean loggingBodyEnabled() {
+        return loggingBodyEnabled;
+    }
+
+    /**
+     * Get set of names that identify HTTP headers omitted from log output.
+     *
+     * @return {@link Set} of HTTP header identifiers
+     */
+    public @NonNull Set<String> hiddenHttpHeaders() {
+        return hiddenHttpHeaders;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            restconf, pingNamePrefix, pingCorePoolSize);
+            restconf, pingNamePrefix, pingCorePoolSize, restconfLoggingEnabled, loggingHeadersEnabled,
+            loggingQueryParametersEnabled, loggingBodyEnabled, hiddenHttpHeaders);
     }
 
     @Override
@@ -77,7 +137,10 @@ public final class JaxRsEndpointConfiguration extends EndpointConfiguration {
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
             && restconf.equals(other.restconf) && pingNamePrefix.equals(other.pingNamePrefix)
-            && pingCorePoolSize == other.pingCorePoolSize;
+            && pingCorePoolSize == other.pingCorePoolSize && restconfLoggingEnabled == other.restconfLoggingEnabled
+            && loggingHeadersEnabled == other.loggingHeadersEnabled
+            && loggingQueryParametersEnabled == other.loggingQueryParametersEnabled
+            && loggingBodyEnabled == other.loggingBodyEnabled && hiddenHttpHeaders.equals(other.hiddenHttpHeaders);
     }
 
     @Override
@@ -85,6 +148,11 @@ public final class JaxRsEndpointConfiguration extends EndpointConfiguration {
         return super.addToStringAttributes(helper)
             .add("restconf", restconf)
             .add("pingNamePrefix", pingNamePrefix)
-            .add("pingCorePoolSize", pingCorePoolSize);
+            .add("pingCorePoolSize", pingCorePoolSize)
+            .add("restconfLoggingEnabled", restconfLoggingEnabled)
+            .add("loggingHeadersEnabled", loggingHeadersEnabled)
+            .add("loggingQueryParametersEnabled", loggingQueryParametersEnabled)
+            .add("loggingBodyEnabled", loggingBodyEnabled)
+            .add("hiddenHttpHeaders", hiddenHttpHeaders);
     }
 }

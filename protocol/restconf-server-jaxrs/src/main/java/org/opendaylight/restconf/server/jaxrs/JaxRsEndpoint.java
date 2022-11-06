@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableSet;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,7 @@ import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.jaxrs.logging.RestconfLoggingBroker;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -84,10 +86,12 @@ public final class JaxRsEndpoint implements SSESenderFactory, AutoCloseable {
                     new Application() {
                         @Override
                         public Set<Object> getSingletons() {
-                            return Set.of(
-                                new JsonJaxRsFormattableBodyWriter(), new XmlJaxRsFormattableBodyWriter(),
-                                new JaxRsRestconf(server, streamRegistry, sseSender, configuration.errorTagMapping(),
-                                    configuration.prettyPrint()));
+                            return ImmutableSet.builder()
+                                .add(new JsonJaxRsFormattableBodyWriter(), new XmlJaxRsFormattableBodyWriter(),
+                                     new JaxRsRestconf(server, streamRegistry, sseSender,
+                                         configuration.errorTagMapping(), configuration.prettyPrint()))
+                                .add(RestconfLoggingBroker.singletons(configuration))
+                                .build();
                         }
                     }).build())
                 .asyncSupported(true)

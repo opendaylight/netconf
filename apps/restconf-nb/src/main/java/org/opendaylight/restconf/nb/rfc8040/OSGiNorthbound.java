@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+import java.util.Set;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpointConfiguration;
@@ -75,6 +76,21 @@ public final class OSGiNorthbound {
         //        Integer.MAX_VALUE, which is not what we want
         @AttributeDefinition(min = "0")
         int max$_$thread$_$count() default JaxRsEndpointConfiguration.DEFAULT_CORE_POOL_SIZE;
+
+        @AttributeDefinition
+        boolean restconf$_$logging$_$enabled() default false;
+
+        @AttributeDefinition
+        boolean logging$_$eaders$_$enabled() default true;
+
+        @AttributeDefinition
+        boolean logging$_$query$_$parameters$_$enabled() default true;
+
+        @AttributeDefinition
+        boolean logging$_$body$_$enabled() default true;
+
+        @AttributeDefinition
+        String[] hidden$_$http$_$headers() default { };
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -121,6 +137,9 @@ public final class OSGiNorthbound {
             PrettyPrintParam.of(configuration.pretty$_$print()),
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.restconf(),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count()));
+            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
+            configuration.restconf$_$logging$_$enabled(), configuration.logging$_$eaders$_$enabled(),
+            configuration.logging$_$query$_$parameters$_$enabled(), configuration.logging$_$body$_$enabled(),
+            Set.of(configuration.hidden$_$http$_$headers())));
     }
 }
