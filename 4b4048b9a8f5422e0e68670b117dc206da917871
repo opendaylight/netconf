@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "33eefe01_664417bb",
         "filename": "/COMMIT_MSG",
@@ -20,10 +21,10 @@
         "endChar": 0
       },
       "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "2558e87e_fd64dcec",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
@@ -43,10 +44,34 @@
         "endChar": 39
       },
       "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a6da339_fe8964b0",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-06T15:50:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2558e87e_fd64dcec",
+      "range": {
+        "startLine": 38,
+        "startChar": 26,
+        "endLine": 38,
+        "endChar": 39
+      },
+      "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "cbf8d0b5_f3ce1c21",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
@@ -66,10 +91,10 @@
         "endChar": 71
       },
       "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "415d5541_b1da12fd",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
@@ -89,10 +114,10 @@
         "endChar": 94
       },
       "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "3d57e4cb_91cf977b",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
@@ -112,10 +137,10 @@
         "endChar": 79
       },
       "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "46b5bedd_2ad10d36",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
@@ -135,8 +160,7 @@
         "endChar": 17
       },
       "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
