@@ -126,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a1520e2a_6b11a669",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-06T19:56:27Z",
+      "side": 1,
+      "message": "so... let\u0027s start with adding a comment explaining what we are attempting to do here... Is this related to the stuff *NormalizedNodeBodyReaders are doing?",
+      "parentUuid": "599b8fa0_1bcefe39",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "633d9145_172f6ba7",
         "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/test-model-aug.yang",
         "patchSetId": 9

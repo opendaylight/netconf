@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "926ba23c_20bf8944",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-06T19:56:27Z",
+      "side": 1,
+      "message": "now imagine what this toArray() is going to do if children.size() \u003d\u003d 1_000_000\n\ncompare that mental picture to doing an obvious:\n\nchildren.iterator().next()\n\nwhich brings about the question: how do we know there is at least one child -- sounds line that\u0027s something we need at least a verify() for",
+      "range": {
+        "startLine": 264,
+        "startChar": 52,
+        "endLine": 264,
+        "endChar": 73
+      },
+      "revId": "e0cc68692585a6dc3e6216cbba9586df6a529653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
