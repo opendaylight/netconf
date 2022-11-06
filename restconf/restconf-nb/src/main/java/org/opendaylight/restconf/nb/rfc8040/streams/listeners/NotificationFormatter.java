@@ -16,6 +16,8 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -25,6 +27,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
+    static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:xml:ns:netconf:notification:1.0";
+    static final String NOTIFICATION_ELEMENT = "notification";
+
+    static final String SAL_REMOTE_NAMESPACE = DataChangedNotification.QNAME.getNamespace().toString();
+    static final String DATA_CHANGED_NOTIFICATION_ELEMENT = DataChangedNotification.QNAME.getLocalName();
+    static final String DATA_CHANGE_EVENT_ELEMENT = DataChangeEvent.QNAME.getLocalName();
+
     static final XMLOutputFactory XML_OUTPUT_FACTORY;
 
     static {
@@ -43,18 +52,14 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
     @Override
     final void fillDocument(final Document doc, final EffectiveModelContext schemaContext, final DOMNotification input)
             throws IOException {
-        final Element notificationElement = doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
-                "notification");
+        final Element notificationElement = doc.createElementNS(NOTIFICATION_NAMESPACE, NOTIFICATION_ELEMENT);
         final Element eventTimeElement = doc.createElement("eventTime");
-        if (input instanceof DOMEvent) {
-            eventTimeElement.setTextContent(toRFC3339(((DOMEvent) input).getEventInstant()));
-        } else {
-            eventTimeElement.setTextContent(toRFC3339(Instant.now()));
-        }
+        final Instant now = input instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now();
+        eventTimeElement.setTextContent(toRFC3339(now));
         notificationElement.appendChild(eventTimeElement);
 
-        final Element notificationEventElement = doc.createElementNS(
-                "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "create-notification-stream");
+        final Element notificationEventElement = doc.createElementNS(SAL_REMOTE_NAMESPACE,
+            "create-notification-stream");
         final Element dataElement = doc.createElement("notification");
         final DOMResult result = new DOMResult(dataElement);
         try {

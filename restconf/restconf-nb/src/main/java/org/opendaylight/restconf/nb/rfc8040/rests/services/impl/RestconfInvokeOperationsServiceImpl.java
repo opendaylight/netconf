@@ -33,11 +33,12 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -55,9 +56,8 @@ import org.slf4j.LoggerFactory;
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfInvokeOperationsServiceImpl.class);
 
-    // FIXME: at some point we do not want to have this here
-    private static final XMLNamespace SAL_REMOTE_NAMESPACE =
-        XMLNamespace.of("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote");
+    // FIXME: at some point we do not want to have this here, as this is only used for dispatch
+    private static final QNameModule SAL_REMOTE_NAMESPACE = CreateDataChangeEventSubscriptionInput.QNAME.getModule();
 
     private final DOMRpcService rpcService;
     private final SchemaContextHandler schemaContextHandler;
@@ -79,8 +79,9 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
 
         final ListenableFuture<? extends DOMRpcResult> future;
         if (mountPoint == null) {
-            // FIXME: this really should be a normal RPC invocation service which has its own interface with JAX-RS
-            if (SAL_REMOTE_NAMESPACE.equals(rpcName.getNamespace())) {
+            // FIXME: this really should be a normal RPC invocation service which has its own interface with JAX-RS,
+            //        except ... we check 'identifier' for .contains() instead of exact RPC name!
+            if (SAL_REMOTE_NAMESPACE.equals(rpcName.getModule())) {
                 if (identifier.contains("create-data-change-event-subscription")) {
                     future = Futures.immediateFuture(
                         CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContext));

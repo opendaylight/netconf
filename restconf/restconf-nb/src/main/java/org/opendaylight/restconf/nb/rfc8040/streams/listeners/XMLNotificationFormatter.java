@@ -22,14 +22,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 final class XMLNotificationFormatter extends NotificationFormatter {
     private static final XMLNotificationFormatter INSTANCE = new XMLNotificationFormatter();
 
-    static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:xml:ns:netconf:notification:1.0";
-    static final String NOTIFICATION_ELEMENT = "notification";
-
-    static final String DATA_CHANGED_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
-    static final String DATA_CHANGED_NOTIFICATION_ELEMENT = "data-changed-notification";
-
-    static final String DATA_CHANGE_EVENT_ELEMENT = "data-change-event";
-
     static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory() {
         @Override
         public XMLNotificationFormatter getFormatter(final String xpathFilter) throws XPathExpressionException {

@@ -7,11 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.NOTIFICATION_ELEMENT;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.NOTIFICATION_NAMESPACE;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.SAL_REMOTE_NAMESPACE;
 import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.XML_OUTPUT_FACTORY;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.DATA_CHANGED_NAMESPACE;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.NOTIFICATION_ELEMENT;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.NOTIFICATION_NAMESPACE;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -65,8 +65,8 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
             xmlStreamWriter.writeCharacters(toRFC3339(now));
             xmlStreamWriter.writeEndElement();
 
-            xmlStreamWriter.setDefaultNamespace(DATA_CHANGED_NAMESPACE);
-            xmlStreamWriter.writeStartElement(DATA_CHANGED_NAMESPACE, DATA_CHANGED_NOTIFICATION_ELEMENT);
+            xmlStreamWriter.setDefaultNamespace(SAL_REMOTE_NAMESPACE);
+            xmlStreamWriter.writeStartElement(SAL_REMOTE_NAMESPACE, DATA_CHANGED_NOTIFICATION_ELEMENT);
 
             final XmlDataTreeCandidateSerializer serializer =
                     new XmlDataTreeCandidateSerializer(schemaContext, xmlStreamWriter);

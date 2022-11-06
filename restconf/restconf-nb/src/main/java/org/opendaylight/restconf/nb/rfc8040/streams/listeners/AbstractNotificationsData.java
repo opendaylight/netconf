@@ -153,8 +153,8 @@ abstract class AbstractNotificationsData {
      * @return element of {@link Document}
      */
     protected Element basePartDoc(final Document doc) {
-        final Element notificationElement =
-                doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0", "notification");
+        final Element notificationElement = doc.createElementNS(
+            NotificationFormatter.NOTIFICATION_NAMESPACE, NotificationFormatter.NOTIFICATION_ELEMENT);
 
         doc.appendChild(notificationElement);
 
