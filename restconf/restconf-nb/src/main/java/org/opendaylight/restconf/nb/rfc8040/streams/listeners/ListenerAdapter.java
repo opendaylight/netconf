@@ -48,14 +48,10 @@ public class ListenerAdapter extends AbstractCommonSubscriber<YangInstanceIdenti
     }
 
     private static DataTreeCandidateFormatterFactory getFormatterFactory(final NotificationOutputType outputType) {
-        switch (outputType) {
-            case JSON:
-                return JSON_FORMATTER_FACTORY;
-            case XML:
-                return XMLDataTreeCandidateFormatter.FACTORY;
-            default:
-                throw new IllegalArgumentException("Unsupported outputType" + outputType);
-        }
+        return switch (outputType) {
+            case JSON -> JSON_FORMATTER_FACTORY;
+            case XML -> XMLDataTreeCandidateFormatter.FACTORY;
+        };
     }
 
     @Override

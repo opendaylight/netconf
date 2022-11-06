@@ -40,14 +40,10 @@ public final class NotificationListenerAdapter extends AbstractCommonSubscriber<
     }
 
     private static NotificationFormatterFactory getFormatterFactory(final NotificationOutputType outputType) {
-        switch (outputType) {
-            case JSON:
-                return JSON_FORMATTER_FACTORY;
-            case XML:
-                return XMLNotificationFormatter.FACTORY;
-            default:
-                throw new IllegalArgumentException("Unsupported outputType " + outputType);
-        }
+        return switch (outputType) {
+            case JSON -> JSON_FORMATTER_FACTORY;
+            case XML -> XMLNotificationFormatter.FACTORY;
+        };
     }
 
     @Override
