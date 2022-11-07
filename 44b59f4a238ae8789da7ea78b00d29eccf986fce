@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0560915d_84386bd1",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-07T00:26:23Z",
+      "side": 1,
+      "message": "should be an interned constant",
+      "range": {
+        "startLine": 155,
+        "startChar": 16,
+        "endLine": 155,
+        "endChar": 63
+      },
+      "revId": "44b59f4a238ae8789da7ea78b00d29eccf986fce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d833c36_4a5ece12",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-07T00:26:23Z",
+      "side": 1,
+      "message": "this is a bit ugly",
+      "range": {
+        "startLine": 159,
+        "startChar": 51,
+        "endLine": 159,
+        "endChar": 77
+      },
+      "revId": "44b59f4a238ae8789da7ea78b00d29eccf986fce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d6bd567_5772d0e5",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-07T00:26:23Z",
+      "side": 1,
+      "message": "yeah, we do not want this hard-codec",
+      "range": {
+        "startLine": 160,
+        "startChar": 84,
+        "endLine": 160,
+        "endChar": 99
+      },
+      "revId": "44b59f4a238ae8789da7ea78b00d29eccf986fce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3f91e13_75b0f8d0",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-07T00:26:23Z",
+      "side": 1,
+      "message": "should be part of .orElseThrows() on optional",
+      "range": {
+        "startLine": 198,
+        "startChar": 18,
+        "endLine": 199,
+        "endChar": 42
+      },
+      "revId": "44b59f4a238ae8789da7ea78b00d29eccf986fce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28115335_ef0dad09",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataStreamServiceImpl.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-11-07T00:26:23Z",
+      "side": 1,
+      "message": "this is dirty: there should be a proper indirection here, as this check is repeated elsewhere\n\nalso ... why this is part of streamName? at the end of the day, the mount check logically belongs to a different layer",
+      "range": {
+        "startLine": 53,
+        "startChar": 12,
+        "endLine": 53,
+        "endChar": 56
+      },
+      "revId": "44b59f4a238ae8789da7ea78b00d29eccf986fce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
