@@ -22,7 +22,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -38,15 +41,19 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yanglib.api.YangLibService;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.ir.IRArgument.Single;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangIRSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaListenerRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
+import org.opendaylight.yangtools.yang.parser.api.YangSyntaxErrorException;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,18 +120,15 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     @Override
     public void schemaSourceRegistered(final Iterable<PotentialSchemaSource<?>> sources) {
         final Map<ModuleKey, Module> newModules = new HashMap<>();
-
-        for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
-            final YangIdentifier moduleName =
-                new YangIdentifier(potentialYangSource.getSourceIdentifier().name().getLocalName());
-
+        for (final PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
+            final SourceIdentifier sourceIdentifier = potentialYangSource.getSourceIdentifier();
+            final YangIdentifier moduleName = new YangIdentifier(sourceIdentifier.name().getLocalName());
             final Module newModule = new ModuleBuilder()
                     .setName(moduleName)
-                    .setRevision(LegacyRevisionUtils.fromYangCommon(
-                        Optional.ofNullable(potentialYangSource.getSourceIdentifier().revision())))
-                    .setSchema(getUrlForModule(potentialYangSource.getSourceIdentifier()))
+                    .setRevision(LegacyRevisionUtils.fromYangCommon(Optional.ofNullable(sourceIdentifier.revision())))
+                    .setSchema(getUrlForModule(sourceIdentifier))
+                    .setFeature(getFeatures(sourceIdentifier))
                     .build();
-
             newModules.put(newModule.key(), newModule);
         }
 
@@ -201,6 +205,43 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     private Uri getUrlForModule(final SourceIdentifier sourceIdentifier) {
         return new Uri("http://" + yanglibConfig.getBindingAddr() + ':' + yanglibConfig.getBindingPort()
                 + "/yanglib/schemas/" + sourceIdentifier.name().getLocalName() + '/' + revString(sourceIdentifier));
+    }
+
+    private Set<YangIdentifier> getFeatures(final SourceIdentifier sourceIdentifier) {
+        final var identifierName = sourceIdentifier.name().getLocalName();
+        return getIrSchemaSource(sourceIdentifier)
+            .map(yangIRSchemaSource -> yangIRSchemaSource.getRootStatement().statements().stream())
+            .orElseGet(Stream::empty)
+            .filter(statement -> "feature".equals(statement.keyword().identifier()))
+            .map(featureStatement -> featureStatement.argument())
+            .filter(Single.class::isInstance)
+            .map(Single.class::cast)
+            .map(singleFeatureStatement -> new YangIdentifier(singleFeatureStatement.string()))
+            .peek(yangIdentifier -> LOG.debug("Found feature {} in provided model {}", yangIdentifier, identifierName))
+            .collect(Collectors.toSet());
+    }
+
+    private Optional<YangIRSchemaSource> getIrSchemaSource(final SourceIdentifier sourceIdentifier) {
+        final YangTextSchemaSource source;
+        try {
+            source = schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class).get();
+        } catch (final ExecutionException e) {
+            // In case that YangTextSchemaSource for provided identifier is not found, we don't have enough information
+            // to determine module features. Return empty set of features.
+            LOG.info("Source was not found for provided model {}. Setting empty features",
+                sourceIdentifier.name().getLocalName(), e);
+            return Optional.empty();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOG.error("Unable to get SchemaSource from source identifier {}", sourceIdentifier, e);
+            throw new IllegalStateException("Unable to get SchemaSource", e);
+        }
+        try {
+            return Optional.of(TextToIRTransformer.transformText(source));
+        } catch (final YangSyntaxErrorException | IOException e) {
+            LOG.error("Failed to transform provided source {} to IRSchemaSource", sourceIdentifier, e);
+            throw new IllegalArgumentException("Failed to transform provided source to IRSchemaSource", e);
+        }
     }
 
     private static String revString(final SourceIdentifier id) {
