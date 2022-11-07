@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "10b01089_4d5c5a3e",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-11-07T16:49:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f555d95_f0053c33",
+      "revId": "e0cc68692585a6dc3e6216cbba9586df6a529653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "926ba23c_20bf8944",
@@ -60,6 +78,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1107578b_a9d02ed5",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-11-07T16:49:55Z",
+      "side": 1,
+      "message": "Is it necessary? I replaced condition from MixinNode to AugmentationNode and ChoiceNode. It is easy just add another line with hasNext() check but isn\u0027t it redundant? Or those nodes still may come without child node?",
+      "parentUuid": "926ba23c_20bf8944",
+      "range": {
+        "startLine": 264,
+        "startChar": 52,
+        "endLine": 264,
+        "endChar": 73
+      },
+      "revId": "e0cc68692585a6dc3e6216cbba9586df6a529653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c4c63f67_c9eb5ae1",
         "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/xml/xmlPATCHdataAugmentedElement.xml",
         "patchSetId": 14
@@ -71,6 +113,24 @@
       "writtenOn": "2022-11-07T12:10:15Z",
       "side": 1,
       "message": "This is what we would like to test:\n\n```\n\u003cyang-patch xmlns\u003d\"urn:ietf:params:xml:ns:yang:ietf-yang-patch\"\u003e\n    \u003cpatch-id\u003etest-patch\u003c/patch-id\u003e\n    \u003ccomment\u003eThis test patch for augmented element\u003c/comment\u003e\n    \u003cedit\u003e\n        \u003cedit-id\u003eedit1\u003c/edit-id\u003e\n        \u003coperation\u003ereplace\u003c/operation\u003e\n        \u003ctarget\u003e/test-model:container-root/test-model:container-lvl1/test-model-aug:container-aug\u003c/target\u003e\n        \u003cvalue\u003e\n            \u003ccontainer-aug xmlns\u003d\"test-ns-aug\"\u003e\n                \u003cleaf-aug\u003edata\u003c/leaf-aug\u003e\n            \u003c/container-aug\u003e\n        \u003c/value\u003e\n    \u003c/edit\u003e\n\u003c/yang-patch\u003e\n```",
+      "revId": "e0cc68692585a6dc3e6216cbba9586df6a529653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "091717dd_3074036a",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/xml/xmlPATCHdataAugmentedElement.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-11-07T16:49:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4c63f67_c9eb5ae1",
       "revId": "e0cc68692585a6dc3e6216cbba9586df6a529653",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

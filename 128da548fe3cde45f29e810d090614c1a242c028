@@ -144,6 +144,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "eef24961_89eadf7d",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-11-07T16:49:55Z",
+      "side": 1,
+      "message": "Yes, you right. I already replaced my code with *NormalizedNodeBodyReaders code.",
+      "parentUuid": "a1520e2a_6b11a669",
+      "revId": "128da548fe3cde45f29e810d090614c1a242c028",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "633d9145_172f6ba7",
         "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/test-model-aug.yang",
         "patchSetId": 9
