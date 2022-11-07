@@ -21,8 +21,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -47,7 +49,11 @@ import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaListenerRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
+import org.opendaylight.yangtools.yang.parser.api.YangSyntaxErrorException;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.parser.rfc7950.ir.IRArgument.Single;
+import org.opendaylight.yangtools.yang.parser.rfc7950.ir.IRStatement;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,13 +119,21 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
             final YangIdentifier moduleName =
                 new YangIdentifier(potentialYangSource.getSourceIdentifier().name().getLocalName());
-
-            final Module newModule = new ModuleBuilder()
-                    .setName(moduleName)
-                    .setRevision(LegacyRevisionUtils.fromYangCommon(
-                        Optional.ofNullable(potentialYangSource.getSourceIdentifier().revision())))
-                    .setSchema(getUrlForModule(potentialYangSource.getSourceIdentifier()))
-                    .build();
+            final Module newModule;
+            try {
+                newModule = new ModuleBuilder()
+                        .setName(moduleName)
+                        .setRevision(LegacyRevisionUtils.fromYangCommon(
+                            Optional.ofNullable(potentialYangSource.getSourceIdentifier().revision())))
+                        .setSchema(getUrlForModule(potentialYangSource.getSourceIdentifier()))
+                        .setFeature(getFeatures(potentialYangSource.getSourceIdentifier()))
+                        .build();
+            } catch (YangSyntaxErrorException | IOException e) {
+                throw new IllegalStateException("Failed to transform provided source to IRSchemaSource", e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException(e);
+            }
 
             newModules.put(newModule.key(), newModule);
         }
@@ -144,6 +158,28 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
                 LOG.warn("Unable to update modules state", throwable);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private Set<YangIdentifier> getFeatures(final SourceIdentifier sourceIdentifier)
+            throws InterruptedException, YangSyntaxErrorException, IOException {
+        final YangTextSchemaSource schemaSource;
+        try {
+            schemaSource = schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class).get();
+        } catch (ExecutionException e) {
+            LOG.debug("Source was not found for provided model {}. Setting empty features",
+                    sourceIdentifier.name().getLocalName(), e);
+            return Set.of();
+        }
+        final var irSchemaSource = TextToIRTransformer.transformText(schemaSource);
+        final Set<YangIdentifier> features = new HashSet<>();
+        for (final IRStatement statement : irSchemaSource.getRootStatement().statements()) {
+            if (statement.keyword().identifier().equals("feature")
+                    && statement.argument() instanceof Single argument) {
+                LOG.debug("Found feature {} in provided model {}", argument, sourceIdentifier.name().getLocalName());
+                features.add(new YangIdentifier((argument).string()));
+            }
+        }
+        return features;
     }
 
     @Override
