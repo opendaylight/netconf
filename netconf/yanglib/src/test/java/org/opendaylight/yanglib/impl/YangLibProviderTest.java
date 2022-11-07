@@ -19,16 +19,14 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
+import java.util.Set;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -60,7 +58,18 @@ import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class YangLibProviderTest {
-    private static final File CACHE_DIR = new File("target/yanglib");
+    private static final File CACHE_DIR = new File(YangLibProvider.class.getResource("/model").getFile());
+    private static final Set<YangIdentifier> IETF_NETCONF_FEATURES;
+
+    static {
+        final var features = new String[] {"candidate", "xpath", "rollback-on-error", "confirmed-commit", "startup",
+                                           "writable-running", "url", "validate"};
+        final Set<YangIdentifier> ietf_features = new HashSet<>();
+        for (final var feature : features) {
+            ietf_features.add(new YangIdentifier(feature));
+        }
+        IETF_NETCONF_FEATURES = Collections.unmodifiableSet(ietf_features);
+    }
 
     @Mock
     private DataBroker dataBroker;
@@ -70,50 +79,33 @@ public class YangLibProviderTest {
 
     private YangLibProvider yangLibProvider;
 
-    @BeforeClass
-    public static void staticSetup() {
-        if (!CACHE_DIR.exists() && !CACHE_DIR.mkdirs()) {
-            throw new RuntimeException("Failed to create " + CACHE_DIR);
-        }
-    }
-
-    @AfterClass
-    public static void staticCleanup() {
-        FileUtils.deleteQuietly(CACHE_DIR);
-    }
-
     @Before
     public void setUp() {
-        try {
-            if (CACHE_DIR.exists()) {
-                FileUtils.cleanDirectory(CACHE_DIR);
-            }
-        } catch (IOException e) {
-            // Ignore
-        }
-
         final YanglibConfig yanglibConfig = new YanglibConfigBuilder().setBindingAddr("www.fake.com")
                 .setBindingPort(Uint32.valueOf(300)).setCacheFolder(CACHE_DIR.getAbsolutePath()).build();
         yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker, new DefaultYangParserFactory());
+
+        when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
+        doNothing().when(writeTransaction)
+                .delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
+        doNothing().when(writeTransaction)
+                .merge(eq(LogicalDatastoreType.OPERATIONAL), eq(InstanceIdentifier.create(ModulesState.class)), any());
+
+        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
     }
 
     @Test
     public void testSchemaSourceRegistered() {
         yangLibProvider.init();
-        when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
-        doNothing().when(writeTransaction)
-                .merge(eq(LogicalDatastoreType.OPERATIONAL), eq(InstanceIdentifier.create(ModulesState.class)), any());
-
         List<PotentialSchemaSource<?>> list = new ArrayList<>();
         list.add(
                 PotentialSchemaSource.create(new SourceIdentifier("no-revision"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         list.add(
-                PotentialSchemaSource.create(new SourceIdentifier("with-revision", "2016-04-28"),
+                PotentialSchemaSource.create(new SourceIdentifier("ietf-netconf", "2011-06-01"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
-        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         yangLibProvider.schemaSourceRegistered(list);
 
         Map<ModuleKey, Module> newModulesList = new HashMap<>();
@@ -122,23 +114,25 @@ public class YangLibProviderTest {
                 .setName(new YangIdentifier("no-revision"))
                 .setRevision(LegacyRevisionUtils.emptyRevision())
                 .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/no-revision/"))
+                .setFeature(Set.of())
                 .build();
 
         newModulesList.put(newModule.key(), newModule);
 
         newModule = new ModuleBuilder()
-                .setName(new YangIdentifier("with-revision"))
-                .setRevision(new Revision(new RevisionIdentifier("2016-04-28")))
-                .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/with-revision/2016-04-28"))
+                .setName(new YangIdentifier("ietf-netconf"))
+                .setRevision(new Revision(new RevisionIdentifier("2011-06-01")))
+                .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/ietf-netconf/2011-06-01"))
+                .setFeature(IETF_NETCONF_FEATURES)
                 .build();
 
         newModulesList.put(newModule.key(), newModule);
 
-        verify(dataBroker).newWriteOnlyTransaction();
+        verify(dataBroker, times(2)).newWriteOnlyTransaction();
         verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),
                 eq(InstanceIdentifier.create(ModulesState.class)),
                 eq(new ModulesStateBuilder().setModule(newModulesList).build()));
-        verify(writeTransaction).commit();
+        verify(writeTransaction, times(2)).commit();
     }
 
     @Test
@@ -170,16 +164,14 @@ public class YangLibProviderTest {
                 PotentialSchemaSource.create(new SourceIdentifier("yang-schema-source"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
-        when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
-        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         yangLibProvider.schemaSourceRegistered(potentialSources);
-        verify(dataBroker).newWriteOnlyTransaction();
+        verify(dataBroker, times(2)).newWriteOnlyTransaction();
 
         ArgumentCaptor<ModulesState> modulesStateCaptor = ArgumentCaptor.forClass(ModulesState.class);
-        verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),
+        verify(writeTransaction, times(2)).merge(eq(LogicalDatastoreType.OPERATIONAL),
                 eq(InstanceIdentifier.create(ModulesState.class)), modulesStateCaptor.capture());
         assertEquals(modulesStateCaptor.getValue().getModule().size(), 1);
-        verify(writeTransaction).commit();
+        verify(writeTransaction, times(2)).commit();
     }
 
     @Test
@@ -200,30 +192,9 @@ public class YangLibProviderTest {
     public void testSchemaSourceUnregistered() {
         yangLibProvider.init();
 
-        when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
-        doNothing().when(writeTransaction)
-                .delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
-
-        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
-
         PotentialSchemaSource<YangTextSchemaSource> yangUnregistererSource =
             PotentialSchemaSource.create(new SourceIdentifier("unregistered-yang-schema-without-revision"),
                 YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
-
-        yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);
-
-        verify(dataBroker).newWriteOnlyTransaction();
-        verify(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL),
-                eq(InstanceIdentifier.create(ModulesState.class)
-                        .child(Module.class,
-                                new ModuleKey(new YangIdentifier("unregistered-yang-schema-without-revision"),
-                                        LegacyRevisionUtils.emptyRevision()))));
-
-        verify(writeTransaction).commit();
-
-        yangUnregistererSource =
-                PotentialSchemaSource.create(new SourceIdentifier("unregistered-yang-with-revision", "2016-04-28"),
-                        YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
 
         yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);
 
@@ -231,9 +202,24 @@ public class YangLibProviderTest {
         verify(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL),
                 eq(InstanceIdentifier.create(ModulesState.class)
                         .child(Module.class,
+                                new ModuleKey(new YangIdentifier("unregistered-yang-schema-without-revision"),
+                                        LegacyRevisionUtils.emptyRevision()))));
+
+        verify(writeTransaction, times(2)).commit();
+
+        yangUnregistererSource =
+                PotentialSchemaSource.create(new SourceIdentifier("unregistered-yang-with-revision", "2016-04-28"),
+                        YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
+
+        yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);
+
+        verify(dataBroker, times(3)).newWriteOnlyTransaction();
+        verify(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL),
+                eq(InstanceIdentifier.create(ModulesState.class)
+                        .child(Module.class,
                                 new ModuleKey(new YangIdentifier("unregistered-yang-with-revision"),
                                         new Revision(new RevisionIdentifier("2016-04-28"))))));
 
-        verify(writeTransaction, times(2)).commit();
+        verify(writeTransaction, times(3)).commit();
     }
 }
