@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -122,6 +123,7 @@ public class YangLibProviderTest {
                 .setName(new YangIdentifier("no-revision"))
                 .setRevision(LegacyRevisionUtils.emptyRevision())
                 .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/no-revision/"))
+                .setFeature(Set.of())
                 .build();
 
         newModulesList.put(newModule.key(), newModule);
@@ -130,6 +132,7 @@ public class YangLibProviderTest {
                 .setName(new YangIdentifier("with-revision"))
                 .setRevision(new Revision(new RevisionIdentifier("2016-04-28")))
                 .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/with-revision/2016-04-28"))
+                .setFeature(Set.of())
                 .build();
 
         newModulesList.put(newModule.key(), newModule);
