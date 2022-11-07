@@ -1,0 +1,266 @@
+module ietf-netconf {
+
+  // the namespace for NETCONF XML definitions is unchanged
+  // from RFC 4741, which this document replaces
+
+  // This model does not contain some functionality from original model, for the test purpose.
+
+  namespace "urn:ietf:params:xml:ns:netconf:base:1.0";
+
+  prefix nc;
+
+  organization
+    "IETF NETCONF (Network Configuration) Working Group";
+
+  contact
+    "WG Web:   <http://tools.ietf.org/wg/netconf/>
+     WG List:  <netconf@ietf.org>
+
+     WG Chair: Bert Wijnen
+               <bertietf@bwijnen.net>
+
+     WG Chair: Mehmet Ersue
+               <mehmet.ersue@nsn.com>
+
+     Editor:   Martin Bjorklund
+               <mbj@tail-f.com>
+
+     Editor:   Juergen Schoenwaelder
+               <j.schoenwaelder@jacobs-university.de>
+
+     Editor:   Andy Bierman
+               <andy.bierman@brocade.com>";
+  description
+    "NETCONF Protocol Data Types and Protocol Operations.
+
+     Copyright (c) 2011 IETF Trust and the persons identified as
+     the document authors.  All rights reserved.
+
+     Redistribution and use in source and binary forms, with or
+     without modification, is permitted pursuant to, and subject
+     to the license terms contained in, the Simplified BSD License
+     set forth in Section 4.c of the IETF Trust's Legal Provisions
+     Relating to IETF Documents
+     (http://trustee.ietf.org/license-info).
+
+     This version of this YANG module is part of RFC 6241; see
+     the RFC itself for full legal notices.";
+
+  revision 2011-06-01 {
+    description
+      "Initial revision;";
+    reference
+      "RFC 6241: Network Configuration Protocol";
+  }
+
+  extension get-filter-element-attributes {
+    description
+      "If this extension is present within an 'anyxml'
+       statement named 'filter', which must be conceptually
+       defined within the RPC input section for the <get>
+       and <get-config> protocol operations, then the
+       following unqualified XML attribute is supported
+       within the <filter> element, within a <get> or
+       <get-config> protocol operation:
+
+         type : optional attribute with allowed
+                value strings 'subtree' and 'xpath'.
+                If missing, the default value is 'subtree'.
+
+       If the 'xpath' feature is supported, then the
+       following unqualified XML attribute is
+       also supported:
+
+         select: optional attribute containing a
+                 string representing an XPath expression.
+                 The 'type' attribute must be equal to 'xpath'
+                 if this attribute is present.";
+  }
+
+  // NETCONF capabilities defined as features
+  feature writable-running {
+    description
+      "NETCONF :writable-running capability;
+       If the server advertises the :writable-running
+       capability for a session, then this feature must
+       also be enabled for that session.  Otherwise,
+       this feature must not be enabled.";
+    reference "RFC 6241, Section 8.2";
+  }
+
+  feature candidate {
+    description
+      "NETCONF :candidate capability;
+       If the server advertises the :candidate
+       capability for a session, then this feature must
+       also be enabled for that session.  Otherwise,
+       this feature must not be enabled.";
+    reference "RFC 6241, Section 8.3";
+  }
+
+  feature confirmed-commit {
+    if-feature candidate;
+    description
+      "NETCONF :confirmed-commit:1.1 capability;
+       If the server advertises the :confirmed-commit:1.1
+       capability for a session, then this feature must
+       also be enabled for that session.  Otherwise,
+       this feature must not be enabled.";
+
+    reference "RFC 6241, Section 8.4";
+  }
+
+  feature rollback-on-error {
+    description
+      "NETCONF :rollback-on-error capability;
+       If the server advertises the :rollback-on-error
+       capability for a session, then this feature must
+       also be enabled for that session.  Otherwise,
+       this feature must not be enabled.";
+    reference "RFC 6241, Section 8.5";
+  }
+
+  feature validate {
+    description
+      "NETCONF :validate:1.1 capability;
+       If the server advertises the :validate:1.1
+       capability for a session, then this feature must
+       also be enabled for that session.  Otherwise,
+       this feature must not be enabled.";
+    reference "RFC 6241, Section 8.6";
+  }
+
+  feature startup {
+    description
+      "NETCONF :startup capability;
+       If the server advertises the :startup
+       capability for a session, then this feature must
+       also be enabled for that session.  Otherwise,
+       this feature must not be enabled.";
+    reference "RFC 6241, Section 8.7";
+  }
+
+  feature url {
+    description
+      "NETCONF :url capability;
+       If the server advertises the :url
+       capability for a session, then this feature must
+       also be enabled for that session.  Otherwise,
+       this feature must not be enabled.";
+    reference "RFC 6241, Section 8.8";
+  }
+
+  feature xpath {
+    description
+      "NETCONF :xpath capability;
+       If the server advertises the :xpath
+       capability for a session, then this feature must
+       also be enabled for that session.  Otherwise,
+       this feature must not be enabled.";
+    reference "RFC 6241, Section 8.9";
+  }
+
+  container feature {
+    description
+      "Particular configuration to retrieve.";
+
+    choice config-source {
+      mandatory true;
+      description
+        "The configuration to retrieve.";
+      leaf candidate {
+        if-feature candidate;
+        type empty;
+        description
+          "The candidate configuration is the config source.";
+      }
+      leaf startup {
+        if-feature startup;
+        type empty;
+        description
+          "The startup configuration is the config source.
+           This is optional-to-implement on the server because
+           not all servers will support filtering for this
+           datastore.";
+      }
+    }
+  }
+
+  rpc get-config {
+    description
+      "Retrieve all or part of a specified configuration.";
+
+    reference "RFC 6241, Section 7.1";
+
+    input {
+      container source {
+        description
+          "Particular configuration to retrieve.";
+
+        choice config-source {
+          mandatory true;
+          description
+            "The configuration to retrieve.";
+          leaf candidate {
+            if-feature candidate;
+            type empty;
+            description
+              "The candidate configuration is the config source.";
+          }
+          leaf startup {
+            if-feature startup;
+            type empty;
+            description
+              "The startup configuration is the config source.
+               This is optional-to-implement on the server because
+               not all servers will support filtering for this
+               datastore.";
+          }
+        }
+      }
+    }
+
+    output {
+      anyxml data {
+        description
+          "Copy of the source datastore subset that matched
+           the filter criteria (if any).  An empty data container
+           indicates that the request did not produce any results.";
+      }
+    }
+  }
+
+  rpc edit-config {
+    description
+      "The <edit-config> operation loads all or part of a specified
+       configuration to the specified target configuration.";
+
+    reference "RFC 6241, Section 7.2";
+
+    input {
+      container target {
+        description
+          "Particular configuration to edit.";
+
+        choice config-target {
+          mandatory true;
+          description
+            "The configuration target.";
+
+          leaf candidate {
+            if-feature candidate;
+            type empty;
+            description
+              "The candidate configuration is the config target.";
+          }
+          leaf running {
+            if-feature writable-running;
+            type empty;
+            description
+              "The running configuration is the config source.";
+          }
+        }
+      }
+    }
+  }
+}
