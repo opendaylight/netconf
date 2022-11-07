@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52c62010_33d2fc33",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-11-07T12:10:15Z",
+      "side": 1,
+      "message": "Interesting is that XML parsing works for augmentation nodes without changes.",
+      "revId": "e0cc68692585a6dc3e6216cbba9586df6a529653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "926ba23c_20bf8944",
@@ -20,6 +37,23 @@
         "endLine": 264,
         "endChar": 73
       },
+      "revId": "e0cc68692585a6dc3e6216cbba9586df6a529653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4c63f67_c9eb5ae1",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/xml/xmlPATCHdataAugmentedElement.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-11-07T12:10:15Z",
+      "side": 1,
+      "message": "This is what we would like to test:\n\n```\n\u003cyang-patch xmlns\u003d\"urn:ietf:params:xml:ns:yang:ietf-yang-patch\"\u003e\n    \u003cpatch-id\u003etest-patch\u003c/patch-id\u003e\n    \u003ccomment\u003eThis test patch for augmented element\u003c/comment\u003e\n    \u003cedit\u003e\n        \u003cedit-id\u003eedit1\u003c/edit-id\u003e\n        \u003coperation\u003ereplace\u003c/operation\u003e\n        \u003ctarget\u003e/test-model:container-root/test-model:container-lvl1/test-model-aug:container-aug\u003c/target\u003e\n        \u003cvalue\u003e\n            \u003ccontainer-aug xmlns\u003d\"test-ns-aug\"\u003e\n                \u003cleaf-aug\u003edata\u003c/leaf-aug\u003e\n            \u003c/container-aug\u003e\n        \u003c/value\u003e\n    \u003c/edit\u003e\n\u003c/yang-patch\u003e\n```",
       "revId": "e0cc68692585a6dc3e6216cbba9586df6a529653",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
