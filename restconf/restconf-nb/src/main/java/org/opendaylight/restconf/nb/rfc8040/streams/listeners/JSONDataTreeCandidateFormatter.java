@@ -54,7 +54,8 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
 
     @Override
     String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
-                      final Instant now, final boolean leafNodesOnly, final boolean skipData)
+                      final Instant now, final boolean leafNodesOnly, final boolean skipData,
+                      final boolean changedLeafNodesOnly)
             throws IOException {
         final Writer writer = new StringWriter();
         final JsonWriter jsonWriter = new JsonWriter(writer).beginObject();
@@ -66,7 +67,7 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
         final JsonDataTreeCandidateSerializer serializer =
                 new JsonDataTreeCandidateSerializer(schemaContext, codecSupplier, jsonWriter);
         for (final DataTreeCandidate candidate : input) {
-            serializer.serialize(candidate, leafNodesOnly, skipData);
+            serializer.serialize(candidate, leafNodesOnly, skipData, changedLeafNodesOnly);
         }
 
         // data-change-event
@@ -80,6 +81,6 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
         // notification
         jsonWriter.endObject();
 
-        return writer.toString();
+        return serializer.getEmptyDataChangedEvent() ? null : writer.toString();
     }
 }
