@@ -19,7 +19,11 @@ import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -50,12 +54,23 @@ import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class YangLibProviderTest {
+    private static final List<String> FEATURES = List.of("candidate", "xpath", "rollback-on-error",
+                                       "confirmed-commit", "startup", "writable-running", "url", "validate");
+    private static final Set<YangIdentifier> IETF_NETCONF_FEATURES = new HashSet<>();
+
     @Mock
     private DataBroker dataBroker;
     @Mock
     private WriteTransaction writeTransaction;
 
     private YangLibProvider yangLibProvider;
+
+    @BeforeClass
+    public static void initFeatures() {
+        for (final var feature : FEATURES) {
+            IETF_NETCONF_FEATURES.add(new YangIdentifier(feature));
+        }
+    }
 
     @Before
     public void setUp() {
@@ -76,10 +91,19 @@ public class YangLibProviderTest {
         // test that initial models are registered
         final var newModulesMap = new HashMap<ModuleKey, Module>();
 
+        final var ietfNetconf = new ModuleBuilder()
+                .setName(new YangIdentifier("ietf-netconf"))
+                .setRevision(new Revision(new RevisionIdentifier("2011-06-01")))
+                .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/ietf-netconf/2011-06-01"))
+                .setFeature(IETF_NETCONF_FEATURES)
+                .build();
+        newModulesMap.put(ietfNetconf.key(), ietfNetconf);
+
         final var model1 = new ModuleBuilder()
             .setName(new YangIdentifier("model1"))
             .setRevision(new Revision(new RevisionIdentifier("2023-02-21")))
             .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/model1/2023-02-21"))
+            .setFeature(Set.of())
             .build();
         newModulesMap.put(model1.key(), model1);
 
@@ -87,6 +111,7 @@ public class YangLibProviderTest {
             .setName(new YangIdentifier("model2"))
             .setRevision(LegacyRevisionUtils.emptyRevision())
             .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/model2"))
+            .setFeature(Set.of())
             .build();
         newModulesMap.put(model2.key(), model2);
 
