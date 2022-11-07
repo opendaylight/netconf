@@ -13,11 +13,8 @@ import static org.junit.Assert.fail;
 import com.google.common.util.concurrent.Uninterruptibles;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
@@ -33,6 +30,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.nb.rfc8040.LeafNodesOnlyParam;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.SkipNotificationDataParam;
@@ -41,6 +39,9 @@ import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.PatchCont1Builder;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice1.PatchCase1Builder;
+import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice2.PatchCase11Builder;
+import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice2.patch.case11.patch.sub.choice11.PatchSubCase11Builder;
+import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice2.patch.case11.patch.sub.choice11.patch.sub.case11.patch.sub.sub.choice11.PatchSubSubCase11Builder;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchContBuilder;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
@@ -48,6 +49,7 @@ import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.p
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1Key;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -63,6 +65,12 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private static final String JSON_NOTIF_LEAVES_CREATE = "/listener-adapter-test/notif-leaves-create.json";
     private static final String JSON_NOTIF_LEAVES_UPDATE =  "/listener-adapter-test/notif-leaves-update.json";
     private static final String JSON_NOTIF_LEAVES_DEL =  "/listener-adapter-test/notif-leaves-del.json";
+    private static final String JSON_NOTIF_CHANGED_LEAVES_CREATE =
+            "/listener-adapter-test/notif-changed-leaves-create.json";
+    private static final String JSON_NOTIF_CHANGED_LEAVES_UPDATE =
+            "/listener-adapter-test/notif-changed-leaves-update.json";
+    private static final String JSON_NOTIF_CHANGED_LEAVES_DEL =
+            "/listener-adapter-test/notif-changed-leaves-del.json";
     private static final String JSON_NOTIF_CREATE = "/listener-adapter-test/notif-create.json";
     private static final String JSON_NOTIF_UPDATE = "/listener-adapter-test/notif-update.json";
     private static final String JSON_NOTIF_DEL = "/listener-adapter-test/notif-del.json";
@@ -80,6 +88,12 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private static final String XML_NOTIF_LEAVES_CREATE = "/listener-adapter-test/notif-leaves-create.xml";
     private static final String XML_NOTIF_LEAVES_UPDATE =  "/listener-adapter-test/notif-leaves-update.xml";
     private static final String XML_NOTIF_LEAVES_DEL =  "/listener-adapter-test/notif-leaves-delete.xml";
+    private static final String XML_NOTIF_CHANGED_LEAVES_CREATE =
+            "/listener-adapter-test/notif-changed-leaves-create.xml";
+    private static final String XML_NOTIF_CHANGED_LEAVES_UPDATE =
+            "/listener-adapter-test/notif-changed-leaves-update.xml";
+    private static final String XML_NOTIF_CHANGED_LEAVES_DEL =
+            "/listener-adapter-test/notif-changed-leaves-delete.xml";
 
     private static final String XML_NOTIF_WITHOUT_DATA_CREATE =
             "/listener-adapter-test/notif-without-data-create.xml";
@@ -124,7 +138,15 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                               final boolean leafNodesOnly, final boolean skipNotificationData) {
             super(path, streamName, outputType);
             setQueryParams(NotificationQueryParams.of(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
-                LeafNodesOnlyParam.of(leafNodesOnly), SkipNotificationDataParam.of(skipNotificationData)));
+                LeafNodesOnlyParam.of(leafNodesOnly), SkipNotificationDataParam.of(skipNotificationData), null));
+        }
+
+        ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
+                              final NotificationOutputType outputType,
+                              final boolean changedLeafNodesOnly) {
+            super(path, streamName, outputType);
+            setQueryParams(NotificationQueryParams.of(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
+                    null, null, ChangedLeafNodesOnlyParam.of(changedLeafNodesOnly)));
         }
 
         @Override
@@ -149,7 +171,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         }
 
         public void assertXmlSimilar(final String xml) {
-            awaitUntillNotification(xml);
+            awaitUntilNotification(xml);
 
             LOG.info("lastNotification: {}", lastNotification);
             final String withFakeDate = withFakeXmlDate(lastNotification);
@@ -160,7 +182,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
             notificationLatch = new CountDownLatch(1);
         }
 
-        public String awaitUntillNotification(final String xml) {
+        public String awaitUntilNotification(final String xml) {
             // FIXME: use awaitility
             if (!Uninterruptibles.awaitUninterruptibly(notificationLatch, 500, TimeUnit.SECONDS)) {
                 fail("Timed out waiting for notification for: " + xml);
@@ -189,15 +211,11 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     }
 
     private String getNotifJson(final String path) throws IOException, URISyntaxException, JSONException {
-        final URL url = getClass().getResource(path);
-        final byte[] bytes = Files.readAllBytes(Paths.get(url.toURI()));
-        return withFakeDate(new String(bytes, StandardCharsets.UTF_8));
+        return withFakeDate(Files.readString(Paths.get(getClass().getResource(path).toURI())));
     }
 
     private String getResultXml(final String path) throws IOException, URISyntaxException, JSONException {
-        final URL url = getClass().getResource(path);
-        final byte[] bytes = Files.readAllBytes(Paths.get(url.toURI()));
-        return withFakeXmlDate(new String(bytes, StandardCharsets.UTF_8));
+        return withFakeXmlDate(Files.readString(Paths.get(getClass().getResource(path).toURI())));
     }
 
     @Test
@@ -214,31 +232,24 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
         WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final InstanceIdentifier<PatchCont> iid = InstanceIdentifier.create(PatchCont.class);
-        PatchContBuilder builder =
-                new PatchContBuilder()
-                        .addAugmentation(
-                                new PatchCont1Builder()
-                            .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceLeaf").build())
-                                        .setLeaf1("AugmentLeaf").build())
-                        .setMyList1(
-                                Map.of(new MyList1Key("Althea"),
-                                        new MyList1Builder().setMyLeaf11("Jed").setName("Althea").build())
-                        );
-        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
+        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
+            .addAugmentation(new PatchCont1Builder()
+                .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceLeaf").build())
+                .setLeaf1("AugmentLeaf")
+                .build())
+            .setMyList1(BindingMap.of(new MyList1Builder().setMyLeaf11("Jed").setName("Althea").build()))
+            .build());
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new PatchContBuilder()
-                .addAugmentation(
-                        new PatchCont1Builder()
-                                .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceUpdate").build())
-                                .setLeaf1("AugmentLeaf").build())
-                .setMyList1(
-                        Map.of(new MyList1Key("Althea"),
-                                new MyList1Builder().setMyLeaf12("Bertha").setName("Althea").build())
-                );
-        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
+            .addAugmentation(new PatchCont1Builder()
+                .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceUpdate").build())
+                .setLeaf1("AugmentLeaf")
+                .build())
+            .setMyList1(BindingMap.of(new MyList1Builder().setMyLeaf12("Bertha").setName("Althea").build()))
+            .build());
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_UPDATE));
 
@@ -246,6 +257,55 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_DEL));
+    }
+
+    @Test
+    public void testJsonNotifsChangedLeaves() throws Exception {
+        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
+                true);
+        adapter.setCloseVars(domDataBroker, databindProvider);
+
+        final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
+        final DOMDataTreeIdentifier root =
+                new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
+        changeService.registerDataTreeChangeListener(root, adapter);
+
+        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+        final InstanceIdentifier<PatchCont> iid = InstanceIdentifier.create(PatchCont.class);
+        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
+            .addAugmentation(new PatchCont1Builder()
+                .setPatchChoice2(new PatchCase11Builder()
+                    .setPatchSubChoice11(new PatchSubCase11Builder()
+                        .setPatchSubSubChoice11(new PatchSubSubCase11Builder().setCaseLeaf11("ChoiceLeaf").build())
+                        .build())
+                    .build())
+                .setLeaf1("AugmentLeaf")
+                .build())
+            .setMyList1(BindingMap.of(new MyList1Builder().setMyLeaf11("Jed").setName("Althea").build()))
+            .build());
+        writeTransaction.commit();
+        adapter.assertGot(getNotifJson(JSON_NOTIF_CHANGED_LEAVES_CREATE));
+
+        writeTransaction = dataBroker.newWriteOnlyTransaction();
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
+            .addAugmentation(new PatchCont1Builder()
+                .setPatchChoice2(new PatchCase11Builder()
+                    .setPatchSubChoice11(new PatchSubCase11Builder()
+                        .setPatchSubSubChoice11(new PatchSubSubCase11Builder().setCaseLeaf11("ChoiceUpdate").build())
+                        .build())
+                    .build())
+                .setLeaf1("AugmentLeaf")
+                .build())
+            .setMyList1(BindingMap.of(new MyList1Builder().setMyLeaf12("Bertha").setName("Althea").build()))
+            .build());
+        writeTransaction.commit();
+        adapter.assertGot(getNotifJson(JSON_NOTIF_CHANGED_LEAVES_UPDATE));
+
+        writeTransaction = dataBroker.newWriteOnlyTransaction();
+        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
+        writeTransaction.commit();
+        adapter.assertGot(getNotifJson(JSON_NOTIF_CHANGED_LEAVES_DEL));
     }
 
     @Test
@@ -382,30 +442,24 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         changeService.registerDataTreeChangeListener(root, adapter);
         WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final InstanceIdentifier<PatchCont> iid = InstanceIdentifier.create(PatchCont.class);
-        PatchContBuilder builder = new PatchContBuilder()
-                .addAugmentation(
-                        new PatchCont1Builder()
-                                .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceLeaf").build())
-                                .setLeaf1("AugmentLeaf").build())
-                                .setMyList1(
-                                        Map.of(new MyList1Key("Althea"),
-                                                new MyList1Builder().setMyLeaf11("Jed").setName("Althea").build())
-                        );
-        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
+        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
+            .addAugmentation(new PatchCont1Builder()
+                .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceLeaf").build())
+                .setLeaf1("AugmentLeaf")
+                .build())
+            .setMyList1(BindingMap.of(new MyList1Builder().setMyLeaf11("Jed").setName("Althea").build()))
+            .build());
         writeTransaction.commit();
         adapter.assertXmlSimilar(getResultXml(XML_NOTIF_LEAVES_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new PatchContBuilder()
-                .addAugmentation(
-                        new PatchCont1Builder()
-                                .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceUpdate").build())
-                                .setLeaf1("AugmentLeaf").build())
-                                .setMyList1(
-                                    Map.of(new MyList1Key("Althea"),
-                                                new MyList1Builder().setMyLeaf12("Bertha").setName("Althea").build())
-                );
-        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
+            .addAugmentation(new PatchCont1Builder()
+                .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceUpdate").build())
+                .setLeaf1("AugmentLeaf")
+                .build())
+            .setMyList1(BindingMap.of(new MyList1Builder().setMyLeaf12("Bertha").setName("Althea").build()))
+            .build());
         writeTransaction.commit();
         adapter.assertXmlSimilar(getResultXml(XML_NOTIF_LEAVES_UPDATE));
 
@@ -414,11 +468,68 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         writeTransaction.commit();
 
         // xmlunit cannot compare deeper children it seems out of the box so just check the iid encoding
-        final String notification = adapter.awaitUntillNotification("");
+        final String notification = adapter.awaitUntilNotification("");
         assertTrue(notification.contains("instance-identifier-patch-module:my-leaf12"));
         assertTrue(notification.contains("instance-identifier-patch-module:my-leaf11"));
         assertTrue(notification.contains("instance-identifier-patch-module:name"));
         assertTrue(notification.contains("augment-instance-identifier-patch-module:case-leaf1"));
+        assertTrue(notification.contains("augment-instance-identifier-patch-module:leaf1"));
+    }
+
+    @Test
+    public void testXmlChangedLeavesOnly() throws Exception {
+        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
+                true);
+        adapter.setCloseVars(domDataBroker, databindProvider);
+
+        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
+        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
+        changeService.registerDataTreeChangeListener(root, adapter);
+        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+        final InstanceIdentifier<PatchCont> iid = InstanceIdentifier.create(PatchCont.class);
+        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
+            .addAugmentation(new PatchCont1Builder()
+                .setPatchChoice2(new PatchCase11Builder()
+                    .setPatchSubChoice11(new PatchSubCase11Builder()
+                        .setPatchSubSubChoice11(new PatchSubSubCase11Builder().setCaseLeaf11("ChoiceLeaf").build())
+                        .build())
+                    .build())
+                .setLeaf1("AugmentLeaf")
+                .build())
+            .setMyList1(BindingMap.of(new MyList1Builder().setMyLeaf11("Jed").setName("Althea").build()))
+            .build());
+        writeTransaction.commit();
+        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_CHANGED_LEAVES_CREATE));
+
+        writeTransaction = dataBroker.newWriteOnlyTransaction();
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
+            .addAugmentation(new PatchCont1Builder()
+                .setPatchChoice2(new PatchCase11Builder()
+                    .setPatchSubChoice11(new PatchSubCase11Builder()
+                        .setPatchSubSubChoice11(new PatchSubSubCase11Builder().setCaseLeaf11("ChoiceUpdate").build())
+                        .build())
+                    .build())
+                .setLeaf1("AugmentLeaf")
+                .build())
+            .setMyList1(BindingMap.of(new MyList1Builder().setMyLeaf12("Bertha").setName("Althea").build()))
+            .build());
+        writeTransaction.commit();
+        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_CHANGED_LEAVES_UPDATE));
+
+        writeTransaction = dataBroker.newWriteOnlyTransaction();
+        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
+        writeTransaction.commit();
+        // xmlunit cannot compare deeper children it seems out of the box so just check the iid encoding
+        final String notification = adapter.awaitUntilNotification("");
+
+        assertTrue(notification.contains("instance-identifier-patch-module:my-leaf11"));
+        assertTrue(notification.contains("instance-identifier-patch-module:my-leaf12"));
+        assertTrue(notification.contains("instance-identifier-patch-module:name"));
+        assertTrue(notification.contains("augment-instance-identifier-patch-module:case-leaf11"));
+        assertTrue(notification.contains("augment-instance-identifier-patch-module:patch-choice2"));
+        assertTrue(notification.contains("augment-instance-identifier-patch-module:patch-sub-choice11"));
+        assertTrue(notification.contains("augment-instance-identifier-patch-module:patch-sub-sub-choice11"));
         assertTrue(notification.contains("augment-instance-identifier-patch-module:leaf1"));
     }
 }

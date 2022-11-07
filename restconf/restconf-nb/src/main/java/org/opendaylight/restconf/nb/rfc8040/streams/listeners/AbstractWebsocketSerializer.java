@@ -13,14 +13,11 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Map;
-import java.util.Set;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
@@ -40,53 +37,48 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         this.context = requireNonNull(context);
     }
 
-    public final void serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly, final boolean skipData)
-            throws T {
-        if (leafNodesOnly) {
-            final Deque<PathArgument> path = new ArrayDeque<>();
+    public final boolean serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly,
+            final boolean skipData, final boolean changedLeafNodesOnly) throws T {
+        if (leafNodesOnly || changedLeafNodesOnly) {
+            final var path = new ArrayDeque<PathArgument>();
             path.addAll(candidate.getRootPath().getPathArguments());
-            serializeLeafNodesOnly(path, candidate.getRootNode(), skipData);
-        } else {
-            serializeData(candidate.getRootPath().getPathArguments(), candidate.getRootNode(), skipData);
+            return serializeLeafNodesOnly(path, candidate.getRootNode(), skipData, changedLeafNodesOnly);
         }
+
+        serializeData(candidate.getRootPath().getPathArguments(), candidate.getRootNode(), skipData);
+        return true;
     }
 
-    final void serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
-            final boolean skipData) throws T {
-        NormalizedNode node = null;
-        switch (candidate.getModificationType()) {
-            case UNMODIFIED:
+    final boolean serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
+            final boolean skipData, final boolean changedLeafNodesOnly) throws T {
+        final var node = switch (candidate.getModificationType()) {
+            case SUBTREE_MODIFIED, APPEARED -> candidate.getDataAfter().orElseThrow();
+            case DELETE, DISAPPEARED -> candidate.getDataBefore().orElseThrow();
+            case WRITE -> changedLeafNodesOnly && isNotUpdate(candidate) ? null
+                : candidate.getDataAfter().orElseThrow();
+            case UNMODIFIED -> {
                 // no reason to do anything with an unmodified node
                 LOG.debug("DataTreeCandidate for a notification is unmodified, not serializing leaves. Candidate: {}",
                         candidate);
-                break;
-            case SUBTREE_MODIFIED:
-            case WRITE:
-            case APPEARED:
-                node = candidate.getDataAfter().get();
-                break;
-            case DELETE:
-            case DISAPPEARED:
-                node = candidate.getDataBefore().get();
-                break;
-            default:
-                LOG.error("DataTreeCandidate modification has unknown type: {}", candidate.getModificationType());
-        }
+                yield null;
+            }
+        };
 
         if (node == null) {
-            return;
+            return false;
         }
-
-        if (node instanceof LeafNode<?> || node instanceof LeafSetNode) {
+        if (node instanceof LeafNode || node instanceof LeafSetNode) {
             serializeData(path, candidate, skipData);
-            return;
+            return true;
         }
 
-        for (DataTreeCandidateNode childNode : candidate.getChildNodes()) {
+        boolean ret = false;
+        for (var childNode : candidate.getChildNodes()) {
             path.add(childNode.getIdentifier());
-            serializeLeafNodesOnly(path, childNode, skipData);
+            ret |= serializeLeafNodesOnly(path, childNode, skipData, changedLeafNodesOnly);
             path.removeLast();
         }
+        return ret;
     }
 
     private void serializeData(final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate,
@@ -110,6 +102,14 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     abstract void serializeData(Inference parent, Collection<PathArgument> dataPath, DataTreeCandidateNode candidate,
         boolean skipData) throws T;
 
+    private static boolean isNotUpdate(final DataTreeCandidateNode node) {
+        final var before = node.getDataBefore();
+        final var after = node.getDataAfter();
+
+        return before.isPresent() && after.isPresent()
+            && before.orElseThrow().body().equals(after.orElseThrow().body());
+    }
+
     abstract void serializePath(Collection<PathArgument> pathArguments) throws T;
 
     abstract void serializeOperation(DataTreeCandidateNode candidate) throws T;
@@ -117,8 +117,8 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     static final String convertPath(final Collection<PathArgument> path) {
         final StringBuilder pathBuilder = new StringBuilder();
 
-        for (PathArgument pathArgument : path) {
-            if (pathArgument instanceof YangInstanceIdentifier.AugmentationIdentifier) {
+        for (var pathArgument : path) {
+            if (pathArgument instanceof AugmentationIdentifier) {
                 continue;
             }
             pathBuilder.append('/');
@@ -126,11 +126,9 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
             pathBuilder.append(':');
             pathBuilder.append(pathArgument.getNodeType().getLocalName());
 
-            if (pathArgument instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
+            if (pathArgument instanceof NodeIdentifierWithPredicates nip) {
                 pathBuilder.append("[");
-                final Set<Map.Entry<QName, Object>> keys =
-                        ((YangInstanceIdentifier.NodeIdentifierWithPredicates) pathArgument).entrySet();
-                for (Map.Entry<QName, Object> key : keys) {
+                for (var key : nip.entrySet()) {
                     pathBuilder.append(key.getKey().getNamespace().toString().replace(':', '-'));
                     pathBuilder.append(':');
                     pathBuilder.append(key.getKey().getLocalName());
@@ -147,25 +145,14 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     static final String modificationTypeToOperation(final DataTreeCandidateNode candidate,
             final ModificationType modificationType) {
-        switch (modificationType) {
-            case UNMODIFIED:
+        return switch (modificationType) {
+            case APPEARED, SUBTREE_MODIFIED, WRITE -> candidate.getDataBefore().isPresent() ? "updated" : "created";
+            case DELETE, DISAPPEARED -> "deleted";
+            case UNMODIFIED -> {
                 // shouldn't ever happen since the root of a modification is only triggered by some event
                 LOG.warn("DataTreeCandidate for a notification is unmodified. Candidate: {}", candidate);
-                return "none";
-            case SUBTREE_MODIFIED:
-            case WRITE:
-            case APPEARED:
-                if (candidate.getDataBefore().isPresent()) {
-                    return "updated";
-                } else {
-                    return "created";
-                }
-            case DELETE:
-            case DISAPPEARED:
-                return "deleted";
-            default:
-                LOG.error("DataTreeCandidate modification has unknown type: {}", candidate.getModificationType());
-                throw new IllegalStateException("Unknown modification type");
-        }
+                yield "none";
+            }
+        };
     }
 }

@@ -24,23 +24,30 @@ public final class NotificationQueryParams implements Immutable {
     private final StartTimeParam startTime;
     private final StopTimeParam stopTime;
     private final FilterParam filter;
+    private final ChangedLeafNodesOnlyParam changedLeafNodesOnly;
 
     private NotificationQueryParams(final StartTimeParam startTime, final StopTimeParam stopTime,
             final FilterParam filter, final LeafNodesOnlyParam leafNodesOnly,
-            final SkipNotificationDataParam skipNotificationData) {
+            final SkipNotificationDataParam skipNotificationData,
+            final ChangedLeafNodesOnlyParam changedLeafNodesOnly) {
         this.startTime = startTime;
         this.stopTime = stopTime;
         this.filter = filter;
         this.leafNodesOnly = leafNodesOnly;
         this.skipNotificationData = skipNotificationData;
+        this.changedLeafNodesOnly = changedLeafNodesOnly;
     }
 
     public static @NonNull NotificationQueryParams of(final StartTimeParam startTime, final StopTimeParam stopTime,
             final FilterParam filter, final LeafNodesOnlyParam leafNodesOnly,
-            final SkipNotificationDataParam skipNotificationData) {
+            final SkipNotificationDataParam skipNotificationData,
+            final ChangedLeafNodesOnlyParam changedLeafNodesOnly) {
         checkArgument(stopTime == null || startTime != null,
             "Stop-time parameter has to be used with start-time parameter.");
-        return new NotificationQueryParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData);
+        checkArgument(changedLeafNodesOnly == null || leafNodesOnly == null,
+            "ChangedLeafNodesOnly parameter cannot be used with leafNodesOnlyParameter.");
+        return new NotificationQueryParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
+                changedLeafNodesOnly);
     }
 
     /**
@@ -88,6 +95,15 @@ public final class NotificationQueryParams implements Immutable {
         return skipNotificationData;
     }
 
+    /**
+     * Get changed-leaf-nodes-only query parameter.
+     *
+     * @return changed-leaf-nodes-only
+     */
+    public @Nullable ChangedLeafNodesOnlyParam changedLeafNodesOnly() {
+        return changedLeafNodesOnly;
+    }
+
     @Override
     public String toString() {
         final var helper = MoreObjects.toStringHelper(this);
@@ -105,6 +121,9 @@ public final class NotificationQueryParams implements Immutable {
         }
         if (skipNotificationData != null) {
             helper.add("skipNotificationData", skipNotificationData.value());
+        }
+        if (changedLeafNodesOnly != null) {
+            helper.add("changedLeafNodesOnly", changedLeafNodesOnly.value());
         }
         return helper.toString();
     }

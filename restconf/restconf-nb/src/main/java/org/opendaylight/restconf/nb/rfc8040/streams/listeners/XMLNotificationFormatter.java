@@ -42,7 +42,8 @@ final class XMLNotificationFormatter extends NotificationFormatter {
 
     @Override
     String createText(final EffectiveModelContext schemaContext, final DOMNotification input, final Instant now,
-                      final boolean leafNodesOnly, final boolean skipData) throws IOException {
+                      final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly)
+            throws IOException {
         final var writer = new StringWriter();
 
         try {
