@@ -46,9 +46,10 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
     @Override
     String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
-                      final Instant now, final boolean leafNodesOnly, final boolean skipData) throws Exception {
+                      final Instant now, final boolean leafNodesOnly, final boolean skipData,
+                      final boolean changedLeafNodesOnly) throws Exception {
         final var writer = new StringWriter();
-
+        boolean emptyDataChangeEvent;
         try {
             final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now);
 
@@ -57,7 +58,7 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
             final var serializer = new XmlDataTreeCandidateSerializer(schemaContext, xmlStreamWriter);
             for (var candidate : input) {
-                serializer.serialize(candidate, leafNodesOnly, skipData);
+                serializer.serialize(candidate, leafNodesOnly, skipData, changedLeafNodesOnly);
             }
 
             // data-changed-notification
@@ -66,10 +67,11 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
             // notification
             xmlStreamWriter.writeEndElement();
             xmlStreamWriter.close();
+            emptyDataChangeEvent = serializer.getEmptyDataChangedEvent();
         } catch (XMLStreamException e) {
             throw new IOException("Failed to write notification content", e);
         }
 
-        return writer.toString();
+        return emptyDataChangeEvent ? null : writer.toString();
     }
 }

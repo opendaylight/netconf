@@ -1,0 +1,37 @@
+{
+  "urn-ietf-params-xml-ns-netconf-notification-1.0:notification": {
+    "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification": {
+      "data-change-event": [
+        {
+          "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11",
+          "data": {
+            "instance-identifier-patch-module:my-leaf11": "Jed"
+          },
+          "operation": "created"
+        },
+        {
+          "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name",
+          "data": {
+            "instance-identifier-patch-module:name": "Althea"
+          },
+          "operation": "created"
+        },
+        {
+          "path": "/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:leaf1",
+          "data": {
+            "augment-iip-module:leaf1": "AugmentLeaf"
+          },
+          "operation": "created"
+        },
+        {
+          "path": "/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice2/augment-instance-identifier-patch-module:patch-sub-choice11/augment-instance-identifier-patch-module:patch-sub-sub-choice11/augment-instance-identifier-patch-module:case-leaf11",
+          "data": {
+            "augment-iip-module:case-leaf11": "ChoiceLeaf"
+          },
+          "operation": "created"
+        }
+      ]
+    },
+    "event-time": "2022-09-22T19:07:42.107085298+02:00"
+  }
+}
