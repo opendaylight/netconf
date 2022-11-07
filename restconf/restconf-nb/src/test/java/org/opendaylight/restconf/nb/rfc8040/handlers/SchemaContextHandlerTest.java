@@ -156,6 +156,7 @@ public class SchemaContextHandlerTest {
                 equalTo("urn:ietf:params:restconf:capability:with-defaults:1.0"),
                 equalTo("urn:opendaylight:params:restconf:capability:pretty-print:1.0"),
                 equalTo("urn:opendaylight:params:restconf:capability:leaf-nodes-only:1.0"),
+                equalTo("urn:opendaylight:params:restconf:capability:changed-leaf-nodes-only:1.0"),
                 equalTo("urn:opendaylight:params:restconf:capability:skip-notification-data:1.0")));
     }
 
