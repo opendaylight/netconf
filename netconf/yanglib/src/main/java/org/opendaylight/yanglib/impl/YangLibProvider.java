@@ -19,9 +19,12 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -38,15 +41,20 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yanglib.api.YangLibService;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.ir.IRArgument.Single;
+import org.opendaylight.yangtools.yang.ir.IRStatement;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangIRSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaListenerRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
+import org.opendaylight.yangtools.yang.parser.api.YangSyntaxErrorException;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +69,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
 
     private static final Predicate<PotentialSchemaSource<?>> YANG_SCHEMA_SOURCE =
         input -> YangTextSchemaSource.class.isAssignableFrom(input.getRepresentation());
+    private static final String FEATURE = "feature";
 
     private final DataBroker dataBroker;
     private final YanglibConfig yanglibConfig;
@@ -108,18 +117,15 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     @Override
     public void schemaSourceRegistered(final Iterable<PotentialSchemaSource<?>> sources) {
         final Map<ModuleKey, Module> newModules = new HashMap<>();
-
-        for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
-            final YangIdentifier moduleName =
-                new YangIdentifier(potentialYangSource.getSourceIdentifier().name().getLocalName());
-
+        for (final PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
+            final SourceIdentifier sourceIdentifier = potentialYangSource.getSourceIdentifier();
+            final YangIdentifier moduleName = new YangIdentifier(sourceIdentifier.name().getLocalName());
             final Module newModule = new ModuleBuilder()
                     .setName(moduleName)
-                    .setRevision(LegacyRevisionUtils.fromYangCommon(
-                        Optional.ofNullable(potentialYangSource.getSourceIdentifier().revision())))
-                    .setSchema(getUrlForModule(potentialYangSource.getSourceIdentifier()))
+                    .setRevision(LegacyRevisionUtils.fromYangCommon(Optional.ofNullable(sourceIdentifier.revision())))
+                    .setSchema(getUrlForModule(sourceIdentifier))
+                    .setFeature(getFeatures(sourceIdentifier))
                     .build();
-
             newModules.put(newModule.key(), newModule);
         }
 
@@ -196,6 +202,34 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     private Uri getUrlForModule(final SourceIdentifier sourceIdentifier) {
         return new Uri("http://" + yanglibConfig.getBindingAddr() + ':' + yanglibConfig.getBindingPort()
                 + "/yanglib/schemas/" + sourceIdentifier.name().getLocalName() + '/' + revString(sourceIdentifier));
+    }
+
+    private Set<YangIdentifier> getFeatures(final SourceIdentifier sourceIdentifier) {
+        final YangIRSchemaSource irSchemaSource;
+        try {
+            final var source = schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class).get();
+            irSchemaSource = TextToIRTransformer.transformText(source);
+        } catch (final ExecutionException e) {
+            // In case that YangTextSchemaSource for provided identifier is not found, we don't have enough information
+            // to determine module features. Return empty set of features.
+            LOG.info("Source was not found for provided model {}. Setting empty features",
+                    sourceIdentifier.name().getLocalName(), e);
+            return Set.of();
+        } catch (final YangSyntaxErrorException | IOException e) {
+            throw new IllegalStateException("Failed to transform provided source to IRSchemaSource", e);
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Unable to get SchemaSource", e);
+        }
+
+        final Set<YangIdentifier> features = new HashSet<>();
+        for (final IRStatement statement : irSchemaSource.getRootStatement().statements()) {
+            if (FEATURE.equals(statement.keyword().identifier()) && statement.argument() instanceof Single argument) {
+                LOG.debug("Found feature {} in provided model {}", argument, sourceIdentifier.name().getLocalName());
+                features.add(new YangIdentifier((argument).string()));
+            }
+        }
+        return Collections.unmodifiableSet(features);
     }
 
     private static String revString(final SourceIdentifier id) {
