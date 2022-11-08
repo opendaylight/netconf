@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -15,11 +16,14 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.MustDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.LeafEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.LeafStatement;
 import org.opendaylight.yangtools.yang.model.ri.type.BaseTypes;
 
 @Deprecated(forRemoval = true, since = "4.0.0")
-final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode implements LeafSchemaNode {
+final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode<LeafStatement>
+        implements LeafSchemaNode, LeafEffectiveStatement {
     private final QName qname;
 
     OperationsLeafSchemaNode(final RpcDefinition rpc) {
@@ -32,7 +36,7 @@ final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode imp
     }
 
     @Override
-    public QName getQName() {
+    public QName argument() {
         return qname;
     }
 
@@ -49,6 +53,12 @@ final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode imp
 
     @Override
     public LeafEffectiveStatement asEffectiveStatement() {
-        throw new UnsupportedOperationException();
+        return this;
+    }
+
+    @Override
+    public List<EffectiveStatement<?, ?>> effectiveSubstatements() {
+        // FIXME: a 'type empty; mandatory true;' substatements, actually
+        return List.of();
     }
 }
