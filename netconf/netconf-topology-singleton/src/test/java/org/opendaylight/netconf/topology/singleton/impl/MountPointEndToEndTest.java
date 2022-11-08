@@ -256,7 +256,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         final var rpcService = router.getRpcService();
         deviceRpcService = new Rpcs.Normalized() {
             @Override
-            public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+            public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
                 return rpcService.invokeRpc(type, input);
             }
 
@@ -525,7 +525,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private void testDOMRpcService(final DOMRpcService domRpcService)
             throws InterruptedException, ExecutionException, TimeoutException {
-        testPutTopRpc(domRpcService, new DefaultDOMRpcResult((NormalizedNode)null));
+        testPutTopRpc(domRpcService, new DefaultDOMRpcResult((ContainerNode)null));
         testPutTopRpc(domRpcService, null);
         testPutTopRpc(domRpcService, new DefaultDOMRpcResult(ImmutableList.of(
                 RpcResultBuilder.newError(ErrorType.APPLICATION, new ErrorTag("tag1"), "error1"),
@@ -554,7 +554,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         testRpc(domRpcService, getTopRpcSchemaPath, getTopInput, result);
     }
 
-    private void testRpc(final DOMRpcService domRpcService, final QName qname, final NormalizedNode input,
+    private void testRpc(final DOMRpcService domRpcService, final QName qname, final ContainerNode input,
             final DOMRpcResult result) throws InterruptedException, ExecutionException, TimeoutException {
         final FluentFuture<DOMRpcResult> future = result == null ? FluentFutures.immediateNullFluentFuture()
                 : FluentFutures.immediateFluentFuture(result);
@@ -565,11 +565,11 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         }
 
         assertNotNull(actual);
-        assertEquals(result.getResult(), actual.getResult());
+        assertEquals(result.value(), actual.value());
 
-        assertEquals(result.getErrors().size(), actual.getErrors().size());
-        Iterator<? extends RpcError> iter1 = result.getErrors().iterator();
-        Iterator<? extends RpcError> iter2 = actual.getErrors().iterator();
+        assertEquals(result.errors().size(), actual.errors().size());
+        Iterator<? extends RpcError> iter1 = result.errors().iterator();
+        Iterator<? extends RpcError> iter2 = actual.errors().iterator();
         while (iter1.hasNext() && iter2.hasNext()) {
             RpcError err1 = iter1.next();
             RpcError err2 = iter2.next();
@@ -582,11 +582,10 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         }
     }
 
-    private void testFailedRpc(final DOMRpcService domRpcService, final QName qname, final NormalizedNode input)
+    private void testFailedRpc(final DOMRpcService domRpcService, final QName qname, final ContainerNode input)
             throws InterruptedException, TimeoutException {
         try {
-            invokeRpc(domRpcService, qname, input, FluentFutures.immediateFailedFluentFuture(
-                    new ClusteringRpcException("mock")));
+            invokeRpc(domRpcService, qname, input, Futures.immediateFailedFuture(new ClusteringRpcException("mock")));
             fail("Expected exception");
         } catch (ExecutionException e) {
             assertTrue(e.getCause() instanceof ClusteringRpcException);
@@ -594,8 +593,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         }
     }
 
-    private DOMRpcResult invokeRpc(final DOMRpcService domRpcService, final QName qname, final NormalizedNode input,
-            final FluentFuture<DOMRpcResult> returnFuture)
+    private DOMRpcResult invokeRpc(final DOMRpcService domRpcService, final QName qname, final ContainerNode input,
+            final ListenableFuture<DOMRpcResult> returnFuture)
                 throws InterruptedException, ExecutionException, TimeoutException {
         topRpcImplementation.init(returnFuture);
         final ListenableFuture<? extends DOMRpcResult> resultFuture = domRpcService.invokeRpc(qname, input);
@@ -749,15 +748,15 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private static class TopDOMRpcImplementation implements DOMRpcImplementation {
         private volatile SettableFuture<Entry<DOMRpcIdentifier, NormalizedNode>> rpcInvokedFuture;
-        private volatile FluentFuture<DOMRpcResult> returnFuture;
+        private volatile ListenableFuture<DOMRpcResult> returnFuture;
 
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final DOMRpcIdentifier rpc, final NormalizedNode input) {
+        public ListenableFuture<DOMRpcResult> invokeRpc(final DOMRpcIdentifier rpc, final ContainerNode input) {
             rpcInvokedFuture.set(Map.entry(rpc, input));
             return returnFuture;
         }
 
-        void init(final FluentFuture<DOMRpcResult> retFuture) {
+        void init(final ListenableFuture<DOMRpcResult> retFuture) {
             returnFuture = retFuture;
             rpcInvokedFuture = SettableFuture.create();
         }

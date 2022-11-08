@@ -64,11 +64,8 @@ import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc8528.model.api.SchemaMountConstants;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
@@ -190,7 +187,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         // TODO check whether the model describing create subscription is present in schema
         // Perhaps add a default schema context to support create-subscription if the model was not provided
         // (same as what we do for base netconf operations in transformer)
-        final ListenableFuture<DOMRpcResult> rpcResultListenableFuture = deviceRpc.invokeRpc(
+        final var rpcResultListenableFuture = deviceRpc.invokeRpc(
                 NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME,
                 NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT);
 
@@ -294,21 +291,17 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     private MountPointContext processSchemaMounts(final DOMRpcResult rpcResult, final MountPointContext emptyContext) {
-        final Collection<? extends RpcError> errors = rpcResult.getErrors();
+        final var errors = rpcResult.errors();
         if (!errors.isEmpty()) {
             LOG.warn("{}: Schema-mounts acquisition resulted in errors {}", id, errors);
         }
-        final NormalizedNode schemaMounts = rpcResult.getResult();
+        final var schemaMounts = rpcResult.value();
         if (schemaMounts == null) {
             LOG.debug("{}: device does not define any schema mounts", id);
             return emptyContext;
         }
-        if (!(schemaMounts instanceof ContainerNode)) {
-            LOG.warn("{}: ignoring non-container schema mounts {}", id, schemaMounts);
-            return emptyContext;
-        }
 
-        return DeviceMountPointContext.create(emptyContext, (ContainerNode) schemaMounts);
+        return DeviceMountPointContext.create(emptyContext, schemaMounts);
     }
 
     @Override

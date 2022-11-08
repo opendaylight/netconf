@@ -69,7 +69,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
             LOG.trace("Lock is not allowed.");
             return;
         }
-        final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<>() {
+        final var lockCandidateCallback = new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
                 if (isSuccess(result)) {
@@ -77,7 +77,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
                         LOG.trace("Lock candidate successful");
                     }
                 } else {
-                    LOG.warn("{}: lock candidate invoked unsuccessfully: {}", id, result.getErrors());
+                    LOG.warn("{}: lock candidate invoked unsuccessfully: {}", id, result.errors());
                 }
             }
 

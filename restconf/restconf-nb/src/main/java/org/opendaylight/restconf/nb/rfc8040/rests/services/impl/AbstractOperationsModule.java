@@ -9,10 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 import org.opendaylight.yangtools.yang.common.YangVersion;
@@ -30,11 +30,14 @@ import org.opendaylight.yangtools.yang.model.api.Submodule;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 import org.opendaylight.yangtools.yang.model.api.YangStmtMapping;
-import org.opendaylight.yangtools.yang.model.api.meta.IdentifierNamespace;
 import org.opendaylight.yangtools.yang.model.api.meta.StatementDefinition;
 import org.opendaylight.yangtools.yang.model.api.meta.StatementOrigin;
+import org.opendaylight.yangtools.yang.model.api.stmt.ExtensionEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.FeatureEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.IdentityEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.SubmoduleEffectiveStatement;
 
 @Deprecated(forRemoval = true, since = "4.0.0")
 abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatement {
@@ -51,17 +54,6 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     @Override
     public final StatementOrigin statementOrigin() {
         return StatementOrigin.CONTEXT;
-    }
-
-    @Override
-    public final <K, V, N extends IdentifierNamespace<K, V>> Optional<V> get(final Class<N> namespace,
-            final K identifier) {
-        return Optional.empty();
-    }
-
-    @Override
-    public final <K, V, N extends IdentifierNamespace<K, V>> Map<K, V> getAll(final Class<N> namespace) {
-        return Map.of();
     }
 
     @Override
@@ -162,11 +154,26 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
 
     @Override
     public final ModuleEffectiveStatement asEffectiveStatement() {
-        throw new UnsupportedOperationException();
+        return this;
     }
 
     @Override
-    public final ConformanceType conformance() {
-        throw new UnsupportedOperationException();
+    public final Optional<ExtensionEffectiveStatement> findExtension(final QName qname) {
+        return Optional.empty();
+    }
+
+    @Override
+    public final Optional<FeatureEffectiveStatement> findFeature(final QName qname) {
+        return Optional.empty();
+    }
+
+    @Override
+    public final Optional<IdentityEffectiveStatement> findIdentity(final QName qname) {
+        return Optional.empty();
+    }
+
+    @Override
+    public final Optional<SubmoduleEffectiveStatement> findSubmodule(final Unqualified submoduleName) {
+        return Optional.empty();
     }
 }

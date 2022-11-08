@@ -143,13 +143,13 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             return EMPTY;
         }
 
-        if (!schemasNodeResult.getErrors().isEmpty()) {
+        if (!schemasNodeResult.errors().isEmpty()) {
             LOG.warn("{}: Unable to detect available schemas, get to {} failed, {}",
-                    id, STATE_SCHEMAS_IDENTIFIER, schemasNodeResult.getErrors());
+                    id, STATE_SCHEMAS_IDENTIFIER, schemasNodeResult.errors());
             return EMPTY;
         }
 
-        final Optional<? extends NormalizedNode> optSchemasNode = findSchemasNode(schemasNodeResult.getResult(),
+        final Optional<? extends NormalizedNode> optSchemasNode = findSchemasNode(schemasNodeResult.value(),
                 schemaContext);
         if (optSchemasNode.isEmpty()) {
             LOG.warn("{}: Unable to detect available schemas, get to {} was empty", id, STATE_SCHEMAS_IDENTIFIER);

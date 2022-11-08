@@ -67,7 +67,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     }
 
     protected static boolean isSuccess(final DOMRpcResult result) {
-        return result.getErrors().isEmpty();
+        return result.errors().isEmpty();
     }
 
     protected void checkNotFinished() {
@@ -249,9 +249,9 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         ErrorTag errorTag = ErrorTag.OPERATION_FAILED;
 
         for (final DOMRpcResult domRpcResult : domRpcResults) {
-            if (!domRpcResult.getErrors().isEmpty()) {
+            if (!domRpcResult.errors().isEmpty()) {
                 errorsEncouneterd = true;
-                final RpcError error = domRpcResult.getErrors().iterator().next();
+                final RpcError error = domRpcResult.errors().iterator().next();
 
                 errType = error.getErrorType();
                 errSeverity = error.getSeverity();

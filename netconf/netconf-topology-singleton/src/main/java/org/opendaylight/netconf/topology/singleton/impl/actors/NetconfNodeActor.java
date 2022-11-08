@@ -68,6 +68,7 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.NewRead
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
@@ -240,7 +241,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                 deviceRpc);
 
         final ListenableFuture<? extends DOMRpcResult> rpcResult = deviceRpc.invokeRpc(qname,
-                normalizedNodeMessage != null ? normalizedNodeMessage.getNode() : null);
+                normalizedNodeMessage != null ? (ContainerNode) normalizedNodeMessage.getNode() : null);
 
         Futures.addCallback(rpcResult, new FutureCallback<DOMRpcResult>() {
             @Override
