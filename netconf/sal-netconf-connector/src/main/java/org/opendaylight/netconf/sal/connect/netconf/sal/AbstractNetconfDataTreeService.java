@@ -193,10 +193,10 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }
 
         final ListenableFuture<DOMRpcResult> result = mergeFutures(lockImpl());
-        Futures.addCallback(result, new FutureCallback<DOMRpcResult>() {
+        Futures.addCallback(result, new FutureCallback<>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
-                final var errors = result.getErrors();
+                final var errors = result.errors();
                 if (errors.isEmpty()) {
                     LOG.debug("{}: Lock successful.", id);
                     return;
@@ -233,7 +233,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }
 
         final ListenableFuture<DOMRpcResult> result = mergeFutures(unlockImpl());
-        Futures.addCallback(result, new FutureCallback<DOMRpcResult>() {
+        Futures.addCallback(result, new FutureCallback<>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
                 final var errors = result.getErrors();

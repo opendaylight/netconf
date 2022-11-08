@@ -22,12 +22,12 @@ import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
+import org.opendaylight.yangtools.yang.model.repo.api.YangIRSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.SoftSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.rfc7950.ir.IRSchemaSource;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -113,7 +113,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         // for a consistent set of modules, as it skips the need to re-parse the text sources multiple times. It also
         // helps establishing different sets of contexts, as they can share this pre-made cache.
         repository.registerSchemaSourceListener(
-            new SoftSchemaSourceCache<>(repository, IRSchemaSource.class));
+            new SoftSchemaSourceCache<>(repository, YangIRSchemaSource.class));
 
         // Attach the filesystem cache, providing persistence capability, so that restarts do not require us to
         // re-populate the cache. This also acts as a side-load capability, as anything pre-populated into that

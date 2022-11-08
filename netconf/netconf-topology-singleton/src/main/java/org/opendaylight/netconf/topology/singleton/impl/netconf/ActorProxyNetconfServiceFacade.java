@@ -47,6 +47,7 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.UnlockReques
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -273,8 +274,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
                     return;
                 }
 
-                if (response instanceof NormalizedNodeMessage) {
-                    final NormalizedNodeMessage data = (NormalizedNodeMessage) response;
+                if (response instanceof NormalizedNodeMessage data) {
                     settableFuture.set(Optional.of(data.getNode()));
                 }
             }
@@ -297,7 +297,8 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
         if (reply.getNormalizedNodeMessage() == null) {
             return new DefaultDOMRpcResult(new ArrayList<>(reply.getRpcErrors()));
         } else {
-            return new DefaultDOMRpcResult(reply.getNormalizedNodeMessage().getNode(), reply.getRpcErrors());
+            return new DefaultDOMRpcResult((ContainerNode) reply.getNormalizedNodeMessage().getNode(),
+                reply.getRpcErrors());
         }
     }
 }

@@ -39,7 +39,6 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -269,10 +268,10 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
                 return;
             }
 
-            if (result.getResult() != null) {
+            if (result.value() != null) {
                 reschedule();
             } else {
-                final var errors = result.getErrors();
+                final var errors = result.errors();
                 if (!errors.isEmpty()) {
                     LOG.warn("{}: Keepalive RPC failed with error: {}", id, errors);
                     reschedule();
@@ -349,7 +348,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         }
 
         @Override
-        public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+        public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
             return scheduleTimeout(delegate.invokeRpc(type, input));
