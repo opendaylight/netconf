@@ -57,7 +57,6 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
@@ -89,7 +88,7 @@ public class RuntimeRpcTest {
 
     private static final DOMRpcService RPC_SERVICE_VOID_INVOKER = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
             return immediateFluentFuture(new DefaultDOMRpcResult(null, List.of()));
         }
 
@@ -101,7 +100,7 @@ public class RuntimeRpcTest {
 
     private static final DOMRpcService RPC_SERVICE_FAILED_INVOCATION = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
             return immediateFailedFluentFuture(new DOMRpcException("rpc invocation not implemented yet") {
                 private static final long serialVersionUID = 1L;
             });
@@ -115,8 +114,8 @@ public class RuntimeRpcTest {
 
     private final DOMRpcService rpcServiceSuccessfulInvocation = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
-            final Collection<DataContainerChild> children = ((ContainerNode) input).body();
+        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
+            final Collection<DataContainerChild> children = input.body();
             final Module module = SCHEMA_CONTEXT.findModules(type.getNamespace()).stream()
                 .findFirst().orElse(null);
             final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(module, module.getNamespace(),
