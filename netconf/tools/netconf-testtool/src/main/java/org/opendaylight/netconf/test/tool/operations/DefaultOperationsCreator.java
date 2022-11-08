@@ -25,26 +25,19 @@ import org.opendaylight.netconf.test.tool.rpc.SimulatedLock;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedUnLock;
 
 public final class DefaultOperationsCreator implements OperationsCreator {
-
     private final SimulatedOperationService simulatedOperationService;
 
-    private DefaultOperationsCreator(final long currentSessionId) {
+    public DefaultOperationsCreator(final long currentSessionId) {
         simulatedOperationService = new SimulatedOperationService(currentSessionId);
     }
 
     @Override
     public NetconfOperationService getNetconfOperationService(final Set<Capability> caps,
-        final SessionIdProvider idProvider,
-        final String netconfSessionIdForReporting) {
+            final SessionIdProvider idProvider, final String netconfSessionIdForReporting) {
         return simulatedOperationService;
     }
 
-    public static DefaultOperationsCreator getDefaultOperationServiceCreator(final long currentSessionId) {
-        return new DefaultOperationsCreator(currentSessionId);
-    }
-
     static class SimulatedOperationService implements NetconfOperationService {
-
         private final long currentSessionId;
 
         SimulatedOperationService(final long currentSessionId) {
