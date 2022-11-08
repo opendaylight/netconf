@@ -190,7 +190,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         // TODO check whether the model describing create subscription is present in schema
         // Perhaps add a default schema context to support create-subscription if the model was not provided
         // (same as what we do for base netconf operations in transformer)
-        final ListenableFuture<DOMRpcResult> rpcResultListenableFuture = deviceRpc.invokeRpc(
+        final var rpcResultListenableFuture = deviceRpc.invokeRpc(
                 NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME,
                 NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT);
 
