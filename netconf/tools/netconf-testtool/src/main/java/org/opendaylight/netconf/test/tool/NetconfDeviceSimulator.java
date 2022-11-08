@@ -10,7 +10,6 @@ package org.opendaylight.netconf.test.tool;
 import com.google.common.collect.Collections2;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.local.LocalAddress;
@@ -23,6 +22,7 @@ import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.AsynchronousChannelGroup;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -72,9 +72,7 @@ import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressFBWarnings("DM_DEFAULT_ENCODING")
 public class NetconfDeviceSimulator implements Closeable {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSimulator.class);
 
     private final NioEventLoopGroup nettyThreadgroup;
@@ -348,8 +346,9 @@ public class NetconfDeviceSimulator implements Closeable {
         final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(module.getName(),
             module.getRevision().map(Revision::toString).orElse(null));
         try {
-            final String moduleContent = new String(
-                consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class).get().read());
+
+            final String moduleContent = consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class)
+                .get().asCharSource(StandardCharsets.UTF_8).read();
             capabilities.add(new YangModuleCapability(module, moduleContent));
             //IOException would be thrown in creating SchemaContext already
         } catch (final ExecutionException | InterruptedException | IOException e) {
