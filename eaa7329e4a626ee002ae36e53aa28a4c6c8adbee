@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "670b6d34_19ee601f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-11-08T15:30:00Z",
+      "side": 1,
+      "message": "Mixin nodes? or augmentations? or Choices? \nDoes this work for another Mixin nodes as well? For example Leafsets?",
+      "revId": "eaa7329e4a626ee002ae36e53aa28a4c6c8adbee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
