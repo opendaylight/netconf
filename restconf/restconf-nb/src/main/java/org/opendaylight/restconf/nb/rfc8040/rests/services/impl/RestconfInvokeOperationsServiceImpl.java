@@ -126,7 +126,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
      * @return {@link DOMRpcResult}
      */
     @VisibleForTesting
-    static ListenableFuture<? extends DOMRpcResult> invokeRpc(final NormalizedNode data, final QName rpc,
+    static ListenableFuture<? extends DOMRpcResult> invokeRpc(final ContainerNode data, final QName rpc,
             final DOMMountPoint mountPoint) {
         return invokeRpc(data, rpc, mountPoint.getService(DOMRpcService.class).orElseThrow(() -> {
             final String errmsg = "RPC service is missing.";
@@ -144,7 +144,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
      * @return {@link DOMRpcResult}
      */
     @VisibleForTesting
-    static ListenableFuture<? extends DOMRpcResult> invokeRpc(final NormalizedNode data, final QName rpc,
+    static ListenableFuture<? extends DOMRpcResult> invokeRpc(final ContainerNode data, final QName rpc,
             final DOMRpcService rpcService) {
         return Futures.catching(rpcService.invokeRpc(rpc, nonnullInput(rpc, data)),
             DOMRpcException.class,
@@ -153,7 +153,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             MoreExecutors.directExecutor());
     }
 
-    private static @NonNull NormalizedNode nonnullInput(final QName type, final NormalizedNode input) {
+    private static @NonNull ContainerNode nonnullInput(final QName type, final ContainerNode input) {
         return input != null ? input
                 : ImmutableNodes.containerNode(YangConstants.operationInputQName(type.getModule()));
     }
