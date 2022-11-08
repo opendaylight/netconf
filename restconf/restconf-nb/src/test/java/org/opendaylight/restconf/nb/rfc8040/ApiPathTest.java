@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ListInstance;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.Step;
-import org.opendaylight.yangtools.yang.common.UnresolvedQName;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 
 public class ApiPathTest {
     @Test
@@ -103,14 +103,14 @@ public class ApiPathTest {
     private static void assertApiIdentifier(final Step step, final String module, final String identifier) {
         assertThat(step, instanceOf(ApiIdentifier.class));
         assertEquals(module, step.module());
-        assertEquals(UnresolvedQName.unqualified(identifier), step.identifier());
+        assertEquals(Unqualified.of(identifier), step.identifier());
     }
 
     private static void assertListInstance(final Step step, final String module, final String identifier,
             final String... keyValues) {
         assertThat(step, instanceOf(ListInstance.class));
         assertEquals(module, step.module());
-        assertEquals(UnresolvedQName.unqualified(identifier), step.identifier());
+        assertEquals(Unqualified.of(identifier), step.identifier());
         assertEquals(Arrays.asList(keyValues), ((ListInstance) step).keyValues());
     }
 
