@@ -114,30 +114,15 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
 
     @Override
     public void schemaSourceRegistered(final Iterable<PotentialSchemaSource<?>> sources) {
-        final Map<ModuleKey, Module> newModules = new HashMap<>();
-
-        for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
-            final YangIdentifier moduleName =
-                new YangIdentifier(potentialYangSource.getSourceIdentifier().name().getLocalName());
-            final Module newModule;
-            try {
-                newModule = new ModuleBuilder()
-                        .setName(moduleName)
-                        .setRevision(LegacyRevisionUtils.fromYangCommon(
-                            Optional.ofNullable(potentialYangSource.getSourceIdentifier().revision())))
-                        .setSchema(getUrlForModule(potentialYangSource.getSourceIdentifier()))
-                        .setFeature(getFeatures(potentialYangSource.getSourceIdentifier()))
-                        .build();
-            } catch (YangSyntaxErrorException | IOException e) {
-                throw new IllegalStateException("Failed to transform provided source to IRSchemaSource", e);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new IllegalStateException(e);
-            }
-
-            newModules.put(newModule.key(), newModule);
+        final Map<ModuleKey, Module> newModules;
+        try {
+            newModules = getYangLibModules(sources);
+        } catch (YangSyntaxErrorException | IOException e) {
+            throw new IllegalStateException("Failed to transform provided source to IRSchemaSource", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(e);
         }
-
         if (newModules.isEmpty()) {
             // If no new yang modules then do nothing
             return;
@@ -158,6 +143,22 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
                 LOG.warn("Unable to update modules state", throwable);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private Map<ModuleKey, Module> getYangLibModules(final Iterable<PotentialSchemaSource<?>> sources)
+            throws YangSyntaxErrorException, IOException, InterruptedException {
+        final Map<ModuleKey, Module> newModules = new HashMap<>();
+        for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
+            final var sourceIdentifier = potentialYangSource.getSourceIdentifier();
+            final var yangLibModule = new ModuleBuilder()
+                    .setName(new YangIdentifier(sourceIdentifier.name().getLocalName()))
+                    .setRevision(LegacyRevisionUtils.fromYangCommon(Optional.ofNullable(sourceIdentifier.revision())))
+                    .setSchema(getUrlForModule(sourceIdentifier))
+                    .setFeature(getFeatures(sourceIdentifier))
+                    .build();
+            newModules.put(yangLibModule.key(), yangLibModule);
+        }
+        return newModules;
     }
 
     private Set<YangIdentifier> getFeatures(final SourceIdentifier sourceIdentifier)
