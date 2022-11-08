@@ -13,7 +13,7 @@ import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.Collection;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
@@ -31,7 +31,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
@@ -53,7 +53,7 @@ public class ProxyDOMRpcService implements Rpcs.Normalized {
     }
 
     @Override
-    public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+    public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
         LOG.trace("{}: Rpc operation invoked with schema type: {} and node: {}.", id, type, input);
 
         final NormalizedNodeMessage normalizedNodeMessage = input != null
@@ -88,13 +88,13 @@ public class ProxyDOMRpcService implements Rpcs.Normalized {
                 if (normalizedNodeMessageResult == null) {
                     result = new DefaultDOMRpcResult(ImmutableList.copyOf(errors));
                 } else {
-                    result = new DefaultDOMRpcResult(normalizedNodeMessageResult.getNode(), errors);
+                    result = new DefaultDOMRpcResult((ContainerNode) normalizedNodeMessageResult.getNode(), errors);
                 }
                 settableFuture.set(result);
             }
         }, actorSystem.dispatcher());
 
-        return FluentFuture.from(settableFuture);
+        return settableFuture;
     }
 
     @Override

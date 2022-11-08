@@ -292,9 +292,9 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         ));
         final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(RpcResultBuilder.success(response).build(),
             GET_SCHEMA_QNAME);
-        assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
-        assertNotNull(compositeNodeRpcResult.getResult());
-        final DOMSource schemaContent = ((DOMSourceAnyxmlNode) ((ContainerNode) compositeNodeRpcResult.getResult())
+        assertTrue(compositeNodeRpcResult.errors().isEmpty());
+        assertNotNull(compositeNodeRpcResult.value());
+        final DOMSource schemaContent = ((DOMSourceAnyxmlNode) compositeNodeRpcResult.value()
                 .body().iterator().next()).body();
         assertThat(schemaContent.getNode().getTextContent(),
                 CoreMatchers.containsString("Random YANG SCHEMA"));
@@ -320,8 +320,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessageTransformer transformer = getTransformer(SCHEMA);
         final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(RpcResultBuilder.success(response).build(),
             NETCONF_GET_CONFIG_QNAME);
-        assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
-        assertNotNull(compositeNodeRpcResult.getResult());
+        assertTrue(compositeNodeRpcResult.errors().isEmpty());
+        assertNotNull(compositeNodeRpcResult.value());
 
         final List<DataContainerChild> values = Lists.newArrayList(
                 NetconfRemoteSchemaYangSourceProvider
@@ -337,8 +337,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final MapEntryNode schemaNode =
                 Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
 
-        final DOMSourceAnyxmlNode data = (DOMSourceAnyxmlNode) ((ContainerNode) compositeNodeRpcResult.getResult())
-                .findChildByArg(toId(NETCONF_DATA_QNAME)).get();
+        final DOMSourceAnyxmlNode data = (DOMSourceAnyxmlNode) compositeNodeRpcResult.value()
+                .findChildByArg(toId(NETCONF_DATA_QNAME)).orElseThrow();
 
         NormalizedNodeResult nodeResult =
                 NetconfUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.body());
@@ -543,8 +543,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final DOMRpcResult compositeNodeRpcResult = netconfMessageTransformer.toRpcResult(
             RpcResultBuilder.success(response).build(),
             NETCONF_COMMIT_QNAME);
-        assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
-        assertNull(compositeNodeRpcResult.getResult());
+        assertTrue(compositeNodeRpcResult.errors().isEmpty());
+        assertNull(compositeNodeRpcResult.value());
     }
 
     @Test

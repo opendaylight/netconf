@@ -104,7 +104,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class NetconfMessageTransformer
-        implements ActionTransformer, NotificationTransformer, RpcTransformer<NormalizedNode, DOMRpcResult> {
+        implements ActionTransformer, NotificationTransformer, RpcTransformer<ContainerNode, DOMRpcResult> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
     private static final ImmutableSet<XMLNamespace> BASE_OR_NOTIFICATION_NS = ImmutableSet.of(
@@ -331,7 +331,7 @@ public class NetconfMessageTransformer
     }
 
     @Override
-    public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode payload) {
+    public NetconfMessage toRpcRequest(final QName rpc, final ContainerNode payload) {
         // In case no input for rpc is defined, we can simply construct the payload here
 
         // Determine whether a base netconf operation is being invoked
@@ -354,8 +354,6 @@ public class NetconfMessageTransformer
 
         checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpc);
 
-        checkArgument(payload instanceof ContainerNode,
-                "Transforming an rpc with input: %s, payload has to be a container, but was: %s", rpc, payload);
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter);
         try {
             // If the schema context for netconf device does not contain model for base netconf operations,
@@ -363,7 +361,7 @@ public class NetconfMessageTransformer
             // This way operations like lock/unlock are supported even if the source for base model was not provided
             final EffectiveModelContext ctx = needToUseBaseCtx ? baseSchema.getEffectiveModelContext()
                     : mountContext.getEffectiveModelContext();
-            NetconfMessageTransformUtil.writeNormalizedOperationInput((ContainerNode) payload, result, Absolute.of(rpc),
+            NetconfMessageTransformUtil.writeNormalizedOperationInput(payload, result, Absolute.of(rpc),
                 ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize input of " + rpc, e);

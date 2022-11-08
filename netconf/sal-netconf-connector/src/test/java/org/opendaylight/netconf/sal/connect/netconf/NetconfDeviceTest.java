@@ -45,8 +45,6 @@ import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -61,14 +59,12 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -77,10 +73,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.xml.sax.SAXException;
 
 public class NetconfDeviceTest extends AbstractTestModelTest {
-
     private static final NetconfMessage NOTIFICATION;
-
-    private static final ContainerNode COMPOSITE_NODE = mockClass(ContainerNode.class);
 
     static {
         try {
@@ -90,8 +83,6 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             throw new ExceptionInInitializerError(e);
         }
     }
-
-    private static final DOMRpcResult RPC_RESULT = new DefaultDOMRpcResult(COMPOSITE_NODE);
 
     public static final String TEST_NAMESPACE = "test:namespace";
     public static final String TEST_MODULE = "test-module";
@@ -257,7 +248,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     private static SchemaRepository getSchemaRepository() {
         final SchemaRepository mock = mock(SchemaRepository.class);
-        final SchemaSourceRepresentation mockRep = mock(SchemaSourceRepresentation.class);
+        final YangTextSchemaSource mockRep = mock(YangTextSchemaSource.class);
         doReturn(Futures.immediateFuture(mockRep))
                 .when(mock).getSchemaSource(any(SourceIdentifier.class), eq(YangTextSchemaSource.class));
         return mock;
