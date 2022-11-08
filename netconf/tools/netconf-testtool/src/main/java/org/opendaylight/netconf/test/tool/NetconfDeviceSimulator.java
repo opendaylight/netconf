@@ -343,18 +343,19 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private static void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities,
                                             final ModuleLike module) {
-        final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(module.getName(),
+        final var sourceId = new SourceIdentifier(module.getName(),
             module.getRevision().map(Revision::toString).orElse(null));
-        try {
 
-            final String moduleContent = consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class)
-                .get().asCharSource(StandardCharsets.UTF_8).read();
-            capabilities.add(new YangModuleCapability(module, moduleContent));
-            //IOException would be thrown in creating SchemaContext already
-        } catch (final ExecutionException | InterruptedException | IOException e) {
+        final String moduleContent;
+        try {
+            moduleContent = consumer.getSchemaSource(sourceId, YangTextSchemaSource.class).get()
+                .asCharSource(StandardCharsets.UTF_8).read();
+        } catch (ExecutionException | InterruptedException | IOException e) {
             throw new IllegalStateException(
-                "Cannot retrieve schema source for module " + moduleSourceIdentifier + " from schema repository", e);
+                "Cannot retrieve schema source for module " + sourceId + " from schema repository", e);
         }
+
+        capabilities.add(new YangModuleCapability(module, moduleContent));
     }
 
     private static void registerSource(final SharedSchemaRepository consumer, final String resource,
