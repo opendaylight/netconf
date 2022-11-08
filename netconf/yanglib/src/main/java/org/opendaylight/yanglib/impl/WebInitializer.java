@@ -11,7 +11,6 @@ import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 import org.opendaylight.aaa.web.ServletDetails;
 import org.opendaylight.aaa.web.WebContext;
-import org.opendaylight.aaa.web.WebContextBuilder;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
@@ -27,7 +26,7 @@ public class WebInitializer {
 
     public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer, ServletSupport servletSupport,
             Application webApp) throws ServletException {
-        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("yanglib").supportsSessions(true)
+        var webContextBuilder = WebContext.builder().contextPath("yanglib").supportsSessions(true)
             .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/*").build());
 
