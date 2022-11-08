@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.operations;
 
-import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
@@ -18,19 +16,16 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 
 
 public class OperationsProvider implements NetconfOperationServiceFactory {
-
     private final Set<Capability> caps;
     private final SessionIdProvider idProvider;
     private final OperationsCreator operationsCreator;
 
-    public OperationsProvider(final SessionIdProvider idProvider,
-        final Set<Capability> caps) {
-        this(idProvider, caps,
-            DefaultOperationsCreator.getDefaultOperationServiceCreator(idProvider.getCurrentSessionId()));
+    public OperationsProvider(final SessionIdProvider idProvider, final Set<Capability> caps) {
+        this(idProvider, caps, new DefaultOperationsCreator(idProvider.getCurrentSessionId()));
     }
 
-    public OperationsProvider(final SessionIdProvider idProvider,
-        final Set<Capability> caps, OperationsCreator operationsCreator) {
+    public OperationsProvider(final SessionIdProvider idProvider, final Set<Capability> caps,
+            final OperationsCreator operationsCreator) {
         this.caps = caps;
         this.idProvider = idProvider;
         this.operationsCreator = operationsCreator;
@@ -42,16 +37,13 @@ public class OperationsProvider implements NetconfOperationServiceFactory {
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(
-        final CapabilityListener listener) {
-        listener.onCapabilitiesChanged(caps, Collections.emptySet());
-        return () -> {
-        };
+    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+        listener.onCapabilitiesChanged(caps, Set.of());
+        return () -> { };
     }
 
     @Override
-    public NetconfOperationService createService(
-        final String netconfSessionIdForReporting) {
+    public NetconfOperationService createService(final String netconfSessionIdForReporting) {
         return operationsCreator.getNetconfOperationService(caps, idProvider, netconfSessionIdForReporting);
     }
 }

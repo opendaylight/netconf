@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.test.tool;
 
+import static java.util.Objects.requireNonNullElseGet;
+
 import com.google.common.collect.Collections2;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -145,10 +147,9 @@ public class NetconfDeviceSimulator implements Closeable {
         } else {
             LOG.info("using OperationsProvider.");
             operationProvider = new OperationsProvider(idProvider, transformedCapabilities,
-                configuration.getOperationsCreator() != null ? configuration.getOperationsCreator()
-                    : DefaultOperationsCreator.getDefaultOperationServiceCreator(idProvider.getCurrentSessionId()));
+                requireNonNullElseGet(configuration.getOperationsCreator(),
+                    () -> new DefaultOperationsCreator(idProvider.getCurrentSessionId())));
         }
-
 
         final NetconfMonitoringOperationServiceFactory monitoringService =
                 new NetconfMonitoringOperationServiceFactory(
