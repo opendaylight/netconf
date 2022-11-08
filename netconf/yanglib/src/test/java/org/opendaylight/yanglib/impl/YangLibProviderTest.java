@@ -52,11 +52,11 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controll
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangIRSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YinSchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
-import org.opendaylight.yangtools.yang.parser.rfc7950.ir.IRSchemaSource;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class YangLibProviderTest {
@@ -160,7 +160,7 @@ public class YangLibProviderTest {
 
         potentialSources.add(
                 PotentialSchemaSource.create(new SourceIdentifier("asts-schema-source"),
-                        IRSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
+                        YangIRSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         yangLibProvider.schemaSourceRegistered(potentialSources);
         verifyNoMoreInteractions(dataBroker, writeTransaction);
