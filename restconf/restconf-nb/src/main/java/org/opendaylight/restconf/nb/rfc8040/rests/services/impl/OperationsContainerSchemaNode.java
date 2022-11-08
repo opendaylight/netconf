@@ -11,9 +11,12 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Maps;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yangtools.util.CollectionWrappers;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
@@ -24,10 +27,15 @@ import org.opendaylight.yangtools.yang.model.api.MustDefinition;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
+import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.ContainerStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.DataTreeEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaTreeEffectiveStatement;
 
 @Deprecated(forRemoval = true, since = "4.0.0")
-final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNode implements ContainerSchemaNode {
+final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNode<ContainerStatement>
+        implements ContainerSchemaNode, ContainerEffectiveStatement {
     // There is no need to intern this nor add a revision, as we are providing the corresponding context anyway
     static final @NonNull QName QNAME = QName.create(OperationsRestconfModule.NAMESPACE, "operations");
 
@@ -38,14 +46,41 @@ final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNod
     }
 
     @Override
-    public QName getQName() {
+    public QName argument() {
         return QNAME;
+    }
+
+    @Override
+    public List<? extends EffectiveStatement<?, ?>> effectiveSubstatements() {
+        return CollectionWrappers.wrapAsList(children.values());
     }
 
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Collection<DataSchemaNode> getChildNodes() {
         return (Collection) children.values();
+    }
+
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Collection<DataTreeEffectiveStatement<?>> dataTreeNodes() {
+        return (Collection) children.values();
+    }
+
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Collection<SchemaTreeEffectiveStatement<?>> schemaTreeNodes() {
+        return (Collection) children.values();
+    }
+
+    @Override
+    public Optional<DataTreeEffectiveStatement<?>> findDataTreeNode(final QName qname) {
+        return Optional.ofNullable(children.get(requireNonNull(qname)));
+    }
+
+    @Override
+    public @NonNull Optional<SchemaTreeEffectiveStatement<?>> findSchemaTreeNode(final QName qname) {
+        return Optional.ofNullable(children.get(requireNonNull(qname)));
     }
 
     @Override
@@ -95,6 +130,6 @@ final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNod
 
     @Override
     public ContainerEffectiveStatement asEffectiveStatement() {
-        throw new UnsupportedOperationException();
+        return this;
     }
 }
