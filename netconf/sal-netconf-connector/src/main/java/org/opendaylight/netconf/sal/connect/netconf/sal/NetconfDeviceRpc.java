@@ -29,12 +29,12 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to
- * {@link NormalizedNode}.
+ * {@link ContainerNode}.
  */
 public final class NetconfDeviceRpc implements Rpcs.Normalized {
     private final RemoteDeviceCommunicator communicator;
@@ -50,7 +50,7 @@ public final class NetconfDeviceRpc implements Rpcs.Normalized {
 
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+    public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
         final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = communicator.sendRequest(
             transformer.toRpcRequest(type, input), type);
 
