@@ -23,13 +23,13 @@ public class NetconfRpcFutureCallback implements FutureCallback<DOMRpcResult> {
     private final RemoteDeviceId id;
 
     public NetconfRpcFutureCallback(final String prefix, final RemoteDeviceId id) {
-        this.type = prefix;
+        type = prefix;
         this.id = id;
     }
 
     @Override
     public void onSuccess(final DOMRpcResult result) {
-        if (result.getErrors().isEmpty()) {
+        if (result.errors().isEmpty()) {
             LOG.trace("{}: {} invoked successfully", id, type);
         } else {
             onUnsuccess(result);
@@ -37,7 +37,7 @@ public class NetconfRpcFutureCallback implements FutureCallback<DOMRpcResult> {
     }
 
     protected void onUnsuccess(final DOMRpcResult result) {
-        LOG.warn("{}: {} invoked unsuccessfully: {}", id, type, result.getErrors());
+        LOG.warn("{}: {} invoked unsuccessfully: {}", id, type, result.errors());
     }
 
     @Override

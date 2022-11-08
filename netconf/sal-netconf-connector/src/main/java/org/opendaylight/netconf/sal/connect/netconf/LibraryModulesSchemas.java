@@ -176,14 +176,14 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return new LibraryModulesSchemas(ImmutableMap.of());
         }
 
-        if (moduleListNodeResult.getErrors().isEmpty() == false) {
+        if (!moduleListNodeResult.errors().isEmpty()) {
             LOG.warn("{}: Unable to detect available schemas, get to {} failed, {}",
-                    deviceId, MODULES_STATE_MODULE_LIST, moduleListNodeResult.getErrors());
+                    deviceId, MODULES_STATE_MODULE_LIST, moduleListNodeResult.errors());
             return new LibraryModulesSchemas(ImmutableMap.of());
         }
 
         final Optional<DataContainerChild> modulesStateNode =
-                findModulesStateNode(moduleListNodeResult.getResult());
+                findModulesStateNode(moduleListNodeResult.value());
         if (modulesStateNode.isPresent()) {
             final DataContainerChild node = modulesStateNode.get();
             checkState(node instanceof ContainerNode, "Expecting container containing schemas, but was %s", node);

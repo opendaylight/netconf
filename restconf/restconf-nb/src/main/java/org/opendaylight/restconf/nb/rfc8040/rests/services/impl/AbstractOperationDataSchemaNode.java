@@ -8,12 +8,26 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.util.Optional;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Status;
+import org.opendaylight.yangtools.yang.model.api.meta.DeclaredStatement;
+import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.xpath.api.YangXPathExpression.QualifiedBound;
 
 @Deprecated(forRemoval = true, since = "4.0.0")
-abstract class AbstractOperationDataSchemaNode implements DataSchemaNode {
+abstract class AbstractOperationDataSchemaNode<D extends DeclaredStatement<QName>>
+        implements DataSchemaNode, EffectiveStatement<QName, D> {
+    @Override
+    public final D getDeclared() {
+        return null;
+    }
+
+    @Override
+    public final QName getQName() {
+        return argument();
+    }
+
     @Override
     public final Status getStatus() {
         return Status.CURRENT;

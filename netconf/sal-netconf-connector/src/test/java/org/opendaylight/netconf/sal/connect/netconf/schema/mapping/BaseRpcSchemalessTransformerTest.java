@@ -115,8 +115,8 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessage msg = new NetconfMessage(doc);
         final DOMRpcResult result = transformer.toRpcResult(RpcResultBuilder.success(msg).build(),
             NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
-        assertNotNull(result.getResult());
-        final ContainerNode rpcReply = (ContainerNode) result.getResult();
+        assertNotNull(result.value());
+        final ContainerNode rpcReply = result.value();
         assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getIdentifier().getNodeType());
         final Optional<?> dataOpt = rpcReply.findChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID);
         assertTrue(dataOpt.isPresent());
