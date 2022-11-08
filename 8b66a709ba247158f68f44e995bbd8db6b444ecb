@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d6a8cee_1f93fe5b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-11-08T07:26:56Z",
+      "side": 1,
+      "message": "restconf-nb: You have 2 Checkstyle violations",
+      "revId": "8b66a709ba247158f68f44e995bbd8db6b444ecb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
