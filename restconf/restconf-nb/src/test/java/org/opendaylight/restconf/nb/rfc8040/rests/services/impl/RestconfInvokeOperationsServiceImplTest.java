@@ -173,7 +173,7 @@ public class RestconfInvokeOperationsServiceImplTest {
             .findFirst()
             .orElseThrow();
 
-        final NormalizedNode data = mock(NormalizedNode.class);
+        final ContainerNode data = mock(ContainerNode.class);
         final DOMRpcResult domRpcResult = mock(DOMRpcResult.class);
         doReturn(immediateFluentFuture(domRpcResult)).when(rpcService).invokeRpc(qname, data);
         doReturn(result).when(domRpcResult).getResult();
