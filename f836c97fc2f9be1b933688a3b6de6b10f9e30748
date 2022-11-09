@@ -16,6 +16,24 @@
       "message": "Instead of:\n```\n        while (data instanceof AugmentationNode || data instanceof ChoiceNode) {\n            data \u003d ((DataContainerNode) data).body().iterator().next();\n        }\n```\n\nI would use:\n```\n        if (data instanceof AugmentationNode augNode) {\n            data \u003d augNode.body().iterator().next();\n        }\n```\nI\u0027m not aware of a case where it would be multiple AugmentationNode consecutively.\n\nChoiceNode shouldn\u0027t be there since it is not translated to data:\nhttps://www.rfc-editor.org/rfc/rfc6020#section-7.9",
       "revId": "f836c97fc2f9be1b933688a3b6de6b10f9e30748",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3663519_b6682f6c",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2022-11-09T10:44:09Z",
+      "side": 1,
+      "message": "Sorry wrong link\nhttps://www.rfc-editor.org/rfc/rfc6020#section-4.2.7",
+      "parentUuid": "d7b746cd_66f97eea",
+      "revId": "f836c97fc2f9be1b933688a3b6de6b10f9e30748",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
