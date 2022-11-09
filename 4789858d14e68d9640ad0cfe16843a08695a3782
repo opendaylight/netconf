@@ -16,6 +16,23 @@
       "message": "Still has unresolved comments",
       "revId": "4789858d14e68d9640ad0cfe16843a08695a3782",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2c13f74_2fb5478f",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-11-09T15:55:12Z",
+      "side": 1,
+      "message": "Why this `pipeline` thing? If we are able to remove it - we can remove \"NettyPipelineAwareChannelSubsystem\" class, too.",
+      "revId": "4789858d14e68d9640ad0cfe16843a08695a3782",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
