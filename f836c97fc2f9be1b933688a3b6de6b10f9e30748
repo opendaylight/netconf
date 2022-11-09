@@ -34,6 +34,24 @@
       "parentUuid": "d7b746cd_66f97eea",
       "revId": "f836c97fc2f9be1b933688a3b6de6b10f9e30748",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61fd4a69_f9b47635",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-11-09T14:25:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3663519_b6682f6c",
+      "revId": "f836c97fc2f9be1b933688a3b6de6b10f9e30748",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
