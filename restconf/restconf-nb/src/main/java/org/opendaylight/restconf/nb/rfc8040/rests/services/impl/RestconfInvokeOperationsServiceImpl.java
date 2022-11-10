@@ -30,7 +30,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
@@ -60,12 +59,9 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     private static final QNameModule SAL_REMOTE_NAMESPACE = CreateDataChangeEventSubscriptionInput.QNAME.getModule();
 
     private final DOMRpcService rpcService;
-    private final SchemaContextHandler schemaContextHandler;
 
-    public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService,
-            final SchemaContextHandler schemaContextHandler) {
+    public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService) {
         this.rpcService = requireNonNull(rpcService);
-        this.schemaContextHandler = requireNonNull(schemaContextHandler);
     }
 
     @Override

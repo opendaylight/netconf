@@ -38,7 +38,7 @@ public class RestconfApplication extends AbstractRestconfApplication {
             streamSubscription,
             new RestconfDataServiceImpl(schemaContextHandler, dataBroker, mountPointService, streamSubscription,
                 actionService, configuration),
-            new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler),
+            new RestconfInvokeOperationsServiceImpl(rpcService),
             new RestconfOperationsServiceImpl(schemaContextHandler, mountPointService),
             new RestconfSchemaServiceImpl(schemaContextHandler, mountPointService,
                 domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class)),

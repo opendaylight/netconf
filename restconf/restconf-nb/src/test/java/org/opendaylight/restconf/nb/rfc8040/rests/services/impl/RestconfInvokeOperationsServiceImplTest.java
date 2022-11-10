@@ -35,20 +35,15 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -90,15 +85,7 @@ public class RestconfInvokeOperationsServiceImplTest {
 
     @Before
     public void setup() {
-        final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
-        final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
-        doReturn(wTx).when(dataBroker).newWriteOnlyTransaction();
-        doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(dataBroker,
-            FixedDOMSchemaService.of(CONTEXT));
-        schemaContextHandler.init();
-        invokeOperationsService =
-                new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler);
+        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(rpcService);
     }
 
     @Test
