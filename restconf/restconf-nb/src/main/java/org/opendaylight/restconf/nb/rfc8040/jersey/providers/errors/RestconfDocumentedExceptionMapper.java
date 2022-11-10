@@ -45,7 +45,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +57,6 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
     private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
     private static final Status DEFAULT_STATUS_CODE = Status.INTERNAL_SERVER_ERROR;
-    // Note: we are using container's QName reference to trim imports
-    private static final SchemaPath ERRORS_GROUPING_PATH = SchemaPath.create(true, Errors.QNAME);
     private static final QName ERROR_TYPE_QNAME = qnameOf("error-type");
     private static final QName ERROR_TAG_QNAME = qnameOf("error-tag");
     private static final QName ERROR_APP_TAG_QNAME = qnameOf("error-app-tag");
@@ -175,7 +172,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
              OutputStreamWriter streamStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
         ) {
             return writeNormalizedNode(errorsContainer, outputStream, new JsonStreamWriterWithDisabledValidation(
-                ERROR_INFO_QNAME, streamStreamWriter, ERRORS_GROUPING_PATH, IETF_RESTCONF_URI, schemaContextHandler));
+                ERROR_INFO_QNAME, streamStreamWriter, IETF_RESTCONF_URI, schemaContextHandler));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output JSON writers", e);
         }
@@ -190,7 +187,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private String serializeErrorsContainerToXml(final ContainerNode errorsContainer) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             return writeNormalizedNode(errorsContainer, outputStream, new XmlStreamWriterWithDisabledValidation(
-                ERROR_INFO_QNAME, outputStream, ERRORS_GROUPING_PATH, schemaContextHandler));
+                ERROR_INFO_QNAME, outputStream, schemaContextHandler));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output XML writers", e);
         }

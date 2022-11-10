@@ -21,13 +21,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
  * XML stream-writer with disabled leaf-type validation for specified QName.
  */
 final class XmlStreamWriterWithDisabledValidation extends StreamWriterWithDisabledValidation {
-
     private static final XMLOutputFactory XML_FACTORY;
 
     static {
@@ -47,15 +45,17 @@ final class XmlStreamWriterWithDisabledValidation extends StreamWriterWithDisabl
      * @param schemaContextHandler Handler that holds actual schema context.
      */
     XmlStreamWriterWithDisabledValidation(final QName excludedQName, final OutputStream outputStream,
-            final SchemaPath schemaPath, final SchemaContextHandler schemaContextHandler) {
+            final SchemaContextHandler schemaContextHandler) {
         super(excludedQName);
+
         try {
-            this.xmlWriter = XML_FACTORY.createXMLStreamWriter(outputStream, StandardCharsets.UTF_8.name());
+            xmlWriter = XML_FACTORY.createXMLStreamWriter(outputStream, StandardCharsets.UTF_8.name());
         } catch (final XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException("Cannot create XML writer", e);
         }
-        this.xmlNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
-                schemaContextHandler.get(), schemaPath);
+
+        xmlNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
+            errorsContainerInference(schemaContextHandler));
     }
 
     @Override

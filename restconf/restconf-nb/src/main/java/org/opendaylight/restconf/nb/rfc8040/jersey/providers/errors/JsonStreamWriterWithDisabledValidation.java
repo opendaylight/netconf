@@ -19,7 +19,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
  * JSON stream-writer with disabled leaf-type validation for specified QName.
@@ -41,13 +40,14 @@ final class JsonStreamWriterWithDisabledValidation extends StreamWriterWithDisab
      * @param schemaContextHandler Handler that holds actual schema context.
      */
     JsonStreamWriterWithDisabledValidation(final QName excludedQName, final OutputStreamWriter outputWriter,
-            final SchemaPath schemaPath, final XMLNamespace initialNs,
-            final SchemaContextHandler schemaContextHandler) {
+            final XMLNamespace initialNs, final SchemaContextHandler schemaContextHandler) {
         super(excludedQName);
-        this.jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter, DEFAULT_INDENT_SPACES_NUM);
-        this.jsonNodeStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
-                JSONCodecFactorySupplier.RFC7951.getShared(schemaContextHandler.get()),
-                schemaPath, initialNs, jsonWriter);
+        jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter, DEFAULT_INDENT_SPACES_NUM);
+
+        final var inference = errorsContainerInference(schemaContextHandler);
+        jsonNodeStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
+            JSONCodecFactorySupplier.RFC7951.getShared(inference.getEffectiveModelContext()),
+            inference, initialNs, jsonWriter);
     }
 
     @Override

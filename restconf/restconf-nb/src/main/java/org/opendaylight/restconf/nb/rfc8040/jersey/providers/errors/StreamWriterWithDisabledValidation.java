@@ -8,10 +8,14 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 
 import java.io.IOException;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Errors;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.ForwardingNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * Created delegating writer to special-case error-info as error-info is defined as an empty container in the restconf
@@ -84,4 +88,10 @@ abstract class StreamWriterWithDisabledValidation extends ForwardingNormalizedNo
      * @throws IOException Writing of the end element to the output stream failed.
      */
     abstract void endNodeWithDisabledValidation() throws IOException;
+
+    static final Inference errorsContainerInference(final SchemaContextHandler schemaContextHandler) {
+        final var stack = SchemaInferenceStack.of(schemaContextHandler.get());
+        stack.enterGrouping(Errors.QNAME);
+        return stack.toInference();
+    }
 }
