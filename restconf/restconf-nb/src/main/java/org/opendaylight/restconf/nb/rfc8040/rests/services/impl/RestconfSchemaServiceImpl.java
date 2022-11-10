@@ -14,11 +14,9 @@ import javax.ws.rs.Path;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Implementation of {@link RestconfSchemaService}.
@@ -30,7 +28,7 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
     private final DOMYangTextSourceProvider sourceProvider;
 
     /**
-     * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}.
+     * Default constructor.
      *
      * @param schemaService a {@link DOMSchemaService}
      * @param mountPointService a {@link DOMMountPointService}

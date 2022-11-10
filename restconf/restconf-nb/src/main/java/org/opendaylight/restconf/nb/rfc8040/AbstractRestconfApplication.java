@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyReader;
@@ -31,13 +31,13 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlPatchStatu
  * Abstract Restconf Application.
  */
 abstract class AbstractRestconfApplication extends Application {
-    private final SchemaContextHandler schemaContextHandler;
+    private final DatabindProvider databindProvider;
     private final DOMMountPointService mountPointService;
     private final List<Object> services;
 
-    AbstractRestconfApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointService mountPointService, final List<Object> services) {
-        this.schemaContextHandler = requireNonNull(schemaContextHandler);
+    AbstractRestconfApplication(final DatabindProvider databindProvider, final DOMMountPointService mountPointService,
+            final List<Object> services) {
+        this.databindProvider = requireNonNull(databindProvider);
         this.mountPointService = requireNonNull(mountPointService);
         this.services = requireNonNull(services);
     }
@@ -54,11 +54,11 @@ abstract class AbstractRestconfApplication extends Application {
     public final Set<Object> getSingletons() {
         return ImmutableSet.<Object>builderWithExpectedSize(services.size() + 5)
             .addAll(services)
-            .add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointService))
-            .add(new JsonPatchBodyReader(schemaContextHandler, mountPointService))
-            .add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService))
-            .add(new XmlPatchBodyReader(schemaContextHandler, mountPointService))
-            .add(new RestconfDocumentedExceptionMapper(schemaContextHandler))
+            .add(new JsonNormalizedNodeBodyReader(databindProvider, mountPointService))
+            .add(new JsonPatchBodyReader(databindProvider, mountPointService))
+            .add(new XmlNormalizedNodeBodyReader(databindProvider, mountPointService))
+            .add(new XmlPatchBodyReader(databindProvider, mountPointService))
+            .add(new RestconfDocumentedExceptionMapper(databindProvider))
             .build();
     }
 }

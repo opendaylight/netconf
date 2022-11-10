@@ -23,7 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
@@ -128,12 +128,13 @@ abstract class SubscribeToStreamUtil {
                 String.format("Stream with name %s was not found.", streamName),
                 ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT));
 
-        final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
+        final EffectiveModelContext schemaContext = handlersHolder.getDatabindProvider().currentContext()
+            .modelContext();
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         notificationListenerAdapter.setQueryParams(notificationQueryParams);
         notificationListenerAdapter.listen(handlersHolder.getNotificationServiceHandler());
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
-        notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getSchemaHandler());
+        notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getDatabindProvider());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                     notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationListenerAdapter.getStart(),
@@ -181,12 +182,12 @@ abstract class SubscribeToStreamUtil {
         listener.setQueryParams(notificationQueryParams);
 
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
-        final SchemaContextHandler schemaHandler = handlersHolder.getSchemaHandler();
+        final DatabindProvider schemaHandler = handlersHolder.getDatabindProvider();
         listener.setCloseVars(dataBroker, schemaHandler);
         listener.listen(dataBroker, LogicalDatastoreType.valueOf(datastoreParam));
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
-        final EffectiveModelContext schemaContext = schemaHandler.get();
+        final EffectiveModelContext schemaContext = schemaHandler.currentContext().modelContext();
         final String serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 
         final MapEntryNode mapToStreams =

@@ -24,7 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -40,7 +40,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,29 +51,29 @@ import org.slf4j.LoggerFactory;
 public class RestconfOperationsServiceImpl implements RestconfOperationsService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfOperationsServiceImpl.class);
 
-    private final SchemaContextHandler schemaContextHandler;
+    private final DatabindProvider databindProvider;
     private final DOMMountPointService mountPointService;
 
     /**
-     * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}.
+     * Set {@link DatabindProvider} for getting actual {@link EffectiveModelContext}.
      *
-     * @param schemaContextHandler handling schema context
-     * @param mountPointService handling dom mount point service
+     * @param databindProvider a {@link DatabindProvider}
+     * @param mountPointService a {@link DOMMountPointService}
      */
-    public RestconfOperationsServiceImpl(final SchemaContextHandler schemaContextHandler,
+    public RestconfOperationsServiceImpl(final DatabindProvider databindProvider,
             final DOMMountPointService mountPointService) {
-        this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.databindProvider = requireNonNull(databindProvider);
         this.mountPointService = requireNonNull(mountPointService);
     }
 
     @Override
     public String getOperationsJSON() {
-        return OperationsContent.JSON.bodyFor(schemaContextHandler.get());
+        return OperationsContent.JSON.bodyFor(databindProvider.currentContext().modelContext());
     }
 
     @Override
     public String getOperationsXML() {
-        return OperationsContent.XML.bodyFor(schemaContextHandler.get());
+        return OperationsContent.XML.bodyFor(databindProvider.currentContext().modelContext());
     }
 
     @Override
@@ -88,7 +87,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         }
 
         final InstanceIdentifierContext mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
-            schemaContextHandler.get(), Optional.of(mountPointService));
+            databindProvider.currentContext().modelContext(), Optional.of(mountPointService));
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         final var entry = contextForModelContext(modelContext(mountPoint), mountPoint);
         return NormalizedNodePayload.of(entry.getKey(), entry.getValue());

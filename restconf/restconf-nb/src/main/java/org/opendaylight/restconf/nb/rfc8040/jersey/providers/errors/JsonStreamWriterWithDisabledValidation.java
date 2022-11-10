@@ -10,12 +10,11 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Errors;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
@@ -32,15 +31,14 @@ final class JsonStreamWriterWithDisabledValidation extends StreamWriterWithDisab
     /**
      * Creation of the custom JSON stream-writer.
      *
-     * @param schemaContextHandler Handler that holds actual schema context.
-     * @param outputWriter         Output stream that is used for creation of JSON writers.
+     * @param databindContext {@link DatabindContext} to use
+     * @param outputWriter    Output stream that is used for creation of JSON writers.
      */
-    JsonStreamWriterWithDisabledValidation(final SchemaContextHandler schemaContextHandler,
+    JsonStreamWriterWithDisabledValidation(final DatabindContext databindContext,
             final OutputStreamWriter outputWriter) {
         jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter, DEFAULT_INDENT_SPACES_NUM);
-        final var inference = errorsContainerInference(schemaContextHandler);
-        jsonNodeStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
-            JSONCodecFactorySupplier.RFC7951.getShared(inference.getEffectiveModelContext()),
+        final var inference = errorsContainerInference(databindContext);
+        jsonNodeStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(databindContext.jsonCodecs(),
             inference, IETF_RESTCONF_URI, jsonWriter);
     }
 

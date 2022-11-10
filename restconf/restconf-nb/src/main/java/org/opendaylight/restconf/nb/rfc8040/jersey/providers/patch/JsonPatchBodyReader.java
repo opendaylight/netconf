@@ -36,7 +36,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -62,9 +62,9 @@ import org.slf4j.LoggerFactory;
 public class JsonPatchBodyReader extends AbstractPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(JsonPatchBodyReader.class);
 
-    public JsonPatchBodyReader(final SchemaContextHandler schemaContextHandler,
+    public JsonPatchBodyReader(final DatabindProvider databindProvider,
             final DOMMountPointService mountPointService) {
-        super(schemaContextHandler, mountPointService);
+        super(databindProvider, mountPointService);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")

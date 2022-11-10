@@ -50,8 +50,8 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
@@ -100,18 +100,18 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private static final QName NETCONF_BASE_QNAME = SchemaContext.NAME;
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
-    private final SchemaContextHandler schemaContextHandler;
+    private final DatabindProvider databindProvider;
     private final MdsalRestconfStrategy restconfStrategy;
     private final DOMMountPointService mountPointService;
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
     private final DOMDataBroker dataBroker;
 
-    public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
+    public RestconfDataServiceImpl(final DatabindProvider databindProvider,
             final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
             final DOMActionService actionService, final Configuration configuration) {
-        this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
         restconfStrategy = new MdsalRestconfStrategy(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
@@ -130,7 +130,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response readData(final String identifier, final UriInfo uriInfo) {
         final ReadDataParams readParams = QueryParams.newReadDataParams(uriInfo);
 
-        final EffectiveModelContext schemaContextRef = schemaContextHandler.get();
+        final EffectiveModelContext schemaContextRef = databindProvider.currentContext().modelContext();
         final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef, Optional.of(mountPointService));
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
@@ -246,8 +246,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response deleteData(final String identifier) {
-        final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, schemaContextHandler.get(), Optional.of(mountPointService));
+        final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
+            databindProvider.currentContext().modelContext(), Optional.of(mountPointService));
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);

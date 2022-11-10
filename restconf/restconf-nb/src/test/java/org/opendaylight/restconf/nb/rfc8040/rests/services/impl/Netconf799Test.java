@@ -24,11 +24,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
@@ -61,18 +60,15 @@ public class Netconf799Test {
             TestRestconfUtils.loadFiles("/instanceidentifier/yang"));
 
         final DOMDataBroker mockDataBroker = mock(DOMDataBroker.class);
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(mockDataBroker,
-            mock(DOMSchemaService.class));
-        schemaContextHandler.onModelContextUpdated(contextRef);
 
         final DOMActionService actionService = mock(DOMActionService.class);
         doReturn(Futures.immediateFuture(new SimpleDOMActionResult(
             Builders.containerBuilder().withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME)).build())))
             .when(actionService).invokeAction(eq(Absolute.of(CONT_QNAME, CONT1_QNAME, RESET_QNAME)), any(), any());
 
-        final RestconfDataServiceImpl dataService = new RestconfDataServiceImpl(schemaContextHandler, mockDataBroker,
-            mock(DOMMountPointService.class), mock(RestconfStreamsSubscriptionService.class),
-            actionService, mock(Configuration.class));
+        final RestconfDataServiceImpl dataService = new RestconfDataServiceImpl(
+            () -> DatabindContext.ofModel(contextRef), mockDataBroker, mock(DOMMountPointService.class),
+            mock(RestconfStreamsSubscriptionService.class), actionService, mock(Configuration.class));
 
         final var nodeAndStack = DataSchemaContextTree.from(contextRef).enterPath(ACTION_YII).orElseThrow();
         final var node = nodeAndStack.node().getDataSchemaNode();

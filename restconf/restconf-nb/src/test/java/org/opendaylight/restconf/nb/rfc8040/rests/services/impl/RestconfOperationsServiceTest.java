@@ -16,16 +16,15 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.TestUtils;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfOperationsServiceTest {
     @Test
     public void getOperationsTest() throws IOException {
-        final var oper = new RestconfOperationsServiceImpl(
-            TestUtils.newSchemaContextHandler(
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"))),
+        final var context = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
+        final var oper = new RestconfOperationsServiceImpl(() -> DatabindContext.ofModel(context),
             mock(DOMMountPointService.class));
 
         assertEquals("{\n"
