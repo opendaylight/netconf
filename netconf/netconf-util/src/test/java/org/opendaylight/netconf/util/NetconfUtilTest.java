@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.w3c.dom.Document;
 
 public class NetconfUtilTest {
@@ -75,8 +75,7 @@ public class NetconfUtilTest {
                 .withChild(sessionList)
                 .build();
         final DOMResult result = new DOMResult(XmlUtil.newDocument());
-        final SchemaPath path = SchemaPath.create(true, NetconfState.QNAME);
-        NetconfUtil.writeNormalizedNode(sessions, result, path, context);
+        NetconfUtil.writeNormalizedNode(sessions, result, context, Absolute.of(NetconfState.QNAME));
         final Document actual = (Document) result.getNode();
         final Document expected = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/sessions.xml"));
         final Diff diff = XMLUnit.compareXML(expected, actual);

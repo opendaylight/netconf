@@ -30,7 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yangtools.yang.binding.Notification;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.w3c.dom.Document;
@@ -55,20 +55,21 @@ public final class NotificationsTransformUtil {
     /**
      * Transform base notification for capabilities into NetconfNotification.
      */
-    public NetconfNotification transform(final Notification notification, final SchemaPath path) {
+    public NetconfNotification transform(final Notification<?> notification, final Absolute path) {
         return transform(notification, Optional.empty(), path);
     }
 
-    public NetconfNotification transform(final Notification notification, final Date eventTime, final SchemaPath path) {
+    public NetconfNotification transform(final Notification<?> notification, final Date eventTime,
+            final Absolute path) {
         return transform(notification, Optional.ofNullable(eventTime), path);
     }
 
-    private NetconfNotification transform(final Notification notification, final Optional<Date> eventTime,
-            final SchemaPath path) {
+    private NetconfNotification transform(final Notification<?> notification, final Optional<Date> eventTime,
+            final Absolute path) {
         final ContainerNode containerNode = serializer.toNormalizedNodeNotification(notification);
         final DOMResult result = new DOMResult(XmlUtil.newDocument());
         try {
-            NetconfUtil.writeNormalizedNode(containerNode, result, path, schemaContext);
+            NetconfUtil.writeNormalizedNode(containerNode, result, schemaContext, path);
         } catch (final XMLStreamException | IOException e) {
             throw new IllegalStateException("Unable to serialize " + notification, e);
         }
