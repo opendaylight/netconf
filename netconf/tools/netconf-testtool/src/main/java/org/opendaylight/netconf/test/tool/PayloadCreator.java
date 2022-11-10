@@ -42,7 +42,7 @@ final class PayloadCreator {
     private static final EffectiveModelContext NETWORK_TOPOLOGY_SCHEMA_CONTEXT =
         BindingRuntimeHelpers.createEffectiveModel(List.of($YangModuleInfoImpl.getInstance()));
     private static final JSONCodecFactory NETWORK_TOPOLOGY_JSON_CODEC_FACTORY =
-        JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(NETWORK_TOPOLOGY_SCHEMA_CONTEXT);
+        JSONCodecFactorySupplier.RFC7951.getShared(NETWORK_TOPOLOGY_SCHEMA_CONTEXT);
 
     private static final QName TOPOLOGY_ID_QNAME = QName.create(Topology.QNAME, "topology-id").intern();
     private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id").intern();
