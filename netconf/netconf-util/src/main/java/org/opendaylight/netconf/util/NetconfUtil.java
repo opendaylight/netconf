@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -46,7 +47,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeS
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -139,15 +140,15 @@ public final class NetconfUtil {
      *
      * @param normalized data to be written
      * @param result     DOM result holder
-     * @param schemaPath schema path of the parent node
      * @param context    mountpoint schema context
+     * @param path       optional schema node identifier of the parent node
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
     public static void writeNormalizedNode(final NormalizedNode normalized, final DOMResult result,
-            final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
+            final EffectiveModelContext context, final @Nullable Absolute path) throws IOException, XMLStreamException {
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
-        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+        try (var streamWriter = newWriter(xmlWriter, context, path);
              var writer = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
             writer.write(normalized);
             writer.flush();
@@ -162,22 +163,22 @@ public final class NetconfUtil {
      * @param normalized data to be written
      * @param metadata   metadata to be written
      * @param result     DOM result holder
-     * @param schemaPath schema path of the parent node
      * @param context    mountpoint schema context
+     * @param path       optional schema node identifier of the parent node
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
     public static void writeNormalizedNode(final NormalizedNode normalized, final @Nullable NormalizedMetadata metadata,
-            final DOMResult result, final SchemaPath schemaPath, final EffectiveModelContext context)
+            final DOMResult result, final EffectiveModelContext context, final @Nullable Absolute path)
                 throws IOException, XMLStreamException {
         if (metadata == null) {
-            writeNormalizedNode(normalized, result, schemaPath, context);
+            writeNormalizedNode(normalized, result, context, path);
             return;
         }
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
-        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+        try (var streamWriter = newWriter(xmlWriter, context, path);
              var writer = NormalizedMetadataWriter.forStreamWriter(streamWriter)) {
             writer.write(normalized, metadata);
             writer.flush();
@@ -191,16 +192,16 @@ public final class NetconfUtil {
      *
      * @param query      path to the root node
      * @param result     DOM result holder
-     * @param schemaPath schema path of the parent node
      * @param context    mountpoint schema context
+     * @param path       optional schema node identifier of the parent node
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
     public static void writeNormalizedNode(final YangInstanceIdentifier query, final DOMResult result,
-            final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
+            final EffectiveModelContext context, final @Nullable Absolute path) throws IOException, XMLStreamException {
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
-        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+        try (var streamWriter = newWriter(xmlWriter, context, path);
              var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
             final Iterator<PathArgument> it = query.getPathArguments().iterator();
             final PathArgument first = it.next();
@@ -217,22 +218,22 @@ public final class NetconfUtil {
      * @param query      path to the root node
      * @param metadata   metadata to be written
      * @param result     DOM result holder
-     * @param schemaPath schema path of the parent node
      * @param context    mountpoint schema context
+     * @param path       optional schema node identifier of the parent node
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
     public static void writeNormalizedNode(final YangInstanceIdentifier query,
-            final @Nullable NormalizedMetadata metadata, final DOMResult result, final SchemaPath schemaPath,
-            final EffectiveModelContext context) throws IOException, XMLStreamException {
+            final @Nullable NormalizedMetadata metadata, final DOMResult result, final EffectiveModelContext context,
+            final @Nullable Absolute path) throws IOException, XMLStreamException {
         if (metadata == null) {
-            writeNormalizedNode(query, result, schemaPath, context);
+            writeNormalizedNode(query, result, context, path);
             return;
         }
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
-        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+        try (var streamWriter = newWriter(xmlWriter, context, path);
              var writer = new EmptyListXmlMetadataWriter(streamWriter, xmlWriter,
                  streamWriter.getExtensions().getInstance(StreamWriterMetadataExtension.class), metadata)) {
             final Iterator<PathArgument> it = query.getPathArguments().iterator();
@@ -248,20 +249,20 @@ public final class NetconfUtil {
      *
      * @param query      path to the root node
      * @param result     DOM result holder
-     * @param schemaPath schema path of the parent node
      * @param context    mountpoint schema context
+     * @param path       optional schema node identifier of the parent node
      * @throws IOException        failed to write filter into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException failed to serialize filter into XML document
      */
     public static void writeFilter(final YangInstanceIdentifier query, final DOMResult result,
-            final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
+            final EffectiveModelContext context, final @Nullable Absolute path) throws IOException, XMLStreamException {
         if (query.isEmpty()) {
             // No query at all
             return;
         }
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
-        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+        try (var streamWriter = newWriter(xmlWriter, context, path);
              var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
             final Iterator<PathArgument> it = query.getPathArguments().iterator();
             final PathArgument first = it.next();
@@ -271,21 +272,27 @@ public final class NetconfUtil {
         }
     }
 
+    private static @NonNull NormalizedNodeStreamWriter newWriter(final XMLStreamWriter writer,
+            final EffectiveModelContext context, final @Nullable Absolute path) {
+        return path == null ? XMLStreamNormalizedNodeStreamWriter.create(writer, context)
+            : XMLStreamNormalizedNodeStreamWriter.create(writer, context, path);
+    }
+
     /**
      * Writing subtree filter specified by parent {@link YangInstanceIdentifier} and specific fields
      * into {@link DOMResult}. Field paths are relative to parent query path.
      *
      * @param query      path to the root node
      * @param result     DOM result holder
-     * @param schemaPath schema path of the parent node
      * @param context    mountpoint schema context
+     * @param path       optional schema node identifier of the parent node
      * @param fields     list of specific fields for which the filter should be created
      * @throws IOException        failed to write filter into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException failed to serialize filter into XML document
      * @throws NullPointerException if any argument is null
      */
     public static void writeFilter(final YangInstanceIdentifier query, final DOMResult result,
-                                   final SchemaPath schemaPath, final EffectiveModelContext context,
+                                   final EffectiveModelContext context, final @Nullable Absolute path,
                                    final List<YangInstanceIdentifier> fields) throws IOException, XMLStreamException {
         if (query.isEmpty() || fields.isEmpty()) {
             // No query at all
@@ -297,7 +304,7 @@ public final class NetconfUtil {
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         try {
-            try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+            try (var streamWriter = newWriter(xmlWriter, context, path);
                  var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
                 final PathArgument first = rootNode.element();
                 StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType())
