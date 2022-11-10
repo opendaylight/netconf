@@ -137,7 +137,8 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
         }
     }
 
-    public EffectiveModelContext get() {
+    @VisibleForTesting
+    EffectiveModelContext get() {
         return schemaContext;
     }
 

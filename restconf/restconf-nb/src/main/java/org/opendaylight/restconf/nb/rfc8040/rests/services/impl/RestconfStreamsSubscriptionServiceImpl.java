@@ -15,15 +15,15 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,15 +47,13 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      *
      * @param dataBroker {@link DOMDataBroker}
      * @param notificationService {@link DOMNotificationService}
-     * @param schemaHandler
-     *             handler of {@link SchemaContext}
-     * @param configuration
-     *             configuration for restconf {@link Configuration}}
+     * @param databindProvider a {@link DatabindProvider}
+     * @param configuration configuration for RESTCONF {@link Configuration}}
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
-            final DOMNotificationService notificationService, final SchemaContextHandler schemaHandler,
+            final DOMNotificationService notificationService, final DatabindProvider databindProvider,
             final Configuration configuration) {
-        handlersHolder = new HandlersHolder(dataBroker, notificationService, schemaHandler);
+        handlersHolder = new HandlersHolder(dataBroker, notificationService, databindProvider);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
     }
@@ -76,7 +74,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         // prepare node with value of location
-        return NormalizedNodePayload.ofLocation(prepareIIDSubsStreamOutput(handlersHolder.getSchemaHandler()),
+        return NormalizedNodePayload.ofLocation(
+            prepareIIDSubsStreamOutput(handlersHolder.getDatabindProvider().currentContext().modelContext()),
             LOCATION_NODEID, response);
     }
 
@@ -86,9 +85,9 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * @param schemaHandler Schema context handler.
      * @return InstanceIdentifier of Location leaf.
      */
-    private static InstanceIdentifierContext prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
+    private static InstanceIdentifierContext prepareIIDSubsStreamOutput(final EffectiveModelContext modelContext) {
         return InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.ofDataTreePath(schemaHandler.get(), NOTIFI_QNAME, LOCATION_QNAME));
+            SchemaInferenceStack.ofDataTreePath(modelContext, NOTIFI_QNAME, LOCATION_QNAME));
     }
 
     /**
@@ -98,13 +97,13 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     public static final class HandlersHolder {
         private final DOMDataBroker dataBroker;
         private final DOMNotificationService notificationService;
-        private final SchemaContextHandler schemaHandler;
+        private final DatabindProvider databindProvider;
 
         private HandlersHolder(final DOMDataBroker dataBroker, final DOMNotificationService notificationService,
-                final SchemaContextHandler schemaHandler) {
+                final DatabindProvider databindProvider) {
             this.dataBroker = dataBroker;
             this.notificationService = notificationService;
-            this.schemaHandler = schemaHandler;
+            this.databindProvider = databindProvider;
         }
 
         /**
@@ -126,12 +125,12 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         /**
-         * Get {@link SchemaContextHandler}.
+         * Get {@link DatabindProvider}.
          *
          * @return the schemaHandler
          */
-        public SchemaContextHandler getSchemaHandler() {
-            return schemaHandler;
+        public DatabindProvider getDatabindProvider() {
+            return databindProvider;
         }
     }
 }

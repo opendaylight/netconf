@@ -11,7 +11,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStreamService;
 
 /**
@@ -20,8 +20,8 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStrea
 @Singleton
 public class DataStreamApplication extends AbstractRestconfApplication {
     @Inject
-    public DataStreamApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointService mountPointService, final RestconfDataStreamService dataStreamService) {
-        super(schemaContextHandler, mountPointService, List.of(dataStreamService));
+    public DataStreamApplication(final DatabindProvider databindProvider, final DOMMountPointService mountPointService,
+            final RestconfDataStreamService dataStreamService) {
+        super(databindProvider, mountPointService, List.of(dataStreamService));
     }
 }
