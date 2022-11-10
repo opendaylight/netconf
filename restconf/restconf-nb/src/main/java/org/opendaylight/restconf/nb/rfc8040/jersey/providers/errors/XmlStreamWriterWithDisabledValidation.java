@@ -16,9 +16,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 
@@ -39,15 +37,11 @@ final class XmlStreamWriterWithDisabledValidation extends StreamWriterWithDisabl
     /**
      * Creation of the custom XML stream-writer.
      *
-     * @param excludedQName        QName of the element that is excluded from type-check.
-     * @param outputStream         Output stream that is used for creation of JSON writers.
-     * @param schemaPath           Schema-path of the {@link NormalizedNode} to be written.
      * @param schemaContextHandler Handler that holds actual schema context.
+     * @param outputStream         Output stream that is used for creation of JSON writers.
      */
-    XmlStreamWriterWithDisabledValidation(final QName excludedQName, final OutputStream outputStream,
-            final SchemaContextHandler schemaContextHandler) {
-        super(excludedQName);
-
+    XmlStreamWriterWithDisabledValidation(final SchemaContextHandler schemaContextHandler,
+            final OutputStream outputStream) {
         try {
             xmlWriter = XML_FACTORY.createXMLStreamWriter(outputStream, StandardCharsets.UTF_8.name());
         } catch (final XMLStreamException | FactoryConfigurationError e) {

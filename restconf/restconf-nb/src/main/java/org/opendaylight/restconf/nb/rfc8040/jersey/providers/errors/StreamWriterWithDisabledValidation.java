@@ -10,9 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 import java.io.IOException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Errors;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.ForwardingNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
@@ -24,22 +22,11 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
  * we override the leafNode behavior for error-info.
  */
 abstract class StreamWriterWithDisabledValidation extends ForwardingNormalizedNodeStreamWriter {
-    private final QName excludedQName;
-
     private boolean inOurLeaf;
-
-    /**
-     * Creation of the {@link NormalizedNode} stream-writer with {@link QName} that is excluded from type-check.
-     *
-     * @param excludedQName QName of the element that is excluded from type-check.
-     */
-    StreamWriterWithDisabledValidation(final QName excludedQName) {
-        this.excludedQName = excludedQName;
-    }
 
     @Override
     public final void startLeafNode(final NodeIdentifier name) throws IOException {
-        if (name.getNodeType().equals(excludedQName)) {
+        if (RestconfDocumentedExceptionMapper.ERROR_INFO_QNAME.equals(name.getNodeType())) {
             inOurLeaf = true;
             startLeafNodeWithDisabledValidation(name);
         } else {

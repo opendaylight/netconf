@@ -37,7 +37,6 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -61,9 +60,8 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private static final QName ERROR_TAG_QNAME = qnameOf("error-tag");
     private static final QName ERROR_APP_TAG_QNAME = qnameOf("error-app-tag");
     private static final QName ERROR_MESSAGE_QNAME = qnameOf("error-message");
-    private static final QName ERROR_INFO_QNAME = qnameOf("error-info");
     private static final QName ERROR_PATH_QNAME = qnameOf("error-path");
-    private static final XMLNamespace IETF_RESTCONF_URI = Errors.QNAME.getModule().getNamespace();
+    static final QName ERROR_INFO_QNAME = qnameOf("error-info");
 
     @Context
     private HttpHeaders headers;
@@ -171,8 +169,8 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              OutputStreamWriter streamStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
         ) {
-            return writeNormalizedNode(errorsContainer, outputStream, new JsonStreamWriterWithDisabledValidation(
-                ERROR_INFO_QNAME, streamStreamWriter, IETF_RESTCONF_URI, schemaContextHandler));
+            return writeNormalizedNode(errorsContainer, outputStream,
+                new JsonStreamWriterWithDisabledValidation(schemaContextHandler, streamStreamWriter));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output JSON writers", e);
         }
@@ -186,8 +184,8 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      */
     private String serializeErrorsContainerToXml(final ContainerNode errorsContainer) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            return writeNormalizedNode(errorsContainer, outputStream, new XmlStreamWriterWithDisabledValidation(
-                ERROR_INFO_QNAME, outputStream, schemaContextHandler));
+            return writeNormalizedNode(errorsContainer, outputStream,
+                new XmlStreamWriterWithDisabledValidation(schemaContextHandler, outputStream));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output XML writers", e);
         }
