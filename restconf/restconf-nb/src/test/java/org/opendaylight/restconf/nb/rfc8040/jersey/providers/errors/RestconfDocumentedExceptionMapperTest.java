@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -38,7 +38,6 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -54,13 +53,10 @@ public class RestconfDocumentedExceptionMapperTest {
 
     @BeforeClass
     public static void setupExceptionMapper() {
-        final SchemaContext schemaContext = YangParserTestUtils.parseYangResources(
+        final var schemaContext = YangParserTestUtils.parseYangResources(
                 RestconfDocumentedExceptionMapperTest.class, "/restconf/impl/ietf-restconf@2017-01-26.yang",
                 "/instanceidentifier/yang/instance-identifier-patch-module.yang");
-        final SchemaContextHandler schemaContextHandler = mock(SchemaContextHandler.class);
-        doReturn(schemaContext).when(schemaContextHandler).get();
-
-        exceptionMapper = new RestconfDocumentedExceptionMapper(schemaContextHandler);
+        exceptionMapper = new RestconfDocumentedExceptionMapper(() -> DatabindContext.ofModel(schemaContext));
     }
 
     /**

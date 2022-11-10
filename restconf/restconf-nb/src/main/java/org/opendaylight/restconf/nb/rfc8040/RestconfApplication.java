@@ -17,7 +17,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContextProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
@@ -29,31 +29,31 @@ import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 
 @Singleton
 public class RestconfApplication extends AbstractRestconfApplication {
-    private RestconfApplication(final SchemaContextHandler schemaContextHandler,
+    private RestconfApplication(final DatabindContextProvider databindContextProvider,
             final DOMMountPointService mountPointService, final RestconfStreamsSubscriptionService streamSubscription,
             final DOMDataBroker dataBroker, final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
             final Configuration configuration) {
-        super(schemaContextHandler, mountPointService, List.of(
+        super(databindContextProvider, mountPointService, List.of(
             streamSubscription,
-            new RestconfDataServiceImpl(schemaContextHandler, dataBroker, mountPointService, streamSubscription,
+            new RestconfDataServiceImpl(databindContextProvider, dataBroker, mountPointService, streamSubscription,
                 actionService, configuration),
             new RestconfInvokeOperationsServiceImpl(rpcService),
-            new RestconfOperationsServiceImpl(schemaContextHandler, mountPointService),
-            new RestconfSchemaServiceImpl(schemaContextHandler, mountPointService,
+            new RestconfOperationsServiceImpl(databindContextProvider, mountPointService),
+            new RestconfSchemaServiceImpl(databindContextProvider, mountPointService,
                 domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class)),
-            new RestconfImpl(schemaContextHandler)));
+            new RestconfImpl(databindContextProvider)));
 
     }
 
     @Inject
-    public RestconfApplication(final SchemaContextHandler schemaContextHandler,
+    public RestconfApplication(final DatabindContextProvider databindContextProvider,
             final DOMMountPointService mountPointService, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService,
             final DOMSchemaService domSchemaService, final Configuration configuration) {
-        this(schemaContextHandler, mountPointService,
-            new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, schemaContextHandler,
+        this(databindContextProvider, mountPointService,
+            new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindContextProvider,
                 configuration),
             dataBroker, rpcService, actionService, notificationService, domSchemaService, configuration);
     }

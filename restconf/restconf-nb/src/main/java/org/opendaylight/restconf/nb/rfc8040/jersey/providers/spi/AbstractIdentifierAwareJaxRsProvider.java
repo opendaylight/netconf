@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -23,7 +25,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContextProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -35,12 +37,12 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     @Context
     private Request request;
 
-    private final SchemaContextHandler schemaContextHandler;
+    private final DatabindContextProvider databindContextProvider;
     private final DOMMountPointService mountPointService;
 
-    protected AbstractIdentifierAwareJaxRsProvider(final SchemaContextHandler schemaContextHandler,
+    protected AbstractIdentifierAwareJaxRsProvider(final DatabindContextProvider databindContextProvider,
             final DOMMountPointService mountPointService) {
-        this.schemaContextHandler = schemaContextHandler;
+        this.databindContextProvider = requireNonNull(databindContextProvider);
         this.mountPointService = mountPointService;
     }
 
@@ -94,7 +96,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     }
 
     protected EffectiveModelContext getSchemaContext() {
-        return schemaContextHandler.get();
+        return databindContextProvider.currentDatabindContext().modelContext();
     }
 
     protected DOMMountPointService getMountPointService() {

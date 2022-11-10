@@ -30,7 +30,7 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     public XmlPatchBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        xmlToPatchBodyReader = new XmlPatchBodyReader(schemaContextHandler, mountPointService);
+        xmlToPatchBodyReader = new XmlPatchBodyReader(databindContextProvider, mountPointService);
     }
 
     @Override

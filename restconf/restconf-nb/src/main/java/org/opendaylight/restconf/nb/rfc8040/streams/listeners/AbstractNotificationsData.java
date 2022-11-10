@@ -24,7 +24,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContextProvider;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ abstract class AbstractNotificationsData {
 
     private final String localName;
 
-    protected SchemaContextHandler schemaHandler;
+    protected DatabindContextProvider databindContextProvider;
     private DOMDataBroker dataBroker;
 
     AbstractNotificationsData(final QName lastQName) {
@@ -56,9 +56,9 @@ abstract class AbstractNotificationsData {
      */
     @SuppressWarnings("checkstyle:hiddenField")
     // FIXME: this is pure lifecycle nightmare just because ...
-    public void setCloseVars(final DOMDataBroker dataBroker, final SchemaContextHandler schemaHandler) {
+    public void setCloseVars(final DOMDataBroker dataBroker, final DatabindContextProvider databindContextProvider) {
         this.dataBroker = dataBroker;
-        this.schemaHandler = schemaHandler;
+        this.databindContextProvider = databindContextProvider;
     }
 
     /**

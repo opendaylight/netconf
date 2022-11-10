@@ -15,6 +15,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContextProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -23,6 +24,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
@@ -53,9 +55,9 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      *             configuration for restconf {@link Configuration}}
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
-            final DOMNotificationService notificationService, final SchemaContextHandler schemaHandler,
+            final DOMNotificationService notificationService, final DatabindContextProvider databindContextProvider,
             final Configuration configuration) {
-        handlersHolder = new HandlersHolder(dataBroker, notificationService, schemaHandler);
+        handlersHolder = new HandlersHolder(dataBroker, notificationService, databindContextProvider);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
     }
@@ -76,7 +78,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         // prepare node with value of location
-        return NormalizedNodePayload.ofLocation(prepareIIDSubsStreamOutput(handlersHolder.getSchemaHandler()),
+        return NormalizedNodePayload.ofLocation(
+            prepareIIDSubsStreamOutput(handlersHolder.getSchemaHandler().currentDatabindContext().modelContext()),
             LOCATION_NODEID, response);
     }
 
@@ -86,9 +89,9 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * @param schemaHandler Schema context handler.
      * @return InstanceIdentifier of Location leaf.
      */
-    private static InstanceIdentifierContext prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
+    private static InstanceIdentifierContext prepareIIDSubsStreamOutput(final EffectiveModelContext modelContext) {
         return InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.ofDataTreePath(schemaHandler.get(), NOTIFI_QNAME, LOCATION_QNAME));
+            SchemaInferenceStack.ofDataTreePath(modelContext, NOTIFI_QNAME, LOCATION_QNAME));
     }
 
     /**
@@ -98,13 +101,13 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     public static final class HandlersHolder {
         private final DOMDataBroker dataBroker;
         private final DOMNotificationService notificationService;
-        private final SchemaContextHandler schemaHandler;
+        private final DatabindContextProvider databindContextProvider;
 
         private HandlersHolder(final DOMDataBroker dataBroker, final DOMNotificationService notificationService,
-                final SchemaContextHandler schemaHandler) {
+                final DatabindContextProvider databindContextProvider) {
             this.dataBroker = dataBroker;
             this.notificationService = notificationService;
-            this.schemaHandler = schemaHandler;
+            this.databindContextProvider = databindContextProvider;
         }
 
         /**
@@ -130,8 +133,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return the schemaHandler
          */
-        public SchemaContextHandler getSchemaHandler() {
-            return schemaHandler;
+        public DatabindContextProvider getSchemaHandler() {
+            return databindContextProvider;
         }
     }
 }

@@ -24,6 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContextProvider;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfOperationsService;
@@ -52,7 +53,7 @@ import org.slf4j.LoggerFactory;
 public class RestconfOperationsServiceImpl implements RestconfOperationsService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfOperationsServiceImpl.class);
 
-    private final SchemaContextHandler schemaContextHandler;
+    private final DatabindContextProvider databindContextProvider;
     private final DOMMountPointService mountPointService;
 
     /**
@@ -61,20 +62,20 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
      * @param schemaContextHandler handling schema context
      * @param mountPointService handling dom mount point service
      */
-    public RestconfOperationsServiceImpl(final SchemaContextHandler schemaContextHandler,
+    public RestconfOperationsServiceImpl(final DatabindContextProvider databindContextProvider,
             final DOMMountPointService mountPointService) {
-        this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.databindContextProvider = requireNonNull(databindContextProvider);
         this.mountPointService = requireNonNull(mountPointService);
     }
 
     @Override
     public String getOperationsJSON() {
-        return OperationsContent.JSON.bodyFor(schemaContextHandler.get());
+        return OperationsContent.JSON.bodyFor(databindContextProvider.currentDatabindContext().modelContext());
     }
 
     @Override
     public String getOperationsXML() {
-        return OperationsContent.XML.bodyFor(schemaContextHandler.get());
+        return OperationsContent.XML.bodyFor(databindContextProvider.currentDatabindContext().modelContext());
     }
 
     @Override
@@ -88,7 +89,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         }
 
         final InstanceIdentifierContext mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
-            schemaContextHandler.get(), Optional.of(mountPointService));
+            databindContextProvider.currentDatabindContext().modelContext(), Optional.of(mountPointService));
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         final var entry = contextForModelContext(modelContext(mountPoint), mountPoint);
         return NormalizedNodePayload.of(entry.getKey(), entry.getValue());
