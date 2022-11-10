@@ -16,7 +16,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
@@ -40,10 +39,8 @@ public class RestconfApplication extends AbstractRestconfApplication {
                 actionService, configuration),
             new RestconfInvokeOperationsServiceImpl(rpcService),
             new RestconfOperationsServiceImpl(schemaContextHandler, mountPointService),
-            new RestconfSchemaServiceImpl(schemaContextHandler, mountPointService,
-                domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class)),
+            new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
             new RestconfImpl(schemaContextHandler)));
-
     }
 
     @Inject

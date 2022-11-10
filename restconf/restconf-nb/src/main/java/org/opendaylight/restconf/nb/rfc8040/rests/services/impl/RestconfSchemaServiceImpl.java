@@ -7,10 +7,12 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import javax.ws.rs.Path;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
@@ -23,27 +25,27 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 @Path("/")
 public class RestconfSchemaServiceImpl implements RestconfSchemaService {
-    private final SchemaContextHandler schemaContextHandler;
+    private final DOMSchemaService schemaService;
     private final DOMMountPointService mountPointService;
     private final DOMYangTextSourceProvider sourceProvider;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}.
      *
-     * @param schemaContextHandler handling schema context
-     * @param mountPointService dom mount point service
+     * @param schemaService a {@link DOMSchemaService}
+     * @param mountPointService a {@link DOMMountPointService}
      */
-    public RestconfSchemaServiceImpl(final SchemaContextHandler schemaContextHandler,
-                                     final DOMMountPointService mountPointService,
-                                     final DOMYangTextSourceProvider sourceProvider) {
-        this.schemaContextHandler = requireNonNull(schemaContextHandler);
+    public RestconfSchemaServiceImpl(final DOMSchemaService schemaService,
+            final DOMMountPointService mountPointService) {
+        this.schemaService = requireNonNull(schemaService);
         this.mountPointService = requireNonNull(mountPointService);
-        this.sourceProvider = requireNonNull(sourceProvider);
+        sourceProvider = schemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
+        checkArgument(sourceProvider != null, "No DOMYangTextSourceProvider available in %s", schemaService);
     }
 
     @Override
     public SchemaExportContext getSchema(final String identifier) {
-        return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextHandler.get(), identifier,
+        return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaService.getGlobalContext(), identifier,
             mountPointService, sourceProvider);
     }
 }
