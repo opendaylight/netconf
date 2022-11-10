@@ -20,8 +20,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.ForwardingNormaliz
  * we override the leafNode behavior for error-info.
  */
 abstract class StreamWriterWithDisabledValidation extends ForwardingNormalizedNodeStreamWriter {
-
     private final QName excludedQName;
+
     private boolean inOurLeaf;
 
     /**
@@ -34,7 +34,7 @@ abstract class StreamWriterWithDisabledValidation extends ForwardingNormalizedNo
     }
 
     @Override
-    public void startLeafNode(final NodeIdentifier name) throws IOException {
+    public final void startLeafNode(final NodeIdentifier name) throws IOException {
         if (name.getNodeType().equals(excludedQName)) {
             inOurLeaf = true;
             startLeafNodeWithDisabledValidation(name);
@@ -52,7 +52,7 @@ abstract class StreamWriterWithDisabledValidation extends ForwardingNormalizedNo
     abstract void startLeafNodeWithDisabledValidation(NodeIdentifier nodeIdentifier) throws IOException;
 
     @Override
-    public void scalarValue(final Object value) throws IOException {
+    public final void scalarValue(final Object value) throws IOException {
         if (inOurLeaf) {
             scalarValueWithDisabledValidation(value);
         } else {
@@ -69,7 +69,7 @@ abstract class StreamWriterWithDisabledValidation extends ForwardingNormalizedNo
     abstract void scalarValueWithDisabledValidation(Object value) throws IOException;
 
     @Override
-    public void endNode() throws IOException {
+    public final void endNode() throws IOException {
         if (inOurLeaf) {
             inOurLeaf = false;
             endNodeWithDisabledValidation();
