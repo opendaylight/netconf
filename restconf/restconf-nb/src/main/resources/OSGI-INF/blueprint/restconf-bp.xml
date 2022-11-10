@@ -58,10 +58,6 @@
     <argument ref="scheduledThreadPool"/>
     <argument ref="configuration"/>
   </bean>
-  <bean id="schemaContextHandler" class="org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler" init-method="init" destroy-method="close">
-    <argument ref="dOMDataBroker"/>
-    <argument ref="dOMSchemaService"/>
-  </bean>
   <bean id="webInitializer" class="org.opendaylight.restconf.nb.rfc8040.web.WebInitializer" destroy-method="close">
     <argument ref="webServer"/>
     <argument ref="webContextSecurer"/>
