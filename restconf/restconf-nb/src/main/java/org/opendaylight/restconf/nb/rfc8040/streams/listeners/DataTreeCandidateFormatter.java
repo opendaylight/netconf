@@ -14,18 +14,15 @@ import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.Notificatio
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathExpressionException;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -55,12 +52,8 @@ abstract class DataTreeCandidateFormatter extends EventFormatter<Collection<Data
                 final DOMResult domResult = new DOMResult(dataElement);
                 final XMLStreamWriter writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(domResult);
 
-                final SchemaPath path = SchemaPath.create(candidate.getRootPath().getPathArguments().stream()
-                        .filter(p -> !(p instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
-                        .map(YangInstanceIdentifier.PathArgument::getNodeType).collect(Collectors.toList()), true);
-
                 writeCandidate(XMLStreamNormalizedNodeStreamWriter.create(writer, schemaContext,
-                        path), candidate);
+                    candidate.getRootPath()), candidate);
 
                 dataChangedElement.appendChild(dataElement);
             } catch (final XMLStreamException e) {
