@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.test.tool;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -34,17 +33,16 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamW
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 final class PayloadCreator {
     private static final Logger LOG = LoggerFactory.getLogger(PayloadCreator.class);
-
-    private static final EffectiveModelContext NETWORK_TOPOLOGY_SCHEMA_CONTEXT = BindingRuntimeHelpers
-            .createEffectiveModel(ImmutableList.of($YangModuleInfoImpl.getInstance()));
-    private static final JSONCodecFactory NETWORK_TOPOLOGY_JSON_CODEC_FACTORY = JSONCodecFactorySupplier
-            .DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(NETWORK_TOPOLOGY_SCHEMA_CONTEXT);
+    private static final EffectiveModelContext NETWORK_TOPOLOGY_SCHEMA_CONTEXT =
+        BindingRuntimeHelpers.createEffectiveModel(List.of($YangModuleInfoImpl.getInstance()));
+    private static final JSONCodecFactory NETWORK_TOPOLOGY_JSON_CODEC_FACTORY =
+        JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(NETWORK_TOPOLOGY_SCHEMA_CONTEXT);
 
     private static final QName TOPOLOGY_ID_QNAME = QName.create(Topology.QNAME, "topology-id").intern();
     private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id").intern();
@@ -84,8 +82,7 @@ final class PayloadCreator {
         final StringWriter writer = new StringWriter();
         final JsonWriter jsonWriter = JsonWriterFactory.createJsonWriter(writer, DEFAULT_REQUEST_PAYLOAD_INDENTATION);
         final NormalizedNodeStreamWriter jsonStream = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
-                NETWORK_TOPOLOGY_JSON_CODEC_FACTORY, SchemaPath.create(true, NetworkTopology.QNAME),
-                null, jsonWriter);
+                NETWORK_TOPOLOGY_JSON_CODEC_FACTORY, Absolute.of(NetworkTopology.QNAME), null, jsonWriter);
         try (NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream)) {
             nodeWriter.write(node);
         } catch (final IOException e) {
