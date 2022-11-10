@@ -81,8 +81,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedN
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -532,20 +532,19 @@ public final class NetconfMessageTransformUtil {
         }
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     public static void writeNormalizedOperationInput(final ContainerNode normalized, final DOMResult result,
             final Absolute operationPath, final EffectiveModelContext baseNetconfCtx)
                 throws IOException, XMLStreamException {
-        final QName inputQName = YangConstants.operationInputQName(operationPath.lastNodeIdentifier().getModule());
-        // FIXME: eliminate this conversion
-        final SchemaPath inputPath = SchemaPath.of(operationPath).createChild(inputQName);
+        final var stack = SchemaInferenceStack.of(baseNetconfCtx, operationPath);
+        stack.enterSchemaTree(YangConstants.operationInputQName(operationPath.lastNodeIdentifier().getModule()));
+        final var inputInference = stack.toSchemaTreeInference();
 
         final XMLStreamWriter writer = NetconfUtil.XML_FACTORY.createXMLStreamWriter(result);
         try {
             try (NormalizedNodeStreamWriter normalizedNodeStreamWriter =
-                    XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, inputPath)) {
+                    XMLStreamNormalizedNodeStreamWriter.create(writer, inputInference)) {
                 try (SchemaOrderedNormalizedNodeWriter normalizedNodeWriter =
-                        new SchemaOrderedNormalizedNodeWriter(normalizedNodeStreamWriter, baseNetconfCtx, inputPath)) {
+                        new SchemaOrderedNormalizedNodeWriter(normalizedNodeStreamWriter, inputInference)) {
                     final Collection<DataContainerChild> value = normalized.body();
                     normalizedNodeWriter.write(value);
                     normalizedNodeWriter.flush();
@@ -554,7 +553,7 @@ public final class NetconfMessageTransformUtil {
         } finally {
             try {
                 writer.close();
-            } catch (final Exception e) {
+            } catch (final XMLStreamException e) {
                 LOG.warn("Unable to close resource properly", e);
             }
         }
