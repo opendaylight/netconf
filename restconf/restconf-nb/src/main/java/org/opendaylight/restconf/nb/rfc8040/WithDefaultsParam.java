@@ -62,19 +62,14 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
     }
 
     public static @NonNull WithDefaultsParam forUriValue(final String uriValue) {
-        switch (uriValue) {
-            case "explicit":
-                return EXPLICIT;
-            case "report-all":
-                return REPORT_ALL;
-            case "report-all-tagged":
-                return REPORT_ALL_TAGGED;
-            case "trim":
-                return TRIM;
-            default:
-                throw new IllegalArgumentException(
-                    "Value can be 'explicit', 'report-all', 'report-all-tagged' or 'trim', not '" + uriValue + "'");
-        }
+        return switch (uriValue) {
+            case "explicit" -> EXPLICIT;
+            case "report-all" -> REPORT_ALL;
+            case "report-all-tagged" -> REPORT_ALL_TAGGED;
+            case "trim" -> TRIM;
+            default -> throw new IllegalArgumentException(
+                "Value can be 'explicit', 'report-all', 'report-all-tagged' or 'trim', not '" + uriValue + "'");
+        };
     }
 
     public static @NonNull URI capabilityUri() {

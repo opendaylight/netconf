@@ -59,18 +59,13 @@ public enum InsertParam implements RestconfQueryParam<InsertParam> {
     }
 
     public static @NonNull InsertParam forUriValue(final String uriValue) {
-        switch (uriValue) {
-            case "after":
-                return AFTER;
-            case "before":
-                return BEFORE;
-            case "first":
-                return FIRST;
-            case "last":
-                return LAST;
-            default:
-                throw new IllegalArgumentException(
-                    "Value can be 'after', 'before', 'first' or 'last', not '" + uriValue + "'");
-        }
+        return switch (uriValue) {
+            case "after" -> AFTER;
+            case "before" -> BEFORE;
+            case "first" -> FIRST;
+            case "last" -> LAST;
+            default -> throw new IllegalArgumentException(
+                "Value can be 'after', 'before', 'first' or 'last', not '" + uriValue + "'");
+        };
     }
 }

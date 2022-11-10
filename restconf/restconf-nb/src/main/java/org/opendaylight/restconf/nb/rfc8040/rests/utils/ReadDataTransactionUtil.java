@@ -19,12 +19,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.ContentParam;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -92,21 +89,14 @@ public final class ReadDataTransactionUtil {
                                                     final @NonNull RestconfStrategy strategy,
                                                     final WithDefaultsParam withDefa,
                                                     final EffectiveModelContext ctx) {
-        // FIXME: use a switch expression when they are available, removing source of RestconfDocumentedException
-        switch (content) {
-            case ALL:
-                return readAllData(strategy, path, withDefa, ctx);
-            case CONFIG:
-                final NormalizedNode read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
-                return withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
-            case NONCONFIG:
-                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
-            default:
-                throw new RestconfDocumentedException(
-                        new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                                "Invalid content parameter: " + content.paramValue(), null,
-                                "The content parameter value must be either config, nonconfig or all (default)"));
-        }
+        return switch (content) {
+            case ALL -> readAllData(strategy, path, withDefa, ctx);
+            case CONFIG -> {
+                final var read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
+                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
+            }
+            case NONCONFIG -> readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
+        };
     }
 
     /**
@@ -125,37 +115,24 @@ public final class ReadDataTransactionUtil {
             final @NonNull YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy,
             final @Nullable WithDefaultsParam withDefa, @NonNull final EffectiveModelContext ctx,
             final @NonNull List<YangInstanceIdentifier> fields) {
-        // FIXME: use a switch expression when they are available, removing source of RestconfDocumentedException
-        switch (content) {
-            case ALL:
-                return readAllData(strategy, path, withDefa, ctx, fields);
-            case CONFIG:
-                final NormalizedNode read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
-                    fields);
-                return withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
-            case NONCONFIG:
-                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, fields);
-            default:
-                throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                        "Invalid content parameter: " + content.paramValue(), null,
-                        "The content parameter value must be either config, nonconfig or all (default)"));
-        }
+        return switch (content) {
+            case ALL -> readAllData(strategy, path, withDefa, ctx, fields);
+            case CONFIG -> {
+                final var read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, fields);
+                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
+            }
+            case NONCONFIG -> readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, fields);
+        };
     }
 
     private static NormalizedNode prepareDataByParamWithDef(final NormalizedNode result,
             final YangInstanceIdentifier path, final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
-        boolean trim;
-        switch (withDefa) {
-            case TRIM:
-                trim = true;
-                break;
-            case EXPLICIT:
-                trim = false;
-                break;
-            default:
-                throw new RestconfDocumentedException("Unsupported with-defaults value " + withDefa.paramValue());
-        }
-
+        final boolean trim = switch (withDefa) {
+            case TRIM -> true;
+            case EXPLICIT -> false;
+            case REPORT_ALL, REPORT_ALL_TAGGED -> throw new RestconfDocumentedException(
+                "Unsupported with-defaults value " + withDefa.paramValue());
+        };
         final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
         final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.findChild(path).orElseThrow().getDataSchemaNode();
         if (result instanceof ContainerNode) {
