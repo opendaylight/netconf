@@ -15,7 +15,7 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
@@ -37,11 +37,10 @@ final class XmlStreamWriterWithDisabledValidation extends StreamWriterWithDisabl
     /**
      * Creation of the custom XML stream-writer.
      *
-     * @param schemaContextHandler Handler that holds actual schema context.
-     * @param outputStream         Output stream that is used for creation of JSON writers.
+     * @param databindContext {@link DatabindContext} to use
+     * @param outputStream    Output stream that is used for creation of JSON writers.
      */
-    XmlStreamWriterWithDisabledValidation(final SchemaContextHandler schemaContextHandler,
-            final OutputStream outputStream) {
+    XmlStreamWriterWithDisabledValidation(final DatabindContext databindContext, final OutputStream outputStream) {
         try {
             xmlWriter = XML_FACTORY.createXMLStreamWriter(outputStream, StandardCharsets.UTF_8.name());
         } catch (final XMLStreamException | FactoryConfigurationError e) {
@@ -49,7 +48,7 @@ final class XmlStreamWriterWithDisabledValidation extends StreamWriterWithDisabl
         }
 
         xmlNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
-            errorsContainerInference(schemaContextHandler));
+            errorsContainerInference(databindContext));
     }
 
     @Override

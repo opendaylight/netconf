@@ -23,7 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContextProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -51,9 +51,9 @@ import org.slf4j.LoggerFactory;
 public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(JsonNormalizedNodeBodyReader.class);
 
-    public JsonNormalizedNodeBodyReader(final SchemaContextHandler schemaContextHandler,
+    public JsonNormalizedNodeBodyReader(final DatabindContextProvider databindContextProvider,
             final DOMMountPointService mountPointService) {
-        super(schemaContextHandler, mountPointService);
+        super(databindContextProvider, mountPointService);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")

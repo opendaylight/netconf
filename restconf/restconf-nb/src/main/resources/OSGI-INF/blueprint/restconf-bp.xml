@@ -40,12 +40,12 @@
   </bean>
 
   <bean id="dataStreamApplication" class="org.opendaylight.restconf.nb.rfc8040.DataStreamApplication">
-    <argument ref="schemaContextHandler"/>
+    <argument ref="databindContextProvider"/>
     <argument ref="dOMMountPointService"/>
     <argument ref="restconfDataStreamServiceImpl"/>
   </bean>
   <bean id="restconfApplication" class="org.opendaylight.restconf.nb.rfc8040.RestconfApplication">
-    <argument ref="schemaContextHandler"/>
+    <argument ref="databindContextProvider"/>
     <argument ref="dOMMountPointService"/>
     <argument ref="dOMDataBroker"/>
     <argument ref="dOMRpcService"/>
@@ -75,6 +75,7 @@
     <argument ref="scheduledThreadPool"/>
     <argument ref="configuration"/>
   </bean>
+  <reference id="databindContextProvider" interface="org.opendaylight.restconf.nb.rfc8040.databind.DatabindContextProvider"/>
   <reference id="customFilterAdapterConfiguration" interface="org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration"/>
   <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
   <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
