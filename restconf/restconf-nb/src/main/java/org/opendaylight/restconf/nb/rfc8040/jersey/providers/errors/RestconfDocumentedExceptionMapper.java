@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.$YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -33,7 +34,7 @@ import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContextProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -63,17 +64,18 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private static final QName ERROR_PATH_QNAME = qnameOf("error-path");
     static final QName ERROR_INFO_QNAME = qnameOf("error-info");
 
+    private final DatabindContextProvider databindContextProvider;
+
     @Context
     private HttpHeaders headers;
-    private final SchemaContextHandler schemaContextHandler;
 
     /**
      * Initialization of the exception mapper.
      *
-     * @param schemaContextHandler Handler that provides actual schema context.
+     * @param databindContextProvider A {@link DatabindContextProvider}
      */
-    public RestconfDocumentedExceptionMapper(final SchemaContextHandler schemaContextHandler) {
-        this.schemaContextHandler = schemaContextHandler;
+    public RestconfDocumentedExceptionMapper(final DatabindContextProvider databindContextProvider) {
+        this.databindContextProvider = requireNonNull(databindContextProvider);
     }
 
     @Override
@@ -170,7 +172,8 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
              OutputStreamWriter streamStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
         ) {
             return writeNormalizedNode(errorsContainer, outputStream,
-                new JsonStreamWriterWithDisabledValidation(schemaContextHandler, streamStreamWriter));
+                new JsonStreamWriterWithDisabledValidation(databindContextProvider.currentDatabindContext(),
+                    streamStreamWriter));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output JSON writers", e);
         }
@@ -185,7 +188,8 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private String serializeErrorsContainerToXml(final ContainerNode errorsContainer) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             return writeNormalizedNode(errorsContainer, outputStream,
-                new XmlStreamWriterWithDisabledValidation(schemaContextHandler, outputStream));
+                new XmlStreamWriterWithDisabledValidation(databindContextProvider.currentDatabindContext(),
+                    outputStream));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output XML writers", e);
         }

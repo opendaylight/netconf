@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import java.io.IOException;
@@ -34,12 +33,12 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.LeafNodesOnlyParam;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.SkipNotificationDataParam;
 import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContextProvider;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.PatchCont1Builder;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice1.PatchCase1Builder;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
@@ -96,12 +95,11 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
-    private SchemaContextHandler schemaContextHandler;
+    private DatabindContextProvider databindContextProvider;
 
     @BeforeClass
     public static void beforeClass() {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResourceDirectory(
-                "/instanceidentifier/yang");
+        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/instanceidentifier/yang");
     }
 
     @AfterClass
@@ -113,9 +111,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void setUp() throws Exception {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
-
-        schemaContextHandler = new SchemaContextHandler(domDataBroker, mock(DOMSchemaService.class));
-        schemaContextHandler.onModelContextUpdated(SCHEMA_CONTEXT);
+        databindContextProvider = () -> DatabindContext.ofModel(SCHEMA_CONTEXT);
     }
 
     class ListenerAdapterTester extends ListenerAdapter {
@@ -208,7 +204,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void testJsonNotifsLeaves() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
             true, false);
-        adapter.setCloseVars(domDataBroker, schemaContextHandler);
+        adapter.setCloseVars(domDataBroker, databindContextProvider);
 
         final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
@@ -256,7 +252,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void testJsonNotifs() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
             false, false);
-        adapter.setCloseVars(domDataBroker, schemaContextHandler);
+        adapter.setCloseVars(domDataBroker, databindContextProvider);
 
         final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
@@ -288,7 +284,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void testJsonNotifsWithoutData() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
             false, true);
-        adapter.setCloseVars(domDataBroker, schemaContextHandler);
+        adapter.setCloseVars(domDataBroker, databindContextProvider);
 
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
@@ -318,7 +314,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void testXmlNotifications() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
             false, false);
-        adapter.setCloseVars(domDataBroker, schemaContextHandler);
+        adapter.setCloseVars(domDataBroker, databindContextProvider);
 
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
@@ -348,7 +344,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void testXmlSkipData() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
             false, true);
-        adapter.setCloseVars(domDataBroker, schemaContextHandler);
+        adapter.setCloseVars(domDataBroker, databindContextProvider);
 
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
@@ -378,7 +374,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void testXmlLeavesOnly() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
             true, false);
-        adapter.setCloseVars(domDataBroker, schemaContextHandler);
+        adapter.setCloseVars(domDataBroker, databindContextProvider);
 
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
