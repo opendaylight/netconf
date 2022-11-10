@@ -30,7 +30,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContextProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -62,9 +62,9 @@ import org.xml.sax.SAXException;
 public class XmlPatchBodyReader extends AbstractPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlPatchBodyReader.class);
 
-    public XmlPatchBodyReader(final SchemaContextHandler schemaContextHandler,
+    public XmlPatchBodyReader(final DatabindContextProvider databindContextProvider,
             final DOMMountPointService mountPointService) {
-        super(schemaContextHandler, mountPointService);
+        super(databindContextProvider, mountPointService);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")

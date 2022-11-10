@@ -59,7 +59,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
@@ -182,8 +182,7 @@ public class RestconfDataServiceImplTest {
                 .node(baseQName)
                 .build();
 
-        contextRef =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
+        contextRef = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
 
         doReturn(CommitInfo.emptyFluentFuture()).when(write).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
@@ -193,12 +192,8 @@ public class RestconfDataServiceImplTest {
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(write).when(mockDataBroker).newWriteOnlyTransaction();
 
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(
-                mockDataBroker, mock(DOMSchemaService.class));
-
-        schemaContextHandler.onModelContextUpdated(contextRef);
-        dataService = new RestconfDataServiceImpl(schemaContextHandler, mockDataBroker, mountPointService,
-                delegRestconfSubscrService, actionService, configuration);
+        dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(contextRef), mockDataBroker,
+                mountPointService, delegRestconfSubscrService, actionService, configuration);
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(contextRef))).when(mountPoint)
