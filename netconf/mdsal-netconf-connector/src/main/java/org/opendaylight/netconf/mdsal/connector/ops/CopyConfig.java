@@ -45,7 +45,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -193,7 +192,7 @@ public final class CopyConfig extends AbstractEdit {
         try {
             final XMLStreamWriter xmlWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
             final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
-                schemaContext.getCurrentContext(), SchemaPath.ROOT);
+                schemaContext.getCurrentContext());
 
             final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true);
             for (DataContainerChild child : data.body()) {
