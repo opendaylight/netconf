@@ -148,14 +148,14 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull NodeIdentifier NETCONF_CONFIG_NODEID = NodeIdentifier.create(NETCONF_CONFIG_QNAME);
 
     public static final @NonNull QName NETCONF_COMMIT_QNAME = QName.create(NETCONF_QNAME, "commit").intern();
-    public static final @NonNull SchemaPath NETCONF_COMMIT_PATH = toPath(NETCONF_COMMIT_QNAME);
+    public static final @NonNull Absolute NETCONF_COMMIT_PATH = toPath(NETCONF_COMMIT_QNAME);
     public static final @NonNull QName NETCONF_VALIDATE_QNAME = QName.create(NETCONF_QNAME, "validate").intern();
     public static final @NonNull NodeIdentifier NETCONF_VALIDATE_NODEID = NodeIdentifier.create(NETCONF_VALIDATE_QNAME);
-    public static final @NonNull SchemaPath NETCONF_VALIDATE_PATH = toPath(NETCONF_VALIDATE_QNAME);
+    public static final @NonNull Absolute NETCONF_VALIDATE_PATH = toPath(NETCONF_VALIDATE_QNAME);
     public static final @NonNull QName NETCONF_COPY_CONFIG_QNAME = QName.create(NETCONF_QNAME, "copy-config").intern();
     public static final @NonNull NodeIdentifier NETCONF_COPY_CONFIG_NODEID =
         NodeIdentifier.create(NETCONF_COPY_CONFIG_QNAME);
-    public static final @NonNull SchemaPath NETCONF_COPY_CONFIG_PATH = toPath(NETCONF_COPY_CONFIG_QNAME);
+    public static final @NonNull Absolute NETCONF_COPY_CONFIG_PATH = toPath(NETCONF_COPY_CONFIG_QNAME);
 
     public static final @NonNull QName NETCONF_OPERATION_QNAME = QName.create(NETCONF_QNAME, "operation").intern();
     private static final @NonNull QName NETCONF_OPERATION_QNAME_LEGACY =
@@ -167,18 +167,18 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull QName NETCONF_EDIT_CONFIG_QNAME = QName.create(NETCONF_QNAME, "edit-config").intern();
     public static final @NonNull NodeIdentifier NETCONF_EDIT_CONFIG_NODEID =
         NodeIdentifier.create(NETCONF_EDIT_CONFIG_QNAME);
-    public static final @NonNull SchemaPath NETCONF_EDIT_CONFIG_PATH = toPath(NETCONF_EDIT_CONFIG_QNAME);
+    public static final @NonNull Absolute NETCONF_EDIT_CONFIG_PATH = toPath(NETCONF_EDIT_CONFIG_QNAME);
     public static final @NonNull QName NETCONF_GET_CONFIG_QNAME = QName.create(NETCONF_QNAME, "get-config");
     public static final @NonNull NodeIdentifier NETCONF_GET_CONFIG_NODEID =
         NodeIdentifier.create(NETCONF_GET_CONFIG_QNAME);
-    public static final @NonNull SchemaPath NETCONF_GET_CONFIG_PATH = toPath(NETCONF_GET_CONFIG_QNAME);
+    public static final @NonNull Absolute NETCONF_GET_CONFIG_PATH = toPath(NETCONF_GET_CONFIG_QNAME);
     public static final @NonNull QName NETCONF_DISCARD_CHANGES_QNAME = QName.create(NETCONF_QNAME, "discard-changes");
-    public static final @NonNull SchemaPath NETCONF_DISCARD_CHANGES_PATH = toPath(NETCONF_DISCARD_CHANGES_QNAME);
+    public static final @NonNull Absolute NETCONF_DISCARD_CHANGES_PATH = toPath(NETCONF_DISCARD_CHANGES_QNAME);
     public static final @NonNull QName NETCONF_TYPE_QNAME = QName.create(NETCONF_QNAME, "type").intern();
     public static final @NonNull QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter").intern();
     public static final @NonNull QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get").intern();
     public static final @NonNull NodeIdentifier NETCONF_GET_NODEID = NodeIdentifier.create(NETCONF_GET_QNAME);
-    public static final @NonNull SchemaPath NETCONF_GET_PATH = toPath(NETCONF_GET_QNAME);
+    public static final @NonNull Absolute NETCONF_GET_PATH = toPath(NETCONF_GET_QNAME);
     public static final @NonNull QName NETCONF_RPC_QNAME = QName.create(NETCONF_QNAME, "rpc").intern();
     public static final QName YANG_QNAME = null;
     public static final URI NETCONF_ACTION_NAMESPACE = URI.create("urn:ietf:params:xml:ns:yang:1");
@@ -199,10 +199,10 @@ public final class NetconfMessageTransformUtil {
 
     public static final @NonNull QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
     public static final @NonNull NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);
-    public static final @NonNull SchemaPath NETCONF_LOCK_PATH = toPath(NETCONF_LOCK_QNAME);
+    public static final @NonNull Absolute NETCONF_LOCK_PATH = toPath(NETCONF_LOCK_QNAME);
     public static final @NonNull QName NETCONF_UNLOCK_QNAME = QName.create(NETCONF_QNAME, "unlock").intern();
     public static final @NonNull NodeIdentifier NETCONF_UNLOCK_NODEID = NodeIdentifier.create(NETCONF_UNLOCK_QNAME);
-    public static final @NonNull SchemaPath NETCONF_UNLOCK_PATH = toPath(NETCONF_UNLOCK_QNAME);
+    public static final @NonNull Absolute NETCONF_UNLOCK_PATH = toPath(NETCONF_UNLOCK_QNAME);
 
     public static final @NonNull NodeIdentifier EDIT_CONTENT_NODEID = NodeIdentifier.create(EditContent.QNAME);
 
@@ -222,7 +222,7 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull ContainerNode CREATE_SUBSCRIPTION_RPC_CONTENT = Builders.containerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(CREATE_SUBSCRIPTION_RPC_QNAME)).build();
 
-    public static final @NonNull SchemaPath CREATE_SUBSCRIPTION_RPC_PATH = toPath(CREATE_SUBSCRIPTION_RPC_QNAME);
+    public static final @NonNull Absolute CREATE_SUBSCRIPTION_RPC_PATH = toPath(CREATE_SUBSCRIPTION_RPC_QNAME);
 
     public static final @NonNull NodeIdentifier NETCONF_FILTER_NODEID = NodeIdentifier.create(NETCONF_FILTER_QNAME);
 
@@ -239,7 +239,7 @@ public final class NetconfMessageTransformUtil {
                                                        final EffectiveModelContext ctx) {
         final Element element = getNetconfFilterElement();
         try {
-            NetconfUtil.writeFilter(identifier, new DOMResult(element), SchemaPath.ROOT, ctx);
+            NetconfUtil.writeFilter(identifier, new DOMResult(element), ctx, null);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize filter element for path " + identifier, e);
         }
@@ -261,7 +261,7 @@ public final class NetconfMessageTransformUtil {
 
         for (final FieldsFilter filter : fieldsFilters) {
             try {
-                NetconfUtil.writeFilter(filter.path(), new DOMResult(element), SchemaPath.ROOT, ctx, filter.fields());
+                NetconfUtil.writeFilter(filter.path(), new DOMResult(element), ctx, null, filter.fields());
             } catch (IOException | XMLStreamException e) {
                 throw new IllegalStateException(String.format(
                         "Unable to serialize filter element for path %s with fields: %s",
@@ -385,10 +385,9 @@ public final class NetconfMessageTransformUtil {
                         nnWriter.write(lastChildOverride.get());
                     }
                 }
-                NetconfUtil.writeNormalizedNode(result.getResult(), metadata, new DOMResult(element),
-                        SchemaPath.ROOT, ctx);
+                NetconfUtil.writeNormalizedNode(result.getResult(), metadata, new DOMResult(element), ctx, null);
             } else {
-                NetconfUtil.writeNormalizedNode(dataPath, metadata, new DOMResult(element), SchemaPath.ROOT, ctx);
+                NetconfUtil.writeNormalizedNode(dataPath, metadata, new DOMResult(element), ctx, null);
             }
         } catch (final IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
@@ -429,8 +428,8 @@ public final class NetconfMessageTransformUtil {
                 .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride)).build();
     }
 
-    public static @NonNull SchemaPath toPath(final QName rpc) {
-        return SchemaPath.ROOT.createChild(rpc);
+    public static @NonNull Absolute toPath(final QName rpc) {
+        return Absolute.of(rpc);
     }
 
     public static Map.Entry<Instant, XmlElement> stripNotification(final NetconfMessage message) {

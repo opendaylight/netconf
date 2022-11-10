@@ -46,7 +46,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
 import org.opendaylight.yangtools.yang.binding.Notification;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -276,10 +276,9 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     }
 
     private static class BaseNotificationPublisherReg implements BaseNotificationPublisherRegistration {
-
-        static final SchemaPath CAPABILITY_CHANGE_SCHEMA_PATH = SchemaPath.create(true, NetconfCapabilityChange.QNAME);
-        static final SchemaPath SESSION_START_PATH = SchemaPath.create(true, NetconfSessionStart.QNAME);
-        static final SchemaPath SESSION_END_PATH = SchemaPath.create(true, NetconfSessionEnd.QNAME);
+        static final Absolute CAPABILITY_CHANGE_SCHEMA_PATH = Absolute.of(NetconfCapabilityChange.QNAME);
+        static final Absolute SESSION_START_PATH = Absolute.of(NetconfSessionStart.QNAME);
+        static final Absolute SESSION_END_PATH = Absolute.of(NetconfSessionEnd.QNAME);
 
         private final NotificationPublisherRegistration baseRegistration;
         private final NotificationsTransformUtil transformUtil;
@@ -295,7 +294,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             baseRegistration.close();
         }
 
-        private NetconfNotification serializeNotification(final Notification notification, final SchemaPath path) {
+        private NetconfNotification serializeNotification(final Notification<?> notification, final Absolute path) {
             return transformUtil.transform(notification, path);
         }
 
@@ -317,8 +316,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     }
 
     private static class YangLibraryPublisherReg implements YangLibraryPublisherRegistration {
-        static final SchemaPath YANG_LIBRARY_CHANGE_PATH = SchemaPath.create(true, YangLibraryChange.QNAME);
-        static final SchemaPath YANG_LIBRARY_UPDATE_PATH = SchemaPath.create(true, YangLibraryUpdate.QNAME);
+        static final Absolute YANG_LIBRARY_CHANGE_PATH = Absolute.of(YangLibraryChange.QNAME);
+        static final Absolute YANG_LIBRARY_UPDATE_PATH = Absolute.of(YangLibraryUpdate.QNAME);
 
         private final NotificationPublisherRegistration baseRegistration;
         private final NotificationsTransformUtil transformUtil;
