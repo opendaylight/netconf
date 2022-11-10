@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 
 import java.io.IOException;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Errors;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.ForwardingNormalizedNodeStreamWriter;
@@ -76,8 +76,8 @@ abstract class StreamWriterWithDisabledValidation extends ForwardingNormalizedNo
      */
     abstract void endNodeWithDisabledValidation() throws IOException;
 
-    static final Inference errorsContainerInference(final SchemaContextHandler schemaContextHandler) {
-        final var stack = SchemaInferenceStack.of(schemaContextHandler.get());
+    static final Inference errorsContainerInference(final DatabindContext databindContext) {
+        final var stack = SchemaInferenceStack.of(databindContext.modelContext());
         stack.enterGrouping(Errors.QNAME);
         return stack.toInference();
     }

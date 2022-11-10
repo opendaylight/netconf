@@ -24,7 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -57,9 +57,9 @@ import org.xml.sax.SAXException;
 public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
 
-    public XmlNormalizedNodeBodyReader(final SchemaContextHandler schemaContextHandler,
+    public XmlNormalizedNodeBodyReader(final DatabindProvider databindProvider,
             final DOMMountPointService mountPointService) {
-        super(schemaContextHandler, mountPointService);
+        super(databindProvider, mountPointService);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")

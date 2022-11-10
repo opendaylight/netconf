@@ -11,7 +11,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
@@ -19,9 +19,9 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
  * Common superclass for readers producing {@link NormalizedNodePayload}.
  */
 abstract class AbstractNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider<NormalizedNodePayload> {
-    AbstractNormalizedNodeBodyReader(final SchemaContextHandler schemaContextHandler,
+    AbstractNormalizedNodeBodyReader(final DatabindProvider databindProvider,
             final DOMMountPointService mountPointService) {
-        super(schemaContextHandler, mountPointService);
+        super(databindProvider, mountPointService);
     }
 
     public final void injectParams(final UriInfo uriInfo, final Request request) {
