@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc010ca4_8145e850",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-11-10T09:09:46Z",
+      "side": 1,
+      "message": "Do we need to have complete `Module` process to be in `try-catch`? Cannot we just log warning/error when we are not able to parse features?\n\nIn addition, if we eliminate blocking call we do not need this catch. There as multiple async block here thus is should be doable.",
+      "revId": "fb3fb0946f3326889b6955246377941aba2cf00f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b36e736c_f7b02fab",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-11-10T09:09:46Z",
+      "side": 1,
+      "message": "Try to use async call if possible. And rework another logic as necessary.",
+      "revId": "fb3fb0946f3326889b6955246377941aba2cf00f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1763adcd_fc361e74",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-11-10T09:09:46Z",
+      "side": 1,
+      "message": "Can we test something reals instead of empty set?",
+      "revId": "fb3fb0946f3326889b6955246377941aba2cf00f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
