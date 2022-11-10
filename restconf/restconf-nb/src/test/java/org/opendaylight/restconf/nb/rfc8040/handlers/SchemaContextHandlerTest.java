@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -54,6 +55,8 @@ public class SchemaContextHandlerTest {
 
     @Mock
     private DOMSchemaService mockDOMSchemaService;
+    @Mock
+    private ListenerRegistration<?> mockListenerReg;
 
     @BeforeClass
     public static void beforeClass() throws FileNotFoundException {
@@ -73,7 +76,10 @@ public class SchemaContextHandlerTest {
         doReturn(wTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
+        doReturn(mockListenerReg).when(mockDOMSchemaService).registerSchemaContextListener(any());
+
         schemaContextHandler = new SchemaContextHandler(dataBroker, mockDOMSchemaService);
+        verify(mockDOMSchemaService).registerSchemaContextListener(schemaContextHandler);
 
         schemaContextHandler.onModelContextUpdated(SCHEMA_CONTEXT);
     }
@@ -83,16 +89,7 @@ public class SchemaContextHandlerTest {
      */
     @Test
     public void testInitAndClose() {
-        ListenerRegistration<?> mockListenerReg = mock(ListenerRegistration.class);
-        doReturn(mockListenerReg).when(mockDOMSchemaService)
-            .registerSchemaContextListener(schemaContextHandler);
-
-        schemaContextHandler.init();
-
-        verify(mockDOMSchemaService).registerSchemaContextListener(schemaContextHandler);
-
         schemaContextHandler.close();
-
         verify(mockListenerReg).close();
     }
 

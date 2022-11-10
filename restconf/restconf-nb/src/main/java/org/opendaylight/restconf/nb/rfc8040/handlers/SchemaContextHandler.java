@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -67,6 +66,9 @@ import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +79,8 @@ import org.slf4j.LoggerFactory;
 //        should live in MD-SAL and be a dynamic store fragment. As a first step we should be turning this into a
 //        completely standalone application.
 @Singleton
-public class SchemaContextHandler implements EffectiveModelContextListener, AutoCloseable {
+@Component(service = { })
+public final class SchemaContextHandler implements EffectiveModelContextListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
 
     @VisibleForTesting
@@ -96,31 +99,24 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
     private static final NodeIdentifier MODULE_SCHEMA_NODEID =
         NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "schema").intern());
 
-    private final AtomicInteger moduleSetId = new AtomicInteger(0);
-
+    private final AtomicInteger moduleSetId = new AtomicInteger();
     private final DOMDataBroker domDataBroker;
-    private final DOMSchemaService domSchemaService;
-    private Registration listenerRegistration;
+    private final Registration listenerRegistration;
 
     private volatile EffectiveModelContext schemaContext;
 
     @Inject
+    @Activate
     public SchemaContextHandler(final DOMDataBroker domDataBroker, final DOMSchemaService domSchemaService) {
         this.domDataBroker = requireNonNull(domDataBroker);
-        this.domSchemaService = requireNonNull(domSchemaService);
-    }
-
-    @PostConstruct
-    public void init() {
         listenerRegistration = domSchemaService.registerSchemaContextListener(this);
     }
 
-    @Override
     @PreDestroy
+    @Deactivate
+    @Override
     public void close() {
-        if (listenerRegistration != null) {
-            listenerRegistration.close();
-        }
+        listenerRegistration.close();
     }
 
     @Override
