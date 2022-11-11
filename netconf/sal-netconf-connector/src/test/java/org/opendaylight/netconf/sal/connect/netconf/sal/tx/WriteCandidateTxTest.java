@@ -20,8 +20,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractTestModelTest;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class WriteCandidateTxTest extends AbstractTestModelTest {
     @Mock
-    private DOMRpcService rpc;
+    private Rpcs.Normalized rpc;
     private NetconfBaseOps netconfOps;
     private RemoteDeviceId id;
 

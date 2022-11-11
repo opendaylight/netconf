@@ -22,8 +22,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class FieldsAwareReadOnlyTxTest {
     @Mock
-    private DOMRpcService rpc;
+    private Rpcs.Normalized rpc;
     @Mock
     private ContainerNode mockedNode;
 

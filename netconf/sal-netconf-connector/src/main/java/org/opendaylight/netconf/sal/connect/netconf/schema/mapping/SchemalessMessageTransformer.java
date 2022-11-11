@@ -84,17 +84,12 @@ public class SchemalessMessageTransformer implements MessageTransformer {
      */
     @Override
     public DOMRpcResult toRpcResult(final NetconfMessage rpcReply, final QName rpc) {
-        final Document document = rpcReply.getDocument();
-        final DOMSourceAnyxmlNode result;
-        if (BaseRpcSchemalessTransformer.isOkPresent(document)) {
-            result =  null;
-        } else {
-            result = Builders.anyXmlBuilder()
-                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
-                    .withValue(new DOMSource(rpcReply.getDocument()))
-                    .build();
-        }
-        return new DefaultDOMRpcResult(result);
+        final var document = rpcReply.getDocument();
+        return new DefaultDOMRpcResult(BaseRpcSchemalessTransformer.isOkPresent(document) ? null
+            : Builders.anyXmlBuilder()
+                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
+                .withValue(new DOMSource(document))
+                .build());
     }
 
     private void wrapPayload(final Document doc) {

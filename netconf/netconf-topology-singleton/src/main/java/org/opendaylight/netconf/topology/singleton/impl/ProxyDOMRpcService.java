@@ -18,8 +18,8 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.Collection;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
 
-public class ProxyDOMRpcService implements DOMRpcService {
+public class ProxyDOMRpcService implements Rpcs.Normalized {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyDOMRpcService.class);
 
     private final ActorRef masterActorRef;

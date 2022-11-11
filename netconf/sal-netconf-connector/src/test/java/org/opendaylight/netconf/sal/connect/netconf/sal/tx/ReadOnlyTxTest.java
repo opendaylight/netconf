@@ -21,8 +21,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ReadOnlyTxTest {
     @Mock
-    private DOMRpcService rpc;
+    private Rpcs.Normalized rpc;
     @Mock
     private ContainerNode mockedNode;
 
