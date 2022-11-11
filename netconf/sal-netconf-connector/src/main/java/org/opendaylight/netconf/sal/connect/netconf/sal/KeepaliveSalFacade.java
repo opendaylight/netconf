@@ -29,9 +29,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -121,7 +121,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         final var kaAction = devAction;
 
         salFacade.onDeviceConnected(deviceSchema, sessionPreferences,
-            new RemoteDeviceServices(new KeepaliveDOMRpcService(services.rpcs()), kaAction));
+            new RemoteDeviceServices(KeepaliveDOMRpcService.of(services.rpcs()), kaAction));
 
         LOG.debug("{}: Netconf session initiated, starting keepalives", id);
         LOG.trace("{}: Scheduling keepalives every {}s", id, keepaliveDelaySeconds);
@@ -271,24 +271,24 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
      * Request timeout task is called once the requestTimeoutMillis is reached. At that moment, if the request is not
      * yet finished, we cancel it.
      */
-    private final class RequestTimeoutTask implements FutureCallback<DOMRpcResult>, Runnable {
-        private final @NonNull SettableFuture<DOMRpcResult> userFuture = SettableFuture.create();
-        private final @NonNull ListenableFuture<? extends DOMRpcResult> deviceFuture;
+    private final class RequestTimeoutTask<V> implements FutureCallback<V>, Runnable {
+        private final @NonNull SettableFuture<V> userFuture = SettableFuture.create();
+        private final @NonNull ListenableFuture<? extends V> rpcResultFuture;
 
-        RequestTimeoutTask(final ListenableFuture<? extends DOMRpcResult> rpcResultFuture) {
-            deviceFuture = requireNonNull(rpcResultFuture);
-            Futures.addCallback(deviceFuture, this, MoreExecutors.directExecutor());
+        RequestTimeoutTask(final ListenableFuture<V> rpcResultFuture) {
+            this.rpcResultFuture = requireNonNull(rpcResultFuture);
+            Futures.addCallback(rpcResultFuture, this, MoreExecutors.directExecutor());
         }
 
         @Override
         public void run() {
-            deviceFuture.cancel(true);
+            rpcResultFuture.cancel(true);
             userFuture.cancel(false);
             keepaliveTask.enableKeepalive();
         }
 
         @Override
-        public void onSuccess(final DOMRpcResult result) {
+        public void onSuccess(final V result) {
             // No matter what response we got,
             // rpc-reply or rpc-error, we got it from device so the netconf session is OK.
             userFuture.set(result);
@@ -307,36 +307,45 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     }
 
     /**
-     * DOMRpcService proxy that attaches reset-keepalive-task and schedule
-     * request-timeout-task to each RPC invocation.
+     * Proxy for {@link Rpcs} which attaches a reset-keepalive-task and schedule request-timeout-task to each RPC
+     * invocation.
      */
-    public final class KeepaliveDOMRpcService implements DOMRpcService {
-        private final @NonNull DOMRpcService deviceRpc;
+    public abstract sealed class KeepaliveDOMRpcService {
+        private final class Normalized extends KeepaliveDOMRpcService implements Rpcs.Normalized {
+            private final Rpcs.Normalized delegate;
 
-        KeepaliveDOMRpcService(final DOMRpcService deviceRpc) {
-            this.deviceRpc = requireNonNull(deviceRpc);
+            Normalized(final Rpcs.Normalized delegate) {
+                this.delegate = requireNonNull(delegate);
+            }
+
+            @Override
+            public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+                // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
+                keepaliveTask.disableKeepalive();
+                return scheduleTimeout(delegate.invokeRpc(type, input));
+            }
+
+            @Override
+            public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
+                    final T rpcListener) {
+                // There is no real communication with the device (yet), hence no recordActivity() or anything
+                return delegate.registerRpcListener(rpcListener);
+            }
         }
 
-        public @NonNull DOMRpcService getDeviceRpc() {
-            return deviceRpc;
+        private final class Schemaless extends KeepaliveDOMRpcService implements Rpcs.SchemaLess {
+            private final Rpcs.SchemaLess delegate;
+
+            Schemaless(final Rpcs.SchemaLess delegate) {
+                this.delegate = requireNonNull(delegate);
+            }
         }
 
-        @Override
-        public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
-            keepaliveTask.disableKeepalive();
-            final ListenableFuture<? extends DOMRpcResult> deviceFuture = deviceRpc.invokeRpc(type, input);
-
-            final RequestTimeoutTask timeout = new RequestTimeoutTask(deviceFuture);
+        private <T> ListenableFuture<T> scheduleTimeout(final ListenableFuture<T> invokeFuture) {
+            final var timeout = new RequestTimeoutTask<>(invokeFuture);
             final ScheduledFuture<?> timeoutFuture = executor.schedule(timeout, timeoutNanos, TimeUnit.NANOSECONDS);
-            deviceFuture.addListener(() -> timeoutFuture.cancel(false), MoreExecutors.directExecutor());
-
+            invokeFuture.addListener(() -> timeoutFuture.cancel(false), MoreExecutors.directExecutor());
             return timeout.userFuture;
-        }
-
-        @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T rpcListener) {
-            // There is no real communication with the device (yet), hence recordActivity() or anything
-            return deviceRpc.registerRpcListener(rpcListener);
         }
     }
 }
