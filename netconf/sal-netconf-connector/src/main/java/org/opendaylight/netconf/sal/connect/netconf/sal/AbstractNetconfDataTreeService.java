@@ -22,10 +22,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
@@ -160,7 +160,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     }
 
     public static @NonNull AbstractNetconfDataTreeService of(final RemoteDeviceId id,
-            final MountPointContext mountContext, final DOMRpcService rpc,
+            final MountPointContext mountContext, final Rpcs.Normalized rpc,
             final NetconfSessionPreferences netconfSessionPreferences) {
         final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mountContext);
         final boolean rollbackSupport = netconfSessionPreferences.isRollbackSupported();

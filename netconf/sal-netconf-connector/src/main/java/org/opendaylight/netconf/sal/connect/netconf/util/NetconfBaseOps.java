@@ -50,10 +50,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.ModifyAction;
-import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade.KeepaliveDOMRpcService;
-import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.input.source.ConfigSource;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
@@ -79,20 +77,14 @@ public final class NetconfBaseOps {
     private static final LeafNode<String> NETCONF_ERROR_OPTION_ROLLBACK =
         ImmutableNodes.leafNode(NETCONF_ERROR_OPTION_NODEID, ROLLBACK_ON_ERROR_OPTION);
 
-    private final DOMRpcService rpc;
+    private final Rpcs.Normalized rpc;
     private final MountPointContext mountContext;
     private final RpcStructureTransformer transformer;
 
-    public NetconfBaseOps(final DOMRpcService rpc, final MountPointContext mountContext) {
+    public NetconfBaseOps(final Rpcs.Normalized rpc, final MountPointContext mountContext) {
         this.rpc = requireNonNull(rpc);
         this.mountContext = requireNonNull(mountContext);
-
-        if (rpc instanceof KeepaliveDOMRpcService keepAlive
-            && keepAlive.getDeviceRpc() instanceof SchemalessNetconfDeviceRpc) {
-            transformer = new SchemalessRpcStructureTransformer();
-        } else {
-            transformer = new NetconfRpcStructureTransformer(mountContext);
-        }
+        transformer = new NetconfRpcStructureTransformer(mountContext);
     }
 
     public ListenableFuture<? extends DOMRpcResult> lock(final FutureCallback<DOMRpcResult> callback,
@@ -280,11 +272,10 @@ public final class NetconfBaseOps {
 
     public ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
             final Optional<YangInstanceIdentifier> filterPath) {
-        return addCallback(requireNonNull(callback),
-            rpc.invokeRpc(NETCONF_GET_QNAME, nonEmptyFilter(filterPath)
-                .map(path -> NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
-                    toFilterStructure(path, mountContext.getEffectiveModelContext())))
-                .orElse(NetconfMessageTransformUtil.GET_RPC_CONTENT)));
+        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_GET_QNAME, nonEmptyFilter(filterPath)
+            .map(path -> NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
+                toFilterStructure(path, mountContext.getEffectiveModelContext())))
+            .orElse(NetconfMessageTransformUtil.GET_RPC_CONTENT)));
     }
 
     private ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,

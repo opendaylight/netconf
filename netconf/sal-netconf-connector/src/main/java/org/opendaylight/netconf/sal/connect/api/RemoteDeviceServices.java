@@ -17,8 +17,41 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 /**
  * Set of interfaces exposed by a {@link RemoteDevice}.
  */
-public record RemoteDeviceServices(@NonNull DOMRpcService rpcs, @Nullable DOMActionService actions) {
+public record RemoteDeviceServices(@NonNull Rpcs rpcs, @Nullable Actions actions) {
     public RemoteDeviceServices {
         requireNonNull(rpcs);
+    }
+
+    /**
+     * Interface exposing NETCONF device RPC service. This interface is never implemented directly, but rather through
+     * its {@code non-sealed} specializations.
+     */
+    public sealed interface Rpcs permits Rpcs.Normalized, Rpcs.Schemaless {
+        /**
+         * NETCONF device RPCs operating just as any other {@link DOMRpcService}.
+         */
+        non-sealed interface Normalized extends Rpcs, DOMRpcService {
+            // Just an interface combination
+        }
+
+        /**
+         * NETCONF device RPCs operating in terms of {@link SchemalessRpcService}.
+         */
+        non-sealed interface Schemaless extends Rpcs, SchemalessRpcService {
+            // Just an interface combination
+        }
+    }
+
+    /**
+     * Interface exposing NETCONF device Action service. This interface is never implemented directly, but rather
+     * through its {@code non-sealed} specializations.
+     */
+    public sealed interface Actions permits Actions.Normalized {
+        /**
+         * NETCONF device RPCs operating just as any other {@link DOMActionService}.
+         */
+        non-sealed interface Normalized extends Actions, DOMActionService {
+            // Just an interface combination
+        }
     }
 }
