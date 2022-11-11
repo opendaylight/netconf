@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * Transforms base netconf RPCs.
  */
-public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfMessage> {
+public class BaseRpcSchemalessTransformer implements MessageTransformer {
     private final ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
     private final EffectiveModelContext modelContext;
     private final MessageCounter counter;

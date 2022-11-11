@@ -37,11 +37,11 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 public final class NetconfDeviceRpc implements DOMRpcService {
     private final RemoteDeviceCommunicator communicator;
-    private final MessageTransformer<NetconfMessage> transformer;
+    private final MessageTransformer transformer;
     private final SchemaContext schemaContext;
 
     public NetconfDeviceRpc(final SchemaContext schemaContext, final RemoteDeviceCommunicator communicator,
-            final MessageTransformer<NetconfMessage> transformer) {
+            final MessageTransformer transformer) {
         this.communicator = communicator;
         this.transformer = transformer;
         this.schemaContext = requireNonNull(schemaContext);

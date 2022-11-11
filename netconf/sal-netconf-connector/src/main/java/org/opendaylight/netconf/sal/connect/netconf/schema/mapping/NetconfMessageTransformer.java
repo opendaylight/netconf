@@ -100,7 +100,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class NetconfMessageTransformer implements MessageTransformer<NetconfMessage> {
+public class NetconfMessageTransformer implements MessageTransformer {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
     private static final ImmutableSet<XMLNamespace> BASE_OR_NOTIFICATION_NS = ImmutableSet.of(
@@ -235,16 +235,14 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private NestedNotificationInfo traverseXmlNodeContainingNotification(final Node xmlNode,
             final SchemaNode schemaNode, final List<QName> schemaBuilder,
             final InstanceIdentifierBuilder instanceBuilder) {
-        if (schemaNode instanceof ContainerSchemaNode) {
-            final var containerSchema = (ContainerSchemaNode) schemaNode;
+        if (schemaNode instanceof ContainerSchemaNode containerSchema) {
             instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
             schemaBuilder.add(containerSchema.getQName());
 
             Entry<Node, SchemaNode> xmlContainerChildPair = findXmlContainerChildPair(xmlNode, containerSchema);
             return traverseXmlNodeContainingNotification(xmlContainerChildPair.getKey(),
                     xmlContainerChildPair.getValue(), schemaBuilder, instanceBuilder);
-        } else if (schemaNode instanceof ListSchemaNode) {
-            final var listSchema = (ListSchemaNode) schemaNode;
+        } else if (schemaNode instanceof ListSchemaNode listSchema) {
             instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
             schemaBuilder.add(listSchema.getQName());
 
