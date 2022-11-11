@@ -20,7 +20,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,10 +87,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NetconfDevice
         implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
-
-    @SuppressFBWarnings(value = "SLF4J_LOGGER_SHOULD_BE_PRIVATE",
-            justification = "Needed for common logging of related classes")
-    static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
 
     private static final QName RFC8528_SCHEMA_MOUNTS_QNAME = QName.create(
         SchemaMountConstants.RFC8528_MODULE, "schema-mounts").intern();

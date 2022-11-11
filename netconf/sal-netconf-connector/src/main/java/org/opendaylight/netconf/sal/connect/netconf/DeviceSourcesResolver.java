@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.LOG;
 
 import com.google.common.collect.Sets;
 import java.util.Set;
@@ -24,11 +23,15 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Schema building callable.
  */
 final class DeviceSourcesResolver implements Callable<DeviceSources> {
+    private static final Logger LOG = LoggerFactory.getLogger(DeviceSourcesResolver.class);
+
     private final NetconfSessionPreferences remoteSessionCapabilities;
     private final NetconfDeviceSchemasResolver stateSchemasResolver;
     private final NetconfDeviceRpc deviceRpc;
