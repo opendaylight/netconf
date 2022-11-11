@@ -27,7 +27,6 @@ import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceP
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
@@ -35,7 +34,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -86,8 +84,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private RemoteDeviceId id;
     private NetconfTopologySetup setup;
     private List<SourceIdentifier> sourceIdentifiers;
-    private DOMRpcService deviceRpc;
-    private DOMActionService deviceAction;
+    private RemoteDeviceServices deviceServices;
     private SlaveSalFacade slaveSalManager;
     private DOMDataBroker deviceDataBroker;
     private NetconfDataTreeService netconfService;
@@ -124,8 +121,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             netconfService = masterActorData.getNetconfDataTreeService();
             final DOMDataTreeReadTransaction tx = deviceDataBroker.newReadOnlyTransaction();
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
-            deviceRpc = masterActorData.getDeviceRpc();
-            deviceAction = masterActorData.getDeviceAction();
+            deviceServices = masterActorData.getDeviceServices();
 
             sender().tell(new MasterActorDataInitialized(), self());
             LOG.debug("{}: Master is ready.", id);

@@ -13,29 +13,27 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
  * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
  */
-public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
-
+public final class SchemalessNetconfDeviceRpc implements Rpcs.Schemaless {
     private final RemoteDeviceCommunicator listener;
     private final BaseRpcSchemalessTransformer baseRpcTransformer;
     private final SchemalessMessageTransformer schemalessTransformer;
@@ -51,7 +49,15 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     }
 
     @Override
-    public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+    public ListenableFuture<? extends DOMRpcResult> invokeBase(final QName type, final ContainerNode input) {
+        if (!isBaseRpc(type)) {
+            throw new IllegalArgumentException("Cannot handle " + type);
+        }
+        return handleRpc(type, input, baseRpcTransformer);
+    }
+
+    @Override
+    public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
         final MessageTransformer transformer;
         if (input instanceof DOMSourceAnyxmlNode) {
             transformer = schemalessTransformer;
@@ -64,13 +70,11 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
         return handleRpc(type, input, transformer);
     }
 
-    private ListenableFuture<DOMRpcResult> handleRpc(final @NonNull QName type, final @NonNull NormalizedNode input,
-            final MessageTransformer transformer) {
-        final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = listener.sendRequest(
-            transformer.toRpcRequest(type, input), type);
-
-        final SettableFuture<DOMRpcResult> ret = SettableFuture.create();
-        Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
+    private @NonNull ListenableFuture<DOMRpcResult> handleRpc(final @NonNull QName type,
+            final @NonNull NormalizedNode input, final MessageTransformer transformer) {
+        final var delegateFuture = listener.sendRequest(transformer.toRpcRequest(type, input), type);
+        final var ret = SettableFuture.<DOMRpcResult>create();
+        Futures.addCallback(delegateFuture, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<NetconfMessage> result) {
                 ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
@@ -89,10 +93,5 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
 
     private static boolean isBaseRpc(final QName type) {
         return NetconfMessageTransformUtil.NETCONF_URI.equals(type.getNamespace());
-    }
-
-    @Override
-    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T lsnr) {
-        throw new UnsupportedOperationException("Not available for netconf 1.0");
     }
 }
