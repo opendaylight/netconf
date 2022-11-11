@@ -26,10 +26,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -54,9 +54,9 @@ public class KeepaliveSalFacadeTest {
     @Mock
     private NetconfDeviceCommunicator listener;
     @Mock
-    private DOMRpcService deviceRpc;
+    private Rpcs.Normalized deviceRpc;
 
-    private DOMRpcService proxyRpc;
+    private Rpcs proxyRpc;
 
     private KeepaliveSalFacade keepaliveSalFacade;
 
