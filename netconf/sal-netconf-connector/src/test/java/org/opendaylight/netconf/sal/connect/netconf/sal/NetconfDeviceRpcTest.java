@@ -60,7 +60,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     @Mock
     private DOMRpcAvailabilityListener listener;
     @Mock
-    private RemoteDeviceCommunicator<NetconfMessage> communicator;
+    private RemoteDeviceCommunicator communicator;
 
     private NetconfDeviceRpc rpc;
     private QName type;
@@ -99,7 +99,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     public void testDeadlock() throws Exception {
         // when rpc is successful, but transformer fails for some reason
         final MessageTransformer<NetconfMessage> failingTransformer = mock(MessageTransformer.class);
-        final RemoteDeviceCommunicator<NetconfMessage> communicatorMock = mock(RemoteDeviceCommunicator.class);
+        final RemoteDeviceCommunicator communicatorMock = mock(RemoteDeviceCommunicator.class);
         final NetconfMessage msg = null;
         final RpcResult<NetconfMessage> result = RpcResultBuilder.success(msg).build();
         when(communicatorMock.sendRequest(any(), any())).thenReturn(Futures.immediateFuture(result));

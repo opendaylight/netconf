@@ -39,11 +39,10 @@ import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
-
     private static final Logger LOG = LoggerFactory.getLogger(SchemalessNetconfDeviceRpcTest.class);
 
     @Mock
-    private RemoteDeviceCommunicator<NetconfMessage> listener;
+    private RemoteDeviceCommunicator listener;
 
     private SchemalessNetconfDeviceRpc deviceRpc;
 

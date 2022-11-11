@@ -29,7 +29,6 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -122,7 +121,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.encryptionService = encryptionService;
         this.baseSchemas = requireNonNull(baseSchemas);
 
-        this.keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
+        keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
     }
 
     @Override
@@ -205,11 +204,11 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade = createSalFacade(remoteDeviceId);
         if (keepaliveDelay > 0) {
             LOG.info("Adding keepalive facade, for device {}", nodeId);
-            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, this.keepaliveExecutor.getExecutor(),
+            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(),
                     keepaliveDelay, node.requireDefaultRequestTimeoutMillis().toJava());
         }
 
-        final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
+        final RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> device;
         final List<SchemaSourceRegistration<?>> yanglibRegistrations;
         if (node.requireSchemaless()) {
             device = new SchemalessNetconfDevice(baseSchemas, remoteDeviceId, salFacade);
@@ -220,7 +219,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(reconnectOnChangedSchema)
                 .setSchemaResourcesDTO(resources)
-                .setGlobalProcessingExecutor(this.processingExecutor)
+                .setGlobalProcessingExecutor(processingExecutor)
                 .setId(remoteDeviceId)
                 .setSalFacade(salFacade)
                 .setNode(node)
@@ -337,11 +336,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
         if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                .rev150114.netconf.node.credentials.credentials.LoginPassword) {
-            final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                    .rev150114.netconf.node.credentials.credentials.LoginPassword loginPassword
-                    = (org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                    .rev150114.netconf.node.credentials.credentials.LoginPassword) credentials;
+                .rev150114.netconf.node.credentials.credentials.LoginPassword loginPassword) {
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         }
         if (credentials instanceof LoginPwUnencrypted) {
