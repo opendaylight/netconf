@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.api;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public interface DeviceActionFactory {
@@ -19,7 +21,7 @@ public interface DeviceActionFactory {
      * @param schemaContext - schema context of device
      * @return {@link DOMActionService} of specific device
      */
-    default DOMActionService createDeviceAction(final MessageTransformer messageTransformer,
+    default @Nullable Actions createDeviceAction(final MessageTransformer messageTransformer,
             final RemoteDeviceCommunicator listener, final SchemaContext schemaContext) {
         return null;
     }
