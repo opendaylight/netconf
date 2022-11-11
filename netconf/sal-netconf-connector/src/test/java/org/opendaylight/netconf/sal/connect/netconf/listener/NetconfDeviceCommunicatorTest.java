@@ -86,7 +86,7 @@ public class NetconfDeviceCommunicatorTest {
     NetconfClientSession mockSession;
 
     @Mock
-    RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> mockDevice;
+    RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> mockDevice;
 
     NetconfDeviceCommunicator communicator;
 
@@ -385,8 +385,7 @@ public class NetconfDeviceCommunicatorTest {
      */
     @Test
     public void testNetconfDeviceReconnectInCommunicator() {
-        final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device =
-                mock(RemoteDevice.class);
+        final RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> device = mock(RemoteDevice.class);
 
         final TimedReconnectStrategy timedReconnectStrategy =
                 new TimedReconnectStrategy(GlobalEventExecutor.INSTANCE, 10000, 0, 1.0, null, 100L, null);
