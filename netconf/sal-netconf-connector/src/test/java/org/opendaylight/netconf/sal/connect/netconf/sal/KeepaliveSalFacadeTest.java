@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
@@ -26,10 +28,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -53,9 +55,9 @@ public class KeepaliveSalFacadeTest {
     @Mock
     private NetconfDeviceCommunicator listener;
     @Mock
-    private DOMRpcService deviceRpc;
+    private Rpcs.Normalized deviceRpc;
 
-    private DOMRpcService proxyRpc;
+    private Rpcs proxyRpc;
 
     private KeepaliveSalFacade keepaliveSalFacade;
 
@@ -80,21 +82,20 @@ public class KeepaliveSalFacadeTest {
     public void testKeepaliveSuccess() throws Exception {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(Builders.containerBuilder()
             .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID)
-            .build()))).when(deviceRpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+            .build()))).when(deviceRpc).invokeNetconf(any(QName.class), any(ContainerNode.class));
 
         final var services = new RemoteDeviceServices(deviceRpc, null);
         keepaliveSalFacade.onDeviceConnected(null, null, services);
 
         verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class));
 
-        verify(deviceRpc, timeout(15000).times(5)).invokeRpc(any(QName.class), any(ContainerNode.class));
+        verify(deviceRpc, timeout(15000).times(5)).invokeNetconf(any(QName.class), any(ContainerNode.class));
     }
 
     @Test
     public void testKeepaliveRpcFailure() {
-
         doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("illegal-state")))
-                .when(deviceRpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+                .when(deviceRpc).invokeNetconf(any(QName.class), any(ContainerNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, new RemoteDeviceServices(deviceRpc, null));
 
@@ -102,7 +103,7 @@ public class KeepaliveSalFacadeTest {
 
         // Should disconnect the session
         verify(listener, timeout(15000).times(1)).disconnect();
-        verify(deviceRpc, times(1)).invokeRpc(any(QName.class), any(ContainerNode.class));
+        verify(deviceRpc, times(1)).invokeNetconf(any(QName.class), any(ContainerNode.class));
     }
 
     @Test
@@ -111,7 +112,7 @@ public class KeepaliveSalFacadeTest {
         final var rpcSuccessWithError = new DefaultDOMRpcResult(mock(RpcError.class));
 
         doReturn(FluentFutures.immediateFluentFuture(rpcSuccessWithError))
-                .when(deviceRpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+                .when(deviceRpc).invokeNetconf(any(QName.class), any(ContainerNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, new RemoteDeviceServices(deviceRpc, null));
 
@@ -119,7 +120,7 @@ public class KeepaliveSalFacadeTest {
 
         // Shouldn't disconnect the session
         verify(listener, times(0)).disconnect();
-        verify(deviceRpc, timeout(15000).times(1)).invokeRpc(any(QName.class), any(ContainerNode.class));
+        verify(deviceRpc, timeout(15000).times(1)).invokeNetconf(any(QName.class), any(ContainerNode.class));
     }
 
     @Test
@@ -136,7 +137,8 @@ public class KeepaliveSalFacadeTest {
 
         keepaliveSalFacade.onDeviceConnected(null, null, new RemoteDeviceServices(deviceRpc, null));
 
-        proxyRpc.invokeRpc(QName.create("foo", "bar"), mock(ContainerNode.class));
+        assertThat(proxyRpc, instanceOf(Rpcs.Normalized.class));
+        ((Rpcs.Normalized) proxyRpc).invokeRpc(QName.create("foo", "bar"), mock(ContainerNode.class));
 
         verify(listener, times(1)).disconnect();
     }

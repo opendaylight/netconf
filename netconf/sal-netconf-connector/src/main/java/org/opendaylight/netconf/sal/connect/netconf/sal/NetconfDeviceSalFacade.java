@@ -69,9 +69,8 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
         final var modelContext = mountContext.getEffectiveModelContext();
 
         final var deviceRpc = services.rpcs();
-        // FIXME: instanceof DOMRpcService, as it might be others
-        final var netconfDataBroker = new NetconfDeviceDataBroker(id, mountContext, deviceRpc, sessionPreferences);
         final var netconfDataTree = AbstractNetconfDataTreeService.of(id, mountContext, deviceRpc, sessionPreferences);
+        final var netconfDataBroker = new NetconfDeviceDataBroker(id, mountContext, deviceRpc, sessionPreferences);
         registerLockListener(netconfDataBroker, netconfDataTree);
 
         salProvider.getMountInstance().onTopologyDeviceConnected(modelContext, services, netconfDataBroker,

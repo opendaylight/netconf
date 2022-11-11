@@ -34,8 +34,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -45,9 +45,9 @@ import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -58,7 +58,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     private final RemoteDeviceId id = new RemoteDeviceId("test-mount", new InetSocketAddress(99));
 
     @Mock
-    private DOMRpcService rpc;
+    private Rpcs.Normalized rpc;
     private YangInstanceIdentifier yangIId;
 
     @Before
@@ -69,7 +69,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         doReturn(successFuture)
                 .doReturn(Futures.immediateFailedFuture(new IllegalStateException("Failed tx")))
                 .doReturn(successFuture)
-                .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+                .when(rpc).invokeNetconf(any(), any());
 
         yangIId = YangInstanceIdentifier.builder().node(NetconfState.QNAME).build();
     }
@@ -80,17 +80,17 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
                 false);
         final MapNode emptyList = ImmutableNodes.mapNodeBuilder(NETCONF_FILTER_QNAME).build();
         tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier
-                .create(new YangInstanceIdentifier.NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
+                .create(new NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
         tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier
-                .create(new YangInstanceIdentifier.NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
+                .create(new NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
 
-        verify(rpc, atMost(1)).invokeRpc(any(QName.class), any(ContainerNode.class));
+        verify(rpc, atMost(1)).invokeNetconf(any(), any());
     }
 
     @Test
     public void testDiscardChanges() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((ContainerNode) null)))
-                .when(rpc).invokeRpc(any(QName.class), isNull());
+                .when(rpc).invokeNetconf(any(), isNull());
 
         final var future = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false)
             .commit();
@@ -98,13 +98,13 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
         // verify discard changes was sent
         final InOrder inOrder = inOrder(rpc);
-        inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME,
+        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME,
             NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_NODEID));
-        inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME,
+        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME,
             NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
-        inOrder.verify(rpc).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME),
+        inOrder.verify(rpc).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME),
             isNull());
-        inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME,
+        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME,
             NetconfBaseOps.getUnLockContent(NETCONF_CANDIDATE_NODEID));
     }
 
@@ -112,7 +112,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     public void testFailedCommit() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null)))
             .doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(RpcResultBuilder.newError(ErrorType.APPLICATION,
-                new ErrorTag("a"), "m")))).when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+                new ErrorTag("a"), "m")))).when(rpc).invokeNetconf(any(), any());
 
         final var future = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false)
             .commit();
@@ -124,7 +124,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     public void testDiscardChangesNotSentWithoutCandidate() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((ContainerNode) null)))
                 .doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("Failed tx")))
-                .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+                .when(rpc).invokeNetconf(any(), any());
 
         final WriteRunningTx tx = new WriteRunningTx(id,
             new NetconfBaseOps(rpc, BASE_SCHEMAS.getBaseSchemaWithNotifications().getMountPointContext()), false);
@@ -133,18 +133,17 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         tx.commit();
         // verify discard changes was sent
         final InOrder inOrder = inOrder(rpc);
-        inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME,
+        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME,
                 NetconfBaseOps.getLockContent(NETCONF_RUNNING_NODEID));
-        inOrder.verify(rpc).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME),
-                any(ContainerNode.class));
-        inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME,
+        inOrder.verify(rpc).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), any());
+        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME,
                 NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_NODEID));
     }
 
     @Test
     public void testListenerSuccess() throws Exception {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((ContainerNode) null)))
-                .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+                .when(rpc).invokeNetconf(any(), any());
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BASE_SCHEMAS.getBaseSchema().getMountPointContext()), false);
         final TxListener listener = mock(TxListener.class);
@@ -160,7 +159,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     @Test
     public void testListenerCancellation() throws Exception {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((ContainerNode) null)))
-                .when(rpc).invokeRpc(any(QName.class), isNull());
+                .when(rpc).invokeNetconf(any(), isNull());
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BASE_SCHEMAS.getBaseSchema().getMountPointContext()), false);
         final TxListener listener = mock(TxListener.class);
@@ -176,8 +175,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     @Test
     public void testListenerFailure() throws Exception {
         final IllegalStateException cause = new IllegalStateException("Failed tx");
-        doReturn(FluentFutures.immediateFailedFluentFuture(cause))
-                .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+        doReturn(FluentFutures.immediateFailedFluentFuture(cause)).when(rpc).invokeNetconf(any(), any());
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BASE_SCHEMAS.getBaseSchema().getMountPointContext()), false);
         final TxListener listener = mock(TxListener.class);

@@ -30,11 +30,11 @@ import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.AbstractWriteTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateRunningTx;
@@ -56,7 +56,7 @@ public class NetconfDeviceDataBrokerTest {
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
     @Mock
-    private DOMRpcService rpcService;
+    private Rpcs.Normalized rpcService;
     private NetconfDeviceDataBroker dataBroker;
 
     @BeforeClass
@@ -72,7 +72,7 @@ public class NetconfDeviceDataBrokerTest {
     @Before
     public void setUp() throws Exception {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(rpcService)
-            .invokeRpc(any(QName.class), any(ContainerNode.class));
+            .invokeNetconf(any(QName.class), any(ContainerNode.class));
         dataBroker = getDataBroker(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
     }
 
@@ -80,21 +80,21 @@ public class NetconfDeviceDataBrokerTest {
     public void testNewReadOnlyTransaction() {
         final DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction();
         tx.read(LogicalDatastoreType.OPERATIONAL, null);
-        verify(rpcService).invokeRpc(eq(NETCONF_GET_QNAME), any(ContainerNode.class));
+        verify(rpcService).invokeNetconf(eq(NETCONF_GET_QNAME), any(ContainerNode.class));
     }
 
     @Test
     public void testNewReadWriteTransaction() {
         final DOMDataTreeReadWriteTransaction tx = dataBroker.newReadWriteTransaction();
         tx.read(LogicalDatastoreType.OPERATIONAL, null);
-        verify(rpcService).invokeRpc(eq(NETCONF_GET_QNAME), any(ContainerNode.class));
+        verify(rpcService).invokeNetconf(eq(NETCONF_GET_QNAME), any(ContainerNode.class));
     }
 
     @Test
     public void testWritableRunningCandidateWriteTransaction() {
-        testWriteTransaction(
-                WriteCandidateRunningTx.class, NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString(),
-                NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+        testWriteTransaction(WriteCandidateRunningTx.class,
+            NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString(),
+            NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
     }
 
     @Test
@@ -117,13 +117,13 @@ public class NetconfDeviceDataBrokerTest {
         final NetconfDOMFieldsReadTransaction roTx = fieldsExtension.newReadOnlyTransaction();
         roTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty(),
                 List.of(YangInstanceIdentifier.empty()));
-        verify(rpcService).invokeRpc(Mockito.eq(NETCONF_GET_CONFIG_QNAME), any(ContainerNode.class));
+        verify(rpcService).invokeNetconf(Mockito.eq(NETCONF_GET_CONFIG_QNAME), any(ContainerNode.class));
 
         // read-write transaction
         final NetconfDOMFieldsReadWriteTransaction rwTx = fieldsExtension.newReadWriteTransaction();
         rwTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty(),
                 List.of(YangInstanceIdentifier.empty()));
-        verify(rpcService).invokeRpc(Mockito.eq(NETCONF_GET_QNAME), any(ContainerNode.class));
+        verify(rpcService).invokeNetconf(Mockito.eq(NETCONF_GET_QNAME), any(ContainerNode.class));
     }
 
     private void testWriteTransaction(final Class<? extends AbstractWriteTx> transaction,

@@ -15,14 +15,18 @@ import akka.cluster.Cluster;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -31,7 +35,10 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
@@ -142,7 +149,30 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     protected DOMDataBroker newDeviceDataBroker(final MountPointContext mountContext,
             final NetconfSessionPreferences preferences) {
-        return new NetconfDeviceDataBroker(id, mountContext, deviceServices.rpcs(), preferences);
+        final Rpcs.Normalized normalizedRpcs;
+        final var deviceRpcs = deviceServices.rpcs();
+        if (deviceRpcs instanceof Rpcs.Normalized normalized) {
+            normalizedRpcs = normalized;
+        } else if (deviceRpcs instanceof Rpcs.Schemaless schemaless) {
+            normalizedRpcs = new Rpcs.Normalized() {
+                @Override
+                public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type,
+                        final NormalizedNode input) {
+                    return schemaless.invokeRpc(type, input);
+                }
+
+                @Override
+                public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
+                        final T listener) {
+                    // Should never be reached
+                    throw new UnsupportedOperationException();
+                }
+            };
+        } else {
+            throw new IllegalStateException("Unsupported RPC implementation " + deviceRpcs);
+        }
+
+        return new NetconfDeviceDataBroker(id, mountContext, normalizedRpcs, preferences);
     }
 
     protected NetconfDataTreeService newNetconfDataTreeService(final MountPointContext mountContext,
@@ -159,7 +189,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
         // send initial data to master actor
         return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, netconfService,
-            sourceIdentifiers, deviceServices.rpcs(), deviceServices.actions()), actorResponseWaitTime);
+            sourceIdentifiers, deviceServices), actorResponseWaitTime);
     }
 
     private void updateDeviceData() {

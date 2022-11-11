@@ -8,10 +8,9 @@
 package org.opendaylight.netconf.topology.singleton.messages;
 
 import java.util.List;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 
 /**
@@ -21,18 +20,16 @@ public class CreateInitialMasterActorData {
     private final DOMDataBroker deviceDataBroker;
     private final NetconfDataTreeService netconfService;
     private final List<SourceIdentifier> allSourceIdentifiers;
-    private final DOMRpcService deviceRpc;
-    private final DOMActionService deviceAction;
+    private final RemoteDeviceServices deviceServices;
 
     public CreateInitialMasterActorData(final DOMDataBroker deviceDataBroker,
                                         final NetconfDataTreeService netconfService,
                                         final List<SourceIdentifier> allSourceIdentifiers,
-                                        final DOMRpcService deviceRpc,final DOMActionService deviceAction) {
+                                        final RemoteDeviceServices deviceServices) {
         this.deviceDataBroker = deviceDataBroker;
         this.netconfService = netconfService;
         this.allSourceIdentifiers = allSourceIdentifiers;
-        this.deviceRpc = deviceRpc;
-        this.deviceAction = deviceAction;
+        this.deviceServices = deviceServices;
     }
 
     public DOMDataBroker getDeviceDataBroker() {
@@ -47,11 +44,7 @@ public class CreateInitialMasterActorData {
         return allSourceIdentifiers;
     }
 
-    public DOMRpcService getDeviceRpc() {
+    public RemoteDeviceServices getDeviceServices() {
         return deviceRpc;
-    }
-
-    public DOMActionService getDeviceAction() {
-        return deviceAction;
     }
 }
