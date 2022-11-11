@@ -25,6 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMActionServiceExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringActionException;
 import org.opendaylight.netconf.topology.singleton.messages.ContainerNodeMessage;
@@ -44,8 +45,7 @@ import scala.concurrent.Future;
  * Communicates action message {@link InvokeActionMessage} to {@link ActorSystem} using {@link ActorRef} and transforms
  * replied NETCONF message to action result, using {@link SimpleDOMActionResult}.
  */
-public class ProxyDOMActionService implements DOMActionService {
-
+public class ProxyDOMActionService implements Actions.Normalized {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyDOMActionService.class);
 
     private final RemoteDeviceId id;
