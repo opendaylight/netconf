@@ -5,10 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.handlers;
+package org.opendaylight.restconf.nb.rfc8040.legacy;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.$YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
@@ -20,25 +19,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.api.query.AbstractReplayParam;
-import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
-import org.opendaylight.restconf.api.query.DepthParam;
-import org.opendaylight.restconf.api.query.FieldsParam;
-import org.opendaylight.restconf.api.query.FilterParam;
-import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
-import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module.ConformanceType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
@@ -72,18 +59,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link SchemaContextHandler}.
+ * A component which maintains the state of {@code ietf-yang-library} inside the datastore.
  */
-// FIXME: this really is a service which is maintaining ietf-yang-library contents inside the datastore. It really
-//        should live in MD-SAL and be a dynamic store fragment. As a first step we should be turning this into a
-//        completely standalone application.
+// FIXME: this should be reconciled with the two other implementations we have.
 @Singleton
 @Component(service = { })
 public final class SchemaContextHandler implements EffectiveModelContextListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
-
-    @VisibleForTesting
-    static final @NonNull QName CAPABILITY_QNAME = qnameOf("capability");
 
     private static final NodeIdentifier MODULE_CONFORMANCE_NODEID =
         NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "conformance-type").intern());
@@ -127,10 +109,6 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
             putData(mapModulesByIetfYangLibraryYang(context.getModules(), context,
                 String.valueOf(moduleSetId.incrementAndGet())));
         }
-
-        if (schemaContext.findModuleStatement(RestconfState.QNAME.getModule()).isPresent()) {
-            putData(mapCapabilites());
-        }
     }
 
     @VisibleForTesting
@@ -162,33 +140,6 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
                 throw new RestconfDocumentedException("Problem occurred while putting data to DS.", failure);
             }
         }
-    }
-
-    /**
-     * Map capabilites by ietf-restconf-monitoring.
-     *
-     * @return mapped capabilites
-     */
-    @VisibleForTesting
-    static ContainerNode mapCapabilites() {
-        return Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(RestconfState.QNAME))
-            .withChild(Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(Capabilities.QNAME))
-                .withChild(Builders.<String>orderedLeafSetBuilder()
-                    .withNodeIdentifier(new NodeIdentifier(CAPABILITY_QNAME))
-                    .withChildValue(DepthParam.capabilityUri().toString())
-                    .withChildValue(FieldsParam.capabilityUri().toString())
-                    .withChildValue(FilterParam.capabilityUri().toString())
-                    .withChildValue(AbstractReplayParam.capabilityUri().toString())
-                    .withChildValue(WithDefaultsParam.capabilityUri().toString())
-                    .withChildValue(PrettyPrintParam.capabilityUri().toString())
-                    .withChildValue(LeafNodesOnlyParam.capabilityUri().toString())
-                    .withChildValue(SkipNotificationDataParam.capabilityUri().toString())
-                    .withChildValue(ChangedLeafNodesOnlyParam.capabilityUri().toString())
-                    .build())
-                .build())
-            .build();
     }
 
     /**
