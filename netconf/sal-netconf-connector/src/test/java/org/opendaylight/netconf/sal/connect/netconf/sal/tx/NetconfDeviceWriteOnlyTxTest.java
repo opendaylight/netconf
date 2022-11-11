@@ -34,8 +34,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -58,7 +58,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     private final RemoteDeviceId id = new RemoteDeviceId("test-mount", new InetSocketAddress(99));
 
     @Mock
-    private DOMRpcService rpc;
+    private Rpcs.Normalized rpc;
     private YangInstanceIdentifier yangIId;
 
     @Before
