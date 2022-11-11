@@ -16,11 +16,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceAccess;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -34,7 +34,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 /**
  * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
  */
-public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
+public final class SchemalessNetconfDeviceRpc implements RemoteDeviceAccess.OrgW3CDom {
 
     private final RemoteDeviceCommunicator<NetconfMessage> listener;
     private final BaseRpcSchemalessTransformer baseRpcTransformer;
@@ -48,7 +48,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
         this.deviceId = deviceId;
         this.listener = listener;
         this.baseRpcTransformer = baseRpcTransformer;
-        this.schemalessTransformer = messageTransformer;
+        schemalessTransformer = messageTransformer;
     }
 
     @Override

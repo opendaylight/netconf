@@ -19,12 +19,12 @@ import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DefaultDOMRpcException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceAccess;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 /**
  * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
  */
-public final class NetconfDeviceRpc implements DOMRpcService {
+public final class NetconfDeviceRpc implements RemoteDeviceAccess.Normalized {
     private final RemoteDeviceCommunicator<NetconfMessage> communicator;
     private final MessageTransformer<NetconfMessage> transformer;
     private final SchemaContext schemaContext;
