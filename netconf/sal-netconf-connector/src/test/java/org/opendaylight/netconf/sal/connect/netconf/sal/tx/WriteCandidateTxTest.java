@@ -13,6 +13,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,43 +21,43 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractTestModelTest;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
-import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class WriteCandidateTxTest extends AbstractTestModelTest {
+    private final RemoteDeviceId id =
+        new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));
+
     @Mock
-    private DOMRpcService rpc;
+    private Rpcs.Normalized rpc;
     private NetconfBaseOps netconfOps;
-    private RemoteDeviceId id;
 
     @Before
     public void setUp() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(rpc).invokeRpc(any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpc).invokeNetconf(any(), any());
         netconfOps = new NetconfBaseOps(rpc, new EmptyMountPointContext(SCHEMA_CONTEXT));
-        id = new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));
     }
 
     @Test
     public void testSubmit() throws Exception {
         final WriteCandidateTx tx = new WriteCandidateTx(id, netconfOps, true);
         //check, if lock is called
-        verify(rpc).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), any());
+        verify(rpc).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), any());
 
         tx.put(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId(), TxTestUtils.getContainerNode());
         tx.merge(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
         //check, if both edits are called
-        verify(rpc, times(2)).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), any());
+        verify(rpc, times(2)).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), any());
         tx.commit().get();
         //check, if unlock is called
-        verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME,
+        verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME,
                 NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
-        verify(rpc).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME), any());
+        verify(rpc).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME), any());
     }
 }
