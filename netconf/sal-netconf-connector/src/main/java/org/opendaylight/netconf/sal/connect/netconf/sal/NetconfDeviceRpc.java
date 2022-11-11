@@ -19,12 +19,12 @@ import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DefaultDOMRpcException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -33,9 +33,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
- * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
+ * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to
+ * {@link NormalizedNode}.
  */
-public final class NetconfDeviceRpc implements DOMRpcService {
+public final class NetconfDeviceRpc implements Rpcs.Normalized {
     private final RemoteDeviceCommunicator communicator;
     private final MessageTransformer transformer;
     private final EffectiveModelContext modelContext;

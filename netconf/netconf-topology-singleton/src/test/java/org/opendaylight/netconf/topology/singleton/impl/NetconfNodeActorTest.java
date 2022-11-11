@@ -86,6 +86,9 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
@@ -143,10 +146,10 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     private final SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository("master");
 
     @Mock
-    private DOMRpcService mockDOMRpcService;
+    private Rpcs.Normalized mockDOMRpcService;
 
     @Mock
-    private DOMActionService mockDOMActionService;
+    private Actions.Normalized mockDOMActionService;
 
     @Mock
     private DOMMountPointService mockMountPointService;
@@ -691,7 +694,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     private void initializeMaster(final List<SourceIdentifier> sourceIdentifiers) {
         masterRef.tell(new CreateInitialMasterActorData(mockDOMDataBroker, netconfService, sourceIdentifiers,
-                mockDOMRpcService, mockDOMActionService), testKit.getRef());
+                new RemoteDeviceServices(mockDOMRpcService, mockDOMActionService)), testKit.getRef());
         testKit.expectMsgClass(MasterActorDataInitialized.class);
     }
 

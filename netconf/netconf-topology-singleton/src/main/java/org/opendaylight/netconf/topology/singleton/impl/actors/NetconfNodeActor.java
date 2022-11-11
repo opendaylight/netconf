@@ -38,6 +38,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMActionService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMRpcService;
@@ -124,8 +126,10 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             netconfService = masterActorData.getNetconfDataTreeService();
             final DOMDataTreeReadTransaction tx = deviceDataBroker.newReadOnlyTransaction();
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
-            deviceRpc = masterActorData.getDeviceRpc();
-            deviceAction = masterActorData.getDeviceAction();
+
+            final var deviceServices = masterActorData.getDeviceServices();
+            deviceRpc = deviceServices.rpcs() instanceof Rpcs.Normalized normalized ? normalized : null;
+            deviceAction = deviceServices.actions() instanceof Actions.Normalized normalized ? normalized : null;
 
             sender().tell(new MasterActorDataInitialized(), self());
             LOG.debug("{}: Master is ready.", id);
@@ -232,7 +236,6 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
     private void invokeSlaveRpc(final QName qname, final NormalizedNodeMessage normalizedNodeMessage,
                                 final ActorRef recipient) {
-
         LOG.debug("{}: invokeSlaveRpc for {}, input: {} on rpc service {}", id, qname, normalizedNodeMessage,
                 deviceRpc);
 
@@ -272,7 +275,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
      * @param recipient {@link ActorRef}
      */
     private void invokeSlaveAction(final Absolute schemaPath, final ContainerNodeMessage containerNodeMessage,
-        final DOMDataTreeIdentifier domDataTreeIdentifier, final ActorRef recipient) {
+            final DOMDataTreeIdentifier domDataTreeIdentifier, final ActorRef recipient) {
         LOG.info("{}: invokeSlaveAction for {}, input: {}, identifier: {} on action service {}", id, schemaPath,
             containerNodeMessage, domDataTreeIdentifier, deviceAction);
 

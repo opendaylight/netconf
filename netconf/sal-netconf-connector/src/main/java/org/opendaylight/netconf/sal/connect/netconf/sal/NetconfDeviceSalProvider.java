@@ -22,7 +22,11 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.sal.connect.api.NetconfRpcService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.sal.connect.api.SchemalessRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -99,17 +103,22 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
             requireNonNull(mountService, "Closed");
             checkState(topologyRegistration == null, "Already initialized");
 
-            final DOMMountPointService.DOMMountPointBuilder mountBuilder =
-                    mountService.createMountPoint(id.getTopologyPath());
+            final var mountBuilder = mountService.createMountPoint(id.getTopologyPath());
             mountBuilder.addService(DOMSchemaService.class, FixedDOMSchemaService.of(() -> initialCtx));
+
+            final var rpcs = services.rpcs();
+            mountBuilder.addService(NetconfRpcService.class, rpcs);
+            if (rpcs instanceof Rpcs.Normalized normalized) {
+                mountBuilder.addService(DOMRpcService.class, normalized);
+            } else if (rpcs instanceof Rpcs.Schemaless schemaless) {
+                mountBuilder.addService(SchemalessRpcService.class, schemaless);
+            }
+            if (services.actions() instanceof Actions.Normalized normalized) {
+                mountBuilder.addService(DOMActionService.class, normalized);
+            }
 
             if (broker != null) {
                 mountBuilder.addService(DOMDataBroker.class, broker);
-            }
-            mountBuilder.addService(DOMRpcService.class, services.rpcs());
-            final var actions = services.actions();
-            if (actions != null) {
-                mountBuilder.addService(DOMActionService.class, actions);
             }
             if (dataTreeService != null) {
                 mountBuilder.addService(NetconfDataTreeService.class, dataTreeService);

@@ -17,6 +17,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
+import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,15 +25,14 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractTestModelTest;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
-import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -43,13 +43,13 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class WriteCandidateRunningTxTest extends AbstractTestModelTest {
     @Mock
-    private DOMRpcService rpc;
+    private Rpcs.Normalized rpc;
     private NetconfBaseOps netconfOps;
     private RemoteDeviceId id;
 
     @Before
     public void setUp() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(rpc).invokeRpc(any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpc).invokeNetconf(any(), any());
         netconfOps = new NetconfBaseOps(rpc, new EmptyMountPointContext(SCHEMA_CONTEXT));
         id = new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));
     }
@@ -62,22 +62,22 @@ public class WriteCandidateRunningTxTest extends AbstractTestModelTest {
                 getLockContent(NETCONF_LOCK_QNAME, NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID);
         final ContainerNode runningLock =
                 getLockContent(NETCONF_LOCK_QNAME, NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID);
-        verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME, runningLock);
-        verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME, candidateLock);
+        verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME, runningLock);
+        verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME, candidateLock);
         tx.put(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId(), TxTestUtils.getContainerNode());
         tx.merge(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
         //check, if both edits are called
-        verify(rpc, times(2)).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), any());
+        verify(rpc, times(2)).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), any());
         tx.commit().get();
         //check, if unlock is called
-        verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME,
+        verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME,
                 NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
         final ContainerNode candidateUnlock = getLockContent(NETCONF_UNLOCK_QNAME,
                 NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID);
         final ContainerNode runningUnlock = getLockContent(NETCONF_UNLOCK_QNAME,
                 NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID);
-        verify(rpc).invokeRpc(NETCONF_UNLOCK_QNAME, candidateUnlock);
-        verify(rpc).invokeRpc(NETCONF_UNLOCK_QNAME, runningUnlock);
+        verify(rpc).invokeNetconf(NETCONF_UNLOCK_QNAME, candidateUnlock);
+        verify(rpc).invokeNetconf(NETCONF_UNLOCK_QNAME, runningUnlock);
     }
 
     private static ContainerNode getLockContent(final QName op, final NodeIdentifier datastore) {

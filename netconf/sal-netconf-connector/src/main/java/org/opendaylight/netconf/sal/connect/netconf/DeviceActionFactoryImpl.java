@@ -16,6 +16,7 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
     private static final Logger LOG = LoggerFactory.getLogger(DeviceActionFactoryImpl.class);
 
     @Override
-    public DOMActionService createDeviceAction(final MessageTransformer messageTransformer,
+    public Actions.Normalized createDeviceAction(final MessageTransformer messageTransformer,
             final RemoteDeviceCommunicator listener) {
         return (schemaPath, dataTreeIdentifier, input) -> {
             requireNonNull(schemaPath);
