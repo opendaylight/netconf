@@ -22,10 +22,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
@@ -160,17 +160,17 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     }
 
     public static @NonNull AbstractNetconfDataTreeService of(final RemoteDeviceId id,
-            final MountPointContext mountContext, final DOMRpcService rpc,
-            final NetconfSessionPreferences netconfSessionPreferences) {
-        final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mountContext);
-        final boolean rollbackSupport = netconfSessionPreferences.isRollbackSupported();
+            final MountPointContext mountContext, final Rpcs rpcs,
+            final NetconfSessionPreferences sessionPreferences) {
+        final var netconfOps = new NetconfBaseOps(rpcs, mountContext);
+        final boolean rollbackSupport = sessionPreferences.isRollbackSupported();
 
         // Examine preferences and decide which implementation to use
-        if (netconfSessionPreferences.isCandidateSupported()) {
-            return netconfSessionPreferences.isRunningWritable()
+        if (sessionPreferences.isCandidateSupported()) {
+            return sessionPreferences.isRunningWritable()
                 ? new CandidateWithRunning(id, netconfOps, rollbackSupport)
                     : new Candidate(id, netconfOps, rollbackSupport);
-        } else if (netconfSessionPreferences.isRunningWritable()) {
+        } else if (sessionPreferences.isRunningWritable()) {
             return new Running(id, netconfOps, rollbackSupport);
         } else {
             throw new IllegalArgumentException("Device " + id.getName() + " has advertised neither :writable-running "

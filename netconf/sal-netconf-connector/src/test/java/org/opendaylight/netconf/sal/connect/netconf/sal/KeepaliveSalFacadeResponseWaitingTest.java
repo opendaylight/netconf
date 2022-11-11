@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import static java.util.Objects.requireNonNull;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -29,10 +30,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -56,7 +57,7 @@ public class KeepaliveSalFacadeResponseWaitingTest {
     private LocalNetconfSalFacade underlyingSalFacade;
 
     @Mock
-    private DOMRpcService deviceRpc;
+    private Rpcs.Normalized deviceRpc;
 
     @Mock
     private NetconfDeviceCommunicator listener;
@@ -106,17 +107,19 @@ public class KeepaliveSalFacadeResponseWaitingTest {
     }
 
     private static final class LocalNetconfSalFacade implements RemoteDeviceHandler {
-        private volatile RemoteDeviceServices currentServices;
+        private volatile Rpcs.Normalized rpcs;
 
         @Override
         public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
                 final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
-            currentServices = requireNonNull(services);
+            final var newRpcs = services.rpcs();
+            assertThat(newRpcs, instanceOf(Rpcs.Normalized.class));
+            rpcs = (Rpcs.Normalized) newRpcs;
         }
 
         @Override
         public void onDeviceDisconnected() {
-            currentServices = null;
+            rpcs = null;
         }
 
         @Override
@@ -132,9 +135,9 @@ public class KeepaliveSalFacadeResponseWaitingTest {
         }
 
         public void invokeNullRpc() {
-            final var local = currentServices;
+            final var local = rpcs;
             if (local != null) {
-                local.rpcs().invokeRpc(null, null);
+                local.invokeRpc(null, null);
             }
         }
     }

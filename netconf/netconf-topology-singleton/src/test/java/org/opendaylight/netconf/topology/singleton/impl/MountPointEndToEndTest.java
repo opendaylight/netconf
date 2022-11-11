@@ -82,6 +82,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementation;
 import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
@@ -91,6 +92,7 @@ import org.opendaylight.mdsal.dom.api.DOMService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
@@ -99,6 +101,7 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
@@ -134,6 +137,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
@@ -196,12 +200,14 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     @Mock private ActorSystemProvider mockMasterActorSystemProvider;
     @Mock private DOMMountPointListener masterMountPointListener;
     private final DOMMountPointService masterMountPointService = new DOMMountPointServiceImpl();
-    private final DOMRpcRouter deviceRpcService = new DOMRpcRouter();
+    private Rpcs.Normalized deviceRpcService;
+
     private DOMClusterSingletonServiceProviderImpl masterClusterSingletonServiceProvider;
     private DataBroker masterDataBroker;
     private DOMDataBroker deviceDOMDataBroker;
     private ActorSystem masterSystem;
     private NetconfTopologyManager masterNetconfTopologyManager;
+
     private volatile SettableFuture<MasterSalFacade> masterSalFacadeFuture = SettableFuture.create();
 
     @Mock private ActorSystemProvider mockSlaveActorSystemProvider;
@@ -239,13 +245,27 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         deviceSchemaContext = BindingRuntimeHelpers.createEffectiveModel(Top.class);
 
-        deviceRpcService.onModelContextUpdated(deviceSchemaContext);
+        final var router = new DOMRpcRouter(FixedDOMSchemaService.of(deviceSchemaContext));
 
         putTopRpcSchemaPath = findRpcDefinition("put-top").getQName();
         getTopRpcSchemaPath = findRpcDefinition("get-top").getQName();
 
-        deviceRpcService.getRpcProviderService().registerRpcImplementation(topRpcImplementation,
+        router.getRpcProviderService().registerRpcImplementation(topRpcImplementation,
                 DOMRpcIdentifier.create(putTopRpcSchemaPath), DOMRpcIdentifier.create(getTopRpcSchemaPath));
+
+        final var rpcService = router.getRpcService();
+        deviceRpcService = new Rpcs.Normalized() {
+            @Override
+            public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+                return rpcService.invokeRpc(type, input);
+            }
+
+            @Override
+            public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
+                    final T listener) {
+                return rpcService.registerRpcListener(listener);
+            }
+        };
 
         setupMaster();
 
@@ -390,7 +410,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             new EmptyMountPointContext(deviceSchemaContext)),
             NetconfSessionPreferences.fromStrings(
                 List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString())),
-            new RemoteDeviceServices(deviceRpcService.getRpcService(), null));
+            new RemoteDeviceServices(deviceRpcService, null));
 
         final var masterMountPoint = awaitMountPoint(masterMountPointService);
 
@@ -466,7 +486,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         masterSalFacade.onDeviceConnected(new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
             new EmptyMountPointContext(deviceSchemaContext)), NetconfSessionPreferences.fromStrings(List.of(
                     NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString())),
-                new RemoteDeviceServices(deviceRpcService.getRpcService(), null));
+                new RemoteDeviceServices(deviceRpcService, null));
 
         verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
 

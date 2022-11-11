@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 
+import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.List;
 import org.junit.Test;
@@ -22,38 +23,35 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
-import org.opendaylight.yangtools.util.concurrent.FluentFutures;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class FieldsAwareReadOnlyTxTest {
     @Mock
-    private DOMRpcService rpc;
+    private Rpcs.Normalized rpc;
     @Mock
     private ContainerNode mockedNode;
 
     @Test
     public void testReadWithFields() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(mockedNode))).when(rpc)
-            .invokeRpc(any(QName.class), any(ContainerNode.class));
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(mockedNode))).when(rpc). invokeNetconf(any(), any());
 
-        final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mock(MountPointContext.class));
-        try (FieldsAwareReadOnlyTx readOnlyTx = new FieldsAwareReadOnlyTx(netconfOps,
+        final var netconfOps = new NetconfBaseOps(rpc, mock(MountPointContext.class));
+        try (var readOnlyTx = new FieldsAwareReadOnlyTx(netconfOps,
                 new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)))) {
 
             readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty(),
                 List.of(YangInstanceIdentifier.empty()));
-            verify(rpc).invokeRpc(eq(NETCONF_GET_CONFIG_QNAME), any(ContainerNode.class));
+            verify(rpc).invokeNetconf(eq(NETCONF_GET_CONFIG_QNAME), any());
 
             readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty());
-            verify(rpc).invokeRpc(eq(NETCONF_GET_QNAME), any(ContainerNode.class));
+            verify(rpc).invokeNetconf(eq(NETCONF_GET_QNAME), any());
         }
     }
 }

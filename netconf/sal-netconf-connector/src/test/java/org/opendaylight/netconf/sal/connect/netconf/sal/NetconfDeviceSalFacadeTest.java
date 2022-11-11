@@ -33,9 +33,9 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -113,7 +113,7 @@ public class NetconfDeviceSalFacadeTest {
         final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(
             List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
 
-        final var deviceServices = new RemoteDeviceServices(mock(DOMRpcService.class), null);
+        final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
         deviceFacade.onDeviceConnected(
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), new EmptyMountPointContext(schemaContext)),
             netconfSessionPreferences, deviceServices);
