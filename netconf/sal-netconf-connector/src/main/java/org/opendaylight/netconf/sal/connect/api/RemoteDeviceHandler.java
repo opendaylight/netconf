@@ -44,10 +44,13 @@ public interface RemoteDeviceHandler<PREF> extends AutoCloseable {
         // DO NOTHING
     }
 
+    // FIXME: document this node
     void onDeviceDisconnected();
 
+    // FIXME: document this node
     void onDeviceFailed(Throwable throwable);
 
+    // FIXME: document this node
     void onNotification(DOMNotification domNotification);
 
     @Override

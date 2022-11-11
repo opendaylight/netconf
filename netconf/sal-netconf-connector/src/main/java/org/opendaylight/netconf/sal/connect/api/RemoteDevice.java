@@ -13,12 +13,15 @@ import org.opendaylight.netconf.api.NetconfMessage;
  * Remote device.
  */
 public interface RemoteDevice<PREF, LISTENER extends RemoteDeviceCommunicator> {
-
+    // FIXME: document this node
     void onRemoteSessionUp(PREF remoteSessionCapabilities, LISTENER listener);
 
+    // FIXME: document this node
     void onRemoteSessionDown();
 
+    // FIXME: document this node
     void onRemoteSessionFailed(Throwable throwable);
 
+    // FIXME: document this node
     void onNotification(NetconfMessage notification);
 }
