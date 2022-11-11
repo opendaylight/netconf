@@ -21,7 +21,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
@@ -72,8 +71,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
     }
 
     @Override
-    public SchemaResourcesDTO getSchemaResources(final NetconfNode node, final Object nodeId) {
-        final String subdir = node.getSchemaCacheDirectory();
+    public SchemaResourcesDTO getSchemaResources(final String subdir, final Object nodeId) {
         if (defaultSubdirectory.equals(subdir)) {
             // Fast path for default devices
             return defaultResources;

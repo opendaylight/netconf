@@ -53,7 +53,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -170,10 +169,8 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
                 .setKeepaliveDelay(Uint32.ONE)
                 .build();
 
-        final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(netconfNode).build();
-
         builder.setSchemaResourceDTO(new DefaultSchemaResourceManager(new DefaultYangParserFactory())
-            .getSchemaResources(netconfNode, "foo"));
+            .getSchemaResources(netconfNode.getSchemaCacheDirectory(), "foo"));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
                 new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);
