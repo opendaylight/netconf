@@ -27,16 +27,16 @@ import org.slf4j.LoggerFactory;
  * Handles incoming notifications. Either caches them(until onRemoteSchemaUp is called) or passes to sal Facade.
  */
 final class NotificationHandler {
-
     private static final Logger LOG = LoggerFactory.getLogger(NotificationHandler.class);
 
     private final RemoteDeviceHandler<?> salFacade;
+    // FIXME: better implementation?
     private final List<NetconfMessage> queue = new LinkedList<>();
     private final RemoteDeviceId id;
-    private boolean passNotifications = false;
 
+    private boolean passNotifications = false;
     private NotificationFilter filter;
-    private MessageTransformer<NetconfMessage> messageTransformer;
+    private MessageTransformer messageTransformer;
 
     NotificationHandler(final RemoteDeviceHandler<?> salFacade, final RemoteDeviceId id) {
         this.salFacade = requireNonNull(salFacade);
@@ -55,8 +55,8 @@ final class NotificationHandler {
      * Forward all cached notifications and pass all notifications from this point directly to sal facade.
      * @param transformer Message transformer
      */
-    synchronized void onRemoteSchemaUp(final MessageTransformer<NetconfMessage> transformer) {
-        this.messageTransformer = requireNonNull(transformer);
+    synchronized void onRemoteSchemaUp(final MessageTransformer transformer) {
+        messageTransformer = requireNonNull(transformer);
 
         passNotifications = true;
 
@@ -92,7 +92,7 @@ final class NotificationHandler {
     }
 
     synchronized void addNotificationFilter(final NotificationFilter newFilter) {
-        this.filter = newFilter;
+        filter = newFilter;
     }
 
     synchronized void onRemoteSchemaDown() {

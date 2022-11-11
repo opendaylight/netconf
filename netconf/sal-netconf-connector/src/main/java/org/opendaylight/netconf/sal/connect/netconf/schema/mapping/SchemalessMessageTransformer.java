@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * Transforms anyxml rpcs for schemaless netconf devices.
  */
-public class SchemalessMessageTransformer implements MessageTransformer<NetconfMessage> {
+public class SchemalessMessageTransformer implements MessageTransformer {
     // TODO maybe we should move this somewhere else as this
     // might be used in applications using schemaless mountpoints
     public static final NodeIdentifier SCHEMALESS_NOTIFICATION_PAYLOAD =

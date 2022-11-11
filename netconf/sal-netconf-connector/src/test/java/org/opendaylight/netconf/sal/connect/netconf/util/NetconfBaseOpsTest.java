@@ -115,8 +115,8 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
                 .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME)))
                 .thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        final MessageTransformer<NetconfMessage> transformer = new NetconfMessageTransformer(
-            new EmptyMountPointContext(SCHEMA_CONTEXT), true, BASE_SCHEMAS.getBaseSchema());
+        final MessageTransformer transformer = new NetconfMessageTransformer(new EmptyMountPointContext(SCHEMA_CONTEXT),
+            true, BASE_SCHEMAS.getBaseSchema());
         final DOMRpcService rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, transformer);
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));

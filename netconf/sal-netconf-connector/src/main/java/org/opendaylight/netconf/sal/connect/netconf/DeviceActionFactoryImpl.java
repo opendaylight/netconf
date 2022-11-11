@@ -36,7 +36,7 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
     private static final Logger LOG = LoggerFactory.getLogger(DeviceActionFactoryImpl.class);
 
     @Override
-    public DOMActionService createDeviceAction(final MessageTransformer<NetconfMessage> messageTransformer,
+    public DOMActionService createDeviceAction(final MessageTransformer messageTransformer,
             final RemoteDeviceCommunicator listener, final SchemaContext schemaContext) {
         return (schemaPath, dataTreeIdentifier, input) -> {
             requireNonNull(schemaPath);

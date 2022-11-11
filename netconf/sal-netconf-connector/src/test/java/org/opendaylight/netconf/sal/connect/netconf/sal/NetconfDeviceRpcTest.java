@@ -98,7 +98,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     @Test
     public void testDeadlock() throws Exception {
         // when rpc is successful, but transformer fails for some reason
-        final MessageTransformer<NetconfMessage> failingTransformer = mock(MessageTransformer.class);
+        final MessageTransformer failingTransformer = mock(MessageTransformer.class);
         final RemoteDeviceCommunicator communicatorMock = mock(RemoteDeviceCommunicator.class);
         final NetconfMessage msg = null;
         final RpcResult<NetconfMessage> result = RpcResultBuilder.success(msg).build();
