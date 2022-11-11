@@ -50,10 +50,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.ModifyAction;
-import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade.KeepaliveDOMRpcService;
-import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.input.source.ConfigSource;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
@@ -79,16 +77,15 @@ public final class NetconfBaseOps {
     private static final LeafNode<String> NETCONF_ERROR_OPTION_ROLLBACK =
         ImmutableNodes.leafNode(NETCONF_ERROR_OPTION_NODEID, ROLLBACK_ON_ERROR_OPTION);
 
-    private final DOMRpcService rpc;
+    private final Rpcs rpcs;
     private final MountPointContext mountContext;
     private final RpcStructureTransformer transformer;
 
-    public NetconfBaseOps(final DOMRpcService rpc, final MountPointContext mountContext) {
-        this.rpc = requireNonNull(rpc);
+    public NetconfBaseOps(final Rpcs rpcs, final MountPointContext mountContext) {
+        this.rpcs = requireNonNull(rpcs);
         this.mountContext = requireNonNull(mountContext);
 
-        if (rpc instanceof KeepaliveDOMRpcService keepAlive
-            && keepAlive.getDeviceRpc() instanceof SchemalessNetconfDeviceRpc) {
+        if (rpcs instanceof Rpcs.SchemaLess) {
             transformer = new SchemalessRpcStructureTransformer();
         } else {
             transformer = new NetconfRpcStructureTransformer(mountContext);
@@ -97,7 +94,7 @@ public final class NetconfBaseOps {
 
     public ListenableFuture<? extends DOMRpcResult> lock(final FutureCallback<DOMRpcResult> callback,
             final NodeIdentifier datastore) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_LOCK_QNAME, getLockContent(datastore)));
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_LOCK_QNAME, getLockContent(datastore)));
     }
 
     private static <T> ListenableFuture<T> addCallback(final FutureCallback<? super T> callback,
@@ -107,43 +104,43 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<? extends DOMRpcResult> lockCandidate(final FutureCallback<DOMRpcResult> callback) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_LOCK_QNAME,
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_LOCK_QNAME,
             getLockContent(NETCONF_CANDIDATE_NODEID)));
     }
 
     public ListenableFuture<? extends DOMRpcResult> lockRunning(final FutureCallback<DOMRpcResult> callback) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_LOCK_QNAME,
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_LOCK_QNAME,
             getLockContent(NETCONF_RUNNING_NODEID)));
     }
 
     public ListenableFuture<? extends DOMRpcResult> unlock(final FutureCallback<DOMRpcResult> callback,
             final NodeIdentifier datastore) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_UNLOCK_QNAME,
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_UNLOCK_QNAME,
             getUnLockContent(datastore)));
     }
 
     public ListenableFuture<? extends DOMRpcResult> unlockRunning(final FutureCallback<DOMRpcResult> callback) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_UNLOCK_QNAME,
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_UNLOCK_QNAME,
             getUnLockContent(NETCONF_RUNNING_NODEID)));
     }
 
     public ListenableFuture<? extends DOMRpcResult> unlockCandidate(final FutureCallback<DOMRpcResult> callback) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_UNLOCK_QNAME,
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_UNLOCK_QNAME,
             getUnLockContent(NETCONF_CANDIDATE_NODEID)));
     }
 
     public ListenableFuture<? extends DOMRpcResult> discardChanges(final FutureCallback<DOMRpcResult> callback) {
         // FIXME: eliminate null
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_DISCARD_CHANGES_QNAME, null));
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_DISCARD_CHANGES_QNAME, null));
     }
 
     public ListenableFuture<? extends DOMRpcResult> commit(final FutureCallback<DOMRpcResult> callback) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_COMMIT_QNAME, COMMIT_RPC_CONTENT));
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_COMMIT_QNAME, COMMIT_RPC_CONTENT));
     }
 
     public ListenableFuture<? extends DOMRpcResult> validate(final FutureCallback<DOMRpcResult> callback,
             final NodeIdentifier datastore) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_VALIDATE_QNAME,
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_VALIDATE_QNAME,
             getValidateContent(requireNonNull(datastore))));
     }
 
@@ -157,7 +154,7 @@ public final class NetconfBaseOps {
 
     public ListenableFuture<? extends DOMRpcResult> copyConfig(final FutureCallback<DOMRpcResult> callback,
             final NodeIdentifier sourceDatastore, final NodeIdentifier targetDatastore) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_COPY_CONFIG_QNAME,
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_COPY_CONFIG_QNAME,
             getCopyConfigContent(sourceDatastore, targetDatastore)));
     }
 
@@ -168,7 +165,7 @@ public final class NetconfBaseOps {
 
     public ListenableFuture<? extends DOMRpcResult> getConfig(final FutureCallback<DOMRpcResult> callback,
             final NodeIdentifier datastore, final Optional<YangInstanceIdentifier> filterPath) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_GET_CONFIG_QNAME, nonEmptyFilter(filterPath)
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_GET_CONFIG_QNAME, nonEmptyFilter(filterPath)
             .map(path -> NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
                 getSourceNode(datastore), transformer.toFilterStructure(path)))
             .orElseGet(() -> NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore)))));
@@ -187,7 +184,7 @@ public final class NetconfBaseOps {
             rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
                     getSourceNode(datastore), getSubtreeFilterFromRootFields(fields));
         }
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_GET_CONFIG_QNAME, rpcInput));
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_GET_CONFIG_QNAME, rpcInput));
     }
 
     /**
@@ -280,11 +277,10 @@ public final class NetconfBaseOps {
 
     public ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
             final Optional<YangInstanceIdentifier> filterPath) {
-        return addCallback(requireNonNull(callback),
-            rpc.invokeRpc(NETCONF_GET_QNAME, nonEmptyFilter(filterPath)
-                .map(path -> NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
-                    toFilterStructure(path, mountContext.getEffectiveModelContext())))
-                .orElse(NetconfMessageTransformUtil.GET_RPC_CONTENT)));
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_GET_QNAME, nonEmptyFilter(filterPath)
+            .map(path -> NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
+                toFilterStructure(path, mountContext.getEffectiveModelContext())))
+            .orElse(NetconfMessageTransformUtil.GET_RPC_CONTENT)));
     }
 
     private ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
@@ -298,7 +294,7 @@ public final class NetconfBaseOps {
         } else {
             rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, getSubtreeFilterFromRootFields(fields));
         }
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_GET_QNAME, rpcInput));
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_GET_QNAME, rpcInput));
     }
 
     private static boolean containsEmptyPath(final List<YangInstanceIdentifier> fields) {
@@ -349,7 +345,7 @@ public final class NetconfBaseOps {
             final FutureCallback<? super DOMRpcResult> callback, final NodeIdentifier datastore,
             final DataContainerChild editStructure, final Optional<ModifyAction> modifyAction,
             final boolean rollback) {
-        return addCallback(requireNonNull(callback), rpc.invokeRpc(NETCONF_EDIT_CONFIG_QNAME,
+        return addCallback(requireNonNull(callback), rpcs.invokeRpc(NETCONF_EDIT_CONFIG_QNAME,
             getEditConfigContent(requireNonNull(datastore), requireNonNull(editStructure), modifyAction, rollback)));
     }
 

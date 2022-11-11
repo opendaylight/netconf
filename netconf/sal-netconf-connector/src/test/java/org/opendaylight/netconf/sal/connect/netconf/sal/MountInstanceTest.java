@@ -29,6 +29,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
@@ -50,7 +51,7 @@ public class MountInstanceTest {
     @Mock
     private NetconfDataTreeService netconfService;
     @Mock
-    private DOMRpcService rpcService;
+    private Rpcs.Normalized rpcService;
     @Mock
     private NetconfDeviceNotificationService notificationService;
     @Mock

@@ -13,6 +13,7 @@ import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
@@ -68,11 +69,17 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
         final var mountContext = deviceSchema.mountContext();
         final var modelContext = mountContext.getEffectiveModelContext();
 
+        final AbstractNetconfDataTreeService netconfDataTree;
+        final NetconfDeviceDataBroker netconfDataBroker;
         final var deviceRpc = services.rpcs();
-        // FIXME: instanceof DOMRpcService, as it might be others
-        final var netconfDataBroker = new NetconfDeviceDataBroker(id, mountContext, deviceRpc, sessionPreferences);
-        final var netconfDataTree = AbstractNetconfDataTreeService.of(id, mountContext, deviceRpc, sessionPreferences);
-        registerLockListener(netconfDataBroker, netconfDataTree);
+        if (deviceRpc instanceof DOMRpcService domDeviceRpc) {
+            netconfDataTree = AbstractNetconfDataTreeService.of(id, mountContext, domDeviceRpc, sessionPreferences);
+            netconfDataBroker = new NetconfDeviceDataBroker(id, mountContext, domDeviceRpc, sessionPreferences);
+            registerLockListener(netconfDataBroker, netconfDataTree);
+        } else {
+            netconfDataTree = null;
+            netconfDataBroker = null;
+        }
 
         salProvider.getMountInstance().onTopologyDeviceConnected(modelContext, services, netconfDataBroker,
             netconfDataTree);
