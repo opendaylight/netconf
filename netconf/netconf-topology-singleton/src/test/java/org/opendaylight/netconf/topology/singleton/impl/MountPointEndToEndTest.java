@@ -282,8 +282,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         doReturn(MoreExecutors.newDirectExecutorService()).when(mockThreadPool).getExecutor();
 
-        final SchemaResourcesDTO resources =  resourceManager.getSchemaResources(
-            new NetconfNodeBuilder().setSchemaCacheDirectory(TEST_DEFAULT_SUBDIR).build(), "test");
+        final SchemaResourcesDTO resources =  resourceManager.getSchemaResources(TEST_DEFAULT_SUBDIR, "test");
         resources.getSchemaRegistry().registerSchemaSource(
             id -> Futures.immediateFuture(YangTextSchemaSource.delegateForByteSource(id,
                     topModuleInfo.getYangTextByteSource())),
