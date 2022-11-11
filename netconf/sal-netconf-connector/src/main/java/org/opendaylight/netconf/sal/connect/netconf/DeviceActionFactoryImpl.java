@@ -18,8 +18,9 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
 import org.opendaylight.yangtools.yang.common.RpcResult;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +37,8 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
     private static final Logger LOG = LoggerFactory.getLogger(DeviceActionFactoryImpl.class);
 
     @Override
-    public DOMActionService createDeviceAction(final MessageTransformer messageTransformer,
-            final RemoteDeviceCommunicator listener, final SchemaContext schemaContext) {
+    public Actions.Normalized createDeviceAction(final MessageTransformer messageTransformer,
+            final RemoteDeviceCommunicator listener, final EffectiveModelContext schemaContext) {
         return (schemaPath, dataTreeIdentifier, input) -> {
             requireNonNull(schemaPath);
             requireNonNull(dataTreeIdentifier);
