@@ -22,8 +22,7 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMes
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
-public class SchemalessNetconfDevice
-        implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
+public class SchemalessNetconfDevice implements RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> {
     private final BaseNetconfSchemas baseSchemas;
     private final RemoteDeviceId id;
     private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;

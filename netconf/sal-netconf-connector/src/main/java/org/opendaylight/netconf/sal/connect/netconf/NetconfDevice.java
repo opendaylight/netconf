@@ -85,8 +85,7 @@ import org.slf4j.LoggerFactory;
 /**
  *  This is a mediator between NetconfDeviceCommunicator and NetconfDeviceSalFacade.
  */
-public class NetconfDevice
-        implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
+public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
 
     private static final QName RFC8528_SCHEMA_MOUNTS_QNAME = QName.create(
@@ -244,9 +243,8 @@ public class NetconfDevice
     }
 
     private synchronized void handleSalInitializationSuccess(final MountPointContext result,
-                                        final NetconfSessionPreferences remoteSessionCapabilities,
-                                        final DOMRpcService deviceRpc,
-                                        final RemoteDeviceCommunicator<NetconfMessage> listener) {
+            final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc,
+            final RemoteDeviceCommunicator listener) {
         //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
         //since salFacade.onDeviceDisconnected was already called.
         if (connected) {
@@ -265,8 +263,7 @@ public class NetconfDevice
         }
     }
 
-    private void handleSalInitializationFailure(final Throwable throwable,
-                                                final RemoteDeviceCommunicator<NetconfMessage> listener) {
+    private void handleSalInitializationFailure(final Throwable throwable, final RemoteDeviceCommunicator listener) {
         LOG.error("{}: Initialization in sal failed, disconnecting from device", id, throwable);
         listener.close();
         onRemoteSessionDown();
@@ -364,7 +361,7 @@ public class NetconfDevice
     }
 
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
-            final RemoteDeviceCommunicator<NetconfMessage> listener, final BaseSchema schema) {
+            final RemoteDeviceCommunicator listener, final BaseSchema schema) {
         return new NetconfDeviceRpc(result.getEffectiveModelContext(), listener,
             new NetconfMessageTransformer(result, true, schema));
     }

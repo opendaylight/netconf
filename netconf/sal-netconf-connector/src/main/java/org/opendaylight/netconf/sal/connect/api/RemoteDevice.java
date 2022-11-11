@@ -7,10 +7,12 @@
  */
 package org.opendaylight.netconf.sal.connect.api;
 
+import org.opendaylight.netconf.api.NetconfMessage;
+
 /**
  * Remote device.
  */
-public interface RemoteDevice<PREF, M, LISTENER extends RemoteDeviceCommunicator<M>> {
+public interface RemoteDevice<PREF, LISTENER extends RemoteDeviceCommunicator> {
 
     void onRemoteSessionUp(PREF remoteSessionCapabilities, LISTENER listener);
 
@@ -18,5 +20,5 @@ public interface RemoteDevice<PREF, M, LISTENER extends RemoteDeviceCommunicator
 
     void onRemoteSessionFailed(Throwable throwable);
 
-    void onNotification(M notification);
+    void onNotification(NetconfMessage notification);
 }

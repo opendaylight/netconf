@@ -12,7 +12,6 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public interface DeviceActionFactory {
-
     /**
      * Allows user to create DOMActionService for specific device.
      *
@@ -22,7 +21,7 @@ public interface DeviceActionFactory {
      * @return {@link DOMActionService} of specific device
      */
     default DOMActionService createDeviceAction(final MessageTransformer<NetconfMessage> messageTransformer,
-            final RemoteDeviceCommunicator<NetconfMessage> listener, final SchemaContext schemaContext) {
+            final RemoteDeviceCommunicator listener, final SchemaContext schemaContext) {
         return null;
     }
 }

@@ -37,7 +37,7 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
 
     @Override
     public DOMActionService createDeviceAction(final MessageTransformer<NetconfMessage> messageTransformer,
-            final RemoteDeviceCommunicator<NetconfMessage> listener, final SchemaContext schemaContext) {
+            final RemoteDeviceCommunicator listener, final SchemaContext schemaContext) {
         return (schemaPath, dataTreeIdentifier, input) -> {
             requireNonNull(schemaPath);
             requireNonNull(dataTreeIdentifier);
