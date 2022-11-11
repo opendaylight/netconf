@@ -17,7 +17,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * Factory for netconf device schemas.
  */
 public interface NetconfDeviceSchemasResolver {
-    NetconfDeviceSchemas resolve(
-            NetconfDeviceRpc deviceRpc, NetconfSessionPreferences remoteSessionCapabilities, RemoteDeviceId id,
-            EffectiveModelContext schemaContext);
+    // FIXME: document this method
+    NetconfDeviceSchemas resolve(NetconfDeviceRpc deviceRpc, NetconfSessionPreferences remoteSessionCapabilities,
+        RemoteDeviceId id, EffectiveModelContext schemaContext);
 }

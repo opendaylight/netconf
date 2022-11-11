@@ -13,7 +13,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 
 public interface RemoteDeviceCommunicator extends AutoCloseable {
-
+    // FIXME: document this node
     ListenableFuture<RpcResult<NetconfMessage>> sendRequest(NetconfMessage message, QName rpc);
 
     @Override
