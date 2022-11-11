@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
@@ -76,7 +75,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
-
     private static final Logger LOG = LoggerFactory.getLogger(RemoteDeviceConnectorImpl.class);
 
     // Initializes default constant instances for the case when the default schema repository
@@ -195,7 +193,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             }
         }
 
-        final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
+        final RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> device;
         if (node.getSchemaless()) {
             device = new SchemalessNetconfDevice(netconfTopologyDeviceSetup.getBaseSchemas(), remoteDeviceId,
                 salFacade);
@@ -318,12 +316,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     }
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
-        if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                .rev150114.netconf.node.credentials.credentials.LoginPassword) {
-            final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                    .rev150114.netconf.node.credentials.credentials.LoginPassword loginPassword
-                    = (org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                    .rev150114.netconf.node.credentials.credentials.LoginPassword) credentials;
+        if (credentials
+                instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
+                    .credentials.credentials.LoginPassword loginPassword) {
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         }
         if (credentials instanceof LoginPwUnencrypted) {

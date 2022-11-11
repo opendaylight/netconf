@@ -36,19 +36,18 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  */
 public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
 
-    private final RemoteDeviceCommunicator<NetconfMessage> listener;
+    private final RemoteDeviceCommunicator listener;
     private final BaseRpcSchemalessTransformer baseRpcTransformer;
     private final SchemalessMessageTransformer schemalessTransformer;
     private final RemoteDeviceId deviceId;
 
-    public SchemalessNetconfDeviceRpc(final RemoteDeviceId deviceId,
-                                      final RemoteDeviceCommunicator<NetconfMessage> listener,
-                                      final BaseRpcSchemalessTransformer baseRpcTransformer,
-                                      final SchemalessMessageTransformer messageTransformer) {
+    public SchemalessNetconfDeviceRpc(final RemoteDeviceId deviceId, final RemoteDeviceCommunicator listener,
+            final BaseRpcSchemalessTransformer baseRpcTransformer,
+            final SchemalessMessageTransformer messageTransformer) {
         this.deviceId = deviceId;
         this.listener = listener;
         this.baseRpcTransformer = baseRpcTransformer;
-        this.schemalessTransformer = messageTransformer;
+        schemalessTransformer = messageTransformer;
     }
 
     @Override

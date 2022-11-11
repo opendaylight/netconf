@@ -87,7 +87,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Mock
-    private RemoteDeviceCommunicator<NetconfMessage> listener;
+    private RemoteDeviceCommunicator listener;
     private NetconfRpcFutureCallback callback;
     private NetconfBaseOps baseOps;
 
