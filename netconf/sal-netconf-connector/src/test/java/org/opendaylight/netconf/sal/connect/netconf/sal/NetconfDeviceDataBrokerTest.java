@@ -30,11 +30,11 @@ import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.AbstractWriteTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateRunningTx;
@@ -56,7 +56,7 @@ public class NetconfDeviceDataBrokerTest {
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
     @Mock
-    private DOMRpcService rpcService;
+    private Rpcs.Normalized rpcService;
     private NetconfDeviceDataBroker dataBroker;
 
     @BeforeClass

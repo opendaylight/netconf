@@ -31,11 +31,9 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractTestModelTest;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
@@ -111,9 +109,8 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
                 .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME)))
                 .thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        final MessageTransformer transformer = new NetconfMessageTransformer(new EmptyMountPointContext(SCHEMA_CONTEXT),
-            true, BASE_SCHEMAS.getBaseSchema());
-        final DOMRpcService rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, transformer);
+        final var rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, new NetconfMessageTransformer(
+            new EmptyMountPointContext(SCHEMA_CONTEXT), true, BASE_SCHEMAS.getBaseSchema()));
         callback = new NetconfRpcFutureCallback("prefix",
             new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));
         baseOps = new NetconfBaseOps(rpc, new EmptyMountPointContext(SCHEMA_CONTEXT));

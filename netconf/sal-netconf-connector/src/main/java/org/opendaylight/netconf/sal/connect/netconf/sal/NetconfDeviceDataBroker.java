@@ -14,7 +14,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.mdsal.dom.spi.PingPongMergingDOMDataBroker;
@@ -22,6 +21,7 @@ import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsTransactionChain;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.FieldsAwareReadOnlyTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.FieldsAwareReadWriteTx;
@@ -49,9 +49,9 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
     private boolean isLockAllowed = true;
 
     public NetconfDeviceDataBroker(final RemoteDeviceId id, final MountPointContext mountContext,
-                                   final DOMRpcService rpc, final NetconfSessionPreferences netconfSessionPreferences) {
+            final Rpcs.Normalized rpc, final NetconfSessionPreferences netconfSessionPreferences) {
         this.id = id;
-        this.netconfOps = new NetconfBaseOps(rpc, mountContext);
+        netconfOps = new NetconfBaseOps(rpc, mountContext);
         // get specific attributes from netconf preferences and get rid of it
         // no need to keep the entire preferences object, its quite big with all the capability QNames
         candidateSupported = netconfSessionPreferences.isCandidateSupported();
@@ -96,7 +96,7 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
     }
 
     void setLockAllowed(final boolean isLockAllowedOrig) {
-        this.isLockAllowed = isLockAllowedOrig;
+        isLockAllowed = isLockAllowedOrig;
     }
 
     private final class NetconfDOMDataBrokerFieldsExtensionImpl implements NetconfDOMDataBrokerFieldsExtension {
