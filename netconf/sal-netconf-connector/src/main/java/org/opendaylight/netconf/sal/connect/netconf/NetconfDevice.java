@@ -115,7 +115,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     private boolean connected = false;
 
     // Message transformer is constructed once the schemas are available
-    private MessageTransformer<NetconfMessage> messageTransformer;
+    private MessageTransformer messageTransformer;
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
             final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
@@ -277,7 +277,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         updateTransformer(null);
     }
 
-    private synchronized void updateTransformer(final MessageTransformer<NetconfMessage> transformer) {
+    private synchronized void updateTransformer(final MessageTransformer transformer) {
         messageTransformer = transformer;
     }
 

@@ -578,8 +578,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         return MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
     }
 
-    public MessageTransformer<NetconfMessage> getMessageTransformer() throws Exception {
-        final MessageTransformer<NetconfMessage> messageTransformer = mockClass(MessageTransformer.class);
+    public MessageTransformer getMessageTransformer() throws Exception {
+        final MessageTransformer messageTransformer = mockClass(MessageTransformer.class);
         doReturn(NOTIFICATION).when(messageTransformer).toRpcRequest(any(QName.class), any(NormalizedNode.class));
         doReturn(RPC_RESULT).when(messageTransformer).toRpcResult(any(NetconfMessage.class), any(QName.class));
         doReturn(COMPOSITE_NODE).when(messageTransformer).toNotification(any(NetconfMessage.class));
