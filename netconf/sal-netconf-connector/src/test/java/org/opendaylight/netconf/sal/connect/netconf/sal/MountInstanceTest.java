@@ -29,18 +29,15 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class MountInstanceTest {
-    private static final Logger LOG = LoggerFactory.getLogger(MountInstanceTest.class);
-
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
     @Mock
@@ -50,7 +47,7 @@ public class MountInstanceTest {
     @Mock
     private NetconfDataTreeService netconfService;
     @Mock
-    private DOMRpcService rpcService;
+    private Rpcs.Normalized rpcService;
     @Mock
     private NetconfDeviceNotificationService notificationService;
     @Mock

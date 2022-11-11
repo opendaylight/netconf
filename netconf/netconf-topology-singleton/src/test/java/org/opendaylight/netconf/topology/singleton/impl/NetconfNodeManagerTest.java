@@ -52,7 +52,6 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -60,6 +59,9 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
@@ -122,10 +124,10 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     private DOMDataBroker mockDeviceDataBroker;
 
     @Mock
-    private DOMRpcService mockRpcService;
+    private Rpcs.Normalized mockRpcService;
 
     @Mock
-    private DOMActionService mockActionService;
+    private Actions.Normalized mockActionService;
 
     @Mock
     private NetconfDeviceSchemasResolver mockSchemasResolver;
@@ -382,8 +384,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     private void initializeMaster() {
         TestKit kit = new TestKit(masterSystem);
         testMasterActorRef.tell(new CreateInitialMasterActorData(mockDeviceDataBroker, netconfService,
-            SOURCE_IDENTIFIERS,
-                mockRpcService, mockActionService), kit.getRef());
+            SOURCE_IDENTIFIERS, new RemoteDeviceServices(mockRpcService, mockActionService)), kit.getRef());
 
         kit.expectMsgClass(MasterActorDataInitialized.class);
     }

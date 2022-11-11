@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.sal.connect.api;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
 
 public interface DeviceActionFactory {
     /**
@@ -16,9 +16,8 @@ public interface DeviceActionFactory {
      *
      * @param messageTransformer - message transformer (for action in this case)
      * @param listener - allows specific service to send and receive messages to/from device
-     * @return {@link DOMActionService} of specific device
+     * @return {@link Actions} of specific device
      */
-    @NonNull DOMActionService createDeviceAction(MessageTransformer messageTransformer,
-            RemoteDeviceCommunicator listener);
+    @NonNull Actions createDeviceAction(MessageTransformer messageTransformer, RemoteDeviceCommunicator listener);
 }
 

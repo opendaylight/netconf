@@ -159,7 +159,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
         // send initial data to master actor
         return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, netconfService,
-            sourceIdentifiers, deviceServices.rpcs(), deviceServices.actions()), actorResponseWaitTime);
+            sourceIdentifiers, deviceServices), actorResponseWaitTime);
     }
 
     private void updateDeviceData() {
