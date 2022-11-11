@@ -116,15 +116,15 @@ public class NetconfTopologyManager
         this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
-        this.actionProviderRegistry = requireNonNull(actionProviderService);
+        actionProviderRegistry = requireNonNull(actionProviderService);
         this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
         this.keepaliveExecutor = keepaliveExecutor.getExecutor();
         this.processingExecutor = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
-        this.actorSystem = requireNonNull(actorSystemProvider).getActorSystem();
+        actorSystem = requireNonNull(actorSystemProvider).getActorSystem();
         this.eventExecutor = requireNonNull(eventExecutor);
         this.clientDispatcher = requireNonNull(clientDispatcher);
         this.topologyId = requireNonNull(topologyId);
-        this.writeTxIdleTimeout = Duration.ofSeconds(config.getWriteTransactionIdleTimeout().toJava());
+        writeTxIdleTimeout = Duration.ofSeconds(config.getWriteTransactionIdleTimeout().toJava());
         this.mountPointService = mountPointService;
         this.encryptionService = requireNonNull(encryptionService);
         this.rpcProviderService = requireNonNull(rpcProviderService);
@@ -318,7 +318,8 @@ public class NetconfTopologyManager
                 .setProcessingExecutor(processingExecutor)
                 .setTopologyId(topologyId)
                 .setNetconfClientDispatcher(clientDispatcher)
-                .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode, deviceId))
+                .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode.getSchemaCacheDirectory(),
+                    deviceId))
                 .setIdleTimeout(writeTxIdleTimeout)
                 .setPrivateKeyPath(privateKeyPath)
                 .setPrivateKeyPassphrase(privateKeyPassphrase)

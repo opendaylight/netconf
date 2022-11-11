@@ -215,7 +215,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             yanglibRegistrations = List.of();
         } else {
             final boolean reconnectOnChangedSchema = node.requireReconnectOnChangedSchema();
-            final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node, nodeId.getValue());
+            final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node.getSchemaCacheDirectory(),
+                nodeId.getValue());
             device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(reconnectOnChangedSchema)
                 .setSchemaResourcesDTO(resources)
