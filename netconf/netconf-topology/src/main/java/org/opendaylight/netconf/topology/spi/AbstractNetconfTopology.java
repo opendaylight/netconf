@@ -208,7 +208,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                     keepaliveDelay, node.requireDefaultRequestTimeoutMillis().toJava());
         }
 
-        final RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> device;
+        final RemoteDevice<NetconfDeviceCommunicator> device;
         final List<SchemaSourceRegistration<?>> yanglibRegistrations;
         if (node.requireSchemaless()) {
             device = new SchemalessNetconfDevice(baseSchemas, remoteDeviceId, salFacade);

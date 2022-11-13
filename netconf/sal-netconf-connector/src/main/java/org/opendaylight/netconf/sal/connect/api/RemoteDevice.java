@@ -8,13 +8,14 @@
 package org.opendaylight.netconf.sal.connect.api;
 
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 
 /**
  * Remote device.
  */
-public interface RemoteDevice<PREF, LISTENER extends RemoteDeviceCommunicator> {
+public interface RemoteDevice<L extends RemoteDeviceCommunicator> {
     // FIXME: document this node
-    void onRemoteSessionUp(PREF remoteSessionCapabilities, LISTENER listener);
+    void onRemoteSessionUp(NetconfSessionPreferences remoteSessionCapabilities, L listener);
 
     // FIXME: document this node
     void onRemoteSessionDown();
