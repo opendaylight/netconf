@@ -75,8 +75,7 @@ public class StressClientCallable implements Callable<Boolean> {
 
     private static NetconfDeviceCommunicator getSessionListener(
             final InetSocketAddress inetAddress, final int messageLimit) {
-        final RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> loggingRemoteDevice =
-            new StressClient.LoggingRemoteDevice();
+        final RemoteDevice<NetconfDeviceCommunicator> loggingRemoteDevice = new StressClient.LoggingRemoteDevice();
         return new NetconfDeviceCommunicator(
             new RemoteDeviceId("secure-test", inetAddress), loggingRemoteDevice, messageLimit);
     }
