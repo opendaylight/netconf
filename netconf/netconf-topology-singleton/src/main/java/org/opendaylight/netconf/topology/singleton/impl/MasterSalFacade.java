@@ -39,8 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
 
-class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessionPreferences> {
-
+class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MasterSalFacade.class);
 
     private final RemoteDeviceId id;

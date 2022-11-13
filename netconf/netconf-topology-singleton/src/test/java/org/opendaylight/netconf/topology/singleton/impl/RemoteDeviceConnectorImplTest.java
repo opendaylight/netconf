@@ -39,7 +39,6 @@ import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -120,7 +119,6 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
                 .setTopologyId(TOPOLOGY_ID);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testStopRemoteDeviceConnection() {
         builder.setNode(new NodeBuilder().setNodeId(NODE_ID)
@@ -139,7 +137,7 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
             .build());
 
         final NetconfDeviceCommunicator communicator = mock(NetconfDeviceCommunicator.class);
-        final RemoteDeviceHandler<NetconfSessionPreferences> salFacade = mock(RemoteDeviceHandler.class);
+        final RemoteDeviceHandler salFacade = mock(RemoteDeviceHandler.class);
 
         final TestingRemoteDeviceConnectorImpl remoteDeviceConnection = new TestingRemoteDeviceConnectorImpl(
             builder.build(), remoteDeviceId, communicator, deviceActionFactory);
@@ -152,7 +150,6 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
         verify(salFacade, times(1)).close();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testKeapAliveFacade() {
         final Credentials credentials = new LoginPasswordBuilder()
@@ -175,7 +172,7 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
                 new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);
 
-        final RemoteDeviceHandler<NetconfSessionPreferences> salFacade = mock(RemoteDeviceHandler.class);
+        final RemoteDeviceHandler salFacade = mock(RemoteDeviceHandler.class);
 
         final NetconfConnectorDTO connectorDTO =
                 remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, salFacade);

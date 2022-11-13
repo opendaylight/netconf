@@ -10,11 +10,11 @@ package org.opendaylight.netconf.sal.connect.api;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
-public interface RemoteDeviceHandler<PREF> extends AutoCloseable {
-
+public interface RemoteDeviceHandler extends AutoCloseable {
     /**
      * When device connected, init new mount point with specific schema context and DOM services.
      *
@@ -22,8 +22,8 @@ public interface RemoteDeviceHandler<PREF> extends AutoCloseable {
      * @param netconfSessionPreferences - session of device
      * @param deviceRpc - {@link DOMRpcService} of device
      */
-    default void onDeviceConnected(final MountPointContext remoteSchemaContext, final PREF netconfSessionPreferences,
-            final DOMRpcService deviceRpc) {
+    default void onDeviceConnected(final MountPointContext remoteSchemaContext,
+            final NetconfSessionPreferences sessionPreferences, final DOMRpcService deviceRpc) {
         // DO NOTHING
     }
 
@@ -35,12 +35,13 @@ public interface RemoteDeviceHandler<PREF> extends AutoCloseable {
      * @param deviceRpc - {@link DOMRpcService} of device
      * @param deviceAction - {@link DOMActionService} of device
      */
-    default void onDeviceConnected(final MountPointContext mountContext, final PREF netconfSessionPreferences,
+    default void onDeviceConnected(final MountPointContext mountContext,
+            final NetconfSessionPreferences sessionPreferences,
             final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
         // DO NOTHING
     }
 
-    default void onDeviceReconnected(final PREF netconfSessionPreferences, final NetconfNode node) {
+    default void onDeviceReconnected(final NetconfSessionPreferences sessionPreferences, final NetconfNode node) {
         // DO NOTHING
     }
 

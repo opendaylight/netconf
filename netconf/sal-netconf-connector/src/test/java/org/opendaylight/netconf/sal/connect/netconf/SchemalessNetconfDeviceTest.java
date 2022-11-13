@@ -40,7 +40,7 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testSessionOnMethods() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = mockCloseableClass(NetconfDeviceCommunicator.class);
         final SchemalessMessageTransformer messageTransformer = mock(SchemalessMessageTransformer.class);
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test-D",
@@ -69,10 +69,8 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
         verify(facade).onDeviceFailed(throwable);
     }
 
-    @SuppressWarnings("unchecked")
-    private static RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler =
-                mockCloseableClass(RemoteDeviceHandler.class);
+    private static RemoteDeviceHandler getFacade() throws Exception {
+        final RemoteDeviceHandler remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
         doNothing().when(remoteDeviceHandler).onDeviceConnected(
                 any(MountPointContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
@@ -105,7 +103,6 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 
         capabilities.addAll(additionalCapabilities);
 
-        return NetconfSessionPreferences.fromStrings(
-                capabilities);
+        return NetconfSessionPreferences.fromStrings(capabilities);
     }
 }

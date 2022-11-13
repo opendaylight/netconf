@@ -25,12 +25,12 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final BaseNetconfSchemas baseSchemas;
     private final RemoteDeviceId id;
-    private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
+    private final RemoteDeviceHandler salFacade;
     private final SchemalessMessageTransformer messageTransformer;
     private final BaseRpcSchemalessTransformer rpcTransformer;
 
     public SchemalessNetconfDevice(final BaseNetconfSchemas baseSchemas, final RemoteDeviceId id,
-                                   final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
+            final RemoteDeviceHandler salFacade) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.id = id;
         this.salFacade = salFacade;
@@ -41,8 +41,7 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
 
     @VisibleForTesting
     SchemalessNetconfDevice(final BaseNetconfSchemas baseSchemas, final RemoteDeviceId id,
-                            final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                            final SchemalessMessageTransformer messageTransformer) {
+            final RemoteDeviceHandler salFacade, final SchemalessMessageTransformer messageTransformer) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.id = id;
         this.salFacade = salFacade;
@@ -53,13 +52,12 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
 
     @Override
     public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
-                                            final NetconfDeviceCommunicator netconfDeviceCommunicator) {
+            final NetconfDeviceCommunicator netconfDeviceCommunicator) {
         final SchemalessNetconfDeviceRpc schemalessNetconfDeviceRpc = new SchemalessNetconfDeviceRpc(id,
                 netconfDeviceCommunicator, rpcTransformer, messageTransformer);
 
         salFacade.onDeviceConnected(baseSchemas.getBaseSchema().getMountPointContext(),
                 remoteSessionCapabilities, schemalessNetconfDeviceRpc);
-
     }
 
     @Override

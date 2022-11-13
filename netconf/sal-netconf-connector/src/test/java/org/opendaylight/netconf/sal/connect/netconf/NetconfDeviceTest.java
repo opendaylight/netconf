@@ -115,7 +115,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     public void testNetconfDeviceFlawedModelFailedResolution() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
 
         final EffectiveModelContextFactory schemaFactory = getSchemaFactory();
@@ -166,7 +166,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     public void testNetconfDeviceFailFirstSchemaFailSecondEmpty() throws Exception {
         final ArrayList<String> capList = Lists.newArrayList(TEST_CAPABILITY);
 
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
 
         final EffectiveModelContextFactory schemaFactory = getSchemaFactory();
@@ -201,7 +201,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     public void testNetconfDeviceMissingSource() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
 
         final EffectiveModelContextFactory schemaFactory = getSchemaFactory();
@@ -271,7 +271,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     public void testNotificationBeforeSchema() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
         final EffectiveModelContextFactory schemaContextProviderFactory = mock(EffectiveModelContextFactory.class);
         final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
@@ -306,7 +306,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     public void testNetconfDeviceReconnect() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
 
         final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
@@ -343,7 +343,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     public void testNetconfDeviceDisconnectListenerCallCancellation() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
         final EffectiveModelContextFactory schemaContextProviderFactory = mock(EffectiveModelContextFactory.class);
         final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
@@ -374,7 +374,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     public void testNetconfDeviceAvailableCapabilitiesBuilding() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
 
         final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
@@ -414,7 +414,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     public void testNetconfDeviceNotificationsModelNotPresentWithCapability() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
         final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
 
@@ -455,7 +455,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     public void testNetconfDeviceNotificationsCapabilityIsNotPresent() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
         final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
 
@@ -493,7 +493,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     public void testNetconfDeviceNotificationsModelIsPresent() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
         final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
 
@@ -546,9 +546,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         return schemaFactory;
     }
 
-    private static RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler =
-                mockCloseableClass(RemoteDeviceHandler.class);
+    private static RemoteDeviceHandler getFacade() throws Exception {
+        final RemoteDeviceHandler remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
         doNothing().when(remoteDeviceHandler).onDeviceConnected(
                 any(MountPointContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class),
                 any(DOMActionService.class));

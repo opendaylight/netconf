@@ -40,8 +40,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessionPreferences> {
-
+public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSalFacade.class);
 
     private final RemoteDeviceId id;
@@ -93,7 +92,7 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
     @Override
     public synchronized void onDeviceReconnected(final NetconfSessionPreferences netconfSessionPreferences,
             final NetconfNode node) {
-        this.salProvider.getTopologyDatastoreAdapter().updateDeviceData(ConnectionStatus.Connecting,
+        salProvider.getTopologyDatastoreAdapter().updateDeviceData(ConnectionStatus.Connecting,
                 netconfSessionPreferences.getNetconfDeviceCapabilities(), LogicalDatastoreType.CONFIGURATION, node);
     }
 
