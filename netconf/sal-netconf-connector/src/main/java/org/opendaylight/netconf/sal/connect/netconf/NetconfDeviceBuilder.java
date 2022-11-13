@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
@@ -24,7 +23,7 @@ public class NetconfDeviceBuilder {
     private boolean reconnectOnSchemasChange;
     private NetconfDevice.SchemaResourcesDTO schemaResourcesDTO;
     private RemoteDeviceId id;
-    private RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
+    private RemoteDeviceHandler salFacade;
     private ListeningExecutorService globalProcessingExecutor;
     private DeviceActionFactory deviceActionFactory;
     private NetconfNode node;
@@ -50,7 +49,7 @@ public class NetconfDeviceBuilder {
         return this;
     }
 
-    public NetconfDeviceBuilder setSalFacade(final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
+    public NetconfDeviceBuilder setSalFacade(final RemoteDeviceHandler salFacade) {
         this.salFacade = salFacade;
         return this;
     }
@@ -87,16 +86,16 @@ public class NetconfDeviceBuilder {
 
     public NetconfDevice build() {
         validation();
-        return new NetconfDevice(this.schemaResourcesDTO, this.baseSchemas, this.id, this.salFacade,
-            this.globalProcessingExecutor, this.reconnectOnSchemasChange, this.deviceActionFactory, this.node,
-            this.eventExecutor, this.nodeOptional);
+        return new NetconfDevice(schemaResourcesDTO, baseSchemas, id, salFacade,
+            globalProcessingExecutor, reconnectOnSchemasChange, deviceActionFactory, node,
+            eventExecutor, nodeOptional);
     }
 
     private void validation() {
-        requireNonNull(this.baseSchemas, "BaseSchemas is not initialized");
-        requireNonNull(this.id, "RemoteDeviceId is not initialized");
-        requireNonNull(this.salFacade, "RemoteDeviceHandler is not initialized");
-        requireNonNull(this.globalProcessingExecutor, "ExecutorService is not initialized");
-        requireNonNull(this.schemaResourcesDTO, "SchemaResourceDTO is not initialized");
+        requireNonNull(baseSchemas, "BaseSchemas is not initialized");
+        requireNonNull(id, "RemoteDeviceId is not initialized");
+        requireNonNull(salFacade, "RemoteDeviceHandler is not initialized");
+        requireNonNull(globalProcessingExecutor, "ExecutorService is not initialized");
+        requireNonNull(schemaResourcesDTO, "SchemaResourceDTO is not initialized");
     }
 }

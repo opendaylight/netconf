@@ -31,7 +31,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
@@ -48,7 +47,7 @@ public class KeepaliveSalFacadeTest {
             new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
 
     @Mock
-    private RemoteDeviceHandler<NetconfSessionPreferences> underlyingSalFacade;
+    private RemoteDeviceHandler underlyingSalFacade;
 
     private ScheduledExecutorService executorServiceSpy;
 

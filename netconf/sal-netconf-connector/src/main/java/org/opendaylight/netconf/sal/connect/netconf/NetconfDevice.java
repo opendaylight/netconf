@@ -100,7 +100,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     protected final List<SchemaSourceRegistration<?>> sourceRegistrations = new ArrayList<>();
 
-    private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
+    private final RemoteDeviceHandler salFacade;
     private final ListeningExecutorService processingExecutor;
     private final DeviceActionFactory deviceActionFactory;
     private final NetconfDeviceSchemasResolver stateSchemasResolver;
@@ -118,14 +118,14 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private MessageTransformer messageTransformer;
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
-            final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
+            final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
             final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
         this(schemaResourcesDTO, baseSchemas, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null,
             null, null, null);
     }
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
-            final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
+            final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
             final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange,
             final DeviceActionFactory deviceActionFactory, final NetconfNode node, final EventExecutor eventExecutor,
             final NetconfNodeAugmentedOptional nodeOptional) {

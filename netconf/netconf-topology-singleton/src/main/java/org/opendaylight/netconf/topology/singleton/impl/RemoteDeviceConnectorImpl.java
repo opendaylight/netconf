@@ -104,7 +104,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     }
 
     @Override
-    public void startRemoteDeviceConnection(final RemoteDeviceHandler<NetconfSessionPreferences> deviceHandler) {
+    public void startRemoteDeviceConnection(final RemoteDeviceHandler deviceHandler) {
 
         final NetconfNode netconfNode = netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class);
         final NodeId nodeId = netconfTopologyDeviceSetup.getNode().getNodeId();
@@ -146,7 +146,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     @VisibleForTesting
     NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-                                                 final RemoteDeviceHandler<NetconfSessionPreferences> deviceHandler) {
+            final RemoteDeviceHandler deviceHandler) {
         //setup default values since default value is not supported in mdsal
         final long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
                 ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis().toJava();
@@ -155,7 +155,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final boolean reconnectOnChangedSchema = node.getReconnectOnChangedSchema() == null
                 ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.getReconnectOnChangedSchema();
 
-        RemoteDeviceHandler<NetconfSessionPreferences> salFacade = requireNonNull(deviceHandler);
+        RemoteDeviceHandler salFacade = requireNonNull(deviceHandler);
         if (keepaliveDelay > 0) {
             LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade,
