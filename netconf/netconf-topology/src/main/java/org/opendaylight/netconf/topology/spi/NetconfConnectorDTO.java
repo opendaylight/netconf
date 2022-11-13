@@ -11,16 +11,14 @@ import java.util.List;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 
 public final class NetconfConnectorDTO implements AutoCloseable {
     private final List<SchemaSourceRegistration<?>> yanglibRegistrations;
     private final NetconfDeviceCommunicator communicator;
-    private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
+    private final RemoteDeviceHandler facade;
 
-    public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator,
-            final RemoteDeviceHandler<NetconfSessionPreferences> facade,
+    public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator, final RemoteDeviceHandler facade,
             final List<SchemaSourceRegistration<?>> yanglibRegistrations) {
         this.communicator = communicator;
         this.facade = facade;
@@ -31,7 +29,7 @@ public final class NetconfConnectorDTO implements AutoCloseable {
         return communicator;
     }
 
-    public RemoteDeviceHandler<NetconfSessionPreferences> getFacade() {
+    public RemoteDeviceHandler getFacade() {
         return facade;
     }
 

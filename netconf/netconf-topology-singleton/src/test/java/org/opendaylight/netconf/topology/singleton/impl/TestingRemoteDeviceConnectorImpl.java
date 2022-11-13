@@ -14,7 +14,6 @@ import java.util.List;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
@@ -37,7 +36,7 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
 
     @Override
     public NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-            final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
+            final RemoteDeviceHandler salFacade) {
         final NetconfConnectorDTO connectorDTO = new NetconfConnectorDTO(communicator, salFacade, List.of());
         doReturn(FluentFutures.immediateNullFluentFuture()).when(communicator).initializeRemoteConnection(any(), any());
         return connectorDTO;

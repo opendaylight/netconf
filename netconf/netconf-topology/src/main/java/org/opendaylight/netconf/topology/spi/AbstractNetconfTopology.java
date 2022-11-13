@@ -201,7 +201,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final RemoteDeviceId remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
 
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
-        RemoteDeviceHandler<NetconfSessionPreferences> salFacade = createSalFacade(remoteDeviceId);
+        RemoteDeviceHandler salFacade = createSalFacade(remoteDeviceId);
         if (keepaliveDelay > 0) {
             LOG.info("Adding keepalive facade, for device {}", nodeId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(),
@@ -359,7 +359,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
     }
 
-    protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id);
+    protected abstract RemoteDeviceHandler createSalFacade(RemoteDeviceId id);
 
     private static Optional<UserPreferences> getUserCapabilities(final NetconfNode node) {
         // if none of yang-module-capabilities or non-module-capabilities is specified

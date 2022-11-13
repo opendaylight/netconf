@@ -17,7 +17,6 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -48,7 +47,7 @@ public class CallHomeTopology extends BaseCallHomeTopology {
     }
 
     @Override
-    protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id) {
+    protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId id) {
         return new NetconfDeviceSalFacade(id, mountPointService, dataBroker, topologyId);
     }
 }

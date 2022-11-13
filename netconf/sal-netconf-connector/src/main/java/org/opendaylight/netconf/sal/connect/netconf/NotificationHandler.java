@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 final class NotificationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationHandler.class);
 
-    private final RemoteDeviceHandler<?> salFacade;
+    private final RemoteDeviceHandler salFacade;
     // FIXME: better implementation?
     private final List<NetconfMessage> queue = new LinkedList<>();
     private final RemoteDeviceId id;
@@ -38,7 +38,7 @@ final class NotificationHandler {
     private NotificationFilter filter;
     private MessageTransformer messageTransformer;
 
-    NotificationHandler(final RemoteDeviceHandler<?> salFacade, final RemoteDeviceId id) {
+    NotificationHandler(final RemoteDeviceHandler salFacade, final RemoteDeviceId id) {
         this.salFacade = requireNonNull(salFacade);
         this.id = requireNonNull(id);
     }

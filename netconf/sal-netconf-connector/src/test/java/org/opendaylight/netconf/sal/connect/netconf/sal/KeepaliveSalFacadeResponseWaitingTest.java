@@ -105,8 +105,7 @@ public class KeepaliveSalFacadeResponseWaitingTest {
         verify(deviceRpc, after(2000).never()).invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
     }
 
-    private final class LocalNetconfSalFacade implements RemoteDeviceHandler<NetconfSessionPreferences> {
-
+    private static final class LocalNetconfSalFacade implements RemoteDeviceHandler {
         private DOMRpcService localDeviceRpc;
 
         @Override

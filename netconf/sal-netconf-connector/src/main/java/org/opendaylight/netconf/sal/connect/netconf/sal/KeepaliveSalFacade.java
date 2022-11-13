@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * and to detect incorrect session drops (netconf session is inactive, but TCP/SSH connection is still present).
  * The keepalive RPC is a get-config with empty filter.
  */
-public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSessionPreferences> {
+public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     private static final Logger LOG = LoggerFactory.getLogger(KeepaliveSalFacade.class);
 
     // 2 minutes keepalive delay by default
@@ -59,7 +59,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     private static final long DEFAULT_TRANSACTION_TIMEOUT_MILLI = TimeUnit.MILLISECONDS.toMillis(60000);
 
     private final KeepaliveTask keepaliveTask = new KeepaliveTask();
-    private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
+    private final RemoteDeviceHandler salFacade;
     private final ScheduledExecutorService executor;
 
     private final long keepaliveDelaySeconds;
@@ -71,9 +71,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     private volatile NetconfDeviceCommunicator listener;
     private volatile DOMRpcService currentDeviceRpc;
 
-    public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                              final ScheduledExecutorService executor, final long keepaliveDelaySeconds,
-                              final long requestTimeoutMillis) {
+    public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
+            final ScheduledExecutorService executor, final long keepaliveDelaySeconds,
+            final long requestTimeoutMillis) {
         this.id = id;
         this.salFacade = salFacade;
         this.executor = requireNonNull(executor);
@@ -82,8 +82,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         timeoutNanos = TimeUnit.MILLISECONDS.toNanos(requestTimeoutMillis);
     }
 
-    public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                              final ScheduledExecutorService executor) {
+    public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
+            final ScheduledExecutorService executor) {
         this(id, salFacade, executor, DEFAULT_DELAY, DEFAULT_TRANSACTION_TIMEOUT_MILLI);
     }
 
@@ -121,7 +121,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     public void onDeviceConnected(final MountPointContext remoteSchemaContext,
             final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc,
             final DOMActionService deviceAction) {
-        this.currentDeviceRpc = requireNonNull(deviceRpc);
+        currentDeviceRpc = requireNonNull(deviceRpc);
         salFacade.onDeviceConnected(remoteSchemaContext, netconfSessionPreferences,
             new KeepaliveDOMRpcService(deviceRpc), deviceAction);
 
@@ -279,7 +279,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         private final @NonNull ListenableFuture<? extends DOMRpcResult> deviceFuture;
 
         RequestTimeoutTask(final ListenableFuture<? extends DOMRpcResult> rpcResultFuture) {
-            this.deviceFuture = requireNonNull(rpcResultFuture);
+            deviceFuture = requireNonNull(rpcResultFuture);
             Futures.addCallback(deviceFuture, this, MoreExecutors.directExecutor());
         }
 
