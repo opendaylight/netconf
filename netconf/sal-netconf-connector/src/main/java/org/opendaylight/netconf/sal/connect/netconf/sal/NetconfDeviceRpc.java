@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
@@ -38,13 +38,13 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public final class NetconfDeviceRpc implements DOMRpcService {
     private final RemoteDeviceCommunicator communicator;
     private final MessageTransformer transformer;
-    private final SchemaContext schemaContext;
+    private final EffectiveModelContext modelContext;
 
-    public NetconfDeviceRpc(final SchemaContext schemaContext, final RemoteDeviceCommunicator communicator,
+    public NetconfDeviceRpc(final EffectiveModelContext modelContext, final RemoteDeviceCommunicator communicator,
             final MessageTransformer transformer) {
+        this.modelContext = requireNonNull(modelContext);
         this.communicator = communicator;
         this.transformer = transformer;
-        this.schemaContext = requireNonNull(schemaContext);
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class NetconfDeviceRpc implements DOMRpcService {
 
     @Override
     public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T listener) {
-        listener.onRpcAvailable(Collections2.transform(schemaContext.getOperations(),
+        listener.onRpcAvailable(Collections2.transform(modelContext.getOperations(),
             input -> DOMRpcIdentifier.create(input.getQName())));
 
         // NOOP, no rpcs appear and disappear in this implementation
