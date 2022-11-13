@@ -29,6 +29,7 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME: propagate to API with immutable semantics
 public final class NetconfSessionPreferences {
 
     private static final class ParameterMatcher {
@@ -38,7 +39,7 @@ public final class NetconfSessionPreferences {
         ParameterMatcher(final String name) {
             predicate = input -> input.startsWith(name);
 
-            this.skipLength = name.length();
+            skipLength = name.length();
         }
 
         String from(final Iterable<String> params) {
