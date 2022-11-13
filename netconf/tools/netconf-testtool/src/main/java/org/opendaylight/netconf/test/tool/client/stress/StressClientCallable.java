@@ -22,7 +22,6 @@ import org.opendaylight.netconf.nettyutil.NeverReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +74,7 @@ public class StressClientCallable implements Callable<Boolean> {
 
     private static NetconfDeviceCommunicator getSessionListener(
             final InetSocketAddress inetAddress, final int messageLimit) {
-        final RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> loggingRemoteDevice =
-            new StressClient.LoggingRemoteDevice();
+        final RemoteDevice<NetconfDeviceCommunicator> loggingRemoteDevice = new StressClient.LoggingRemoteDevice();
         return new NetconfDeviceCommunicator(
             new RemoteDeviceId("secure-test", inetAddress), loggingRemoteDevice, messageLimit);
     }

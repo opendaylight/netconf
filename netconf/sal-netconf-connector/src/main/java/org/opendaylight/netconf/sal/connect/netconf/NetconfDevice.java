@@ -85,7 +85,7 @@ import org.slf4j.LoggerFactory;
 /**
  *  This is a mediator between NetconfDeviceCommunicator and NetconfDeviceSalFacade.
  */
-public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> {
+public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
 
     private static final QName RFC8528_SCHEMA_MOUNTS_QNAME = QName.create(

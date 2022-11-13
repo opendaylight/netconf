@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 public class NetconfDeviceCommunicator implements NetconfClientSessionListener, RemoteDeviceCommunicator {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicator.class);
 
-    protected final RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> remoteDevice;
+    protected final RemoteDevice<NetconfDeviceCommunicator> remoteDevice;
     private final Optional<UserPreferences> overrideNetconfCapabilities;
     protected final RemoteDeviceId id;
     private final Lock sessionLock = new ReentrantLock();
@@ -77,23 +77,19 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         return closing != 0;
     }
 
-    public NetconfDeviceCommunicator(
-            final RemoteDeviceId id,
-            final RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> remoteDevice,
+    public NetconfDeviceCommunicator(final RemoteDeviceId id,
+            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice,
             final UserPreferences netconfSessionPreferences, final int rpcMessageLimit) {
         this(id, remoteDevice, Optional.of(netconfSessionPreferences), rpcMessageLimit);
     }
 
-    public NetconfDeviceCommunicator(
-            final RemoteDeviceId id,
-            final RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> remoteDevice,
-            final int rpcMessageLimit) {
+    public NetconfDeviceCommunicator(final RemoteDeviceId id,
+            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit) {
         this(id, remoteDevice, Optional.empty(), rpcMessageLimit);
     }
 
-    private NetconfDeviceCommunicator(
-            final RemoteDeviceId id,
-            final RemoteDevice<NetconfSessionPreferences,  NetconfDeviceCommunicator> remoteDevice,
+    private NetconfDeviceCommunicator(final RemoteDeviceId id,
+            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice,
             final Optional<UserPreferences> overrideNetconfCapabilities, final int rpcMessageLimit) {
         concurentRpcMsgs = rpcMessageLimit;
         this.id = id;

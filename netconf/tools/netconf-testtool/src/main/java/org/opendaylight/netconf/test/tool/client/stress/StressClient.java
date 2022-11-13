@@ -259,7 +259,7 @@ public final class StressClient {
         return null;
     }
 
-    static class LoggingRemoteDevice implements RemoteDevice<NetconfSessionPreferences, NetconfDeviceCommunicator> {
+    static class LoggingRemoteDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         @Override
         public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
                                       final NetconfDeviceCommunicator netconfDeviceCommunicator) {
