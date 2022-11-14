@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "667404bb_267f6ff4",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2022-11-14T12:27:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2c13f74_2fb5478f",
+      "revId": "4789858d14e68d9640ad0cfe16843a08695a3782",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c476f8ac_7df32215",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-11-10T08:42:38Z",
       "side": 1,
       "message": "Probably this is the key to solution. We need to do this sooner or replace it with different logic.",
+      "revId": "4789858d14e68d9640ad0cfe16843a08695a3782",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "238754a7_49604cbc",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2022-11-14T12:27:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c476f8ac_7df32215",
       "revId": "4789858d14e68d9640ad0cfe16843a08695a3782",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
