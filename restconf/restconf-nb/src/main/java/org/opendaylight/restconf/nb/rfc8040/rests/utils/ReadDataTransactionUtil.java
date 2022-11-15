@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -52,6 +53,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeCon
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -133,17 +135,15 @@ public final class ReadDataTransactionUtil {
             case REPORT_ALL, REPORT_ALL_TAGGED -> throw new RestconfDocumentedException(
                 "Unsupported with-defaults value " + withDefa.paramValue());
         };
-        final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
-        final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.findChild(path).orElseThrow().getDataSchemaNode();
+        final DataSchemaContextNode<?> ctxNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
+        final DataSchemaNode baseSchemaNode = ctxNode.getDataSchemaNode();
         if (result instanceof ContainerNode) {
-            final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder =
-                SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
-            buildCont(builder, (ContainerNode) result, baseSchemaCtxTree, path, trim);
+            final var builder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
+            buildCont(builder, (ContainerNode) result, ctxNode, trim);
             return builder.build();
         } else {
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
-                SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
-            buildMapEntryBuilder(builder, (MapEntryNode) result, baseSchemaCtxTree, path, trim,
+            final var builder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
+            buildMapEntryBuilder(builder, (MapEntryNode) result, ctxNode, trim,
                     ((ListSchemaNode) baseSchemaNode).getKeyDefinition());
             return builder.build();
         }
@@ -151,21 +151,23 @@ public final class ReadDataTransactionUtil {
 
     private static void buildMapEntryBuilder(
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
-            final MapEntryNode result, final DataSchemaContextTree baseSchemaCtxTree,
-            final YangInstanceIdentifier actualPath, final boolean trim, final List<QName> keys) {
+            final MapEntryNode result, final DataSchemaContextNode<?> ctxNode, final boolean trim,
+            final List<QName> keys) {
         for (final DataContainerChild child : result.body()) {
-            final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
-            final DataSchemaNode childSchema = baseSchemaCtxTree.findChild(path).orElseThrow().getDataSchemaNode();
+            final var childCtx = ctxNode.getChild(child.getIdentifier());
+            if (childCtx == null) {
+                throw new NoSuchElementException("Failed to map child " + child.getIdentifier());
+            }
+
+            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> childBuilder =
-                    SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
-                buildCont(childBuilder, (ContainerNode) child, baseSchemaCtxTree, path, trim);
+                final var childBuilder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
+                buildCont(childBuilder, (ContainerNode) child, childCtx, trim);
                 builder.withChild(childBuilder.build());
             } else if (child instanceof MapNode) {
-                final CollectionNodeBuilder<MapEntryNode, SystemMapNode> childBuilder =
-                    SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
-                buildList(childBuilder, (MapNode) child, baseSchemaCtxTree, path, trim,
-                        ((ListSchemaNode) childSchema).getKeyDefinition());
+                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
+                buildList(childBuilder, (MapNode) child, childCtx, trim,
+                    ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
@@ -184,35 +186,36 @@ public final class ReadDataTransactionUtil {
     }
 
     private static void buildList(final CollectionNodeBuilder<MapEntryNode, SystemMapNode> builder,
-            final MapNode result, final DataSchemaContextTree baseSchemaCtxTree, final YangInstanceIdentifier path,
-            final boolean trim, final List<QName> keys) {
+            final MapNode result, DataSchemaContextNode<?> ctxNode, final boolean trim, final List<QName> keys) {
         for (final MapEntryNode mapEntryNode : result.body()) {
-            final YangInstanceIdentifier actualNode = path.node(mapEntryNode.getIdentifier());
-            final DataSchemaNode childSchema = baseSchemaCtxTree.findChild(actualNode).orElseThrow()
-                    .getDataSchemaNode();
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
-                SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) childSchema);
-            buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, baseSchemaCtxTree, actualNode, trim, keys);
+            final var childCtx = ctxNode.getChild(mapEntryNode.getIdentifier());
+            if (childCtx == null) {
+                throw new NoSuchElementException("Failed to match entry " + mapEntryNode.getIdentifier());
+            }
+            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
+            final var mapEntryBuilder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) childSchema);
+            buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, childCtx, trim, keys);
             builder.withChild(mapEntryBuilder.build());
         }
     }
 
     private static void buildCont(final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder,
-            final ContainerNode result, final DataSchemaContextTree baseSchemaCtxTree,
-            final YangInstanceIdentifier actualPath, final boolean trim) {
+            final ContainerNode result, final DataSchemaContextNode<?> ctxNode, final boolean trim) {
         for (final DataContainerChild child : result.body()) {
-            final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
-            final DataSchemaNode childSchema = baseSchemaCtxTree.findChild(path).orElseThrow().getDataSchemaNode();
+            final var childCtx = ctxNode.getChild(child.getIdentifier());
+            if (childCtx == null) {
+                throw new NoSuchElementException("Cannot resolve child " + child.getIdentifier());
+            }
+
+            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builderChild =
-                    SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
-                buildCont(builderChild, result, baseSchemaCtxTree, actualPath, trim);
+                final var builderChild = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
+                buildCont(builderChild, result, childCtx, trim);
                 builder.withChild(builderChild.build());
             } else if (child instanceof MapNode) {
-                final CollectionNodeBuilder<MapEntryNode, SystemMapNode> childBuilder =
-                    SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
-                buildList(childBuilder, (MapNode) child, baseSchemaCtxTree, path, trim,
-                        ((ListSchemaNode) childSchema).getKeyDefinition());
+                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
+                buildList(childBuilder, (MapNode) child, childCtx, trim,
+                    ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
