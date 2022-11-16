@@ -43,7 +43,7 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
     NetconfCallHomeServer(final SshClient sshClient, final CallHomeAuthorizationProvider authProvider,
             final Factory factory, final InetSocketAddress socketAddress, final StatusRecorder recorder) {
         this(sshClient, authProvider, factory, socketAddress, recorder,
-            new NettyIoServiceFactory(factory.getNettyGroup()));
+            new NettyIoServiceFactory(sshClient, factory.getNettyGroup()));
     }
 
     @VisibleForTesting
