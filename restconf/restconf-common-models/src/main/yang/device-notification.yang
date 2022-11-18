@@ -1,0 +1,42 @@
+module device-notification {
+      import network-topology { prefix nt; revision-date 2013-10-21; }
+       import yang-ext { prefix ext; revision-date "2013-07-09";}
+       import ietf-inet-types { prefix inet; revision-date "2013-07-15"; }
+
+    yang-version 1.1;
+    namespace "device:notification";
+    prefix "device-notifi";
+
+    contact "nikk.sonitech@gmail.com>";
+
+    description
+          "This module contains the definition of methods related to
+          device notification model";
+
+    revision "2022-06-01" {
+        description
+            "Initial revision";
+    }
+grouping pathgroup {
+container test {
+ leaf  node-id {
+     type instance-identifier;
+ }
+
+}
+
+}
+    rpc subscribe-device-notification {
+        input {
+            uses pathgroup;
+
+         }
+         output {
+            leaf stream-path {
+                type string;
+                description "Notification stream path.";
+            }
+         }
+    }
+
+}

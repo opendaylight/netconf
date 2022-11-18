@@ -57,9 +57,9 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
     private final P path;
 
     @GuardedBy("this")
-    private final Set<StreamSessionHandler> subscribers = new HashSet<>();
+    protected final Set<StreamSessionHandler> subscribers = new HashSet<>();
     @GuardedBy("this")
-    private Registration registration;
+    protected Registration registration;
 
     // FIXME: these should be final
     private Instant start = null;
@@ -101,7 +101,7 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
     }
 
     @Override
-    public final synchronized void close() throws InterruptedException, ExecutionException {
+    public synchronized void close() throws InterruptedException, ExecutionException {
         if (registration != null) {
             registration.close();
             registration = null;

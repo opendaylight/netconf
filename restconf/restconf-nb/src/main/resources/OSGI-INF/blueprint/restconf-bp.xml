@@ -54,6 +54,11 @@
     <argument ref="dOMSchemaService"/>
     <argument ref="configuration"/>
   </bean>
+  <bean id="deviceMountPointListener" class="org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceMountPointListener" init-method="init">
+    <argument ref="dOMMountPointService"/>
+    <argument ref="dOMDataBroker"/>
+    <argument ref="schemaContextHandler"/>
+  </bean>
   <bean id="restconfDataStreamServiceImpl" class="org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl">
     <argument ref="scheduledThreadPool"/>
     <argument ref="configuration"/>
@@ -65,6 +70,7 @@
   <bean id="webInitializer" class="org.opendaylight.restconf.nb.rfc8040.web.WebInitializer" destroy-method="close">
     <argument ref="webServer"/>
     <argument ref="webContextSecurer"/>
+
     <argument ref="servletSupport"/>
     <argument ref="restconfApplication"/>
     <argument ref="dataStreamApplication"/>
