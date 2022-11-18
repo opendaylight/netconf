@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "3bfaa64e_128496e4",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
@@ -20,8 +21,31 @@
         "endChar": 47
       },
       "revId": "4d52f601a1077d6001f5a82c05a1efa2a665b781",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85ef0cea_ba61a694",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2022-11-18T09:19:01Z",
+      "side": 1,
+      "message": "Should be fixed now",
+      "parentUuid": "3bfaa64e_128496e4",
+      "range": {
+        "startLine": 229,
+        "startChar": 31,
+        "endLine": 229,
+        "endChar": 47
+      },
+      "revId": "4d52f601a1077d6001f5a82c05a1efa2a665b781",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
