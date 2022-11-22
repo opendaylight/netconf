@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dedbcea0_d35a9f9c",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2022-11-22T10:23:08Z",
+      "side": 1,
+      "message": "Do we need this variable? I see it only being set in constructor and used nowhere else in this class.",
+      "revId": "ea3202c8c00311e23c54f0b30d2f6b2c0b4b5087",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
