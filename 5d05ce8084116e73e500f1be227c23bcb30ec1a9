@@ -33,6 +33,29 @@
       "message": "What are you doing here?",
       "revId": "5d05ce8084116e73e500f1be227c23bcb30ec1a9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fed360d_fdced89b",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-11-22T13:43:25Z",
+      "side": 1,
+      "message": "This one seems redundant if you look at next two lines - expectedData is ContainerNode. I think we don\u0027t need it here.",
+      "range": {
+        "startLine": 153,
+        "startChar": 8,
+        "endLine": 153,
+        "endChar": 18
+      },
+      "revId": "5d05ce8084116e73e500f1be227c23bcb30ec1a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
