@@ -100,6 +100,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a124034_3851e022",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-11-22T10:02:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1107578b_a9d02ed5",
+      "range": {
+        "startLine": 264,
+        "startChar": 52,
+        "endLine": 264,
+        "endChar": 73
+      },
+      "revId": "e0cc68692585a6dc3e6216cbba9586df6a529653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4c63f67_c9eb5ae1",
