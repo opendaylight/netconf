@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2942ae09_fa317693",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-11-22T13:28:32Z",
+      "side": 1,
+      "message": "Inconsistent formatting.",
+      "revId": "d6ea9f29516fa9edd5ff5e7459d52f463ab84a64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
