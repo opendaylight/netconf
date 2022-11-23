@@ -56,6 +56,30 @@
       },
       "revId": "5d05ce8084116e73e500f1be227c23bcb30ec1a9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9312a7fa_7df1cb9b",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-11-23T13:19:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0fed360d_fdced89b",
+      "range": {
+        "startLine": 153,
+        "startChar": 8,
+        "endLine": 153,
+        "endChar": 18
+      },
+      "revId": "5d05ce8084116e73e500f1be227c23bcb30ec1a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

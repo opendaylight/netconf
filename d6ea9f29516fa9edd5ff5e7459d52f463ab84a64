@@ -16,6 +16,24 @@
       "message": "Inconsistent formatting.",
       "revId": "d6ea9f29516fa9edd5ff5e7459d52f463ab84a64",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "737b2d5f_3fda77c1",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-11-23T13:19:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2942ae09_fa317693",
+      "revId": "d6ea9f29516fa9edd5ff5e7459d52f463ab84a64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
