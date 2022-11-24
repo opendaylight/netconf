@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71d98d28_7620b45a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-11-24T06:39:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0560915d_84386bd1",
+      "range": {
+        "startLine": 155,
+        "startChar": 16,
+        "endLine": 155,
+        "endChar": 63
+      },
+      "revId": "44b59f4a238ae8789da7ea78b00d29eccf986fce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d833c36_4a5ece12",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-11-07T00:26:23Z",
       "side": 1,
       "message": "this is a bit ugly",
+      "range": {
+        "startLine": 159,
+        "startChar": 51,
+        "endLine": 159,
+        "endChar": 77
+      },
+      "revId": "44b59f4a238ae8789da7ea78b00d29eccf986fce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29e45d99_dab512f7",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-11-24T06:39:23Z",
+      "side": 1,
+      "message": "created new method which i borrowed from org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger.extractDeviceName() method",
+      "parentUuid": "7d833c36_4a5ece12",
       "range": {
         "startLine": 159,
         "startChar": 51,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57ac5b66_e631663c",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-11-24T06:39:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d6bd567_5772d0e5",
+      "range": {
+        "startLine": 160,
+        "startChar": 84,
+        "endLine": 160,
+        "endChar": 99
+      },
+      "revId": "44b59f4a238ae8789da7ea78b00d29eccf986fce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a3f91e13_75b0f8d0",
@@ -93,6 +165,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9514db3c_71cf3e30",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-11-24T06:39:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3f91e13_75b0f8d0",
+      "range": {
+        "startLine": 198,
+        "startChar": 18,
+        "endLine": 199,
+        "endChar": 42
+      },
+      "revId": "44b59f4a238ae8789da7ea78b00d29eccf986fce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "28115335_ef0dad09",
@@ -106,6 +202,30 @@
       "writtenOn": "2022-11-07T00:26:23Z",
       "side": 1,
       "message": "this is dirty: there should be a proper indirection here, as this check is repeated elsewhere\n\nalso ... why this is part of streamName? at the end of the day, the mount check logically belongs to a different layer",
+      "range": {
+        "startLine": 53,
+        "startChar": 12,
+        "endLine": 53,
+        "endChar": 56
+      },
+      "revId": "44b59f4a238ae8789da7ea78b00d29eccf986fce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07ae5f73_65d1e321",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataStreamServiceImpl.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-11-24T06:39:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28115335_ef0dad09",
       "range": {
         "startLine": 53,
         "startChar": 12,
