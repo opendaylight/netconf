@@ -11,7 +11,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,7 +22,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.ContentParam;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
@@ -52,14 +50,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
 /**
@@ -83,19 +73,17 @@ public final class ReadDataTransactionUtil {
      * @param path           the path to read
      * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
      * @param withDefa       value of with-defaults parameter
-     * @param ctx            schema context
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
                                                     final @NonNull YangInstanceIdentifier path,
                                                     final @NonNull RestconfStrategy strategy,
-                                                    final WithDefaultsParam withDefa,
-                                                    final EffectiveModelContext ctx) {
+                                                    final WithDefaultsParam withDefa) {
         return switch (content) {
-            case ALL -> readAllData(strategy, path, withDefa, ctx);
+            case ALL -> readAllData(strategy, path, withDefa);
             case CONFIG -> {
                 final var read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
-                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
+                yield withDefa == null ? read : prepareDataByParamWithDef(read, withDefa);
             }
             case NONCONFIG -> readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
         };
@@ -109,124 +97,105 @@ public final class ReadDataTransactionUtil {
      * @param path           the parent path to read
      * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
      * @param withDefa       value of with-defaults parameter
-     * @param ctx            schema context
      * @param fields         paths to selected subtrees which should be read, relative to to the parent path
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy,
-            final @Nullable WithDefaultsParam withDefa, @NonNull final EffectiveModelContext ctx,
-            final @NonNull List<YangInstanceIdentifier> fields) {
+            final @Nullable WithDefaultsParam withDefa, final @NonNull List<YangInstanceIdentifier> fields) {
         return switch (content) {
-            case ALL -> readAllData(strategy, path, withDefa, ctx, fields);
+            case ALL -> readAllData(strategy, path, withDefa, fields);
             case CONFIG -> {
                 final var read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, fields);
-                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
+                yield withDefa == null ? read : prepareDataByParamWithDef(read, withDefa);
             }
             case NONCONFIG -> readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, fields);
         };
     }
 
     private static NormalizedNode prepareDataByParamWithDef(final NormalizedNode result,
-            final YangInstanceIdentifier path, final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
+            final WithDefaultsParam withDefa) {
         final boolean trim = switch (withDefa) {
             case TRIM -> true;
             case EXPLICIT -> false;
             case REPORT_ALL, REPORT_ALL_TAGGED -> throw new RestconfDocumentedException(
-                "Unsupported with-defaults value " + withDefa.paramValue());
+                    "Unsupported with-defaults value " + withDefa.paramValue());
         };
-        final DataSchemaContextNode<?> ctxNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
-        final DataSchemaNode baseSchemaNode = ctxNode.getDataSchemaNode();
+        final var qName = result.getIdentifier().getNodeType();
+        final var identifier = NodeIdentifier.create(qName);
         if (result instanceof ContainerNode) {
-            final var builder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
-            buildCont(builder, (ContainerNode) result, ctxNode, trim);
+            final var builder = Builders.containerBuilder()
+                    .withNodeIdentifier(identifier)
+                    .withValue(((ContainerNode) result).body());
+            buildCont(builder, (ContainerNode) result, trim);
             return builder.build();
         } else {
-            final var builder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
-            buildMapEntryBuilder(builder, (MapEntryNode) result, ctxNode, trim,
-                    ((ListSchemaNode) baseSchemaNode).getKeyDefinition());
+            final var builder = Builders.mapEntryBuilder()
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(identifier.getNodeType()))
+                    .withValue((Collection<DataContainerChild>) result.body());
+            buildMapEntryBuilder(builder, (MapEntryNode) result, trim);
             return builder.build();
         }
     }
 
     private static void buildMapEntryBuilder(
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
-            final MapEntryNode result, final DataSchemaContextNode<?> ctxNode, final boolean trim,
-            final List<QName> keys) {
+            final MapEntryNode result, final boolean trim) {
         for (final DataContainerChild child : result.body()) {
-            final var childCtx = ctxNode.getChild(child.getIdentifier());
-            if (childCtx == null) {
-                throw new NoSuchElementException("Failed to map child " + child.getIdentifier());
-            }
-
-            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
+            final var qName = child.getIdentifier().getNodeType();
+            final var identifier = NodeIdentifier.create(qName);
             if (child instanceof ContainerNode) {
-                final var childBuilder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
-                buildCont(childBuilder, (ContainerNode) child, childCtx, trim);
+                final var childBuilder = Builders.containerBuilder()
+                        .withNodeIdentifier(identifier);
+                buildCont(childBuilder, (ContainerNode) child, trim);
                 builder.withChild(childBuilder.build());
             } else if (child instanceof MapNode) {
-                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
-                buildList(childBuilder, (MapNode) child, childCtx, trim,
-                    ((ListSchemaNode) childSchema).getKeyDefinition());
+                final var childBuilder = Builders.mapBuilder()
+                        .withNodeIdentifier(identifier);
+                buildList(childBuilder, (MapNode) child, trim);
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
-                final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
-                final Object nodeVal = child.body();
-                if (keys.contains(child.getIdentifier().getNodeType())) {
-                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                } else if (trim) {
-                    if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                        builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                    }
-                } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                }
+                final var childBuilder = Builders.leafBuilder()
+                        .withNodeIdentifier(identifier)
+                        .withValue(child.body());
+                builder.withChild(childBuilder.build());
             }
         }
     }
 
     private static void buildList(final CollectionNodeBuilder<MapEntryNode, SystemMapNode> builder,
-            final MapNode result, DataSchemaContextNode<?> ctxNode, final boolean trim, final List<QName> keys) {
+            final MapNode result, final boolean trim) {
         for (final MapEntryNode mapEntryNode : result.body()) {
-            final var childCtx = ctxNode.getChild(mapEntryNode.getIdentifier());
-            if (childCtx == null) {
-                throw new NoSuchElementException("Failed to match entry " + mapEntryNode.getIdentifier());
-            }
-            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
-            final var mapEntryBuilder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) childSchema);
-            buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, childCtx, trim, keys);
+            final var qName = mapEntryNode.getIdentifier().getNodeType();
+            final var identifier = NodeIdentifierWithPredicates.of(qName);
+            final var mapEntryBuilder = Builders.mapEntryBuilder()
+                    .withNodeIdentifier(identifier)
+                    .withValue(mapEntryNode.body());
+            buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, trim);
             builder.withChild(mapEntryBuilder.build());
         }
     }
 
     private static void buildCont(final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder,
-            final ContainerNode result, final DataSchemaContextNode<?> ctxNode, final boolean trim) {
+            final ContainerNode result, final boolean trim) {
         for (final DataContainerChild child : result.body()) {
-            final var childCtx = ctxNode.getChild(child.getIdentifier());
-            if (childCtx == null) {
-                throw new NoSuchElementException("Cannot resolve child " + child.getIdentifier());
-            }
-
-            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
+            final var qName = child.getIdentifier().getNodeType();
+            final var identifier = NodeIdentifier.create(qName);
             if (child instanceof ContainerNode) {
-                final var builderChild = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
-                buildCont(builderChild, result, childCtx, trim);
+                final var builderChild = Builders.containerBuilder()
+                        .withNodeIdentifier(identifier);
+                buildCont(builderChild, (ContainerNode) child, trim);
                 builder.withChild(builderChild.build());
             } else if (child instanceof MapNode) {
-                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
-                buildList(childBuilder, (MapNode) child, childCtx, trim,
-                    ((ListSchemaNode) childSchema).getKeyDefinition());
+                final var childBuilder = Builders.mapBuilder()
+                        .withNodeIdentifier(identifier);
+                buildList(childBuilder, (MapNode) child, trim);
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
-                final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
-                final Object nodeVal = child.body();
-                if (trim) {
-                    if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                        builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                    }
-                } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                }
+                final var childBuilder = Builders.leafBuilder()
+                        .withNodeIdentifier(identifier)
+                        .withValue(child.body());
+                builder.withChild(childBuilder.build());
             }
         }
     }
@@ -276,11 +245,10 @@ public final class ReadDataTransactionUtil {
      *
      * @param strategy {@link RestconfStrategy} - object that perform the actual DS operations
      * @param withDefa with-defaults parameter
-     * @param ctx      schema context
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
-            final YangInstanceIdentifier path, final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
+            final YangInstanceIdentifier path, final WithDefaultsParam withDefa) {
         // PREPARE STATE DATA NODE
         final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
         // PREPARE CONFIG DATA NODE
@@ -288,7 +256,7 @@ public final class ReadDataTransactionUtil {
             path);
 
         return mergeConfigAndSTateDataIfNeeded(stateDataNode,
-            withDefa == null ? configDataNode : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
+            withDefa == null ? configDataNode : prepareDataByParamWithDef(configDataNode, withDefa));
     }
 
     /**
@@ -298,13 +266,12 @@ public final class ReadDataTransactionUtil {
      * @param strategy {@link RestconfStrategy} - object that perform the actual DS operations
      * @param path     parent path to selected fields
      * @param withDefa with-defaults parameter
-     * @param ctx      schema context
      * @param fields   paths to selected subtrees which should be read, relative to to the parent path
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
             final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
-            final @NonNull EffectiveModelContext ctx, final @NonNull List<YangInstanceIdentifier> fields) {
+            final @NonNull List<YangInstanceIdentifier> fields) {
         // PREPARE STATE DATA NODE
         final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path,
             fields);
@@ -313,7 +280,7 @@ public final class ReadDataTransactionUtil {
         final NormalizedNode configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
             fields);
         return mergeConfigAndSTateDataIfNeeded(stateDataNode,
-            withDefa == null ? configDataNode : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
+            withDefa == null ? configDataNode : prepareDataByParamWithDef(configDataNode, withDefa));
     }
 
     private static NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
