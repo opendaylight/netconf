@@ -27,7 +27,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.nb.rfc8040.ContentParam;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
@@ -44,8 +43,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ReadDataTransactionUtilTest {
@@ -60,10 +57,7 @@ public class ReadDataTransactionUtilTest {
     @Mock
     private DOMDataTreeReadTransaction read;
     @Mock
-    private EffectiveModelContext mockSchemaContext;
-    @Mock
     private DOMDataBroker mockDataBroker;
-    private EffectiveModelContext schemaContext;
 
     @Before
     public void setUp() throws Exception {
@@ -72,8 +66,6 @@ public class ReadDataTransactionUtilTest {
         doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         mdsalStrategy = new MdsalRestconfStrategy(mockDataBroker);
         netconfStrategy = new NetconfRestconfStrategy(netconfService);
-        schemaContext = YangParserTestUtils.parseYangFiles(
-                TestRestconfUtils.loadFiles("/modules"));
     }
 
     @Test
@@ -169,7 +161,7 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
         final NormalizedNode normalizedNode = ReadDataTransactionUtil.readData(
-                ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM, schemaContext);
+                ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM);
         assertEquals(content, normalizedNode);
     }
 
@@ -213,7 +205,7 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
         final NormalizedNode normalizedNode = ReadDataTransactionUtil.readData(
-                ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM, schemaContext);
+                ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM);
 
 //assertEquals(content, normalizedNode); is not used because two duplicated child nodes are created in mapEntryNode
         assertTrue(normalizedNode instanceof ContainerNode);
@@ -256,7 +248,7 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
         final NormalizedNode normalizedNode = ReadDataTransactionUtil.readData(
-                ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM, schemaContext);
+                ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM);
         assertEquals(content, normalizedNode);
     }
 
@@ -415,6 +407,6 @@ public class ReadDataTransactionUtilTest {
      */
     private @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) {
-        return ReadDataTransactionUtil.readData(content, path, strategy, null, mockSchemaContext);
+        return ReadDataTransactionUtil.readData(content, path, strategy, null);
     }
 }
