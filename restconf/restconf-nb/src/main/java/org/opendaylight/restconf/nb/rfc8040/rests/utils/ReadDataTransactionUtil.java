@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -52,10 +53,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapEntryNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapNodeBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -127,6 +129,8 @@ public final class ReadDataTransactionUtil {
         };
     }
 
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+            justification = "https://github.com/spotbugs/spotbugs/issues/1867")
     private static NormalizedNode prepareDataByParamWithDef(final NormalizedNode result,
             final YangInstanceIdentifier path, final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
         final boolean trim = switch (withDefa) {
@@ -138,17 +142,19 @@ public final class ReadDataTransactionUtil {
         final DataSchemaContextNode<?> ctxNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
         final DataSchemaNode baseSchemaNode = ctxNode.getDataSchemaNode();
         if (result instanceof ContainerNode) {
-            final var builder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
+            final var builder = ImmutableContainerNodeBuilder.create((ContainerNode) result);
             buildCont(builder, (ContainerNode) result, ctxNode, trim);
             return builder.build();
         } else {
-            final var builder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
+            final var builder = ImmutableMapEntryNodeBuilder.create((MapEntryNode) baseSchemaNode);
             buildMapEntryBuilder(builder, (MapEntryNode) result, ctxNode, trim,
                     ((ListSchemaNode) baseSchemaNode).getKeyDefinition());
             return builder.build();
         }
     }
 
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+            justification = "https://github.com/spotbugs/spotbugs/issues/1867")
     private static void buildMapEntryBuilder(
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
             final MapEntryNode result, final DataSchemaContextNode<?> ctxNode, final boolean trim,
@@ -161,11 +167,11 @@ public final class ReadDataTransactionUtil {
 
             final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final var childBuilder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
+                final var childBuilder = ImmutableContainerNodeBuilder.create((ContainerNode) childSchema);
                 buildCont(childBuilder, (ContainerNode) child, childCtx, trim);
                 builder.withChild(childBuilder.build());
             } else if (child instanceof MapNode) {
-                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
+                final var childBuilder = ImmutableMapNodeBuilder.create((SystemMapNode) childSchema);
                 buildList(childBuilder, (MapNode) child, childCtx, trim,
                     ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
@@ -185,6 +191,8 @@ public final class ReadDataTransactionUtil {
         }
     }
 
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+            justification = "https://github.com/spotbugs/spotbugs/issues/1867")
     private static void buildList(final CollectionNodeBuilder<MapEntryNode, SystemMapNode> builder,
             final MapNode result, DataSchemaContextNode<?> ctxNode, final boolean trim, final List<QName> keys) {
         for (final MapEntryNode mapEntryNode : result.body()) {
@@ -193,12 +201,14 @@ public final class ReadDataTransactionUtil {
                 throw new NoSuchElementException("Failed to match entry " + mapEntryNode.getIdentifier());
             }
             final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
-            final var mapEntryBuilder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) childSchema);
+            final var mapEntryBuilder = ImmutableMapEntryNodeBuilder.create((MapEntryNode) childSchema);
             buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, childCtx, trim, keys);
             builder.withChild(mapEntryBuilder.build());
         }
     }
 
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+            justification = "https://github.com/spotbugs/spotbugs/issues/1867")
     private static void buildCont(final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder,
             final ContainerNode result, final DataSchemaContextNode<?> ctxNode, final boolean trim) {
         for (final DataContainerChild child : result.body()) {
@@ -209,11 +219,11 @@ public final class ReadDataTransactionUtil {
 
             final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final var builderChild = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
+                final var builderChild = ImmutableContainerNodeBuilder.create((ContainerNode) childSchema);
                 buildCont(builderChild, result, childCtx, trim);
                 builder.withChild(builderChild.build());
             } else if (child instanceof MapNode) {
-                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
+                final var childBuilder = ImmutableMapNodeBuilder.create((SystemMapNode) childSchema);
                 buildList(childBuilder, (MapNode) child, childCtx, trim,
                     ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
