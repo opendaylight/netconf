@@ -52,7 +52,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapEntryNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapNodeBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -138,11 +140,11 @@ public final class ReadDataTransactionUtil {
         final DataSchemaContextNode<?> ctxNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
         final DataSchemaNode baseSchemaNode = ctxNode.getDataSchemaNode();
         if (result instanceof ContainerNode) {
-            final var builder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
+            final var builder = ImmutableContainerNodeBuilder.create((ContainerSchemaNode) baseSchemaNode);
             buildCont(builder, (ContainerNode) result, ctxNode, trim);
             return builder.build();
         } else {
-            final var builder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
+            final var builder = ImmutableMapEntryNodeBuilder.create((ListSchemaNode) baseSchemaNode);
             buildMapEntryBuilder(builder, (MapEntryNode) result, ctxNode, trim,
                     ((ListSchemaNode) baseSchemaNode).getKeyDefinition());
             return builder.build();
@@ -161,11 +163,11 @@ public final class ReadDataTransactionUtil {
 
             final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final var childBuilder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
+                final var childBuilder = ImmutableContainerNodeBuilder.create((ContainerSchemaNode) childSchema);
                 buildCont(childBuilder, (ContainerNode) child, childCtx, trim);
                 builder.withChild(childBuilder.build());
             } else if (child instanceof MapNode) {
-                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
+                final var childBuilder = ImmutableMapNodeBuilder.create((ListSchemaNode) childSchema);
                 buildList(childBuilder, (MapNode) child, childCtx, trim,
                     ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
@@ -193,7 +195,7 @@ public final class ReadDataTransactionUtil {
                 throw new NoSuchElementException("Failed to match entry " + mapEntryNode.getIdentifier());
             }
             final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
-            final var mapEntryBuilder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) childSchema);
+            final var mapEntryBuilder = ImmutableMapEntryNodeBuilder.create((ListSchemaNode) childSchema);
             buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, childCtx, trim, keys);
             builder.withChild(mapEntryBuilder.build());
         }
@@ -209,11 +211,11 @@ public final class ReadDataTransactionUtil {
 
             final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final var builderChild = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
+                final var builderChild = ImmutableContainerNodeBuilder.create((ContainerSchemaNode) childSchema);
                 buildCont(builderChild, result, childCtx, trim);
                 builder.withChild(builderChild.build());
             } else if (child instanceof MapNode) {
-                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
+                final var childBuilder = ImmutableMapNodeBuilder.create((ListSchemaNode) childSchema);
                 buildList(childBuilder, (MapNode) child, childCtx, trim,
                     ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
