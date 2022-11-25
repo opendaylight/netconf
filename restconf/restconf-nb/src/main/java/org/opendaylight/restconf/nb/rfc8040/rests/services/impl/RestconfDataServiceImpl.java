@@ -147,10 +147,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final NormalizedNode node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
             node = ReadDataTransactionUtil.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                    strategy, readParams.withDefaults(), schemaContextRef, fieldPaths);
+                    strategy, readParams.withDefaults(), fieldPaths);
         } else {
             node = ReadDataTransactionUtil.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                    strategy, readParams.withDefaults(), schemaContextRef);
+                    strategy, readParams.withDefaults());
         }
 
         // FIXME: this is utter craziness, refactor it properly!
