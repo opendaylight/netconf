@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6cd108f_fcd0ca67",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2022-11-29T09:23:26Z",
+      "side": 1,
+      "message": "can we not make the session parameter of type NettyAwareClientSession directly, instead of checking and casting afterwards?",
+      "range": {
+        "startLine": 76,
+        "startChar": 43,
+        "endLine": 76,
+        "endChar": 50
+      },
+      "revId": "f4cf229e825659558c59f4e8e7bcc524e59932da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
