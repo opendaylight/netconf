@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eaa41ece_95045b75",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 20
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2022-11-29T09:40:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "daf932e5_c1ee9cbc",
+      "revId": "f3a4a2368a5d373fc622c244b168a31998ed3235",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "82828e0d_f1834d95",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-11-25T12:37:44Z",
       "side": 1,
       "message": "Please reinvestigate this. Is it ok to remove netconfChannel usage? If yes the we do not need it as parameter as well.",
+      "revId": "f3a4a2368a5d373fc622c244b168a31998ed3235",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56d54255_22f8652c",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2022-11-29T09:40:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82828e0d_f1834d95",
       "revId": "f3a4a2368a5d373fc622c244b168a31998ed3235",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
