@@ -1,0 +1,18 @@
+{
+  "ietf-yang-patch:yang-patch": {
+    "patch-id": "set-patch",
+    "comment": "comment",
+    "edit": [
+      {
+        "edit-id": "edit1",
+        "operation": "replace",
+        "target": "/set-model:cont-root/set-model:cont1/set-model:my-set=\"data1\"",
+        "value": {
+          "my-set": [
+            "data1"
+          ]
+        }
+      }
+    ]
+  }
+}
