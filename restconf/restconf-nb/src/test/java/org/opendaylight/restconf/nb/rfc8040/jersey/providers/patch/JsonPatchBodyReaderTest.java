@@ -22,6 +22,8 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReader
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -200,6 +202,104 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
         checkPatchContext(returnValue);
         final var data = returnValue.getData().get(0).getNode();
         assertEquals(CONT_AUG, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the system map node element.
+     */
+    @Test
+    public void modulePatchTargetMapNodeTest() throws Exception {
+        mockBodyReader("", jsonToPatchBodyReader, false);
+        final var inputStream = JsonBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHdataMapNode.json");
+        final QName MAP = QName.create("map:ns", "my-map").intern();
+        final QName KEY = QName.create("map:ns", "key-leaf").intern();
+        final QName DATA = QName.create("map:ns", "data-leaf").intern();
+        final var expectedData = Builders.mapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(MAP))
+                .withChild(Builders.mapEntryBuilder()
+                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(MAP, KEY, "key"))
+                        .withChild(ImmutableNodes.leafNode(KEY, "key"))
+                        .withChild(ImmutableNodes.leafNode(DATA, "data"))
+                        .build())
+                .build();
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(MAP, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the leaf set node element.
+     */
+    @Test
+    public void modulePatchTargetLeafSetNodeTest() throws Exception {
+        mockBodyReader("", jsonToPatchBodyReader, false);
+        final var inputStream = JsonBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHdataLeafSetNode.json");
+        final QName LEAF_SET = QName.create("set:ns", "my-set").intern();
+        final var expectedData = Builders.leafSetBuilder()
+                .withNodeIdentifier(new NodeIdentifier(LEAF_SET))
+                .withChild(Builders.leafSetEntryBuilder()
+                        .withNodeIdentifier(new NodeWithValue(LEAF_SET, "data1"))
+                        .withValue("data1")
+                        .build())
+                .build();
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(LEAF_SET, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the unkeyed list node element.
+     */
+    @Test
+    public void modulePatchTargetUnkeyedListNodeTest() throws Exception {
+        mockBodyReader("", jsonToPatchBodyReader, false);
+        final var inputStream = JsonBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHdataUnkeyedListNode.json");
+        final QName LIST = QName.create("list:ns", "unkeyed-list").intern();
+        final QName DATA1 = QName.create("list:ns", "leaf1").intern();
+        final QName DATA2 = QName.create("list:ns", "leaf2").intern();
+        final var expectedData = Builders.unkeyedListBuilder()
+                .withNodeIdentifier(new NodeIdentifier(LIST))
+                .withChild(Builders.unkeyedListEntryBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(LIST))
+                        .withChild(ImmutableNodes.leafNode(DATA1, "data1"))
+                        .withChild(ImmutableNodes.leafNode(DATA2, "data2"))
+                        .build())
+                .build();
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(LIST, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the choice node element.
+     */
+    @Test
+    public void modulePatchTargetChoiceNodeTest() throws Exception {
+        mockBodyReader("", jsonToPatchBodyReader, false);
+        final var inputStream = JsonBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHdataChoiceNode.json");
+        final QName CONT = QName.create("choice:ns", "case-cont1").intern();
+        final QName DATA = QName.create("choice:ns", "case-leaf1").intern();
+        final var expectedData = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(CONT))
+                .withChild(ImmutableNodes.leafNode(DATA, "data"))
+                .build();
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(CONT, data.getIdentifier().getNodeType());
         assertEquals(expectedData, data);
     }
 }
