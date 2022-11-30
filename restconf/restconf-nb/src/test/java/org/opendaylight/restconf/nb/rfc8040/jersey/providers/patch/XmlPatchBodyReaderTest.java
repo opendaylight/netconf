@@ -13,12 +13,15 @@ import static org.junit.Assert.assertThrows;
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -140,13 +143,108 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
         final var inputStream = XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataAugmentedElement.xml");
         final var expectedData = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(CONT_AUG_QNAME))
+                .withNodeIdentifier(new NodeIdentifier(CONT_AUG_QNAME))
                 .withChild(ImmutableNodes.leafNode(LEAF_AUG_QNAME, "data"))
                 .build();
         final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
         final var data = returnValue.getData().get(0).getNode();
         assertEquals(CONT_AUG_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the top system map node element.
+     */
+    @Test
+    public void moduleTargetMapNodeTest() throws Exception {
+        mockBodyReader("", xmlToPatchBodyReader, false);
+        final var inputStream = XmlBodyReaderTest.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataMapNode.xml");
+
+        final var expectedData = Builders.mapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(MAP_CONT_QNAME))
+                .withChild(Builders.mapEntryBuilder()
+                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(MAP_CONT_QNAME, KEY_LEAF_QNAME, "key"))
+                        .withChild(ImmutableNodes.leafNode(KEY_LEAF_QNAME, "key"))
+                        .withChild(ImmutableNodes.leafNode(DATA_LEAF_QNAME, "data"))
+                        .build())
+                .build();
+
+        final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(MAP_CONT_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the leaf set node element.
+     * TODO: Remove ignore when NETCONF-937 will be resolved
+     */
+    @Ignore
+    @Test
+    public void modulePatchTargetLeafSetNodeTest() throws Exception {
+        mockBodyReader("", xmlToPatchBodyReader, false);
+        final var inputStream = XmlBodyReaderTest.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataLeafSetNode.xml");
+
+        final var expectedData = Builders.leafSetBuilder()
+                .withNodeIdentifier(new NodeIdentifier(LEAF_SET_QNAME))
+                .withChild(Builders.leafSetEntryBuilder()
+                        .withNodeIdentifier(new NodeWithValue(LEAF_SET_QNAME, "data1"))
+                        .withValue("data1")
+                        .build())
+                .build();
+
+        final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(LEAF_SET_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the top unkeyed list element.
+     */
+    @Test
+    public void moduleTargetUnkeyedListNodeTest() throws Exception {
+        mockBodyReader("", xmlToPatchBodyReader, false);
+        final var inputStream = XmlBodyReaderTest.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataUnkeyedListNode.xml");
+
+        final var expectedData = Builders.unkeyedListBuilder()
+                .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+                .withChild(Builders.unkeyedListEntryBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+                        .withChild(ImmutableNodes.leafNode(LIST_LEAF1_QNAME, "data1"))
+                        .withChild(ImmutableNodes.leafNode(LIST_LEAF2_QNAME, "data2"))
+                        .build())
+                .build();
+
+        final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(LIST_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the top choice node element.
+     */
+    @Test
+    public void moduleTargetChoiceNodeTest() throws Exception {
+        mockBodyReader("", xmlToPatchBodyReader, false);
+        final var inputStream = XmlBodyReaderTest.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataChoiceNode.xml");
+        final var expectedData = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(CHOICE_CONT_QNAME))
+                .withChild(ImmutableNodes.leafNode(CASE_LEAF1_QNAME, "data"))
+                .build();
+        final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(CHOICE_CONT_QNAME, data.getIdentifier().getNodeType());
         assertEquals(expectedData, data);
     }
 }
