@@ -1,0 +1,18 @@
+{
+  "ietf-yang-patch:yang-patch": {
+    "patch-id": "choice-patch",
+    "comment": "comment",
+    "edit": [
+      {
+        "edit-id": "edit1",
+        "operation": "replace",
+        "target": "/choice-model:cont-root/choice-model:cont1/choice-model:case-cont1",
+        "value": {
+          "case-cont1": {
+            "case-leaf1": "data"
+          }
+        }
+      }
+    ]
+  }
+}
