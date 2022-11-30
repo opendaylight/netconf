@@ -7,16 +7,16 @@
   -->
 
 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
-    <patch-id>test-patch</patch-id>
+    <patch-id>choice-patch</patch-id>
     <comment>This test patch for augmented element</comment>
     <edit>
         <edit-id>edit1</edit-id>
         <operation>replace</operation>
-        <target>/test-model:container-root/test-model:container-lvl1/test-model-aug:container-aug</target>
+        <target>/choice-model:cont-root/choice-model:cont1/choice-model:case-cont1</target>
         <value>
-            <container-aug xmlns="test-ns-aug">
-                <leaf-aug>data</leaf-aug>
-            </container-aug>
+            <case-cont1 xmlns="choice:ns">
+                <case-leaf1>data</case-leaf1>
+            </case-cont1>
         </value>
     </edit>
 </yang-patch>
