@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee9e9508_0da711fe",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-12-01T12:49:31Z",
+      "side": 1,
+      "message": "Random empty line?",
+      "revId": "b94c7a868c782ebeaddaa0a4d04a221198a3c9f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a519c98_198a2177",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-12-01T12:49:31Z",
+      "side": 1,
+      "message": "Random empty line?",
+      "revId": "b94c7a868c782ebeaddaa0a4d04a221198a3c9f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
