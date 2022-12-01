@@ -26,6 +26,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.nb.rfc8040.ContentParam;
+import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -33,13 +35,16 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ReadDataTransactionUtilTest {
@@ -140,6 +145,150 @@ public class ReadDataTransactionUtilTest {
 
         normalizedNode = readData(ContentParam.ALL, DATA.path, netconfStrategy);
         assertEquals(checkingData, normalizedNode);
+    }
+
+    @Test
+    public void readLeafWithDefaultParameters() throws Exception {
+        final LeafNode leafNode = Builders.leafBuilder().withNodeIdentifier(
+                new NodeIdentifier(QName.create(DATA.base, "exampleLeaf"))).withValue("i am leaf").build();
+
+        final ContainerNode content = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(QName.create(DATA.base, "cont")))
+                .withChild(leafNode)
+                .build();
+        EffectiveModelContext mySchemaContext = YangParserTestUtils.parseYangFiles(
+                TestRestconfUtils.loadFiles("/modules"));
+
+        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(QName.create(DATA.base, "cont")
+                ).build();
+
+        doReturn(immediateFluentFuture(Optional.of(content))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(netconfService).getConfig(path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(netconfService).get(path);
+
+        NormalizedNode normalizedNode = ReadDataTransactionUtil.readData(
+                ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM, mySchemaContext);
+        assertEquals(content, normalizedNode);
+
+        normalizedNode =  ReadDataTransactionUtil.readData(
+                ContentParam.ALL, path, netconfStrategy, WithDefaultsParam.TRIM, mySchemaContext);
+        assertEquals(content, normalizedNode);
+    }
+
+    @Test
+    public void readContainerWithDefaultParameters() throws Exception {
+
+        final QName leafBool = QName.create(DATA.base, "leafBool");
+        final QName containerBool = QName.create(DATA.base, "containerBool");
+        final QName containerInt = QName.create(DATA.base, "containerInt");
+        final QName leafInt = QName.create(DATA.base, "leafInt");
+        final QName exampleList = QName.create(DATA.base, "exampleList");
+        final QName cont = QName.create(DATA.base, "cont");
+
+        EffectiveModelContext mySchemaContext = YangParserTestUtils.parseYangFiles(
+                TestRestconfUtils.loadFiles("/modules"));
+        final LeafNode leafNode = Builders.leafBuilder().withNodeIdentifier(
+                NodeIdentifier.create(leafBool))
+                .withValue(true).build();
+        final ContainerNode containerNode = Builders.containerBuilder().withNodeIdentifier(
+                NodeIdentifier.create(containerBool))
+                .withChild(leafNode).build();
+        final LeafNode leafNode1 = Builders.leafBuilder().withNodeIdentifier(
+                NodeIdentifier.create(leafInt))
+                .withValue(12).build();
+        final ContainerNode containerNode1 = Builders.containerBuilder().withNodeIdentifier(
+                NodeIdentifier.create(containerInt))
+                .withChild(leafNode1).build();
+        final MapEntryNode entryNode = Builders.mapEntryBuilder()
+                .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(exampleList))
+                .withChild(containerNode)
+                .addChild(containerNode1).build();
+        final MapNode mapNode = Builders.mapBuilder().withNodeIdentifier(
+                NodeIdentifier.create(exampleList))
+                .withChild(entryNode).build();
+        final ContainerNode content = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(cont))
+                .withChild(mapNode).build();
+
+        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(cont).build();
+
+        doReturn(immediateFluentFuture(Optional.of(content))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(netconfService).getConfig(path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(netconfService).get(path);
+
+        NormalizedNode normalizedNode = ReadDataTransactionUtil.readData(
+                ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM, mySchemaContext);
+
+        assertEquals(((MapNode) ((ContainerNode) normalizedNode).getChildByArg(
+                        NodeIdentifier.create(QName.create(DATA.base, "exampleList")))).getChildByArg(
+                        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(QName.create(DATA.base, "exampleList"))),
+                ((MapNode) content.getChildByArg(
+                        NodeIdentifier.create(QName.create(DATA.base, "exampleList")))).childByArg(
+                        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(
+                                QName.create(DATA.base, "exampleList"))));
+
+        normalizedNode =  ReadDataTransactionUtil.readData(
+                ContentParam.ALL, path, netconfStrategy, WithDefaultsParam.TRIM, mySchemaContext);
+
+//assertEquals(content, normalizedNode); is not used because two duplicated child nodes are created in mapEntryNode
+        assertEquals(((MapNode) ((ContainerNode) normalizedNode).getChildByArg(
+                        NodeIdentifier.create(QName.create(DATA.base, "exampleList")))).getChildByArg(
+                        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(QName.create(DATA.base, "exampleList"))),
+                ((MapNode) content.getChildByArg(
+                        NodeIdentifier.create(QName.create(DATA.base, "exampleList")))).childByArg(
+                        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(
+                                QName.create(DATA.base, "exampleList"))));
+    }
+
+    @Test
+    public void readLeafInListWithDefaultParameters() throws Exception {
+
+        final QName leafInList = QName.create(DATA.base, "leafInList");
+        final QName exampleList = QName.create(DATA.base, "exampleList");
+        final QName container = QName.create(DATA.base, "cont");
+
+        EffectiveModelContext mySchemaContext = YangParserTestUtils.parseYangFiles(
+                TestRestconfUtils.loadFiles("/modules"));
+
+        final LeafNode leafNode = Builders.leafBuilder().withNodeIdentifier(
+                NodeIdentifier.create(leafInList))
+                .withValue("I am leaf in list").build();
+
+        final MapEntryNode entryNode = Builders.mapEntryBuilder()
+                .withNodeIdentifier(
+                        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(exampleList))
+                .addChild(leafNode).build();
+
+        final MapNode mapNode = Builders.mapBuilder().withNodeIdentifier(
+                NodeIdentifier.create(QName.create(DATA.base, "exampleList")))
+                .withChild(entryNode).build();
+
+        final ContainerNode content = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(container))
+                .withChild(mapNode).build();
+
+        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(container).build();
+
+        doReturn(immediateFluentFuture(Optional.of(content))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(netconfService).getConfig(path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(netconfService).get(path);
+
+        NormalizedNode normalizedNode = ReadDataTransactionUtil.readData(
+                ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM, mySchemaContext);
+        assertEquals(content, normalizedNode);
+
+        normalizedNode =  ReadDataTransactionUtil.readData(
+                ContentParam.ALL, path, netconfStrategy, WithDefaultsParam.TRIM, mySchemaContext);
+        assertEquals(content, normalizedNode);
     }
 
     @Test
