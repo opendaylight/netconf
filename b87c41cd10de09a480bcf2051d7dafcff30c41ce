@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6928958a_add8680e",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "final",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8669e3f9_be0bd348",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "The same QName is created twice.",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77ece14e_2434fcc6",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "final",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3facf382_cf74c41b",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "Its enough to test it once 😊",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7dfcaccc_65c28b70",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "Not needed to make this empty line.",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dea9c5c_91193d31",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "final",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1bf69ba_b79f3ead",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "We already have this QName, plea use its reference here.",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd8d0e65_3daf9d43",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "hmm..",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92babb4d_94bf4226",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "Not needed empty line.",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4ac5683_b647ed1d",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "final",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a67256b9_72cd56ab",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-01T09:52:28Z",
+      "side": 1,
+      "message": "final",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
