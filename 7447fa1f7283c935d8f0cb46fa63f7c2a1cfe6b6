@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "787d1959_313f2470",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyAwareChannelSubsystem.java",
@@ -20,10 +21,10 @@
         "endChar": 5
       },
       "revId": "7447fa1f7283c935d8f0cb46fa63f7c2a1cfe6b6",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "1c5198e9_0ec29a8e",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyAwareChannelSubsystem.java",
@@ -44,8 +45,31 @@
         "endChar": 5
       },
       "revId": "7447fa1f7283c935d8f0cb46fa63f7c2a1cfe6b6",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c2b6bbe_7de264ec",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyAwareChannelSubsystem.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2022-12-01T15:10:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c5198e9_0ec29a8e",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 5
+      },
+      "revId": "7447fa1f7283c935d8f0cb46fa63f7c2a1cfe6b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

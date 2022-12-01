@@ -69,6 +69,24 @@
       "parentUuid": "3d8606d7_3bb1565b",
       "revId": "23f88e50829cf37bf7b58805bae078d69ae1128d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7e0bb91_42e380be",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyPipelineAwareChannelSubsystem.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2022-12-01T15:10:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99408b97_fe233859",
+      "revId": "23f88e50829cf37bf7b58805bae078d69ae1128d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

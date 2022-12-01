@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "7abf3012_35663f8a",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyPipelineAwareChannelSubsystem.java",
@@ -14,8 +15,25 @@
       "side": 1,
       "message": "Can we get rid of this class somehow? It is very similar to another one (NettyAwareChannelSubsystem). Why in call-home do we need pipeline instead of context?",
       "revId": "0c8caea00356c8c0a03bae4024f7adbaf9292f7f",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82616de1_3aa752d0",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyPipelineAwareChannelSubsystem.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2022-12-01T15:10:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7abf3012_35663f8a",
+      "revId": "0c8caea00356c8c0a03bae4024f7adbaf9292f7f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
