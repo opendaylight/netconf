@@ -18,7 +18,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,8 +93,8 @@ public class NetconfDeviceSalFacadeTest {
     public void testOnDeviceConnected() {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
 
-        final NetconfSessionPreferences netconfSessionPreferences =
-                NetconfSessionPreferences.fromStrings(getCapabilities());
+        final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(
+            List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
 
         final DOMRpcService deviceRpc = mock(DOMRpcService.class);
         deviceFacade.onDeviceConnected(new EmptyMountPointContext(schemaContext), netconfSessionPreferences, deviceRpc,
@@ -113,9 +112,5 @@ public class NetconfDeviceSalFacadeTest {
         final DOMNotification domNotification = mock(DOMNotification.class);
         deviceFacade.onNotification(domNotification);
         verify(mountInstance).publish(domNotification);
-    }
-
-    private static List<String> getCapabilities() {
-        return Arrays.asList(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
     }
 }
