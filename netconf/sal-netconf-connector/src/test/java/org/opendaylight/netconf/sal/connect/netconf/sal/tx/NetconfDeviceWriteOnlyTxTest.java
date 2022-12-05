@@ -50,7 +50,6 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -65,7 +64,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     @Before
     public void setUp() {
         final ListenableFuture<DefaultDOMRpcResult> successFuture =
-                Futures.immediateFuture(new DefaultDOMRpcResult((NormalizedNode) null));
+                Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null));
 
         doReturn(successFuture)
                 .doReturn(Futures.immediateFailedFuture(new IllegalStateException("Failed tx")))
@@ -90,7 +89,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testDiscardChanges() throws InterruptedException {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((ContainerNode) null)))
                 .when(rpc).invokeRpc(any(QName.class), isNull());
 
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)),
@@ -116,7 +115,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testFailedCommit() throws Exception {
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null)))
             .doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(RpcResultBuilder.newError(ErrorType.APPLICATION,
                 new ErrorTag("a"), "m")))).when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
 
@@ -133,7 +132,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testDiscardChangesNotSentWithoutCandidate() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((ContainerNode) null)))
                 .doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("Failed tx")))
                 .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
 
@@ -154,7 +153,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testListenerSuccess() throws Exception {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((ContainerNode) null)))
                 .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BASE_SCHEMAS.getBaseSchema().getMountPointContext()), false);
@@ -170,7 +169,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testListenerCancellation() throws Exception {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((ContainerNode) null)))
                 .when(rpc).invokeRpc(any(QName.class), isNull());
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BASE_SCHEMAS.getBaseSchema().getMountPointContext()), false);

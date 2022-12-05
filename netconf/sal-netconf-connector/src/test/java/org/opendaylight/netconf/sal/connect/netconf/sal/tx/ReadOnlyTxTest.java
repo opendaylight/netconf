@@ -31,14 +31,13 @@ import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ReadOnlyTxTest {
     @Mock
     private DOMRpcService rpc;
     @Mock
-    private NormalizedNode mockedNode;
+    private ContainerNode mockedNode;
 
     @Before
     public void setUp() {

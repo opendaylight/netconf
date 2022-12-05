@@ -404,7 +404,7 @@ public class NetconfMessageTransformer implements MessageTransformer {
 
     @Override
     public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final QName rpc) {
-        final NormalizedNode normalizedNode;
+        final ContainerNode normalizedNode;
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
             normalizedNode = Builders.containerBuilder()
                     .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
@@ -437,7 +437,7 @@ public class NetconfMessageTransformer implements MessageTransformer {
     public DOMActionResult toActionResult(final Absolute action, final NetconfMessage message) {
         final ActionDefinition actionDefinition = actions.get(action);
         checkArgument(actionDefinition != null, "Action does not exist: %s", action);
-        final ContainerNode normalizedNode = (ContainerNode) parseResult(message, action, actionDefinition);
+        final ContainerNode normalizedNode = parseResult(message, action, actionDefinition);
 
         if (normalizedNode == null) {
             return new SimpleDOMActionResult(List.of());
@@ -446,7 +446,7 @@ public class NetconfMessageTransformer implements MessageTransformer {
         }
     }
 
-    private NormalizedNode parseResult(final NetconfMessage message, final Absolute operationPath,
+    private ContainerNode parseResult(final NetconfMessage message, final Absolute operationPath,
             final OperationDefinition operationDef) {
         final Optional<XmlElement> okResponseElement = XmlElement.fromDomDocument(message.getDocument())
                 .getOnlyChildElementWithSameNamespaceOptionally("ok");
@@ -480,7 +480,7 @@ public class NetconfMessageTransformer implements MessageTransformer {
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
         }
-        return resultHolder.getResult();
+        return (ContainerNode) resultHolder.getResult();
     }
 
     @Beta

@@ -220,7 +220,7 @@ public final class NetconfBaseOps {
         requireNonNull(callback);
         requireNonNull(datastore);
 
-        final NormalizedNode rpcInput;
+        final ContainerNode rpcInput;
         if (isFilterPresent(filterPath)) {
             final DataContainerChild node = transformer.toFilterStructure(
                     Collections.singletonList(FieldsFilter.of(filterPath.get(), fields)));
@@ -346,7 +346,7 @@ public final class NetconfBaseOps {
             final Optional<YangInstanceIdentifier> filterPath, final List<YangInstanceIdentifier> fields) {
         requireNonNull(callback);
 
-        final NormalizedNode rpcInput;
+        final ContainerNode rpcInput;
         if (isFilterPresent(filterPath)) {
             rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, transformer.toFilterStructure(
                     Collections.singletonList(FieldsFilter.of(filterPath.get(), fields))));

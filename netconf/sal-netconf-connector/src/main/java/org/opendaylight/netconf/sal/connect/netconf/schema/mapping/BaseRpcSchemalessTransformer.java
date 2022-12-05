@@ -83,7 +83,7 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer {
 
     @Override
     public DOMRpcResult toRpcResult(final NetconfMessage message, final QName rpc) {
-        final NormalizedNode normalizedNode;
+        final ContainerNode normalizedNode;
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
             final Element xmlData = NetconfMessageTransformUtil.getDataSubtree(message.getDocument());
             final Document data = XmlUtil.newDocument();
