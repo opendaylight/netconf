@@ -115,8 +115,11 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
      */
     public void init() {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
-        initTopology(wtx, LogicalDatastoreType.CONFIGURATION);
-        initTopology(wtx, LogicalDatastoreType.OPERATIONAL);
+        // FIXME: this should be a put(), as we are initializing and will be re-populating the datastore with all the
+        //        devices. Whathever has been there before should be nuked to properly re-align lifecycle
+        wtx.merge(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.builder(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .build(), new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build());
         wtx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -166,14 +169,6 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
                     LOG.debug("Unsupported modification type: {}.", rootNode.getModificationType());
             }
         }
-    }
-
-    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
-        // FIXME: this should be a put(), as we are initializing and will be re-populating the datastore with all the
-        //        devices. Whathever has been there before should be nuked to properly re-align lifecycle
-        wtx.merge(datastoreType, InstanceIdentifier.builder(NetworkTopology.class)
-            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
-            .build(), new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build());
     }
 
     /**
