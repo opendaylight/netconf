@@ -270,8 +270,12 @@ public class NetconfTopologyManager
 
     private ListenerRegistration<NetconfTopologyManager> registerDataTreeChangeListener() {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
-        initTopology(wtx, LogicalDatastoreType.CONFIGURATION);
-        initTopology(wtx, LogicalDatastoreType.OPERATIONAL);
+        // FIXME: how does this play out with lifecycle? In a cluster, someone needs to ensure this call happens, but
+        //        also we need to to make sure config -> oper is properly synchronized. Non-clustered case relies on
+        //        oper being transient and perhaps on a put() instead, how do we handle that in the clustered case?
+        wtx.merge(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.builder(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .build(), new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build());
         wtx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -287,15 +291,6 @@ public class NetconfTopologyManager
         LOG.debug("Registering datastore listener");
         return dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
             NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
-    }
-
-    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
-        // FIXME: how does this play out with lifecycle? In a cluster, someone needs to ensure this call happens, but
-        //        also we need to to make sure config -> oper is properly synchronized. Non-clustered case relies on
-        //        oper being transient and perhaps on a put() instead, how do we handle that in the clustered case?
-        wtx.merge(datastoreType, InstanceIdentifier.builder(NetworkTopology.class)
-            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
-            .build(), new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build());
     }
 
     private NetconfTopologySetup createSetup(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
