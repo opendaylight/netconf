@@ -12,9 +12,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.Transaction;
-import org.opendaylight.mdsal.binding.api.TransactionChain;
-import org.opendaylight.mdsal.binding.api.TransactionChainListener;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -36,40 +33,20 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
     private final RemoteDeviceId id;
     private final MountInstance mountInstance;
-    private final DataBroker dataBroker;
 
     private volatile NetconfDeviceTopologyAdapter topologyDatastoreAdapter;
-
-    private TransactionChain txChain;
-
-    private final TransactionChainListener transactionChainListener =  new TransactionChainListener() {
-        @Override
-        public void onTransactionChainFailed(final TransactionChain chain, final Transaction transaction,
-                final Throwable cause) {
-            LOG.error("{}: TransactionChain({}) {} FAILED!", id, chain, transaction.getIdentifier(), cause);
-            chain.close();
-            resetTransactionChainForAdapaters();
-            throw new IllegalStateException(id + "  TransactionChain(" + chain + ") not committed correctly", cause);
-        }
-
-        @Override
-        public void onTransactionChainSuccessful(final TransactionChain chain) {
-            LOG.trace("{}: TransactionChain({}) SUCCESSFUL", id, chain);
-        }
-    };
 
     public NetconfDeviceSalProvider(final RemoteDeviceId deviceId, final DOMMountPointService mountService) {
         this(deviceId, mountService, null);
     }
 
+    // FIXME: NETCONF-918: remove this method
     public NetconfDeviceSalProvider(final RemoteDeviceId deviceId, final DOMMountPointService mountService,
             final DataBroker dataBroker) {
-        this.id = deviceId;
+        id = deviceId;
         mountInstance = new MountInstance(mountService, id);
-        this.dataBroker = dataBroker;
         if (dataBroker != null) {
-            txChain = requireNonNull(dataBroker).createTransactionChain(transactionChainListener);
-            topologyDatastoreAdapter = new NetconfDeviceTopologyAdapter(id, txChain);
+            topologyDatastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, id);
         }
     }
 
@@ -86,21 +63,12 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         return local;
     }
 
-    private void resetTransactionChainForAdapaters() {
-        txChain = requireNonNull(dataBroker).createTransactionChain(transactionChainListener);
-        topologyDatastoreAdapter.setTxChain(txChain);
-        LOG.trace("{}: Resetting TransactionChain {}", id, txChain);
-    }
-
     @Override
     public void close() {
         mountInstance.close();
         if (topologyDatastoreAdapter != null) {
             topologyDatastoreAdapter.close();
-        }
-        topologyDatastoreAdapter = null;
-        if (txChain != null) {
-            txChain.close();
+            topologyDatastoreAdapter = null;
         }
     }
 
@@ -138,7 +106,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
             if (netconfService != null) {
                 mountBuilder.addService(NetconfDataTreeService.class, netconfService);
             }
-            this.notificationService = newNotificationService;
+            notificationService = newNotificationService;
 
             topologyRegistration = mountBuilder.register();
             LOG.debug("{}: TOPOLOGY Mountpoint exposed into MD-SAL {}", id, topologyRegistration);
