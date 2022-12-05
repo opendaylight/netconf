@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -16,8 +17,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableItem;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -47,32 +49,32 @@ public final class NetconfTopologyUtils {
         return masterAddress.replace("//", "") + "_" + name;
     }
 
-    public static NodeId getNodeId(final InstanceIdentifier.PathArgument pathArgument) {
-        if (pathArgument instanceof InstanceIdentifier.IdentifiableItem) {
-            final Identifier<?> key = ((InstanceIdentifier.IdentifiableItem<?, ?>) pathArgument).getKey();
-            if (key instanceof NodeKey) {
-                return ((NodeKey) key).getNodeId();
-            }
+    public static @NonNull NodeId getNodeId(final PathArgument pathArgument) {
+        if (pathArgument instanceof IdentifiableItem<?, ?> identifiableItem
+            && identifiableItem.getKey() instanceof NodeKey nodeKey) {
+            return nodeKey.getNodeId();
         }
         throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);
     }
 
-    public static KeyedInstanceIdentifier<Topology, TopologyKey> createTopologyListPath(final String topologyId) {
-        final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
-        return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+    public static @NonNull KeyedInstanceIdentifier<Topology, TopologyKey> createTopologyListPath(
+            final String topologyId) {
+        return InstanceIdentifier.create(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
     }
 
-    public static KeyedInstanceIdentifier<Node, NodeKey> createTopologyNodeListPath(final NodeKey key,
+    public static @NonNull KeyedInstanceIdentifier<Node, NodeKey> createTopologyNodeListPath(final NodeKey key,
             final String topologyId) {
         return createTopologyListPath(topologyId)
                 .child(Node.class, new NodeKey(new NodeId(key.getNodeId().getValue())));
     }
 
-    public static InstanceIdentifier<Node> createTopologyNodePath(final String topologyId) {
+    public static @NonNull InstanceIdentifier<Node> createTopologyNodePath(final String topologyId) {
         return createTopologyListPath(topologyId).child(Node.class);
     }
 
-    public static DocumentedException createMasterIsDownException(final RemoteDeviceId id, final Exception cause) {
+    public static @NonNull DocumentedException createMasterIsDownException(final RemoteDeviceId id,
+            final Exception cause) {
         return new DocumentedException(id + ":Master is down. Please try again.", cause,
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.WARNING);
     }

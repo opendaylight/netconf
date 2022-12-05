@@ -12,15 +12,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -41,6 +38,7 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
@@ -68,7 +66,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableItem;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
@@ -81,43 +78,38 @@ import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfTopologyImplTest {
-
     private static final NodeId NODE_ID = new NodeId("testing-node");
     private static final String TOPOLOGY_ID = "testing-topology";
 
     @Mock
     private NetconfClientDispatcher mockedClientDispatcher;
-
     @Mock
     private EventExecutor mockedEventExecutor;
-
     @Mock
     private ScheduledThreadPool mockedKeepaliveExecutor;
-
     @Mock
     private ThreadPool mockedProcessingExecutor;
-
     @Mock
     private SchemaResourceManager mockedResourceManager;
-
     @Mock
     private DataBroker dataBroker;
-
     @Mock
     private DOMMountPointService mountPointService;
-
     @Mock
     private AAAEncryptionService encryptionService;
-
     @Mock
     private RpcProviderService rpcProviderService;
+    @Mock
+    private WriteTransaction wtx;
 
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
     @Before
     public void setUp() {
-        when(mockedProcessingExecutor.getExecutor()).thenReturn(MoreExecutors.newDirectExecutorService());
+        doReturn(MoreExecutors.newDirectExecutorService()).when(mockedProcessingExecutor).getExecutor();
+        doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
             mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker, mountPointService,
@@ -128,21 +120,12 @@ public class NetconfTopologyImplTest {
 
     @Test
     public void testInit() {
-        final WriteTransaction wtx = mock(WriteTransaction.class);
-        when(dataBroker.newWriteOnlyTransaction()).thenReturn(wtx);
-        doNothing().when(wtx)
-                .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
-        doReturn(emptyFluentFuture()).when(wtx).commit();
         topology.init();
 
         //verify initialization of topology
-        final InstanceIdentifier<NetworkTopology> networkTopologyId =
-                InstanceIdentifier.builder(NetworkTopology.class).build();
-        final Topology topo = new TopologyBuilder().setTopologyId(new TopologyId(TOPOLOGY_ID)).build();
-        verify(wtx).merge(LogicalDatastoreType.CONFIGURATION,
-                networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))), topo);
-        verify(wtx).merge(LogicalDatastoreType.OPERATIONAL,
-                networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))), topo);
+        verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.builder(NetworkTopology.class)
+                .child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))).build(),
+                new TopologyBuilder().setTopologyId(new TopologyId(TOPOLOGY_ID)).build());
     }
 
     @Test

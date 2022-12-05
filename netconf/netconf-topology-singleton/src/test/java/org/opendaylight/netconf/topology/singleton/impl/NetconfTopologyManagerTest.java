@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -156,12 +155,10 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         netconfTopologyManager.init();
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            ReadTransaction readTx = dataBroker.newReadOnlyTransaction();
-            Optional<Topology> config = readTx.read(LogicalDatastoreType.CONFIGURATION,
+            try (ReadTransaction readTx = dataBroker.newReadOnlyTransaction()) {
+                return readTx.exists(LogicalDatastoreType.OPERATIONAL,
                     NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
-            Optional<Topology> oper = readTx.read(LogicalDatastoreType.OPERATIONAL,
-                    NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
-            return config.isPresent() && oper.isPresent();
+            }
         });
 
         // verify registration is called with right parameters
