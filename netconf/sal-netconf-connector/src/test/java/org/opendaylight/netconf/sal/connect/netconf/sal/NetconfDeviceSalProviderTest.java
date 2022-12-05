@@ -8,8 +8,6 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,7 +25,6 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.TransactionChainListener;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
@@ -51,7 +48,6 @@ public class NetconfDeviceSalProviderTest {
     public void setUp() throws Exception {
         doReturn(chain).when(dataBroker).createTransactionChain(any(TransactionChainListener.class));
         doReturn(writeTx).when(chain).newWriteOnlyTransaction();
-        doNothing().when(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         doReturn("Some object").when(writeTx).getIdentifier();
         doReturn(emptyFluentFuture()).when(writeTx).commit();
         provider = new NetconfDeviceSalProvider(new RemoteDeviceId("device1",
