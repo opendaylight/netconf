@@ -657,11 +657,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static void verifyTopologyNodesCreated(final DataBroker dataBroker) {
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
             try (ReadTransaction readTx = dataBroker.newReadOnlyTransaction()) {
-                Optional<Topology> configTopology = readTx.read(LogicalDatastoreType.CONFIGURATION,
-                        NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
-                Optional<Topology> operTopology = readTx.read(LogicalDatastoreType.OPERATIONAL,
-                        NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
-                return configTopology.isPresent() && operTopology.isPresent();
+                return readTx.exists(LogicalDatastoreType.OPERATIONAL,
+                    NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
             }
         });
     }
