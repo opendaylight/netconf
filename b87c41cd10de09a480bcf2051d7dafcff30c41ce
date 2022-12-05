@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7f6a7bf_d17c5036",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-05T17:04:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6928958a_add8680e",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8669e3f9_be0bd348",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-12-01T09:52:28Z",
       "side": 1,
       "message": "The same QName is created twice.",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b69a1b4c_892fe444",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-05T17:04:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8669e3f9_be0bd348",
       "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a73fbb3c_01f669df",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-05T17:04:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77ece14e_2434fcc6",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3facf382_cf74c41b",
@@ -65,6 +119,24 @@
       "writtenOn": "2022-12-01T09:52:28Z",
       "side": 1,
       "message": "Its enough to test it once 😊",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfb08d89_aa3a2ebb",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-05T17:04:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3facf382_cf74c41b",
       "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98e0f000_48aa6186",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-05T17:04:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7dfcaccc_65c28b70",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4dea9c5c_91193d31",
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed27b42d_d2441127",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-05T17:04:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4dea9c5c_91193d31",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d1bf69ba_b79f3ead",
@@ -116,6 +224,24 @@
       "writtenOn": "2022-12-01T09:52:28Z",
       "side": 1,
       "message": "We already have this QName, plea use its reference here.",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "977e0a17_bde0d9b7",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-05T17:04:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1bf69ba_b79f3ead",
       "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +280,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "41c01950_5405b6a1",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-05T17:04:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92babb4d_94bf4226",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4ac5683_b647ed1d",
@@ -171,6 +315,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19985509_6516e85d",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-05T17:04:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4ac5683_b647ed1d",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a67256b9_72cd56ab",
@@ -184,6 +346,24 @@
       "writtenOn": "2022-12-01T09:52:28Z",
       "side": 1,
       "message": "final",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef5d0e1e_03742406",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-05T17:04:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a67256b9_72cd56ab",
       "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
