@@ -61,7 +61,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
@@ -140,9 +139,6 @@ public class NetconfTopologyImplTest {
         final InstanceIdentifier<NetworkTopology> networkTopologyId =
                 InstanceIdentifier.builder(NetworkTopology.class).build();
         final Topology topo = new TopologyBuilder().setTopologyId(new TopologyId(TOPOLOGY_ID)).build();
-        final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
-        verify(wtx).merge(LogicalDatastoreType.CONFIGURATION, networkTopologyId, networkTopology);
-        verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, networkTopologyId, networkTopology);
         verify(wtx).merge(LogicalDatastoreType.CONFIGURATION,
                 networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))), topo);
         verify(wtx).merge(LogicalDatastoreType.OPERATIONAL,
