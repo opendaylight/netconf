@@ -33,65 +33,36 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability.FailureReason;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapabilityBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.network.topology.topology.topology.types.TopologyNetconf;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// Non-final for testing
 public class NetconfDeviceTopologyAdapter implements AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceTopologyAdapter.class);
 
     private final RemoteDeviceId id;
+
     private TransactionChain txChain;
 
-    private final InstanceIdentifier<NetworkTopology> networkTopologyPath;
-    private final KeyedInstanceIdentifier<Topology, TopologyKey> topologyListPath;
-    private static final String UNKNOWN_REASON = "Unknown reason";
-
     NetconfDeviceTopologyAdapter(final RemoteDeviceId id, final TransactionChain txChain) {
-        this.id = id;
+        this.id = requireNonNull(id);
         this.txChain = requireNonNull(txChain);
 
-        this.networkTopologyPath = InstanceIdentifier.builder(NetworkTopology.class).build();
-        this.topologyListPath = networkTopologyPath
-                .child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));
-
-        initDeviceData();
-    }
-
-    private void initDeviceData() {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
-
-        createNetworkTopologyIfNotPresent(writeTx);
-
-        final Node node = getNodeIdBuilder(id)
-                .addAugmentation(new NetconfNodeBuilder()
-                    .setConnectionStatus(ConnectionStatus.Connecting)
-                    .setHost(id.getHost())
-                    .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort()))).build())
-                .build();
-
-        LOG.trace("{}: Init device state transaction {} putting if absent operational data started.",
-                id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), node);
+        LOG.trace("{}: Init device state transaction {} putting if absent operational data started.", id,
+            writeTx.getIdentifier());
+        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), getNodeIdBuilder(id)
+            .addAugmentation(new NetconfNodeBuilder()
+                .setConnectionStatus(ConnectionStatus.Connecting)
+                .setHost(id.getHost())
+                .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort()))).build())
+            .build());
         LOG.trace("{}: Init device state transaction {} putting operational data ended.", id, writeTx.getIdentifier());
-        LOG.trace("{}: Init device state transaction {} putting if absent config data started.",
-                id, writeTx.getIdentifier());
-        LOG.trace("{}: Init device state transaction {} putting config data ended.", id, writeTx.getIdentifier());
 
         commitTransaction(writeTx, "init");
     }
@@ -136,7 +107,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
     }
 
     public void setDeviceAsFailed(final Throwable throwable) {
-        String reason = throwable != null && throwable.getMessage() != null ? throwable.getMessage() : UNKNOWN_REASON;
+        String reason = throwable != null && throwable.getMessage() != null ? throwable.getMessage() : "Unknown reason";
 
         final NetconfNode data = new NetconfNodeBuilder()
                 .setHost(id.getHost())
@@ -203,53 +174,31 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
     public void removeDeviceConfiguration() {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
-        LOG.trace(
-                "{}: Close device state transaction {} removing all data started.",
-                id, writeTx.getIdentifier());
+        LOG.trace("{}: Close device state transaction {} removing all data started.", id, writeTx.getIdentifier());
         writeTx.delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
-        LOG.trace(
-                "{}: Close device state transaction {} removing all data ended.",
-                id, writeTx.getIdentifier());
+        LOG.trace("{}: Close device state transaction {} removing all data ended.", id, writeTx.getIdentifier());
 
+        final var future = writeTx.commit();
         try {
-            writeTx.commit().get();
+            future.get();
         } catch (InterruptedException | ExecutionException e) {
             LOG.error("{}: Transaction(close) {} FAILED!", id, writeTx.getIdentifier(), e);
             throw new IllegalStateException(id + "  Transaction(close) not committed correctly", e);
         }
     }
 
-    private void createNetworkTopologyIfNotPresent(final WriteTransaction writeTx) {
-
-        final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
-        LOG.trace("{}: Transaction {} merging {} container to ensure its presence", id, writeTx.getIdentifier(),
-            NetworkTopology.QNAME);
-        writeTx.merge(LogicalDatastoreType.OPERATIONAL, networkTopologyPath, networkTopology);
-
-        final Topology topology =
-                new TopologyBuilder().setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).build();
-        LOG.trace("{}: Transaction {} merging {} container to ensure its presence", id, writeTx.getIdentifier(),
-                Topology.QNAME);
-        writeTx.merge(LogicalDatastoreType.OPERATIONAL, topologyListPath, topology);
-    }
-
     private void commitTransaction(final WriteTransaction transaction, final String txType) {
-        LOG.trace("{}: Committing Transaction {}:{}", id, txType,
-                transaction.getIdentifier());
+        LOG.trace("{}: Committing Transaction {}:{}", id, txType, transaction.getIdentifier());
 
         transaction.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                LOG.trace("{}: Transaction({}) {} SUCCESSFUL", id, txType,
-                        transaction.getIdentifier());
+                LOG.trace("{}: Transaction({}) {} SUCCESSFUL", id, txType, transaction.getIdentifier());
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
-                LOG.error("{}: Transaction({}) {} FAILED!", id, txType,
-                        transaction.getIdentifier(), throwable);
-                throw new IllegalStateException(
-                        id + "  Transaction(" + txType + ") not committed correctly", throwable);
+                LOG.error("{}: Transaction({}) {} FAILED!", id, txType, transaction.getIdentifier(), throwable);
             }
         }, MoreExecutors.directExecutor());
     }
