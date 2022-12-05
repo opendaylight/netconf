@@ -136,13 +136,9 @@ public class NetconfTopologyImplTest {
         topology.init();
 
         //verify initialization of topology
-        final InstanceIdentifier<NetworkTopology> networkTopologyId =
-                InstanceIdentifier.builder(NetworkTopology.class).build();
-        final Topology topo = new TopologyBuilder().setTopologyId(new TopologyId(TOPOLOGY_ID)).build();
-        verify(wtx).merge(LogicalDatastoreType.CONFIGURATION,
-                networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))), topo);
-        verify(wtx).merge(LogicalDatastoreType.OPERATIONAL,
-                networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))), topo);
+        verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.builder(NetworkTopology.class)
+                .child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))).build(),
+                new TopologyBuilder().setTopologyId(new TopologyId(TOPOLOGY_ID)).build());
     }
 
     @Test

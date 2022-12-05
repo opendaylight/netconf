@@ -28,8 +28,6 @@ import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -39,9 +37,8 @@ import com.typesafe.config.ConfigFactory;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.File;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -50,6 +47,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -102,7 +100,6 @@ import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager;
-import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
@@ -130,12 +127,13 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controll
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.two.level.list.TopLevelListKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -176,7 +174,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final String TOP_MODULE_NAME = "opendaylight-mdsal-list-test";
     private static final String ACTOR_SYSTEM_NAME = "test";
     private static final String TOPOLOGY_ID = TopologyNetconf.QNAME.getLocalName();
-    private static final KeyedInstanceIdentifier<Node, NodeKey> NODE_INSTANCE_ID =
+    private static final @NonNull KeyedInstanceIdentifier<Node, NodeKey> NODE_INSTANCE_ID =
         NetconfTopologyUtils.createTopologyNodeListPath(new NodeKey(new NodeId("node-id")), TOPOLOGY_ID);
 
     private static final String TEST_ROOT_DIRECTORY = "test-cache-root";
@@ -268,7 +266,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     private void setupMaster() throws Exception {
-        AbstractConcurrentDataBrokerTest dataBrokerTest = newDataBrokerTest();
+        final var dataBrokerTest = newDataBrokerTest();
         masterDataBroker = dataBrokerTest.getDataBroker();
         deviceDOMDataBroker = dataBrokerTest.getDomBroker();
         bindingToNormalized = dataBrokerTest.getDataBrokerTestCustomizer().getAdapterContext().currentSerializer();
@@ -282,7 +280,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         doReturn(MoreExecutors.newDirectExecutorService()).when(mockThreadPool).getExecutor();
 
-        final SchemaResourcesDTO resources =  resourceManager.getSchemaResources(TEST_DEFAULT_SUBDIR, "test");
+        final var resources =  resourceManager.getSchemaResources(TEST_DEFAULT_SUBDIR, "test");
         resources.getSchemaRegistry().registerSchemaSource(
             id -> Futures.immediateFuture(YangTextSchemaSource.delegateForByteSource(id,
                     topModuleInfo.getYangTextByteSource())),
@@ -297,14 +295,14 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 mockRpcProviderService, deviceActionFactory, resourceManager) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
-                final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
-                final DeviceActionFactory deviceActionFact) {
-                NetconfTopologyContext context =
-                    super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, deviceActionFact);
+                    final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
+                    final DeviceActionFactory deviceActionFact) {
+                final var context = super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime,
+                    deviceActionFact);
 
-                NetconfTopologyContext spiedContext = spy(context);
+                final var spiedContext = spy(context);
                 doAnswer(invocation -> {
-                    final MasterSalFacade spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
+                    final var spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
                     doReturn(deviceDOMDataBroker).when(spiedFacade).newDeviceDataBroker();
                     masterSalFacadeFuture.set(spiedFacade);
                     return spiedFacade;
@@ -377,19 +375,18 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         testCleanup();
     }
 
-    private MasterSalFacade testMaster() throws InterruptedException, ExecutionException, TimeoutException {
+    private MasterSalFacade testMaster() throws Exception {
         LOG.info("****** Testing master");
 
         writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
 
-        final MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
-        final ArrayList<String> capabilities = Lists.newArrayList(
-            NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
-
+        final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(new EmptyMountPointContext(deviceSchemaContext),
-                NetconfSessionPreferences.fromStrings(capabilities), deviceRpcService.getRpcService());
+                NetconfSessionPreferences.fromStrings(
+                    List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString())),
+                deviceRpcService.getRpcService());
 
-        DOMMountPoint masterMountPoint = awaitMountPoint(masterMountPointService);
+        final var masterMountPoint = awaitMountPoint(masterMountPointService);
 
         LOG.info("****** Testing master DOMDataBroker operations");
 
@@ -401,7 +398,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         return masterSalFacade;
     }
 
-    private void testSlave() throws InterruptedException, ExecutionException, TimeoutException {
+    private void testSlave() throws Exception {
         LOG.info("****** Testing slave");
 
         writeNetconfNode("slave", slaveDataBroker);
@@ -448,7 +445,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         testDOMRpcService(getDOMRpcService(slaveMountPoint));
     }
 
-    private MasterSalFacade testMasterNodeUpdated() throws InterruptedException, ExecutionException, TimeoutException {
+    private MasterSalFacade testMasterNodeUpdated() throws Exception {
         LOG.info("****** Testing update master node");
 
         masterMountPointService.registerProvisionListener(masterMountPointListener);
@@ -459,12 +456,11 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         verify(masterMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
 
-        MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
-        final ArrayList<String> capabilities = Lists.newArrayList(
-            NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
-
+        final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(new EmptyMountPointContext(deviceSchemaContext),
-                NetconfSessionPreferences.fromStrings(capabilities), deviceRpcService.getRpcService());
+                NetconfSessionPreferences.fromStrings(List.of(
+                    NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString())),
+                deviceRpcService.getRpcService());
 
         verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
 
@@ -474,8 +470,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         return masterSalFacade;
     }
 
-    private void testMasterDisconnected(final MasterSalFacade masterSalFacade)
-            throws InterruptedException, ExecutionException, TimeoutException {
+    private void testMasterDisconnected(final MasterSalFacade masterSalFacade) throws Exception {
         LOG.info("****** Testing master disconnected");
 
         masterSalFacade.onDeviceDisconnected();
@@ -614,32 +609,34 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         assertTrue(readTx.cancel());
     }
 
-    private static void writeNetconfNode(final String cacheDir, final DataBroker databroker)
-            throws InterruptedException, ExecutionException, TimeoutException {
-        final Node node = new NodeBuilder()
-                .withKey(NODE_INSTANCE_ID.getKey())
-                .addAugmentation(new NetconfNodeBuilder()
-                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                    .setPort(new PortNumber(Uint16.valueOf(1234)))
-                    .setActorResponseWaitTime(Uint16.valueOf(10))
-                    .setTcpOnly(Boolean.TRUE)
-                    .setSchemaless(Boolean.FALSE)
-                    .setKeepaliveDelay(Uint32.ZERO)
-                    .setConnectionTimeoutMillis(Uint32.valueOf(5000))
-                    .setDefaultRequestTimeoutMillis(Uint32.valueOf(5000))
-                    .setMaxConnectionAttempts(Uint32.ONE)
-                    .setCredentials(new LoginPwUnencryptedBuilder()
-                        .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
-                            .setUsername("user")
-                            .setPassword("pass")
-                            .build())
+    private static void writeNetconfNode(final String cacheDir, final DataBroker dataBroker) throws Exception {
+        putData(dataBroker, NODE_INSTANCE_ID, new NodeBuilder()
+            .withKey(NODE_INSTANCE_ID.getKey())
+            .addAugmentation(new NetconfNodeBuilder()
+                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                .setPort(new PortNumber(Uint16.valueOf(1234)))
+                .setActorResponseWaitTime(Uint16.valueOf(10))
+                .setTcpOnly(Boolean.TRUE)
+                .setSchemaless(Boolean.FALSE)
+                .setKeepaliveDelay(Uint32.ZERO)
+                .setConnectionTimeoutMillis(Uint32.valueOf(5000))
+                .setDefaultRequestTimeoutMillis(Uint32.valueOf(5000))
+                .setMaxConnectionAttempts(Uint32.ONE)
+                .setCredentials(new LoginPwUnencryptedBuilder()
+                    .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                        .setUsername("user")
+                        .setPassword("pass")
                         .build())
-                    .setSchemaCacheDirectory(cacheDir)
                     .build())
-                .build();
+                .setSchemaCacheDirectory(cacheDir)
+                .build())
+            .build());
+    }
 
-        final WriteTransaction writeTx = databroker.newWriteOnlyTransaction();
-        writeTx.put(LogicalDatastoreType.CONFIGURATION, NODE_INSTANCE_ID, node);
+    private static <T extends DataObject> void putData(final DataBroker databroker, final InstanceIdentifier<T> path,
+            final T data) throws Exception {
+        final var writeTx = databroker.newWriteOnlyTransaction();
+        writeTx.put(LogicalDatastoreType.CONFIGURATION, path, data);
         writeTx.commit().get(5, TimeUnit.SECONDS);
     }
 
@@ -657,28 +654,27 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static void verifyTopologyNodesCreated(final DataBroker dataBroker) {
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
             try (ReadTransaction readTx = dataBroker.newReadOnlyTransaction()) {
-                Optional<Topology> configTopology = readTx.read(LogicalDatastoreType.CONFIGURATION,
-                        NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
-                Optional<Topology> operTopology = readTx.read(LogicalDatastoreType.OPERATIONAL,
-                        NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
-                return configTopology.isPresent() && operTopology.isPresent();
+                return readTx.exists(LogicalDatastoreType.OPERATIONAL,
+                    NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
             }
         });
     }
 
     private AbstractConcurrentDataBrokerTest newDataBrokerTest() throws Exception {
-        AbstractConcurrentDataBrokerTest dataBrokerTest = new AbstractConcurrentDataBrokerTest(true) {
+        final var dataBrokerTest = new AbstractConcurrentDataBrokerTest(true) {
             @Override
-            protected Set<YangModuleInfo> getModuleInfos() throws Exception {
-                return ImmutableSet.of(BindingReflections.getModuleInfo(NetconfNode.class),
+            protected Set<YangModuleInfo> getModuleInfos() {
+                return Set.of(BindingReflections.getModuleInfo(NetconfNode.class),
                         BindingReflections.getModuleInfo(NetworkTopology.class),
-                        BindingReflections.getModuleInfo(Topology.class),
                         BindingReflections.getModuleInfo(Keystore.class),
                         topModuleInfo);
             }
         };
 
         dataBrokerTest.setup();
+
+        final var path = NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID);
+        putData(dataBrokerTest.getDataBroker(), path, new TopologyBuilder().withKey(path.getKey()).build());
         return dataBrokerTest;
     }
 
@@ -701,16 +697,14 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private static <T extends DOMService> T getMountPointService(final DOMMountPoint mountPoint,
             final Class<T> serviceClass) {
-        final Optional<T> maybeService = mountPoint.getService(serviceClass);
-        assertTrue(maybeService.isPresent());
-        return maybeService.get();
+        return mountPoint.getService(serviceClass).orElseThrow();
     }
 
     private DOMMountPoint awaitMountPoint(final DOMMountPointService mountPointService) {
         await().atMost(5, TimeUnit.SECONDS).until(() ->
                 mountPointService.getMountPoint(yangNodeInstanceId).isPresent());
 
-        return mountPointService.getMountPoint(yangNodeInstanceId).get();
+        return mountPointService.getMountPoint(yangNodeInstanceId).orElseThrow();
     }
 
     private RpcDefinition findRpcDefinition(final String rpc) {
@@ -733,7 +727,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         @Override
         public FluentFuture<DOMRpcResult> invokeRpc(final DOMRpcIdentifier rpc, final NormalizedNode input) {
-            rpcInvokedFuture.set(new SimpleEntry<>(rpc, input));
+            rpcInvokedFuture.set(Map.entry(rpc, input));
             return returnFuture;
         }
 
