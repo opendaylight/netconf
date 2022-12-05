@@ -11,7 +11,6 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
 import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.BASE_URI_PATTERN;
 
-import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -21,7 +20,6 @@ import org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter;
 import org.opendaylight.aaa.web.FilterDetails;
 import org.opendaylight.aaa.web.ServletDetails;
 import org.opendaylight.aaa.web.WebContext;
-import org.opendaylight.aaa.web.WebContextBuilder;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
@@ -37,7 +35,7 @@ import org.opendaylight.yangtools.concepts.Registration;
  * @author Thomas Pantelis
  */
 @Singleton
-public class WebInitializer {
+public final class WebInitializer implements AutoCloseable {
     private final Registration registration;
 
     @Inject
@@ -46,7 +44,7 @@ public class WebInitializer {
             final DataStreamApplication webAppNotif,
             final CustomFilterAdapterConfiguration customFilterAdapterConfig,
             final WebSocketInitializer webSocketServlet) throws ServletException {
-        WebContextBuilder webContextBuilder = WebContext.builder()
+        final var webContextBuilder = WebContext.builder()
             .contextPath("/")
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
@@ -61,9 +59,8 @@ public class WebInitializer {
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addAllUrlPatterns(List.of(
-                    "/" + BASE_URI_PATTERN + "/" + DATA_SUBSCRIPTION + "/*",
-                    "/" + BASE_URI_PATTERN + "/" + NOTIFICATION_STREAM + "/*"))
+                .addUrlPattern("/" + BASE_URI_PATTERN + "/" + DATA_SUBSCRIPTION + "/*")
+                .addUrlPattern("/" + BASE_URI_PATTERN + "/" + NOTIFICATION_STREAM + "/*")
                 .servlet(webSocketServlet)
                 .build())
             .addServlet(ServletDetails.builder()
@@ -85,9 +82,8 @@ public class WebInitializer {
     }
 
     @PreDestroy
+    @Override
     public void close() {
-        if (registration != null) {
-            registration.close();
-        }
+        registration.close();
     }
 }
