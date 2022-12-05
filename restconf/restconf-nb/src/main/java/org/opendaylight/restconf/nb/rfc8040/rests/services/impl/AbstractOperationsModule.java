@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.UnresolvedQName;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 import org.opendaylight.yangtools.yang.common.YangVersion;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
@@ -67,7 +66,7 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
 
     @Override
     public final Unqualified argument() {
-        return UnresolvedQName.unqualified(getName());
+        return Unqualified.of(getName());
     }
 
     @Override
