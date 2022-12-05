@@ -55,7 +55,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
@@ -291,13 +290,12 @@ public class NetconfTopologyManager
     }
 
     private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
-        final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
-        final InstanceIdentifier<NetworkTopology> networkTopologyId =
-                InstanceIdentifier.builder(NetworkTopology.class).build();
-        wtx.merge(datastoreType, networkTopologyId, networkTopology);
-        final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build();
-        wtx.merge(datastoreType, networkTopologyId.child(Topology.class,
-                new TopologyKey(new TopologyId(topologyId))), topology);
+        // FIXME: how does this play out with lifecycle? In a cluster, someone needs to ensure this call happens, but
+        //        also we need to to make sure config -> oper is properly synchronized. Non-clustered case relies on
+        //        oper being transient and perhaps on a put() instead, how do we handle that in the clustered case?
+        wtx.merge(datastoreType, InstanceIdentifier.builder(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .build(), new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build());
     }
 
     private NetconfTopologySetup createSetup(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
