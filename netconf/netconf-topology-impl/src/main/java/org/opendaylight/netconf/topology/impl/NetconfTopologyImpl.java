@@ -39,7 +39,6 @@ import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
@@ -170,13 +169,11 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     }
 
     private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
-        final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
-        final InstanceIdentifier<NetworkTopology> networkTopologyId =
-                InstanceIdentifier.builder(NetworkTopology.class).build();
-        wtx.merge(datastoreType, networkTopologyId, networkTopology);
-        final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build();
-        wtx.merge(datastoreType,
-                networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(topologyId))), topology);
+        // FIXME: this should be a put(), as we are initializing and will be re-populating the datastore with all the
+        //        devices. Whathever has been there before should be nuked to properly re-align lifecycle
+        wtx.merge(datastoreType, InstanceIdentifier.builder(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .build(), new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build());
     }
 
     /**
