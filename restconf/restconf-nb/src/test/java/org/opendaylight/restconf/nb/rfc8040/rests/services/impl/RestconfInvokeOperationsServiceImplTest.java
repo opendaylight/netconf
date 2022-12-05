@@ -51,7 +51,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -167,13 +166,13 @@ public class RestconfInvokeOperationsServiceImplTest {
         assertEquals(OUTPUT, rpcResult.getResult());
     }
 
-    private NormalizedNodePayload prepNNC(final NormalizedNode result) {
+    private NormalizedNodePayload prepNNC(final ContainerNode result) {
         final QName qname = QName.create("invoke:rpc:module", "2013-12-03", "rpc-test");
         final RpcDefinition schemaNode = CONTEXT.getOperations().stream().filter(rpc -> rpc.getQName().equals(qname))
             .findFirst()
             .orElseThrow();
 
-        final NormalizedNode data = mock(NormalizedNode.class);
+        final ContainerNode data = mock(ContainerNode.class);
         final DOMRpcResult domRpcResult = mock(DOMRpcResult.class);
         doReturn(immediateFluentFuture(domRpcResult)).when(rpcService).invokeRpc(qname, data);
         doReturn(result).when(domRpcResult).getResult();
