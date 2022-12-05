@@ -41,10 +41,11 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.augment.test.rev160808.Node1;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -85,11 +86,7 @@ public class NetconfDeviceTopologyAdapterTest {
     @Before
     public void setUp() throws Exception {
         doReturn(writeTx).when(txChain).newWriteOnlyTransaction();
-        doNothing().when(writeTx)
-                .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
-        doNothing().when(writeTx)
-                .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetworkTopology.class));
-
+        doNothing().when(writeTx).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
         doReturn(txIdent).when(writeTx).getIdentifier();
 
         ConcurrentDataBrokerTestCustomizer customizer = new ConcurrentDataBrokerTestCustomizer(true);
@@ -110,6 +107,11 @@ public class NetconfDeviceTopologyAdapterTest {
             }
         });
 
+        final var wtx = transactionChain.newWriteOnlyTransaction();
+        wtx.put(LogicalDatastoreType.OPERATIONAL, RemoteDeviceId.DEFAULT_TOPOLOGY_IID, new TopologyBuilder()
+            .withKey(RemoteDeviceId.DEFAULT_TOPOLOGY_IID.getKey())
+            .build());
+        wtx.commit();
     }
 
     @Test
@@ -131,8 +133,8 @@ public class NetconfDeviceTopologyAdapterTest {
             Optional<NetconfNode> netconfNode = dataBroker.newReadWriteTransaction()
                     .read(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class))
                     .get(5, TimeUnit.SECONDS);
-            return netconfNode.isPresent() && netconfNode.get().getConnectionStatus()
-                    == NetconfNodeConnectionStatus.ConnectionStatus.UnableToConnect;
+            return netconfNode.isPresent()
+                && netconfNode.orElseThrow().getConnectionStatus() == ConnectionStatus.UnableToConnect;
         });
     }
 
