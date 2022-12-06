@@ -234,24 +234,25 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             keepAliveFacade = null;
         }
 
+        // Setup reconnection on empty context, if so configured
+        if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
+            LOG.warn("Ignoring missing schema sources is not currently implemented for {}", deviceId);
+        }
+
         final RemoteDevice<NetconfDeviceCommunicator> device;
         final List<SchemaSourceRegistration<?>> yanglibRegistrations;
         if (node.requireSchemaless()) {
             device = new SchemalessNetconfDevice(baseSchemas, deviceId, salFacade);
             yanglibRegistrations = List.of();
         } else {
-            final boolean reconnectOnChangedSchema = node.requireReconnectOnChangedSchema();
             final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node.getSchemaCacheDirectory(),
                 nodeId.getValue());
             device = new NetconfDeviceBuilder()
-                .setReconnectOnSchemasChange(reconnectOnChangedSchema)
+                .setReconnectOnSchemasChange(node.requireReconnectOnChangedSchema())
                 .setSchemaResourcesDTO(resources)
                 .setGlobalProcessingExecutor(processingExecutor)
                 .setId(deviceId)
                 .setSalFacade(salFacade)
-                .setNode(node)
-                .setEventExecutor(eventExecutor)
-                .setNodeOptional(nodeOptional)
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
                 .build();
