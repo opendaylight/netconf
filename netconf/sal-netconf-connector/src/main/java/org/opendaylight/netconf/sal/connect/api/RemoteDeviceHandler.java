@@ -11,7 +11,6 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
 public interface RemoteDeviceHandler extends AutoCloseable {
@@ -38,10 +37,6 @@ public interface RemoteDeviceHandler extends AutoCloseable {
     default void onDeviceConnected(final MountPointContext mountContext,
             final NetconfSessionPreferences sessionPreferences,
             final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
-        // DO NOTHING
-    }
-
-    default void onDeviceReconnected(final NetconfSessionPreferences sessionPreferences, final NetconfNode node) {
         // DO NOTHING
     }
 
