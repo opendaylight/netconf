@@ -13,6 +13,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
@@ -56,8 +57,11 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
         final SchemalessNetconfDeviceRpc schemalessNetconfDeviceRpc = new SchemalessNetconfDeviceRpc(id,
                 netconfDeviceCommunicator, rpcTransformer, messageTransformer);
 
-        salFacade.onDeviceConnected(baseSchemas.getBaseSchema().getMountPointContext(),
-                remoteSessionCapabilities, schemalessNetconfDeviceRpc);
+        salFacade.onDeviceConnected(
+            // FIXME: or bound from base schema rather?
+            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
+            baseSchemas.getBaseSchema().getMountPointContext()),
+            remoteSessionCapabilities, schemalessNetconfDeviceRpc);
     }
 
     @Override
