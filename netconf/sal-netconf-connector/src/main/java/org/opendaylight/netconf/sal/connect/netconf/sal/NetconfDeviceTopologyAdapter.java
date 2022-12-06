@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
@@ -81,7 +82,7 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
         if (node != null && dsType == LogicalDatastoreType.CONFIGURATION) {
             data = node;
         } else {
-            data = buildDataForNetconfNode(connectionStatus, capabilities, dsType, node);
+            data = buildDataForNetconfNode(connectionStatus, capabilities);
         }
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
@@ -153,19 +154,17 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
     }
 
     private NetconfNode buildDataForNetconfNode(final ConnectionStatus connectionStatus,
-            final NetconfDeviceCapabilities capabilities, final LogicalDatastoreType dsType, final NetconfNode node) {
-        List<AvailableCapability> capabilityList = new ArrayList<>();
-        capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
-        capabilityList.addAll(capabilities.getResolvedCapabilities());
-
-        final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();
-        avCapabalitiesBuilder.setAvailableCapability(capabilityList);
-
+            final NetconfDeviceCapabilities capabilities) {
         return new NetconfNodeBuilder()
             .setHost(id.getHost())
             .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
             .setConnectionStatus(connectionStatus)
-            .setAvailableCapabilities(avCapabalitiesBuilder.build())
+            .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
+                .setAvailableCapability(ImmutableList.<AvailableCapability>builder()
+                    .addAll(capabilities.getNonModuleBasedCapabilities())
+                    .addAll(capabilities.getResolvedCapabilities())
+                    .build())
+                .build())
             .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
             .build();
     }
