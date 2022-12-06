@@ -232,6 +232,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         } else {
             salFacade = deviceSalFacade;
             keepAliveFacade = null;
+        }
 
         // Setup reconnection on empty context, if so configured
         if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
