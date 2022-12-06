@@ -59,11 +59,12 @@ public final class NetconfSessionPreferences {
     private static final Splitter AMP_SPLITTER = Splitter.on('&');
     private static final Predicate<String> CONTAINS_REVISION = input -> input.contains("revision=");
 
-    private final Map<QName, CapabilityOrigin> moduleBasedCaps;
-    private final Map<String, CapabilityOrigin> nonModuleCaps;
+    private final NetconfDeviceCapabilities capabilities = new NetconfDeviceCapabilities();
+    private final ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps;
+    private final ImmutableMap<String, CapabilityOrigin> nonModuleCaps;
 
-    NetconfSessionPreferences(final Map<String, CapabilityOrigin> nonModuleCaps,
-                              final Map<QName, CapabilityOrigin> moduleBasedCaps) {
+    private NetconfSessionPreferences(final ImmutableMap<String, CapabilityOrigin> nonModuleCaps,
+            final ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps) {
         this.nonModuleCaps = requireNonNull(nonModuleCaps);
         this.moduleBasedCaps = requireNonNull(moduleBasedCaps);
     }
@@ -82,6 +83,10 @@ public final class NetconfSessionPreferences {
 
     public Map<String, CapabilityOrigin> getNonModuleBasedCapsOrigin() {
         return nonModuleCaps;
+    }
+
+    public NetconfDeviceCapabilities getNetconfDeviceCapabilities() {
+        return capabilities;
     }
 
     // allows partial matches - assuming parameters are in the same order
@@ -142,60 +147,53 @@ public final class NetconfSessionPreferences {
      * Merge module-based list of capabilities with current list of module-based capabilities.
      *
      * @param netconfSessionModuleCapabilities capabilities to merge into this
-     *
      * @return new instance of preferences with merged module-based capabilities
      */
     public NetconfSessionPreferences addModuleCaps(final NetconfSessionPreferences netconfSessionModuleCapabilities) {
-        final Map<QName, CapabilityOrigin> mergedCaps = Maps.newHashMapWithExpectedSize(moduleBasedCaps.size()
-                + netconfSessionModuleCapabilities.getModuleBasedCaps().size());
+        final var mergedCaps = Maps.<QName, CapabilityOrigin>newHashMapWithExpectedSize(moduleBasedCaps.size()
+                + netconfSessionModuleCapabilities.moduleBasedCaps.size());
         mergedCaps.putAll(moduleBasedCaps);
-        mergedCaps.putAll(netconfSessionModuleCapabilities.getModuleBasedCapsOrigin());
-        return new NetconfSessionPreferences(getNonModuleBasedCapsOrigin(), mergedCaps);
+        mergedCaps.putAll(netconfSessionModuleCapabilities.moduleBasedCaps);
+        return new NetconfSessionPreferences(nonModuleCaps, ImmutableMap.copyOf(mergedCaps));
     }
 
     /**
      * Override current list of module-based capabilities.
      *
      * @param netconfSessionPreferences capabilities to override in this
-     *
      * @return new instance of preferences with replaced module-based capabilities
      */
     public NetconfSessionPreferences replaceModuleCaps(final NetconfSessionPreferences netconfSessionPreferences) {
-        return new NetconfSessionPreferences(
-                getNonModuleBasedCapsOrigin(), netconfSessionPreferences.getModuleBasedCapsOrigin());
+        return new NetconfSessionPreferences(nonModuleCaps, netconfSessionPreferences.moduleBasedCaps);
     }
 
     public NetconfSessionPreferences replaceModuleCaps(final Map<QName, CapabilityOrigin> newModuleBasedCaps) {
-        return new NetconfSessionPreferences(getNonModuleBasedCapsOrigin(), newModuleBasedCaps);
+        return new NetconfSessionPreferences(nonModuleCaps, ImmutableMap.copyOf(newModuleBasedCaps));
     }
-
 
     /**
      * Merge list of non-module based capabilities with current list of non-module based capabilities.
      *
      * @param netconfSessionNonModuleCapabilities capabilities to merge into this
-     *
      * @return new instance of preferences with merged non-module based capabilities
      */
     public NetconfSessionPreferences addNonModuleCaps(
             final NetconfSessionPreferences netconfSessionNonModuleCapabilities) {
-        final Map<String, CapabilityOrigin> mergedCaps = Maps.newHashMapWithExpectedSize(
-                nonModuleCaps.size() + netconfSessionNonModuleCapabilities.getNonModuleCaps().size());
-        mergedCaps.putAll(getNonModuleBasedCapsOrigin());
-        mergedCaps.putAll(netconfSessionNonModuleCapabilities.getNonModuleBasedCapsOrigin());
-        return new NetconfSessionPreferences(mergedCaps, getModuleBasedCapsOrigin());
+        final var mergedCaps = Maps.<String, CapabilityOrigin>newHashMapWithExpectedSize(
+                nonModuleCaps.size() + netconfSessionNonModuleCapabilities.nonModuleCaps.size());
+        mergedCaps.putAll(nonModuleCaps);
+        mergedCaps.putAll(netconfSessionNonModuleCapabilities.nonModuleCaps);
+        return new NetconfSessionPreferences(ImmutableMap.copyOf(mergedCaps), moduleBasedCaps);
     }
 
     /**
      * Override current list of non-module based capabilities.
      *
      * @param netconfSessionPreferences capabilities to override in this
-     *
      * @return new instance of preferences with replaced non-module based capabilities
      */
     public NetconfSessionPreferences replaceNonModuleCaps(final NetconfSessionPreferences netconfSessionPreferences) {
-        return new NetconfSessionPreferences(
-                netconfSessionPreferences.getNonModuleBasedCapsOrigin(), getModuleBasedCapsOrigin());
+        return new NetconfSessionPreferences(netconfSessionPreferences.nonModuleCaps, moduleBasedCaps);
     }
 
     public static NetconfSessionPreferences fromNetconfSession(final NetconfClientSession session) {
@@ -217,8 +215,8 @@ public final class NetconfSessionPreferences {
 
     public static NetconfSessionPreferences fromStrings(final Collection<String> capabilities,
                                                         final CapabilityOrigin capabilityOrigin) {
-        final Map<QName, CapabilityOrigin> moduleBasedCaps = new HashMap<>();
-        final Map<String, CapabilityOrigin> nonModuleCaps = new HashMap<>();
+        final var moduleBasedCaps = new HashMap<QName, CapabilityOrigin>();
+        final var nonModuleCaps = new HashMap<String, CapabilityOrigin>();
 
         for (final String capability : capabilities) {
             nonModuleCaps.put(capability, capabilityOrigin);
@@ -274,12 +272,4 @@ public final class NetconfSessionPreferences {
         moduleBasedCaps.put(qualifiedName, capabilityOrigin);
         nonModuleCaps.remove(capability);
     }
-
-    private final NetconfDeviceCapabilities capabilities = new NetconfDeviceCapabilities();
-
-    public NetconfDeviceCapabilities getNetconfDeviceCapabilities() {
-        return capabilities;
-    }
-
-
 }
