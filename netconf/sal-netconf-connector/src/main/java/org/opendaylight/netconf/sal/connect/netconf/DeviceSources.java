@@ -9,14 +9,17 @@ package org.opendaylight.netconf.sal.connect.netconf;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.Collections2;
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 
 /**
  * Contains RequiredSources - sources from capabilities.
@@ -41,16 +44,17 @@ final class DeviceSources {
         return providedSources;
     }
 
-    Collection<SourceIdentifier> getRequiredSources() {
-        return Collections2.transform(requiredSources, DeviceSources::toSourceId);
+    List<SourceIdentifier> getRequiredSources() {
+        return requiredSources.stream().map(DeviceSources::toSourceId).collect(Collectors.toList());
     }
 
-    Collection<SourceIdentifier> getProvidedSources() {
-        return Collections2.transform(providedSources, DeviceSources::toSourceId);
-    }
-
-    SchemaSourceProvider<YangTextSchemaSource> getSourceProvider() {
-        return sourceProvider;
+    List<Registration> register(final SchemaSourceRegistry schemaRegistry) {
+        return providedSources.stream()
+            .map(DeviceSources::toSourceId)
+            .map(sourceId -> schemaRegistry.registerSchemaSource(sourceProvider,
+                PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class,
+                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())))
+            .collect(Collectors.toUnmodifiableList());
     }
 
     private static SourceIdentifier toSourceId(final QName input) {
