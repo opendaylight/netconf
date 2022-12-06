@@ -89,11 +89,11 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
             .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
             .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
                 .setAvailableCapability(ImmutableList.<AvailableCapability>builder()
-                    .addAll(capabilities.getNonModuleBasedCapabilities())
-                    .addAll(capabilities.getResolvedCapabilities())
+                    .addAll(capabilities.nonModuleBasedCapabilities())
+                    .addAll(capabilities.resolvedCapabilities())
                     .build())
                 .build())
-            .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
+            .setUnavailableCapabilities(unavailableCapabilities(capabilities.unresolvedCapabilites()))
             .build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
@@ -157,8 +157,8 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
     private NetconfNode buildDataForNetconfClusteredNode(final boolean up, final String masterNodeAddress,
                                                          final NetconfDeviceCapabilities capabilities) {
         List<AvailableCapability> capabilityList = new ArrayList<>();
-        capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
-        capabilityList.addAll(capabilities.getResolvedCapabilities());
+        capabilityList.addAll(capabilities.nonModuleBasedCapabilities());
+        capabilityList.addAll(capabilities.resolvedCapabilities());
         final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();
         avCapabalitiesBuilder.setAvailableCapability(capabilityList);
 
@@ -167,7 +167,7 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
                 .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
                 .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
                 .setAvailableCapabilities(avCapabalitiesBuilder.build())
-                .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
+                .setUnavailableCapabilities(unavailableCapabilities(capabilities.unresolvedCapabilites()))
                 .setClusteredConnectionStatus(
                         new ClusteredConnectionStatusBuilder().setNetconfMasterNode(masterNodeAddress).build());
 
