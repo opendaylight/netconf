@@ -5,57 +5,31 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability.FailureReason;
 import org.opendaylight.yangtools.yang.common.QName;
 
-public final class NetconfDeviceCapabilities {
-    private final Map<QName, FailureReason> unresolvedCapabilites;
-    private final Set<AvailableCapability>  resolvedCapabilities;
-    private final Set<AvailableCapability> nonModuleBasedCapabilities;
+public record NetconfDeviceCapabilities(
+        @NonNull ImmutableMap<QName, FailureReason> unresolvedCapabilites,
+        @NonNull ImmutableSet<AvailableCapability> resolvedCapabilities,
+        @NonNull ImmutableSet<AvailableCapability> nonModuleBasedCapabilities) {
+    private static final @NonNull NetconfDeviceCapabilities EMPTY =
+        new NetconfDeviceCapabilities(ImmutableMap.of(), ImmutableSet.of(), ImmutableSet.of());
 
-    public NetconfDeviceCapabilities() {
-        this.unresolvedCapabilites = new HashMap<>();
-        this.resolvedCapabilities = new HashSet<>();
-        this.nonModuleBasedCapabilities = new HashSet<>();
+    public NetconfDeviceCapabilities {
+        requireNonNull(unresolvedCapabilites);
+        requireNonNull(resolvedCapabilities);
+        requireNonNull(nonModuleBasedCapabilities);
     }
 
-    public void addUnresolvedCapability(QName source, FailureReason reason) {
-        unresolvedCapabilites.put(source, reason);
+    public static @NonNull NetconfDeviceCapabilities empty() {
+        return EMPTY;
     }
-
-    public void addUnresolvedCapabilities(Collection<QName> capabilities, FailureReason reason) {
-        for (QName s : capabilities) {
-            unresolvedCapabilites.put(s, reason);
-        }
-    }
-
-    public void addCapabilities(Collection<AvailableCapability>  availableSchemas) {
-        resolvedCapabilities.addAll(availableSchemas);
-    }
-
-    public void addNonModuleBasedCapabilities(Collection<AvailableCapability> nonModuleCapabilities) {
-        this.nonModuleBasedCapabilities.addAll(nonModuleCapabilities);
-    }
-
-    public Set<AvailableCapability> getNonModuleBasedCapabilities() {
-        return nonModuleBasedCapabilities;
-    }
-
-    public Map<QName, FailureReason> getUnresolvedCapabilites() {
-        return unresolvedCapabilites;
-    }
-
-    public Set<AvailableCapability>  getResolvedCapabilities() {
-        return resolvedCapabilities;
-    }
-
 }
