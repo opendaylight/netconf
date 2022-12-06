@@ -126,12 +126,13 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             }
 
             remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
-            if (!firstConnectionFuture.isDone()) {
-                // FIXME: right, except ... this does not include the device schema setup, so is it really useful?
-                firstConnectionFuture.set(Empty.value());
-            }
         } finally {
             sessionLock.unlock();
+        }
+
+        // FIXME: right, except ... this does not include the device schema setup, so is it really useful?
+        if (!firstConnectionFuture.set(Empty.value())) {
+            LOG.trace("{}: First connection already completed", id);
         }
     }
 
