@@ -13,6 +13,8 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -23,14 +25,17 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -51,8 +56,10 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessag
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability.FailureReason;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
@@ -152,18 +159,20 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         }
 
         // Set up the SchemaContext for the device
-        final ListenableFuture<EffectiveModelContext> futureSchema = Futures.transformAsync(sourceResolverFuture,
+        final ListenableFuture<SchemaResult> futureSchema = Futures.transformAsync(sourceResolverFuture,
             deviceSources -> assembleSchemaContext(deviceSources, remoteSessionCapabilities), processingExecutor);
 
         // Potentially acquire mount point list and interpret it
-        final ListenableFuture<MountPointContext> futureContext = Futures.transformAsync(futureSchema,
-            schemaContext -> createMountPointContext(schemaContext, baseSchema, listener), processingExecutor);
+        final ListenableFuture<NetconfDeviceSchema> futureContext = Futures.transformAsync(futureSchema,
+            result -> Futures.transform(createMountPointContext(result.modelContext(), baseSchema, listener),
+                mount -> new NetconfDeviceSchema(result.capabilities(), mount), processingExecutor),
+            processingExecutor);
 
-        Futures.addCallback(futureContext, new FutureCallback<MountPointContext>() {
+        Futures.addCallback(futureContext, new FutureCallback<>() {
             @Override
-            public void onSuccess(final MountPointContext result) {
+            public void onSuccess(final NetconfDeviceSchema result) {
                 handleSalInitializationSuccess(result, remoteSessionCapabilities,
-                        getDeviceSpecificRpc(result, listener, baseSchema), listener);
+                        getDeviceSpecificRpc(result.mountContext(), listener, baseSchema), listener);
             }
 
             @Override
@@ -211,19 +220,20 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
     }
 
-    private synchronized void handleSalInitializationSuccess(final MountPointContext result,
+    private synchronized void handleSalInitializationSuccess(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc,
             final RemoteDeviceCommunicator listener) {
         //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
         //since salFacade.onDeviceDisconnected was already called.
         if (connected) {
-            messageTransformer = new NetconfMessageTransformer(result, true,
+            final var mount = deviceSchema.mountContext();
+            messageTransformer = new NetconfMessageTransformer(mount, true,
                 resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
 
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
-            salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
+            salFacade.onDeviceConnected(deviceSchema, remoteSessionCapabilities, deviceRpc,
                     deviceActionFactory == null ? null : deviceActionFactory.createDeviceAction(
-                            messageTransformer, listener, result.getEffectiveModelContext()));
+                            messageTransformer, listener, mount.getEffectiveModelContext()));
             notificationHandler.onRemoteSchemaUp(messageTransformer);
 
             LOG.info("{}: Netconf connector initialized successfully", id);
@@ -254,7 +264,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         this.connected = connected;
     }
 
-    private ListenableFuture<EffectiveModelContext> assembleSchemaContext(final DeviceSources deviceSources,
+    private ListenableFuture<SchemaResult> assembleSchemaContext(final DeviceSources deviceSources,
             final NetconfSessionPreferences remoteSessionCapabilities) {
         LOG.debug("{}: Resolved device sources to {}", id, deviceSources);
 
@@ -263,8 +273,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         return new SchemaSetup(deviceSources, remoteSessionCapabilities).startResolution();
     }
 
-    private ListenableFuture<MountPointContext> createMountPointContext(final EffectiveModelContext schemaContext,
-            final BaseSchema baseSchema, final NetconfDeviceCommunicator listener) {
+    private ListenableFuture<@NonNull MountPointContext> createMountPointContext(
+            final EffectiveModelContext schemaContext, final BaseSchema baseSchema,
+            final NetconfDeviceCommunicator listener) {
         final MountPointContext emptyContext = new EmptyMountPointContext(schemaContext);
         if (schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isEmpty()) {
             return Futures.immediateFuture(emptyContext);
@@ -369,14 +380,32 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     /**
      * A dedicated exception to indicate when we fail to setup a SchemaContext.
-     *
-     * @author Robert Varga
      */
-    private static final class EmptySchemaContextException extends Exception {
-        private static final long serialVersionUID = 1L;
+    public static final class EmptySchemaContextException extends Exception {
+        private static final long serialVersionUID = 2L;
 
-        EmptySchemaContextException(final String message) {
+        private final @NonNull NetconfDeviceCapabilities failedCapabilities;
+
+        EmptySchemaContextException(final String message, final NetconfDeviceCapabilities failedCapabilities) {
             super(message);
+            this.failedCapabilities = requireNonNull(failedCapabilities);
+        }
+
+        public @NonNull NetconfDeviceCapabilities failedCapabilities() {
+            return failedCapabilities;
+        }
+    }
+
+    /**
+     * {@link NetconfDeviceCapabilities} and {@link EffectiveModelContext}.
+     */
+    private record SchemaResult(
+        @NonNull NetconfDeviceCapabilities capabilities,
+        @NonNull EffectiveModelContext modelContext) {
+
+        SchemaResult {
+            requireNonNull(capabilities);
+            requireNonNull(modelContext);
         }
     }
 
@@ -384,18 +413,20 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
      * Schema builder that tries to build schema context from provided sources or biggest subset of it.
      */
     private final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
-        private final SettableFuture<EffectiveModelContext> resultFuture = SettableFuture.create();
+        private final SettableFuture<SchemaResult> resultFuture = SettableFuture.create();
+
+        private final Set<AvailableCapability> nonModuleBasedCapabilities = new HashSet<>();
+        private final Map<QName, FailureReason> unresolvedCapabilites = new HashMap<>();
+        private final Set<AvailableCapability> resolvedCapabilities = new HashSet<>();
 
         private final DeviceSources deviceSources;
         private final NetconfSessionPreferences remoteSessionCapabilities;
-        private final NetconfDeviceCapabilities capabilities;
 
         private Collection<SourceIdentifier> requiredSources;
 
         SchemaSetup(final DeviceSources deviceSources, final NetconfSessionPreferences remoteSessionCapabilities) {
             this.deviceSources = deviceSources;
             this.remoteSessionCapabilities = remoteSessionCapabilities;
-            capabilities = remoteSessionCapabilities.getNetconfDeviceCapabilities();
 
             // If device supports notifications and does not contain necessary modules, add them automatically
             if (remoteSessionCapabilities.containsNonModuleCapability(
@@ -413,12 +444,12 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             requiredSources = deviceSources.getRequiredSources();
             final Collection<SourceIdentifier> missingSources = filterMissingSources(requiredSources);
 
-            capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
-                    UnavailableCapability.FailureReason.MissingSource);
+            addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
+                UnavailableCapability.FailureReason.MissingSource);
             requiredSources.removeAll(missingSources);
         }
 
-        ListenableFuture<EffectiveModelContext> startResolution() {
+        ListenableFuture<SchemaResult> startResolution() {
             trySetupSchema();
             return resultFuture;
         }
@@ -428,19 +459,23 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             LOG.debug("{}: Schema context built successfully from {}", id, requiredSources);
 
             final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(),
-                    capabilities.getUnresolvedCapabilites().keySet());
-            capabilities.addCapabilities(filteredQNames.stream().map(entry -> new AvailableCapabilityBuilder()
-                    .setCapability(entry.toString()).setCapabilityOrigin(
-                            remoteSessionCapabilities.getModuleBasedCapsOrigin().get(entry)).build())
-                    .collect(Collectors.toList()));
+                    unresolvedCapabilites.keySet());
+            resolvedCapabilities.addAll(filteredQNames.stream()
+                .map(capability -> new AvailableCapabilityBuilder()
+                    .setCapability(capability.toString())
+                    .setCapabilityOrigin(remoteSessionCapabilities.capabilityOrigin(capability))
+                    .build())
+                .collect(Collectors.toList()));
 
-            capabilities.addNonModuleBasedCapabilities(remoteSessionCapabilities
-                    .getNonModuleCaps().stream().map(entry -> new AvailableCapabilityBuilder()
-                            .setCapability(entry).setCapabilityOrigin(
-                                    remoteSessionCapabilities.getNonModuleBasedCapsOrigin().get(entry)).build())
-                    .collect(Collectors.toList()));
+            nonModuleBasedCapabilities.addAll(remoteSessionCapabilities.getNonModuleCaps().stream()
+                .map(capability -> new AvailableCapabilityBuilder()
+                    .setCapability(capability)
+                    .setCapabilityOrigin(remoteSessionCapabilities.capabilityOrigin(capability))
+                    .build())
+                .collect(Collectors.toList()));
 
-            resultFuture.set(result);
+
+            resultFuture.set(new SchemaResult(captureCapabilities(), result));
         }
 
         @Override
@@ -470,8 +505,14 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
                     MoreExecutors.directExecutor());
             } else {
                 LOG.debug("{}: no more sources for schema context", id);
-                resultFuture.setException(new EmptySchemaContextException(id + ": No more sources for schema context"));
+                resultFuture.setException(new EmptySchemaContextException(id + ": No more sources for schema context",
+                    captureCapabilities()));
             }
+        }
+
+        private @NonNull NetconfDeviceCapabilities captureCapabilities() {
+            return new NetconfDeviceCapabilities(ImmutableMap.copyOf(unresolvedCapabilites),
+                ImmutableSet.copyOf(resolvedCapabilities), ImmutableSet.copyOf(nonModuleBasedCapabilities));
         }
 
         private List<SourceIdentifier> filterMissingSources(final Collection<SourceIdentifier> origSources) {
@@ -485,6 +526,12 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             }).collect(Collectors.toList());
         }
 
+        private void addUnresolvedCapabilities(final Collection<QName> capabilities, final FailureReason reason) {
+            for (QName s : capabilities) {
+                unresolvedCapabilites.put(s, reason);
+            }
+        }
+
         private List<SourceIdentifier> handleMissingSchemaSourceException(
                 final MissingSchemaSourceException exception) {
             // In case source missing, try without it
@@ -493,11 +540,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
                 id, missingSource);
             LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it",
                 id, missingSource, exception);
-            final Collection<QName> qNameOfMissingSource =
-                getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
+            final var qNameOfMissingSource = getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
             if (!qNameOfMissingSource.isEmpty()) {
-                capabilities.addUnresolvedCapabilities(
-                        qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
+                addUnresolvedCapabilities(qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
             }
             return stripUnavailableSource(missingSource);
         }
@@ -514,14 +559,13 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
                     id, failedSourceId);
                 LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
                     id, failedSourceId, resolutionException);
-                capabilities.addUnresolvedCapabilities(
-                        getQNameFromSourceIdentifiers(Collections.singleton(failedSourceId)),
+                addUnresolvedCapabilities(getQNameFromSourceIdentifiers(List.of(failedSourceId)),
                         UnavailableCapability.FailureReason.UnableToResolve);
                 return stripUnavailableSource(resolutionException.getFailedSource());
             }
             // unsatisfied imports
-            final Set<SourceIdentifier> unresolvedSources = resolutionException.getUnsatisfiedImports().keySet();
-            capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(unresolvedSources),
+            addUnresolvedCapabilities(
+                getQNameFromSourceIdentifiers(resolutionException.getUnsatisfiedImports().keySet()),
                 UnavailableCapability.FailureReason.UnableToResolve);
             LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
                 id, resolutionException.getUnsatisfiedImports());

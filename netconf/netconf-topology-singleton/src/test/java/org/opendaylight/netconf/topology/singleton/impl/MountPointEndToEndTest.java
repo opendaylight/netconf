@@ -103,6 +103,8 @@ import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
@@ -134,6 +136,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -305,7 +308,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 NetconfTopologyContext spiedContext = spy(context);
                 doAnswer(invocation -> {
                     final MasterSalFacade spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
-                    doReturn(deviceDOMDataBroker).when(spiedFacade).newDeviceDataBroker();
+                    doReturn(deviceDOMDataBroker).when(spiedFacade)
+                        .newDeviceDataBroker(any(MountPointContext.class), any(NetconfSessionPreferences.class));
                     masterSalFacadeFuture.set(spiedFacade);
                     return spiedFacade;
                 }).when(spiedContext).newMasterSalFacade();
@@ -386,8 +390,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         final ArrayList<String> capabilities = Lists.newArrayList(
             NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
 
-        masterSalFacade.onDeviceConnected(new EmptyMountPointContext(deviceSchemaContext),
-                NetconfSessionPreferences.fromStrings(capabilities), deviceRpcService.getRpcService());
+        masterSalFacade.onDeviceConnected(new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
+            new EmptyMountPointContext(deviceSchemaContext)), NetconfSessionPreferences.fromStrings(capabilities),
+            deviceRpcService.getRpcService());
 
         DOMMountPoint masterMountPoint = awaitMountPoint(masterMountPointService);
 
@@ -463,8 +468,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         final ArrayList<String> capabilities = Lists.newArrayList(
             NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
 
-        masterSalFacade.onDeviceConnected(new EmptyMountPointContext(deviceSchemaContext),
-                NetconfSessionPreferences.fromStrings(capabilities), deviceRpcService.getRpcService());
+        masterSalFacade.onDeviceConnected(new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
+            new EmptyMountPointContext(deviceSchemaContext)), NetconfSessionPreferences.fromStrings(capabilities),
+            deviceRpcService.getRpcService());
 
         verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
 

@@ -77,7 +77,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testDeviceUpdate() throws Exception {
-        adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
+        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty());
 
         verify(mockChain, times(2)).newWriteOnlyTransaction();
         verify(mockTx, times(1)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
