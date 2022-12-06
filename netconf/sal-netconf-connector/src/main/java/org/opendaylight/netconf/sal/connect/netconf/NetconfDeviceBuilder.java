@@ -10,25 +10,19 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
-import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 
 public class NetconfDeviceBuilder {
-
     private boolean reconnectOnSchemasChange;
-    private NetconfDevice.SchemaResourcesDTO schemaResourcesDTO;
+    private SchemaResourcesDTO schemaResourcesDTO;
     private RemoteDeviceId id;
     private RemoteDeviceHandler salFacade;
     private ListeningExecutorService globalProcessingExecutor;
     private DeviceActionFactory deviceActionFactory;
-    private NetconfNode node;
-    private EventExecutor eventExecutor;
-    private NetconfNodeAugmentedOptional nodeOptional;
     private BaseNetconfSchemas baseSchemas;
 
     public NetconfDeviceBuilder() {
@@ -44,7 +38,7 @@ public class NetconfDeviceBuilder {
         return this;
     }
 
-    public NetconfDeviceBuilder setSchemaResourcesDTO(final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO) {
+    public NetconfDeviceBuilder setSchemaResourcesDTO(final SchemaResourcesDTO schemaResourcesDTO) {
         this.schemaResourcesDTO = schemaResourcesDTO;
         return this;
     }
@@ -64,21 +58,6 @@ public class NetconfDeviceBuilder {
         return this;
     }
 
-    public NetconfDeviceBuilder setNode(final NetconfNode node) {
-        this.node = node;
-        return this;
-    }
-
-    public NetconfDeviceBuilder setEventExecutor(final EventExecutor eventExecutor) {
-        this.eventExecutor = eventExecutor;
-        return this;
-    }
-
-    public NetconfDeviceBuilder setNodeOptional(final NetconfNodeAugmentedOptional nodeOptional) {
-        this.nodeOptional = nodeOptional;
-        return this;
-    }
-
     public NetconfDeviceBuilder setBaseSchemas(final BaseNetconfSchemas baseSchemas) {
         this.baseSchemas = requireNonNull(baseSchemas);
         return this;
@@ -87,8 +66,7 @@ public class NetconfDeviceBuilder {
     public NetconfDevice build() {
         validation();
         return new NetconfDevice(schemaResourcesDTO, baseSchemas, id, salFacade,
-            globalProcessingExecutor, reconnectOnSchemasChange, deviceActionFactory, node,
-            eventExecutor, nodeOptional);
+            globalProcessingExecutor, reconnectOnSchemasChange, deviceActionFactory);
     }
 
     private void validation() {
