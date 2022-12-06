@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9d8cc90_d5f69c23",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2022-12-06T08:24:31Z",
+      "side": 1,
+      "message": "I would like to point out that creation of schemaContext inside test is not needed after this patch, since SchemaAware NormalizedNode builders are removed.",
+      "revId": "8d9a84f9ae3820dee15e40fc8c47c144119c1256",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
