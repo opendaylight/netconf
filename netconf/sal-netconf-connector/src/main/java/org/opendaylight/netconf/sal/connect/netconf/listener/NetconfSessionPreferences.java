@@ -59,7 +59,7 @@ public final class NetconfSessionPreferences {
     private static final Splitter AMP_SPLITTER = Splitter.on('&');
     private static final Predicate<String> CONTAINS_REVISION = input -> input.contains("revision=");
 
-    private final NetconfDeviceCapabilities capabilities = new NetconfDeviceCapabilities();
+    private final NetconfDeviceCapabilities capabilities = NetconfDeviceCapabilities.empty();
     private final ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps;
     private final ImmutableMap<String, CapabilityOrigin> nonModuleCaps;
 
