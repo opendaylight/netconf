@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,6 +57,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev19
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc8528.model.api.SchemaMountConstants;
@@ -75,9 +75,6 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +95,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     protected final SchemaSourceRegistry schemaRegistry;
     protected final SchemaRepository schemaRepository;
 
-    protected final List<SchemaSourceRegistration<?>> sourceRegistrations = new ArrayList<>();
+    protected final List<Registration> sourceRegistrations = new ArrayList<>();
 
     private final RemoteDeviceHandler salFacade;
     private final ListeningExecutorService processingExecutor;
@@ -288,12 +285,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private ListenableFuture<EffectiveModelContext> assembleSchemaContext(final DeviceSources deviceSources,
             final NetconfSessionPreferences remoteSessionCapabilities) {
         LOG.debug("{}: Resolved device sources to {}", id, deviceSources);
-        final SchemaSourceProvider<YangTextSchemaSource> yangProvider = deviceSources.getSourceProvider();
-        for (final SourceIdentifier sourceId : deviceSources.getProvidedSources()) {
-            sourceRegistrations.add(schemaRegistry.registerSchemaSource(yangProvider,
-                PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class,
-                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
-        }
+
+        sourceRegistrations.addAll(deviceSources.register(schemaRegistry));
 
         return new SchemaSetup(deviceSources, remoteSessionCapabilities).startResolution();
     }
@@ -340,7 +333,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         notificationHandler.onRemoteSchemaDown();
 
         salFacade.onDeviceDisconnected();
-        sourceRegistrations.forEach(SchemaSourceRegistration::close);
+        sourceRegistrations.forEach(Registration::close);
         sourceRegistrations.clear();
         resetMessageTransformer();
     }
@@ -509,7 +502,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             }
         }
 
-        private Collection<SourceIdentifier> filterMissingSources(final Collection<SourceIdentifier> origSources) {
+        private List<SourceIdentifier> filterMissingSources(final Collection<SourceIdentifier> origSources) {
             return origSources.parallelStream().filter(sourceIdentifier -> {
                 try {
                     schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class).get();
@@ -520,7 +513,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             }).collect(Collectors.toList());
         }
 
-        private Collection<SourceIdentifier> handleMissingSchemaSourceException(
+        private List<SourceIdentifier> handleMissingSchemaSourceException(
                 final MissingSchemaSourceException exception) {
             // In case source missing, try without it
             final SourceIdentifier missingSource = exception.getSourceId();
@@ -565,11 +558,11 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             return resolutionException.getResolvedSources();
         }
 
-        private Collection<SourceIdentifier> stripUnavailableSource(final SourceIdentifier sourceIdToRemove) {
-            final LinkedList<SourceIdentifier> sourceIdentifiers = new LinkedList<>(requiredSources);
-            checkState(sourceIdentifiers.remove(sourceIdToRemove),
-                    "%s: Trying to remove %s from %s failed", id, sourceIdToRemove, requiredSources);
-            return sourceIdentifiers;
+        private List<SourceIdentifier> stripUnavailableSource(final SourceIdentifier sourceIdToRemove) {
+            final var tmp = new ArrayList<>(requiredSources);
+            checkState(tmp.remove(sourceIdToRemove), "%s: Trying to remove %s from %s failed", id, sourceIdToRemove,
+                requiredSources);
+            return tmp;
         }
 
         private Collection<QName> getQNameFromSourceIdentifiers(final Collection<SourceIdentifier> identifiers) {
