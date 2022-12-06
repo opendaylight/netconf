@@ -24,6 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.AbstractNetconfDataTreeService;
@@ -50,6 +51,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     private MountPointContext currentMountContext = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
+    private NetconfDeviceCapabilities deviceCapabilities = null;
     private DOMRpcService deviceRpc = null;
     private DOMDataBroker deviceDataBroker = null;
     private NetconfDataTreeService netconfService = null;
@@ -69,21 +71,23 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     }
 
     @Override
-    public void onDeviceConnected(final MountPointContext mountContext,
+    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService, final DOMActionService domActionService) {
         deviceAction = domActionService;
         LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, "
             + "DOMActionService exposed for the device", id);
-        onDeviceConnected(mountContext, sessionPreferences, domRpcService);
+        onDeviceConnected(deviceSchema, sessionPreferences, domRpcService);
     }
 
     @Override
-    public void onDeviceConnected(final MountPointContext mountContext,
+    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService) {
-        currentMountContext = mountContext;
+        currentMountContext = deviceSchema.mountContext();
         netconfSessionPreferences = sessionPreferences;
+        // FIXME: receive this object
+        deviceCapabilities = null;
         deviceRpc = domRpcService;
 
         LOG.info("Device {} connected - registering master mount point", id);
@@ -107,7 +111,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     @Override
     public void onDeviceDisconnected() {
         LOG.info("Device {} disconnected - unregistering master mount point", id);
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
+        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, NetconfDeviceCapabilities.empty());
         unregisterMasterMountPoint();
     }
 
@@ -170,8 +174,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private void updateDeviceData() {
         final String masterAddress = Cluster.get(actorSystem).selfAddress().toString();
         LOG.debug("{}: updateDeviceData with master address {}", id, masterAddress);
-        salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, masterAddress,
-                netconfSessionPreferences.getNetconfDeviceCapabilities());
+        salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, masterAddress, deviceCapabilities);
     }
 
     private void unregisterMasterMountPoint() {
