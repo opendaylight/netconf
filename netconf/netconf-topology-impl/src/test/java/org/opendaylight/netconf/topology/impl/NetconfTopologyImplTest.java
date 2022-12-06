@@ -48,7 +48,6 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.DefaultBaseNetconfSchemas;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
@@ -74,6 +73,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableItem;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.common.Decimal64;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
@@ -258,13 +258,13 @@ public class NetconfTopologyImplTest {
         }
 
         @Override
-        public ListenableFuture<NetconfDeviceCapabilities> connectNode(final NodeId nodeId, final Node configNode) {
-            return Futures.immediateFuture(new NetconfDeviceCapabilities());
+        public ListenableFuture<Empty> connectNode(final NodeId nodeId, final Node configNode) {
+            return Futures.immediateFuture(Empty.value());
         }
 
         @Override
-        public ListenableFuture<Void> disconnectNode(final NodeId nodeId) {
-            return Futures.immediateFuture(null);
+        public ListenableFuture<Empty> disconnectNode(final NodeId nodeId) {
+            return Futures.immediateFuture(Empty.value());
         }
     }
 
