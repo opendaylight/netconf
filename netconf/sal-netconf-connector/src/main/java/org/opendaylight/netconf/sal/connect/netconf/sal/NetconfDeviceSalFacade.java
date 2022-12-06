@@ -20,6 +20,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -71,34 +72,37 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
     }
 
     @Override
-    public synchronized void onDeviceConnected(final MountPointContext mountContext,
-                                               final NetconfSessionPreferences netconfSessionPreferences,
-                                               final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
+    public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
+            final NetconfSessionPreferences sessionPreferences, final DOMRpcService deviceRpc,
+            final DOMActionService deviceAction) {
+        final MountPointContext mountContext = deviceSchema.mountContext();
         final EffectiveModelContext schemaContext = mountContext.getEffectiveModelContext();
+
         final NetconfDeviceDataBroker netconfDeviceDataBroker =
-                new NetconfDeviceDataBroker(id, mountContext, deviceRpc, netconfSessionPreferences);
+                new NetconfDeviceDataBroker(id, mountContext, deviceRpc, sessionPreferences);
         final NetconfDataTreeService netconfService =
-                AbstractNetconfDataTreeService.of(id, mountContext, deviceRpc, netconfSessionPreferences);
+                AbstractNetconfDataTreeService.of(id, mountContext, deviceRpc, sessionPreferences);
         registerLockListener(netconfDeviceDataBroker, netconfService);
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
-        salProvider.getMountInstance()
-                .onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, netconfService,
-                        deviceRpc, notificationService, deviceAction);
-        salProvider.getTopologyDatastoreAdapter()
-                .updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
+        salProvider.getMountInstance().onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, netconfService,
+            deviceRpc, notificationService, deviceAction);
+        salProvider.getTopologyDatastoreAdapter().updateDeviceData(true, deviceSchema.capabilities());
     }
 
     @Override
-    public synchronized void onDeviceReconnected(final NetconfSessionPreferences netconfSessionPreferences,
+    public synchronized void onDeviceReconnected(final NetconfDeviceCapabilities failedCapabilities,
             final NetconfNode node) {
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(ConnectionStatus.Connecting,
-                netconfSessionPreferences.getNetconfDeviceCapabilities(), LogicalDatastoreType.CONFIGURATION, node);
+        // FIXME: this is nice, so when this happens, we will tickle configuration, either writing the node, which we
+        //        got from topology's DTCL, or making up one, if the node is not provided -- for making it up, we would
+        //        use last state of capabilities, as they are mutated
+        salProvider.getTopologyDatastoreAdapter().updateDeviceData(ConnectionStatus.Connecting, failedCapabilities,
+            LogicalDatastoreType.CONFIGURATION, node);
     }
 
     @Override
     public synchronized void onDeviceDisconnected() {
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
+        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, NetconfDeviceCapabilities.empty());
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
         closeLockChangeListener();
     }

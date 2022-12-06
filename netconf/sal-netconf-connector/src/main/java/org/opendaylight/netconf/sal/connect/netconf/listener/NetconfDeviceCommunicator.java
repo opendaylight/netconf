@@ -39,6 +39,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -61,7 +62,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     private final Queue<Request> requests = new ArrayDeque<>();
     private NetconfClientSession currentSession;
 
-    private final SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
+    private final SettableFuture<Empty> firstConnectionFuture;
     private Future<?> taskFuture;
 
     // isSessionClosing indicates a close operation on the session is issued and
@@ -106,19 +107,17 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.debug("{}: Session established", id);
             currentSession = session;
 
-            NetconfSessionPreferences netconfSessionPreferences =
-                                             NetconfSessionPreferences.fromNetconfSession(session);
-            LOG.trace("{}: Session advertised capabilities: {}", id,
-                    netconfSessionPreferences);
+            var netconfSessionPreferences = NetconfSessionPreferences.fromNetconfSession(session);
+            LOG.trace("{}: Session advertised capabilities: {}", id, netconfSessionPreferences);
 
             if (overrideNetconfCapabilities.isPresent()) {
-                final NetconfSessionPreferences sessionPreferences = overrideNetconfCapabilities
-                        .get().getSessionPreferences();
-                netconfSessionPreferences = overrideNetconfCapabilities.get().moduleBasedCapsOverrided()
+                final var override = overrideNetconfCapabilities.orElseThrow();
+                final var sessionPreferences = override.getSessionPreferences();
+                netconfSessionPreferences = override.moduleBasedCapsOverrided()
                         ? netconfSessionPreferences.replaceModuleCaps(sessionPreferences)
                         : netconfSessionPreferences.addModuleCaps(sessionPreferences);
 
-                netconfSessionPreferences = overrideNetconfCapabilities.get().nonModuleBasedCapsOverrided()
+                netconfSessionPreferences = override.nonModuleBasedCapsOverrided()
                         ? netconfSessionPreferences.replaceNonModuleCaps(sessionPreferences)
                         : netconfSessionPreferences.addNonModuleCaps(sessionPreferences);
                 LOG.debug("{}: Session capabilities overridden, capabilities that will be used: {}", id,
@@ -127,7 +126,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
             remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
             if (!firstConnectionFuture.isDone()) {
-                firstConnectionFuture.set(netconfSessionPreferences.getNetconfDeviceCapabilities());
+                // FIXME: right, except ... this does not include the device schema setup, so is it really useful?
+                firstConnectionFuture.set(Empty.value());
             }
         } finally {
             sessionLock.unlock();
@@ -142,7 +142,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
      * @return a ListenableFuture that returns success on first successful connection and failure when the underlying
      *         reconnecting strategy runs out of reconnection attempts
      */
-    public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection(
+    public ListenableFuture<Empty> initializeRemoteConnection(
             final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
 
         final Future<?> connectFuture;
