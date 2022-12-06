@@ -226,10 +226,19 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
         RemoteDeviceHandler salFacade = createSalFacade(remoteDeviceId);
+        final KeepaliveSalFacade keepAlive;
         if (keepaliveDelay > 0) {
             LOG.info("Adding keepalive facade, for device {}", nodeId);
-            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(),
+            salFacade = keepAlive = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(),
                     keepaliveDelay, node.requireDefaultRequestTimeoutMillis().toJava());
+        } else {
+            keepAlive = null;
+        }
+
+        // Setup reconnection on empty context, if so configured
+        if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
+            salFacade = new ReconnectRemoteDeviceHandler(eventExecutor, remoteDeviceId, salFacade,
+                nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime());
         }
 
         final RemoteDevice<NetconfDeviceCommunicator> device;
@@ -238,18 +247,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             device = new SchemalessNetconfDevice(baseSchemas, remoteDeviceId, salFacade);
             yanglibRegistrations = List.of();
         } else {
-            final boolean reconnectOnChangedSchema = node.requireReconnectOnChangedSchema();
             final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node.getSchemaCacheDirectory(),
                 nodeId.getValue());
             device = new NetconfDeviceBuilder()
-                .setReconnectOnSchemasChange(reconnectOnChangedSchema)
+                .setReconnectOnSchemasChange(node.requireReconnectOnChangedSchema())
                 .setSchemaResourcesDTO(resources)
                 .setGlobalProcessingExecutor(processingExecutor)
                 .setId(remoteDeviceId)
                 .setSalFacade(salFacade)
-                .setNode(node)
-                .setEventExecutor(eventExecutor)
-                .setNodeOptional(nodeOptional)
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
                 .build();
@@ -264,11 +269,11 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         final NetconfDeviceCommunicator netconfDeviceCommunicator =
              userCapabilities.isPresent() ? new NetconfDeviceCommunicator(remoteDeviceId, device,
-                     userCapabilities.get(), rpcMessageLimit)
+                     userCapabilities.orElseThrow(), rpcMessageLimit)
             : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
 
-        if (salFacade instanceof KeepaliveSalFacade) {
-            ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
+        if (keepAlive != null) {
+            keepAlive.setListener(netconfDeviceCommunicator);
         }
 
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, yanglibRegistrations);
