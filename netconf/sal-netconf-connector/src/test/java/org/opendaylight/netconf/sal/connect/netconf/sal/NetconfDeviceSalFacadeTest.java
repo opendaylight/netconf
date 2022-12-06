@@ -36,6 +36,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -112,8 +114,10 @@ public class NetconfDeviceSalFacadeTest {
             List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
 
         final DOMRpcService deviceRpc = mock(DOMRpcService.class);
-        deviceFacade.onDeviceConnected(new EmptyMountPointContext(schemaContext), netconfSessionPreferences, deviceRpc,
-            null);
+        deviceFacade.onDeviceConnected(
+            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), new EmptyMountPointContext(schemaContext)),
+            netconfSessionPreferences, deviceRpc, null);
+
         verifyConnectionStatusUpdate(ConnectionStatus.Connected);
         verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext),
                 any(DOMDataBroker.class), any(NetconfDataTreeService.class), eq(deviceRpc),
