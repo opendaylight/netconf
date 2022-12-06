@@ -170,12 +170,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     @Override
     public ListenableFuture<Empty> disconnectNode(final NodeId nodeId) {
-        LOG.debug("Disconnecting RemoteDevice{{}}", nodeId.getValue());
+        final var nodeName = nodeId.getValue();
+        LOG.debug("Disconnecting RemoteDevice{{}}", nodeName);
 
         final NetconfConnectorDTO connectorDTO = activeConnectors.remove(nodeId);
         if (connectorDTO == null) {
             return Futures.immediateFailedFuture(
-                new IllegalStateException("Unable to disconnect device that is not connected"));
+                new IllegalStateException("Cannot disconnect " + nodeName + " as it is not connected"));
         }
 
         connectorDTO.close();
