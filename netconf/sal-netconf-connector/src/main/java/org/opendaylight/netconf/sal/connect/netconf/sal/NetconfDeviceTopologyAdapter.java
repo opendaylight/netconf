@@ -75,6 +75,7 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
         commitTransaction(writeTx, "init");
     }
 
+    // FIXME: remove check for datastore -- we have only two callers
     public void updateDeviceData(final ConnectionStatus connectionStatus,
             final NetconfDeviceCapabilities capabilities, final LogicalDatastoreType dsType, final NetconfNode node) {
         NetconfNode data;
@@ -155,8 +156,8 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
     private NetconfNode buildDataForNetconfNode(final ConnectionStatus connectionStatus,
             final NetconfDeviceCapabilities capabilities, final LogicalDatastoreType dsType, final NetconfNode node) {
         List<AvailableCapability> capabilityList = new ArrayList<>();
-        capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
-        capabilityList.addAll(capabilities.getResolvedCapabilities());
+        capabilityList.addAll(capabilities.nonModuleBasedCapabilities());
+        capabilityList.addAll(capabilities.resolvedCapabilities());
 
         final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();
         avCapabalitiesBuilder.setAvailableCapability(capabilityList);
@@ -166,15 +167,15 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
             .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
             .setConnectionStatus(connectionStatus)
             .setAvailableCapabilities(avCapabalitiesBuilder.build())
-            .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
+            .setUnavailableCapabilities(unavailableCapabilities(capabilities.unresolvedCapabilites()))
             .build();
     }
 
     private NetconfNode buildDataForNetconfClusteredNode(final boolean up, final String masterNodeAddress,
                                                          final NetconfDeviceCapabilities capabilities) {
         List<AvailableCapability> capabilityList = new ArrayList<>();
-        capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
-        capabilityList.addAll(capabilities.getResolvedCapabilities());
+        capabilityList.addAll(capabilities.nonModuleBasedCapabilities());
+        capabilityList.addAll(capabilities.resolvedCapabilities());
         final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();
         avCapabalitiesBuilder.setAvailableCapability(capabilityList);
 
@@ -183,7 +184,7 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
                 .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
                 .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
                 .setAvailableCapabilities(avCapabalitiesBuilder.build())
-                .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
+                .setUnavailableCapabilities(unavailableCapabilities(capabilities.unresolvedCapabilites()))
                 .setClusteredConnectionStatus(
                         new ClusteredConnectionStatusBuilder().setNetconfMasterNode(masterNodeAddress).build());
 
