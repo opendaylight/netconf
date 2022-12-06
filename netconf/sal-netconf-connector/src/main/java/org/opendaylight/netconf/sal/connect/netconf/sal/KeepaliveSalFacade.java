@@ -32,12 +32,12 @@ import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -112,17 +112,17 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     }
 
     @Override
-    public void onDeviceConnected(final MountPointContext remoteSchemaContext,
-                          final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
-        onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc, null);
+    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
+            final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
+        onDeviceConnected(deviceSchema, netconfSessionPreferences, deviceRpc, null);
     }
 
     @Override
-    public void onDeviceConnected(final MountPointContext remoteSchemaContext,
+    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc,
             final DOMActionService deviceAction) {
         currentDeviceRpc = requireNonNull(deviceRpc);
-        salFacade.onDeviceConnected(remoteSchemaContext, netconfSessionPreferences,
+        salFacade.onDeviceConnected(deviceSchema, netconfSessionPreferences,
             new KeepaliveDOMRpcService(deviceRpc), deviceAction);
 
         LOG.debug("{}: Netconf session initiated, starting keepalives", id);
