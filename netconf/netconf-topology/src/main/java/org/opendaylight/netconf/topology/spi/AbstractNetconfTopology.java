@@ -223,9 +223,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .setGlobalProcessingExecutor(processingExecutor)
                 .setId(remoteDeviceId)
                 .setSalFacade(salFacade)
-                .setNode(node)
-                .setEventExecutor(eventExecutor)
-                .setNodeOptional(nodeOptional)
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
                 .build();
