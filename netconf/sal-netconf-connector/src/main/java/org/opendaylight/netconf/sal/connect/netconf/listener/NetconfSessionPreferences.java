@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
@@ -59,7 +60,6 @@ public final class NetconfSessionPreferences {
     private static final Splitter AMP_SPLITTER = Splitter.on('&');
     private static final Predicate<String> CONTAINS_REVISION = input -> input.contains("revision=");
 
-    private final NetconfDeviceCapabilities capabilities = new NetconfDeviceCapabilities();
     private final ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps;
     private final ImmutableMap<String, CapabilityOrigin> nonModuleCaps;
 
@@ -85,8 +85,12 @@ public final class NetconfSessionPreferences {
         return nonModuleCaps;
     }
 
-    public NetconfDeviceCapabilities getNetconfDeviceCapabilities() {
-        return capabilities;
+    public @Nullable CapabilityOrigin capabilityOrigin(final QName capability) {
+        return moduleBasedCaps.get(requireNonNull(capability));
+    }
+
+    public @Nullable CapabilityOrigin capabilityOrigin(final String capability) {
+        return nonModuleCaps.get(requireNonNull(capability));
     }
 
     // allows partial matches - assuming parameters are in the same order
