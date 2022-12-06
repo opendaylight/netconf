@@ -16,6 +16,63 @@
       "message": "I would like to point out that creation of schemaContext inside test is not needed after this patch, since SchemaAware NormalizedNode builders are removed.",
       "revId": "8d9a84f9ae3820dee15e40fc8c47c144119c1256",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09e1684b_2686124e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2022-12-06T13:22:01Z",
+      "side": 1,
+      "message": "Looks good, just some minor points to consider.",
+      "revId": "8d9a84f9ae3820dee15e40fc8c47c144119c1256",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f79e2863_bbdc3d84",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2022-12-06T13:22:01Z",
+      "side": 1,
+      "message": "are we sure that ContainerNode, MapNode and LeafNode are the only admissible instances? Or are we ignoring the rest?",
+      "range": {
+        "startLine": 154,
+        "startChar": 12,
+        "endLine": 154,
+        "endChar": 14
+      },
+      "revId": "8d9a84f9ae3820dee15e40fc8c47c144119c1256",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49a0b26a_630d019a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2022-12-06T13:22:01Z",
+      "side": 1,
+      "message": "same call in each condition. If we need to ignore other instances than those matching the conditions, then this is fine. If we are sure, there are not other admissible instances in result.body(), you can call this once, outside of the \"if\" statements. I might be wrong though, just consider please.",
+      "revId": "8d9a84f9ae3820dee15e40fc8c47c144119c1256",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
