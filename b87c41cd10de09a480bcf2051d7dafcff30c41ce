@@ -265,6 +265,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6c875127_014c12d1",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2022-12-06T08:22:54Z",
+      "side": 1,
+      "message": "I was able to fix this issue after removal of the SchemaAware NormalizedNode builders. but it seems like it does not work here since they are not removed here. We will be able to use assertEquals(content, normalizedNode); after SchemaAware NormalizedNode builders are removed",
+      "parentUuid": "dd8d0e65_3daf9d43",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "92babb4d_94bf4226",
         "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
         "patchSetId": 1
