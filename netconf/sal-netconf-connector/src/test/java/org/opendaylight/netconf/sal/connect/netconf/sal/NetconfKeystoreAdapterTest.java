@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -14,10 +17,7 @@ import static org.mockito.Mockito.mock;
 
 import java.security.KeyStoreException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,24 +53,19 @@ public class NetconfKeystoreAdapterTest {
     @Mock
     private DataBroker dataBroker;
     @Mock
-    private ListenerRegistration listenerRegistration;
+    private ListenerRegistration<?> listenerRegistration;
 
     @Before
     public void setUp() {
-        doReturn(listenerRegistration).when(dataBroker).registerDataTreeChangeListener(
-                any(DataTreeIdentifier.class), any(NetconfKeystoreAdapter.class));
+        doReturn(listenerRegistration).when(dataBroker)
+            .registerDataTreeChangeListener(any(DataTreeIdentifier.class), any(NetconfKeystoreAdapter.class));
     }
 
     @Test
     public void testKeystoreAdapterInit() throws Exception {
-        NetconfKeystoreAdapter keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
-
-        try {
-            keystoreAdapter.getJavaKeyStore();
-            Assert.fail(IllegalStateException.class + "exception expected");
-        } catch (KeyStoreException e) {
-            assertTrue(e.getMessage().startsWith("No keystore private key found"));
-        }
+        final var keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
+        final var ex = assertThrows(KeyStoreException.class, keystoreAdapter::getJavaKeyStore);
+        assertThat(ex.getMessage(), startsWith("No keystore private key found"));
     }
 
     @SuppressWarnings("unchecked")
@@ -81,20 +76,18 @@ public class NetconfKeystoreAdapterTest {
         doReturn(keystoreObjectModification).when(dataTreeModification).getRootNode();
 
         DataObjectModification<?> childObjectModification = mock(DataObjectModification.class);
-        doReturn(Collections.singletonList(childObjectModification))
-            .when(keystoreObjectModification).getModifiedChildren();
+        doReturn(List.of(childObjectModification)).when(keystoreObjectModification).getModifiedChildren();
         doReturn(PrivateKey.class).when(childObjectModification).getDataType();
 
-        doReturn(DataObjectModification.ModificationType.WRITE)
-            .when(childObjectModification).getModificationType();
+        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification).getModificationType();
 
-        PrivateKey privateKey = getPrivateKey();
+        final var privateKey = getPrivateKey();
         doReturn(privateKey).when(childObjectModification).getDataAfter();
 
-        NetconfKeystoreAdapter keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
-        keystoreAdapter.onDataTreeChanged(Collections.singletonList(dataTreeModification));
+        final var keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
+        keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification));
 
-        java.security.KeyStore keyStore = keystoreAdapter.getJavaKeyStore();
+        final var keyStore = keystoreAdapter.getJavaKeyStore();
         assertTrue(keyStore.containsAlias(privateKey.getName()));
     }
 
@@ -107,14 +100,12 @@ public class NetconfKeystoreAdapterTest {
         doReturn(keystoreObjectModification1).when(dataTreeModification1).getRootNode();
 
         DataObjectModification<?> childObjectModification1 = mock(DataObjectModification.class);
-        doReturn(Collections.singletonList(childObjectModification1))
-            .when(keystoreObjectModification1).getModifiedChildren();
+        doReturn(List.of(childObjectModification1)).when(keystoreObjectModification1).getModifiedChildren();
         doReturn(PrivateKey.class).when(childObjectModification1).getDataType();
 
-        doReturn(DataObjectModification.ModificationType.WRITE)
-            .when(childObjectModification1).getModificationType();
+        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification1).getModificationType();
 
-        PrivateKey privateKey = getPrivateKey();
+        final var privateKey = getPrivateKey();
         doReturn(privateKey).when(childObjectModification1).getDataAfter();
 
         // Prepare TrustedCertificate configuration
@@ -123,22 +114,21 @@ public class NetconfKeystoreAdapterTest {
         doReturn(keystoreObjectModification2).when(dataTreeModification2).getRootNode();
 
         DataObjectModification<?> childObjectModification2 = mock(DataObjectModification.class);
-        doReturn(Collections.singletonList(childObjectModification2))
-            .when(keystoreObjectModification2).getModifiedChildren();
+        doReturn(List.of(childObjectModification2)).when(keystoreObjectModification2).getModifiedChildren();
         doReturn(TrustedCertificate.class).when(childObjectModification2).getDataType();
 
         doReturn(DataObjectModification.ModificationType.WRITE)
             .when(childObjectModification2).getModificationType();
 
-        TrustedCertificate trustedCertificate = geTrustedCertificate();
+        final var trustedCertificate = geTrustedCertificate();
         doReturn(trustedCertificate).when(childObjectModification2).getDataAfter();
 
         // Apply configurations
-        NetconfKeystoreAdapter keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
-        keystoreAdapter.onDataTreeChanged(Arrays.asList(dataTreeModification1, dataTreeModification2));
+        final var keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
+        keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
 
         // Check result
-        java.security.KeyStore keyStore = keystoreAdapter.getJavaKeyStore();
+        final var keyStore = keystoreAdapter.getJavaKeyStore();
         assertTrue(keyStore.containsAlias(privateKey.getName()));
         assertTrue(keyStore.containsAlias(trustedCertificate.getName()));
     }
