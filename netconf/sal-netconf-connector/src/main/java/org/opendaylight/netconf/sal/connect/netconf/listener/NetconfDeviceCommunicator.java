@@ -100,10 +100,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.debug("{}: Session established", id);
             currentSession = session;
 
-            NetconfSessionPreferences netconfSessionPreferences =
-                                             NetconfSessionPreferences.fromNetconfSession(session);
-            LOG.trace("{}: Session advertised capabilities: {}", id,
-                    netconfSessionPreferences);
+            var netconfSessionPreferences = NetconfSessionPreferences.fromNetconfSession(session);
+            LOG.trace("{}: Session advertised capabilities: {}", id, netconfSessionPreferences);
 
             final var localOverride = overrideNetconfCapabilities;
             if (localOverride != null) {
