@@ -98,7 +98,7 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
 
     @Override
     public synchronized void onDeviceDisconnected() {
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
+        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, NetconfDeviceCapabilities.empty());
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
         closeLockChangeListener();
     }

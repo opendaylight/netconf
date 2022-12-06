@@ -263,7 +263,7 @@ public class NetconfTopologyImplTest {
 
         @Override
         public ListenableFuture<NetconfDeviceCapabilities> connectNode(final NodeId nodeId, final Node configNode) {
-            return Futures.immediateFuture(new NetconfDeviceCapabilities());
+            return Futures.immediateFuture(NetconfDeviceCapabilities.empty());
         }
 
         @Override
