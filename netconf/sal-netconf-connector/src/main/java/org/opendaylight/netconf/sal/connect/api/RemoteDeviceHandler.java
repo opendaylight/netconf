@@ -10,18 +10,18 @@ package org.opendaylight.netconf.sal.connect.api;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
 public interface RemoteDeviceHandler extends AutoCloseable {
     /**
      * When device connected, init new mount point with specific schema context and DOM services.
      *
-     * @param remoteSchemaContext - schema context of connected device
+     * @param deviceSchema - {@link NetconfDeviceSchema} of connected device
      * @param sessionPreferences - session of device
      * @param deviceRpc - {@link DOMRpcService} of device
      */
-    default void onDeviceConnected(final MountPointContext remoteSchemaContext,
+    default void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final DOMRpcService deviceRpc) {
         // DO NOTHING
     }
@@ -29,12 +29,12 @@ public interface RemoteDeviceHandler extends AutoCloseable {
     /**
      * When device connected, init new mount point with specific schema context and DOM services.
      *
-     * @param mountContext - MountPointContext of connected device
+     * @param deviceSchema - {@link NetconfDeviceSchema} of connected device
      * @param sessionPreferences - session of device
      * @param deviceRpc - {@link DOMRpcService} of device
      * @param deviceAction - {@link DOMActionService} of device
      */
-    default void onDeviceConnected(final MountPointContext mountContext,
+    default void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences,
             final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
         // DO NOTHING

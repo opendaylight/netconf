@@ -63,7 +63,6 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -157,7 +156,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 getSessionCaps(true, Lists.newArrayList(TEST_CAPABILITY, TEST_CAPABILITY2));
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class),
+        verify(facade, timeout(5000)).onDeviceConnected(any(NetconfDeviceSchema.class),
             any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
         verify(schemaFactory, times(2)).createEffectiveModelContext(anyCollection());
     }
@@ -246,7 +245,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 getSessionCaps(true, Lists.newArrayList(TEST_CAPABILITY, TEST_CAPABILITY2));
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class),
+        verify(facade, timeout(5000)).onDeviceConnected(any(NetconfDeviceSchema.class),
             any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
         verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollection());
     }
@@ -327,7 +326,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         verify(schemaContextProviderFactory, timeout(5000)).createEffectiveModelContext(any(Collection.class));
         verify(facade, timeout(5000)).onDeviceConnected(
-                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
                 isNull());
 
         device.onRemoteSessionDown();
@@ -337,7 +336,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         verify(schemaContextProviderFactory, timeout(5000).times(2)).createEffectiveModelContext(any(Collection.class));
         verify(facade, timeout(5000).times(2)).onDeviceConnected(
-                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
                 isNull());
     }
 
@@ -400,13 +399,10 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
 
-        final ArgumentCaptor<NetconfSessionPreferences> argument =
-                ArgumentCaptor.forClass(NetconfSessionPreferences.class);
-        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class), argument.capture(),
+        final ArgumentCaptor<NetconfDeviceSchema> argument =  ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
             any(DOMRpcService.class), isNull());
-        final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().getNetconfDeviceCapabilities();
-
-        netconfDeviceCaps.getResolvedCapabilities()
+        argument.getValue().capabilities().resolvedCapabilities()
                 .forEach(entry -> assertEquals("Builded 'AvailableCapability' schemas should match input capabilities.",
                         moduleBasedCaps.get(
                                 QName.create(entry.getCapability())).getName(), entry.getCapabilityOrigin().getName()));
@@ -434,9 +430,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         netconfSpy.onRemoteSessionUp(sessionCaps, listener);
 
-        final ArgumentCaptor<NetconfSessionPreferences> argument =
-                ArgumentCaptor.forClass(NetconfSessionPreferences.class);
-        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class), argument.capture(),
+        final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
                 any(DOMRpcService.class), isNull());
 
         List<String> notificationModulesName = Arrays.asList(
@@ -445,8 +440,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
                         .$YangModuleInfoImpl.getInstance().getName().toString());
 
-        final Set<AvailableCapability> resolvedCapabilities = argument.getValue().getNetconfDeviceCapabilities()
-                .getResolvedCapabilities();
+        final Set<AvailableCapability> resolvedCapabilities = argument.getValue().capabilities().resolvedCapabilities();
 
         assertEquals(2, resolvedCapabilities.size());
         assertTrue(resolvedCapabilities.stream().anyMatch(entry -> notificationModulesName
@@ -475,20 +469,19 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         netconfSpy.onRemoteSessionUp(sessionCaps, listener);
 
-        final ArgumentCaptor<NetconfSessionPreferences> argument =
-                ArgumentCaptor.forClass(NetconfSessionPreferences.class);
-        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class), argument.capture(),
+        final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
                 any(DOMRpcService.class), isNull());
-        final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().getNetconfDeviceCapabilities();
+        final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().capabilities();
 
-        List<String> notificationModulesName = Arrays.asList(
+        List<String> notificationModulesName = List.of(
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
                         .$YangModuleInfoImpl.getInstance().getName().toString(),
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
                         .$YangModuleInfoImpl.getInstance().getName().toString());
 
-        assertFalse(netconfDeviceCaps.getResolvedCapabilities().stream().anyMatch(entry -> notificationModulesName
-                .contains(entry.getCapability())));
+        assertFalse(netconfDeviceCaps.resolvedCapabilities().stream()
+            .anyMatch(entry -> notificationModulesName.contains(entry.getCapability())));
     }
 
     @Test
@@ -521,12 +514,10 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
 
-        final ArgumentCaptor<NetconfSessionPreferences> argument =
-                ArgumentCaptor.forClass(NetconfSessionPreferences.class);
-        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class), argument.capture(),
+        final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
                 any(DOMRpcService.class), isNull());
-        final Set<AvailableCapability> resolvedCapabilities = argument.getValue().getNetconfDeviceCapabilities()
-                .getResolvedCapabilities();
+        final Set<AvailableCapability> resolvedCapabilities = argument.getValue().capabilities().resolvedCapabilities();
 
         List<String> notificationModulesName = Arrays.asList(
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
@@ -549,7 +540,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     private static RemoteDeviceHandler getFacade() throws Exception {
         final RemoteDeviceHandler remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
         doNothing().when(remoteDeviceHandler).onDeviceConnected(
-                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class),
+                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class),
                 any(DOMActionService.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
         doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
