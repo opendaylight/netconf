@@ -22,6 +22,30 @@
       },
       "revId": "ff36265699d01acf25b7d9f47fb4210ea1b02b2f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdcdcc54_9d9b8e96",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2022-12-06T08:15:50Z",
+      "side": 1,
+      "message": "resolved, Suppress is removed in newest patchset",
+      "parentUuid": "5f764080_f8d812c7",
+      "range": {
+        "startLine": 131,
+        "startChar": 4,
+        "endLine": 131,
+        "endChar": 70
+      },
+      "revId": "ff36265699d01acf25b7d9f47fb4210ea1b02b2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
