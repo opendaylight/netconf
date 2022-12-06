@@ -50,7 +50,7 @@ public class NetconfDeviceSalProviderTest {
         doReturn("Some object").when(writeTx).getIdentifier();
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         provider = new NetconfDeviceSalProvider(new RemoteDeviceId("device1",
-                InetSocketAddress.createUnresolved("localhost", 17830)), mountPointService, dataBroker);
+                InetSocketAddress.createUnresolved("localhost", 17830)), mountPointService);
         doReturn(tx).when(chain).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
         doReturn(tx).when(tx).getIdentifier();

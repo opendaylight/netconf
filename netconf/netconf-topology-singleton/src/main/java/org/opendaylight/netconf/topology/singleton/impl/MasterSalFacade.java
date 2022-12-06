@@ -62,7 +62,8 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
                     final DOMMountPointService mountService,
                     final DataBroker dataBroker) {
         this.id = id;
-        salProvider = new NetconfDeviceSalProvider(id, mountService, dataBroker);
+        salProvider = new NetconfDeviceSalProvider(id, mountService);
+        // FIXME: datastore updater
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
         this.actorResponseWaitTime = actorResponseWaitTime;

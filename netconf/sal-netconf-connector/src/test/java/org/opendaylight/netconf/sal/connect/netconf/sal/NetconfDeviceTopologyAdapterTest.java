@@ -13,6 +13,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,11 +87,13 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testRemoveDeviceConfiguration() throws Exception {
-        listeners.getValue().onTransactionChainSuccessful(mockChain);
-        adapter.close();
+        final var future = adapter.shutdown();
 
         verify(mockChain, times(2)).newWriteOnlyTransaction();
         verify(mockTx).delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
         verify(mockTx, times(2)).commit();
+
+        listeners.getValue().onTransactionChainSuccessful(mockChain);
+        Futures.getDone(future);
     }
 }

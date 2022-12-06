@@ -38,17 +38,14 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceSalFacadeTest {
-
-    private NetconfDeviceSalFacade deviceFacade;
-
-    @Mock
-    private NetconfDeviceTopologyAdapter netconfDeviceTopologyAdapter;
     @Mock
     private NetconfDeviceSalProvider.MountInstance mountInstance;
     @Mock
     private NetconfDeviceSalProvider salProvider;
     @Mock
     private DataBroker dataBroker;
+
+    private NetconfDeviceSalFacade deviceFacade;
 
     @Before
     public void setUp() throws Exception {

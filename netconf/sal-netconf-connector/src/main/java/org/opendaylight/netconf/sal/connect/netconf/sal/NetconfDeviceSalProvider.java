@@ -11,7 +11,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
-import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -34,20 +33,9 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
     private final RemoteDeviceId id;
     private final MountInstance mountInstance;
 
-    private volatile NetconfDeviceTopologyAdapter topologyDatastoreAdapter;
-
     public NetconfDeviceSalProvider(final RemoteDeviceId deviceId, final DOMMountPointService mountService) {
-        this(deviceId, mountService, null);
-    }
-
-    // FIXME: NETCONF-918: remove this method
-    public NetconfDeviceSalProvider(final RemoteDeviceId deviceId, final DOMMountPointService mountService,
-            final DataBroker dataBroker) {
-        id = deviceId;
+        id = requireNonNull(deviceId);
         mountInstance = new MountInstance(mountService, id);
-        if (dataBroker != null) {
-            topologyDatastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, id);
-        }
     }
 
     public MountInstance getMountInstance() {
@@ -56,20 +44,9 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         return mountInstance;
     }
 
-    public NetconfDeviceTopologyAdapter getTopologyDatastoreAdapter() {
-        final NetconfDeviceTopologyAdapter local = topologyDatastoreAdapter;
-        checkState(local != null,
-                "%s: Sal provider %s was not initialized by sal. Cannot get topology datastore adapter", id, this);
-        return local;
-    }
-
     @Override
     public void close() {
         mountInstance.close();
-        if (topologyDatastoreAdapter != null) {
-            topologyDatastoreAdapter.close();
-            topologyDatastoreAdapter = null;
-        }
     }
 
     public static class MountInstance implements AutoCloseable {

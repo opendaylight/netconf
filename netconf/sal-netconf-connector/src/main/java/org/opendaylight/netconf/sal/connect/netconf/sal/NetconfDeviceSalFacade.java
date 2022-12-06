@@ -20,7 +20,6 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeFieldsOptional;
@@ -30,7 +29,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev19
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.netconf.node.fields.optional.topology.NodeKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.netconf.node.fields.optional.topology.node.DatastoreLock;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -53,7 +51,7 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
 
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
             final DataBroker dataBroker, final String topologyId) {
-        this(id, new NetconfDeviceSalProvider(id, mountPointService, dataBroker), dataBroker, topologyId);
+        this(id, new NetconfDeviceSalProvider(id, mountPointService), dataBroker, topologyId);
     }
 
     @VisibleForTesting
@@ -85,27 +83,21 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
         salProvider.getMountInstance()
                 .onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, netconfService,
                         deviceRpc, notificationService, deviceAction);
-        salProvider.getTopologyDatastoreAdapter()
-                .updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
 
     @Override
-    public synchronized void onDeviceReconnected(final NetconfSessionPreferences netconfSessionPreferences,
-            final NetconfNode node) {
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(ConnectionStatus.Connecting,
-                netconfSessionPreferences.getNetconfDeviceCapabilities(), LogicalDatastoreType.CONFIGURATION, node);
+    public void onDeviceReconnected(final NetconfSessionPreferences netconfSessionPreferences, final NetconfNode node) {
+        // No-op
     }
 
     @Override
     public synchronized void onDeviceDisconnected() {
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
         closeLockChangeListener();
     }
 
     @Override
     public synchronized void onDeviceFailed(final Throwable throwable) {
-        salProvider.getTopologyDatastoreAdapter().setDeviceAsFailed(throwable);
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
         closeLockChangeListener();
     }

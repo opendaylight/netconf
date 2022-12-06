@@ -10,12 +10,12 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.Transaction;
@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // Non-final for testing
-public class NetconfDeviceTopologyAdapter implements TransactionChainListener, AutoCloseable {
+public class NetconfDeviceTopologyAdapter implements TransactionChainListener {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceTopologyAdapter.class);
 
     private final SettableFuture<Empty> closeFuture = SettableFuture.create();
@@ -216,8 +216,7 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
         return new NodeBuilder().withKey(new NodeKey(new NodeId(id.getName())));
     }
 
-    @Override
-    public void close() {
+    public ListenableFuture<?> shutdown() {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Close device state transaction {} removing all data started.", id, writeTx.getIdentifier());
         writeTx.delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
@@ -225,12 +224,6 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
         writeTx.commit();
 
         txChain.close();
-
-        try {
-            closeFuture.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error("{}: Transaction(close) {} FAILED!", id, writeTx.getIdentifier(), e);
-            throw new IllegalStateException(id + "  Transaction(close) not committed correctly", e);
-        }
+        return closeFuture;
     }
 }
