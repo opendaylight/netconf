@@ -237,6 +237,11 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         } else {
             salFacade = deviceSalFacade;
             keepAliveFacade = null;
+
+        // Setup reconnection on empty context, if so configured
+        if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
+            salFacade = new ReconnectRemoteDeviceHandler(eventExecutor, deviceId, salFacade,
+                nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime());
         }
 
         final RemoteDevice<NetconfDeviceCommunicator> device;
@@ -245,18 +250,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             device = new SchemalessNetconfDevice(baseSchemas, deviceId, salFacade);
             yanglibRegistrations = List.of();
         } else {
-            final boolean reconnectOnChangedSchema = node.requireReconnectOnChangedSchema();
             final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node.getSchemaCacheDirectory(),
                 nodeId.getValue());
             device = new NetconfDeviceBuilder()
-                .setReconnectOnSchemasChange(reconnectOnChangedSchema)
+                .setReconnectOnSchemasChange(node.requireReconnectOnChangedSchema())
                 .setSchemaResourcesDTO(resources)
                 .setGlobalProcessingExecutor(processingExecutor)
                 .setId(deviceId)
                 .setSalFacade(salFacade)
-                .setNode(node)
-                .setEventExecutor(eventExecutor)
-                .setNodeOptional(nodeOptional)
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
                 .build();
@@ -269,10 +270,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", deviceId);
         }
 
-        final NetconfDeviceCommunicator netconfDeviceCommunicator =
-             userCapabilities.isPresent() ? new NetconfDeviceCommunicator(deviceId, device,
-                     userCapabilities.get(), rpcMessageLimit)
-            : new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit);
+        final NetconfDeviceCommunicator netconfDeviceCommunicator = userCapabilities.isPresent()
+            ? new NetconfDeviceCommunicator(deviceId, device, userCapabilities.orElseThrow(), rpcMessageLimit)
+                : new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit);
 
         if (keepAliveFacade != null) {
             keepAliveFacade.setListener(netconfDeviceCommunicator);
