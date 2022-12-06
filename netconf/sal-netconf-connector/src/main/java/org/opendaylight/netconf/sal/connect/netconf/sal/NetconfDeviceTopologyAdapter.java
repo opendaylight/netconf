@@ -9,12 +9,10 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -32,16 +30,13 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.ClusteredConnectionStatusBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability.FailureReason;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.common.Empty;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +75,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         if (node != null && dsType == LogicalDatastoreType.CONFIGURATION) {
             data = node;
         } else {
-            data = buildDataForNetconfNode(connectionStatus, capabilities, dsType, node);
+            data = newNetconfNodeBuilder(connectionStatus, capabilities).build();
         }
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
@@ -100,13 +95,16 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
 
     public void updateClusteredDeviceData(final boolean up, final String masterAddress,
                                           final NetconfDeviceCapabilities capabilities) {
-        final NetconfNode data = buildDataForNetconfClusteredNode(up, masterAddress, capabilities);
-
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
         writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
-                id.getTopologyBindingPath().augmentation(NetconfNode.class), data);
+            id.getTopologyBindingPath().augmentation(NetconfNode.class),
+            newNetconfNodeBuilder(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting, capabilities)
+                .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
+                    .setNetconfMasterNode(masterAddress)
+                    .build())
+                .build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
 
@@ -151,48 +149,27 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         commitTransaction(writeTx, "update-failed-device");
     }
 
-    private NetconfNode buildDataForNetconfNode(final ConnectionStatus connectionStatus,
-            final NetconfDeviceCapabilities capabilities, final LogicalDatastoreType dsType, final NetconfNode node) {
-        List<AvailableCapability> capabilityList = new ArrayList<>();
-        capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
-        capabilityList.addAll(capabilities.getResolvedCapabilities());
-
-        final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();
-        avCapabalitiesBuilder.setAvailableCapability(capabilityList);
-
+    private NetconfNodeBuilder newNetconfNodeBuilder(final ConnectionStatus connectionStatus,
+            final NetconfDeviceCapabilities capabilities) {
         return new NetconfNodeBuilder()
             .setHost(id.getHost())
             .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
             .setConnectionStatus(connectionStatus)
-            .setAvailableCapabilities(avCapabalitiesBuilder.build())
-            .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
-            .build();
-    }
-
-    private NetconfNode buildDataForNetconfClusteredNode(final boolean up, final String masterNodeAddress,
-                                                         final NetconfDeviceCapabilities capabilities) {
-        List<AvailableCapability> capabilityList = new ArrayList<>();
-        capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
-        capabilityList.addAll(capabilities.getResolvedCapabilities());
-        final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();
-        avCapabalitiesBuilder.setAvailableCapability(capabilityList);
-
-        final NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder()
-                .setHost(id.getHost())
-                .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
-                .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
-                .setAvailableCapabilities(avCapabalitiesBuilder.build())
-                .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
-                .setClusteredConnectionStatus(
-                        new ClusteredConnectionStatusBuilder().setNetconfMasterNode(masterNodeAddress).build());
-
-        return netconfNodeBuilder.build();
-    }
-
-    private static UnavailableCapabilities unavailableCapabilities(final Map<QName, FailureReason> input) {
-        return new UnavailableCapabilitiesBuilder().setUnavailableCapability(input.entrySet().stream().map(
-            e -> new UnavailableCapabilityBuilder().setCapability(e.getKey().toString()).setFailureReason(
-                e.getValue()).build()).collect(Collectors.toList())).build();
+            .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
+                .setAvailableCapability(ImmutableList.<AvailableCapability>builder()
+                    .addAll(capabilities.getNonModuleBasedCapabilities())
+                    .addAll(capabilities.getResolvedCapabilities())
+                    .build())
+                .build())
+            .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder()
+                .setUnavailableCapability(capabilities.getUnresolvedCapabilites().entrySet().stream()
+                    .map(unresolved -> new UnavailableCapabilityBuilder()
+                        // FIXME: better conversion than 'toString' ?
+                        .setCapability(unresolved.getKey().toString())
+                        .setFailureReason(unresolved.getValue())
+                        .build())
+                    .collect(Collectors.toUnmodifiableList()))
+                .build());
     }
 
     private void commitTransaction(final WriteTransaction transaction, final String txType) {
