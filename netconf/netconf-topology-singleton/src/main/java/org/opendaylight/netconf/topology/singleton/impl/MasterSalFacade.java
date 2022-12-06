@@ -24,6 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.AbstractNetconfDataTreeService;
@@ -48,7 +49,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
 
-    private MountPointContext currentMountContext = null;
+    private NetconfDeviceSchema currentSchema = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
     private DOMRpcService deviceRpc = null;
     private DOMDataBroker deviceDataBroker = null;
@@ -69,20 +70,20 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     }
 
     @Override
-    public void onDeviceConnected(final MountPointContext mountContext,
+    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService, final DOMActionService domActionService) {
         deviceAction = domActionService;
         LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, "
             + "DOMActionService exposed for the device", id);
-        onDeviceConnected(mountContext, sessionPreferences, domRpcService);
+        onDeviceConnected(deviceSchema, sessionPreferences, domRpcService);
     }
 
     @Override
-    public void onDeviceConnected(final MountPointContext mountContext,
+    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService) {
-        currentMountContext = mountContext;
+        currentSchema = requireNonNull(deviceSchema);
         netconfSessionPreferences = sessionPreferences;
         deviceRpc = domRpcService;
 
@@ -101,13 +102,12 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
                 LOG.error("{}: CreateInitialMasterActorData to {} failed", id, masterActorRef, failure);
             }
         }, actorSystem.dispatcher());
-
     }
 
     @Override
     public void onDeviceDisconnected() {
         LOG.info("Device {} disconnected - unregistering master mount point", id);
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
+        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, NetconfDeviceCapabilities.empty());
         unregisterMasterMountPoint();
     }
 
@@ -130,12 +130,16 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     private void registerMasterMountPoint() {
         requireNonNull(id);
-        requireNonNull(currentMountContext, "Device has no remote schema context yet. Probably not fully connected.");
-        requireNonNull(netconfSessionPreferences, "Device has no capabilities yet. Probably not fully connected.");
+
+        final var mountContext = requireNonNull(currentSchema,
+            "Device has no remote schema context yet. Probably not fully connected.")
+            .mountContext();
+        final var preferences = requireNonNull(netconfSessionPreferences,
+            "Device has no capabilities yet. Probably not fully connected.");
 
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
-        deviceDataBroker = newDeviceDataBroker();
-        netconfService = newNetconfDataTreeService();
+        deviceDataBroker = newDeviceDataBroker(mountContext, preferences);
+        netconfService = newNetconfDataTreeService(mountContext, preferences);
 
         // We need to create ProxyDOMDataBroker so accessing mountpoint
         // on leader node would be same as on follower node
@@ -143,21 +147,23 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
             actorResponseWaitTime);
         final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
-        salProvider.getMountInstance().onTopologyDeviceConnected(currentMountContext.getEffectiveModelContext(),
+        salProvider.getMountInstance().onTopologyDeviceConnected(mountContext.getEffectiveModelContext(),
             proxyDataBroker, proxyNetconfService, deviceRpc, notificationService, deviceAction);
     }
 
-    protected DOMDataBroker newDeviceDataBroker() {
-        return new NetconfDeviceDataBroker(id, currentMountContext, deviceRpc, netconfSessionPreferences);
+    protected DOMDataBroker newDeviceDataBroker(final MountPointContext mountContext,
+            final NetconfSessionPreferences preferences) {
+        return new NetconfDeviceDataBroker(id, mountContext, deviceRpc, preferences);
     }
 
-    protected NetconfDataTreeService newNetconfDataTreeService() {
-        return AbstractNetconfDataTreeService.of(id, currentMountContext, deviceRpc, netconfSessionPreferences);
+    protected NetconfDataTreeService newNetconfDataTreeService(final MountPointContext mountContext,
+            final NetconfSessionPreferences preferences) {
+        return AbstractNetconfDataTreeService.of(id, mountContext, deviceRpc, preferences);
     }
 
     private Future<Object> sendInitialDataToActor() {
         final List<SourceIdentifier> sourceIdentifiers = List.copyOf(SchemaContextUtil.getConstituentModuleIdentifiers(
-            currentMountContext.getEffectiveModelContext()));
+            currentSchema.mountContext().getEffectiveModelContext()));
 
         LOG.debug("{}: Sending CreateInitialMasterActorData with sourceIdentifiers {} to {}", id, sourceIdentifiers,
             masterActorRef);
@@ -171,7 +177,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         final String masterAddress = Cluster.get(actorSystem).selfAddress().toString();
         LOG.debug("{}: updateDeviceData with master address {}", id, masterAddress);
         salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, masterAddress,
-                netconfSessionPreferences.getNetconfDeviceCapabilities());
+            currentSchema.capabilities());
     }
 
     private void unregisterMasterMountPoint() {

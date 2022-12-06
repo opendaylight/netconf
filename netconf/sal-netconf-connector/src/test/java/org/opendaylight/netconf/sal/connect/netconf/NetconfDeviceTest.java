@@ -406,7 +406,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             any(DOMRpcService.class), isNull());
         final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().getNetconfDeviceCapabilities();
 
-        netconfDeviceCaps.getResolvedCapabilities()
+        netconfDeviceCaps.resolvedCapabilities()
                 .forEach(entry -> assertEquals("Builded 'AvailableCapability' schemas should match input capabilities.",
                         moduleBasedCaps.get(
                                 QName.create(entry.getCapability())).getName(), entry.getCapabilityOrigin().getName()));
@@ -481,14 +481,14 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 any(DOMRpcService.class), isNull());
         final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().getNetconfDeviceCapabilities();
 
-        List<String> notificationModulesName = Arrays.asList(
+        List<String> notificationModulesName = List.of(
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
                         .$YangModuleInfoImpl.getInstance().getName().toString(),
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
                         .$YangModuleInfoImpl.getInstance().getName().toString());
 
-        assertFalse(netconfDeviceCaps.getResolvedCapabilities().stream().anyMatch(entry -> notificationModulesName
-                .contains(entry.getCapability())));
+        assertFalse(netconfDeviceCaps.resolvedCapabilities().stream()
+            .anyMatch(entry -> notificationModulesName.contains(entry.getCapability())));
     }
 
     @Test
