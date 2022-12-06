@@ -76,28 +76,29 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
         commitTransaction(writeTx, "init");
     }
 
-    public void updateDeviceData(final ConnectionStatus connectionStatus,
-            final NetconfDeviceCapabilities capabilities, final LogicalDatastoreType dsType, final NetconfNode node) {
-        NetconfNode data;
-        if (node != null && dsType == LogicalDatastoreType.CONFIGURATION) {
-            data = node;
-        } else {
-            data = buildDataForNetconfNode(connectionStatus, capabilities);
-        }
-
+    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.mergeParentStructurePut(dsType, id.getTopologyBindingPath().augmentation(NetconfNode.class), data);
+
+        // FIXME: this needs to be tied together with node's operational existence
+        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
+            id.getTopologyBindingPath().augmentation(NetconfNode.class), new NetconfNodeBuilder()
+            .setHost(id.getHost())
+            .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
+            .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
+            .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
+                .setAvailableCapability(ImmutableList.<AvailableCapability>builder()
+                    .addAll(capabilities.getNonModuleBasedCapabilities())
+                    .addAll(capabilities.getResolvedCapabilities())
+                    .build())
+                .build())
+            .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
+            .build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
 
         commitTransaction(writeTx, "update");
-    }
-
-    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
-        updateDeviceData(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting, capabilities,
-                LogicalDatastoreType.OPERATIONAL, null);
     }
 
     public void updateClusteredDeviceData(final boolean up, final String masterAddress,
@@ -151,22 +152,6 @@ public class NetconfDeviceTopologyAdapter implements TransactionChainListener, A
                 id, writeTx.getIdentifier());
 
         commitTransaction(writeTx, "update-failed-device");
-    }
-
-    private NetconfNode buildDataForNetconfNode(final ConnectionStatus connectionStatus,
-            final NetconfDeviceCapabilities capabilities) {
-        return new NetconfNodeBuilder()
-            .setHost(id.getHost())
-            .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
-            .setConnectionStatus(connectionStatus)
-            .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
-                .setAvailableCapability(ImmutableList.<AvailableCapability>builder()
-                    .addAll(capabilities.getNonModuleBasedCapabilities())
-                    .addAll(capabilities.getResolvedCapabilities())
-                    .build())
-                .build())
-            .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
-            .build();
     }
 
     private NetconfNode buildDataForNetconfClusteredNode(final boolean up, final String masterNodeAddress,
