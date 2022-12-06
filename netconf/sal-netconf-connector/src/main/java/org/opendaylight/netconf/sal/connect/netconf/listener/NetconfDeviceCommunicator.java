@@ -106,28 +106,27 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.debug("{}: Session established", id);
             currentSession = session;
 
-            NetconfSessionPreferences netconfSessionPreferences =
-                                             NetconfSessionPreferences.fromNetconfSession(session);
-            LOG.trace("{}: Session advertised capabilities: {}", id,
-                    netconfSessionPreferences);
+            var netconfSessionPreferences = NetconfSessionPreferences.fromNetconfSession(session);
+            LOG.trace("{}: Session advertised capabilities: {}", id, netconfSessionPreferences);
 
             if (overrideNetconfCapabilities.isPresent()) {
-                final NetconfSessionPreferences sessionPreferences = overrideNetconfCapabilities
-                        .get().getSessionPreferences();
-                netconfSessionPreferences = overrideNetconfCapabilities.get().moduleBasedCapsOverrided()
+                final var override = overrideNetconfCapabilities.orElseThrow();
+                final var sessionPreferences = override.getSessionPreferences();
+                netconfSessionPreferences = override.moduleBasedCapsOverrided()
                         ? netconfSessionPreferences.replaceModuleCaps(sessionPreferences)
                         : netconfSessionPreferences.addModuleCaps(sessionPreferences);
 
-                netconfSessionPreferences = overrideNetconfCapabilities.get().nonModuleBasedCapsOverrided()
+                netconfSessionPreferences = override.nonModuleBasedCapsOverrided()
                         ? netconfSessionPreferences.replaceNonModuleCaps(sessionPreferences)
                         : netconfSessionPreferences.addNonModuleCaps(sessionPreferences);
                 LOG.debug("{}: Session capabilities overridden, capabilities that will be used: {}", id,
                         netconfSessionPreferences);
             }
 
-            remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
+            final var deviceCapabilities = remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
             if (!firstConnectionFuture.isDone()) {
-                firstConnectionFuture.set(netconfSessionPreferences.getNetconfDeviceCapabilities());
+                // FIXME: this
+                firstConnectionFuture.set(deviceCapabilities);
             }
         } finally {
             sessionLock.unlock();

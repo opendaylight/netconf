@@ -24,8 +24,10 @@ import io.netty.util.concurrent.EventExecutor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -43,7 +45,6 @@ import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
@@ -55,8 +56,10 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability.FailureReason;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
@@ -414,16 +417,18 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         private final SettableFuture<EffectiveModelContext> resultFuture = SettableFuture.create();
 
+        private final Set<AvailableCapability> nonModuleBasedCapabilities = new HashSet<>();
+        private final Map<QName, FailureReason> unresolvedCapabilites = new HashMap<>();
+        private final Set<AvailableCapability> resolvedCapabilities = new HashSet<>();
+
         private final DeviceSources deviceSources;
         private final NetconfSessionPreferences remoteSessionCapabilities;
-        private final NetconfDeviceCapabilities capabilities;
 
         private Collection<SourceIdentifier> requiredSources;
 
         SchemaSetup(final DeviceSources deviceSources, final NetconfSessionPreferences remoteSessionCapabilities) {
             this.deviceSources = deviceSources;
             this.remoteSessionCapabilities = remoteSessionCapabilities;
-            capabilities = remoteSessionCapabilities.getNetconfDeviceCapabilities();
 
             // If device supports notifications and does not contain necessary modules, add them automatically
             if (remoteSessionCapabilities.containsNonModuleCapability(
@@ -441,8 +446,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             requiredSources = deviceSources.getRequiredSources();
             final Collection<SourceIdentifier> missingSources = filterMissingSources(requiredSources);
 
-            capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
-                    UnavailableCapability.FailureReason.MissingSource);
+            addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
+                UnavailableCapability.FailureReason.MissingSource);
             requiredSources.removeAll(missingSources);
         }
 
@@ -456,17 +461,20 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             LOG.debug("{}: Schema context built successfully from {}", id, requiredSources);
 
             final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(),
-                    capabilities.getUnresolvedCapabilites().keySet());
-            capabilities.addCapabilities(filteredQNames.stream().map(entry -> new AvailableCapabilityBuilder()
-                    .setCapability(entry.toString()).setCapabilityOrigin(
-                            remoteSessionCapabilities.getModuleBasedCapsOrigin().get(entry)).build())
-                    .collect(Collectors.toList()));
+                    unresolvedCapabilites.keySet());
+            resolvedCapabilities.addAll(filteredQNames.stream()
+                .map(capability -> new AvailableCapabilityBuilder()
+                    .setCapability(capability.toString())
+                    .setCapabilityOrigin(remoteSessionCapabilities.capabilityOrigin(capability))
+                    .build())
+                .collect(Collectors.toList()));
 
-            capabilities.addNonModuleBasedCapabilities(remoteSessionCapabilities
-                    .getNonModuleCaps().stream().map(entry -> new AvailableCapabilityBuilder()
-                            .setCapability(entry).setCapabilityOrigin(
-                                    remoteSessionCapabilities.getNonModuleBasedCapsOrigin().get(entry)).build())
-                    .collect(Collectors.toList()));
+            nonModuleBasedCapabilities.addAll(remoteSessionCapabilities.getNonModuleCaps().stream()
+                .map(capability -> new AvailableCapabilityBuilder()
+                    .setCapability(capability)
+                    .setCapabilityOrigin(remoteSessionCapabilities.capabilityOrigin(capability))
+                    .build())
+                .collect(Collectors.toList()));
 
             resultFuture.set(result);
         }
@@ -513,6 +521,12 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             }).collect(Collectors.toList());
         }
 
+        private void addUnresolvedCapabilities(final Collection<QName> capabilities, final FailureReason reason) {
+            for (QName s : capabilities) {
+                unresolvedCapabilites.put(s, reason);
+            }
+        }
+
         private List<SourceIdentifier> handleMissingSchemaSourceException(
                 final MissingSchemaSourceException exception) {
             // In case source missing, try without it
@@ -521,11 +535,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
                 id, missingSource);
             LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it",
                 id, missingSource, exception);
-            final Collection<QName> qNameOfMissingSource =
-                getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
+            final var qNameOfMissingSource = getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
             if (!qNameOfMissingSource.isEmpty()) {
-                capabilities.addUnresolvedCapabilities(
-                        qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
+                addUnresolvedCapabilities(qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
             }
             return stripUnavailableSource(missingSource);
         }
@@ -542,14 +554,13 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
                     id, failedSourceId);
                 LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
                     id, failedSourceId, resolutionException);
-                capabilities.addUnresolvedCapabilities(
-                        getQNameFromSourceIdentifiers(Collections.singleton(failedSourceId)),
+                addUnresolvedCapabilities(getQNameFromSourceIdentifiers(List.of(failedSourceId)),
                         UnavailableCapability.FailureReason.UnableToResolve);
                 return stripUnavailableSource(resolutionException.getFailedSource());
             }
             // unsatisfied imports
-            final Set<SourceIdentifier> unresolvedSources = resolutionException.getUnsatisfiedImports().keySet();
-            capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(unresolvedSources),
+            addUnresolvedCapabilities(
+                getQNameFromSourceIdentifiers(resolutionException.getUnsatisfiedImports().keySet()),
                 UnavailableCapability.FailureReason.UnableToResolve);
             LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
                 id, resolutionException.getUnsatisfiedImports());

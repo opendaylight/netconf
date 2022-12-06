@@ -35,6 +35,9 @@ public interface RemoteDeviceHandler extends AutoCloseable {
      * @param deviceRpc - {@link DOMRpcService} of device
      * @param deviceAction - {@link DOMActionService} of device
      */
+
+    // FIXME: should expose NetconfDeviceCapabilities
+
     default void onDeviceConnected(final MountPointContext mountContext,
             final NetconfSessionPreferences sessionPreferences,
             final DOMRpcService deviceRpc, final DOMActionService deviceAction) {

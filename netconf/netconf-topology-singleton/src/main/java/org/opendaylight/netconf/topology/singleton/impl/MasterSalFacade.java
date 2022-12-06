@@ -50,6 +50,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     private MountPointContext currentMountContext = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
+    private NetconfDeviceCapabilities deviceCapabilities = null;
     private DOMRpcService deviceRpc = null;
     private DOMDataBroker deviceDataBroker = null;
     private NetconfDataTreeService netconfService = null;
@@ -84,6 +85,8 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
                                   final DOMRpcService domRpcService) {
         currentMountContext = mountContext;
         netconfSessionPreferences = sessionPreferences;
+        // FIXME: receive this object
+        deviceCapabilities = null;
         deviceRpc = domRpcService;
 
         LOG.info("Device {} connected - registering master mount point", id);
@@ -170,8 +173,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private void updateDeviceData() {
         final String masterAddress = Cluster.get(actorSystem).selfAddress().toString();
         LOG.debug("{}: updateDeviceData with master address {}", id, masterAddress);
-        salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, masterAddress,
-                netconfSessionPreferences.getNetconfDeviceCapabilities());
+        salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, masterAddress, deviceCapabilities);
     }
 
     private void unregisterMasterMountPoint() {

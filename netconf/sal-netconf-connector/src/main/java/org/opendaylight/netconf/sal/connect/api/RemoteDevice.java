@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.api;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 
 /**
@@ -15,7 +17,8 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
  */
 public interface RemoteDevice<L extends RemoteDeviceCommunicator> {
     // FIXME: document this node
-    void onRemoteSessionUp(NetconfSessionPreferences remoteSessionCapabilities, L listener);
+    @NonNull NetconfDeviceCapabilities onRemoteSessionUp(NetconfSessionPreferences remoteSessionCapabilities,
+        L listener);
 
     // FIXME: document this node
     void onRemoteSessionDown();
