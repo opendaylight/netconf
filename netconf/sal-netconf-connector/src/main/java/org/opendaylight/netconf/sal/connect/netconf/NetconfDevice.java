@@ -20,7 +20,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import io.netty.util.concurrent.EventExecutor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,7 +29,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -53,8 +51,6 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessag
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -104,9 +100,6 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final NotificationHandler notificationHandler;
     private final boolean reconnectOnSchemasChange;
     private final BaseNetconfSchemas baseSchemas;
-    private final NetconfNode node;
-    private final EventExecutor eventExecutor;
-    private final NetconfNodeAugmentedOptional nodeOptional;
 
     @GuardedBy("this")
     private boolean connected = false;
@@ -117,22 +110,17 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
             final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
             final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
-        this(schemaResourcesDTO, baseSchemas, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null,
-            null, null, null);
+        this(schemaResourcesDTO, baseSchemas, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null);
     }
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
             final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
             final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange,
-            final DeviceActionFactory deviceActionFactory, final NetconfNode node, final EventExecutor eventExecutor,
-            final NetconfNodeAugmentedOptional nodeOptional) {
+            final DeviceActionFactory deviceActionFactory) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.id = id;
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
         this.deviceActionFactory = deviceActionFactory;
-        this.node = node;
-        this.eventExecutor = eventExecutor;
-        this.nodeOptional = nodeOptional;
         schemaRegistry = schemaResourcesDTO.getSchemaRegistry();
         schemaRepository = schemaResourcesDTO.getSchemaRepository();
         schemaContextFactory = schemaResourcesDTO.getSchemaContextFactory();
@@ -181,22 +169,6 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             @Override
             public void onFailure(final Throwable cause) {
                 LOG.warn("{}: Unexpected error resolving device sources", id, cause);
-
-                // No more sources, fail or try to reconnect
-                if (cause instanceof EmptySchemaContextException) {
-                    if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
-                        eventExecutor.schedule(() -> {
-                            LOG.warn("Reconnection is allowed! This can lead to unexpected errors at runtime.");
-                            LOG.warn("{} : No more sources for schema context.", id);
-                            LOG.info("{} : Try to remount device.", id);
-                            onRemoteSessionDown();
-                            salFacade.onDeviceReconnected(remoteSessionCapabilities, node);
-                        }, nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime().toJava(),
-                            TimeUnit.MILLISECONDS);
-                        return;
-                    }
-                }
-
                 handleSalInitializationFailure(cause, listener);
                 salFacade.onDeviceFailed(cause);
             }
