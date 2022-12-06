@@ -39,6 +39,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -61,7 +62,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     private final Queue<Request> requests = new ArrayDeque<>();
     private NetconfClientSession currentSession;
 
-    private final SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
+    private final SettableFuture<Empty> firstConnectionFuture = SettableFuture.create();
     private Future<?> taskFuture;
 
     // isSessionClosing indicates a close operation on the session is issued and
@@ -95,7 +96,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
-        firstConnectionFuture = SettableFuture.create();
         semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit) : null;
     }
 
@@ -127,7 +127,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
             remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
             if (!firstConnectionFuture.isDone()) {
-                firstConnectionFuture.set(netconfSessionPreferences.getNetconfDeviceCapabilities());
+                // FIXME: right, except ... this does not include the device schema setup, so is it really useful?
+                firstConnectionFuture.set(Empty.value());
             }
         } finally {
             sessionLock.unlock();
@@ -142,8 +143,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
      * @return a ListenableFuture that returns success on first successful connection and failure when the underlying
      *         reconnecting strategy runs out of reconnection attempts
      */
-    public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection(
-            final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
+    public ListenableFuture<Empty> initializeRemoteConnection(final NetconfClientDispatcher dispatcher,
+            final NetconfClientConfiguration config) {
 
         final Future<?> connectFuture;
         if (config instanceof NetconfReconnectingClientConfiguration) {
