@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c163515_5407071d",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfImpl.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-07T09:32:15Z",
+      "side": 1,
+      "message": "final var operations \u003d operattionsService.getOperations().getData();",
+      "revId": "a5c7f40fd4e8f66de6ad538c5ad45c5daab4c45a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d438bdc6_b1e5f57b",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfImpl.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-07T09:32:15Z",
+      "side": 1,
+      "message": "addChild((DataContainerChild) operations)",
+      "revId": "a5c7f40fd4e8f66de6ad538c5ad45c5daab4c45a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
