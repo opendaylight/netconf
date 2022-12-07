@@ -299,6 +299,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3345b225_c1dd4748",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2022-12-07T11:27:27Z",
+      "side": 1,
+      "message": "Added to the patch:\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/103400/6..7",
+      "parentUuid": "15f1b059_f5f54c4a",
+      "revId": "b87c41cd10de09a480bcf2051d7dafcff30c41ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92babb4d_94bf4226",
