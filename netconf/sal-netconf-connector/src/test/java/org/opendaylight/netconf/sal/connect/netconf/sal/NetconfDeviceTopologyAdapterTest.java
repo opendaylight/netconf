@@ -167,7 +167,7 @@ public class NetconfDeviceTopologyAdapterTest {
                 .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
                 .node(netconfTestLeafQname).build();
 
-        LeafNode augmentNode = ImmutableNodes.leafNode(netconfTestLeafQname, dataTestId);
+        LeafNode<Integer> augmentNode = ImmutableNodes.leafNode(netconfTestLeafQname, dataTestId);
 
         DOMDataTreeWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
