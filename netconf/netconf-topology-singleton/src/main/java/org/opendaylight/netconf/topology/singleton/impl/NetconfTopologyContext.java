@@ -32,13 +32,12 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.Future;
 
 class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyContext.class);
 
-    private final ServiceGroupIdentifier serviceGroupIdent;
+    private final @NonNull ServiceGroupIdentifier serviceGroupIdent;
     private final Timeout actorResponseWaitTime;
     private final DOMMountPointService mountService;
     private final DeviceActionFactory deviceActionFactory;
@@ -56,7 +55,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
             final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory) {
         this.netconfTopologyDeviceSetup = requireNonNull(netconfTopologyDeviceSetup);
-        this.serviceGroupIdent = serviceGroupIdent;
+        this.serviceGroupIdent = requireNonNull(serviceGroupIdent);
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.mountService = mountService;
         this.deviceActionFactory = deviceActionFactory;
@@ -143,17 +142,15 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
         if (isMaster) {
             remoteDeviceConnector.stopRemoteDeviceConnection();
-        }
-        if (!isMaster) {
+        } else {
             netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, remoteDeviceId);
         }
         remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
             deviceActionFactory);
 
         if (isMaster) {
-            final Future<Object> future = Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(
-                netconfTopologyDeviceSetup, remoteDeviceId), actorResponseWaitTime);
-            future.onComplete(new OnComplete<Object>() {
+            Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(netconfTopologyDeviceSetup, remoteDeviceId),
+                actorResponseWaitTime).onComplete(new OnComplete<>() {
                 @Override
                 public void onComplete(final Throwable failure, final Object success) {
                     if (failure != null) {
