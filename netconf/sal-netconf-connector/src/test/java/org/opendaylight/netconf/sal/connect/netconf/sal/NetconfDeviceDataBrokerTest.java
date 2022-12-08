@@ -16,10 +16,8 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 
-import com.google.common.collect.ClassToInstanceMap;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -30,7 +28,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -112,21 +109,20 @@ public class NetconfDeviceDataBrokerTest {
 
     @Test
     public void testDOMFieldsExtensions() {
-        final ClassToInstanceMap<DOMDataBrokerExtension> extensions = dataBroker.getExtensions();
-        final NetconfDOMDataBrokerFieldsExtension fieldsExtension = extensions.getInstance(
+        final NetconfDOMDataBrokerFieldsExtension fieldsExtension = dataBroker.getExtensions().getInstance(
                 NetconfDOMDataBrokerFieldsExtension.class);
         assertNotNull(fieldsExtension);
 
         // read-only transaction
         final NetconfDOMFieldsReadTransaction roTx = fieldsExtension.newReadOnlyTransaction();
         roTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty(),
-                Collections.singletonList(YangInstanceIdentifier.empty()));
+                List.of(YangInstanceIdentifier.empty()));
         verify(rpcService).invokeRpc(Mockito.eq(NETCONF_GET_CONFIG_QNAME), any(ContainerNode.class));
 
         // read-write transaction
         final NetconfDOMFieldsReadWriteTransaction rwTx = fieldsExtension.newReadWriteTransaction();
         rwTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty(),
-                Collections.singletonList(YangInstanceIdentifier.empty()));
+                List.of(YangInstanceIdentifier.empty()));
         verify(rpcService).invokeRpc(Mockito.eq(NETCONF_GET_QNAME), any(ContainerNode.class));
     }
 
@@ -137,7 +133,7 @@ public class NetconfDeviceDataBrokerTest {
     }
 
     private NetconfDeviceDataBroker getDataBroker(final String... caps) {
-        NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(Arrays.asList(caps));
+        NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(List.of(caps));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
         return new NetconfDeviceDataBroker(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);
