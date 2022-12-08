@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -78,12 +76,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     public boolean isSessionClosing() {
         return closing != 0;
-    }
-
-    public NetconfDeviceCommunicator(final RemoteDeviceId id,
-            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice,
-            final UserPreferences netconfSessionPreferences, final int rpcMessageLimit) {
-        this(id, remoteDevice, rpcMessageLimit, requireNonNull(netconfSessionPreferences));
     }
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id,

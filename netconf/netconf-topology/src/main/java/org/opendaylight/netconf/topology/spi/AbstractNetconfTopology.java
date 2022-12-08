@@ -10,7 +10,6 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -24,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -50,8 +48,6 @@ import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.auth.DatastoreBackedPublicKeyAuth;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
@@ -65,7 +61,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev19
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol.Name;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.KeyAuth;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPw;
@@ -269,7 +264,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         final var netconfDeviceCommunicator = new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit,
-            extractUserCapabilities(node));
+            NetconfNodeUtils.extractUserCapabilities(node));
 
         if (keepAliveFacade != null) {
             keepAliveFacade.setListener(netconfDeviceCommunicator);
@@ -385,41 +380,5 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                     keystoreAdapter, encryptionService);
         }
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
-    }
-
-    private static @Nullable UserPreferences extractUserCapabilities(final NetconfNode node) {
-        final var moduleCaps = node.getYangModuleCapabilities();
-        final var nonModuleCaps = node.getNonModuleCapabilities();
-
-        if (moduleCaps == null && nonModuleCaps == null) {
-            // if none of yang-module-capabilities or non-module-capabilities is specified
-            return null;
-        }
-
-        final var capabilities = new ArrayList<String>();
-        final boolean overrideYangModuleCaps;
-        if (moduleCaps != null) {
-            capabilities.addAll(moduleCaps.getCapability());
-            overrideYangModuleCaps = moduleCaps.getOverride();
-        } else {
-            overrideYangModuleCaps = false;
-        }
-
-        //non-module capabilities should not exist in yang module capabilities
-        final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
-        Preconditions.checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(),
-                "List yang-module-capabilities/capability should contain only module based capabilities. "
-                        + "Non-module capabilities used: " + netconfSessionPreferences.getNonModuleCaps());
-
-        final boolean overrideNonModuleCaps;
-        if (nonModuleCaps != null) {
-            capabilities.addAll(nonModuleCaps.getCapability());
-            overrideNonModuleCaps = nonModuleCaps.getOverride();
-        } else {
-            overrideNonModuleCaps = false;
-        }
-
-        return new UserPreferences(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined),
-            overrideYangModuleCaps, overrideNonModuleCaps);
     }
 }
