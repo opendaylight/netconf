@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -21,7 +20,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -40,8 +38,6 @@ import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.auth.DatastoreBackedPublicKeyAuth;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
@@ -56,7 +52,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.OdlHelloMessageCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.KeyAuth;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPw;
@@ -216,45 +211,13 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             LOG.info("{}: Concurrent rpc limit is smaller than 1, no limit will be enforced.", remoteDeviceId);
         }
 
-        final var userCapabilities = extractUserCapabilities(node);
-        final var netconfDeviceCommunicator = userCapabilities != null
-            ? new NetconfDeviceCommunicator(remoteDeviceId, device, new UserPreferences(userCapabilities,
-                node.getYangModuleCapabilities() == null ? false : node.getYangModuleCapabilities().getOverride(),
-                    node.getNonModuleCapabilities() == null ? false : node.getNonModuleCapabilities().getOverride()),
-                rpcMessageLimit)
-            : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
+        final var netconfDeviceCommunicator = new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit,
+            NetconfNodeUtils.extractUserCapabilities(node));
 
         if (salFacade instanceof KeepaliveSalFacade) {
             ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
         }
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, registeredYangLibSources);
-    }
-
-    // FIXME: reconcile with AbstractNetconfTopology
-    private static @Nullable NetconfSessionPreferences extractUserCapabilities(final NetconfNode node) {
-        final var moduleCaps = node.getYangModuleCapabilities();
-        final var nonModuleCaps = node.getNonModuleCapabilities();
-
-        if (moduleCaps == null && node.getNonModuleCapabilities() == null) {
-            return null;
-        }
-
-        final var capabilities = new ArrayList<String>();
-        if (moduleCaps != null) {
-            capabilities.addAll(moduleCaps.getCapability());
-        }
-
-        //non-module capabilities should not exist in yang module capabilities
-        final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
-        checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(),
-                "List yang-module-capabilities/capability should contain only module based capabilities. "
-                        + "Non-module capabilities used: " + netconfSessionPreferences.getNonModuleCaps());
-
-        if (nonModuleCaps != null) {
-            capabilities.addAll(nonModuleCaps.getCapability());
-        }
-
-        return NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined);
     }
 
     @VisibleForTesting
