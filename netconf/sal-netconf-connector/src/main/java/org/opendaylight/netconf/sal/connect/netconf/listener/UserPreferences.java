@@ -19,15 +19,13 @@ public class UserPreferences {
     private final boolean overrideNonModuleCapabilities;
 
     public UserPreferences(final @NonNull NetconfSessionPreferences sessionPreferences,
-            boolean overrideModuleCapabilities, boolean overrideNonModuleCapabilities) {
+            final boolean overrideModuleCapabilities, final boolean overrideNonModuleCapabilities) {
 
-        if (overrideModuleCapabilities && (sessionPreferences.getModuleBasedCaps() == null
-                || sessionPreferences.getModuleBasedCaps().isEmpty())) {
+        if (overrideModuleCapabilities && sessionPreferences.moduleBasedCaps().isEmpty()) {
             throw new IllegalStateException(
                     "Override module based capabilities flag set true but module based capabilities list is empty.");
         }
-        if (overrideNonModuleCapabilities && (sessionPreferences.getNonModuleCaps() == null
-                || sessionPreferences.getNonModuleCaps().isEmpty())) {
+        if (overrideNonModuleCapabilities && sessionPreferences.nonModuleCaps().isEmpty()) {
             throw new IllegalStateException(
                     "Override non-module based capabilities set true but non-module based capabilities list is empty.");
         }

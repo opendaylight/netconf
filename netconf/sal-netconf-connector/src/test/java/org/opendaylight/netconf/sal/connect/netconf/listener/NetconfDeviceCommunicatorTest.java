@@ -26,7 +26,6 @@ import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARA
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -39,8 +38,8 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -131,15 +130,14 @@ public class NetconfDeviceCommunicatorTest {
 
     @Test
     public void testOnSessionUp() {
-        String testCapability = "urn:opendaylight:params:xml:ns:test?module=test-module&revision=2014-06-02";
-        Collection<String> serverCapabilities =
-                Sets.newHashSet(NetconfMessageTransformUtil.NETCONF_ROLLBACK_ON_ERROR_URI.toString(),
-                        NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString(),
-                        testCapability);
+        final var testCapability = "urn:opendaylight:params:xml:ns:test?module=test-module&revision=2014-06-02";
+        final var serverCapabilities = Set.of(
+            NetconfMessageTransformUtil.NETCONF_ROLLBACK_ON_ERROR_URI.toString(),
+            NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString(),
+            testCapability);
         doReturn(serverCapabilities).when(mockSession).getServerCapabilities();
 
-        ArgumentCaptor<NetconfSessionPreferences> netconfSessionPreferences =
-                ArgumentCaptor.forClass(NetconfSessionPreferences.class);
+        final var netconfSessionPreferences = ArgumentCaptor.forClass(NetconfSessionPreferences.class);
         doNothing().when(mockDevice).onRemoteSessionUp(netconfSessionPreferences.capture(), eq(communicator));
 
         communicator.onSessionUp(mockSession);
@@ -148,14 +146,13 @@ public class NetconfDeviceCommunicatorTest {
         verify(mockDevice).onRemoteSessionUp(netconfSessionPreferences.capture(), eq(communicator));
 
         NetconfSessionPreferences actualCapabilites = netconfSessionPreferences.getValue();
-        assertEquals("containsModuleCapability", true, actualCapabilites.containsNonModuleCapability(
+        assertTrue(actualCapabilites.containsNonModuleCapability(
                 NetconfMessageTransformUtil.NETCONF_ROLLBACK_ON_ERROR_URI.toString()));
-        assertEquals("containsModuleCapability", false, actualCapabilites.containsNonModuleCapability(testCapability));
-        assertEquals("getModuleBasedCaps", Sets.newHashSet(
-                QName.create("urn:opendaylight:params:xml:ns:test", "2014-06-02", "test-module")),
-                actualCapabilites.getModuleBasedCaps());
-        assertEquals("isRollbackSupported", true, actualCapabilites.isRollbackSupported());
-        assertEquals("isMonitoringSupported", true, actualCapabilites.isMonitoringSupported());
+        assertFalse(actualCapabilites.containsNonModuleCapability(testCapability));
+        assertEquals(Set.of(QName.create("urn:opendaylight:params:xml:ns:test", "2014-06-02", "test-module")),
+                actualCapabilites.moduleBasedCaps().keySet());
+        assertTrue(actualCapabilites.isRollbackSupported());
+        assertTrue(actualCapabilites.isMonitoringSupported());
     }
 
     @SuppressWarnings("unchecked")

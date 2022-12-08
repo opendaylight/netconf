@@ -461,7 +461,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
                     .build())
                 .collect(Collectors.toList()));
 
-            nonModuleBasedCapabilities.addAll(remoteSessionCapabilities.getNonModuleCaps().stream()
+            nonModuleBasedCapabilities.addAll(remoteSessionCapabilities.nonModuleCaps().keySet().stream()
                 .map(capability -> new AvailableCapabilityBuilder()
                     .setCapability(capability)
                     .setCapabilityOrigin(remoteSessionCapabilities.capabilityOrigin(capability))
