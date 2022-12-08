@@ -7,19 +7,20 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
+import static java.util.Objects.requireNonNull;
+
 import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * DTO with user capabilities to override or merge with device specific capabilities.
  */
-public class UserPreferences {
+public record UserPreferences(
+        @NonNull NetconfSessionPreferences sessionPreferences,
+        boolean overrideModuleCapabilities,
+        boolean overrideNonModuleCapabilities) {
 
-    private final NetconfSessionPreferences sessionPreferences;
-    private final boolean overrideModuleCapabilities;
-    private final boolean overrideNonModuleCapabilities;
-
-    public UserPreferences(final @NonNull NetconfSessionPreferences sessionPreferences,
-            final boolean overrideModuleCapabilities, final boolean overrideNonModuleCapabilities) {
+    public UserPreferences {
+        requireNonNull(sessionPreferences);
 
         if (overrideModuleCapabilities && sessionPreferences.moduleBasedCaps().isEmpty()) {
             throw new IllegalStateException(
@@ -29,31 +30,6 @@ public class UserPreferences {
             throw new IllegalStateException(
                     "Override non-module based capabilities set true but non-module based capabilities list is empty.");
         }
-
-        this.sessionPreferences = sessionPreferences;
-        this.overrideModuleCapabilities = overrideModuleCapabilities;
-        this.overrideNonModuleCapabilities = overrideNonModuleCapabilities;
     }
 
-    public NetconfSessionPreferences getSessionPreferences() {
-        return sessionPreferences;
-    }
-
-    public boolean moduleBasedCapsOverrided() {
-        return overrideModuleCapabilities;
-    }
-
-    public boolean nonModuleBasedCapsOverrided() {
-        return overrideNonModuleCapabilities;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("UserPreferences{");
-        sb.append("sessionPreferences=").append(sessionPreferences);
-        sb.append(", overrideModuleCapabilities=").append(overrideModuleCapabilities);
-        sb.append(", overrideNonModuleCapabilities=").append(overrideNonModuleCapabilities);
-        sb.append('}');
-        return sb.toString();
-    }
 }
