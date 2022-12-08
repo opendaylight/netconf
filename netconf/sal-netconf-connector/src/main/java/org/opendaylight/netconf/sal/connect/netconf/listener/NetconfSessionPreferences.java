@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -20,7 +19,7 @@ import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -31,27 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // FIXME: propagate to API with immutable semantics
-public final class NetconfSessionPreferences {
-
-    private static final class ParameterMatcher {
-        private final Predicate<String> predicate;
-        private final int skipLength;
-
-        ParameterMatcher(final String name) {
-            predicate = input -> input.startsWith(name);
-
-            skipLength = name.length();
-        }
-
-        String from(final Iterable<String> params) {
-            final Optional<String> o = Iterables.tryFind(params, predicate);
-            if (!o.isPresent()) {
-                return null;
-            }
-
-            return o.get().substring(skipLength);
-        }
-    }
+public record NetconfSessionPreferences(
+        @NonNull ImmutableMap<String, CapabilityOrigin> nonModuleCaps,
+        @NonNull ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps) {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionPreferences.class);
     private static final ParameterMatcher MODULE_PARAM = new ParameterMatcher("module=");
@@ -60,29 +41,9 @@ public final class NetconfSessionPreferences {
     private static final Splitter AMP_SPLITTER = Splitter.on('&');
     private static final Predicate<String> CONTAINS_REVISION = input -> input.contains("revision=");
 
-    private final ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps;
-    private final ImmutableMap<String, CapabilityOrigin> nonModuleCaps;
-
-    private NetconfSessionPreferences(final ImmutableMap<String, CapabilityOrigin> nonModuleCaps,
-            final ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps) {
-        this.nonModuleCaps = requireNonNull(nonModuleCaps);
-        this.moduleBasedCaps = requireNonNull(moduleBasedCaps);
-    }
-
-    public Set<QName> getModuleBasedCaps() {
-        return moduleBasedCaps.keySet();
-    }
-
-    public Map<QName, CapabilityOrigin> getModuleBasedCapsOrigin() {
-        return moduleBasedCaps;
-    }
-
-    public Set<String> getNonModuleCaps() {
-        return nonModuleCaps.keySet();
-    }
-
-    public Map<String, CapabilityOrigin> getNonModuleBasedCapsOrigin() {
-        return nonModuleCaps;
+    public NetconfSessionPreferences {
+        requireNonNull(nonModuleCaps);
+        requireNonNull(moduleBasedCaps);
     }
 
     public @Nullable CapabilityOrigin capabilityOrigin(final QName capability) {
@@ -95,7 +56,7 @@ public final class NetconfSessionPreferences {
 
     // allows partial matches - assuming parameters are in the same order
     public boolean containsPartialNonModuleCapability(final String capability) {
-        for (final String nonModuleCap : getNonModuleCaps()) {
+        for (var nonModuleCap : nonModuleCaps.keySet()) {
             if (nonModuleCap.startsWith(capability)) {
                 LOG.trace("capability {} partially matches {}", capability, nonModuleCaps);
                 return true;
@@ -275,5 +236,23 @@ public final class NetconfSessionPreferences {
                                        final QName qualifiedName, final CapabilityOrigin capabilityOrigin) {
         moduleBasedCaps.put(qualifiedName, capabilityOrigin);
         nonModuleCaps.remove(capability);
+    }
+
+    private static final class ParameterMatcher {
+        private final Predicate<String> predicate;
+        private final int skipLength;
+
+        ParameterMatcher(final String name) {
+            predicate = input -> input.startsWith(name);
+            skipLength = name.length();
+        }
+
+        String from(final Iterable<String> params) {
+            final var found = Iterables.tryFind(params, predicate);
+            if (!found.isPresent()) {
+                return null;
+            }
+            return found.get().substring(skipLength);
+        }
     }
 }

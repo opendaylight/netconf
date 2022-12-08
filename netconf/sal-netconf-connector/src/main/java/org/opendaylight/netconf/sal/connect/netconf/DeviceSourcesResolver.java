@@ -10,9 +10,8 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Sets;
-import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.Callable;
-import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
@@ -20,9 +19,6 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYa
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,15 +46,14 @@ final class DeviceSourcesResolver implements Callable<DeviceSources> {
 
     @Override
     public DeviceSources call() {
-        final NetconfDeviceSchemas availableSchemas = stateSchemasResolver.resolve(deviceRpc, remoteSessionCapabilities,
-            id, baseSchema.getEffectiveModelContext());
+        final var availableSchemas = stateSchemasResolver.resolve(deviceRpc, remoteSessionCapabilities, id,
+            baseSchema.getEffectiveModelContext());
         LOG.debug("{}: Schemas exposed by ietf-netconf-monitoring: {}", id,
             availableSchemas.getAvailableYangSchemasQNames());
 
-        final Set<QName> requiredSources = Sets.newHashSet(remoteSessionCapabilities.getModuleBasedCaps());
-        final Set<QName> providedSources = availableSchemas.getAvailableYangSchemasQNames();
-
-        final Set<QName> requiredSourcesNotProvided = Sets.difference(requiredSources, providedSources);
+        final var requiredSources = new HashSet<>(remoteSessionCapabilities.moduleBasedCaps().keySet());
+        final var providedSources = availableSchemas.getAvailableYangSchemasQNames();
+        final var requiredSourcesNotProvided = Sets.difference(requiredSources, providedSources);
         if (!requiredSourcesNotProvided.isEmpty()) {
             LOG.warn("{}: Netconf device does not provide all yang models reported in hello message capabilities,"
                     + " required but not provided: {}", id, requiredSourcesNotProvided);
@@ -70,7 +65,7 @@ final class DeviceSourcesResolver implements Callable<DeviceSources> {
         // This clashes with the option of a user to specify supported yang models manually in configuration
         // for netconf-connector and as a result one is not able to fully override yang models of a device.
         // It is only possible to add additional models.
-        final Set<QName> providedSourcesNotRequired = Sets.difference(providedSources, requiredSources);
+        final var providedSourcesNotRequired = Sets.difference(providedSources, requiredSources);
         if (!providedSourcesNotRequired.isEmpty()) {
             LOG.warn("{}: Netconf device provides additional yang models not reported in "
                     + "hello message capabilities: {}", id, providedSourcesNotRequired);
@@ -79,14 +74,9 @@ final class DeviceSourcesResolver implements Callable<DeviceSources> {
             requiredSources.addAll(providedSourcesNotRequired);
         }
 
-        final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
-        if (availableSchemas instanceof LibraryModulesSchemas) {
-            sourceProvider = new YangLibrarySchemaYangSourceProvider(id,
-                    ((LibraryModulesSchemas) availableSchemas).getAvailableModels());
-        } else {
-            sourceProvider = new NetconfRemoteSchemaYangSourceProvider(id, deviceRpc);
-        }
-
+        final var sourceProvider = availableSchemas instanceof LibraryModulesSchemas libraryModule
+            ? new YangLibrarySchemaYangSourceProvider(id, libraryModule.getAvailableModels())
+                : new NetconfRemoteSchemaYangSourceProvider(id, deviceRpc);
         return new DeviceSources(requiredSources, providedSources, sourceProvider);
     }
 }
