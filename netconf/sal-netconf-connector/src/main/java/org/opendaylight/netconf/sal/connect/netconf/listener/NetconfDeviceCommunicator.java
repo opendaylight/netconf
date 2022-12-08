@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -16,12 +18,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -52,7 +54,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicator.class);
 
     protected final RemoteDevice<NetconfDeviceCommunicator> remoteDevice;
-    private final Optional<UserPreferences> overrideNetconfCapabilities;
+    private final @Nullable UserPreferences overrideNetconfCapabilities;
     protected final RemoteDeviceId id;
     private final Lock sessionLock = new ReentrantLock();
 
@@ -81,17 +83,17 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     public NetconfDeviceCommunicator(final RemoteDeviceId id,
             final RemoteDevice<NetconfDeviceCommunicator> remoteDevice,
             final UserPreferences netconfSessionPreferences, final int rpcMessageLimit) {
-        this(id, remoteDevice, Optional.of(netconfSessionPreferences), rpcMessageLimit);
+        this(id, remoteDevice, rpcMessageLimit, requireNonNull(netconfSessionPreferences));
     }
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id,
             final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit) {
-        this(id, remoteDevice, Optional.empty(), rpcMessageLimit);
+        this(id, remoteDevice, rpcMessageLimit, null);
     }
 
-    private NetconfDeviceCommunicator(final RemoteDeviceId id,
-            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice,
-            final Optional<UserPreferences> overrideNetconfCapabilities, final int rpcMessageLimit) {
+    public NetconfDeviceCommunicator(final RemoteDeviceId id,
+            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit,
+            final @Nullable UserPreferences overrideNetconfCapabilities) {
         concurentRpcMsgs = rpcMessageLimit;
         this.id = id;
         this.remoteDevice = remoteDevice;
@@ -111,14 +113,14 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.trace("{}: Session advertised capabilities: {}", id,
                     netconfSessionPreferences);
 
-            if (overrideNetconfCapabilities.isPresent()) {
-                final NetconfSessionPreferences sessionPreferences = overrideNetconfCapabilities
-                        .get().getSessionPreferences();
-                netconfSessionPreferences = overrideNetconfCapabilities.get().moduleBasedCapsOverrided()
+            final var localOverride = overrideNetconfCapabilities;
+            if (localOverride != null) {
+                final var sessionPreferences = localOverride.getSessionPreferences();
+                netconfSessionPreferences = localOverride.moduleBasedCapsOverrided()
                         ? netconfSessionPreferences.replaceModuleCaps(sessionPreferences)
                         : netconfSessionPreferences.addModuleCaps(sessionPreferences);
 
-                netconfSessionPreferences = overrideNetconfCapabilities.get().nonModuleBasedCapsOverrided()
+                netconfSessionPreferences = localOverride.nonModuleBasedCapsOverrided()
                         ? netconfSessionPreferences.replaceNonModuleCaps(sessionPreferences)
                         : netconfSessionPreferences.addNonModuleCaps(sessionPreferences);
                 LOG.debug("{}: Session capabilities overridden, capabilities that will be used: {}", id,

@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -263,16 +263,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
         }
 
-        final Optional<UserPreferences> userCapabilities = getUserCapabilities(node);
         final int rpcMessageLimit = node.requireConcurrentRpcLimit().toJava();
         if (rpcMessageLimit < 1) {
             LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", deviceId);
         }
 
-        final NetconfDeviceCommunicator netconfDeviceCommunicator =
-             userCapabilities.isPresent() ? new NetconfDeviceCommunicator(deviceId, device,
-                     userCapabilities.get(), rpcMessageLimit)
-            : new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit);
+        final var netconfDeviceCommunicator = new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit,
+            extractUserCapabilities(node));
 
         if (keepAliveFacade != null) {
             keepAliveFacade.setListener(netconfDeviceCommunicator);
@@ -390,34 +387,39 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
     }
 
-    private static Optional<UserPreferences> getUserCapabilities(final NetconfNode node) {
-        // if none of yang-module-capabilities or non-module-capabilities is specified
-        // just return absent
-        if (node.getYangModuleCapabilities() == null && node.getNonModuleCapabilities() == null) {
-            return Optional.empty();
+    private static @Nullable UserPreferences extractUserCapabilities(final NetconfNode node) {
+        final var moduleCaps = node.getYangModuleCapabilities();
+        final var nonModuleCaps = node.getNonModuleCapabilities();
+
+        if (moduleCaps == null && nonModuleCaps == null) {
+            // if none of yang-module-capabilities or non-module-capabilities is specified
+            return null;
         }
 
-        final List<String> capabilities = new ArrayList<>();
-
-        boolean overrideYangModuleCaps = false;
-        if (node.getYangModuleCapabilities() != null) {
-            capabilities.addAll(node.getYangModuleCapabilities().getCapability());
-            overrideYangModuleCaps = node.getYangModuleCapabilities().getOverride();
+        final var capabilities = new ArrayList<String>();
+        final boolean overrideYangModuleCaps;
+        if (moduleCaps != null) {
+            capabilities.addAll(moduleCaps.getCapability());
+            overrideYangModuleCaps = moduleCaps.getOverride();
+        } else {
+            overrideYangModuleCaps = false;
         }
 
         //non-module capabilities should not exist in yang module capabilities
-        final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
+        final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
         Preconditions.checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(),
                 "List yang-module-capabilities/capability should contain only module based capabilities. "
                         + "Non-module capabilities used: " + netconfSessionPreferences.getNonModuleCaps());
 
-        boolean overrideNonModuleCaps = false;
-        if (node.getNonModuleCapabilities() != null) {
-            capabilities.addAll(node.getNonModuleCapabilities().getCapability());
-            overrideNonModuleCaps = node.getNonModuleCapabilities().getOverride();
+        final boolean overrideNonModuleCaps;
+        if (nonModuleCaps != null) {
+            capabilities.addAll(nonModuleCaps.getCapability());
+            overrideNonModuleCaps = nonModuleCaps.getOverride();
+        } else {
+            overrideNonModuleCaps = false;
         }
 
-        return Optional.of(new UserPreferences(NetconfSessionPreferences
-            .fromStrings(capabilities, CapabilityOrigin.UserDefined), overrideYangModuleCaps, overrideNonModuleCaps));
+        return new UserPreferences(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined),
+            overrideYangModuleCaps, overrideNonModuleCaps);
     }
 }

@@ -21,7 +21,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -209,17 +209,16 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     .build();
         }
 
-        final Optional<NetconfSessionPreferences> userCapabilities = getUserCapabilities(node);
-        final int rpcMessageLimit =
-                node.getConcurrentRpcLimit() == null
-                        ? NetconfTopologyUtils.DEFAULT_CONCURRENT_RPC_LIMIT : node.getConcurrentRpcLimit().toJava();
+        final int rpcMessageLimit = node.getConcurrentRpcLimit() == null
+            ? NetconfTopologyUtils.DEFAULT_CONCURRENT_RPC_LIMIT : node.getConcurrentRpcLimit().toJava();
 
         if (rpcMessageLimit < 1) {
             LOG.info("{}: Concurrent rpc limit is smaller than 1, no limit will be enforced.", remoteDeviceId);
         }
 
-        NetconfDeviceCommunicator netconfDeviceCommunicator = userCapabilities.isPresent()
-            ? new NetconfDeviceCommunicator(remoteDeviceId, device, new UserPreferences(userCapabilities.get(),
+        final var userCapabilities = extractUserCapabilities(node);
+        final var netconfDeviceCommunicator = userCapabilities != null
+            ? new NetconfDeviceCommunicator(remoteDeviceId, device, new UserPreferences(userCapabilities,
                 node.getYangModuleCapabilities() == null ? false : node.getYangModuleCapabilities().getOverride(),
                     node.getNonModuleCapabilities() == null ? false : node.getNonModuleCapabilities().getOverride()),
                 rpcMessageLimit)
@@ -231,27 +230,31 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, registeredYangLibSources);
     }
 
-    private static Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
-        if (node.getYangModuleCapabilities() == null && node.getNonModuleCapabilities() == null) {
-            return Optional.empty();
-        }
-        final List<String> capabilities = new ArrayList<>();
+    // FIXME: reconcile with AbstractNetconfTopology
+    private static @Nullable NetconfSessionPreferences extractUserCapabilities(final NetconfNode node) {
+        final var moduleCaps = node.getYangModuleCapabilities();
+        final var nonModuleCaps = node.getNonModuleCapabilities();
 
-        if (node.getYangModuleCapabilities() != null) {
-            capabilities.addAll(node.getYangModuleCapabilities().getCapability());
+        if (moduleCaps == null && node.getNonModuleCapabilities() == null) {
+            return null;
+        }
+
+        final var capabilities = new ArrayList<String>();
+        if (moduleCaps != null) {
+            capabilities.addAll(moduleCaps.getCapability());
         }
 
         //non-module capabilities should not exist in yang module capabilities
-        final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
+        final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
         checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(),
                 "List yang-module-capabilities/capability should contain only module based capabilities. "
                         + "Non-module capabilities used: " + netconfSessionPreferences.getNonModuleCaps());
 
-        if (node.getNonModuleCapabilities() != null) {
-            capabilities.addAll(node.getNonModuleCapabilities().getCapability());
+        if (nonModuleCaps != null) {
+            capabilities.addAll(nonModuleCaps.getCapability());
         }
 
-        return Optional.of(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined));
+        return NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined);
     }
 
     @VisibleForTesting
