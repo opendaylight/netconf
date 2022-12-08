@@ -92,8 +92,8 @@ public class NetconfDeviceCommunicatorTest {
 
     @Before
     public void setUp() throws Exception {
-        communicator = new NetconfDeviceCommunicator(
-                new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, 10);
+        communicator = NetconfDeviceCommunicator.of(new RemoteDeviceId("test",
+            InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, 10);
     }
 
     void setupSession() {
@@ -412,8 +412,8 @@ public class NetconfDeviceCommunicatorTest {
         final EventLoopGroup group = new NioEventLoopGroup();
         final Timer time = new HashedWheelTimer();
         try {
-            final NetconfDeviceCommunicator listener = new NetconfDeviceCommunicator(
-                    new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), device, 10);
+            final var communicator = NetconfDeviceCommunicator.of(new RemoteDeviceId("test",
+                InetSocketAddress.createUnresolved("localhost", 22)), device, 10);
             final NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create()
                     .withAddress(new InetSocketAddress("localhost", 65000))
                     .withReconnectStrategy(reconnectStrategy)
@@ -421,10 +421,10 @@ public class NetconfDeviceCommunicatorTest {
                     .withAuthHandler(new LoginPasswordHandler("admin", "admin"))
                     .withConnectionTimeoutMillis(10000)
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
-                    .withSessionListener(listener)
+                    .withSessionListener(communicator)
                     .build();
 
-            listener.initializeRemoteConnection(new NetconfClientDispatcherImpl(group, group, time), cfg);
+            communicator.initializeRemoteConnection(new NetconfClientDispatcherImpl(group, group, time), cfg);
 
             verify(reconnectStrategy,
                     timeout(TimeUnit.MINUTES.toMillis(4)).times(101)).scheduleReconnect(any(Throwable.class));
