@@ -243,9 +243,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         //non-module capabilities should not exist in yang module capabilities
         final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
-        checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(),
+        checkState(netconfSessionPreferences.nonModuleCaps().isEmpty(),
                 "List yang-module-capabilities/capability should contain only module based capabilities. "
-                        + "Non-module capabilities used: " + netconfSessionPreferences.getNonModuleCaps());
+                        + "Non-module capabilities used: " + netconfSessionPreferences.nonModuleCaps());
 
         if (node.getNonModuleCapabilities() != null) {
             capabilities.addAll(node.getNonModuleCapabilities().getCapability());
