@@ -24,7 +24,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -63,6 +63,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -172,9 +173,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final SchemaRepository schemaRepository = getSchemaRepository();
 
         // Make fallback attempt to fail due to empty resolved sources
-        final SchemaResolutionException schemaResolutionException
-                = new SchemaResolutionException("fail first",
-                Collections.emptyList(), HashMultimap.create());
+        final SchemaResolutionException schemaResolutionException = new SchemaResolutionException("fail first",
+                List.of(), ImmutableMultimap.of());
         doReturn(Futures.immediateFailedFuture(schemaResolutionException))
                 .when(schemaFactory).createEffectiveModelContext(anyCollection());
 
@@ -392,10 +392,10 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
-        final Map<QName, AvailableCapability.CapabilityOrigin> moduleBasedCaps = new HashMap<>();
-        moduleBasedCaps.putAll(sessionCaps.getModuleBasedCapsOrigin());
+        final Map<QName, CapabilityOrigin> moduleBasedCaps = new HashMap<>();
+        moduleBasedCaps.putAll(sessionCaps.moduleBasedCaps());
         moduleBasedCaps
-                .put(QName.create("(test:qname:side:loading)test"), AvailableCapability.CapabilityOrigin.UserDefined);
+                .put(QName.create("(test:qname:side:loading)test"), CapabilityOrigin.UserDefined);
 
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
 
@@ -503,13 +503,13 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false, Collections.emptyList());
 
-        final Map<QName, AvailableCapability.CapabilityOrigin> moduleBasedCaps = new HashMap<>();
+        final Map<QName, CapabilityOrigin> moduleBasedCaps = new HashMap<>();
         moduleBasedCaps.put(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
                         .$YangModuleInfoImpl.getInstance().getName(),
-                AvailableCapability.CapabilityOrigin.DeviceAdvertised);
+                CapabilityOrigin.DeviceAdvertised);
         moduleBasedCaps.put(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
                         .$YangModuleInfoImpl.getInstance().getName(),
-                AvailableCapability.CapabilityOrigin.DeviceAdvertised);
+                CapabilityOrigin.DeviceAdvertised);
 
 
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);

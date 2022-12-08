@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -37,13 +37,13 @@ public class NetconfSessionPreferencesTest {
 
         final var merged = sessionCaps1.addModuleCaps(sessionCaps2);
         assertCaps(merged, 2, 2 + 1 /*Preserved monitoring*/ + 2 /*already present*/);
-        for (var qname : sessionCaps2.getModuleBasedCaps()) {
-            assertThat(merged.getModuleBasedCaps(), hasItem(qname));
+        for (var qname : sessionCaps2.moduleBasedCaps().keySet()) {
+            assertThat(merged.moduleBasedCaps(), hasKey(qname));
         }
-        assertThat(merged.getModuleBasedCaps(), hasItem(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING));
+        assertThat(merged.moduleBasedCaps(), hasKey(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING));
 
-        assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:base:1.0"));
-        assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:capability:rollback-on-error:1.0"));
+        assertThat(merged.nonModuleCaps(), hasKey("urn:ietf:params:netconf:base:1.0"));
+        assertThat(merged.nonModuleCaps(), hasKey("urn:ietf:params:netconf:capability:rollback-on-error:1.0"));
     }
 
     @Test
@@ -89,13 +89,13 @@ public class NetconfSessionPreferencesTest {
         final var merged = sessionCaps1.addNonModuleCaps(sessionCaps2);
 
         assertCaps(merged, 3 + 2, 3);
-        sessionCaps2.getNonModuleCaps().forEach(
-            capability -> assertThat(merged.getNonModuleCaps(), hasItem(capability)));
+        sessionCaps2.nonModuleCaps().forEach(
+            (capability, origin) -> assertThat(merged.nonModuleCaps(), hasKey(capability)));
 
-        assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:base:1.0"));
-        assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:capability:rollback-on-error:1.0"));
-        assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:capability:writable-running:1.0"));
-        assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:capability:notification:1.0"));
+        assertThat(merged.nonModuleCaps(), hasKey("urn:ietf:params:netconf:base:1.0"));
+        assertThat(merged.nonModuleCaps(), hasKey("urn:ietf:params:netconf:capability:rollback-on-error:1.0"));
+        assertThat(merged.nonModuleCaps(), hasKey("urn:ietf:params:netconf:capability:writable-running:1.0"));
+        assertThat(merged.nonModuleCaps(), hasKey("urn:ietf:params:netconf:capability:notification:1.0"));
 
         assertTrue(merged.isCandidateSupported());
         assertTrue(merged.isRunningWritable());
@@ -143,7 +143,7 @@ public class NetconfSessionPreferencesTest {
 
     private static void assertCaps(final NetconfSessionPreferences sessionCaps1, final int nonModuleCaps,
             final int moduleCaps) {
-        assertEquals(nonModuleCaps, sessionCaps1.getNonModuleCaps().size());
-        assertEquals(moduleCaps, sessionCaps1.getModuleBasedCaps().size());
+        assertEquals(nonModuleCaps, sessionCaps1.nonModuleCaps().size());
+        assertEquals(moduleCaps, sessionCaps1.moduleBasedCaps().size());
     }
 }
