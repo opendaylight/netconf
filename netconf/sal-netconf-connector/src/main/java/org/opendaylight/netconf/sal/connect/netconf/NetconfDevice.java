@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -221,9 +220,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
                         // Only disconnect is enough,
                         // the reconnecting nature of the connector will take care of reconnecting
                         listener.disconnect();
-                        return Optional.empty();
+                        return false;
                     }
-                    return Optional.of(notification);
+                    return true;
                 });
             }
 

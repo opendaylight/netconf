@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Predicate;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -86,7 +86,7 @@ final class NotificationHandler {
     private synchronized void passNotification(final DOMNotification parsedNotification) {
         LOG.debug("{}: Forwarding notification {}", id, parsedNotification);
 
-        if (filter == null || filter.filterNotification(parsedNotification).isPresent()) {
+        if (filter == null || filter.test(parsedNotification)) {
             salFacade.onNotification(parsedNotification);
         }
     }
@@ -101,8 +101,8 @@ final class NotificationHandler {
         messageTransformer = null;
     }
 
-    interface NotificationFilter {
+    @FunctionalInterface
+    interface NotificationFilter extends Predicate<DOMNotification> {
 
-        Optional<DOMNotification> filterNotification(DOMNotification notification);
     }
 }
