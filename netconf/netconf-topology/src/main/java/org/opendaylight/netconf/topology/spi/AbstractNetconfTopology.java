@@ -53,6 +53,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommun
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
@@ -222,20 +223,26 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
-        final RemoteDeviceId remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
-
+        final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
-        RemoteDeviceHandler salFacade = createSalFacade(remoteDeviceId);
+
+        final var deviceSalFacade = new NetconfDeviceSalFacade(deviceId, mountPointService, dataBroker, topologyId);
+        // The facade we are going it present to NetconfDevice
+        RemoteDeviceHandler salFacade;
+        final KeepaliveSalFacade keepAliveFacade;
         if (keepaliveDelay > 0) {
             LOG.info("Adding keepalive facade, for device {}", nodeId);
-            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(),
-                    keepaliveDelay, node.requireDefaultRequestTimeoutMillis().toJava());
+            salFacade = keepAliveFacade = new KeepaliveSalFacade(deviceId, deviceSalFacade,
+                keepaliveExecutor.getExecutor(), keepaliveDelay, node.requireDefaultRequestTimeoutMillis().toJava());
+        } else {
+            salFacade = deviceSalFacade;
+            keepAliveFacade = null;
         }
 
         final RemoteDevice<NetconfDeviceCommunicator> device;
         final List<SchemaSourceRegistration<?>> yanglibRegistrations;
         if (node.requireSchemaless()) {
-            device = new SchemalessNetconfDevice(baseSchemas, remoteDeviceId, salFacade);
+            device = new SchemalessNetconfDevice(baseSchemas, deviceId, salFacade);
             yanglibRegistrations = List.of();
         } else {
             final boolean reconnectOnChangedSchema = node.requireReconnectOnChangedSchema();
@@ -245,7 +252,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .setReconnectOnSchemasChange(reconnectOnChangedSchema)
                 .setSchemaResourcesDTO(resources)
                 .setGlobalProcessingExecutor(processingExecutor)
-                .setId(remoteDeviceId)
+                .setId(deviceId)
                 .setSalFacade(salFacade)
                 .setNode(node)
                 .setEventExecutor(eventExecutor)
@@ -253,22 +260,22 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
                 .build();
-            yanglibRegistrations = registerDeviceSchemaSources(remoteDeviceId, node, resources);
+            yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
         }
 
         final Optional<UserPreferences> userCapabilities = getUserCapabilities(node);
         final int rpcMessageLimit = node.requireConcurrentRpcLimit().toJava();
         if (rpcMessageLimit < 1) {
-            LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", remoteDeviceId);
+            LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", deviceId);
         }
 
         final NetconfDeviceCommunicator netconfDeviceCommunicator =
-             userCapabilities.isPresent() ? new NetconfDeviceCommunicator(remoteDeviceId, device,
+             userCapabilities.isPresent() ? new NetconfDeviceCommunicator(deviceId, device,
                      userCapabilities.get(), rpcMessageLimit)
-            : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
+            : new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit);
 
-        if (salFacade instanceof KeepaliveSalFacade) {
-            ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
+        if (keepAliveFacade != null) {
+            keepAliveFacade.setListener(netconfDeviceCommunicator);
         }
 
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, yanglibRegistrations);
@@ -382,8 +389,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
     }
-
-    protected abstract RemoteDeviceHandler createSalFacade(RemoteDeviceId id);
 
     private static Optional<UserPreferences> getUserCapabilities(final NetconfNode node) {
         // if none of yang-module-capabilities or non-module-capabilities is specified
