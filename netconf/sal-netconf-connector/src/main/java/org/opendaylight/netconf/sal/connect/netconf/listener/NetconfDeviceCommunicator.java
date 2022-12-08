@@ -21,6 +21,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -48,7 +49,7 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfDeviceCommunicator implements NetconfClientSessionListener, RemoteDeviceCommunicator {
+public final class NetconfDeviceCommunicator implements NetconfClientSessionListener, RemoteDeviceCommunicator {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicator.class);
 
     protected final RemoteDevice<NetconfDeviceCommunicator> remoteDevice;
@@ -78,12 +79,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         return closing != 0;
     }
 
-    public NetconfDeviceCommunicator(final RemoteDeviceId id,
-            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit) {
-        this(id, remoteDevice, rpcMessageLimit, null);
-    }
-
-    public NetconfDeviceCommunicator(final RemoteDeviceId id,
+    private NetconfDeviceCommunicator(final RemoteDeviceId id,
             final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit,
             final @Nullable UserPreferences overrideNetconfCapabilities) {
         concurentRpcMsgs = rpcMessageLimit;
@@ -91,6 +87,17 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
         semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit) : null;
+    }
+
+    public static @NonNull NetconfDeviceCommunicator of(final RemoteDeviceId id,
+            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit) {
+        return of(id, remoteDevice, rpcMessageLimit, null);
+    }
+
+    public static @NonNull NetconfDeviceCommunicator of(final RemoteDeviceId id,
+            final RemoteDevice<NetconfDeviceCommunicator> remoteDevice, final int rpcMessageLimit,
+            final @Nullable UserPreferences overrideNetconfCapabilities) {
+        return new NetconfDeviceCommunicator(id, remoteDevice, rpcMessageLimit, overrideNetconfCapabilities);
     }
 
     @Override

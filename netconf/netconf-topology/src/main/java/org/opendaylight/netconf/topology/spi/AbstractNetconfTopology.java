@@ -263,7 +263,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", deviceId);
         }
 
-        final var netconfDeviceCommunicator = new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit,
+        final var netconfDeviceCommunicator = NetconfDeviceCommunicator.of(deviceId, device, rpcMessageLimit,
             NetconfNodeUtils.extractUserCapabilities(node));
 
         if (keepAliveFacade != null) {

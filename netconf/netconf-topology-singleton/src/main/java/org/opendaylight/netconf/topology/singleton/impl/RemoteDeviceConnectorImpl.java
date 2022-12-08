@@ -211,7 +211,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             LOG.info("{}: Concurrent rpc limit is smaller than 1, no limit will be enforced.", remoteDeviceId);
         }
 
-        final var netconfDeviceCommunicator = new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit,
+        final var netconfDeviceCommunicator = NetconfDeviceCommunicator.of(remoteDeviceId, device, rpcMessageLimit,
             NetconfNodeUtils.extractUserCapabilities(node));
 
         if (salFacade instanceof KeepaliveSalFacade) {
