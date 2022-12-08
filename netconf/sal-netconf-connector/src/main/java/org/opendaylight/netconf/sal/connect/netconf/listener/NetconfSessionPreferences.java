@@ -33,17 +33,76 @@ import org.slf4j.LoggerFactory;
 public record NetconfSessionPreferences(
         @NonNull ImmutableMap<String, CapabilityOrigin> nonModuleCaps,
         @NonNull ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps) {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionPreferences.class);
     private static final ParameterMatcher MODULE_PARAM = new ParameterMatcher("module=");
     private static final ParameterMatcher REVISION_PARAM = new ParameterMatcher("revision=");
     private static final ParameterMatcher BROKEN_REVISON_PARAM = new ParameterMatcher("amp;revision=");
     private static final Splitter AMP_SPLITTER = Splitter.on('&');
-    private static final Predicate<String> CONTAINS_REVISION = input -> input.contains("revision=");
 
     public NetconfSessionPreferences {
         requireNonNull(nonModuleCaps);
         requireNonNull(moduleBasedCaps);
+    }
+
+    public static @NonNull NetconfSessionPreferences fromNetconfSession(final NetconfClientSession session) {
+        return fromStrings(session.getServerCapabilities());
+    }
+
+    public static @NonNull NetconfSessionPreferences fromStrings(final Collection<String> capabilities) {
+        // we do not know origin of capabilities from only Strings, so we set it to default value
+        return fromStrings(capabilities, CapabilityOrigin.DeviceAdvertised);
+    }
+
+    public static @NonNull NetconfSessionPreferences fromStrings(final Collection<String> capabilities,
+            final CapabilityOrigin capabilityOrigin) {
+        final var moduleBasedCaps = new HashMap<QName, CapabilityOrigin>();
+        final var nonModuleCaps = new HashMap<String, CapabilityOrigin>();
+
+        for (final String capability : capabilities) {
+            nonModuleCaps.put(capability, capabilityOrigin);
+            final int qmark = capability.indexOf('?');
+            if (qmark == -1) {
+                continue;
+            }
+
+            final String namespace = capability.substring(0, qmark);
+            final Iterable<String> queryParams = AMP_SPLITTER.split(capability.substring(qmark + 1));
+            final String moduleName = MODULE_PARAM.from(queryParams);
+            if (Strings.isNullOrEmpty(moduleName)) {
+                continue;
+            }
+
+            String revision = REVISION_PARAM.from(queryParams);
+            if (!Strings.isNullOrEmpty(revision)) {
+                addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, revision, moduleName),
+                        capabilityOrigin);
+                continue;
+            }
+
+            /*
+             * We have seen devices which mis-escape revision, but the revision may not
+             * even be there. First check if there is a substring that matches revision.
+             */
+            if (Iterables.any(queryParams, input -> input.contains("revision="))) {
+                LOG.debug("Netconf device was not reporting revision correctly, trying to get amp;revision=");
+                revision = BROKEN_REVISON_PARAM.from(queryParams);
+                if (Strings.isNullOrEmpty(revision)) {
+                    LOG.warn("Netconf device returned revision incorrectly escaped for {}, ignoring it", capability);
+                    addModuleQName(moduleBasedCaps, nonModuleCaps, capability,
+                            cachedQName(namespace, moduleName), capabilityOrigin);
+                } else {
+                    addModuleQName(moduleBasedCaps, nonModuleCaps, capability,
+                            cachedQName(namespace, revision, moduleName), capabilityOrigin);
+                }
+                continue;
+            }
+
+            // Fallback, no revision provided for module
+            addModuleQName(moduleBasedCaps, nonModuleCaps, capability,
+                    cachedQName(namespace, moduleName), capabilityOrigin);
+        }
+
+        return new NetconfSessionPreferences(ImmutableMap.copyOf(nonModuleCaps), ImmutableMap.copyOf(moduleBasedCaps));
     }
 
     public @Nullable CapabilityOrigin capabilityOrigin(final QName capability) {
@@ -76,13 +135,13 @@ public record NetconfSessionPreferences(
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("capabilities", nonModuleCaps)
-                .add("moduleBasedCapabilities", moduleBasedCaps)
-                .add("rollback", isRollbackSupported())
-                .add("monitoring", isMonitoringSupported())
-                .add("candidate", isCandidateSupported())
-                .add("writableRunning", isRunningWritable())
-                .toString();
+            .add("capabilities", nonModuleCaps)
+            .add("moduleBasedCapabilities", moduleBasedCaps)
+            .add("rollback", isRollbackSupported())
+            .add("monitoring", isMonitoringSupported())
+            .add("candidate", isCandidateSupported())
+            .add("writableRunning", isRunningWritable())
+            .toString();
     }
 
     public boolean isRollbackSupported() {
@@ -161,74 +220,12 @@ public record NetconfSessionPreferences(
         return new NetconfSessionPreferences(netconfSessionPreferences.nonModuleCaps, moduleBasedCaps);
     }
 
-    public static NetconfSessionPreferences fromNetconfSession(final NetconfClientSession session) {
-        return fromStrings(session.getServerCapabilities());
-    }
-
     private static QName cachedQName(final String namespace, final String revision, final String moduleName) {
         return QName.create(namespace, revision, moduleName).intern();
     }
 
     private static QName cachedQName(final String namespace, final String moduleName) {
         return QName.create(XMLNamespace.of(namespace), moduleName).withoutRevision().intern();
-    }
-
-    public static NetconfSessionPreferences fromStrings(final Collection<String> capabilities) {
-        // we do not know origin of capabilities from only Strings, so we set it to default value
-        return fromStrings(capabilities, CapabilityOrigin.DeviceAdvertised);
-    }
-
-    public static NetconfSessionPreferences fromStrings(final Collection<String> capabilities,
-                                                        final CapabilityOrigin capabilityOrigin) {
-        final var moduleBasedCaps = new HashMap<QName, CapabilityOrigin>();
-        final var nonModuleCaps = new HashMap<String, CapabilityOrigin>();
-
-        for (final String capability : capabilities) {
-            nonModuleCaps.put(capability, capabilityOrigin);
-            final int qmark = capability.indexOf('?');
-            if (qmark == -1) {
-                continue;
-            }
-
-            final String namespace = capability.substring(0, qmark);
-            final Iterable<String> queryParams = AMP_SPLITTER.split(capability.substring(qmark + 1));
-            final String moduleName = MODULE_PARAM.from(queryParams);
-            if (Strings.isNullOrEmpty(moduleName)) {
-                continue;
-            }
-
-            String revision = REVISION_PARAM.from(queryParams);
-            if (!Strings.isNullOrEmpty(revision)) {
-                addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, revision, moduleName),
-                        capabilityOrigin);
-                continue;
-            }
-
-            /*
-             * We have seen devices which mis-escape revision, but the revision may not
-             * even be there. First check if there is a substring that matches revision.
-             */
-            if (Iterables.any(queryParams, CONTAINS_REVISION)) {
-
-                LOG.debug("Netconf device was not reporting revision correctly, trying to get amp;revision=");
-                revision = BROKEN_REVISON_PARAM.from(queryParams);
-                if (Strings.isNullOrEmpty(revision)) {
-                    LOG.warn("Netconf device returned revision incorrectly escaped for {}, ignoring it", capability);
-                    addModuleQName(moduleBasedCaps, nonModuleCaps, capability,
-                            cachedQName(namespace, moduleName), capabilityOrigin);
-                } else {
-                    addModuleQName(moduleBasedCaps, nonModuleCaps, capability,
-                            cachedQName(namespace, revision, moduleName), capabilityOrigin);
-                }
-                continue;
-            }
-
-            // Fallback, no revision provided for module
-            addModuleQName(moduleBasedCaps, nonModuleCaps, capability,
-                    cachedQName(namespace, moduleName), capabilityOrigin);
-        }
-
-        return new NetconfSessionPreferences(ImmutableMap.copyOf(nonModuleCaps), ImmutableMap.copyOf(moduleBasedCaps));
     }
 
     private static void addModuleQName(final Map<QName, CapabilityOrigin> moduleBasedCaps,
