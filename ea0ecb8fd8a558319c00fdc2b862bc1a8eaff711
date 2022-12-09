@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6119ee3_6e2225af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2850
+      },
+      "writtenOn": "2022-12-09T10:17:40Z",
+      "side": 1,
+      "message": "Please don\u0027t take any OPNFV CI vote into account.\n\nI\u0027m cleaning the overall design in OPNFV and our Jenkins is still listening all Gerrit servers available worldwide :) The new filters should prevent that.",
+      "revId": "ea0ecb8fd8a558319c00fdc2b862bc1a8eaff711",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
