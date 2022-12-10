@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.InetSocketAddress;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,6 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
@@ -79,8 +79,8 @@ public class MountInstanceTest {
 
     @Test
     public void testOnTopologyDeviceConnected() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
-            notificationService, null);
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+            notificationService, broker, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMDataBroker.class, broker);
         verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
@@ -89,8 +89,8 @@ public class MountInstanceTest {
 
     @Test
     public void testOnTopologyDeviceConnectedWithNetconfService() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, null, netconfService, rpcService,
-                notificationService, null);
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+            notificationService, null, netconfService);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(NetconfDataTreeService.class, netconfService);
         verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
@@ -99,31 +99,26 @@ public class MountInstanceTest {
 
     @Test
     public void testOnTopologyDeviceDisconnected() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
-            notificationService, null);
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+            notificationService, broker, null);
         mountInstance.onTopologyDeviceDisconnected();
         verify(registration).close();
-        try {
-            mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
-                notificationService, null);
-        } catch (final IllegalStateException e) {
-            LOG.warn("Operation failed.", e);
-            Assert.fail("Topology registration still present after disconnect ");
-        }
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+            notificationService, broker, null);
     }
 
     @Test
     public void testClose() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
-            notificationService, null);
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+            notificationService, broker, null);
         mountInstance.close();
         verify(registration).close();
     }
 
     @Test
     public void testPublishNotification() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
-            notificationService, null);
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+            notificationService, broker, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
         mountInstance.publish(notification);

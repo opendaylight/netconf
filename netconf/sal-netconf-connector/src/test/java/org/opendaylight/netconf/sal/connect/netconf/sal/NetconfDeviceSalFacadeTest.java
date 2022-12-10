@@ -11,7 +11,6 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -36,6 +35,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -116,12 +116,11 @@ public class NetconfDeviceSalFacadeTest {
         final DOMRpcService deviceRpc = mock(DOMRpcService.class);
         deviceFacade.onDeviceConnected(
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), new EmptyMountPointContext(schemaContext)),
-            netconfSessionPreferences, deviceRpc, null);
+            netconfSessionPreferences, new RemoteDeviceServices(deviceRpc, null));
 
         verifyConnectionStatusUpdate(ConnectionStatus.Connected);
         verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext),
-                any(DOMDataBroker.class), any(NetconfDataTreeService.class), eq(deviceRpc),
-                any(NetconfDeviceNotificationService.class), isNull());
+            eq(new RemoteDeviceServices(deviceRpc, null)), any(DOMDataBroker.class), any(NetconfDataTreeService.class));
     }
 
     @Test

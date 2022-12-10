@@ -11,12 +11,11 @@ import com.google.common.annotations.VisibleForTesting;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -30,9 +29,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev19
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,20 +64,18 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
 
     @Override
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences, final DOMRpcService deviceRpc,
-            final DOMActionService deviceAction) {
-        final MountPointContext mountContext = deviceSchema.mountContext();
-        final EffectiveModelContext schemaContext = mountContext.getEffectiveModelContext();
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+        final var mountContext = deviceSchema.mountContext();
+        final var modelContext = mountContext.getEffectiveModelContext();
 
-        final NetconfDeviceDataBroker netconfDeviceDataBroker =
-                new NetconfDeviceDataBroker(id, mountContext, deviceRpc, sessionPreferences);
-        final NetconfDataTreeService netconfService =
-                AbstractNetconfDataTreeService.of(id, mountContext, deviceRpc, sessionPreferences);
-        registerLockListener(netconfDeviceDataBroker, netconfService);
-        final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
+        final var deviceRpc = services.rpcs();
+        // FIXME: instanceof DOMRpcService, as it might be others
+        final var netconfDataBroker = new NetconfDeviceDataBroker(id, mountContext, deviceRpc, sessionPreferences);
+        final var netconfDataTree = AbstractNetconfDataTreeService.of(id, mountContext, deviceRpc, sessionPreferences);
+        registerLockListener(netconfDataBroker, netconfDataTree);
 
-        salProvider.getMountInstance().onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, netconfService,
-            deviceRpc, notificationService, deviceAction);
+        salProvider.getMountInstance().onTopologyDeviceConnected(modelContext, services, netconfDataBroker,
+            netconfDataTree);
         salProvider.getTopologyDatastoreAdapter().updateDeviceData(true, deviceSchema.capabilities());
     }
 

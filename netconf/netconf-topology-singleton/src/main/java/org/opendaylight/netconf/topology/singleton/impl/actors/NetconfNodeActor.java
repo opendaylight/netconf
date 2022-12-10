@@ -37,6 +37,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMActionService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMRpcService;
@@ -105,10 +106,10 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                                final DOMMountPointService mountPointService) {
         this.setup = setup;
         this.id = id;
-        this.schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
-        this.schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
+        schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
+        schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
         this.actorResponseWaitTime = actorResponseWaitTime;
-        this.writeTxIdleTimeout = setup.getIdleTimeout();
+        writeTxIdleTimeout = setup.getIdleTimeout();
         this.mountPointService = mountPointService;
     }
 
@@ -117,15 +118,14 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     public void handleReceive(final Object message) {
         LOG.debug("{}:  received message {}", id, message);
 
-        if (message instanceof CreateInitialMasterActorData) { // master
-            final CreateInitialMasterActorData masterActorData = (CreateInitialMasterActorData) message;
+        if (message instanceof CreateInitialMasterActorData masterActorData) { // master
             sourceIdentifiers = masterActorData.getSourceIndentifiers();
-            this.deviceDataBroker = masterActorData.getDeviceDataBroker();
-            this.netconfService = masterActorData.getNetconfDataTreeService();
+            deviceDataBroker = masterActorData.getDeviceDataBroker();
+            netconfService = masterActorData.getNetconfDataTreeService();
             final DOMDataTreeReadTransaction tx = deviceDataBroker.newReadOnlyTransaction();
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
-            this.deviceRpc = masterActorData.getDeviceRpc();
-            this.deviceAction = masterActorData.getDeviceAction();
+            deviceRpc = masterActorData.getDeviceRpc();
+            deviceAction = masterActorData.getDeviceAction();
 
             sender().tell(new MasterActorDataInitialized(), self());
             LOG.debug("{}: Master is ready.", id);
@@ -133,8 +133,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             setup = ((RefreshSetupMasterActorData) message).getNetconfTopologyDeviceSetup();
             id = ((RefreshSetupMasterActorData) message).getRemoteDeviceId();
             sender().tell(new MasterActorDataInitialized(), self());
-        } else if (message instanceof AskForMasterMountPoint) { // master
-            AskForMasterMountPoint askForMasterMountPoint = (AskForMasterMountPoint) message;
+        } else if (message instanceof AskForMasterMountPoint askForMasterMountPoint) { // master
             // only master contains reference to deviceDataBroker
             if (deviceDataBroker != null) {
                 LOG.debug("{}: Sending RegisterMountPoint reply to {}", id, askForMasterMountPoint.getSlaveActorRef());
@@ -144,8 +143,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                 LOG.warn("{}: Received {} but we don't appear to be the master", id, askForMasterMountPoint);
                 sender().tell(new Failure(new NotMasterException(self())), self());
             }
-        } else if (message instanceof YangTextSchemaSourceRequest) { // master
-            final YangTextSchemaSourceRequest yangTextSchemaSourceRequest = (YangTextSchemaSourceRequest) message;
+        } else if (message instanceof YangTextSchemaSourceRequest yangTextSchemaSourceRequest) { // master
             sendYangTextSchemaSourceProxy(yangTextSchemaSourceRequest.getSourceIdentifier(), sender());
         } else if (message instanceof NewReadTransactionRequest) { // master
             sender().tell(new Success(readTxActor), self());
@@ -165,17 +163,14 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             } catch (final Exception t) {
                 sender().tell(new Failure(t), self());
             }
-        } else if (message instanceof InvokeRpcMessage) { // master
-            final InvokeRpcMessage invokeRpcMessage = (InvokeRpcMessage) message;
+        } else if (message instanceof InvokeRpcMessage invokeRpcMessage) { // master
             invokeSlaveRpc(invokeRpcMessage.getSchemaPath().lastNodeIdentifier(),
                 invokeRpcMessage.getNormalizedNodeMessage(), sender());
-        } else if (message instanceof InvokeActionMessage) { // master
-            final InvokeActionMessage invokeActionMessage = (InvokeActionMessage) message;
+        } else if (message instanceof InvokeActionMessage invokeActionMessage) { // master
             LOG.info("InvokeActionMessage Details : {}", invokeActionMessage.toString());
             invokeSlaveAction(invokeActionMessage.getSchemaPath(), invokeActionMessage.getContainerNodeMessage(),
                 invokeActionMessage.getDOMDataTreeIdentifier(), sender());
-        } else if (message instanceof RegisterMountPoint) { //slaves
-            RegisterMountPoint registerMountPoint = (RegisterMountPoint) message;
+        } else if (message instanceof RegisterMountPoint registerMountPoint) { //slaves
             sourceIdentifiers = registerMountPoint.getSourceIndentifiers();
             registerSlaveMountPoint(registerMountPoint.getMasterActorRef());
             sender().tell(new Success(null), self());
@@ -315,14 +310,6 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         resolveSchemaContext(createSchemaContextFactory(masterReference), slaveSalManager, masterReference, 1);
     }
 
-    private DOMRpcService getDOMRpcService(final ActorRef masterReference) {
-        return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id, actorResponseWaitTime);
-    }
-
-    private DOMActionService getDOMActionService(final ActorRef masterReference) {
-        return new ProxyDOMActionService(setup.getActorSystem(), masterReference, id, actorResponseWaitTime);
-    }
-
     private EffectiveModelContextFactory createSchemaContextFactory(final ActorRef masterReference) {
         final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
                 new ProxyYangTextSourceProvider(masterReference, getContext().dispatcher(), actorResponseWaitTime);
@@ -351,8 +338,10 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                     if (slaveSalManager == localSlaveSalManager) {
                         LOG.info("{}: Schema context resolved: {} - registering slave mount point",
                                 id, result.getModules());
-                        slaveSalManager.registerSlaveMountPoint(result, getDOMRpcService(masterReference),
-                            getDOMActionService(masterReference), masterReference);
+                        final var actorSystem = setup.getActorSystem();
+                        slaveSalManager.registerSlaveMountPoint(result, masterReference, new RemoteDeviceServices(
+                            new ProxyDOMRpcService(actorSystem, masterReference, id, actorResponseWaitTime),
+                            new ProxyDOMActionService(actorSystem, masterReference, id, actorResponseWaitTime)));
                     }
                 });
             }
