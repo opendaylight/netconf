@@ -45,6 +45,7 @@ import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -232,9 +233,10 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
                 resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
 
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
-            salFacade.onDeviceConnected(deviceSchema, remoteSessionCapabilities, deviceRpc,
+            salFacade.onDeviceConnected(deviceSchema, remoteSessionCapabilities,
+                new RemoteDeviceServices(deviceRpc,
                     deviceActionFactory == null ? null : deviceActionFactory.createDeviceAction(
-                            messageTransformer, listener, mount.getEffectiveModelContext()));
+                            messageTransformer, listener, mount.getEffectiveModelContext())));
             notificationHandler.onRemoteSchemaUp(messageTransformer);
 
             LOG.info("{}: Netconf connector initialized successfully", id);
