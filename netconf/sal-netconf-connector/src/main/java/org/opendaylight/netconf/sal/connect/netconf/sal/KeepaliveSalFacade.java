@@ -26,12 +26,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -113,16 +113,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
     @Override
     public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
-        onDeviceConnected(deviceSchema, netconfSessionPreferences, deviceRpc, null);
-    }
-
-    @Override
-    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc,
-            final DOMActionService deviceAction) {
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         currentDeviceRpc = requireNonNull(deviceRpc);
-        salFacade.onDeviceConnected(deviceSchema, netconfSessionPreferences,
+        salFacade.onDeviceConnected(deviceSchema, sessionPreferences,
             new KeepaliveDOMRpcService(deviceRpc), deviceAction);
 
         LOG.debug("{}: Netconf session initiated, starting keepalives", id);

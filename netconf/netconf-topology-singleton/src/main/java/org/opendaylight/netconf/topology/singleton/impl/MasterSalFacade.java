@@ -24,6 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -71,21 +72,13 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     @Override
     public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-                                  final NetconfSessionPreferences sessionPreferences,
-                                  final DOMRpcService domRpcService, final DOMActionService domActionService) {
-        deviceAction = domActionService;
-        LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, "
-            + "DOMActionService exposed for the device", id);
-        onDeviceConnected(deviceSchema, sessionPreferences, domRpcService);
-    }
-
-    @Override
-    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-                                  final NetconfSessionPreferences sessionPreferences,
-                                  final DOMRpcService domRpcService) {
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         currentSchema = requireNonNull(deviceSchema);
         netconfSessionPreferences = sessionPreferences;
         deviceRpc = domRpcService;
+        deviceAction = domActionService;
+        LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, "
+            + "DOMActionService exposed for the device", id);
 
         LOG.info("Device {} connected - registering master mount point", id);
 
