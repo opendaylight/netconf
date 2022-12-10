@@ -17,19 +17,17 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import java.util.List;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.AbstractNetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
@@ -51,10 +49,9 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     private NetconfDeviceSchema currentSchema = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
-    private DOMRpcService deviceRpc = null;
+    private RemoteDeviceServices deviceServices = null;
     private DOMDataBroker deviceDataBroker = null;
     private NetconfDataTreeService netconfService = null;
-    private DOMActionService deviceAction = null;
 
     MasterSalFacade(final RemoteDeviceId id,
                     final ActorSystem actorSystem,
@@ -71,21 +68,14 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     @Override
     public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-                                  final NetconfSessionPreferences sessionPreferences,
-                                  final DOMRpcService domRpcService, final DOMActionService domActionService) {
-        deviceAction = domActionService;
-        LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, "
-            + "DOMActionService exposed for the device", id);
-        onDeviceConnected(deviceSchema, sessionPreferences, domRpcService);
-    }
-
-    @Override
-    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-                                  final NetconfSessionPreferences sessionPreferences,
-                                  final DOMRpcService domRpcService) {
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         currentSchema = requireNonNull(deviceSchema);
-        netconfSessionPreferences = sessionPreferences;
-        deviceRpc = domRpcService;
+        netconfSessionPreferences = requireNonNull(sessionPreferences);
+        deviceServices = requireNonNull(services);
+        if (services.actions() != null) {
+            LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, DOMActionService exposed for "
+                + "the device", id);
+        }
 
         LOG.info("Device {} connected - registering master mount point", id);
 
@@ -137,7 +127,6 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         final var preferences = requireNonNull(netconfSessionPreferences,
             "Device has no capabilities yet. Probably not fully connected.");
 
-        final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
         deviceDataBroker = newDeviceDataBroker(mountContext, preferences);
         netconfService = newNetconfDataTreeService(mountContext, preferences);
 
@@ -148,17 +137,17 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
         salProvider.getMountInstance().onTopologyDeviceConnected(mountContext.getEffectiveModelContext(),
-            proxyDataBroker, proxyNetconfService, deviceRpc, notificationService, deviceAction);
+            deviceServices, proxyDataBroker, proxyNetconfService);
     }
 
     protected DOMDataBroker newDeviceDataBroker(final MountPointContext mountContext,
             final NetconfSessionPreferences preferences) {
-        return new NetconfDeviceDataBroker(id, mountContext, deviceRpc, preferences);
+        return new NetconfDeviceDataBroker(id, mountContext, deviceServices.rpcs(), preferences);
     }
 
     protected NetconfDataTreeService newNetconfDataTreeService(final MountPointContext mountContext,
             final NetconfSessionPreferences preferences) {
-        return AbstractNetconfDataTreeService.of(id, mountContext, deviceRpc, preferences);
+        return AbstractNetconfDataTreeService.of(id, mountContext, deviceServices.rpcs(), preferences);
     }
 
     private Future<Object> sendInitialDataToActor() {
@@ -170,7 +159,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
         // send initial data to master actor
         return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, netconfService,
-            sourceIdentifiers, deviceRpc, deviceAction), actorResponseWaitTime);
+            sourceIdentifiers, deviceServices.rpcs(), deviceServices.actions()), actorResponseWaitTime);
     }
 
     private void updateDeviceData() {

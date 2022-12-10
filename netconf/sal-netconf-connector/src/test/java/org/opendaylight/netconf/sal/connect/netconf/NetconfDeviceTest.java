@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -45,10 +44,8 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -56,10 +53,10 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
@@ -158,7 +155,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         device.onRemoteSessionUp(sessionCaps, listener);
 
         verify(facade, timeout(5000)).onDeviceConnected(any(NetconfDeviceSchema.class),
-            any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
+            any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
         verify(schemaFactory, times(2)).createEffectiveModelContext(anyCollection());
     }
 
@@ -242,11 +239,11 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .build();
         // Monitoring supported
         final NetconfSessionPreferences sessionCaps =
-                getSessionCaps(true, Lists.newArrayList(TEST_CAPABILITY, TEST_CAPABILITY2));
+                getSessionCaps(true, List.of(TEST_CAPABILITY, TEST_CAPABILITY2));
         device.onRemoteSessionUp(sessionCaps, listener);
 
         verify(facade, timeout(5000)).onDeviceConnected(any(NetconfDeviceSchema.class),
-            any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
+            any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
         verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollection());
     }
 
@@ -326,8 +323,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         verify(schemaContextProviderFactory, timeout(5000)).createEffectiveModelContext(any(Collection.class));
         verify(facade, timeout(5000)).onDeviceConnected(
-                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
-                isNull());
+                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
 
         device.onRemoteSessionDown();
         verify(facade, timeout(5000)).onDeviceDisconnected();
@@ -336,8 +332,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         verify(schemaContextProviderFactory, timeout(5000).times(2)).createEffectiveModelContext(any(Collection.class));
         verify(facade, timeout(5000).times(2)).onDeviceConnected(
-                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
-                isNull());
+                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
     }
 
     @Test
@@ -368,7 +363,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         //complete schema setup
         schemaFuture.set(SCHEMA_CONTEXT);
         //facade.onDeviceDisconnected() was called, so facade.onDeviceConnected() shouldn't be called anymore
-        verify(facade, after(1000).never()).onDeviceConnected(any(), any(), any(), any(DOMActionService.class));
+        verify(facade, after(1000).never()).onDeviceConnected(any(), any(), any(RemoteDeviceServices.class));
     }
 
     @Test
@@ -401,7 +396,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final ArgumentCaptor<NetconfDeviceSchema> argument =  ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
-            any(DOMRpcService.class), isNull());
+            any(RemoteDeviceServices.class));
         argument.getValue().capabilities().resolvedCapabilities()
                 .forEach(entry -> assertEquals("Builded 'AvailableCapability' schemas should match input capabilities.",
                         moduleBasedCaps.get(
@@ -432,7 +427,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
-                any(DOMRpcService.class), isNull());
+                any(RemoteDeviceServices.class));
 
         List<String> notificationModulesName = Arrays.asList(
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
@@ -471,7 +466,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
-                any(DOMRpcService.class), isNull());
+                any(RemoteDeviceServices.class));
         final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().capabilities();
 
         List<String> notificationModulesName = List.of(
@@ -516,10 +511,10 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
-                any(DOMRpcService.class), isNull());
+                any(RemoteDeviceServices.class));
         final Set<AvailableCapability> resolvedCapabilities = argument.getValue().capabilities().resolvedCapabilities();
 
-        List<String> notificationModulesName = Arrays.asList(
+        List<String> notificationModulesName = List.of(
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
                         .$YangModuleInfoImpl.getInstance().getName().toString(),
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
@@ -540,8 +535,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     private static RemoteDeviceHandler getFacade() throws Exception {
         final RemoteDeviceHandler remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
         doNothing().when(remoteDeviceHandler).onDeviceConnected(
-                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class),
-                any(DOMActionService.class));
+                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
         doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
         return remoteDeviceHandler;
