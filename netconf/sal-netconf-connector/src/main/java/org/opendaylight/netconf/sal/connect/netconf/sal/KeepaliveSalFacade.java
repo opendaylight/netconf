@@ -26,12 +26,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -69,7 +69,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     private final RemoteDeviceId id;
 
     private volatile NetconfDeviceCommunicator listener;
-    private volatile DOMRpcService currentDeviceRpc;
+    private volatile RemoteDeviceServices currentServices;
 
     public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
             final ScheduledExecutorService executor, final long keepaliveDelaySeconds,
@@ -101,7 +101,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
      */
     private synchronized void stopKeepalives() {
         keepaliveTask.disableKeepalive();
-        currentDeviceRpc = null;
+        currentServices = null;
     }
 
     void reconnect() {
@@ -113,17 +113,15 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
     @Override
     public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
-        onDeviceConnected(deviceSchema, netconfSessionPreferences, deviceRpc, null);
-    }
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+        currentServices = requireNonNull(services);
 
-    @Override
-    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc,
-            final DOMActionService deviceAction) {
-        currentDeviceRpc = requireNonNull(deviceRpc);
-        salFacade.onDeviceConnected(deviceSchema, netconfSessionPreferences,
-            new KeepaliveDOMRpcService(deviceRpc), deviceAction);
+        final var devAction = services.actions();
+        // FIXME: wrap with keepalive
+        final var kaAction = devAction;
+
+        salFacade.onDeviceConnected(deviceSchema, sessionPreferences,
+            new RemoteDeviceServices(new KeepaliveDOMRpcService(services.rpcs()), kaAction));
 
         LOG.debug("{}: Netconf session initiated, starting keepalives", id);
         LOG.trace("{}: Scheduling keepalives every {}s", id, keepaliveDelaySeconds);
@@ -213,8 +211,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
                 return;
             }
 
-            final var deviceRpc = currentDeviceRpc;
-            if (deviceRpc == null) {
+            final var localServices = currentServices;
+            if (localServices == null) {
                 // deviceRpc is null, which means we hit the reconnect window and attempted to send keepalive while
                 // we were reconnecting. Next keepalive will be scheduled after reconnect so no action necessary here.
                 LOG.debug("{}: Skipping keepalive while reconnecting", id);
@@ -222,7 +220,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             }
 
             LOG.trace("{}: Invoking keepalive RPC", id);
-            final var deviceFuture = deviceRpc.invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
+            final var deviceFuture = localServices.rpcs().invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
 
             lastActivity = now;
             Futures.addCallback(deviceFuture, this, MoreExecutors.directExecutor());

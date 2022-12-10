@@ -98,6 +98,7 @@ import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProvi
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
@@ -389,7 +390,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             new EmptyMountPointContext(deviceSchemaContext)),
             NetconfSessionPreferences.fromStrings(
                 List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString())),
-            deviceRpcService.getRpcService());
+            new RemoteDeviceServices(deviceRpcService.getRpcService(), null));
 
         final var masterMountPoint = awaitMountPoint(masterMountPointService);
 
@@ -465,7 +466,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         masterSalFacade.onDeviceConnected(new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
             new EmptyMountPointContext(deviceSchemaContext)), NetconfSessionPreferences.fromStrings(List.of(
                     NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString())),
-                deviceRpcService.getRpcService());
+                new RemoteDeviceServices(deviceRpcService.getRpcService(), null));
 
         verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
 
