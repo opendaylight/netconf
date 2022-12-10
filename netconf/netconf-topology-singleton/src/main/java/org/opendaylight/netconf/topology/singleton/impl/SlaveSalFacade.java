@@ -11,11 +11,9 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -37,25 +35,24 @@ public class SlaveSalFacade {
                           final Timeout actorResponseWaitTime,
                           final DOMMountPointService mountPointService) {
         this.id = id;
-        this.salProvider = new NetconfDeviceSalProvider(id, mountPointService);
+        salProvider = new NetconfDeviceSalProvider(id, mountPointService);
         this.actorSystem = actorSystem;
         this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
-    public void registerSlaveMountPoint(final EffectiveModelContext remoteSchemaContext, final DOMRpcService deviceRpc,
-            final DOMActionService deviceAction, final ActorRef masterActorRef) {
+    public void registerSlaveMountPoint(final EffectiveModelContext remoteSchemaContext, final ActorRef masterActorRef,
+            final RemoteDeviceServices services) {
         if (!registered.compareAndSet(false, true)) {
             return;
         }
 
-        final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
         final ProxyDOMDataBroker netconfDeviceDataBroker = new ProxyDOMDataBroker(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
         final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
 
-        salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, netconfDeviceDataBroker,
-            proxyNetconfService, deviceRpc, notificationService, deviceAction);
+        salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, services, netconfDeviceDataBroker,
+            proxyNetconfService);
 
         LOG.info("{}: Slave mount point registered.", id);
     }
