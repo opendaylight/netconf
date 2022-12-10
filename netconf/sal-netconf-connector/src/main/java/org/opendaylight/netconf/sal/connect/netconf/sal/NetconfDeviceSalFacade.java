@@ -11,12 +11,11 @@ import com.google.common.annotations.VisibleForTesting;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -67,8 +66,7 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
 
     @Override
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences, final DOMRpcService deviceRpc,
-            final DOMActionService deviceAction) {
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         final MountPointContext mountContext = deviceSchema.mountContext();
         final EffectiveModelContext schemaContext = mountContext.getEffectiveModelContext();
 
