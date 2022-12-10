@@ -7,9 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.api;
 
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 
@@ -17,28 +15,12 @@ public interface RemoteDeviceHandler extends AutoCloseable {
     /**
      * When device connected, init new mount point with specific schema context and DOM services.
      *
-     * @param deviceSchema - {@link NetconfDeviceSchema} of connected device
-     * @param sessionPreferences - session of device
-     * @param deviceRpc - {@link DOMRpcService} of device
+     * @param deviceSchema {@link NetconfDeviceSchema} of connected device
+     * @param sessionPreferences session of device
+     * @param services {@link RemoteDeviceServices} available
      */
-    default void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences, final DOMRpcService deviceRpc) {
-        // DO NOTHING
-    }
-
-    /**
-     * When device connected, init new mount point with specific schema context and DOM services.
-     *
-     * @param deviceSchema - {@link NetconfDeviceSchema} of connected device
-     * @param sessionPreferences - session of device
-     * @param deviceRpc - {@link DOMRpcService} of device
-     * @param deviceAction - {@link DOMActionService} of device
-     */
-    default void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences,
-            final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
-        // DO NOTHING
-    }
+    void onDeviceConnected(NetconfDeviceSchema deviceSchema, NetconfSessionPreferences sessionPreferences,
+            RemoteDeviceServices services);
 
     // FIXME: document this node
     void onDeviceDisconnected();
