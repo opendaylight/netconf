@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "272db628_ad2ac5ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-12T07:38:22Z",
+      "side": 1,
+      "message": "This needs to be updated to properly track schema -- note we lost comparison with the default value, which is what the code is very much about.",
+      "revId": "67d71ebe9aa308ef04429b70cbfe55c1bb9db3b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
