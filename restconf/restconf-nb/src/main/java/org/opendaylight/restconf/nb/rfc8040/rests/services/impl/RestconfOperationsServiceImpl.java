@@ -80,11 +80,11 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
     @Override
     public NormalizedNodePayload getOperations(final String identifier, final UriInfo uriInfo) {
         if (!identifier.contains(RestconfConstants.MOUNT)) {
-            final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to "
-                    + " end with " + RestconfConstants.MOUNT;
+            final var errMsg = """
+                    URI has bad format. If operations behind mount point should be showed, URI has to end with %s.
+                    """.formatted(RestconfConstants.MOUNT);
             LOG.debug("{} for {}", errMsg, identifier);
-            throw new RestconfDocumentedException(errMsg + RestconfConstants.MOUNT, ErrorType.PROTOCOL,
-                    ErrorTag.INVALID_VALUE);
+            throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
         final InstanceIdentifierContext mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
