@@ -213,7 +213,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
                 return;
             }
 
-            final DOMRpcService deviceRpc = currentDeviceRpc;
+            final var deviceRpc = currentDeviceRpc;
             if (deviceRpc == null) {
                 // deviceRpc is null, which means we hit the reconnect window and attempted to send keepalive while
                 // we were reconnecting. Next keepalive will be scheduled after reconnect so no action necessary here.
@@ -222,8 +222,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             }
 
             LOG.trace("{}: Invoking keepalive RPC", id);
-            final ListenableFuture<? extends DOMRpcResult> deviceFuture =
-                currentDeviceRpc.invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
+            final var deviceFuture = deviceRpc.invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
 
             lastActivity = now;
             Futures.addCallback(deviceFuture, this, MoreExecutors.directExecutor());
