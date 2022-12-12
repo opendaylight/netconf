@@ -69,8 +69,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
             final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to "
                     + " end with " + RestconfConstants.MOUNT;
             LOG.debug("{} for {}", errMsg, identifier);
-            throw new RestconfDocumentedException(errMsg + RestconfConstants.MOUNT, ErrorType.PROTOCOL,
-                    ErrorTag.INVALID_VALUE);
+            throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
         final InstanceIdentifierContext mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
