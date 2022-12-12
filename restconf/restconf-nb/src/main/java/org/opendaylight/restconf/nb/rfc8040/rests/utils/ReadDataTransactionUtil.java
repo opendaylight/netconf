@@ -11,7 +11,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -52,10 +51,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -83,7 +80,6 @@ public final class ReadDataTransactionUtil {
      * @param path           the path to read
      * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
      * @param withDefa       value of with-defaults parameter
-     * @param ctx            schema context
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
@@ -109,7 +105,6 @@ public final class ReadDataTransactionUtil {
      * @param path           the parent path to read
      * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
      * @param withDefa       value of with-defaults parameter
-     * @param ctx            schema context
      * @param fields         paths to selected subtrees which should be read, relative to to the parent path
      * @return {@link NormalizedNode}
      */
@@ -133,18 +128,23 @@ public final class ReadDataTransactionUtil {
             case TRIM -> true;
             case EXPLICIT -> false;
             case REPORT_ALL, REPORT_ALL_TAGGED -> throw new RestconfDocumentedException(
-                "Unsupported with-defaults value " + withDefa.paramValue());
+                    "Unsupported with-defaults value " + withDefa.paramValue());
         };
+        final var qName = result.getIdentifier().getNodeType();
+        final var identifier = NodeIdentifier.create(qName);
         final DataSchemaContextNode<?> ctxNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
-        final DataSchemaNode baseSchemaNode = ctxNode.getDataSchemaNode();
         if (result instanceof ContainerNode) {
-            final var builder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
+            final var builder = Builders.containerBuilder()
+                    .withNodeIdentifier(identifier)
+                    .withValue(((ContainerNode) result).body());
             buildCont(builder, (ContainerNode) result, ctxNode, trim);
             return builder.build();
         } else {
-            final var builder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
+            final var builder = Builders.mapEntryBuilder()
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(identifier.getNodeType()))
+                    .withValue((Collection<DataContainerChild>) result.body());
             buildMapEntryBuilder(builder, (MapEntryNode) result, ctxNode, trim,
-                    ((ListSchemaNode) baseSchemaNode).getKeyDefinition());
+                    ((ListSchemaNode) ctxNode.getDataSchemaNode()).getKeyDefinition());
             return builder.build();
         }
     }
@@ -154,27 +154,33 @@ public final class ReadDataTransactionUtil {
             final MapEntryNode result, final DataSchemaContextNode<?> ctxNode, final boolean trim,
             final List<QName> keys) {
         for (final DataContainerChild child : result.body()) {
+            final var identifier = child.getIdentifier();
             final var childCtx = ctxNode.getChild(child.getIdentifier());
-            if (childCtx == null) {
-                throw new NoSuchElementException("Failed to map child " + child.getIdentifier());
-            }
-
-            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final var childBuilder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
+                final var childBuilder = Builders.containerBuilder()
+                        .withNodeIdentifier((NodeIdentifier) identifier);
                 buildCont(childBuilder, (ContainerNode) child, childCtx, trim);
                 builder.withChild(childBuilder.build());
-            } else if (child instanceof MapNode) {
-                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
-                buildList(childBuilder, (MapNode) child, childCtx, trim,
-                    ((ListSchemaNode) childSchema).getKeyDefinition());
+            } else if (child instanceof SystemMapNode) {
+                final var childBuilder = Builders.mapBuilder()
+                        .withNodeIdentifier((NodeIdentifier) identifier);
+                buildListSystemMapNode(childBuilder, (MapNode) child,childCtx, trim, keys);
+                builder.withChild(childBuilder.build());
+            } else if (child instanceof UserMapNode) {
+                final var childBuilder = Builders.orderedMapBuilder()
+                        .withNodeIdentifier((NodeIdentifier) identifier);
+                buildListUserMapNode(childBuilder, (MapNode) child,childCtx, trim, keys);
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
+                final DataSchemaNode childSchema = ctxNode.getChild(child.getIdentifier()).getDataSchemaNode();
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
                 final Object nodeVal = child.body();
-                if (keys.contains(child.getIdentifier().getNodeType())) {
-                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                } else if (trim) {
+                final var childBuilder = Builders.leafBuilder()
+                        .withNodeIdentifier((NodeIdentifier) identifier)
+                        .withValue(child.body());
+                builder.withChild(childBuilder.build());
+
+                if (trim) {
                     if (defaultVal == null || !defaultVal.equals(nodeVal)) {
                         builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
                     }
@@ -185,15 +191,27 @@ public final class ReadDataTransactionUtil {
         }
     }
 
-    private static void buildList(final CollectionNodeBuilder<MapEntryNode, SystemMapNode> builder,
+    private static void buildListSystemMapNode(final CollectionNodeBuilder<MapEntryNode, SystemMapNode> builder,
             final MapNode result, DataSchemaContextNode<?> ctxNode, final boolean trim, final List<QName> keys) {
         for (final MapEntryNode mapEntryNode : result.body()) {
+            final var identifier = mapEntryNode.getIdentifier();
             final var childCtx = ctxNode.getChild(mapEntryNode.getIdentifier());
-            if (childCtx == null) {
-                throw new NoSuchElementException("Failed to match entry " + mapEntryNode.getIdentifier());
-            }
-            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
-            final var mapEntryBuilder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) childSchema);
+            final var mapEntryBuilder = Builders.mapEntryBuilder()
+                    .withNodeIdentifier(identifier)
+                    .withValue(mapEntryNode.body());
+            buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, childCtx, trim, keys);
+            builder.withChild(mapEntryBuilder.build());
+        }
+    }
+
+    private static void buildListUserMapNode(final CollectionNodeBuilder<MapEntryNode, UserMapNode> builder,
+            final MapNode result, DataSchemaContextNode<?> ctxNode, final boolean trim, final List<QName> keys) {
+        for (final MapEntryNode mapEntryNode : result.body()) {
+            final var identifier = mapEntryNode.getIdentifier();
+            final var childCtx = ctxNode.getChild(mapEntryNode.getIdentifier());
+            final var mapEntryBuilder = Builders.mapEntryBuilder()
+                    .withNodeIdentifier(identifier)
+                    .withValue(mapEntryNode.body());
             buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, childCtx, trim, keys);
             builder.withChild(mapEntryBuilder.build());
         }
@@ -202,30 +220,39 @@ public final class ReadDataTransactionUtil {
     private static void buildCont(final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder,
             final ContainerNode result, final DataSchemaContextNode<?> ctxNode, final boolean trim) {
         for (final DataContainerChild child : result.body()) {
+            final var qName = child.getIdentifier().getNodeType();
+            final var identifier = NodeIdentifier.create(qName);
             final var childCtx = ctxNode.getChild(child.getIdentifier());
-            if (childCtx == null) {
-                throw new NoSuchElementException("Cannot resolve child " + child.getIdentifier());
-            }
-
             final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final var builderChild = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
-                buildCont(builderChild, result, childCtx, trim);
+                final var builderChild = Builders.containerBuilder()
+                        .withNodeIdentifier(identifier);
+                buildCont(builderChild, (ContainerNode) child, ctxNode, trim);
                 builder.withChild(builderChild.build());
-            } else if (child instanceof MapNode) {
-                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
-                buildList(childBuilder, (MapNode) child, childCtx, trim,
-                    ((ListSchemaNode) childSchema).getKeyDefinition());
+            } else if (child instanceof SystemMapNode) {
+                final var childBuilder = Builders.mapBuilder()
+                        .withNodeIdentifier(identifier);
+                buildListSystemMapNode(childBuilder, (MapNode) child, childCtx, trim,
+                        ((ListSchemaNode) childSchema).getKeyDefinition());
+                builder.withChild(childBuilder.build());
+            } else if (child instanceof UserMapNode) {
+                final var childBuilder = Builders.orderedMapBuilder()
+                        .withNodeIdentifier(identifier);
+                buildListUserMapNode(childBuilder, (MapNode) child, childCtx, trim,
+                        ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
+                final var childBuilder = Builders.leafBuilder()
+                        .withNodeIdentifier(identifier)
+                        .withValue(child.body());
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
                 final Object nodeVal = child.body();
                 if (trim) {
                     if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                        builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
+                        builder.withChild(childBuilder.build());
                     }
                 } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
+                    builder.withChild(childBuilder.build());
                 }
             }
         }
@@ -276,7 +303,6 @@ public final class ReadDataTransactionUtil {
      *
      * @param strategy {@link RestconfStrategy} - object that perform the actual DS operations
      * @param withDefa with-defaults parameter
-     * @param ctx      schema context
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
@@ -298,7 +324,6 @@ public final class ReadDataTransactionUtil {
      * @param strategy {@link RestconfStrategy} - object that perform the actual DS operations
      * @param path     parent path to selected fields
      * @param withDefa with-defaults parameter
-     * @param ctx      schema context
      * @param fields   paths to selected subtrees which should be read, relative to to the parent path
      * @return {@link NormalizedNode}
      */

@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
@@ -215,14 +214,7 @@ public class ReadDataTransactionUtilTest {
         final NormalizedNode normalizedNode = ReadDataTransactionUtil.readData(
                 ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM, schemaContext);
 
-//assertEquals(content, normalizedNode); is not used because two duplicated child nodes are created in mapEntryNode
-        assertTrue(normalizedNode instanceof ContainerNode);
-        assertEquals(((MapNode) ((ContainerNode) normalizedNode).getChildByArg(
-                        NodeIdentifier.create(exampleList))).getChildByArg(
-                        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(exampleList)),
-                ((MapNode) content.getChildByArg(
-                        NodeIdentifier.create(exampleList))).childByArg(
-                        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(exampleList)));
+        assertEquals(content, normalizedNode);
     }
 
     @Test
