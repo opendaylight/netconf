@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "887b972c_089e664b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 41
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-12-13T16:48:40Z",
+      "side": 1,
+      "message": "Please provide your input. ",
+      "revId": "1673707d0fc4e0eda20d8892d5414464bb939a71",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e2f9f1e_a1a83ff4",
@@ -14,6 +31,30 @@
       "writtenOn": "2022-12-11T20:15:24Z",
       "side": 1,
       "message": "what is this really referencing?",
+      "range": {
+        "startLine": 37,
+        "startChar": 44,
+        "endLine": 39,
+        "endChar": 40
+      },
+      "revId": "1673707d0fc4e0eda20d8892d5414464bb939a71",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96f5918d_d9b029ae",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationListenerAdaptor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-12-13T16:48:40Z",
+      "side": 1,
+      "message": "It is dummy because parent abstract class needs this value as not null.",
+      "parentUuid": "3e2f9f1e_a1a83ff4",
       "range": {
         "startLine": 37,
         "startChar": 44,
@@ -47,6 +88,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0fa90bb_92e12d2d",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationListenerAdaptor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-12-13T16:48:40Z",
+      "side": 1,
+      "message": "It is dummy because parent abstract class needs this value as not null.",
+      "parentUuid": "0c919a5d_ce3835a2",
+      "range": {
+        "startLine": 49,
+        "startChar": 58,
+        "endLine": 49,
+        "endChar": 62
+      },
+      "revId": "1673707d0fc4e0eda20d8892d5414464bb939a71",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "73a6c8eb_698d4a23",
@@ -60,6 +125,30 @@
       "writtenOn": "2022-12-11T20:15:24Z",
       "side": 1,
       "message": "this looks copy\u0026pasted fro NOtificationListenerAdaptor -- why are we not sharing code?",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 5
+      },
+      "revId": "1673707d0fc4e0eda20d8892d5414464bb939a71",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "842eedd2_91e2d730",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationListenerAdaptor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-12-13T16:48:40Z",
+      "side": 1,
+      "message": "I need to hold EffectiveModelContext for further use (all code similar) but I could not use NotificationListenerAdaptor because of final class. \n\nPlease suggest.",
+      "parentUuid": "73a6c8eb_698d4a23",
       "range": {
         "startLine": 66,
         "startChar": 0,
