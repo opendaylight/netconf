@@ -16,6 +16,24 @@
       "message": "This needs to be updated to properly track schema -- note we lost comparison with the default value, which is what the code is very much about.",
       "revId": "67d71ebe9aa308ef04429b70cbfe55c1bb9db3b2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd7f06ff_1c497554",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2022-12-13T09:13:39Z",
+      "side": 1,
+      "message": "Comparison with default value added back. Adding schemaContext back was also required to make this change work.",
+      "parentUuid": "272db628_ad2ac5ea",
+      "revId": "67d71ebe9aa308ef04429b70cbfe55c1bb9db3b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
