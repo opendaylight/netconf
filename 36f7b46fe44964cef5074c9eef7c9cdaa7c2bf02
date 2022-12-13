@@ -51,6 +51,24 @@
       "message": "Line 119 already contains `new RemoteDeviceServices(deviceRpc, null)` can we make a variable?",
       "revId": "36f7b46fe44964cef5074c9eef7c9cdaa7c2bf02",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cddb782_c5f7afdf",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceSalFacadeTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-13T17:21:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12ea96e3_3d240280",
+      "revId": "36f7b46fe44964cef5074c9eef7c9cdaa7c2bf02",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
