@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14389746_2f66e4ad",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-13T17:07:53Z",
+      "side": 1,
+      "message": "Guaranteed to be non-null by RemoteDeviceServices contract",
+      "parentUuid": "039d30c0_3304270b",
+      "revId": "36f7b46fe44964cef5074c9eef7c9cdaa7c2bf02",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12ea96e3_3d240280",
