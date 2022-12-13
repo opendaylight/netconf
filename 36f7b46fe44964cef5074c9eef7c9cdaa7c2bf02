@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "039d30c0_3304270b",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-13T11:44:42Z",
+      "side": 1,
+      "message": "Please check the case when `local.rpcs()` is `null`.",
+      "revId": "36f7b46fe44964cef5074c9eef7c9cdaa7c2bf02",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12ea96e3_3d240280",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceSalFacadeTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-13T11:44:42Z",
+      "side": 1,
+      "message": "Line 119 already contains `new RemoteDeviceServices(deviceRpc, null)` can we make a variable?",
+      "revId": "36f7b46fe44964cef5074c9eef7c9cdaa7c2bf02",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
