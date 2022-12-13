@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6556e337_3a878ca1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2022-12-13T08:49:33Z",
+      "side": 1,
+      "message": "I have tried Callhome session with Netopeer2 device and session was not successfully created.\n\n```\n2022-12-13T09:30:33,642 | INFO  | nioEventLoopGroup-4-2 | CallHomeMountDispatcher          | 248 - org.opendaylight.netconf.callhome-provider - 4.0.3.SNAPSHOT | Activating NETCONF channel for ip /172.17.0.2:33202 device context CallHomeMountSessionContext{address\u003d/172.17.0.2:33202, hostKey\u003dRSA Public Key [16:9b:98:7b:59:3b:95:67:57:2b:86:a2:0a:2c:e9:fe:56:40:67:be],[56:66:d1:a4]\n        modulus: ...\npublic exponent: 10001\n}\n2022-12-13T09:30:33,643 | INFO  | nioEventLoopGroup-4-2 | CallHomeSessionContext           | 247 - org.opendaylight.netconf.callhome-protocol - 4.0.3.SNAPSHOT | Activating Netconf channel for /172.17.0.2:33202 with org.opendaylight.netconf.callhome.mount.CallHomeMountSessionContext$1@67c14ae9\n2022-12-13T09:30:33,780 | WARN  | nioEventLoopGroup-4-3 | AbstractNetconfSessionNegotiator | 261 - org.opendaylight.netconf.netty-util - 4.0.3.SNAPSHOT | Failed to send negotiation proposal on channel [id: 0xa45e4a10, L:/192.168.56.101:4334]\njava.lang.UnsupportedOperationException: null\n\tat io.netty.channel.AbstractServerChannel.filterOutboundMessage(AbstractServerChannel.java:73) ~[?:?]\n\tat io.netty.channel.AbstractChannel$AbstractUnsafe.write(AbstractChannel.java:868) ~[?:?]\n\tat io.netty.channel.DefaultChannelPipeline$HeadContext.write(DefaultChannelPipeline.java:1367) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite0(AbstractChannelHandlerContext.java:717) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite(AbstractChannelHandlerContext.java:709) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:792) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:702) ~[?:?]\n\tat io.netty.handler.codec.MessageToByteEncoder.write(MessageToByteEncoder.java:113) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite0(AbstractChannelHandlerContext.java:717) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite(AbstractChannelHandlerContext.java:709) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:792) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:702) ~[?:?]\n\tat io.netty.handler.codec.MessageToByteEncoder.write(MessageToByteEncoder.java:113) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite0(AbstractChannelHandlerContext.java:717) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWriteAndFlush(AbstractChannelHandlerContext.java:764) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:790) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.writeAndFlush(AbstractChannelHandlerContext.java:758) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.writeAndFlush(AbstractChannelHandlerContext.java:808) ~[?:?]\n\tat io.netty.channel.DefaultChannelPipeline.writeAndFlush(DefaultChannelPipeline.java:1025) ~[?:?]\n\tat io.netty.channel.AbstractChannel.writeAndFlush(AbstractChannel.java:306) ~[?:?]\n\tat org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator.start(AbstractNetconfSessionNegotiator.java:154) ~[?:?]\n\tat org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator.startNegotiation(AbstractNetconfSessionNegotiator.java:132) ~[?:?]\n\tat org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator.channelActive(AbstractNetconfSessionNegotiator.java:362) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:230) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:216) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.fireChannelActive(AbstractChannelHandlerContext.java:209) ~[?:?]\n\tat io.netty.channel.DefaultChannelPipeline$HeadContext.channelActive(DefaultChannelPipeline.java:1398) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:230) ~[?:?]\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:216) ~[?:?]\n\tat io.netty.channel.DefaultChannelPipeline.fireChannelActive(DefaultChannelPipeline.java:895) ~[?:?]\n\tat io.netty.channel.AbstractChannel$AbstractUnsafe.register0(AbstractChannel.java:522) ~[?:?]\n\tat io.netty.channel.AbstractChannel$AbstractUnsafe.access$200(AbstractChannel.java:429) ~[?:?]\n\tat io.netty.channel.AbstractChannel$AbstractUnsafe$1.run(AbstractChannel.java:486) ~[?:?]\n\tat io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:164) ~[?:?]\n\tat io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:469) ~[?:?]\n\tat io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:503) ~[?:?]\n\tat io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:986) ~[?:?]\n\tat io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[?:?]\n\tat io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[?:?]\n\tat java.lang.Thread.run(Thread.java:833) ~[?:?]\n```",
+      "revId": "bbeacece3118494d7cab2c9b944a8b52f55122f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7557987_fee3aa7a",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2022-12-13T08:49:33Z",
+      "side": 1,
+      "message": "Closing CallHome session after unsuccessful device connection fails on unchecked cast.\n\n```\n192.168.56.101:4334] closed: fail\njava.lang.ClassCastException: class org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator cannot be cast to class org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext$SshWriteAsyncHandlerAdapter (org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator is in unnamed module of loader org.eclipse.osgi.internal.loader.EquinoxClassLoader @48097c8d; org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext$SshWriteAsyncHandlerAdapter is in unnamed module of loader org.eclipse.osgi.internal.loader.EquinoxClassLoader @489da686)\n\tat org.opendaylight.netconf.callhome.protocol.MinaSshNettyChannel.doClose(MinaSshNettyChannel.java:116) ~[?:?]\n\tat io.netty.channel.AbstractChannel$AbstractUnsafe.doClose0(AbstractChannel.java:754) ~[?:?]\n```",
+      "revId": "bbeacece3118494d7cab2c9b944a8b52f55122f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
