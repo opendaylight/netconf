@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.api;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public interface DeviceActionFactory {
     /**
@@ -16,12 +16,9 @@ public interface DeviceActionFactory {
      *
      * @param messageTransformer - message transformer (for action in this case)
      * @param listener - allows specific service to send and receive messages to/from device
-     * @param schemaContext - schema context of device
      * @return {@link DOMActionService} of specific device
      */
-    default DOMActionService createDeviceAction(final MessageTransformer messageTransformer,
-            final RemoteDeviceCommunicator listener, final SchemaContext schemaContext) {
-        return null;
-    }
+    @NonNull DOMActionService createDeviceAction(MessageTransformer messageTransformer,
+            RemoteDeviceCommunicator listener);
 }
 
