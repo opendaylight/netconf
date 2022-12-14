@@ -65,6 +65,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -78,6 +79,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 public final class NetconfBaseOps {
     private static final NodeIdentifier CONFIG_SOURCE_NODEID = NodeIdentifier.create(ConfigSource.QNAME);
     private static final NodeIdentifier CONFIG_TARGET_NODEID = NodeIdentifier.create(ConfigTarget.QNAME);
+    private static final LeafNode<String> NETCONF_ERROR_OPTION_ROLLBACK =
+        ImmutableNodes.leafNode(NETCONF_ERROR_OPTION_NODEID, ROLLBACK_ON_ERROR_OPTION);
 
     private final DOMRpcService rpc;
     private final MountPointContext mountContext;
@@ -363,10 +366,10 @@ public final class NetconfBaseOps {
 
     private static ContainerNode getEditConfigContent(final QName datastore, final DataContainerChild editStructure,
             final Optional<ModifyAction> defaultOperation, final boolean rollback) {
-        final var editBuilder = Builders.containerBuilder().withNodeIdentifier(NETCONF_EDIT_CONFIG_NODEID);
-
-        // Target
-        editBuilder.withChild(getTargetNode(datastore));
+        final var editBuilder = Builders.containerBuilder()
+            .withNodeIdentifier(NETCONF_EDIT_CONFIG_NODEID)
+            // Target
+            .withChild(getTargetNode(datastore));
 
         // Default operation
         defaultOperation.ifPresent(op -> {
@@ -375,8 +378,7 @@ public final class NetconfBaseOps {
 
         // Error option
         if (rollback) {
-            // FIXME:
-            editBuilder.withChild(ImmutableNodes.leafNode(NETCONF_ERROR_OPTION_NODEID, ROLLBACK_ON_ERROR_OPTION));
+            editBuilder.withChild(NETCONF_ERROR_OPTION_ROLLBACK);
         }
 
         // Edit content
