@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -17,9 +17,9 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -88,46 +88,36 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testDiscardChanges() throws InterruptedException {
+    public void testDiscardChanges() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((ContainerNode) null)))
                 .when(rpc).invokeRpc(any(QName.class), isNull());
 
-        final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)),
-                false);
-        try {
-            tx.commit().get();
-        } catch (final ExecutionException e) {
-            // verify discard changes was sent
-            final InOrder inOrder = inOrder(rpc);
-            inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME,
-                    NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_QNAME));
-            inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME,
-                    NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
-            inOrder.verify(rpc).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME),
-                    isNull());
-            inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME,
-                    NetconfBaseOps.getUnLockContent(NETCONF_CANDIDATE_QNAME));
-            return;
-        }
+        final var future = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false)
+            .commit();
+        assertThrows(ExecutionException.class, () -> Futures.getDone(future));
 
-        fail("Submit should fail");
+        // verify discard changes was sent
+        final InOrder inOrder = inOrder(rpc);
+        inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME,
+            NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_NODEID));
+        inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME,
+            NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
+        inOrder.verify(rpc).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME),
+            isNull());
+        inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME,
+            NetconfBaseOps.getUnLockContent(NETCONF_CANDIDATE_NODEID));
     }
 
     @Test
-    public void testFailedCommit() throws Exception {
+    public void testFailedCommit() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null)))
             .doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(RpcResultBuilder.newError(ErrorType.APPLICATION,
                 new ErrorTag("a"), "m")))).when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
 
-        final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)),
-                false);
+        final var future = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false)
+            .commit();
 
-        try {
-            tx.commit().get();
-            fail("Submit should fail");
-        } catch (final ExecutionException e) {
-            // Intended
-        }
+        assertThrows(ExecutionException.class, () -> Futures.getDone(future));
     }
 
     @Test
@@ -144,11 +134,11 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         // verify discard changes was sent
         final InOrder inOrder = inOrder(rpc);
         inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME,
-                NetconfBaseOps.getLockContent(NETCONF_RUNNING_QNAME));
+                NetconfBaseOps.getLockContent(NETCONF_RUNNING_NODEID));
         inOrder.verify(rpc).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME),
                 any(ContainerNode.class));
         inOrder.verify(rpc).invokeRpc(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME,
-                NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_QNAME));
+                NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_NODEID));
     }
 
     @Test

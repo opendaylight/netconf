@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps.getSourceNode;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -157,7 +157,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     // Keepalive RPC static resources
     private static final @NonNull ContainerNode KEEPALIVE_PAYLOAD =
         NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
-            getSourceNode(NETCONF_RUNNING_QNAME), NetconfMessageTransformUtil.EMPTY_FILTER);
+            getSourceNode(NETCONF_RUNNING_NODEID), NetconfMessageTransformUtil.EMPTY_FILTER);
 
     /**
      * Invoke keepalive RPC and check the response. In case of any received response the keepalive

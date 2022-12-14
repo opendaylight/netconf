@@ -36,7 +36,6 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
@@ -79,11 +78,9 @@ public class KeepaliveSalFacadeTest {
 
     @Test
     public void testKeepaliveSuccess() throws Exception {
-        final DOMRpcResult result = new DefaultDOMRpcResult(Builders.containerBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
-
-        doReturn(FluentFutures.immediateFluentFuture(result))
-                .when(deviceRpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(Builders.containerBuilder()
+            .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID)
+            .build()))).when(deviceRpc).invokeRpc(any(QName.class), any(ContainerNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 

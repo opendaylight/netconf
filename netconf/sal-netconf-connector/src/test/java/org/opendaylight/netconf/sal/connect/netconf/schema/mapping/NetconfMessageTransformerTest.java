@@ -16,14 +16,14 @@ import static org.junit.Assert.assertTrue;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.GET_SCHEMA_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_LOCK_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.createEditConfigStructure;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toFilterStructure;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
@@ -206,7 +206,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     public void testLockRequestBaseSchemaNotPresent() throws Exception {
         final NetconfMessageTransformer transformer = getTransformer(PARTIAL_SCHEMA);
         final NetconfMessage netconfMessage = transformer.toRpcRequest(NETCONF_LOCK_QNAME,
-                NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_QNAME));
+                NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_NODEID));
 
         assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<lock"));
         assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<rpc"));
@@ -351,7 +351,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                     NodeIdentifierWithPredicates.of(Schema.QNAME),
                     toId(QName.create(Schemas.QNAME, "version"))), SCHEMA);
 
-        final ContainerNode source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
+        final ContainerNode source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_NODEID);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
@@ -379,7 +379,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final AnyxmlNode<?> filter = toFilterStructure(
                 YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME)), SCHEMA);
 
-        final ContainerNode source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
+        final ContainerNode source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_NODEID);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
@@ -421,7 +421,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 createEditConfigStructure(BASE_SCHEMAS.getBaseSchemaWithNotifications().getEffectiveModelContext(), id,
                     Optional.empty(), Optional.ofNullable(schemaNode));
 
-        final DataContainerChild target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
+        final DataContainerChild target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_NODEID);
 
         final ContainerNode wrap =
                 NetconfMessageTransformUtil.wrap(NETCONF_EDIT_CONFIG_QNAME, editConfigStructure, target);

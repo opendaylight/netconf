@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps.getSourceNode;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
 
 import com.google.common.util.concurrent.SettableFuture;
 import java.net.InetSocketAddress;
@@ -37,7 +37,6 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommun
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
@@ -48,7 +47,7 @@ public class KeepaliveSalFacadeResponseWaitingTest {
             new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
     private static final @NonNull ContainerNode KEEPALIVE_PAYLOAD =
         NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
-            getSourceNode(NETCONF_RUNNING_QNAME), NetconfMessageTransformUtil.EMPTY_FILTER);
+            getSourceNode(NETCONF_RUNNING_NODEID), NetconfMessageTransformUtil.EMPTY_FILTER);
 
     private KeepaliveSalFacade keepaliveSalFacade;
     private ScheduledExecutorService executorService;
@@ -87,9 +86,9 @@ public class KeepaliveSalFacadeResponseWaitingTest {
 
         //This settable future will be used to check the invokation of keepalive RPC. Should be never invoked.
         final SettableFuture<DOMRpcResult> keepaliveSettableFuture = SettableFuture.create();
-        final DOMRpcResult keepaliveResult = new DefaultDOMRpcResult(Builders.containerBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
-        keepaliveSettableFuture.set(keepaliveResult);
+        keepaliveSettableFuture.set(new DefaultDOMRpcResult(Builders.containerBuilder()
+            .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID)
+            .build()));
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 

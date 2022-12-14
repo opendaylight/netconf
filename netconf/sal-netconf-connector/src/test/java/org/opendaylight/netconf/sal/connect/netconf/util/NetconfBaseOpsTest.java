@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -51,10 +50,7 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -118,15 +114,14 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         final MessageTransformer transformer = new NetconfMessageTransformer(new EmptyMountPointContext(SCHEMA_CONTEXT),
             true, BASE_SCHEMAS.getBaseSchema());
         final DOMRpcService rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, transformer);
-        final RemoteDeviceId id =
-                new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
-        callback = new NetconfRpcFutureCallback("prefix", id);
+        callback = new NetconfRpcFutureCallback("prefix",
+            new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));
         baseOps = new NetconfBaseOps(rpc, new EmptyMountPointContext(SCHEMA_CONTEXT));
     }
 
     @Test
     public void testLock() throws Exception {
-        baseOps.lock(callback, NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME);
+        baseOps.lock(callback, NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID);
         verifyMessageSent("lock", NetconfMessageTransformUtil.NETCONF_LOCK_QNAME);
     }
 
@@ -138,7 +133,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testUnlock() throws Exception {
-        baseOps.unlock(callback, NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME);
+        baseOps.unlock(callback, NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID);
         verifyMessageSent("unlock", NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME);
     }
 
@@ -187,8 +182,8 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testCopyConfig() throws Exception {
-        baseOps.copyConfig(callback, NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME,
-                NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME);
+        baseOps.copyConfig(callback, NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID,
+                NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID);
         verifyMessageSent("copy-config", NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME);
     }
 
@@ -200,18 +195,16 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testGetConfigRunningData() throws Exception {
-        final Optional<NormalizedNode> dataOpt =
-                baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
+        final var dataOpt = baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
         assertTrue(dataOpt.isPresent());
-        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getIdentifier().getNodeType());
+        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().getIdentifier().getNodeType());
     }
 
     @Test
     public void testGetData() throws Exception {
-        final Optional<NormalizedNode> dataOpt =
-                baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
+        final var dataOpt = baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
         assertTrue(dataOpt.isPresent());
-        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getIdentifier().getNodeType());
+        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().getIdentifier().getNodeType());
     }
 
     @Test
@@ -228,10 +221,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testGetConfigCandidateWithFilter() throws Exception {
-        final YangInstanceIdentifier id = YangInstanceIdentifier.builder()
-                .node(CONTAINER_C_QNAME)
-                .build();
-        baseOps.getConfigCandidate(callback, Optional.of(id));
+        baseOps.getConfigCandidate(callback, Optional.of(YangInstanceIdentifier.of(CONTAINER_C_QNAME)));
         verifyMessageSent("getConfig_candidate-filter", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
     }
 
@@ -243,58 +233,38 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testEditConfigCandidate() throws Exception {
-        final LeafNode<Object> leaf = Builders.leafBuilder()
-                .withNodeIdentifier(LEAF_A_NID)
-                .withValue("leaf-value")
-                .build();
-        final YangInstanceIdentifier leafId = YangInstanceIdentifier.builder()
-                .node(CONTAINER_C_QNAME)
-                .node(LEAF_A_NID)
-                .build();
-        final DataContainerChild structure = baseOps.createEditConfigStructure(Optional.of(leaf),
-                Optional.of(ModifyAction.REPLACE), leafId);
-        baseOps.editConfigCandidate(callback, structure, true);
+        baseOps.editConfigCandidate(callback, baseOps.createEditConfigStructure(
+            Optional.of(ImmutableNodes.leafNode(LEAF_A_NID, "leaf-value")),
+            Optional.of(ModifyAction.REPLACE), YangInstanceIdentifier.builder()
+            .node(CONTAINER_C_QNAME)
+            .node(LEAF_A_NID)
+            .build()), true);
         verifyMessageSent("edit-config-test-module", NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
     }
 
     @Test
     public void testDeleteContainerNodeCandidate() throws Exception {
-        final YangInstanceIdentifier containerId = YangInstanceIdentifier.builder()
-                .node(CONTAINER_C_QNAME)
-                .build();
-        final DataContainerChild structure = baseOps.createEditConfigStructure(Optional.empty(),
-                Optional.of(ModifyAction.DELETE), containerId);
-        baseOps.editConfigCandidate(callback, structure, true);
+        baseOps.editConfigCandidate(callback, baseOps.createEditConfigStructure(Optional.empty(),
+            Optional.of(ModifyAction.DELETE), YangInstanceIdentifier.of(CONTAINER_C_QNAME)), true);
         verifyMessageSent("edit-config-delete-container-node-candidate",
                 NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
     }
 
     @Test
     public void testDeleteLeafNodeCandidate() throws Exception {
-        final YangInstanceIdentifier leafId = YangInstanceIdentifier.builder()
-                .node(CONTAINER_C_QNAME)
-                .node(LEAF_A_NID)
-                .build();
-        final DataContainerChild structure = baseOps.createEditConfigStructure(Optional.empty(),
-                Optional.of(ModifyAction.DELETE), leafId);
-        baseOps.editConfigCandidate(callback, structure, true);
+        baseOps.editConfigCandidate(callback, baseOps.createEditConfigStructure(Optional.empty(),
+            Optional.of(ModifyAction.DELETE),
+            YangInstanceIdentifier.builder().node(CONTAINER_C_QNAME).node(LEAF_A_NID).build()), true);
         verifyMessageSent("edit-config-delete-leaf-node-candidate",
                 NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
     }
 
     @Test
     public void testEditConfigRunning() throws Exception {
-        final LeafNode<Object> leaf = Builders.leafBuilder()
-                .withNodeIdentifier(LEAF_A_NID)
-                .withValue("leaf-value")
-                .build();
-        final YangInstanceIdentifier leafId = YangInstanceIdentifier.builder()
-                .node(CONTAINER_C_NID)
-                .node(LEAF_A_NID)
-                .build();
-        final DataContainerChild structure = baseOps.createEditConfigStructure(Optional.of(leaf),
-                Optional.of(ModifyAction.REPLACE), leafId);
-        baseOps.editConfigRunning(callback, structure, ModifyAction.MERGE, true);
+        baseOps.editConfigRunning(callback, baseOps.createEditConfigStructure(
+            Optional.of(ImmutableNodes.leafNode(LEAF_A_NID, "leaf-value")),
+            Optional.of(ModifyAction.REPLACE),
+            YangInstanceIdentifier.builder().node(CONTAINER_C_NID).node(LEAF_A_NID).build()), ModifyAction.MERGE, true);
         verifyMessageSent("edit-config-test-module-running", NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
     }
 
@@ -323,13 +293,13 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     @Test
     public void testGetDataWithoutFields() {
         assertThrows(ExecutionException.class, () -> baseOps.getData(callback,
-                Optional.of(YangInstanceIdentifier.empty()), Collections.emptyList()).get());
+                Optional.of(YangInstanceIdentifier.empty()), List.of()).get());
     }
 
     @Test
     public void getConfigRunningDataWithoutFields() {
         assertThrows(ExecutionException.class, () -> baseOps.getConfigRunningData(callback,
-                Optional.of(YangInstanceIdentifier.empty()), Collections.emptyList()).get());
+                Optional.of(YangInstanceIdentifier.empty()), List.of()).get());
     }
 
     @Test

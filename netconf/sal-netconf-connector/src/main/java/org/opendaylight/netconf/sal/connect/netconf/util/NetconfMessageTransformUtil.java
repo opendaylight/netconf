@@ -139,9 +139,12 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull NodeIdentifier NETCONF_ERROR_OPTION_NODEID =
         NodeIdentifier.create(NETCONF_ERROR_OPTION_QNAME);
     public static final @NonNull QName NETCONF_RUNNING_QNAME = QName.create(NETCONF_QNAME, "running").intern();
+    public static final @NonNull NodeIdentifier NETCONF_RUNNING_NODEID = NodeIdentifier.create(NETCONF_RUNNING_QNAME);
     public static final @NonNull QName NETCONF_SOURCE_QNAME = QName.create(NETCONF_QNAME, "source").intern();
     public static final @NonNull NodeIdentifier NETCONF_SOURCE_NODEID = NodeIdentifier.create(NETCONF_SOURCE_QNAME);
     public static final @NonNull QName NETCONF_CANDIDATE_QNAME = QName.create(NETCONF_QNAME, "candidate").intern();
+    public static final @NonNull NodeIdentifier NETCONF_CANDIDATE_NODEID =
+        NodeIdentifier.create(NETCONF_CANDIDATE_QNAME);
     public static final @NonNull QName NETCONF_TARGET_QNAME = QName.create(NETCONF_QNAME, "target").intern();
     public static final @NonNull NodeIdentifier NETCONF_TARGET_NODEID = NodeIdentifier.create(NETCONF_TARGET_QNAME);
     public static final @NonNull QName NETCONF_CONFIG_QNAME = QName.create(NETCONF_QNAME, "config").intern();
@@ -322,8 +325,8 @@ public final class NetconfMessageTransformUtil {
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause());
     }
 
-    public static NodeIdentifier toId(final PathArgument qname) {
-        return qname instanceof NodeIdentifier ? (NodeIdentifier) qname : toId(qname.getNodeType());
+    public static NodeIdentifier toId(final PathArgument arg) {
+        return arg instanceof NodeIdentifier nodeId ? nodeId : toId(arg.getNodeType());
     }
 
     public static NodeIdentifier toId(final QName nodeType) {
