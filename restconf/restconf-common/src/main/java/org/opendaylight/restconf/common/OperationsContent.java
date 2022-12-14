@@ -9,17 +9,12 @@ package org.opendaylight.restconf.common;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.HashBasedTable;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
@@ -108,46 +103,34 @@ public enum OperationsContent {
      */
     public final @NonNull String bodyFor(final @Nullable EffectiveModelContext context) {
         if (context == null) {
+            // Defensive, return empty content
             return emptyBody;
         }
         final var modules = context.getModuleStatements();
         if (modules.isEmpty()) {
+            // No modules, return empty content
             return emptyBody;
         }
 
-        // Index into prefix -> revision -> module table
-        final var prefixRevModule = HashBasedTable.<String, Optional<Revision>, ModuleEffectiveStatement>create();
-        for (var module : modules.values()) {
-            prefixRevModule.put(prefix(module), module.localQNameModule().getRevision(), module);
-        }
-
-        // Now extract RPC names for each module with highest revision. This needed so we expose the right set of RPCs,
-        // as we always pick the latest revision to resolve prefix (or module name)
-        // TODO: Simplify this once we have yangtools-7.0.9+
-        final var moduleRpcs = new ArrayList<Entry<String, List<String>>>();
-        for (var moduleEntry : prefixRevModule.rowMap().entrySet()) {
-            final var revisions = new ArrayList<>(moduleEntry.getValue().keySet());
-            revisions.sort(Revision::compare);
-            final var selectedRevision = revisions.get(revisions.size() - 1);
-
-            final var rpcNames = moduleEntry.getValue().get(selectedRevision)
-                .streamEffectiveSubstatements(RpcEffectiveStatement.class)
+        final var moduleRpcs = modules.values().stream()
+            // Extract XMLNamespaces
+            .map(module -> module.localQNameModule().getNamespace())
+            // Make sure each is XMLNamespace unique
+            .distinct()
+            // Find the most recent module with that namespace. This needed so we expose the right set of RPCs,
+            // as we always pick the latest revision to resolve prefix (or module name).
+            .map(namespace -> context.findModuleStatements(namespace).iterator().next())
+            // Convert to module prefix + List<String> with RPC names
+            .map(module -> Map.entry(prefix(module), module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
                 .map(rpc -> rpc.argument().getLocalName())
-                .collect(Collectors.toUnmodifiableList());
-            if (!rpcNames.isEmpty()) {
-                moduleRpcs.add(Map.entry(moduleEntry.getKey(), rpcNames));
-            }
-        }
+                .collect(Collectors.toList())))
+            // Skip prefixes which do not have any RPCs
+            .filter(entry -> !entry.getValue().isEmpty())
+            // Ensure stability: sort by prefix
+            .sorted(Entry.comparingByKey())
+            .collect(Collectors.toList());
 
-        if (moduleRpcs.isEmpty()) {
-            // No RPCs, return empty content
-            return emptyBody;
-        }
-
-        // Ensure stability: sort by prefix
-        moduleRpcs.sort(Comparator.comparing(Entry::getKey));
-
-        return modules.isEmpty() ? emptyBody : createBody(moduleRpcs);
+        return moduleRpcs.isEmpty() ? emptyBody : createBody(moduleRpcs);
     }
 
     abstract @NonNull String createBody(List<Entry<String, List<String>>> rpcsByPrefix);
