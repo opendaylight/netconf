@@ -12,7 +12,6 @@ import akka.dispatch.Futures;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
@@ -38,30 +37,24 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
     @Override
     public Future<Set<SourceIdentifier>> getProvidedSources() {
         // NOOP
-        return Futures.successful(Collections.emptySet());
+        return Futures.successful(Set.of());
     }
 
     @Override
     public Future<YangTextSchemaSourceSerializationProxy> getYangTextSchemaSource(
             final SourceIdentifier sourceIdentifier) {
-
-        final Future<Object> scalaFuture = Patterns.ask(masterRef,
-                new YangTextSchemaSourceRequest(sourceIdentifier), actorResponseWaitTime);
-
-        final Promise.DefaultPromise<YangTextSchemaSourceSerializationProxy> promise = new Promise.DefaultPromise<>();
-
-        scalaFuture.onComplete(new OnComplete<Object>() {
-            @Override
-            public void onComplete(final Throwable failure, final Object success) {
-                if (failure != null) {
-                    promise.failure(failure);
-                    return;
+        final var promise = new Promise.DefaultPromise<YangTextSchemaSourceSerializationProxy>();
+        Patterns.ask(masterRef, new YangTextSchemaSourceRequest(sourceIdentifier), actorResponseWaitTime).onComplete(
+            new OnComplete<>() {
+                @Override
+                public void onComplete(final Throwable failure, final Object success) {
+                    if (failure == null) {
+                        promise.success((YangTextSchemaSourceSerializationProxy) success);
+                    } else {
+                        promise.failure(failure);
+                    }
                 }
-
-                promise.success((YangTextSchemaSourceSerializationProxy) success);
-            }
-        }, executionContext);
-
+            }, executionContext);
         return promise.future();
     }
 }

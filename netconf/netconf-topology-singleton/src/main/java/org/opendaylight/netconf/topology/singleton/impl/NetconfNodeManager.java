@@ -40,7 +40,6 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.Future;
 
 /**
  * Managing and reacting on data tree changes in specific netconf node when master writes status to the operational
@@ -176,8 +175,7 @@ class NetconfNodeManager
     @Holding("this")
     private void sendAskForMasterMountPointWithRetries(final AskForMasterMountPoint askForMasterMountPoint,
             final ActorSelection masterActor, final int tries, final int updateCount) {
-        final Future<Object> future = Patterns.ask(masterActor, askForMasterMountPoint, actorResponseWaitTime);
-        future.onComplete(new OnComplete<Object>() {
+        Patterns.ask(masterActor, askForMasterMountPoint, actorResponseWaitTime).onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 synchronized (this) {
@@ -191,10 +189,10 @@ class NetconfNodeManager
                             LOG.warn("{}: Failed to send message to {} - retrying...", id, masterActor, failure);
                         }
                         sendAskForMasterMountPointWithRetries(askForMasterMountPoint, masterActor, tries + 1,
-                                updateCount);
+                            updateCount);
                     } else if (failure != null) {
                         LOG.error("{}: Failed to send message {} to {}. Slave mount point could not be created",
-                                id, askForMasterMountPoint, masterActor, failure);
+                            id, askForMasterMountPoint, masterActor, failure);
                     } else {
                         LOG.debug("{}: {} message to {} succeeded", id, askForMasterMountPoint, masterActor);
                     }
@@ -210,8 +208,7 @@ class NetconfNodeManager
                     mountPointService));
             LOG.debug("{}: Slave actor created with name {}", id, slaveActorRef);
         } else {
-            slaveActorRef
-                    .tell(new RefreshSlaveActor(setup, id, actorResponseWaitTime), ActorRef.noSender());
+            slaveActorRef.tell(new RefreshSlaveActor(setup, id, actorResponseWaitTime), ActorRef.noSender());
         }
     }
 
