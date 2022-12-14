@@ -235,8 +235,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
             salFacade.onDeviceConnected(deviceSchema, remoteSessionCapabilities,
                 new RemoteDeviceServices(deviceRpc, deviceActionFactory == null ? null
-                    : deviceActionFactory.createDeviceAction(messageTransformer, listener,
-                        mount.getEffectiveModelContext())));
+                    : deviceActionFactory.createDeviceAction(messageTransformer, listener)));
             notificationHandler.onRemoteSchemaUp(messageTransformer);
 
             LOG.info("{}: Netconf connector initialized successfully", id);

@@ -10,16 +10,12 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
-import org.opendaylight.yangtools.yang.common.RpcResult;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,13 +33,13 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
 
     @Override
     public DOMActionService createDeviceAction(final MessageTransformer messageTransformer,
-            final RemoteDeviceCommunicator listener, final SchemaContext schemaContext) {
+            final RemoteDeviceCommunicator listener) {
         return (schemaPath, dataTreeIdentifier, input) -> {
             requireNonNull(schemaPath);
             requireNonNull(dataTreeIdentifier);
             requireNonNull(input);
 
-            final ListenableFuture<RpcResult<NetconfMessage>> actionResultFuture = listener.sendRequest(
+            final var actionResultFuture = listener.sendRequest(
                 messageTransformer.toActionRequest(schemaPath, dataTreeIdentifier, input),
                 input.getIdentifier().getNodeType());
 
