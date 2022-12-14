@@ -24,6 +24,7 @@ public class Netconf822Test {
 
     @Test
     public void testOperationsContentJSON() {
+        var ttt = OperationsContent.JSON.bodyFor(CONTEXT);
         assertEquals("{\n"
             + "  \"ietf-restconf:operations\" : {\n"
             + "    \"foo:new\": [null]\n"

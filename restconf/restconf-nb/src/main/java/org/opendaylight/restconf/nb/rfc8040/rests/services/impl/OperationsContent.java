@@ -9,14 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.HashBasedTable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import com.google.common.collect.HashBasedTable;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -114,27 +110,22 @@ enum OperationsContent {
             return emptyBody;
         }
 
-        // Index into prefix -> revision -> module table
-        final var prefixRevModule = HashBasedTable.<String, Optional<Revision>, ModuleEffectiveStatement>create();
-        for (var module : modules.values()) {
-            prefixRevModule.put(prefix(module), module.localQNameModule().getRevision(), module);
-        }
 
         // Now extract RPC names for each module with highest revision. This needed so we expose the right set of RPCs,
         // as we always pick the latest revision to resolve prefix (or module name)
-        // TODO: Simplify this once we have yangtools-7.0.9+
-        final var moduleRpcs = new ArrayList<Entry<String, List<String>>>();
-        for (var moduleEntry : prefixRevModule.rowMap().entrySet()) {
-            final var revisions = new ArrayList<>(moduleEntry.getValue().keySet());
-            revisions.sort(Revision::compare);
-            final var selectedRevision = revisions.get(revisions.size() - 1);
+        final var moduleRpcs = new HashMap<String, List<String>>();
+        for (var module : modules.values()) {
+            final var namespace = module.localQNameModule().getNamespace();
+            if (moduleRpcs.containsKey(namespace)) {
+                continue;
+            }
+            final var stmt = context.findModuleStatements(namespace).stream().findFirst().get();
 
-            final var rpcNames = moduleEntry.getValue().get(selectedRevision)
-                .streamEffectiveSubstatements(RpcEffectiveStatement.class)
-                .map(rpc -> rpc.argument().getLocalName())
-                .collect(Collectors.toUnmodifiableList());
+            final var rpcNames = stmt.streamEffectiveSubstatements(RpcEffectiveStatement.class)
+                    .map(rpc -> rpc.argument().getLocalName())
+                    .toList();
             if (!rpcNames.isEmpty()) {
-                moduleRpcs.add(Map.entry(moduleEntry.getKey(), rpcNames));
+                moduleRpcs.put(prefix(stmt), rpcNames);
             }
         }
 
@@ -144,9 +135,11 @@ enum OperationsContent {
         }
 
         // Ensure stability: sort by prefix
-        moduleRpcs.sort(Comparator.comparing(Entry::getKey));
+        final var rpcsList = new ArrayList<Entry<String, List<String>>>();
+        rpcsList.addAll(moduleRpcs.entrySet().stream().toList());
+        rpcsList.sort(Comparator.comparing(Entry::getKey));
 
-        return modules.isEmpty() ? emptyBody : createBody(moduleRpcs);
+        return modules.isEmpty() ? emptyBody : createBody(rpcsList);
     }
 
     abstract @NonNull String createBody(List<Entry<String, List<String>>> rpcsByPrefix);
