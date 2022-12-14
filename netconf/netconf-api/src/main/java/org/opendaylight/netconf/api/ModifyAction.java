@@ -7,53 +7,101 @@
  */
 package org.opendaylight.netconf.api;
 
-import java.util.Arrays;
+import static java.util.Objects.requireNonNull;
 
+import org.eclipse.jdt.annotation.NonNull;
+
+/**
+ * NETCONF modification actions, as allowed for in {@code operation} and {@code default-operation} attributes of
+ * {@code <edit-config>} operation, as defined in
+ * <a href="https://www.rfc-editor.org/rfc/rfc6241#section-7.2">RFC6241 section 7.2</a>.
+ *
+ * <p>
+ * This concept is uncharacteristically bound to two separate semantics, but for a good reason: at the end of the day we
+ * want to know what the effective operation is.
+ */
 public enum ModifyAction {
-    MERGE(true), REPLACE(true), CREATE(false), DELETE(false), REMOVE(false), NONE(true, false);
+    // operation and default-operation
+    MERGE("merge",     true,  true),
+    REPLACE("replace", true,  true),
+    // operation only
+    CREATE("create",   true,  false),
+    DELETE("delete",   true,  false),
+    REMOVE("remove",   true,  false),
 
-    public static ModifyAction fromXmlValue(final String xmlNameOfAction) {
-        switch (xmlNameOfAction) {
-            case "merge":
-                return MERGE;
-            case "replace":
-                return REPLACE;
-            case "remove":
-                return REMOVE;
-            case "delete":
-                return DELETE;
-            case "create":
-                return CREATE;
-            case "none":
-                return NONE;
-            default:
-                throw new IllegalArgumentException("Unknown operation " + xmlNameOfAction + " available operations "
-                        + Arrays.toString(ModifyAction.values()));
-        }
+    // default-operation-only
+    NONE("none",       false, true);
+
+    private final @NonNull String xmlValue;
+    private final boolean isDefaultOperation;
+    private final boolean isOperation;
+
+    ModifyAction(final String xmlValue, final boolean isOperation, final boolean isDefaultOperation) {
+        this.xmlValue = requireNonNull(xmlValue);
+        this.isDefaultOperation = isDefaultOperation;
+        this.isOperation = isOperation;
     }
 
-    private final boolean asDefaultPermitted;
-    private final boolean onElementPermitted;
-
-    ModifyAction(final boolean asDefaultPermitted, final boolean onElementPermitted) {
-        this.asDefaultPermitted = asDefaultPermitted;
-        this.onElementPermitted = onElementPermitted;
+    /**
+     * Return the {@link ModifyAction} corresponding to a {@link #xmlValue}.
+     *
+     * @param xmlValue XML attribute or element value
+     * @return A {@link ModifyAction}
+     * @throws NullPointerException if {@code xmlValue} is {@code null}
+     * @throws IllegalArgumentException if {@code xmlValue} is not recognized
+     */
+    public static @NonNull ModifyAction ofXmlValue(final String xmlValue) {
+        return switch (xmlValue) {
+            case "merge" -> MERGE;
+            case "replace" -> REPLACE;
+            case "remove" -> REMOVE;
+            case "delete" -> DELETE;
+            case "create" -> CREATE;
+            case "none" -> NONE;
+            default -> throw new IllegalArgumentException("Unknown operation " + xmlValue);
+        };
     }
 
-    ModifyAction(final boolean asDefaultPermitted) {
-        this(asDefaultPermitted, true);
+    /**
+     * Return an XML string literal corresponding to this {@link ModifyAction}.
+     *
+     * @return An XML string literal
+     */
+    public @NonNull String xmlValue() {
+        return xmlValue;
     }
 
     /**
      * Check if this operation is a candidate for {@code default-operation} argument.
      *
-     * @return True if this operation can be used as {@code default-operation}.
+     * @return {@code true} if this operation can be used as {@code default-operation}, {@code false} otherwise.
+     * @deprecated Use {@link #isDefaultOperation()} instead
      */
+    @Deprecated(since = "5.0.0", forRemoval = true)
     public boolean isAsDefaultPermitted() {
-        return asDefaultPermitted;
+        return isDefaultOperation;
     }
 
+    /**
+     * Check if this operation is a candidate for {@code default-operation} argument.
+     *
+     * @return {@code true} if this operation can be used as {@code default-operation}, {@code false} otherwise.
+     */
+    public boolean isDefaultOperation() {
+        return isDefaultOperation;
+    }
+
+    @Deprecated(since = "5.0.0", forRemoval = true)
     public boolean isOnElementPermitted() {
-        return onElementPermitted;
+        return isOperation;
+    }
+
+    /**
+     * Check if this operation is a candidate for {@code operation} attribute.
+     *
+     * @return {@code true} if this operation can be used as {@code operation}, {@code false} otherwise.
+     */
+    public boolean isOperation() {
+        return isOperation;
     }
 }

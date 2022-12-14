@@ -79,13 +79,12 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
 
     @Override
     public void metadata(final ImmutableMap<QName, Object> metadata) throws IOException {
-        final Object operation = metadata.get(OPERATION_ATTRIBUTE);
-        if (operation != null) {
-            checkState(operation instanceof String, "Unexpected operation attribute value %s", operation);
-            final ModifyAction newAction = ModifyAction.fromXmlValue((String) operation);
-            currentAction = newAction;
+        final var operation = metadata.get(OPERATION_ATTRIBUTE);
+        if (operation instanceof String str) {
+            currentAction = ModifyAction.ofXmlValue(str);
+        } else if (operation != null) {
+            throw new IllegalStateException("Unexpected operation attribute value " + operation);
         }
-
         writer.metadata(filterMeta(metadata));
     }
 
@@ -186,7 +185,7 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
 
     @Override
     public void endNode() throws IOException {
-        final ModifyAction prevAction = actions.peek();
+        final var prevAction = actions.peek();
         if (prevAction != null) {
             // We only split out a builder if we a changing action relative to parent and we are not inside
             // a remove/delete operation

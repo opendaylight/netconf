@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 
 import java.util.List;
-import java.util.ListIterator;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -24,51 +24,47 @@ import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public final class EditConfig extends AbstractEdit {
-
     private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
-
     private static final String OPERATION_NAME = "edit-config";
-    private static final String DEFAULT_OPERATION_KEY = "default-operation";
+    private static final String DEFAULT_OPERATION = "default-operation";
+
     private final TransactionProvider transactionProvider;
 
     public EditConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
             final TransactionProvider transactionProvider) {
         super(netconfSessionIdForReporting, schemaContext);
-        this.transactionProvider = transactionProvider;
+        this.transactionProvider = requireNonNull(transactionProvider);
+    }
+
+    @Override
+    protected String getOperationName() {
+        return OPERATION_NAME;
     }
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
             throws DocumentedException {
-        final XmlElement targetElement = extractTargetElement(operationElement, OPERATION_NAME);
-        final Datastore targetDatastore = Datastore.valueOf(targetElement.getName());
-        if (targetDatastore == Datastore.running) {
+        if (Datastore.valueOf(extractTargetElement(operationElement, OPERATION_NAME).getName()) == Datastore.running) {
             throw new DocumentedException("edit-config on running datastore is not supported",
                     ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         }
 
-        final ModifyAction defaultAction = getDefaultOperation(operationElement);
-
-        final XmlElement configElement = getConfigElement(operationElement);
-
-        for (final XmlElement element : configElement.getChildElements()) {
-            final SplittingNormalizedNodeMetadataStreamWriter writer = new SplittingNormalizedNodeMetadataStreamWriter(
-                defaultAction);
+        final var defaultAction = getDefaultOperation(operationElement);
+        for (var element : getConfigElement(operationElement).getChildElements()) {
+            final var writer = new SplittingNormalizedNodeMetadataStreamWriter(defaultAction);
             parseIntoNormalizedNode(getSchemaNodeFromNamespace(element.getNamespace(), element), element, writer);
             executeOperations(writer.getDataTreeChanges());
         }
@@ -77,19 +73,18 @@ public final class EditConfig extends AbstractEdit {
     }
 
     private void executeOperations(final List<DataTreeChange> changes) throws DocumentedException {
-        final DOMDataTreeReadWriteTransaction rwTx = transactionProvider.getOrCreateTransaction();
-        final ListIterator<DataTreeChange> iterator = changes.listIterator(changes.size());
-
+        final var rwTx = transactionProvider.getOrCreateTransaction();
+        final var iterator = changes.listIterator(changes.size());
         while (iterator.hasPrevious()) {
-            final DataTreeChange dtc = iterator.previous();
-            executeChange(rwTx, dtc);
+            executeChange(rwTx, iterator.previous());
         }
     }
 
+    // FIXME: we should have proper ReadWriteOperations
     private void executeChange(final DOMDataTreeReadWriteTransaction rwtx, final DataTreeChange change)
             throws DocumentedException {
-        final YangInstanceIdentifier path = change.getPath();
-        final NormalizedNode changeData = change.getChangeRoot();
+        final var path = change.getPath();
+        final var changeData = change.getChangeRoot();
         switch (change.getAction()) {
             case NONE:
                 return;
@@ -99,6 +94,7 @@ public final class EditConfig extends AbstractEdit {
                 break;
             case CREATE:
                 try {
+                    // FIXME: synchronous operation: can we get a rwTx.create() with a per-operation result instead?
                     if (rwtx.exists(LogicalDatastoreType.CONFIGURATION, path).get()) {
                         throw new DocumentedException("Data already exists, cannot execute CREATE operation",
                             ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
@@ -115,6 +111,8 @@ public final class EditConfig extends AbstractEdit {
                 break;
             case DELETE:
                 try {
+                    // FIXME: synchronous operation: can we get a rwTx.delete() semantics with a per-operation result
+                    //        instead?
                     if (!rwtx.exists(LogicalDatastoreType.CONFIGURATION, path).get()) {
                         throw new DocumentedException("Data is missing, cannot execute DELETE operation",
                             ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
@@ -132,60 +130,40 @@ public final class EditConfig extends AbstractEdit {
         }
     }
 
-    private void mergeParentMixin(final DOMDataTreeReadWriteTransaction rwtx, final YangInstanceIdentifier path,
+    private void mergeParentMixin(final DOMDataTreeWriteOperations rwtx, final YangInstanceIdentifier path,
                                   final NormalizedNode change) {
-        final YangInstanceIdentifier parentNodeYid = path.getParent();
+        final var parentNodeYid = path.getParent();
         if (change instanceof MapEntryNode) {
-            final DataSchemaNode schemaNode = DataSchemaContextTree.from(schemaContext.getCurrentContext())
+            final var dataSchemaNode = DataSchemaContextTree.from(schemaContext.getCurrentContext())
                 .findChild(parentNodeYid)
                 .orElseThrow(() -> new IllegalStateException("Cannot find schema for " + parentNodeYid))
                 .getDataSchemaNode();
 
             // we should have the schema node that points to the parent list now, enforce it
-            checkState(schemaNode instanceof ListSchemaNode, "Schema node is not pointing to a list.");
-
-            //merge empty ordered or unordered map
-            if (((ListSchemaNode) schemaNode).isUserOrdered()) {
-                final MapNode mixinNode = Builders.orderedMapBuilder()
-                        .withNodeIdentifier(
-                                new YangInstanceIdentifier.NodeIdentifier(
-                                        parentNodeYid.getLastPathArgument().getNodeType()))
-                        .build();
-                rwtx.merge(LogicalDatastoreType.CONFIGURATION, parentNodeYid, mixinNode);
-                return;
+            if (!(dataSchemaNode instanceof ListSchemaNode listSchemaNode)) {
+                throw new IllegalStateException("Schema node is not pointing to a list");
             }
 
-            final MapNode mixinNode = Builders.mapBuilder()
-                    .withNodeIdentifier(
-                            new YangInstanceIdentifier.NodeIdentifier(
-                                        parentNodeYid.getLastPathArgument().getNodeType()))
-                    .build();
-            rwtx.merge(LogicalDatastoreType.CONFIGURATION, parentNodeYid, mixinNode);
-        } else if (parentNodeYid.getLastPathArgument() instanceof YangInstanceIdentifier.AugmentationIdentifier) {
+            // merge empty ordered or unordered map
+            rwtx.merge(LogicalDatastoreType.CONFIGURATION, parentNodeYid,
+                (listSchemaNode.isUserOrdered() ? Builders.orderedMapBuilder() : Builders.mapBuilder())
+                    .withNodeIdentifier(new NodeIdentifier(parentNodeYid.getLastPathArgument().getNodeType()))
+                    .build());
+        } else if (parentNodeYid.getLastPathArgument() instanceof AugmentationIdentifier augId) {
             // merge empty augmentation node
-            final YangInstanceIdentifier.AugmentationIdentifier augmentationYid =
-                (YangInstanceIdentifier.AugmentationIdentifier) parentNodeYid.getLastPathArgument();
-            final AugmentationNode augmentationNode = Builders.augmentationBuilder()
-                .withNodeIdentifier(augmentationYid).build();
-            rwtx.merge(LogicalDatastoreType.CONFIGURATION, parentNodeYid, augmentationNode);
+            rwtx.merge(LogicalDatastoreType.CONFIGURATION, parentNodeYid, Builders.augmentationBuilder()
+                .withNodeIdentifier(augId)
+                .build());
         }
     }
 
     private static ModifyAction getDefaultOperation(final XmlElement operationElement) throws DocumentedException {
-        final NodeList elementsByTagName = getElementsByTagName(operationElement, DEFAULT_OPERATION_KEY);
-        if (elementsByTagName.getLength() == 0) {
-            return ModifyAction.MERGE;
-        } else if (elementsByTagName.getLength() > 1) {
-            throw new DocumentedException("Multiple " + DEFAULT_OPERATION_KEY + " elements", ErrorType.RPC,
+        final var elementsByTagName = getElementsByTagName(operationElement, DEFAULT_OPERATION);
+        return switch (elementsByTagName.getLength()) {
+            case 0 -> ModifyAction.MERGE;
+            case 1 ->  ModifyAction.ofXmlValue(elementsByTagName.item(0).getTextContent());
+            default -> throw new DocumentedException("Multiple " + DEFAULT_OPERATION + " elements", ErrorType.RPC,
                 ErrorTag.UNKNOWN_ATTRIBUTE, ErrorSeverity.ERROR);
-        } else {
-            return ModifyAction.fromXmlValue(elementsByTagName.item(0).getTextContent());
-        }
-
-    }
-
-    @Override
-    protected String getOperationName() {
-        return OPERATION_NAME;
+        };
     }
 }

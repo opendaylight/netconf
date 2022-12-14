@@ -5,9 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+// FIXME: document, rename to LegacyDatastore (as per NMDA), add XML interaction values
 public enum Datastore {
     candidate, running
 }
