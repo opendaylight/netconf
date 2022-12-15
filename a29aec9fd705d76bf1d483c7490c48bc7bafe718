@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e474167a_25f78559",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-15T11:12:26Z",
+      "side": 1,
+      "message": "OK, we need to create hash map anyway because there can be multiple namespaces of multiple revisions.",
+      "parentUuid": "6495ff09_2503d1a6",
+      "revId": "a29aec9fd705d76bf1d483c7490c48bc7bafe718",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a196166_6a189863",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84540a41_a62e843d",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-15T11:12:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a196166_6a189863",
+      "revId": "a29aec9fd705d76bf1d483c7490c48bc7bafe718",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e82e3064_d9f337d7",
@@ -48,6 +84,24 @@
       "writtenOn": "2022-12-15T08:04:17Z",
       "side": 1,
       "message": "If we used `new ArrayList\u003cEntry\u003cString, List\u003cString\u003e\u003e\u003e();` on line 116 maybe we could avoid this.",
+      "revId": "a29aec9fd705d76bf1d483c7490c48bc7bafe718",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ef2ad00_e3f9dbcd",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-12-15T11:12:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82e3064_d9f337d7",
       "revId": "a29aec9fd705d76bf1d483c7490c48bc7bafe718",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
