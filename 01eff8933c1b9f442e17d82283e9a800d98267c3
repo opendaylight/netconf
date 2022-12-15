@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ac5b258_1aaa48c2",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-15T16:43:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bde2f352_f4214575",
+      "range": {
+        "startLine": 117,
+        "startChar": 28,
+        "endLine": 117,
+        "endChar": 31
+      },
+      "revId": "01eff8933c1b9f442e17d82283e9a800d98267c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "defc4d6e_f060c4d4",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-12-15T12:27:05Z",
       "side": 1,
       "message": "and then we do not use the same module as the one enumerated in moduleStmts.\n\nso namespaceModule should become a \u0027Set\u003cXMLNamespace\u003e namespaces\u0027\nand then we pick up the module from findModuleStatements().",
+      "range": {
+        "startLine": 130,
+        "startChar": 52,
+        "endLine": 130,
+        "endChar": 68
+      },
+      "revId": "01eff8933c1b9f442e17d82283e9a800d98267c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "093a5caa_cfde0683",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-15T16:43:19Z",
+      "side": 1,
+      "message": "Actually all this is easily expressed in terms of a stream now",
+      "parentUuid": "defc4d6e_f060c4d4",
       "range": {
         "startLine": 130,
         "startChar": 52,
