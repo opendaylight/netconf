@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
@@ -82,6 +83,11 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         public ListenableFuture<DOMRpcResult> discardChanges() {
             // Changes cannot be discarded from running
             return RPC_SUCCESS;
+        }
+
+        @Override
+        public synchronized ListenableFuture<? extends DOMRpcResult> commit() {
+            return immediateFluentFuture(new DefaultDOMRpcResult(null, List.of()));
         }
 
         @Override
