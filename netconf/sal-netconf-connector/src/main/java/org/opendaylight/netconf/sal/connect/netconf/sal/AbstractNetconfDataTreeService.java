@@ -85,6 +85,11 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }
 
         @Override
+        public synchronized ListenableFuture<? extends DOMRpcResult> commit() {
+            return Futures.immediateFuture(new DefaultDOMRpcResult(null, List.of()));
+        }
+
+        @Override
         ListenableFuture<? extends DOMRpcResult> lockSingle() {
             return netconfOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id));
         }
