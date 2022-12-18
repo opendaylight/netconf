@@ -52,15 +52,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Util class for read data from data store via transaction.
@@ -71,6 +70,8 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  * </ul>
  */
 public final class ReadDataTransactionUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(ReadDataTransactionUtil.class);
+
     private ReadDataTransactionUtil() {
         // Hidden on purpose
     }
@@ -127,7 +128,7 @@ public final class ReadDataTransactionUtil {
         };
     }
 
-    private static NormalizedNode prepareDataByParamWithDef(final NormalizedNode result,
+    private static NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData,
             final YangInstanceIdentifier path, final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
         final boolean trim = switch (withDefa) {
             case TRIM -> true;
@@ -135,100 +136,120 @@ public final class ReadDataTransactionUtil {
             case REPORT_ALL, REPORT_ALL_TAGGED -> throw new RestconfDocumentedException(
                 "Unsupported with-defaults value " + withDefa.paramValue());
         };
-        final DataSchemaContextNode<?> ctxNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
-        final DataSchemaNode baseSchemaNode = ctxNode.getDataSchemaNode();
-        if (result instanceof ContainerNode) {
-            final var builder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
-            buildCont(builder, (ContainerNode) result, ctxNode, trim);
+
+        final var ctxNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
+        if (readData instanceof ContainerNode container) {
+            final var builder = Builders.containerBuilder().withNodeIdentifier(container.getIdentifier());
+            buildCont(builder, container.body(), ctxNode, trim);
+            return builder.build();
+        } else if (readData instanceof MapEntryNode mapEntry) {
+            if (!(ctxNode.getDataSchemaNode() instanceof ListSchemaNode listSchema)) {
+                throw new IllegalStateException("Input " + mapEntry + " does not match " + ctxNode);
+            }
+
+            final var builder = Builders.mapEntryBuilder().withNodeIdentifier(mapEntry.getIdentifier());
+            buildMapEntryBuilder(builder, mapEntry.body(), ctxNode, trim, listSchema.getKeyDefinition());
             return builder.build();
         } else {
-            final var builder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
-            buildMapEntryBuilder(builder, (MapEntryNode) result, ctxNode, trim,
-                    ((ListSchemaNode) baseSchemaNode).getKeyDefinition());
-            return builder.build();
+            throw new IllegalStateException("Unhandled data contract " + readData.contract());
         }
     }
 
     private static void buildMapEntryBuilder(
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
-            final MapEntryNode result, final DataSchemaContextNode<?> ctxNode, final boolean trim,
-            final List<QName> keys) {
-        for (final DataContainerChild child : result.body()) {
-            final var childCtx = ctxNode.getChild(child.getIdentifier());
-            if (childCtx == null) {
-                throw new NoSuchElementException("Failed to map child " + child.getIdentifier());
-            }
+            final Collection<@NonNull DataContainerChild> children, final DataSchemaContextNode<?> ctxNode,
+            final boolean trim, final List<QName> keys) {
+        for (var child : children) {
+            final var childCtx = getChildContext(ctxNode, child);
 
-            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
-            if (child instanceof ContainerNode) {
-                final var childBuilder = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
-                buildCont(childBuilder, (ContainerNode) child, childCtx, trim);
-                builder.withChild(childBuilder.build());
-            } else if (child instanceof MapNode) {
-                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
-                buildList(childBuilder, (MapNode) child, childCtx, trim,
-                    ((ListSchemaNode) childSchema).getKeyDefinition());
-                builder.withChild(childBuilder.build());
-            } else if (child instanceof LeafNode) {
-                final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
-                final Object nodeVal = child.body();
-                if (keys.contains(child.getIdentifier().getNodeType())) {
-                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                } else if (trim) {
-                    if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                        builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                    }
-                } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                }
+            if (child instanceof ContainerNode container) {
+                appendContainer(builder, container, childCtx, trim);
+            } else if (child instanceof MapNode map) {
+                appendMap(builder, map, childCtx, trim);
+            } else if (child instanceof LeafNode<?> leaf) {
+                appendLeaf(builder, leaf, childCtx, trim, keys);
+            } else {
+                // FIXME: we should never hit this, throw an ISE if this ever happens
+                LOG.debug("Ignoring unhandled child contract {}", child.contract());
             }
         }
     }
 
-    private static void buildList(final CollectionNodeBuilder<MapEntryNode, SystemMapNode> builder,
-            final MapNode result, DataSchemaContextNode<?> ctxNode, final boolean trim, final List<QName> keys) {
-        for (final MapEntryNode mapEntryNode : result.body()) {
-            final var childCtx = ctxNode.getChild(mapEntryNode.getIdentifier());
-            if (childCtx == null) {
-                throw new NoSuchElementException("Failed to match entry " + mapEntryNode.getIdentifier());
+    private static void appendContainer(final DataContainerNodeBuilder<?, ?> builder, final ContainerNode container,
+            final DataSchemaContextNode<?> ctxNode, final boolean trim) {
+        final var childBuilder = Builders.containerBuilder().withNodeIdentifier(container.getIdentifier());
+        buildCont(childBuilder, container.body(), ctxNode, trim);
+        builder.withChild(childBuilder.build());
+    }
+
+    private static void appendLeaf(final DataContainerNodeBuilder<?, ?> builder, final LeafNode<?> leaf,
+            final DataSchemaContextNode<?> ctxNode, final boolean trim, final List<QName> keys) {
+        if (!(ctxNode.getDataSchemaNode() instanceof LeafSchemaNode leafSchema)) {
+            throw new IllegalStateException("Input " + leaf + " does not match " + ctxNode);
+        }
+
+        final var defaultVal = leafSchema.getType().getDefaultValue().orElse(null);
+        final var nodeVal = leaf.body();
+        // TODO: it seems we could just reuse leaf in most cases
+        if (keys.contains(leafSchema.getQName())) {
+            builder.withChild(ImmutableNodes.leafNode(leafSchema.getQName(), nodeVal));
+        } else if (trim) {
+            if (defaultVal == null || !defaultVal.equals(nodeVal)) {
+                builder.withChild(ImmutableNodes.leafNode(leafSchema.getQName(), nodeVal));
             }
-            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
-            final var mapEntryBuilder = SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) childSchema);
-            buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, childCtx, trim, keys);
+        } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
+            builder.withChild(ImmutableNodes.leafNode(leafSchema.getQName(), nodeVal));
+        }
+    }
+
+    private static void appendMap(final DataContainerNodeBuilder<?, ?> builder, final MapNode map,
+            final DataSchemaContextNode<?> childCtx, final boolean trim) {
+        if (!(childCtx.getDataSchemaNode() instanceof ListSchemaNode listSchema)) {
+            throw new IllegalStateException("Input " + map + " does not match " + childCtx);
+        }
+
+        final var childBuilder = switch (map.ordering()) {
+            case SYSTEM -> Builders.mapBuilder();
+            case USER -> Builders.orderedMapBuilder();
+        };
+        buildList(childBuilder.withNodeIdentifier(map.getIdentifier()), map.body(), childCtx, trim,
+            listSchema.getKeyDefinition());
+        builder.withChild(childBuilder.build());
+    }
+
+    private static void buildList(final CollectionNodeBuilder<MapEntryNode, ? extends MapNode> builder,
+            final Collection<@NonNull MapEntryNode> entries, final DataSchemaContextNode<?> ctxNode, final boolean trim,
+            final List<@NonNull QName> keys) {
+        for (var entry : entries) {
+            final var childCtx = getChildContext(ctxNode, entry);
+            final var mapEntryBuilder = Builders.mapEntryBuilder().withNodeIdentifier(entry.getIdentifier());
+            buildMapEntryBuilder(mapEntryBuilder, entry.body(), childCtx, trim, keys);
             builder.withChild(mapEntryBuilder.build());
         }
     }
 
     private static void buildCont(final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder,
-            final ContainerNode result, final DataSchemaContextNode<?> ctxNode, final boolean trim) {
-        for (final DataContainerChild child : result.body()) {
-            final var childCtx = ctxNode.getChild(child.getIdentifier());
-            if (childCtx == null) {
-                throw new NoSuchElementException("Cannot resolve child " + child.getIdentifier());
-            }
-
-            final DataSchemaNode childSchema = childCtx.getDataSchemaNode();
-            if (child instanceof ContainerNode) {
-                final var builderChild = SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) childSchema);
-                buildCont(builderChild, result, childCtx, trim);
-                builder.withChild(builderChild.build());
-            } else if (child instanceof MapNode) {
-                final var childBuilder = SchemaAwareBuilders.mapBuilder((ListSchemaNode) childSchema);
-                buildList(childBuilder, (MapNode) child, childCtx, trim,
-                    ((ListSchemaNode) childSchema).getKeyDefinition());
-                builder.withChild(childBuilder.build());
-            } else if (child instanceof LeafNode) {
-                final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
-                final Object nodeVal = child.body();
-                if (trim) {
-                    if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                        builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                    }
-                } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
-                }
+            final Collection<DataContainerChild> children, final DataSchemaContextNode<?> ctxNode, final boolean trim) {
+        for (var child : children) {
+            final var childCtx = getChildContext(ctxNode, child);
+            if (child instanceof ContainerNode container) {
+                appendContainer(builder, container, childCtx, trim);
+            } else if (child instanceof MapNode map) {
+                appendMap(builder, map, childCtx, trim);
+            } else if (child instanceof LeafNode<?> leaf) {
+                appendLeaf(builder, leaf, childCtx, trim, List.of());
             }
         }
+    }
+
+    private static @NonNull DataSchemaContextNode<?> getChildContext(final DataSchemaContextNode<?> ctxNode,
+            final NormalizedNode child) {
+        final var childId = child.getIdentifier();
+        final var childCtx = ctxNode.getChild(childId);
+        if (childCtx == null) {
+            throw new NoSuchElementException("Cannot resolve child " + childId + " in " + ctxNode);
+        }
+        return childCtx;
     }
 
     /**
