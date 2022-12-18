@@ -16,6 +16,24 @@
       "message": "all of the FIXMEs should be resolved:\n\n-Identifiers were cleaned up\n-Added comparison with default value\n-Differentiated system/user map nodes",
       "revId": "18b9d628f4faf597670cb50516afa28495c3d712",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "939e02fc_24462a8a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-18T23:42:45Z",
+      "side": 1,
+      "message": "Right, but the comparison of values still disappeared. I have fixed it up.\nThis will need some additional test coverage.",
+      "parentUuid": "fc47a2c1_2d3268fb",
+      "revId": "18b9d628f4faf597670cb50516afa28495c3d712",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
