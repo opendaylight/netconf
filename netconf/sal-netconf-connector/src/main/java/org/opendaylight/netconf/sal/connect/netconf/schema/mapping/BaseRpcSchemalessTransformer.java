@@ -13,13 +13,12 @@ import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
+import org.opendaylight.netconf.sal.connect.api.RpcTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -36,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * Transforms base netconf RPCs.
  */
-public class BaseRpcSchemalessTransformer implements MessageTransformer {
+public class BaseRpcSchemalessTransformer implements RpcTransformer {
     private final ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
     private final EffectiveModelContext modelContext;
     private final MessageCounter counter;
@@ -46,11 +45,6 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer {
         mappedRpcs = baseSchema.getMappedRpcs();
         modelContext = baseSchema.getEffectiveModelContext();
         this.counter = counter;
-    }
-
-    @Override
-    public DOMNotification toNotification(final NetconfMessage message) {
-        throw new UnsupportedOperationException("Notifications not supported.");
     }
 
     @Override

@@ -22,9 +22,9 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DefaultDOMRpcException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.sal.connect.api.RpcTransformer;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -38,11 +38,11 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  */
 public final class NetconfDeviceRpc implements Rpcs.Normalized {
     private final RemoteDeviceCommunicator communicator;
-    private final MessageTransformer transformer;
+    private final RpcTransformer transformer;
     private final EffectiveModelContext modelContext;
 
     public NetconfDeviceRpc(final EffectiveModelContext modelContext, final RemoteDeviceCommunicator communicator,
-            final MessageTransformer transformer) {
+            final RpcTransformer transformer) {
         this.modelContext = requireNonNull(modelContext);
         this.communicator = communicator;
         this.transformer = transformer;

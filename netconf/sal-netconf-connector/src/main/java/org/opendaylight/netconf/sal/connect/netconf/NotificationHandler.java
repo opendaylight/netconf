@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
+import org.opendaylight.netconf.sal.connect.api.NotificationTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ final class NotificationHandler {
 
     private boolean passNotifications = false;
     private NotificationFilter filter;
-    private MessageTransformer messageTransformer;
+    private NotificationTransformer messageTransformer;
 
     NotificationHandler(final RemoteDeviceHandler salFacade, final RemoteDeviceId id) {
         this.salFacade = requireNonNull(salFacade);
@@ -55,7 +55,7 @@ final class NotificationHandler {
      * Forward all cached notifications and pass all notifications from this point directly to sal facade.
      * @param transformer Message transformer
      */
-    synchronized void onRemoteSchemaUp(final MessageTransformer transformer) {
+    synchronized void onRemoteSchemaUp(final NotificationTransformer transformer) {
         messageTransformer = requireNonNull(transformer);
 
         passNotifications = true;

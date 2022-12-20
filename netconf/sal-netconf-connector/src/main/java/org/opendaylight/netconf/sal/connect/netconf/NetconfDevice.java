@@ -39,7 +39,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
@@ -112,7 +111,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private boolean connected = false;
 
     // Message transformer is constructed once the schemas are available
-    private MessageTransformer messageTransformer;
+    private NetconfMessageTransformer messageTransformer;
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
             final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
@@ -258,7 +257,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         updateTransformer(null);
     }
 
-    private synchronized void updateTransformer(final MessageTransformer transformer) {
+    private synchronized void updateTransformer(final NetconfMessageTransformer transformer) {
         messageTransformer = transformer;
     }
 

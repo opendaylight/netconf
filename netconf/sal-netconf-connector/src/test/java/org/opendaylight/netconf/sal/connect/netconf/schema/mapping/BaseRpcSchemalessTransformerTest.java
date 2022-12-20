@@ -67,12 +67,6 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         transformer = new BaseRpcSchemalessTransformer(BASE_SCHEMAS, new MessageCounter());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void toNotification() throws Exception {
-        transformer.toNotification(new NetconfMessage(
-                XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/notification-payload.xml"))));
-    }
-
     @Test
     public void toRpcRequest() throws Exception {
         final Document doc =
