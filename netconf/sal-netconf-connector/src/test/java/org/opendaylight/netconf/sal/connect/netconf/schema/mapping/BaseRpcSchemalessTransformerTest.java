@@ -28,6 +28,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.target.config.target.Candidate;
 import org.opendaylight.yangtools.yang.common.Empty;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -112,7 +113,8 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         final Element element = (Element) doc.importNode(dataElement, true);
         doc.getDocumentElement().appendChild(element);
         final NetconfMessage msg = new NetconfMessage(doc);
-        final DOMRpcResult result = transformer.toRpcResult(msg, NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
+        final DOMRpcResult result = transformer.toRpcResult(RpcResultBuilder.success(msg).build(),
+            NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
         assertNotNull(result.getResult());
         final ContainerNode rpcReply = (ContainerNode) result.getResult();
         assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getIdentifier().getNodeType());

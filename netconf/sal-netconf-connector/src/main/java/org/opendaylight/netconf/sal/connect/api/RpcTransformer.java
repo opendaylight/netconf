@@ -7,17 +7,19 @@
  */
 package org.opendaylight.netconf.sal.connect.api;
 
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.common.RpcResult;
 
 /**
  * Interface for transforming NETCONF device RPC request/response messages.
+ *
+ * @param <P> {@code rpc} input payload type
+ * @param <R> {@code rpc} result type
  */
-public interface RpcTransformer {
+public interface RpcTransformer<P, R> {
 
-    NetconfMessage toRpcRequest(QName rpc, NormalizedNode node);
+    NetconfMessage toRpcRequest(QName rpc, P payload);
 
-    DOMRpcResult toRpcResult(NetconfMessage message, QName rpc);
+    R toRpcResult(RpcResult<NetconfMessage> resultPayload, QName rpc);
 }

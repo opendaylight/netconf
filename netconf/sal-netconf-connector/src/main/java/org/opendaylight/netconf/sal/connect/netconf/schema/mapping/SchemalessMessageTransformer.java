@@ -11,8 +11,6 @@ import java.time.Instant;
 import java.util.Map;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -21,10 +19,10 @@ import org.opendaylight.netconf.sal.connect.api.RpcTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,7 +30,7 @@ import org.w3c.dom.Element;
 /**
  * Transforms anyxml rpcs for schemaless netconf devices.
  */
-public class SchemalessMessageTransformer implements NotificationTransformer, RpcTransformer {
+public class SchemalessMessageTransformer implements NotificationTransformer, RpcTransformer<DOMSource, DOMSource> {
     // TODO maybe we should move this somewhere else as this
     // might be used in applications using schemaless mountpoints
     public static final NodeIdentifier SCHEMALESS_NOTIFICATION_PAYLOAD =
@@ -71,26 +69,21 @@ public class SchemalessMessageTransformer implements NotificationTransformer, Rp
     }
 
     @Override
-    public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode input) {
-        final DOMSource payload = (DOMSource) input.body();
+    public NetconfMessage toRpcRequest(final QName rpc, final DOMSource payload) {
         wrapPayload((Document) payload.getNode());
-        return new NetconfMessage((Document) ((DOMSourceAnyxmlNode) input).body().getNode());
+        return new NetconfMessage((Document) payload.getNode());
     }
 
     /**
      * Transforms reply message to anyXml node.
      * In case, that rpc-reply doesn't contain data and contains only &lt;ok/&gt; element, returns null.
-     * @param rpcReply reply message
+     * @param resultPayload reply message
      * @return anyxml
      */
     @Override
-    public DOMRpcResult toRpcResult(final NetconfMessage rpcReply, final QName rpc) {
-        final var document = rpcReply.getDocument();
-        return new DefaultDOMRpcResult(BaseRpcSchemalessTransformer.isOkPresent(document) ? null
-            : Builders.anyXmlBuilder()
-                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
-                .withValue(new DOMSource(document))
-                .build());
+    public DOMSource toRpcResult(final RpcResult<NetconfMessage> resultPayload, final QName rpc) {
+        final var document = resultPayload.getResult().getDocument();
+        return BaseRpcSchemalessTransformer.isOkPresent(document) ? null : new DOMSource(document);
     }
 
     private void wrapPayload(final Document doc) {
