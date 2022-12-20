@@ -16,7 +16,8 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
+import org.opendaylight.netconf.sal.connect.api.NotificationTransformer;
+import org.opendaylight.netconf.sal.connect.api.RpcTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -31,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * Transforms anyxml rpcs for schemaless netconf devices.
  */
-public class SchemalessMessageTransformer implements MessageTransformer {
+public class SchemalessMessageTransformer implements NotificationTransformer, RpcTransformer {
     // TODO maybe we should move this somewhere else as this
     // might be used in applications using schemaless mountpoints
     public static final NodeIdentifier SCHEMALESS_NOTIFICATION_PAYLOAD =

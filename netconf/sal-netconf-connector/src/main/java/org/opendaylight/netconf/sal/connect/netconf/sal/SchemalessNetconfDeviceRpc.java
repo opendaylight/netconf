@@ -17,9 +17,9 @@ import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.sal.connect.api.RpcTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -58,7 +58,7 @@ public final class SchemalessNetconfDeviceRpc implements Rpcs.Schemaless {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
-        final MessageTransformer transformer;
+        final RpcTransformer transformer;
         if (input instanceof DOMSourceAnyxmlNode) {
             transformer = schemalessTransformer;
         } else if (isBaseRpc(type)) {
@@ -71,7 +71,7 @@ public final class SchemalessNetconfDeviceRpc implements Rpcs.Schemaless {
     }
 
     private @NonNull ListenableFuture<DOMRpcResult> handleRpc(final @NonNull QName type,
-            final @NonNull NormalizedNode input, final MessageTransformer transformer) {
+            final @NonNull NormalizedNode input, final RpcTransformer transformer) {
         final var delegateFuture = listener.sendRequest(transformer.toRpcRequest(type, input), type);
         final var ret = SettableFuture.<DOMRpcResult>create();
         Futures.addCallback(delegateFuture, new FutureCallback<>() {

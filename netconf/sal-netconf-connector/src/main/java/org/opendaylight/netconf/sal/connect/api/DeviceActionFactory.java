@@ -18,6 +18,6 @@ public interface DeviceActionFactory {
      * @param listener - allows specific service to send and receive messages to/from device
      * @return {@link Actions} of specific device
      */
-    @NonNull Actions createDeviceAction(MessageTransformer messageTransformer, RemoteDeviceCommunicator listener);
+    @NonNull Actions createDeviceAction(ActionTransformer messageTransformer, RemoteDeviceCommunicator listener);
 }
 

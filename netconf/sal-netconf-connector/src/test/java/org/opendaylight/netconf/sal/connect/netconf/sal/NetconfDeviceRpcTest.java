@@ -34,8 +34,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.api.RpcTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -98,7 +98,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     @Test
     public void testDeadlock() throws Exception {
         // when rpc is successful, but transformer fails for some reason
-        final MessageTransformer failingTransformer = mock(MessageTransformer.class);
+        final RpcTransformer failingTransformer = mock(RpcTransformer.class);
         final RemoteDeviceCommunicator communicatorMock = mock(RemoteDeviceCommunicator.class);
         final NetconfMessage msg = null;
         final RpcResult<NetconfMessage> result = RpcResultBuilder.success(msg).build();

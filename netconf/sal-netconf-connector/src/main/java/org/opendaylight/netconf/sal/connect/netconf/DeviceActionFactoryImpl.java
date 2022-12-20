@@ -13,8 +13,8 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.netconf.sal.connect.api.ActionTransformer;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
 import org.osgi.service.component.annotations.Component;
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the factory for creation of {@link DOMActionService} instances that are provided by device.
- * {@link DOMActionService} is implemented using {@link MessageTransformer} that builds NETCONF RPCs and
+ * {@link DOMActionService} is implemented using {@link ActionTransformer} that builds NETCONF RPCs and
  * transforms replied NETCONF message  to action result, and using {@link RemoteDeviceCommunicator} that is responsible
  * for sending of built RPCs to NETCONF client.
  */
@@ -33,7 +33,7 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
     private static final Logger LOG = LoggerFactory.getLogger(DeviceActionFactoryImpl.class);
 
     @Override
-    public Actions.Normalized createDeviceAction(final MessageTransformer messageTransformer,
+    public Actions.Normalized createDeviceAction(final ActionTransformer messageTransformer,
             final RemoteDeviceCommunicator listener) {
         return (schemaPath, dataTreeIdentifier, input) -> {
             requireNonNull(schemaPath);

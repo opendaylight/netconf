@@ -50,7 +50,6 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
@@ -63,7 +62,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
@@ -560,14 +558,6 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     public ListeningExecutorService getExecutor() {
         return MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
-    }
-
-    public MessageTransformer getMessageTransformer() throws Exception {
-        final MessageTransformer messageTransformer = mockClass(MessageTransformer.class);
-        doReturn(NOTIFICATION).when(messageTransformer).toRpcRequest(any(QName.class), any(NormalizedNode.class));
-        doReturn(RPC_RESULT).when(messageTransformer).toRpcResult(any(NetconfMessage.class), any(QName.class));
-        doReturn(COMPOSITE_NODE).when(messageTransformer).toNotification(any(NetconfMessage.class));
-        return messageTransformer;
     }
 
     public NetconfSessionPreferences getSessionCaps(final boolean addMonitor,

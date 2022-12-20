@@ -58,7 +58,9 @@ import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
+import org.opendaylight.netconf.sal.connect.api.ActionTransformer;
+import org.opendaylight.netconf.sal.connect.api.NotificationTransformer;
+import org.opendaylight.netconf.sal.connect.api.RpcTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
@@ -100,7 +102,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class NetconfMessageTransformer implements MessageTransformer {
+public class NetconfMessageTransformer implements ActionTransformer, NotificationTransformer, RpcTransformer {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
     private static final ImmutableSet<XMLNamespace> BASE_OR_NOTIFICATION_NS = ImmutableSet.of(
