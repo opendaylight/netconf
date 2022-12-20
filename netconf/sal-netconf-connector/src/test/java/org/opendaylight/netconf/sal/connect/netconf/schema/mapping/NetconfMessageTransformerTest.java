@@ -76,6 +76,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.netconf.config.change.Edit;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -228,15 +229,18 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessageTransformer transformer = getTransformer(PARTIAL_SCHEMA);
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
-        transformer.toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)), NETCONF_LOCK_QNAME);
+        transformer.toRpcResult(
+            RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
+            NETCONF_LOCK_QNAME);
     }
 
     @Test
     public void testRpcEmptyBodyWithOutputDefinedSchemaResult() throws Exception {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
-        DOMRpcResult domRpcResult = actionNetconfMessageTransformer
-                .toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)), RPC_WITH_OUTPUT_QNAME);
+        DOMRpcResult domRpcResult = actionNetconfMessageTransformer.toRpcResult(
+            RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
+            RPC_WITH_OUTPUT_QNAME);
         assertNotNull(domRpcResult);
     }
 
@@ -244,8 +248,9 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     public void testRpcEmptyBodyWithoutOutputDefinedSchemaResult() throws Exception {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
-        DOMRpcResult domRpcResult = actionNetconfMessageTransformer
-                .toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)), RPC_WITHOUT_OUTPUT_QNAME);
+        DOMRpcResult domRpcResult = actionNetconfMessageTransformer.toRpcResult(
+            RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
+            RPC_WITHOUT_OUTPUT_QNAME);
         assertNotNull(domRpcResult);
     }
 
@@ -285,7 +290,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                         + "</data>\n"
                         + "</rpc-reply>"
         ));
-        final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(response, GET_SCHEMA_QNAME);
+        final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(RpcResultBuilder.success(response).build(),
+            GET_SCHEMA_QNAME);
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNotNull(compositeNodeRpcResult.getResult());
         final DOMSource schemaContent = ((DOMSourceAnyxmlNode) ((ContainerNode) compositeNodeRpcResult.getResult())
@@ -312,7 +318,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "</rpc-reply>"));
 
         final NetconfMessageTransformer transformer = getTransformer(SCHEMA);
-        final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(response, NETCONF_GET_CONFIG_QNAME);
+        final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(RpcResultBuilder.success(response).build(),
+            NETCONF_GET_CONFIG_QNAME);
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNotNull(compositeNodeRpcResult.getResult());
 
@@ -533,8 +540,9 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>"
         ));
-        final DOMRpcResult compositeNodeRpcResult =
-                netconfMessageTransformer.toRpcResult(response, NETCONF_COMMIT_QNAME);
+        final DOMRpcResult compositeNodeRpcResult = netconfMessageTransformer.toRpcResult(
+            RpcResultBuilder.success(response).build(),
+            NETCONF_COMMIT_QNAME);
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNull(compositeNodeRpcResult.getResult());
     }

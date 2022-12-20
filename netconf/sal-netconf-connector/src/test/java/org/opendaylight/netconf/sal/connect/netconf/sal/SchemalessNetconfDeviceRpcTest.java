@@ -31,9 +31,6 @@ import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,12 +69,7 @@ public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
                 + "      </mainroot>\n"
                 + "    </filter>\n"
                 + "  </get-config>"));
-        AnyxmlNode<?> input = Builders.anyXmlBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(qName))
-                .withValue(src)
-                .build();
-
-        deviceRpc.invokeRpc(qName, input);
+        deviceRpc.invokeRpc(qName, src);
         ArgumentCaptor<NetconfMessage> msgCaptor = ArgumentCaptor.forClass(NetconfMessage.class);
         ArgumentCaptor<QName> qnameCaptor = ArgumentCaptor.forClass(QName.class);
         verify(listener).sendRequest(msgCaptor.capture(), qnameCaptor.capture());

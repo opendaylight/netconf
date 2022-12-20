@@ -20,7 +20,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DefaultDOMRpcException;
-import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
@@ -38,11 +37,11 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  */
 public final class NetconfDeviceRpc implements Rpcs.Normalized {
     private final RemoteDeviceCommunicator communicator;
-    private final RpcTransformer transformer;
+    private final RpcTransformer<NormalizedNode, DOMRpcResult> transformer;
     private final EffectiveModelContext modelContext;
 
     public NetconfDeviceRpc(final EffectiveModelContext modelContext, final RemoteDeviceCommunicator communicator,
-            final RpcTransformer transformer) {
+            final RpcTransformer<NormalizedNode, DOMRpcResult> transformer) {
         this.modelContext = requireNonNull(modelContext);
         this.communicator = communicator;
         this.transformer = transformer;
@@ -58,13 +57,16 @@ public final class NetconfDeviceRpc implements Rpcs.Normalized {
         Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
             @Override
             public void onSuccess(final RpcResult<NetconfMessage> result) {
+                final DOMRpcResult rpcResult;
                 try {
-                    ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
-                            : new DefaultDOMRpcResult(result.getErrors()));
+                    rpcResult = transformer.toRpcResult(result, type);
                 } catch (Exception cause) {
                     ret.setException(new DefaultDOMRpcException(
-                            "Unable to parse rpc reply. type: " + type + " input: " + input, cause));
+                        "Unable to parse rpc reply. type: " + type + " input: " + input, cause));
+                    return;
                 }
+
+                ret.set(rpcResult);
             }
 
             @Override
