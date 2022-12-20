@@ -7,23 +7,24 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.api.NotificationTransformer;
 import org.opendaylight.netconf.sal.connect.api.RpcTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -37,7 +38,7 @@ import org.w3c.dom.Element;
 /**
  * Transforms base netconf RPCs.
  */
-public class BaseRpcSchemalessTransformer implements NotificationTransformer, RpcTransformer {
+public class BaseRpcSchemalessTransformer implements RpcTransformer<NormalizedNode, DOMRpcResult> {
     private final ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
     private final EffectiveModelContext modelContext;
     private final MessageCounter counter;
@@ -50,23 +51,18 @@ public class BaseRpcSchemalessTransformer implements NotificationTransformer, Rp
     }
 
     @Override
-    public DOMNotification toNotification(final NetconfMessage message) {
-        throw new UnsupportedOperationException("Notifications not supported.");
-    }
-
-    @Override
     public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode payload) {
         // In case no input for rpc is defined, we can simply construct the payload here
 
-        final RpcDefinition mappedRpc = Preconditions.checkNotNull(mappedRpcs.get(rpc),
+        final var mappedRpc = checkNotNull(mappedRpcs.get(rpc),
             "Unknown rpc %s, available rpcs: %s", rpc, mappedRpcs.keySet());
         final DOMResult domResult = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter);
         if (mappedRpc.getInput().getChildNodes().isEmpty()) {
             return new NetconfMessage(domResult.getNode().getOwnerDocument());
         }
 
-        Preconditions.checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpc);
-        Preconditions.checkArgument(payload instanceof ContainerNode,
+        checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpc);
+        checkArgument(payload instanceof ContainerNode,
                 "Transforming an rpc with input: %s, payload has to be a container, but was: %s", rpc, payload);
 
         final DOMResult result = domResult;
@@ -83,7 +79,12 @@ public class BaseRpcSchemalessTransformer implements NotificationTransformer, Rp
     }
 
     @Override
-    public DOMRpcResult toRpcResult(final NetconfMessage message, final QName rpc) {
+    public DOMRpcResult toRpcResult(final RpcResult<NetconfMessage> resultPayload, final QName rpc) {
+        if (!resultPayload.isSuccessful()) {
+            return new DefaultDOMRpcResult(resultPayload.getErrors());
+        }
+
+        final var message = resultPayload.getResult();
         final ContainerNode normalizedNode;
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
             final Element xmlData = NetconfMessageTransformUtil.getDataSubtree(message.getDocument());
@@ -99,8 +100,8 @@ public class BaseRpcSchemalessTransformer implements NotificationTransformer, Rp
                     .withChild(xmlDataNode).build();
         } else {
             //other base rpcs don't have any output, we can simply construct the payload here
-            Preconditions.checkArgument(isOkPresent(message.getDocument()),
-                    "Unexpected content in response of rpc: %s, %s", rpc, message);
+            checkArgument(isOkPresent(message.getDocument()),
+                "Unexpected content in response of rpc: %s, %s", rpc, message);
             normalizedNode = null;
 
         }

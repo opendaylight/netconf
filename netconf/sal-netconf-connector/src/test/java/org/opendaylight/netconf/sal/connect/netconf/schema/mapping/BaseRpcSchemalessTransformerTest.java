@@ -67,12 +67,6 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         transformer = new BaseRpcSchemalessTransformer(BASE_SCHEMAS, new MessageCounter());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void toNotification() throws Exception {
-        transformer.toNotification(new NetconfMessage(
-                XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/notification-payload.xml"))));
-    }
-
     @Test
     public void toRpcRequest() throws Exception {
         final Document doc =
@@ -120,7 +114,7 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessage msg = new NetconfMessage(doc);
         final DOMRpcResult result = transformer.toRpcResult(msg, NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
         assertNotNull(result.getResult());
-        final ContainerNode rpcReply = (ContainerNode) result.getResult();
+        final ContainerNode rpcReply = result.getResult();
         assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getIdentifier().getNodeType());
         final Optional<?> dataOpt = rpcReply.findChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID);
         assertTrue(dataOpt.isPresent());

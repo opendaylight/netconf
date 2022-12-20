@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.xml.transform.dom.DOMSource;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -38,7 +39,6 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -381,7 +381,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         }
 
         @Override
-        public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+        public ListenableFuture<? extends DOMSource> invokeRpc(final QName type, final DOMSource input) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
             return scheduleTimeout(delegate.invokeRpc(type, input));

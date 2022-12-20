@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -18,7 +17,6 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -26,7 +24,6 @@ import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -79,11 +76,7 @@ public class SchemalessMessageTransformerTest {
     @Test
     public void toRpcRequest() throws Exception {
         final Node src = XmlUtil.readXmlToDocument("<test-rpc xmlns=\"test-ns\"><input>aaa</input></test-rpc>");
-        final DOMSourceAnyxmlNode input = Builders.anyXmlBuilder()
-                .withNodeIdentifier(new NodeIdentifier(TEST_RPC))
-                .withValue(new DOMSource(src))
-                .build();
-        final NetconfMessage netconfMessage = transformer.toRpcRequest(TEST_RPC, input);
+        final NetconfMessage netconfMessage = transformer.toRpcRequest(TEST_RPC, new DOMSource(src));
         final Diff diff = XMLUnit.compareXML(XmlUtil.readXmlToDocument(EXP_REQUEST), netconfMessage.getDocument());
         assertTrue(diff.toString(), diff.similar());
     }
@@ -92,10 +85,8 @@ public class SchemalessMessageTransformerTest {
     public void toRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(EXP_REPLY);
         final NetconfMessage netconfMessage = new NetconfMessage(doc);
-        final DOMRpcResult result = transformer.toRpcResult(netconfMessage, TEST_RPC);
-        final DOMSource value = (DOMSource) result.getResult().body();
-        assertNotNull(result.getResult());
-        final Document domSourceDoc = (Document) value.getNode();
+        final DOMSource result = transformer.toRpcResult(netconfMessage, TEST_RPC);
+        final Document domSourceDoc = (Document) result.getNode();
         final Diff diff = XMLUnit.compareXML(XmlUtil.readXmlToDocument(EXP_REPLY), domSourceDoc);
         assertTrue(diff.toString(), diff.similar());
     }
@@ -103,8 +94,8 @@ public class SchemalessMessageTransformerTest {
     @Test
     public void toEmptyRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(OK_REPLY);
-        final DOMRpcResult result = transformer.toRpcResult(
+        final DOMSource result = transformer.toRpcResult(
                 new NetconfMessage(doc), NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME);
-        assertNull(result.getResult());
+        assertNull(result);
     }
 }
