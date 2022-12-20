@@ -9,11 +9,13 @@ package org.opendaylight.netconf.sal.connect.api;
 
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
-public interface MessageTransformer extends ActionTransformer, NotificationTransformer, RpcTransformer {
+public interface MessageTransformer
+        extends ActionTransformer, NotificationTransformer, RpcTransformer<NormalizedNode, DOMRpcResult> {
     @Override
     default NetconfMessage toActionRequest(final Absolute action, final DOMDataTreeIdentifier domDataTreeIdentifier,
             final NormalizedNode payload) {

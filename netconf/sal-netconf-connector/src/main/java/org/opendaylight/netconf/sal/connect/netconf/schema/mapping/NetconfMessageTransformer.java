@@ -64,6 +64,7 @@ import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
@@ -403,7 +404,7 @@ public class NetconfMessageTransformer implements MessageTransformer {
     }
 
     @Override
-    public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final QName rpc) {
+    public synchronized DOMRpcResult toRpcResult(final RpcResult<NetconfMessage> resultPayload, final QName rpc) {
         final ContainerNode normalizedNode;
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
             normalizedNode = Builders.containerBuilder()
