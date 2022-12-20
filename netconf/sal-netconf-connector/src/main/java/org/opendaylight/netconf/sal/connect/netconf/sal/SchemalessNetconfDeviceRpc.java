@@ -12,10 +12,10 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
@@ -27,8 +27,6 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
  * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
@@ -57,28 +55,18 @@ public final class SchemalessNetconfDeviceRpc implements Rpcs.Schemaless {
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
-        final RpcTransformer transformer;
-        if (input instanceof DOMSourceAnyxmlNode) {
-            transformer = schemalessTransformer;
-        } else if (isBaseRpc(type)) {
-            transformer = baseRpcTransformer;
-        } else {
-            return Futures.immediateFailedFuture(new DOMRpcImplementationNotAvailableException(
-                "Unable to invoke rpc %s", type));
-        }
-        return handleRpc(type, input, transformer);
+    public ListenableFuture<? extends DOMSource> invokeRpc(final QName type, final DOMSource input) {
+        return handleRpc(type, input, schemalessTransformer);
     }
 
-    private @NonNull ListenableFuture<DOMRpcResult> handleRpc(final @NonNull QName type,
-            final @NonNull NormalizedNode input, final RpcTransformer transformer) {
+    private @NonNull <I, R> ListenableFuture<R> handleRpc(final @NonNull QName type,
+            final @NonNull I input, final RpcTransformer<I, R> transformer) {
         final var delegateFuture = listener.sendRequest(transformer.toRpcRequest(type, input), type);
-        final var ret = SettableFuture.<DOMRpcResult>create();
+        final var ret = SettableFuture.<R>create();
         Futures.addCallback(delegateFuture, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<NetconfMessage> result) {
-                ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
-                        : new DefaultDOMRpcResult(result.getErrors()));
+                ret.set(transformer.toRpcResult(result, type));
             }
 
             @Override

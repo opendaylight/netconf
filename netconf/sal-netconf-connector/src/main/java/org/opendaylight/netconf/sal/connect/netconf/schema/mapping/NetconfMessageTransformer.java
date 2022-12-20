@@ -66,6 +66,7 @@ import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
@@ -102,7 +103,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class NetconfMessageTransformer implements ActionTransformer, NotificationTransformer, RpcTransformer {
+public class NetconfMessageTransformer
+        implements ActionTransformer, NotificationTransformer, RpcTransformer<NormalizedNode, DOMRpcResult> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
     private static final ImmutableSet<XMLNamespace> BASE_OR_NOTIFICATION_NS = ImmutableSet.of(
@@ -405,7 +407,12 @@ public class NetconfMessageTransformer implements ActionTransformer, Notificatio
     }
 
     @Override
-    public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final QName rpc) {
+    public synchronized DOMRpcResult toRpcResult(final RpcResult<NetconfMessage> resultPayload, final QName rpc) {
+        if (!resultPayload.isSuccessful()) {
+            return new DefaultDOMRpcResult(resultPayload.getErrors());
+        }
+
+        final var message = resultPayload.getResult();
         final ContainerNode normalizedNode;
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
             normalizedNode = Builders.containerBuilder()

@@ -9,19 +9,16 @@ package org.opendaylight.netconf.sal.connect.api;
 
 import com.google.common.annotations.Beta;
 import com.google.common.util.concurrent.ListenableFuture;
+import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMService;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
  * A {@link DOMService} exposing RPC invocation model based either {@code ContainerNode} or {@code AnyxmlNode}.
  */
 @Beta
 public interface SchemalessRpcService extends DOMService {
-    // FIXME: NETCONF-669: DOMRpcResult and NormalizedNode does not work yangtools-10, at which point we need to provide
-    //                     our own structure for result. The shape of those structure is TBD as we untangle
-    //                     the transformers.
-    @NonNull ListenableFuture<? extends DOMRpcResult> invokeRpc(@NonNull QName type, @NonNull NormalizedNode input);
+
+    @NonNull ListenableFuture<? extends DOMSource> invokeRpc(@NonNull QName type, @NonNull DOMSource payload);
 }
