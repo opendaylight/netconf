@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.util;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.COMMIT_RPC_CONTENT;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.DISCARD_CHANGES_RPC_CONTENT;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.EDIT_CONTENT_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.GET_RPC_CONTENT;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID;
@@ -133,8 +134,8 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<? extends DOMRpcResult> discardChanges(final FutureCallback<DOMRpcResult> callback) {
-        // FIXME: eliminate null
-        return addCallback(requireNonNull(callback), rpc.invokeNetconf(NETCONF_DISCARD_CHANGES_QNAME, null));
+        return addCallback(requireNonNull(callback), rpc.invokeNetconf(NETCONF_DISCARD_CHANGES_QNAME,
+            DISCARD_CHANGES_RPC_CONTENT));
     }
 
     public ListenableFuture<? extends DOMRpcResult> commit(final FutureCallback<DOMRpcResult> callback) {
