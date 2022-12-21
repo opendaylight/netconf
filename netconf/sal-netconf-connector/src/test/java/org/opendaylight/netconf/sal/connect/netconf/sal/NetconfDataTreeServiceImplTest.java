@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME;
@@ -83,9 +82,8 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     public void discardChanges() {
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpcService).invokeNetconf(any(), isNull());
         netconService.discardChanges();
-        verify(rpcService).invokeNetconf(eq(NETCONF_DISCARD_CHANGES_QNAME), isNull());
+        verify(rpcService).invokeNetconf(eq(NETCONF_DISCARD_CHANGES_QNAME), any());
     }
 
     @Test
