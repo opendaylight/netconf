@@ -26,8 +26,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.ConnectionOper.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.augment.test.rev160808.Node1;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
@@ -82,8 +82,7 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> dataBroker.newReadWriteTransaction()
             .read(LogicalDatastoreType.OPERATIONAL, ID.getTopologyBindingPath().augmentation(NetconfNode.class))
             .get(5, TimeUnit.SECONDS)
-            .map(NetconfNodeConnectionStatus::getConnectionStatus)
-            .filter(status -> status == NetconfNodeConnectionStatus.ConnectionStatus.UnableToConnect)
+            .filter(conn -> conn.getConnectionStatus() == ConnectionStatus.UnableToConnect)
             .isPresent());
     }
 
