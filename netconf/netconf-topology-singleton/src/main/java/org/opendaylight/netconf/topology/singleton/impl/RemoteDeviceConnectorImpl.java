@@ -49,16 +49,13 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUti
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.OdlHelloMessageCapabilities;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.KeyAuth;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwUnencrypted;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.key.auth.KeyBased;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.LoginPassword;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.OdlHelloMessageCapabilities;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.KeyAuth;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -245,16 +242,16 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
 
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
-        final Protocol protocol = node.getProtocol();
+        final var protocol = node.getProtocol();
         if (isTcpOnly) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
                     .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
-        } else if (protocol == null || protocol.getName() == Protocol.Name.SSH) {
+        } else if (protocol == null || protocol.getName() == Name.SSH) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
                     .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
-        } else if (protocol.getName() == Protocol.Name.TLS) {
+        } else if (protocol.getName() == Name.TLS) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
                     .withSslHandlerFactory(new SslHandlerFactoryImpl(keystoreAdapter, protocol.getSpecification()))
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
@@ -283,22 +280,21 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
         if (credentials
-                instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
+                instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225
                     .credentials.credentials.LoginPassword loginPassword) {
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         }
-        if (credentials instanceof LoginPwUnencrypted) {
-            final LoginPasswordUnencrypted loginPassword =
-                    ((LoginPwUnencrypted) credentials).getLoginPasswordUnencrypted();
+        if (credentials instanceof LoginPwUnencrypted unencrypted) {
+            final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         }
-        if (credentials instanceof LoginPw) {
-            final LoginPassword loginPassword = ((LoginPw) credentials).getLoginPassword();
+        if (credentials instanceof LoginPw loginPw) {
+            final var loginPassword = loginPw.getLoginPassword();
             return new LoginPasswordHandler(loginPassword.getUsername(),
                     encryptionService.decrypt(loginPassword.getPassword()));
         }
-        if (credentials instanceof KeyAuth) {
-            final KeyBased keyPair = ((KeyAuth) credentials).getKeyBased();
+        if (credentials instanceof KeyAuth keyAuth) {
+            final var keyPair = keyAuth.getKeyBased();
             return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getKeyId(),
                     keystoreAdapter, encryptionService);
         }

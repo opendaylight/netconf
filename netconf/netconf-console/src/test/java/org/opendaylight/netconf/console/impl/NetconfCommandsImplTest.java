@@ -40,14 +40,14 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilities;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.network.topology.topology.topology.types.TopologyNetconf;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.ConnectionOper.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.AvailableCapabilities;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.AvailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.available.capabilities.AvailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.available.capabilities.AvailableCapabilityBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
@@ -55,16 +55,13 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 public class NetconfCommandsImplTest {
-
     private static final String NODE_ID = "NodeID";
     private static final String IP = "192.168.1.1";
     private static final int PORT = 1234;
-    private static final NetconfNodeConnectionStatus.ConnectionStatus CONN_STATUS =
-            NetconfNodeConnectionStatus.ConnectionStatus.Connected;
+    private static final ConnectionStatus CONN_STATUS = ConnectionStatus.Connected;
     private static final String CAP_PREFIX = "prefix";
 
     private static BindingRuntimeContext RUNTIME_CONTEXT;
@@ -217,7 +214,7 @@ public class NetconfCommandsImplTest {
     }
 
     private static Node getNetconfNode(final String nodeIdent, final String ip, final int portNumber,
-            final NetconfNodeConnectionStatus.ConnectionStatus cs, final String notificationCapabilityPrefix) {
+            final ConnectionStatus cs, final String notificationCapabilityPrefix) {
 
         final Host host = new Host(new IpAddress(new Ipv4Address(ip)));
         final PortNumber port = new PortNumber(Uint16.valueOf(portNumber));
@@ -229,11 +226,8 @@ public class NetconfCommandsImplTest {
         final AvailableCapabilities avCaps =
                 new AvailableCapabilitiesBuilder().setAvailableCapability(avCapList).build();
 
-        final NodeId nodeId = new NodeId(nodeIdent);
-        final NodeKey nk = new NodeKey(nodeId);
         return new NodeBuilder()
-                .withKey(nk)
-                .setNodeId(nodeId)
+                .setNodeId(new NodeId(nodeIdent))
                 .addAugmentation(new NetconfNodeBuilder()
                     .setConnectionStatus(cs).setHost(host).setPort(port).setAvailableCapabilities(avCaps).build())
                 .build();

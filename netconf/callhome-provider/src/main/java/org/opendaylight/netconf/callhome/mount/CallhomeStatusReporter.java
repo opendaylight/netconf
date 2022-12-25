@@ -30,9 +30,8 @@ import org.opendaylight.netconf.callhome.protocol.StatusRecorder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1.DeviceStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1Builder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.network.topology.topology.topology.types.TopologyNetconf;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.NetconfCallhomeServer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.AllowedDevices;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.Device;
@@ -66,8 +65,8 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
     private final ListenerRegistration<CallhomeStatusReporter> reg;
 
     CallhomeStatusReporter(final DataBroker broker) {
-        this.dataBroker = broker;
-        this.reg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL,
+        dataBroker = broker;
+        reg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL,
             NETCONF_TOPO_IID.child(Node.class)), this);
     }
 
@@ -111,9 +110,7 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
     }
 
     private void handledNetconfNode(final NodeId nodeId, final NetconfNode nnode) {
-        NetconfNodeConnectionStatus.ConnectionStatus csts = nnode.getConnectionStatus();
-
-        switch (csts) {
+        switch (nnode.getConnectionStatus()) {
             case Connected: {
                 handleConnectedNetconfNode(nodeId);
                 break;
