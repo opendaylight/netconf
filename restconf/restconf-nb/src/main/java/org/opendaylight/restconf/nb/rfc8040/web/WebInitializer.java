@@ -36,7 +36,8 @@ import org.opendaylight.yangtools.concepts.Registration;
  */
 @Singleton
 public final class WebInitializer implements AutoCloseable {
-    private final Registration registration;
+    private final Registration discoveryReg;
+    private final Registration restconfReg;
 
     @Inject
     public WebInitializer(final WebServer webServer, final WebContextSecurer webContextSecurer,
@@ -44,29 +45,24 @@ public final class WebInitializer implements AutoCloseable {
             final DataStreamApplication webAppNotif,
             final CustomFilterAdapterConfiguration customFilterAdapterConfig,
             final WebSocketInitializer webSocketServlet) throws ServletException {
-        final var webContextBuilder = WebContext.builder()
-            .contextPath("/")
+        final var restconfBuilder = WebContext.builder()
+            .contextPath("/" + BASE_URI_PATTERN)
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
-                .addUrlPattern("/" + BASE_URI_PATTERN + "/*")
+                .addUrlPattern("/*")
                 .servlet(servletSupport.createHttpServletBuilder(webApp).build())
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern("/" + BASE_URI_PATTERN + "/notif/*")
+                .addUrlPattern("/notif/*")
                 .servlet(servletSupport.createHttpServletBuilder(webAppNotif).build())
                 .name("notificationServlet")
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern("/" + BASE_URI_PATTERN + "/" + DATA_SUBSCRIPTION + "/*")
-                .addUrlPattern("/" + BASE_URI_PATTERN + "/" + NOTIFICATION_STREAM + "/*")
+                .addUrlPattern("/" + DATA_SUBSCRIPTION + "/*")
+                .addUrlPattern("/" + NOTIFICATION_STREAM + "/*")
                 .servlet(webSocketServlet)
-                .build())
-            .addServlet(ServletDetails.builder()
-                .addUrlPattern("/.well-known/*")
-                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(BASE_URI_PATTERN)).build())
-                .name("Rootfound")
                 .build())
 
             // Allows user to add javax.servlet.Filter(s) in front of REST services
@@ -76,14 +72,28 @@ public final class WebInitializer implements AutoCloseable {
                 .asyncSupported(true)
                 .build());
 
-        webContextSecurer.requireAuthentication(webContextBuilder, true, "/" + BASE_URI_PATTERN + "/*");
+        webContextSecurer.requireAuthentication(restconfBuilder, true, "/*");
 
-        registration = webServer.registerWebContext(webContextBuilder.build());
+        restconfReg = webServer.registerWebContext(restconfBuilder.build());
+
+        final var discoveryBuilder = WebContext.builder()
+            .contextPath("/.well-known")
+            .supportsSessions(false)
+            .addServlet(ServletDetails.builder()
+                .addUrlPattern("/*")
+                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(BASE_URI_PATTERN)).build())
+                .name("Rootfound")
+                .build());
+
+        webContextSecurer.requireAuthentication(discoveryBuilder, true, "/*");
+
+        discoveryReg = webServer.registerWebContext(discoveryBuilder.build());
     }
 
     @PreDestroy
     @Override
     public void close() {
-        registration.close();
+        discoveryReg.close();
+        restconfReg.close();
     }
 }
