@@ -106,8 +106,8 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         return Futures.transform(
             rpc.invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, getSchemaRequest), input -> {
                 // Transform composite node to string schema representation and then to ASTSchemaSource.
-                if (input.getErrors().isEmpty()) {
-                    final Optional<String> schemaString = getSchemaFromRpc(id, input.getResult());
+                if (input.errors().isEmpty()) {
+                    final Optional<String> schemaString = getSchemaFromRpc(id, input.value());
                     checkState(schemaString.isPresent(),
                         "%s: Unexpected response to get-schema, schema not present in message for: %s", id,
                         sourceIdentifier);
@@ -117,10 +117,10 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
                 }
 
                 LOG.warn("{}: YANG schema was not successfully retrieved for {}. Errors: {}", id, sourceIdentifier,
-                    input.getErrors());
+                    input.errors());
                 throw new IllegalStateException(String.format(
                     "%s: YANG schema was not successfully retrieved for %s. Errors: %s", id, sourceIdentifier,
-                    input.getErrors()));
+                    input.errors()));
             }, MoreExecutors.directExecutor());
     }
 

@@ -511,8 +511,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         result = slaveDomRPCService.invokeRpc(testQName, outputNode).get(2, TimeUnit.SECONDS);
 
-        assertEquals(outputNode, result.getResult());
-        assertTrue(result.getErrors().isEmpty());
+        assertEquals(outputNode, result.value());
+        assertTrue(result.errors().isEmpty());
 
         // RPC with response error.
 
@@ -521,8 +521,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         result = slaveDomRPCService.invokeRpc(testQName, outputNode).get(2, TimeUnit.SECONDS);
 
-        assertNull(result.getResult());
-        assertEquals(rpcError, result.getErrors().iterator().next());
+        assertNull(result.value());
+        assertEquals(rpcError, result.errors().iterator().next());
 
         // RPC with response output and error.
 
@@ -532,8 +532,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final DOMRpcResult resultOutputError =
                 slaveDomRPCService.invokeRpc(testQName, outputNode).get(2, TimeUnit.SECONDS);
 
-        assertEquals(outputNode, resultOutputError.getResult());
-        assertEquals(rpcError, resultOutputError.getErrors().iterator().next());
+        assertEquals(outputNode, resultOutputError.value());
+        assertEquals(rpcError, resultOutputError.errors().iterator().next());
 
         // RPC failure.
         doReturn(FluentFutures.immediateFailedFluentFuture(new ClusteringRpcException("mock")))

@@ -258,9 +258,9 @@ public final class NetconfBaseOps {
     private ListenableFuture<Optional<NormalizedNode>> extractData(final Optional<YangInstanceIdentifier> path,
             final ListenableFuture<? extends DOMRpcResult> configRunning) {
         return Futures.transform(configRunning, result -> {
-            final var errors = result.getErrors();
+            final var errors = result.errors();
             checkArgument(errors.isEmpty(), "Unable to read data: %s, errors: %s", path, errors);
-            return transformer.selectFromDataStructure(((ContainerNode) result.getResult())
+            return transformer.selectFromDataStructure(result.value()
                 .getChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID), path.orElseThrow());
         }, MoreExecutors.directExecutor());
     }
