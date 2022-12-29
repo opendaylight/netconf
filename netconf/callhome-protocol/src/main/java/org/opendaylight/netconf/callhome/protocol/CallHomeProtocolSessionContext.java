@@ -9,6 +9,7 @@ package org.opendaylight.netconf.callhome.protocol;
 
 import java.net.SocketAddress;
 import java.security.PublicKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.Protocol.Name;
 
 /**
  * Protocol level Session Context for incoming Call Home connections.
@@ -44,7 +45,7 @@ public interface CallHomeProtocolSessionContext {
     /**
      * Returns transport type for this session.
      *
-     * @return {@link TransportType} for this session.
+     * @return {@link Name} for this session.
      */
-    TransportType getTransportType();
+    Name getTransportType();
 }

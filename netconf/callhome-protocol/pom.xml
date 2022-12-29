@@ -21,17 +21,18 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-client</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-client</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>sal-netconf-connector</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>mockito-configuration</artifactId>
