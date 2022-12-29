@@ -236,7 +236,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         Futures.addCallback(result, new FutureCallback<>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
-                final var errors = result.getErrors();
+                final var errors = result.errors();
                 if (errors.isEmpty()) {
                     LOG.debug("{}: Unlock successful.", id);
                     return;
@@ -359,7 +359,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
             final var builder = ImmutableList.<RpcError>builder();
             for (ListenableFuture<? extends DOMRpcResult> future : futures) {
-                builder.addAll(Futures.getDone(future).getErrors());
+                builder.addAll(Futures.getDone(future).errors());
             }
             return new DefaultDOMRpcResult(null, builder.build());
         }, MoreExecutors.directExecutor());

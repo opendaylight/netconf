@@ -65,60 +65,51 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
 
     @Override
     public void onReceive(final Object message) {
-        if (message instanceof GetWithFieldsRequest) {
-            final GetWithFieldsRequest getRequest = (GetWithFieldsRequest) message;
+        if (message instanceof GetWithFieldsRequest getRequest) {
             final YangInstanceIdentifier path = getRequest.getPath();
             final ListenableFuture<Optional<NormalizedNode>> future = netconfService.get(
                     getRequest.getPath(), getRequest.getFields());
             context().stop(self());
             sendResult(future, path, sender(), self());
-        } else if (message instanceof GetRequest) {
-            final GetRequest getRequest = (GetRequest) message;
+        } else if (message instanceof GetRequest getRequest) {
             final YangInstanceIdentifier path = getRequest.getPath();
             final ListenableFuture<Optional<NormalizedNode>> future = netconfService.get(path);
             context().stop(self());
             sendResult(future, path, sender(), self());
-        } else if (message instanceof GetConfigWithFieldsRequest) {
-            final GetConfigWithFieldsRequest getConfigRequest = (GetConfigWithFieldsRequest) message;
+        } else if (message instanceof GetConfigWithFieldsRequest getConfigRequest) {
             final YangInstanceIdentifier path = getConfigRequest.getPath();
             final ListenableFuture<Optional<NormalizedNode>> future = netconfService.getConfig(
                     path, getConfigRequest.getFields());
             context().stop(self());
             sendResult(future, path, sender(), self());
-        } else if (message instanceof GetConfigRequest) {
-            final GetConfigRequest getConfigRequest = (GetConfigRequest) message;
+        } else if (message instanceof GetConfigRequest getConfigRequest) {
             final YangInstanceIdentifier path = getConfigRequest.getPath();
             final ListenableFuture<Optional<NormalizedNode>> future = netconfService.getConfig(path);
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof LockRequest) {
             invokeRpcCall(netconfService::lock, sender(), self());
-        } else if (message instanceof MergeEditConfigRequest) {
-            final MergeEditConfigRequest request = (MergeEditConfigRequest) message;
+        } else if (message instanceof MergeEditConfigRequest request) {
             netconfService.merge(
                 request.getStore(),
                 request.getNormalizedNodeMessage().getIdentifier(),
                 request.getNormalizedNodeMessage().getNode(),
                 Optional.ofNullable(request.getDefaultOperation()));
-        } else if (message instanceof ReplaceEditConfigRequest) {
-            final ReplaceEditConfigRequest request = (ReplaceEditConfigRequest) message;
+        } else if (message instanceof ReplaceEditConfigRequest request) {
             netconfService.replace(
                 request.getStore(),
                 request.getNormalizedNodeMessage().getIdentifier(),
                 request.getNormalizedNodeMessage().getNode(),
                 Optional.ofNullable(request.getDefaultOperation()));
-        } else if (message instanceof CreateEditConfigRequest) {
-            final CreateEditConfigRequest request = (CreateEditConfigRequest) message;
+        } else if (message instanceof CreateEditConfigRequest request) {
             netconfService.create(
                 request.getStore(),
                 request.getNormalizedNodeMessage().getIdentifier(),
                 request.getNormalizedNodeMessage().getNode(),
                 Optional.ofNullable(request.getDefaultOperation()));
-        } else if (message instanceof DeleteEditConfigRequest) {
-            final DeleteEditConfigRequest request = (DeleteEditConfigRequest) message;
+        } else if (message instanceof DeleteEditConfigRequest request) {
             netconfService.delete(request.getStore(), request.getPath());
-        } else if (message instanceof RemoveEditConfigRequest) {
-            final RemoveEditConfigRequest request = (RemoveEditConfigRequest) message;
+        } else if (message instanceof RemoveEditConfigRequest request) {
             netconfService.remove(request.getStore(), request.getPath());
         } else if (message instanceof CommitRequest) {
             submit(sender(), self());
@@ -147,10 +138,10 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
                     return;
                 }
                 NormalizedNodeMessage nodeMessageResp = null;
-                if (result.getResult() != null) {
-                    nodeMessageResp = new NormalizedNodeMessage(YangInstanceIdentifier.empty(), result.getResult());
+                if (result.value() != null) {
+                    nodeMessageResp = new NormalizedNodeMessage(YangInstanceIdentifier.empty(), result.value());
                 }
-                requester.tell(new InvokeRpcMessageReply(nodeMessageResp, result.getErrors()), self);
+                requester.tell(new InvokeRpcMessageReply(nodeMessageResp, result.errors()), self);
             }
 
             @Override
@@ -170,10 +161,10 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
                     return;
                 }
                 NormalizedNodeMessage nodeMessageResp = null;
-                if (rpcResult.getResult() != null) {
-                    nodeMessageResp = new NormalizedNodeMessage(YangInstanceIdentifier.empty(), rpcResult.getResult());
+                if (rpcResult.value() != null) {
+                    nodeMessageResp = new NormalizedNodeMessage(YangInstanceIdentifier.empty(), rpcResult.value());
                 }
-                requester.tell(new InvokeRpcMessageReply(nodeMessageResp, rpcResult.getErrors()), self);
+                requester.tell(new InvokeRpcMessageReply(nodeMessageResp, rpcResult.errors()), self);
             }
 
             @Override
