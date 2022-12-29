@@ -18,7 +18,6 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
@@ -83,8 +82,7 @@ class CallHomeMountSessionContext {
                         .setPort(key.getPort())
                         .setTcpOnly(false)
                         .setProtocol(new ProtocolBuilder()
-                                // FIXME: not .name() but an explicit contract
-                                .setName(Name.valueOf(protocol.getTransportType().name()))
+                                .setName(protocol.getTransportType())
                                 .build())
                         .setSchemaless(false)
                         .setReconnectOnChangedSchema(false)

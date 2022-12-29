@@ -23,12 +23,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
-import org.opendaylight.netconf.callhome.protocol.TransportType;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.TlsClientChannelInitializer;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.Protocol.Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +47,8 @@ final class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext 
                               final CallHomeNetconfSubsystemListener subsystemListener) {
         this.channel = requireNonNull(channel, "channel");
         this.deviceId = deviceId;
-        this.socketAddress = channel.remoteAddress();
-        this.publicKey = createPublicKey(channel);
+        socketAddress = channel.remoteAddress();
+        publicKey = createPublicKey(channel);
         this.sslHandlerFactory = requireNonNull(sslHandlerFactory, "sslHandlerFactory");
         this.subsystemListener = subsystemListener;
     }
@@ -98,8 +98,8 @@ final class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext 
     }
 
     @Override
-    public TransportType getTransportType() {
-        return TransportType.TLS;
+    public Name getTransportType() {
+        return Name.TLS;
     }
 
     private static PublicKey createPublicKey(final Channel ch) {

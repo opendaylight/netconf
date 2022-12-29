@@ -24,9 +24,9 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
-import org.opendaylight.netconf.callhome.protocol.TransportType;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.Protocol.Name;
 
 public class CallHomeMountSessionContextTest {
     private Inet4Address someAddressIpv4;
@@ -45,7 +45,7 @@ public class CallHomeMountSessionContextTest {
         mockActivator = mock(CallHomeChannelActivator.class);
         mockCallback = mock(CallHomeMountSessionContext.CloseCallback.class);
         doReturn(someSocketAddress).when(mockProtocol).getRemoteAddress();
-        doReturn(TransportType.SSH).when(mockProtocol).getTransportType();
+        doReturn(Name.SSH).when(mockProtocol).getTransportType();
 
         instance = new CallHomeMountSessionContext("test",mockProtocol, mockActivator, mockCallback);
     }
