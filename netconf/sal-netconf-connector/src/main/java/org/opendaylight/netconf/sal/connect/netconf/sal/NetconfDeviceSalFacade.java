@@ -118,15 +118,11 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
     private void registerLockListener(final NetconfDeviceDataBroker netconfDeviceDataBroker,
                                       final NetconfDataTreeService netconfDataTreeService) {
         listenerRegistration = dataBroker.registerDataTreeChangeListener(
-                DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, createTopologyListPath()),
-                new LockChangeListener(netconfDeviceDataBroker, netconfDataTreeService));
-    }
-
-    private InstanceIdentifier<DatastoreLock> createTopologyListPath() {
-        return InstanceIdentifier.create(NetconfNodeFieldsOptional.class)
+            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
+                InstanceIdentifier.create(NetconfNodeFieldsOptional.class)
                 .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
                 .child(Node.class, new NodeKey(new NodeId(id.getName())))
-                .child(DatastoreLock.class);
-
+                .child(DatastoreLock.class)),
+            new LockChangeListener(netconfDeviceDataBroker, netconfDataTreeService));
     }
 }
