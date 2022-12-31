@@ -146,6 +146,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "94f03be4_37717d10",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationListenerAdaptor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-31T14:31:52Z",
+      "side": 1,
+      "message": "Well, in that case it should have been documented as a dummy, with explicitly dummy values -- otherwise people will end up trying to figure out why is this referencing a magic QName which does not exist in the model.",
+      "parentUuid": "f0fa90bb_92e12d2d",
+      "range": {
+        "startLine": 49,
+        "startChar": 58,
+        "endLine": 49,
+        "endChar": 62
+      },
+      "revId": "1673707d0fc4e0eda20d8892d5414464bb939a71",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "73a6c8eb_698d4a23",
@@ -207,6 +231,30 @@
       "side": 1,
       "message": "NotificationListenerAdaptor is marked as final class, I can not extend/ or reuse it\u0027s functionality. I need EffectiveModelContext object/ variable in the class  for further use.",
       "parentUuid": "842eedd2_91e2d730",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 5
+      },
+      "revId": "1673707d0fc4e0eda20d8892d5414464bb939a71",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76f082d1_0143ee69",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationListenerAdaptor.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-12-31T14:31:52Z",
+      "side": 1,
+      "message": "Well, even if both classes and up being final, why would that preclude us from sharing implementation, for example through a common superclass?",
+      "parentUuid": "efeaf331_6fcd5414",
       "range": {
         "startLine": 66,
         "startChar": 0,
