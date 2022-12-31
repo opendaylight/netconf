@@ -4,7 +4,7 @@ module netconf-node-topology {
 
     import network-topology { prefix nt; revision-date 2013-10-21; }
     import yang-ext { prefix ext; revision-date "2013-07-09";}
-    import netconf-node-optional { prefix nno; revision-date "2019-06-14"; }
+    import netconf-node-optional { prefix nno; }
     import odl-netconf-device { prefix ond; }
 
     revision 2022-12-25 {
@@ -19,6 +19,7 @@ module netconf-node-topology {
       uses ond:credentials;
       uses ond:connection-parameters;
       uses ond:netconf-schema-storage;
+      uses ond:datastore-access;
     }
 
     rpc create-device {

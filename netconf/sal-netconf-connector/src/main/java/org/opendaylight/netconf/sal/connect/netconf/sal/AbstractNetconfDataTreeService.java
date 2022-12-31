@@ -39,10 +39,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeService {
+public abstract sealed class AbstractNetconfDataTreeService implements NetconfDataTreeService {
     private static final class Candidate extends AbstractNetconfDataTreeService {
-        Candidate(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport) {
-            super(id, netconfOps, rollbackSupport);
+        Candidate(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
+                final boolean lockDatastore) {
+            super(id, netconfOps, rollbackSupport, lockDatastore);
         }
 
         /**
@@ -74,8 +75,9 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     }
 
     private static final class Running extends AbstractNetconfDataTreeService {
-        Running(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport) {
-            super(id, netconfOps, rollbackSupport);
+        Running(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
+                final boolean lockDatastore) {
+            super(id, netconfOps, rollbackSupport, lockDatastore);
         }
 
         @Override
@@ -114,10 +116,10 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         private final Running running;
 
         CandidateWithRunning(final RemoteDeviceId id, final NetconfBaseOps netconfOps,
-                final boolean rollbackSupport) {
-            super(id, netconfOps, rollbackSupport);
-            candidate = new Candidate(id, netconfOps, rollbackSupport);
-            running = new Running(id, netconfOps, rollbackSupport);
+                final boolean rollbackSupport, final boolean lockDatastore) {
+            super(id, netconfOps, rollbackSupport, lockDatastore);
+            candidate = new Candidate(id, netconfOps, rollbackSupport, lockDatastore);
+            running = new Running(id, netconfOps, rollbackSupport, lockDatastore);
         }
 
         @Override
@@ -155,29 +157,29 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     final NetconfBaseOps netconfOps;
     final boolean rollbackSupport;
 
-    // FIXME: what do we do with locks acquired before this got flipped?
-    private volatile boolean isLockAllowed = true;
+    private final boolean lockDatastore;
 
     AbstractNetconfDataTreeService(final RemoteDeviceId id, final NetconfBaseOps netconfOps,
-            final boolean rollbackSupport) {
+            final boolean rollbackSupport, final boolean lockDatastore) {
         this.id = requireNonNull(id);
         this.netconfOps = requireNonNull(netconfOps);
         this.rollbackSupport = rollbackSupport;
+        this.lockDatastore = lockDatastore;
     }
 
     public static @NonNull AbstractNetconfDataTreeService of(final RemoteDeviceId id,
             final MountPointContext mountContext, final Rpcs rpcs,
-            final NetconfSessionPreferences sessionPreferences) {
+            final NetconfSessionPreferences sessionPreferences, final boolean lockDatastore) {
         final var netconfOps = new NetconfBaseOps(rpcs, mountContext);
         final boolean rollbackSupport = sessionPreferences.isRollbackSupported();
 
         // Examine preferences and decide which implementation to use
         if (sessionPreferences.isCandidateSupported()) {
             return sessionPreferences.isRunningWritable()
-                ? new CandidateWithRunning(id, netconfOps, rollbackSupport)
-                    : new Candidate(id, netconfOps, rollbackSupport);
+                ? new CandidateWithRunning(id, netconfOps, rollbackSupport, lockDatastore)
+                    : new Candidate(id, netconfOps, rollbackSupport, lockDatastore);
         } else if (sessionPreferences.isRunningWritable()) {
-            return new Running(id, netconfOps, rollbackSupport);
+            return new Running(id, netconfOps, rollbackSupport, lockDatastore);
         } else {
             throw new IllegalArgumentException("Device " + id.getName() + " has advertised neither :writable-running "
                 + "nor :candidate capability. Failed to establish session, as at least one of these must be "
@@ -187,7 +189,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
     @Override
     public synchronized ListenableFuture<DOMRpcResult> lock() {
-        if (!isLockAllowed) {
+        if (!lockDatastore) {
             LOG.trace("Lock is not allowed by device configuration, ignoring lock results: {}", id);
             return RPC_SUCCESS;
         }
@@ -226,8 +228,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
     @Override
     public synchronized ListenableFuture<DOMRpcResult> unlock() {
-        // FIXME: deal with lock with lifecycle?
-        if (!isLockAllowed) {
+        if (!lockDatastore) {
             LOG.trace("Unlock is not allowed: {}", id);
             return RPC_SUCCESS;
         }
@@ -335,10 +336,6 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     @Override
     public final Object getDeviceId() {
         return id;
-    }
-
-    final void setLockAllowed(final boolean isLockAllowedOrig) {
-        isLockAllowed = isLockAllowedOrig;
     }
 
     abstract ListenableFuture<? extends DOMRpcResult> editConfig(DataContainerChild editStructure,

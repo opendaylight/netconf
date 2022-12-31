@@ -46,6 +46,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private final NetconfDeviceSalProvider salProvider;
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
+    private final boolean lockDatastore;
 
     private NetconfDeviceSchema currentSchema = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
@@ -58,12 +59,14 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
                     final ActorRef masterActorRef,
                     final Timeout actorResponseWaitTime,
                     final DOMMountPointService mountService,
-                    final DataBroker dataBroker) {
+                    final DataBroker dataBroker,
+                    final boolean lockDatastore) {
         this.id = id;
         salProvider = new NetconfDeviceSalProvider(id, mountService, dataBroker);
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
         this.actorResponseWaitTime = actorResponseWaitTime;
+        this.lockDatastore = lockDatastore;
     }
 
     @Override
@@ -142,12 +145,12 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     protected DOMDataBroker newDeviceDataBroker(final MountPointContext mountContext,
             final NetconfSessionPreferences preferences) {
-        return new NetconfDeviceDataBroker(id, mountContext, deviceServices.rpcs(), preferences);
+        return new NetconfDeviceDataBroker(id, mountContext, deviceServices.rpcs(), preferences, lockDatastore);
     }
 
     protected NetconfDataTreeService newNetconfDataTreeService(final MountPointContext mountContext,
             final NetconfSessionPreferences preferences) {
-        return AbstractNetconfDataTreeService.of(id, mountContext, deviceServices.rpcs(), preferences);
+        return AbstractNetconfDataTreeService.of(id, mountContext, deviceServices.rpcs(), preferences, lockDatastore);
     }
 
     private Future<Object> sendInitialDataToActor() {

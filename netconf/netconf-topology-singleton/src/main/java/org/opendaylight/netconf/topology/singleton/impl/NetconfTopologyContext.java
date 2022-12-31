@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import akka.actor.ActorRef;
@@ -34,19 +35,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyContext.class);
 
     private final @NonNull ServiceGroupIdentifier serviceGroupIdent;
     private final Timeout actorResponseWaitTime;
     private final DOMMountPointService mountService;
     private final DeviceActionFactory deviceActionFactory;
+    private final boolean lockDatastore;
 
     private NetconfTopologySetup netconfTopologyDeviceSetup;
     private RemoteDeviceId remoteDeviceId;
     private RemoteDeviceConnector remoteDeviceConnector;
     private NetconfNodeManager netconfNodeManager;
     private ActorRef masterActorRef;
+
     private final AtomicBoolean closed = new AtomicBoolean(false);
     private final AtomicBoolean stopped = new AtomicBoolean(false);
     private volatile boolean isMaster;
@@ -61,10 +63,12 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         this.deviceActionFactory = deviceActionFactory;
 
         final var node = netconfTopologyDeviceSetup.getNode();
-        remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), node.augmentation(NetconfNode.class));
+        final var netconfNode = verifyNotNull(node.augmentation(NetconfNode.class));
+        remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), netconfNode);
         remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
             deviceActionFactory);
         netconfNodeManager = createNodeDeviceManager();
+        lockDatastore = netconfNode.requireLockDatastore();
     }
 
     @Override
@@ -179,6 +183,6 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     protected MasterSalFacade newMasterSalFacade() {
         return new MasterSalFacade(remoteDeviceId, netconfTopologyDeviceSetup.getActorSystem(), masterActorRef,
-                actorResponseWaitTime, mountService, netconfTopologyDeviceSetup.getDataBroker());
+                actorResponseWaitTime, mountService, netconfTopologyDeviceSetup.getDataBroker(), lockDatastore);
     }
 }
