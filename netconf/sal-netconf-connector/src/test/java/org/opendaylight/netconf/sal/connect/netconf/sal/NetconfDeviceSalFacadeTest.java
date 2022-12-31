@@ -75,7 +75,7 @@ public class NetconfDeviceSalFacadeTest {
 
         final NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(dataBroker, remoteDeviceId);
 
-        deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, salProvider, dataBroker, "mockTopo");
+        deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, salProvider);
 
         doReturn(adapter).when(salProvider).getTopologyDatastoreAdapter();
 

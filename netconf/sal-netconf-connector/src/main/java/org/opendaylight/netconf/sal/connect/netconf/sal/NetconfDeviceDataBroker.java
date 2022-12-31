@@ -7,9 +7,11 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -34,22 +36,20 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteRunningTx;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.DatastoreAccess;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
 public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
-
     private final NetconfDOMDataBrokerFieldsExtension fieldsExtension = new NetconfDOMDataBrokerFieldsExtensionImpl();
-
     private final RemoteDeviceId id;
     private final NetconfBaseOps netconfOps;
     private final boolean rollbackSupport;
     private final boolean candidateSupported;
     private final boolean runningWritable;
-
-    private boolean isLockAllowed = true;
+    private final boolean lockDatastore;
 
     public NetconfDeviceDataBroker(final RemoteDeviceId id, final MountPointContext mountContext, final Rpcs rpcs,
-            final NetconfSessionPreferences netconfSessionPreferences) {
+            final NetconfSessionPreferences netconfSessionPreferences, final @Nullable DatastoreAccess dsAccess) {
         this.id = id;
         netconfOps = new NetconfBaseOps(rpcs, mountContext);
         // get specific attributes from netconf preferences and get rid of it
@@ -57,9 +57,10 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
         candidateSupported = netconfSessionPreferences.isCandidateSupported();
         runningWritable = netconfSessionPreferences.isRunningWritable();
         rollbackSupport = netconfSessionPreferences.isRollbackSupported();
-        Preconditions.checkArgument(candidateSupported || runningWritable,
-            "Device %s has advertised neither :writable-running nor :candidate capability."
-                    + "At least one of these should be advertised. Failed to establish a session.", id.getName());
+        checkArgument(candidateSupported || runningWritable,
+            "Device %s has advertised neither :writable-running nor :candidate capability. At least one of these "
+                + "should be advertised. Failed to establish a session.", id.getName());
+        lockDatastore = dsAccess == null || dsAccess.requireLockDatastore();
     }
 
     @Override
@@ -76,12 +77,12 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
     public DOMDataTreeWriteTransaction newWriteOnlyTransaction() {
         if (candidateSupported) {
             if (runningWritable) {
-                return new WriteCandidateRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
+                return new WriteCandidateRunningTx(id, netconfOps, rollbackSupport, lockDatastore);
             } else {
-                return new WriteCandidateTx(id, netconfOps, rollbackSupport, isLockAllowed);
+                return new WriteCandidateTx(id, netconfOps, rollbackSupport, lockDatastore);
             }
         } else {
-            return new WriteRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
+            return new WriteRunningTx(id, netconfOps, rollbackSupport, lockDatastore);
         }
     }
 
@@ -93,10 +94,6 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
     @Override
     public ClassToInstanceMap<DOMDataBrokerExtension> getExtensions() {
         return ImmutableClassToInstanceMap.of(NetconfDOMDataBrokerFieldsExtension.class, fieldsExtension);
-    }
-
-    void setLockAllowed(final boolean isLockAllowedOrig) {
-        isLockAllowed = isLockAllowedOrig;
     }
 
     private final class NetconfDOMDataBrokerFieldsExtensionImpl implements NetconfDOMDataBrokerFieldsExtension {

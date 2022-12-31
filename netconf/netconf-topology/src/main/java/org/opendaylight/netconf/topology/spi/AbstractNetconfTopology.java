@@ -62,7 +62,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.KeyAuth;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.LoginPwUnencrypted;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -216,7 +216,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
 
-        final var deviceSalFacade = new NetconfDeviceSalFacade(deviceId, mountPointService, dataBroker, topologyId);
+        final var deviceSalFacade = new NetconfDeviceSalFacade(deviceId, mountPointService, dataBroker);
         // The facade we are going it present to NetconfDevice
         RemoteDeviceHandler salFacade;
         final KeepaliveSalFacade keepAliveFacade;

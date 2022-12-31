@@ -142,12 +142,16 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     protected DOMDataBroker newDeviceDataBroker(final MountPointContext mountContext,
             final NetconfSessionPreferences preferences) {
-        return new NetconfDeviceDataBroker(id, mountContext, deviceServices.rpcs(), preferences);
+        return new NetconfDeviceDataBroker(id, mountContext, deviceServices.rpcs(), preferences,
+            // FIXME: pass down lock flag
+            null);
     }
 
     protected NetconfDataTreeService newNetconfDataTreeService(final MountPointContext mountContext,
             final NetconfSessionPreferences preferences) {
-        return AbstractNetconfDataTreeService.of(id, mountContext, deviceServices.rpcs(), preferences);
+        return AbstractNetconfDataTreeService.of(id, mountContext, deviceServices.rpcs(), preferences,
+            // FIXME: pass down lock flag
+            null);
     }
 
     private Future<Object> sendInitialDataToActor() {

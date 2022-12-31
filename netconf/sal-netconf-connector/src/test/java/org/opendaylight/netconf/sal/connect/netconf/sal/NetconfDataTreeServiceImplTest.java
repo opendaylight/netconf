@@ -162,6 +162,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
                 List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
-        return AbstractNetconfDataTreeService.of(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);
+        return AbstractNetconfDataTreeService.of(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs,
+            null);
     }
 }

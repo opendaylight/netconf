@@ -133,7 +133,7 @@ public class NetconfDeviceDataBrokerTest {
         NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(List.of(caps));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
-        return new NetconfDeviceDataBroker(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);
+        return new NetconfDeviceDataBroker(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs, null);
     }
 
 }
