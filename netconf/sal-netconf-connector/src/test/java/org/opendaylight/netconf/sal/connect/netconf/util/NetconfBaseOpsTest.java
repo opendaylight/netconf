@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
@@ -232,7 +232,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     public void testEditConfigCandidate() throws Exception {
         baseOps.editConfigCandidate(callback, baseOps.createEditConfigStructure(
             Optional.of(ImmutableNodes.leafNode(LEAF_A_NID, "leaf-value")),
-            Optional.of(ModifyAction.REPLACE), YangInstanceIdentifier.builder()
+            Optional.of(EffectiveOperation.REPLACE), YangInstanceIdentifier.builder()
             .node(CONTAINER_C_QNAME)
             .node(LEAF_A_NID)
             .build()), true);
@@ -242,7 +242,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     @Test
     public void testDeleteContainerNodeCandidate() throws Exception {
         baseOps.editConfigCandidate(callback, baseOps.createEditConfigStructure(Optional.empty(),
-            Optional.of(ModifyAction.DELETE), YangInstanceIdentifier.of(CONTAINER_C_QNAME)), true);
+            Optional.of(EffectiveOperation.DELETE), YangInstanceIdentifier.of(CONTAINER_C_QNAME)), true);
         verifyMessageSent("edit-config-delete-container-node-candidate",
                 NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
     }
@@ -250,7 +250,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     @Test
     public void testDeleteLeafNodeCandidate() throws Exception {
         baseOps.editConfigCandidate(callback, baseOps.createEditConfigStructure(Optional.empty(),
-            Optional.of(ModifyAction.DELETE),
+            Optional.of(EffectiveOperation.DELETE),
             YangInstanceIdentifier.builder().node(CONTAINER_C_QNAME).node(LEAF_A_NID).build()), true);
         verifyMessageSent("edit-config-delete-leaf-node-candidate",
                 NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
@@ -260,8 +260,9 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     public void testEditConfigRunning() throws Exception {
         baseOps.editConfigRunning(callback, baseOps.createEditConfigStructure(
             Optional.of(ImmutableNodes.leafNode(LEAF_A_NID, "leaf-value")),
-            Optional.of(ModifyAction.REPLACE),
-            YangInstanceIdentifier.builder().node(CONTAINER_C_NID).node(LEAF_A_NID).build()), ModifyAction.MERGE, true);
+            Optional.of(EffectiveOperation.REPLACE),
+            YangInstanceIdentifier.builder().node(CONTAINER_C_NID).node(LEAF_A_NID).build()),
+            EffectiveOperation.MERGE, true);
         verifyMessageSent("edit-config-test-module-running", NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
     }
 

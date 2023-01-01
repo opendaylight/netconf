@@ -15,7 +15,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
@@ -157,11 +157,11 @@ public final class EditConfig extends AbstractEdit {
         }
     }
 
-    private static ModifyAction getDefaultOperation(final XmlElement operationElement) throws DocumentedException {
+    private static EffectiveOperation getDefaultOperation(final XmlElement operationElement) throws DocumentedException {
         final var elementsByTagName = getElementsByTagName(operationElement, DEFAULT_OPERATION);
         return switch (elementsByTagName.getLength()) {
-            case 0 -> ModifyAction.MERGE;
-            case 1 ->  ModifyAction.ofXmlValue(elementsByTagName.item(0).getTextContent());
+            case 0 -> EffectiveOperation.MERGE;
+            case 1 ->  EffectiveOperation.ofXmlValue(elementsByTagName.item(0).getTextContent());
             default -> throw new DocumentedException("Multiple " + DEFAULT_OPERATION + " elements", ErrorType.RPC,
                 ErrorTag.UNKNOWN_ATTRIBUTE, ErrorSeverity.ERROR);
         };

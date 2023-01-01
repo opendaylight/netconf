@@ -35,7 +35,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.FailedNetconfMessage;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -357,13 +357,13 @@ public final class NetconfMessageTransformUtil {
      *
      * @param ctx {@link EffectiveModelContext} device's model context
      * @param dataPath {@link YangInstanceIdentifier} path to data in device's data-store
-     * @param operation Optional of {@link ModifyAction} action to be invoked
+     * @param operation Optional of {@link EffectiveOperation} action to be invoked
      * @param lastChildOverride Optional of {@code NormalizedNode} data on which action will be invoked
      * @return {@link DOMSourceAnyxmlNode} containing edit-config structure
      */
     public static DOMSourceAnyxmlNode createEditConfigAnyxml(
             final EffectiveModelContext ctx, final YangInstanceIdentifier dataPath,
-            final Optional<ModifyAction> operation, final Optional<NormalizedNode> lastChildOverride) {
+            final Optional<EffectiveOperation> operation, final Optional<NormalizedNode> lastChildOverride) {
         if (dataPath.isEmpty()) {
             Preconditions.checkArgument(lastChildOverride.isPresent(),
                     "Data has to be present when creating structure for top level element");
@@ -400,7 +400,7 @@ public final class NetconfMessageTransformUtil {
                 .build();
     }
 
-    private static NormalizedMetadata leafMetadata(final YangInstanceIdentifier path, final ModifyAction oper) {
+    private static NormalizedMetadata leafMetadata(final YangInstanceIdentifier path, final EffectiveOperation oper) {
         final List<PathArgument> args = path.getPathArguments();
         final Deque<Builder> builders = new ArrayDeque<>(args.size());
 
@@ -425,7 +425,7 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static DataContainerChild createEditConfigStructure(final EffectiveModelContext ctx,
-            final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation,
+            final YangInstanceIdentifier dataPath, final Optional<EffectiveOperation> operation,
             final Optional<NormalizedNode> lastChildOverride) {
         return Builders.choiceBuilder().withNodeIdentifier(EDIT_CONTENT_NODEID)
                 .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride)).build();

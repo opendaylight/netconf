@@ -23,7 +23,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -67,7 +67,7 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
 
         @Override
         ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild editStructure,
-                final ModifyAction defaultOperation) {
+                final EffectiveOperation defaultOperation) {
             final NetconfRpcFutureCallback callback = new NetconfRpcFutureCallback("Edit candidate", id);
             return defaultOperation == null ? netconfOps.editConfigCandidate(callback, editStructure, rollbackSupport)
                 : netconfOps.editConfigCandidate(callback, editStructure, defaultOperation, rollbackSupport);
@@ -104,7 +104,7 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
 
         @Override
         ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild editStructure,
-                final ModifyAction defaultOperation) {
+                final EffectiveOperation defaultOperation) {
             final NetconfRpcFutureCallback callback = new NetconfRpcFutureCallback("Edit running", id);
             return defaultOperation == null ? netconfOps.editConfigRunning(callback, editStructure, rollbackSupport)
                 : netconfOps.editConfigRunning(callback, editStructure, defaultOperation, rollbackSupport);
@@ -144,7 +144,7 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
 
         @Override
         ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild editStructure,
-                final ModifyAction defaultOperation) {
+                final EffectiveOperation defaultOperation) {
             return candidate.editConfig(editStructure, defaultOperation);
         }
     }
@@ -287,30 +287,30 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
     @Override
     public synchronized ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         checkEditable(store);
         return editConfig(
-            netconfOps.createEditConfigStructure(Optional.ofNullable(data), Optional.of(ModifyAction.MERGE), path),
+            netconfOps.createEditConfigStructure(Optional.ofNullable(data), Optional.of(EffectiveOperation.MERGE), path),
             defaultOperation.orElse(null));
     }
 
     @Override
     public synchronized ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         checkEditable(store);
         return editConfig(
-            netconfOps.createEditConfigStructure(Optional.ofNullable(data), Optional.of(ModifyAction.REPLACE), path),
+            netconfOps.createEditConfigStructure(Optional.ofNullable(data), Optional.of(EffectiveOperation.REPLACE), path),
             defaultOperation.orElse(null));
     }
 
     @Override
     public synchronized ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         checkEditable(store);
         return editConfig(
-            netconfOps.createEditConfigStructure(Optional.ofNullable(data), Optional.of(ModifyAction.CREATE), path),
+            netconfOps.createEditConfigStructure(Optional.ofNullable(data), Optional.of(EffectiveOperation.CREATE), path),
             defaultOperation.orElse(null));
     }
 
@@ -318,14 +318,14 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
     public synchronized ListenableFuture<? extends DOMRpcResult> delete(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         return editConfig(netconfOps.createEditConfigStructure(Optional.empty(),
-                Optional.of(ModifyAction.DELETE), path), null);
+                Optional.of(EffectiveOperation.DELETE), path), null);
     }
 
     @Override
     public synchronized ListenableFuture<? extends DOMRpcResult> remove(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         return editConfig(netconfOps.createEditConfigStructure(Optional.empty(),
-                Optional.of(ModifyAction.REMOVE), path), null);
+                Optional.of(EffectiveOperation.REMOVE), path), null);
     }
 
     @Override
@@ -339,7 +339,7 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
     }
 
     abstract ListenableFuture<? extends DOMRpcResult> editConfig(DataContainerChild editStructure,
-        @Nullable ModifyAction defaultOperation);
+        @Nullable EffectiveOperation defaultOperation);
 
     private static void checkEditable(final LogicalDatastoreType store) {
         checkArgument(store == LogicalDatastoreType.CONFIGURATION, "Can only edit configuration data, not %s", store);

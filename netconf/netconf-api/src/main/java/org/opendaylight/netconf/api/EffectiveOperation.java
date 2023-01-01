@@ -20,7 +20,7 @@ import org.eclipse.jdt.annotation.NonNull;
  * This concept is uncharacteristically bound to two separate semantics, but for a good reason: at the end of the day we
  * want to know what the effective operation is.
  */
-public enum ModifyAction {
+public enum EffectiveOperation {
     // operation and default-operation
     MERGE("merge",     true,  true),
     REPLACE("replace", true,  true),
@@ -36,21 +36,21 @@ public enum ModifyAction {
     private final boolean isDefaultOperation;
     private final boolean isOperation;
 
-    ModifyAction(final String xmlValue, final boolean isOperation, final boolean isDefaultOperation) {
+    EffectiveOperation(final String xmlValue, final boolean isOperation, final boolean isDefaultOperation) {
         this.xmlValue = requireNonNull(xmlValue);
         this.isDefaultOperation = isDefaultOperation;
         this.isOperation = isOperation;
     }
 
     /**
-     * Return the {@link ModifyAction} corresponding to a {@link #xmlValue}.
+     * Return the {@link EffectiveOperation} corresponding to a {@link #xmlValue}.
      *
      * @param xmlValue XML attribute or element value
-     * @return A {@link ModifyAction}
+     * @return A {@link EffectiveOperation}
      * @throws NullPointerException if {@code xmlValue} is {@code null}
      * @throws IllegalArgumentException if {@code xmlValue} is not recognized
      */
-    public static @NonNull ModifyAction ofXmlValue(final String xmlValue) {
+    public static @NonNull EffectiveOperation ofXmlValue(final String xmlValue) {
         return switch (xmlValue) {
             case "merge" -> MERGE;
             case "replace" -> REPLACE;
@@ -63,7 +63,7 @@ public enum ModifyAction {
     }
 
     /**
-     * Return an XML string literal corresponding to this {@link ModifyAction}.
+     * Return an XML string literal corresponding to this {@link EffectiveOperation}.
      *
      * @return An XML string literal
      */

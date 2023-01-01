@@ -26,7 +26,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -112,7 +112,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         }
 
         final DataContainerChild editStructure = netOps.createEditConfigStructure(Optional.ofNullable(data),
-                        Optional.of(ModifyAction.REPLACE), path);
+                        Optional.of(EffectiveOperation.REPLACE), path);
         editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "put");
     }
 
@@ -146,8 +146,8 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         checkEditable(store);
         final DataContainerChild editStructure = netOps.createEditConfigStructure(Optional.empty(),
-                        Optional.of(ModifyAction.DELETE), path);
-        editConfig(path, Optional.empty(), editStructure, Optional.of(ModifyAction.NONE), "delete");
+                        Optional.of(EffectiveOperation.DELETE), path);
+        editConfig(path, Optional.empty(), editStructure, Optional.of(EffectiveOperation.NONE), "delete");
     }
 
     @Override
@@ -212,7 +212,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
 
     protected abstract void editConfig(YangInstanceIdentifier path, Optional<NormalizedNode> data,
                                        DataContainerChild editStructure,
-                                       Optional<ModifyAction> defaultOperation, String operation);
+                                       Optional<EffectiveOperation> defaultOperation, String operation);
 
     protected ListenableFuture<RpcResult<Void>> resultsToTxStatus() {
         final SettableFuture<RpcResult<Void>> transformed = SettableFuture.create();

@@ -26,7 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -113,12 +113,12 @@ public class SchemalessRpcStructureTransformerTest {
 
         if (expectedException != null) {
             assertThrows(expectedException,
-                () -> adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE)));
+                () -> adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(EffectiveOperation.REPLACE)));
             return;
         }
 
         final DOMSourceAnyxmlNode anyXmlNode =
-                adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE));
+                adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(EffectiveOperation.REPLACE));
         final String s = XmlUtil.toString((Element) anyXmlNode.body().getNode());
         Diff diff = new Diff(expectedConfig, s);
         assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
