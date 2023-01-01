@@ -35,7 +35,7 @@ public class SlaveSalFacade {
         this.id = id;
         this.actorSystem = actorSystem;
         this.actorResponseWaitTime = actorResponseWaitTime;
-        mount = new NetconfDeviceMount(mountPointService, id);
+        mount = new NetconfDeviceMount(id, mountPointService, NetconfDeviceMount.defaultTopologyMountPath(id));
     }
 
     public void registerSlaveMountPoint(final EffectiveModelContext remoteSchemaContext, final ActorRef masterActorRef,

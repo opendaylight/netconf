@@ -25,7 +25,8 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
 
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
             final boolean lockDatastore) {
-        this(id, new NetconfDeviceMount(mountPointService, id), lockDatastore);
+        this(id, new NetconfDeviceMount(id, mountPointService, NetconfDeviceMount.defaultTopologyMountPath(id)),
+            lockDatastore);
     }
 
     @VisibleForTesting

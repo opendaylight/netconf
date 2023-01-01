@@ -63,6 +63,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceMount;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -233,7 +234,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         verify(mockMountPointBuilder).addService(eq(DOMDataBroker.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMRpcService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMNotificationService.class), any());
-        verify(mockMountPointService).createMountPoint(DEVICE_ID.getTopologyPath());
+        verify(mockMountPointService).createMountPoint(NetconfDeviceMount.defaultTopologyMountPath(DEVICE_ID));
 
         // Notify that the NetconfNode operational state was deleted. Expect the slave mount point closed.
 

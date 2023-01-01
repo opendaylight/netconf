@@ -11,6 +11,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -27,7 +28,13 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.api.SchemalessRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,16 +42,36 @@ import org.slf4j.LoggerFactory;
 // Non-final for mocking
 public class NetconfDeviceMount implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceMount.class);
+    private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id").intern();
+    // FIXME: push this out to callers
+    private static final YangInstanceIdentifier DEFAULT_TOPOLOGY_NODE = YangInstanceIdentifier.builder()
+        .node(NetworkTopology.QNAME).node(Topology.QNAME)
+        .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), RemoteDeviceId.DEFAULT_TOPOLOGY_NAME)
+        .node(Node.QNAME)
+        .build();
 
     private final DOMMountPointService mountService;
+    private final YangInstanceIdentifier mountPath;
     private final RemoteDeviceId id;
 
     private NetconfDeviceNotificationService notificationService;
     private ObjectRegistration<DOMMountPoint> topologyRegistration;
 
+    @Deprecated(forRemoval = true)
     public NetconfDeviceMount(final DOMMountPointService mountService, final RemoteDeviceId id) {
-        this.mountService = requireNonNull(mountService);
+        this(id, mountService, defaultTopologyMountPath(id));
+    }
+
+    public NetconfDeviceMount(final RemoteDeviceId id, final DOMMountPointService mountService,
+            final YangInstanceIdentifier mountPath) {
         this.id = requireNonNull(id);
+        this.mountService = requireNonNull(mountService);
+        this.mountPath = requireNonNull(mountPath);
+    }
+
+    @Deprecated(forRemoval = true)
+    public static @NonNull YangInstanceIdentifier defaultTopologyMountPath(final RemoteDeviceId id) {
+        return DEFAULT_TOPOLOGY_NODE.node(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, id.getName()));
     }
 
     public void onDeviceConnected(final EffectiveModelContext initialCtx,
@@ -60,7 +87,7 @@ public class NetconfDeviceMount implements AutoCloseable {
         requireNonNull(mountService, "Closed");
         checkState(topologyRegistration == null, "Already initialized");
 
-        final var mountBuilder = mountService.createMountPoint(id.getTopologyPath());
+        final var mountBuilder = mountService.createMountPoint(mountPath);
         mountBuilder.addService(DOMSchemaService.class, FixedDOMSchemaService.of(() -> initialCtx));
 
         final var rpcs = services.rpcs();
