@@ -28,6 +28,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.sal.connect.api.SchemalessRpcService;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -42,11 +43,16 @@ import org.slf4j.LoggerFactory;
 // Non-final for mocking
 public class NetconfDeviceMount implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceMount.class);
+
+    // FIXME: extract all of this to users, as they are in control of topology-id
+    @Deprecated(forRemoval = true)
+    public static final String DEFAULT_TOPOLOGY_NAME = TopologyNetconf.QNAME.getLocalName();
+
     private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id").intern();
     // FIXME: push this out to callers
     private static final YangInstanceIdentifier DEFAULT_TOPOLOGY_NODE = YangInstanceIdentifier.builder()
         .node(NetworkTopology.QNAME).node(Topology.QNAME)
-        .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), RemoteDeviceId.DEFAULT_TOPOLOGY_NAME)
+        .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), DEFAULT_TOPOLOGY_NAME)
         .node(Node.QNAME)
         .build();
 

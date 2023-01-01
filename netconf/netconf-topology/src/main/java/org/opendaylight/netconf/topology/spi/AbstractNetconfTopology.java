@@ -50,6 +50,7 @@ import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.auth.DatastoreBackedPublicKeyAuth;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceMount;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
@@ -88,7 +89,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     @Deprecated(forRemoval = true)
     public static final KeyedInstanceIdentifier<Topology, TopologyKey> DEFAULT_TOPOLOGY_IID =
         InstanceIdentifier.create(NetworkTopology.class)
-        .child(Topology.class, new TopologyKey(new TopologyId(RemoteDeviceId.DEFAULT_TOPOLOGY_NAME)));
+        .child(Topology.class, new TopologyKey(new TopologyId(NetconfDeviceMount.DEFAULT_TOPOLOGY_NAME)));
 
     private final NetconfClientDispatcher clientDispatcher;
     private final EventExecutor eventExecutor;
