@@ -17,6 +17,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private final RemoteDeviceId id;
@@ -24,9 +25,8 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
     private final boolean lockDatastore;
 
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
-            final boolean lockDatastore) {
-        this(id, new NetconfDeviceMount(id, mountPointService, NetconfDeviceMount.defaultTopologyMountPath(id)),
-            lockDatastore);
+            final YangInstanceIdentifier mountPath, final boolean lockDatastore) {
+        this(id, new NetconfDeviceMount(id, mountPointService, mountPath), lockDatastore);
     }
 
     @VisibleForTesting

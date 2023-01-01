@@ -47,7 +47,7 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
     private static final RemoteDeviceId ID = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
     private static final KeyedInstanceIdentifier<Topology, TopologyKey> TEST_TOPOLOGY_ID =
         // FIXME: do not use this constant
-        RemoteDeviceId.DEFAULT_TOPOLOGY_IID;
+        AbstractNetconfTopology.DEFAULT_TOPOLOGY_IID;
 
     private static BindingRuntimeContext RUNTIME_CONTEXT;
 

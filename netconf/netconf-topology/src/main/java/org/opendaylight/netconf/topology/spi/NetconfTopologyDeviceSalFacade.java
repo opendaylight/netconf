@@ -14,6 +14,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceMount;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 
 /**
@@ -24,8 +25,9 @@ public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
 
     public NetconfTopologyDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
             final boolean lockDatastore, final DataBroker dataBroker) {
-        super(id, mountPointService, lockDatastore);
-        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, RemoteDeviceId.DEFAULT_TOPOLOGY_IID, id);
+        super(id, mountPointService, NetconfDeviceMount.defaultTopologyMountPath(id), lockDatastore);
+        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, AbstractNetconfTopology.DEFAULT_TOPOLOGY_IID,
+            id);
     }
 
     @Override

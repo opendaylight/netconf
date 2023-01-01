@@ -57,11 +57,6 @@ public class NetconfDeviceMount implements AutoCloseable {
     private NetconfDeviceNotificationService notificationService;
     private ObjectRegistration<DOMMountPoint> topologyRegistration;
 
-    @Deprecated(forRemoval = true)
-    public NetconfDeviceMount(final DOMMountPointService mountService, final RemoteDeviceId id) {
-        this(id, mountService, defaultTopologyMountPath(id));
-    }
-
     public NetconfDeviceMount(final RemoteDeviceId id, final DOMMountPointService mountService,
             final YangInstanceIdentifier mountPath) {
         this.id = requireNonNull(id);
