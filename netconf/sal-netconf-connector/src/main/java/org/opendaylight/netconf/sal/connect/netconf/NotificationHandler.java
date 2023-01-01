@@ -19,7 +19,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.NotificationTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

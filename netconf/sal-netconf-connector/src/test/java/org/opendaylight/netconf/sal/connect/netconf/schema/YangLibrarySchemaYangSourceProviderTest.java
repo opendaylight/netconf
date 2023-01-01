@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;

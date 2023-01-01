@@ -13,12 +13,12 @@ import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -32,6 +32,7 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswo
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
@@ -41,7 +42,6 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommun
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
