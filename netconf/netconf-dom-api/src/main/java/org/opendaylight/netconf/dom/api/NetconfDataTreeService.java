@@ -15,7 +15,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMService;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -83,7 +83,7 @@ public interface NetconfDataTreeService extends DOMService {
      * @return result of &lt;get-config&gt; operation
      */
     ListenableFuture<Optional<NormalizedNode>> getConfig(YangInstanceIdentifier path,
-                                                         List<YangInstanceIdentifier> fields);
+        List<YangInstanceIdentifier> fields);
 
     /**
      * The &lt;edit-config&gt; operation with "merge" attribute.
@@ -93,7 +93,7 @@ public interface NetconfDataTreeService extends DOMService {
      * @return result of &lt;edit-config&gt; operation
      */
     ListenableFuture<? extends DOMRpcResult> merge(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                   NormalizedNode data, Optional<ModifyAction> defaultOperation);
+        NormalizedNode data, Optional<EffectiveOperation> defaultOperation);
 
     /**
      * The &lt;edit-config&gt; operation with "replace" attribute.
@@ -103,7 +103,7 @@ public interface NetconfDataTreeService extends DOMService {
      * @return result of &lt;edit-config&gt; operation
      */
     ListenableFuture<? extends DOMRpcResult> replace(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                     NormalizedNode data, Optional<ModifyAction> defaultOperation);
+        NormalizedNode data, Optional<EffectiveOperation> defaultOperation);
 
     /**
      * The &lt;edit-config&gt; operation with "create" attribute.
@@ -113,7 +113,7 @@ public interface NetconfDataTreeService extends DOMService {
      * @return result of &lt;edit-config&gt; operation
      */
     ListenableFuture<? extends DOMRpcResult> create(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                    NormalizedNode data, Optional<ModifyAction> defaultOperation);
+        NormalizedNode data, Optional<EffectiveOperation> defaultOperation);
 
     /**
      * The &lt;edit-config&gt; operation with "create" attribute.

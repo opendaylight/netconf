@@ -21,7 +21,7 @@ import java.util.Deque;
 import java.util.List;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
 import org.opendaylight.yangtools.rfc7952.data.api.StreamWriterMetadataExtension;
@@ -51,19 +51,19 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
     // Path of the node we are currently in
     private final Deque<PathArgument> currentPath = new ArrayDeque<>();
     // Stack of parent changes.
-    private final Deque<ModifyAction> actions = new ArrayDeque<>();
+    private final Deque<EffectiveOperation> actions = new ArrayDeque<>();
     // Stack of stashed writers which have been split out
-    private final ModifyAction defaultAction;
+    private final EffectiveOperation defaultAction;
     // Backing writer
     private final ComponentNormalizedNodeStreamWriter writer;
 
     // Current action, populated to default action on entry
-    private ModifyAction currentAction;
+    private EffectiveOperation currentAction;
 
     // Tracks the number of delete operations in actions
     private int deleteDepth;
 
-    SplittingNormalizedNodeMetadataStreamWriter(final ModifyAction defaultAction) {
+    SplittingNormalizedNodeMetadataStreamWriter(final EffectiveOperation defaultAction) {
         this.defaultAction = requireNonNull(defaultAction);
         writer = new ComponentNormalizedNodeStreamWriter(result);
     }
@@ -81,7 +81,7 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
     public void metadata(final ImmutableMap<QName, Object> metadata) throws IOException {
         final var operation = metadata.get(OPERATION_ATTRIBUTE);
         if (operation instanceof String str) {
-            currentAction = ModifyAction.ofXmlValue(str);
+            currentAction = EffectiveOperation.ofXmlValue(str);
         } else if (operation != null) {
             throw new IllegalStateException("Unexpected operation attribute value " + operation);
         }
@@ -225,7 +225,7 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
     }
 
     private boolean atRemoval() {
-        return currentAction == ModifyAction.DELETE || currentAction == ModifyAction.REMOVE;
+        return currentAction == EffectiveOperation.DELETE || currentAction == EffectiveOperation.REMOVE;
     }
 
     private void popPath() {

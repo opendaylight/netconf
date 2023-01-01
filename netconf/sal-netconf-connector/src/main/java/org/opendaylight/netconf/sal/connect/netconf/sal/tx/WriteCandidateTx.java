@@ -13,7 +13,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -132,8 +132,8 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
     @Override
     protected void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode> data,
-                              final DataContainerChild editStructure, final Optional<ModifyAction> defaultOperation,
-                              final String operation) {
+            final DataContainerChild editStructure, final Optional<EffectiveOperation> defaultOperation,
+            final String operation) {
 
         final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit candidate", id);
 

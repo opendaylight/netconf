@@ -26,7 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -94,13 +94,13 @@ public class SchemalessRpcStructureTransformerTest {
         this.path = path;
         this.testDataset = testDataset;
         this.expectedException = expectedException;
-        this.source = new DOMSource(XmlUtil.readXmlToDocument(getClass()
+        source = new DOMSource(XmlUtil.readXmlToDocument(getClass()
                 .getResourceAsStream("/schemaless/data/" + testDataset)).getDocumentElement());
-        this.expectedConfig = new String(Files.readAllBytes(
+        expectedConfig = new String(Files.readAllBytes(
                 Paths.get(getClass().getResource("/schemaless/edit-config/" + testDataset).toURI())));
-        this.expectedFilter = new String(Files.readAllBytes(
+        expectedFilter = new String(Files.readAllBytes(
                 Paths.get(getClass().getResource("/schemaless/filter/" + testDataset).toURI())));
-        this.getConfigData = new String(Files.readAllBytes(
+        getConfigData = new String(Files.readAllBytes(
                 Paths.get(getClass().getResource("/schemaless/get-config/" + testDataset).toURI())));
     }
 
@@ -113,12 +113,13 @@ public class SchemalessRpcStructureTransformerTest {
 
         if (expectedException != null) {
             assertThrows(expectedException,
-                () -> adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE)));
+                () -> adapter.createEditConfigStructure(Optional.of(data), path,
+                    Optional.of(EffectiveOperation.REPLACE)));
             return;
         }
 
         final DOMSourceAnyxmlNode anyXmlNode =
-                adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE));
+                adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(EffectiveOperation.REPLACE));
         final String s = XmlUtil.toString((Element) anyXmlNode.body().getNode());
         Diff diff = new Diff(expectedConfig, s);
         assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());

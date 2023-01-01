@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -78,7 +78,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
      */
     @Override
     public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode> data,
-            final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation) {
+            final YangInstanceIdentifier dataPath, final Optional<EffectiveOperation> operation) {
         final var dataValue = data.orElseThrow();
         if (!(dataValue instanceof DOMSourceAnyxmlNode anxmlData)) {
             throw new IllegalArgumentException("Unexpected data " + dataValue.prettyTree());
@@ -193,7 +193,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         }
     }
 
-    private static void setOperationAttribute(final ModifyAction operation, final Document document,
+    private static void setOperationAttribute(final EffectiveOperation operation, final Document document,
             final Element dataNode) {
         final var operationAttribute = document.createAttributeNS(NETCONF_OPERATION_QNAME.getNamespace().toString(),
             NETCONF_OPERATION_QNAME.getLocalName());

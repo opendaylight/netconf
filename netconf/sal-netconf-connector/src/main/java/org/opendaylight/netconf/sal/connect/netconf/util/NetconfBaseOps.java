@@ -51,7 +51,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.sal.connect.api.NetconfRpcService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
@@ -326,7 +326,7 @@ public final class NetconfBaseOps {
 
     public ListenableFuture<? extends DOMRpcResult> editConfigCandidate(
             final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild editStructure,
-            final ModifyAction modifyAction, final boolean rollback) {
+            final EffectiveOperation modifyAction, final boolean rollback) {
         return editConfig(callback, NETCONF_CANDIDATE_NODEID, editStructure, Optional.of(modifyAction), rollback);
     }
 
@@ -338,7 +338,7 @@ public final class NetconfBaseOps {
 
     public ListenableFuture<? extends DOMRpcResult> editConfigRunning(
             final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild editStructure,
-            final ModifyAction modifyAction, final boolean rollback) {
+            final EffectiveOperation modifyAction, final boolean rollback) {
         return editConfig(callback, NETCONF_RUNNING_NODEID, editStructure, Optional.of(modifyAction), rollback);
     }
 
@@ -350,14 +350,14 @@ public final class NetconfBaseOps {
 
     public ListenableFuture<? extends DOMRpcResult> editConfig(
             final FutureCallback<? super DOMRpcResult> callback, final NodeIdentifier datastore,
-            final DataContainerChild editStructure, final Optional<ModifyAction> modifyAction,
+            final DataContainerChild editStructure, final Optional<EffectiveOperation> modifyAction,
             final boolean rollback) {
         return addCallback(requireNonNull(callback), rpc.invokeNetconf(NETCONF_EDIT_CONFIG_QNAME,
             getEditConfigContent(requireNonNull(datastore), requireNonNull(editStructure), modifyAction, rollback)));
     }
 
     public ChoiceNode createEditConfigStructure(final Optional<NormalizedNode> lastChild,
-            final Optional<ModifyAction> operation, final YangInstanceIdentifier dataPath) {
+            final Optional<EffectiveOperation> operation, final YangInstanceIdentifier dataPath) {
         return Builders.choiceBuilder()
             .withNodeIdentifier(EDIT_CONTENT_NODEID)
             .withChild(transformer.createEditConfigStructure(lastChild, dataPath, operation))
@@ -365,7 +365,7 @@ public final class NetconfBaseOps {
     }
 
     private static ContainerNode getEditConfigContent(final NodeIdentifier datastore,
-            final DataContainerChild editStructure, final Optional<ModifyAction> defaultOperation,
+            final DataContainerChild editStructure, final Optional<EffectiveOperation> defaultOperation,
             final boolean rollback) {
         final var editBuilder = Builders.containerBuilder()
             .withNodeIdentifier(NETCONF_EDIT_CONFIG_NODEID)

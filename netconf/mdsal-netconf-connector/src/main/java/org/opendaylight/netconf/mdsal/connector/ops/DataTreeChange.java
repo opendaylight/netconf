@@ -13,7 +13,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import java.util.Deque;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -21,9 +21,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 public final class DataTreeChange {
     private final NormalizedNode changeRoot;
     private final YangInstanceIdentifier path;
-    private final ModifyAction action;
+    private final EffectiveOperation action;
 
-    DataTreeChange(final NormalizedNode changeRoot, final ModifyAction action, final Deque<PathArgument> path) {
+    DataTreeChange(final NormalizedNode changeRoot, final EffectiveOperation action, final Deque<PathArgument> path) {
         this.changeRoot = requireNonNull(changeRoot);
         this.action = requireNonNull(action);
 
@@ -36,7 +36,7 @@ public final class DataTreeChange {
         return changeRoot;
     }
 
-    public ModifyAction getAction() {
+    public EffectiveOperation getAction() {
         return action;
     }
 
