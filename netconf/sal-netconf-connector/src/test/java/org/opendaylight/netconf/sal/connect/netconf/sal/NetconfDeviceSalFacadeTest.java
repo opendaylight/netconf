@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -22,15 +20,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.TransactionChain;
-import org.opendaylight.mdsal.binding.api.WriteTransaction;
-import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -41,8 +32,6 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabi
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.ConnectionOper.ConnectionStatus;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -54,30 +43,12 @@ public class NetconfDeviceSalFacadeTest {
     private NetconfDeviceSalProvider.MountInstance mountInstance;
     @Mock
     private NetconfDeviceSalProvider salProvider;
-    @Mock
-    private DataBroker dataBroker;
-    @Mock
-    private TransactionChain txChain;
-    @Mock
-    private WriteTransaction tx;
-    @Captor
-    private ArgumentCaptor<NetconfNode> nodeCaptor;
 
     private NetconfDeviceSalFacade deviceFacade;
 
     @Before
     public void setUp() throws Exception {
-        doReturn(txChain).when(dataBroker).createMergingTransactionChain(any());
-        doReturn(tx).when(txChain).newWriteOnlyTransaction();
-        doNothing().when(tx).mergeParentStructurePut(eq(LogicalDatastoreType.OPERATIONAL),
-            eq(remoteDeviceId.getTopologyBindingPath().augmentation(NetconfNode.class)), nodeCaptor.capture());
-        doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
-
-        final NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(dataBroker, remoteDeviceId);
-
         deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, salProvider, true);
-
-        doReturn(adapter).when(salProvider).getTopologyDatastoreAdapter();
 
         doReturn(mountInstance).when(salProvider).getMountInstance();
         doNothing().when(mountInstance).onTopologyDeviceDisconnected();
@@ -87,7 +58,6 @@ public class NetconfDeviceSalFacadeTest {
     public void testOnDeviceDisconnected() {
         deviceFacade.onDeviceDisconnected();
 
-        verifyConnectionStatusUpdate(ConnectionStatus.Connecting);
         verify(mountInstance, times(1)).onTopologyDeviceDisconnected();
     }
 
@@ -96,7 +66,6 @@ public class NetconfDeviceSalFacadeTest {
         final Throwable throwable = new Throwable();
         deviceFacade.onDeviceFailed(throwable);
 
-        verifyConnectionStatusUpdate(ConnectionStatus.UnableToConnect);
         verify(mountInstance, times(1)).onTopologyDeviceDisconnected();
     }
 
@@ -118,7 +87,6 @@ public class NetconfDeviceSalFacadeTest {
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), new EmptyMountPointContext(schemaContext)),
             netconfSessionPreferences, deviceServices);
 
-        verifyConnectionStatusUpdate(ConnectionStatus.Connected);
         verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext), eq(deviceServices),
             any(DOMDataBroker.class), any(NetconfDataTreeService.class));
     }
@@ -128,11 +96,5 @@ public class NetconfDeviceSalFacadeTest {
         final DOMNotification domNotification = mock(DOMNotification.class);
         deviceFacade.onNotification(domNotification);
         verify(mountInstance).publish(domNotification);
-    }
-
-    private void verifyConnectionStatusUpdate(final ConnectionStatus expectedStatus) {
-        verify(tx).mergeParentStructurePut(eq(LogicalDatastoreType.OPERATIONAL),
-            eq(remoteDeviceId.getTopologyBindingPath().augmentation(NetconfNode.class)), any());
-        assertEquals(expectedStatus, nodeCaptor.getValue().getConnectionStatus());
     }
 }
