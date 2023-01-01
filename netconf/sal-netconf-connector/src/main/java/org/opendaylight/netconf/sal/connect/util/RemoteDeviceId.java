@@ -22,7 +22,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
-public final class RemoteDeviceId {
+public record RemoteDeviceId(@NonNull String name, @NonNull InetSocketAddress address) {
     // FIXME: extract all of this to users, as they are in control of topology-id
     @Deprecated(since = "5.0.0", forRemoval = true)
     public static final String DEFAULT_TOPOLOGY_NAME = TopologyNetconf.QNAME.getLocalName();
@@ -33,43 +33,14 @@ public final class RemoteDeviceId {
         InstanceIdentifier.create(NetworkTopology.class)
         .child(Topology.class, new TopologyKey(new TopologyId(DEFAULT_TOPOLOGY_NAME)));
 
-    private final @NonNull String name;
-    private final @NonNull InetSocketAddress address;
-    private final @NonNull Host host;
+    public RemoteDeviceId {
+        requireNonNull(name);
+        requireNonNull(address);
+    }
 
-    public RemoteDeviceId(final String name, final InetSocketAddress address) {
-        this.name = requireNonNull(name);
-        this.address = requireNonNull(address);
-
+    public @NonNull Host host() {
         final var addr = address.getAddress();
-        host = addr != null ? new Host(IetfInetUtil.INSTANCE.ipAddressFor(addr))
+        return addr != null ? new Host(IetfInetUtil.INSTANCE.ipAddressFor(addr))
             : new Host(new DomainName(address.getHostString()));
-    }
-
-    public @NonNull String getName() {
-        return name;
-    }
-
-    public @NonNull InetSocketAddress getAddress() {
-        return address;
-    }
-
-    public@NonNull Host getHost() {
-        return host;
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        return this == obj || obj instanceof RemoteDeviceId other && name.equals(other.name);
-    }
-
-    @Override
-    public String toString() {
-        return "RemoteDevice{" + name + '}';
     }
 }

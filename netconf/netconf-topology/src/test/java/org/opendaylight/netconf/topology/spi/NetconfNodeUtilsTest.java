@@ -28,8 +28,8 @@ public class NetconfNodeUtilsTest {
             .setPort(new PortNumber(Uint16.valueOf(9999)))
             .build());
 
-        assertEquals("testing-node", id.getName());
-        assertEquals(host, id.getHost());
-        assertEquals(9999, id.getAddress().getPort());
+        assertEquals("testing-node", id.name());
+        assertEquals(host, id.host());
+        assertEquals(9999, id.address().getPort());
     }
 }

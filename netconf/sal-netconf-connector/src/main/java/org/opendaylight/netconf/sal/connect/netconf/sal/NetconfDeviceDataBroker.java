@@ -57,7 +57,7 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
         rollbackSupport = netconfSessionPreferences.isRollbackSupported();
         checkArgument(candidateSupported || runningWritable,
             "Device %s has advertised neither :writable-running nor :candidate capability. At least one of these "
-                + "should be advertised. Failed to establish a session.", id.getName());
+                + "should be advertised. Failed to establish a session.", id.name());
         this.lockDatastore = lockDatastore;
     }
 

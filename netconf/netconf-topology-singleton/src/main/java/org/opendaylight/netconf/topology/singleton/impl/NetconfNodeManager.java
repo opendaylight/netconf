@@ -158,7 +158,7 @@ class NetconfNodeManager
 
             final String masterAddress = netconfNodeAfter.getClusteredConnectionStatus().getNetconfMasterNode();
             final String masterActorPath = NetconfTopologyUtils.createActorPath(masterAddress,
-                    NetconfTopologyUtils.createMasterActorName(id.getName(),
+                    NetconfTopologyUtils.createMasterActorName(id.name(),
                             netconfNodeAfter.getClusteredConnectionStatus().getNetconfMasterNode()));
 
             final AskForMasterMountPoint askForMasterMountPoint = new AskForMasterMountPoint(slaveActorRef);

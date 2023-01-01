@@ -88,7 +88,7 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> dataBroker.newReadWriteTransaction()
             .read(LogicalDatastoreType.OPERATIONAL, TEST_TOPOLOGY_ID
-                .child(Node.class, new NodeKey(new NodeId(ID.getName())))
+                .child(Node.class, new NodeKey(new NodeId(ID.name())))
                 .augmentation(NetconfNode.class))
             .get(5, TimeUnit.SECONDS)
             .filter(conn -> conn.getConnectionStatus() == ConnectionStatus.UnableToConnect)

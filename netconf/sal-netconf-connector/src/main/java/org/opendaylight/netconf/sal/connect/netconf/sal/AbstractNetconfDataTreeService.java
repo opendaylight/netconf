@@ -181,7 +181,7 @@ public abstract sealed class AbstractNetconfDataTreeService implements NetconfDa
         } else if (sessionPreferences.isRunningWritable()) {
             return new Running(id, netconfOps, rollbackSupport, lockDatastore);
         } else {
-            throw new IllegalArgumentException("Device " + id.getName() + " has advertised neither :writable-running "
+            throw new IllegalArgumentException("Device " + id.name() + " has advertised neither :writable-running "
                 + "nor :candidate capability. Failed to establish session, as at least one of these must be "
                 + "advertised.");
         }

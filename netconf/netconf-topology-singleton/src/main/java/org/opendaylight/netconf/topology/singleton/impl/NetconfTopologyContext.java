@@ -73,7 +73,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     @Override
     public void instantiateServiceInstance() {
-        LOG.info("Master was selected: {}", remoteDeviceId.getHost().getIpAddress());
+        LOG.info("Master was selected: {}", remoteDeviceId.host().getIpAddress());
 
         isMaster = true;
 
@@ -88,7 +88,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
                     Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
                     netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService),
-                    NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
+                    NetconfTopologyUtils.createMasterActorName(remoteDeviceId.name(), masterAddress));
 
             remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
         }
