@@ -33,9 +33,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.unavailable.capabilities.UnavailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
@@ -58,7 +56,9 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Init device state transaction {} putting if absent operational data started.", id,
             writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), getNodeIdBuilder(id)
+        final var nodePath = id.getTopologyBindingPath();
+        writeTx.put(LogicalDatastoreType.OPERATIONAL, nodePath, new NodeBuilder()
+            .withKey(nodePath.getKey())
             .addAugmentation(new NetconfNodeBuilder()
                 .setConnectionStatus(ConnectionStatus.Connecting)
                 .setHost(id.getHost())
@@ -176,10 +176,6 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
                 LOG.error("{}: Transaction({}) {} FAILED!", id, txType, transaction.getIdentifier(), throwable);
             }
         }, MoreExecutors.directExecutor());
-    }
-
-    private static NodeBuilder getNodeIdBuilder(final RemoteDeviceId id) {
-        return new NodeBuilder().withKey(new NodeKey(new NodeId(id.getName())));
     }
 
     @Override
