@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -85,7 +85,7 @@ public class WriteRunningTx extends AbstractWriteTx {
     @Override
     protected void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode> data,
                               final DataContainerChild editStructure,
-                              final Optional<ModifyAction> defaultOperation,
+                              final Optional<EffectiveOperation> defaultOperation,
                               final String operation) {
         changes.add(new Change(editStructure, defaultOperation));
     }
@@ -101,9 +101,9 @@ public class WriteRunningTx extends AbstractWriteTx {
     private static final class Change {
 
         private final DataContainerChild editStructure;
-        private final Optional<ModifyAction> defaultOperation;
+        private final Optional<EffectiveOperation> defaultOperation;
 
-        Change(final DataContainerChild editStructure, final Optional<ModifyAction> defaultOperation) {
+        Change(final DataContainerChild editStructure, final Optional<EffectiveOperation> defaultOperation) {
             this.editStructure = editStructure;
             this.defaultOperation = defaultOperation;
         }

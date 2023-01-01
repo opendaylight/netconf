@@ -24,7 +24,7 @@ import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -128,7 +128,7 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         LOG.debug("{}: Merge {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.merge(store, path, data, defaultOperation)));
@@ -138,7 +138,7 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         LOG.debug("{}: Replace {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.replace(store, path, data, defaultOperation)));
@@ -148,7 +148,7 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     @Override
     public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         LOG.debug("{}: Create {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.create(store, path, data, defaultOperation)));

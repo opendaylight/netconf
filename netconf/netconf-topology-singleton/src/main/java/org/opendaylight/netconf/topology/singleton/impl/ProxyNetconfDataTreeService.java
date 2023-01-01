@@ -17,7 +17,7 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.netconf.ProxyNetconfService;
@@ -103,7 +103,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         isLocked();
         return proxyNetconfService.merge(store, path, data, defaultOperation);
     }
@@ -111,7 +111,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         isLocked();
         return proxyNetconfService.replace(store, path, data, defaultOperation);
     }
@@ -119,7 +119,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
     @Override
     public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         isLocked();
         return proxyNetconfService.create(store, path, data, defaultOperation);
     }

@@ -9,7 +9,7 @@ package org.opendaylight.netconf.topology.singleton.messages.netconf;
 
 import java.io.Serializable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 
 public class EditConfigRequest implements Serializable {
@@ -17,10 +17,10 @@ public class EditConfigRequest implements Serializable {
 
     private final LogicalDatastoreType store;
     private final NormalizedNodeMessage data;
-    private final ModifyAction defaultOperation;
+    private final EffectiveOperation defaultOperation;
 
     public EditConfigRequest(final LogicalDatastoreType store, final NormalizedNodeMessage data,
-                             final ModifyAction defaultOperation) {
+                             final EffectiveOperation defaultOperation) {
         this.store = store;
         this.data = data;
         this.defaultOperation = defaultOperation;
@@ -34,7 +34,7 @@ public class EditConfigRequest implements Serializable {
         return store;
     }
 
-    public ModifyAction getDefaultOperation() {
+    public EffectiveOperation getDefaultOperation() {
         return defaultOperation;
     }
 }

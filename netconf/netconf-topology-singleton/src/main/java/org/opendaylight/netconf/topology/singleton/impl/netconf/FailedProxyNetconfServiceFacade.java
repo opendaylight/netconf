@@ -18,7 +18,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -84,7 +84,7 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         LOG.debug("{}: Merge {} {} - failure", id, store, path, failure);
         return serviceFailed("merge");
     }
@@ -92,7 +92,7 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         LOG.debug("{}: Replace {} {} - failure", id, store, path, failure);
         return serviceFailed("replace");
     }
@@ -100,7 +100,7 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
     @Override
     public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         LOG.debug("{}: Create {} {} - failure", id, store, path, failure);
         return serviceFailed("create");
     }

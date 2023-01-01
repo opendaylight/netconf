@@ -26,7 +26,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -168,7 +168,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         LOG.debug("{}: Merge {} {} via actor {}", id, store, path, masterActor);
         masterActor.tell(new MergeEditConfigRequest(
             store, new NormalizedNodeMessage(path, data), defaultOperation.orElse(null)), ActorRef.noSender());
@@ -179,7 +179,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         LOG.debug("{}: Replace {} {} via actor {}", id, store, path, masterActor);
 
         masterActor.tell(new ReplaceEditConfigRequest(
@@ -190,7 +190,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     @Override
     public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final NormalizedNode data,
-            final Optional<ModifyAction> defaultOperation) {
+            final Optional<EffectiveOperation> defaultOperation) {
         LOG.debug("{}: Create {} {} via actor {}", id, store, path, masterActor);
         masterActor.tell(new CreateEditConfigRequest(
             store, new NormalizedNodeMessage(path, data), defaultOperation.orElse(null)), ActorRef.noSender());
