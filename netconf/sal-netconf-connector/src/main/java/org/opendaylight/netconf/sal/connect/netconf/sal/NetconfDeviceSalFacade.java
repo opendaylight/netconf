@@ -7,20 +7,20 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
-import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseable {
+public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSalFacade.class);
 
     private final RemoteDeviceId id;
@@ -28,15 +28,15 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
     private final boolean lockDatastore;
 
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
-            final DataBroker dataBroker, final boolean lockDatastore) {
-        this(id, new NetconfDeviceSalProvider(id, mountPointService, dataBroker), lockDatastore);
+            final boolean lockDatastore) {
+        this(id, new NetconfDeviceSalProvider(id, mountPointService), lockDatastore);
     }
 
     @VisibleForTesting
     NetconfDeviceSalFacade(final RemoteDeviceId id, final NetconfDeviceSalProvider salProvider,
             final boolean lockDatastore) {
-        this.id = id;
-        this.salProvider = salProvider;
+        this.id = requireNonNull(id);
+        this.salProvider = requireNonNull(salProvider);
         this.lockDatastore = lockDatastore;
     }
 
@@ -60,18 +60,15 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
 
         salProvider.getMountInstance().onTopologyDeviceConnected(modelContext, services, netconfDataBroker,
             netconfDataTree);
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(true, deviceSchema.capabilities());
     }
 
     @Override
     public synchronized void onDeviceDisconnected() {
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, NetconfDeviceCapabilities.empty());
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
     }
 
     @Override
     public synchronized void onDeviceFailed(final Throwable throwable) {
-        salProvider.getTopologyDatastoreAdapter().setDeviceAsFailed(throwable);
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
     }
 
