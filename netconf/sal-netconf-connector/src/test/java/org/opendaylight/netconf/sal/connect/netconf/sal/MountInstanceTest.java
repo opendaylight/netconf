@@ -57,7 +57,7 @@ public class MountInstanceTest {
     @Mock
     private DOMNotification notification;
 
-    private NetconfDeviceSalProvider.MountInstance mountInstance;
+    private NetconfDeviceMount mountInstance;
 
     @BeforeClass
     public static void suiteSetUp() throws Exception {
@@ -69,14 +69,14 @@ public class MountInstanceTest {
         when(service.createMountPoint(any(YangInstanceIdentifier.class))).thenReturn(mountPointBuilder);
 
         when(mountPointBuilder.register()).thenReturn(registration);
-        mountInstance = new NetconfDeviceSalProvider.MountInstance(
+        mountInstance = new NetconfDeviceMount(
                 service, new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));
     }
 
 
     @Test
     public void testOnTopologyDeviceConnected() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMDataBroker.class, broker);
@@ -86,7 +86,7 @@ public class MountInstanceTest {
 
     @Test
     public void testOnTopologyDeviceConnectedWithNetconfService() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, null, netconfService);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(NetconfDataTreeService.class, netconfService);
@@ -96,17 +96,17 @@ public class MountInstanceTest {
 
     @Test
     public void testOnTopologyDeviceDisconnected() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
-        mountInstance.onTopologyDeviceDisconnected();
+        mountInstance.onDeviceDisconnected();
         verify(registration).close();
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
     }
 
     @Test
     public void testClose() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         mountInstance.close();
         verify(registration).close();
@@ -114,7 +114,7 @@ public class MountInstanceTest {
 
     @Test
     public void testPublishNotification() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
+        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, new RemoteDeviceServices(rpcService, null),
             notificationService, broker, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);

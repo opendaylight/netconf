@@ -28,7 +28,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabi
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.AbstractNetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceMount;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
@@ -44,10 +44,10 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     private final RemoteDeviceId id;
     private final Timeout actorResponseWaitTime;
-    private final NetconfDeviceSalProvider salProvider;
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
     private final NetconfDeviceTopologyAdapter datastoreAdapter;
+    private final NetconfDeviceMount mount;
     private final boolean lockDatastore;
 
     private NetconfDeviceSchema currentSchema = null;
@@ -64,7 +64,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
                     final DataBroker dataBroker,
                     final boolean lockDatastore) {
         this.id = id;
-        salProvider = new NetconfDeviceSalProvider(id, mountService);
+        mount = new NetconfDeviceMount(mountService, id);
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
         this.actorResponseWaitTime = actorResponseWaitTime;
@@ -105,25 +105,24 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     public void onDeviceDisconnected() {
         LOG.info("Device {} disconnected - unregistering master mount point", id);
         datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty());
-        unregisterMasterMountPoint();
+        mount.onDeviceDisconnected();
     }
 
     @Override
     public void onDeviceFailed(final Throwable throwable) {
         datastoreAdapter.setDeviceAsFailed(throwable);
-        unregisterMasterMountPoint();
+        mount.onDeviceDisconnected();
     }
 
     @Override
     public void onNotification(final DOMNotification domNotification) {
-        salProvider.getMountInstance().publish(domNotification);
+        mount.publish(domNotification);
     }
 
     @Override
     public void close() {
         datastoreAdapter.close();
-        unregisterMasterMountPoint();
-        closeGracefully(salProvider);
+        mount.close();
     }
 
     private void registerMasterMountPoint() {
@@ -144,8 +143,8 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
             actorResponseWaitTime);
         final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
-        salProvider.getMountInstance().onTopologyDeviceConnected(mountContext.getEffectiveModelContext(),
-            deviceServices, proxyDataBroker, proxyNetconfService);
+        mount.onDeviceConnected(mountContext.getEffectiveModelContext(), deviceServices,
+            proxyDataBroker, proxyNetconfService);
     }
 
     protected DOMDataBroker newDeviceDataBroker(final MountPointContext mountContext,
@@ -174,20 +173,5 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         final String masterAddress = Cluster.get(actorSystem).selfAddress().toString();
         LOG.debug("{}: updateDeviceData with master address {}", id, masterAddress);
         datastoreAdapter.updateClusteredDeviceData(true, masterAddress, currentSchema.capabilities());
-    }
-
-    private void unregisterMasterMountPoint() {
-        salProvider.getMountInstance().onTopologyDeviceDisconnected();
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    private void closeGracefully(final AutoCloseable resource) {
-        if (resource != null) {
-            try {
-                resource.close();
-            } catch (final Exception e) {
-                LOG.error("{}: Ignoring exception while closing {}", id, resource, e);
-            }
-        }
     }
 }

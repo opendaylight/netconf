@@ -17,32 +17,27 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSalFacade.class);
-
     private final RemoteDeviceId id;
-    private final NetconfDeviceSalProvider salProvider;
+    private final NetconfDeviceMount mount;
     private final boolean lockDatastore;
 
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
             final boolean lockDatastore) {
-        this(id, new NetconfDeviceSalProvider(id, mountPointService), lockDatastore);
+        this(id, new NetconfDeviceMount(mountPointService, id), lockDatastore);
     }
 
     @VisibleForTesting
-    NetconfDeviceSalFacade(final RemoteDeviceId id, final NetconfDeviceSalProvider salProvider,
-            final boolean lockDatastore) {
+    NetconfDeviceSalFacade(final RemoteDeviceId id, final NetconfDeviceMount mount, final boolean lockDatastore) {
         this.id = requireNonNull(id);
-        this.salProvider = requireNonNull(salProvider);
+        this.mount = requireNonNull(mount);
         this.lockDatastore = lockDatastore;
     }
 
     @Override
     public synchronized void onNotification(final DOMNotification domNotification) {
-        salProvider.getMountInstance().publish(domNotification);
+        mount.publish(domNotification);
     }
 
     @Override
@@ -58,33 +53,21 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
         final var netconfDataBroker = new NetconfDeviceDataBroker(id, mountContext, deviceRpc, sessionPreferences,
             lockDatastore);
 
-        salProvider.getMountInstance().onTopologyDeviceConnected(modelContext, services, netconfDataBroker,
-            netconfDataTree);
+        mount.onDeviceConnected(modelContext, services, netconfDataBroker, netconfDataTree);
     }
 
     @Override
     public synchronized void onDeviceDisconnected() {
-        salProvider.getMountInstance().onTopologyDeviceDisconnected();
+        mount.onDeviceDisconnected();
     }
 
     @Override
     public synchronized void onDeviceFailed(final Throwable throwable) {
-        salProvider.getMountInstance().onTopologyDeviceDisconnected();
+        mount.onDeviceDisconnected();
     }
 
     @Override
     public synchronized void close() {
-        closeGracefully(salProvider);
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    private void closeGracefully(final AutoCloseable resource) {
-        if (resource != null) {
-            try {
-                resource.close();
-            } catch (final Exception e) {
-                LOG.warn("{}: Ignoring exception while closing {}", id, resource, e);
-            }
-        }
+        mount.close();
     }
 }
