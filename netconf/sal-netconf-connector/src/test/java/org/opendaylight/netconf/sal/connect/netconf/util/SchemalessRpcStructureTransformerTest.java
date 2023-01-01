@@ -96,12 +96,12 @@ public class SchemalessRpcStructureTransformerTest {
         this.expectedException = expectedException;
         source = new DOMSource(XmlUtil.readXmlToDocument(getClass()
                 .getResourceAsStream("/schemaless/data/" + testDataset)).getDocumentElement());
-        expectedConfig = new String(Files.readAllBytes(
-                Paths.get(getClass().getResource("/schemaless/edit-config/" + testDataset).toURI())));
-        expectedFilter = new String(Files.readAllBytes(
-                Paths.get(getClass().getResource("/schemaless/filter/" + testDataset).toURI())));
-        getConfigData = new String(Files.readAllBytes(
-                Paths.get(getClass().getResource("/schemaless/get-config/" + testDataset).toURI())));
+        expectedConfig = Files.readString(
+                Paths.get(getClass().getResource("/schemaless/edit-config/" + testDataset).toURI()));
+        expectedFilter = Files.readString(
+                Paths.get(getClass().getResource("/schemaless/filter/" + testDataset).toURI()));
+        getConfigData = Files.readString(
+                Paths.get(getClass().getResource("/schemaless/get-config/" + testDataset).toURI()));
     }
 
     @Test
