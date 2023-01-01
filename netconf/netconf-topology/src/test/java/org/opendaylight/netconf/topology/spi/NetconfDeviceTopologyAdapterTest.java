@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceTopologyAdapterTest {
     private static final KeyedInstanceIdentifier<Topology, TopologyKey> TEST_TOPOLOGY_ID =
-        RemoteDeviceId.DEFAULT_TOPOLOGY_IID;
+        AbstractNetconfTopology.DEFAULT_TOPOLOGY_IID;
     private final RemoteDeviceId id = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
 
     @Mock
