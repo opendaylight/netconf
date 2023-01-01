@@ -219,7 +219,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     private RpcResult<NetconfMessage> createSessionDownRpcResult() {
         return createErrorRpcResult(ErrorType.TRANSPORT,
-                String.format("The netconf session to %1$s is disconnected", id.getName()));
+                String.format("The netconf session to %1$s is disconnected", id.name()));
     }
 
     private static RpcResult<NetconfMessage> createErrorRpcResult(final ErrorType errorType, final String message) {
@@ -350,10 +350,10 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         try {
             if (semaphore != null && !semaphore.tryAcquire()) {
                 LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
-                    + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.getName());
+                    + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.name());
                 return FluentFutures.immediateFailedFluentFuture(new NetconfDocumentedException(
                         "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
-                        + ") waiting for emptying the queue of Netconf device with id: " + id.getName()));
+                        + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
             }
 
             return sendRequestWithLock(message, rpc);

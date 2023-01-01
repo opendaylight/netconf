@@ -72,8 +72,8 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
             .withKey(nodePath.getKey())
             .addAugmentation(new NetconfNodeBuilder()
                 .setConnectionStatus(ConnectionStatus.Connecting)
-                .setHost(id.getHost())
-                .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort()))).build())
+                .setHost(id.host())
+                .setPort(new PortNumber(Uint16.valueOf(id.address().getPort()))).build())
             .build());
         LOG.trace("{}: Init device state transaction {} putting operational data ended.", id, writeTx.getIdentifier());
 
@@ -81,7 +81,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
     }
 
     private @NonNull KeyedInstanceIdentifier<Node, NodeKey> nodePath() {
-        return topologyPath.child(Node.class, new NodeKey(new NodeId(id.getName())));
+        return topologyPath.child(Node.class, new NodeKey(new NodeId(id.name())));
     }
 
     private @NonNull InstanceIdentifier<NetconfNode> netconfNodePath() {
@@ -140,8 +140,8 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         String reason = throwable != null && throwable.getMessage() != null ? throwable.getMessage() : "Unknown reason";
 
         final NetconfNode data = new NetconfNodeBuilder()
-                .setHost(id.getHost())
-                .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
+                .setHost(id.host())
+                .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))
                 .setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
@@ -158,8 +158,8 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
 
     private NetconfNodeBuilder newNetconfNodeBuilder(final boolean up, final NetconfDeviceCapabilities capabilities) {
         return new NetconfNodeBuilder()
-            .setHost(id.getHost())
-            .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
+            .setHost(id.host())
+            .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))
             .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
             .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
                 .setAvailableCapability(ImmutableList.<AvailableCapability>builder()

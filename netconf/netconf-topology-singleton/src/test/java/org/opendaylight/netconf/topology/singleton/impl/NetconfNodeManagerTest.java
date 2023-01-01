@@ -175,7 +175,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         testMasterActorRef = TestActorRef.create(masterSystem, Props.create(TestMasterActor.class, masterSetup,
                 DEVICE_ID, responseTimeout, mockMountPointService).withDispatcher(Dispatchers.DefaultDispatcherId()),
-                NetconfTopologyUtils.createMasterActorName(DEVICE_ID.getName(), masterAddress));
+                NetconfTopologyUtils.createMasterActorName(DEVICE_ID.name(), masterAddress));
 
         SharedSchemaRepository slaveSchemaRepository = new SharedSchemaRepository("slave");
         slaveSchemaRepository.registerSchemaSourceListener(

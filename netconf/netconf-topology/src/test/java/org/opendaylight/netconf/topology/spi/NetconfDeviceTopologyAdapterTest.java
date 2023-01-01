@@ -98,7 +98,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
         verify(mockChain, times(2)).newWriteOnlyTransaction();
         verify(mockTx).delete(LogicalDatastoreType.OPERATIONAL,
-            TEST_TOPOLOGY_ID.child(Node.class, new NodeKey(new NodeId(id.getName()))));
+            TEST_TOPOLOGY_ID.child(Node.class, new NodeKey(new NodeId(id.name()))));
         verify(mockTx, times(2)).commit();
     }
 }

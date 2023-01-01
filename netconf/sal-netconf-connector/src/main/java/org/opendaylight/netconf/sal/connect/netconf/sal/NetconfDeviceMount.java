@@ -71,7 +71,7 @@ public class NetconfDeviceMount implements AutoCloseable {
 
     @Deprecated(forRemoval = true)
     public static @NonNull YangInstanceIdentifier defaultTopologyMountPath(final RemoteDeviceId id) {
-        return DEFAULT_TOPOLOGY_NODE.node(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, id.getName()));
+        return DEFAULT_TOPOLOGY_NODE.node(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, id.name()));
     }
 
     public void onDeviceConnected(final EffectiveModelContext initialCtx,
