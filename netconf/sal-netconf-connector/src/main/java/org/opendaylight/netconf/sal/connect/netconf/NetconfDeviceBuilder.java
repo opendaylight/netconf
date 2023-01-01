@@ -12,9 +12,9 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
 public class NetconfDeviceBuilder {
     private boolean reconnectOnSchemasChange;
