@@ -18,12 +18,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -31,6 +29,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 
 public final class RemoteDeviceId {
+    // FIXME: extract all of this to users, as they are in control of topology-id
     private static final String DEFAULT_TOPOLOGY_NAME = TopologyNetconf.QNAME.getLocalName();
     private static final YangInstanceIdentifier DEFAULT_TOPOLOGY_NODE = YangInstanceIdentifier.builder()
             .node(NetworkTopology.QNAME).node(Topology.QNAME)
@@ -47,7 +46,6 @@ public final class RemoteDeviceId {
 
     private final @NonNull String name;
     private final @NonNull YangInstanceIdentifier topologyPath;
-    private final @NonNull KeyedInstanceIdentifier<Node, NodeKey> topologyBindingPath;
 
     private InetSocketAddress address;
     private Host host;
@@ -55,7 +53,6 @@ public final class RemoteDeviceId {
     private RemoteDeviceId(final String name) {
         this.name = requireNonNull(name);
         topologyPath = DEFAULT_TOPOLOGY_NODE.node(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, name));
-        topologyBindingPath = DEFAULT_TOPOLOGY_IID.child(Node.class, new NodeKey(new NodeId(name)));
     }
 
     public RemoteDeviceId(final String name, final InetSocketAddress address) {
@@ -72,10 +69,6 @@ public final class RemoteDeviceId {
 
     public @NonNull String getName() {
         return name;
-    }
-
-    public @NonNull KeyedInstanceIdentifier<Node, NodeKey> getTopologyBindingPath() {
-        return topologyBindingPath;
     }
 
     public @NonNull YangInstanceIdentifier getTopologyPath() {
