@@ -30,9 +30,13 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.Co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.augment.test.rev160808.Node1;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -41,6 +45,9 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 // FIXME: base on AbstractDataBrokerTest test?
 public class NetconfDeficeTopologyAdapterIntegrationTest {
     private static final RemoteDeviceId ID = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
+    private static final KeyedInstanceIdentifier<Topology, TopologyKey> TEST_TOPOLOGY_ID =
+        // FIXME: do not use this constant
+        RemoteDeviceId.DEFAULT_TOPOLOGY_IID;
 
     private static BindingRuntimeContext RUNTIME_CONTEXT;
 
@@ -67,12 +74,12 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
         customizer.updateSchema(RUNTIME_CONTEXT);
 
         final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.put(LogicalDatastoreType.OPERATIONAL, RemoteDeviceId.DEFAULT_TOPOLOGY_IID, new TopologyBuilder()
-            .withKey(RemoteDeviceId.DEFAULT_TOPOLOGY_IID.getKey())
+        tx.put(LogicalDatastoreType.OPERATIONAL, TEST_TOPOLOGY_ID, new TopologyBuilder()
+            .withKey(TEST_TOPOLOGY_ID.getKey())
             .build());
         tx.commit().get(2, TimeUnit.SECONDS);
 
-        adapter = new NetconfDeviceTopologyAdapter(dataBroker, ID);
+        adapter = new NetconfDeviceTopologyAdapter(dataBroker, TEST_TOPOLOGY_ID, ID);
     }
 
     @Test
@@ -80,7 +87,9 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
         adapter.setDeviceAsFailed(null);
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> dataBroker.newReadWriteTransaction()
-            .read(LogicalDatastoreType.OPERATIONAL, ID.getTopologyBindingPath().augmentation(NetconfNode.class))
+            .read(LogicalDatastoreType.OPERATIONAL, TEST_TOPOLOGY_ID
+                .child(Node.class, new NodeKey(new NodeId(ID.getName())))
+                .augmentation(NetconfNode.class))
             .get(5, TimeUnit.SECONDS)
             .filter(conn -> conn.getConnectionStatus() == ConnectionStatus.UnableToConnect)
             .isPresent());
