@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import java.net.InetSocketAddress;
 import java.util.Objects;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.DomainName;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -44,9 +45,9 @@ public final class RemoteDeviceId {
         InstanceIdentifier.create(NetworkTopology.class)
         .child(Topology.class, new TopologyKey(new TopologyId(DEFAULT_TOPOLOGY_NAME)));
 
-    private final String name;
-    private final YangInstanceIdentifier topologyPath;
-    private final KeyedInstanceIdentifier<Node, NodeKey> topologyBindingPath;
+    private final @NonNull String name;
+    private final @NonNull YangInstanceIdentifier topologyPath;
+    private final @NonNull KeyedInstanceIdentifier<Node, NodeKey> topologyBindingPath;
 
     private InetSocketAddress address;
     private Host host;
@@ -69,15 +70,15 @@ public final class RemoteDeviceId {
             : new Host(new DomainName(address.getHostString()));
     }
 
-    public String getName() {
+    public @NonNull String getName() {
         return name;
     }
 
-    public KeyedInstanceIdentifier<Node, NodeKey> getTopologyBindingPath() {
+    public @NonNull KeyedInstanceIdentifier<Node, NodeKey> getTopologyBindingPath() {
         return topologyBindingPath;
     }
 
-    public YangInstanceIdentifier getTopologyPath() {
+    public @NonNull YangInstanceIdentifier getTopologyPath() {
         return topologyPath;
     }
 
