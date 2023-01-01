@@ -24,6 +24,14 @@
             <artifactId>threadpool-config-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>ietf-topology</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>yang-ext</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>sal-netconf-connector</artifactId>
         </dependency>
