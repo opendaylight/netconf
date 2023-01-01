@@ -73,11 +73,7 @@ public class NetconfDeviceSalFacadeTest {
             eq(remoteDeviceId.getTopologyBindingPath().augmentation(NetconfNode.class)), nodeCaptor.capture());
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        final NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(dataBroker, remoteDeviceId);
-
         deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, salProvider, true);
-
-        doReturn(adapter).when(salProvider).getTopologyDatastoreAdapter();
 
         doReturn(mountInstance).when(salProvider).getMountInstance();
         doNothing().when(mountInstance).onTopologyDeviceDisconnected();
