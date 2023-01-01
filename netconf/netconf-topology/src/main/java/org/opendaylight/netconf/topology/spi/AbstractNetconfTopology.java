@@ -49,7 +49,6 @@ import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.auth.DatastoreBackedPublicKeyAuth;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
@@ -216,8 +215,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
 
-        final var deviceSalFacade = new NetconfDeviceSalFacade(deviceId, mountPointService, dataBroker,
-            node.requireLockDatastore());
+        final var deviceSalFacade = new NetconfTopologyDeviceSalFacade(deviceId, mountPointService,
+            node.requireLockDatastore(), dataBroker);
         // The facade we are going it present to NetconfDevice
         RemoteDeviceHandler salFacade;
         final KeepaliveSalFacade keepAliveFacade;

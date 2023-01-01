@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal;
+package org.opendaylight.netconf.topology.spi;
 
 import static java.util.Objects.requireNonNull;
 
@@ -50,7 +50,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
 
     private TransactionChain txChain;
 
-    NetconfDeviceTopologyAdapter(final DataBroker dataBroker, final RemoteDeviceId id) {
+    public NetconfDeviceTopologyAdapter(final DataBroker dataBroker, final RemoteDeviceId id) {
         this.dataBroker = requireNonNull(dataBroker);
         this.id = requireNonNull(id);
         txChain = dataBroker.createMergingTransactionChain(this);

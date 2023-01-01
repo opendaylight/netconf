@@ -31,6 +31,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
+import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
@@ -46,6 +47,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private final NetconfDeviceSalProvider salProvider;
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
+    private final NetconfDeviceTopologyAdapter datastoreAdapter;
     private final boolean lockDatastore;
 
     private NetconfDeviceSchema currentSchema = null;
@@ -62,11 +64,13 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
                     final DataBroker dataBroker,
                     final boolean lockDatastore) {
         this.id = id;
-        salProvider = new NetconfDeviceSalProvider(id, mountService, dataBroker);
+        salProvider = new NetconfDeviceSalProvider(id, mountService);
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.lockDatastore = lockDatastore;
+
+        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, id);
     }
 
     @Override
@@ -100,13 +104,13 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     @Override
     public void onDeviceDisconnected() {
         LOG.info("Device {} disconnected - unregistering master mount point", id);
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, NetconfDeviceCapabilities.empty());
+        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty());
         unregisterMasterMountPoint();
     }
 
     @Override
     public void onDeviceFailed(final Throwable throwable) {
-        salProvider.getTopologyDatastoreAdapter().setDeviceAsFailed(throwable);
+        datastoreAdapter.setDeviceAsFailed(throwable);
         unregisterMasterMountPoint();
     }
 
@@ -117,6 +121,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     @Override
     public void close() {
+        datastoreAdapter.close();
         unregisterMasterMountPoint();
         closeGracefully(salProvider);
     }
@@ -168,8 +173,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private void updateDeviceData() {
         final String masterAddress = Cluster.get(actorSystem).selfAddress().toString();
         LOG.debug("{}: updateDeviceData with master address {}", id, masterAddress);
-        salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, masterAddress,
-            currentSchema.capabilities());
+        datastoreAdapter.updateClusteredDeviceData(true, masterAddress, currentSchema.capabilities());
     }
 
     private void unregisterMasterMountPoint() {
