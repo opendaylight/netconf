@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,16 +21,15 @@ import org.slf4j.LoggerFactory;
  * </ul>
  */
 public class WriteCandidateRunningTx extends WriteCandidateTx {
-
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateRunningTx.class);
 
     public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps,
-                                   final boolean rollbackSupport) {
+            final boolean rollbackSupport) {
         this(id, netOps, rollbackSupport, true);
     }
 
-    public WriteCandidateRunningTx(RemoteDeviceId id, NetconfBaseOps netconfOps, boolean rollbackSupport,
-            boolean isLockAllowed) {
+    public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps,
+            final boolean rollbackSupport, final boolean isLockAllowed) {
         super(id, netconfOps, rollbackSupport, isLockAllowed);
     }
 

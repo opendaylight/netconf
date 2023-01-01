@@ -5,17 +5,15 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.messages;
 
 import akka.util.Timeout;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 
 public class RefreshSlaveActor {
-
     private final SchemaRepository schemaRepository;
     private final RemoteDeviceId id;
     private final SchemaSourceRegistry schemaRegistry;
@@ -26,8 +24,8 @@ public class RefreshSlaveActor {
                              final Timeout actorResponseWaitTime) {
         this.setup = setup;
         this.id = id;
-        this.schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
-        this.schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
+        schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
+        schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
         this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
