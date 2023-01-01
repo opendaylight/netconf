@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,25 +39,22 @@ public class NetconfDeviceSalFacadeTest {
     private final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test", new InetSocketAddress("127.0.0.1", 8000));
 
     @Mock
-    private NetconfDeviceSalProvider.MountInstance mountInstance;
-    @Mock
-    private NetconfDeviceSalProvider salProvider;
+    private NetconfDeviceMount mountInstance;
 
     private NetconfDeviceSalFacade deviceFacade;
 
     @Before
     public void setUp() throws Exception {
-        deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, salProvider, true);
+        doNothing().when(mountInstance).onDeviceDisconnected();
 
-        doReturn(mountInstance).when(salProvider).getMountInstance();
-        doNothing().when(mountInstance).onTopologyDeviceDisconnected();
+        deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, mountInstance, true);
     }
 
     @Test
     public void testOnDeviceDisconnected() {
         deviceFacade.onDeviceDisconnected();
 
-        verify(mountInstance, times(1)).onTopologyDeviceDisconnected();
+        verify(mountInstance, times(1)).onDeviceDisconnected();
     }
 
     @Test
@@ -66,13 +62,13 @@ public class NetconfDeviceSalFacadeTest {
         final Throwable throwable = new Throwable();
         deviceFacade.onDeviceFailed(throwable);
 
-        verify(mountInstance, times(1)).onTopologyDeviceDisconnected();
+        verify(mountInstance, times(1)).onDeviceDisconnected();
     }
 
     @Test
     public void testOnDeviceClose() throws Exception {
         deviceFacade.close();
-        verify(salProvider).close();
+        verify(mountInstance).close();
     }
 
     @Test
@@ -87,7 +83,7 @@ public class NetconfDeviceSalFacadeTest {
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), new EmptyMountPointContext(schemaContext)),
             netconfSessionPreferences, deviceServices);
 
-        verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext), eq(deviceServices),
+        verify(mountInstance, times(1)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
             any(DOMDataBroker.class), any(NetconfDataTreeService.class));
     }
 
