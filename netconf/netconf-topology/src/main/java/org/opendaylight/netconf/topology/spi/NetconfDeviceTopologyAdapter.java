@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.Transaction;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
@@ -33,7 +34,14 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.unavailable.capabilities.UnavailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
@@ -43,20 +51,23 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceTopologyAdapter.class);
 
     private final SettableFuture<Empty> closeFuture = SettableFuture.create();
+    private final @NonNull KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath;
     private final DataBroker dataBroker;
     private final RemoteDeviceId id;
 
     private TransactionChain txChain;
 
-    public NetconfDeviceTopologyAdapter(final DataBroker dataBroker, final RemoteDeviceId id) {
+    public NetconfDeviceTopologyAdapter(final DataBroker dataBroker,
+            final KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath, final RemoteDeviceId id) {
         this.dataBroker = requireNonNull(dataBroker);
+        this.topologyPath = requireNonNull(topologyPath);
         this.id = requireNonNull(id);
         txChain = dataBroker.createMergingTransactionChain(this);
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Init device state transaction {} putting if absent operational data started.", id,
             writeTx.getIdentifier());
-        final var nodePath = id.getTopologyBindingPath();
+        final var nodePath = nodePath();
         writeTx.put(LogicalDatastoreType.OPERATIONAL, nodePath, new NodeBuilder()
             .withKey(nodePath.getKey())
             .addAugmentation(new NetconfNodeBuilder()
@@ -69,14 +80,21 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         commitTransaction(writeTx, "init");
     }
 
+    private @NonNull KeyedInstanceIdentifier<Node, NodeKey> nodePath() {
+        return topologyPath.child(Node.class, new NodeKey(new NodeId(id.getName())));
+    }
+
+    private @NonNull InstanceIdentifier<NetconfNode> netconfNodePath() {
+        return nodePath().augmentation(NetconfNode.class);
+    }
+
     public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
 
         // FIXME: this needs to be tied together with node's operational existence
-        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
-            id.getTopologyBindingPath().augmentation(NetconfNode.class),
+        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
             newNetconfNodeBuilder(up, capabilities).build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
@@ -89,8 +107,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
-            id.getTopologyBindingPath().augmentation(NetconfNode.class),
+        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
             newNetconfNodeBuilder(up, capabilities)
                 .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
                     .setNetconfMasterNode(masterAddress)
@@ -131,8 +148,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         LOG.trace(
                 "{}: Setting device state as failed {} putting operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
-                id.getTopologyBindingPath().augmentation(NetconfNode.class), data);
+        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(), data);
         LOG.trace(
                 "{}: Setting device state as failed {} putting operational data ended.",
                 id, writeTx.getIdentifier());
@@ -182,7 +198,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
     public void close() {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Close device state transaction {} removing all data started.", id, writeTx.getIdentifier());
-        writeTx.delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
+        writeTx.delete(LogicalDatastoreType.OPERATIONAL, nodePath());
         LOG.trace("{}: Close device state transaction {} removing all data ended.", id, writeTx.getIdentifier());
         commitTransaction(writeTx, "close");
 
