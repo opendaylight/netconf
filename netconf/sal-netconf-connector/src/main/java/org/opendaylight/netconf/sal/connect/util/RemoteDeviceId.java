@@ -45,7 +45,6 @@ public final class RemoteDeviceId {
         .child(Topology.class, new TopologyKey(new TopologyId(DEFAULT_TOPOLOGY_NAME)));
 
     private final String name;
-    private final NodeKey key;
     private final YangInstanceIdentifier topologyPath;
     private final KeyedInstanceIdentifier<Node, NodeKey> topologyBindingPath;
     private InetSocketAddress address;
@@ -54,8 +53,7 @@ public final class RemoteDeviceId {
     private RemoteDeviceId(final String name) {
         this.name = requireNonNull(name);
         topologyPath = DEFAULT_TOPOLOGY_NODE.node(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, name));
-        key = new NodeKey(new NodeId(name));
-        topologyBindingPath = DEFAULT_TOPOLOGY_IID.child(Node.class, key);
+        topologyBindingPath = DEFAULT_TOPOLOGY_IID.child(Node.class, new NodeKey(new NodeId(name)));
     }
 
     public RemoteDeviceId(final String name, final InetSocketAddress address) {
@@ -74,11 +72,7 @@ public final class RemoteDeviceId {
         return name;
     }
 
-    public NodeKey getBindingKey() {
-        return key;
-    }
-
-    public InstanceIdentifier<Node> getTopologyBindingPath() {
+    public KeyedInstanceIdentifier<Node, NodeKey> getTopologyBindingPath() {
         return topologyBindingPath;
     }
 
