@@ -47,6 +47,7 @@ public final class RemoteDeviceId {
     private final String name;
     private final YangInstanceIdentifier topologyPath;
     private final KeyedInstanceIdentifier<Node, NodeKey> topologyBindingPath;
+
     private InetSocketAddress address;
     private Host host;
 
@@ -96,11 +97,11 @@ public final class RemoteDeviceId {
     @Override
     public boolean equals(final Object obj) {
         return this == obj || obj instanceof RemoteDeviceId other
-            && name.equals(other.name) && topologyBindingPath.equals(other.topologyBindingPath);
+            && name.equals(other.name) && topologyPath.equals(other.topologyPath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, topologyBindingPath);
+        return Objects.hash(name, topologyPath);
     }
 }
