@@ -14,13 +14,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.DomainName;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.network.topology.topology.topology.types.TopologyNetconf;
 
 public record RemoteDeviceId(@NonNull String name, @NonNull InetSocketAddress address) {
-    // FIXME: extract all of this to users, as they are in control of topology-id
-    @Deprecated(since = "5.0.0", forRemoval = true)
-    public static final String DEFAULT_TOPOLOGY_NAME = TopologyNetconf.QNAME.getLocalName();
-
     public RemoteDeviceId {
         requireNonNull(name);
         requireNonNull(address);

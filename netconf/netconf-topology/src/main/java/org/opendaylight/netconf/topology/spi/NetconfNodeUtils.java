@@ -17,12 +17,41 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.network.topology.topology.topology.types.TopologyNetconf;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 
 /**
  * Utility methods to work with {@link NetconfNode} information.
  */
 public final class NetconfNodeUtils {
+    // FIXME: extract all of this to users, as they are in control of topology-id
+    @Deprecated(forRemoval = true)
+    public static final String DEFAULT_TOPOLOGY_NAME = TopologyNetconf.QNAME.getLocalName();
+
+    // FIXME: extract this into caller and pass to constructor
+    @Deprecated(forRemoval = true)
+    public static final KeyedInstanceIdentifier<Topology, TopologyKey> DEFAULT_TOPOLOGY_IID =
+        InstanceIdentifier.create(NetworkTopology.class)
+        .child(Topology.class, new TopologyKey(new TopologyId(DEFAULT_TOPOLOGY_NAME)));
+
+    private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id").intern();
+    // FIXME: push this out to callers
+    private static final YangInstanceIdentifier DEFAULT_TOPOLOGY_NODE = YangInstanceIdentifier.builder()
+        .node(NetworkTopology.QNAME).node(Topology.QNAME)
+        .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), DEFAULT_TOPOLOGY_NAME)
+        .node(Node.QNAME)
+        .build();
+
     private NetconfNodeUtils() {
         // Hidden on purpose
     }
@@ -90,5 +119,10 @@ public final class NetconfNodeUtils {
 
         return new UserPreferences(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined),
             overrideYangModuleCaps, overrideNonModuleCaps);
+    }
+
+    @Deprecated(forRemoval = true)
+    public static @NonNull YangInstanceIdentifier defaultTopologyMountPath(final RemoteDeviceId id) {
+        return DEFAULT_TOPOLOGY_NODE.node(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, id.name()));
     }
 }

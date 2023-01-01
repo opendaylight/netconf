@@ -15,6 +15,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceMount;
+import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class SlaveSalFacade {
         this.id = id;
         this.actorSystem = actorSystem;
         this.actorResponseWaitTime = actorResponseWaitTime;
-        mount = new NetconfDeviceMount(id, mountPointService, NetconfDeviceMount.defaultTopologyMountPath(id));
+        mount = new NetconfDeviceMount(id, mountPointService, NetconfNodeUtils.defaultTopologyMountPath(id));
     }
 
     public void registerSlaveMountPoint(final EffectiveModelContext remoteSchemaContext, final ActorRef masterActorRef,
