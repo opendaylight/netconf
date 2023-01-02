@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3f301c8_e339b90a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-02T13:30:37Z",
+      "side": 1,
+      "message": "Its not working. I am always getting `\"netconf-node-topology:session-id\": 0`.\n\nWee need to investigate where session id is obtained (`NetconfNodeUtils.java`), maybe other places as well.\n\nIn addition there is no test which asserts session id value.",
+      "revId": "bdb447f7512877b662c9a9cfd38f22935d1b1956",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
