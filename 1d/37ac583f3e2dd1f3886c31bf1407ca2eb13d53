@@ -1,0 +1,8 @@
+Code-Review+1: Branislav Malo <bmalo@frinx.io>
+Code-Review+2: Robert Varga <nite@hq.sk>
+Verified+1: jenkins-releng ODL
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Mon, 02 Jan 2023 18:04:04 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/99855
+Project: netconf
+Branch: refs/heads/master
