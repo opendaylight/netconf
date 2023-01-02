@@ -47,7 +47,6 @@
     <module>netconf-auth</module>
     <module>aaa-authn-odl-plugin</module>
     <module>netconf-notifications-api</module>
-    <module>sal-netconf-connector</module>
     <module>yanglib</module>
     <module>tools</module>
 
