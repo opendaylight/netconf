@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d4e83a6_bbddcce7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-02T14:26:15Z",
+      "side": 1,
+      "message": "We can find current session id in `NetconfDeviceCommunicator#onSessionUp`. We have to adapt `NetconfSessionPreferences.fromNetconfSession` method to use it.",
+      "revId": "34330cf565c90221c360b425c36a42695dcd2b20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
