@@ -47,9 +47,6 @@
     <module>netconf-auth</module>
     <module>aaa-authn-odl-plugin</module>
     <module>netconf-notifications-api</module>
-    <module>netconf-topology</module>
-    <module>netconf-topology-impl</module>
-    <module>netconf-topology-singleton</module>
     <module>sal-netconf-connector</module>
     <module>yanglib</module>
     <module>tools</module>
@@ -57,7 +54,6 @@
 
     <module>callhome-model</module>
     <module>callhome-protocol</module>
-    <module>callhome-provider</module>
 
     <module>netconf-test-models</module>
 
