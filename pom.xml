@@ -37,6 +37,7 @@
         <module>model</module>
         <module>transport</module>
         <module>apps</module>
+        <module>third-party</module>
 
         <!-- Legacy layout -->
         <module>netconf</module>
