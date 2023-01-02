@@ -33,6 +33,24 @@
       "message": "Unsigned? You are using -1 as placeholder when there is no session ID.\nWhat about to use yangtools provided Uint32 type?",
       "revId": "560e321e65f87f98fad87172290c84c315fae7c4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4036b2a3_dd5df5d6",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 11
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-02T12:49:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a78af9a_e5c6d45a",
+      "revId": "560e321e65f87f98fad87172290c84c315fae7c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
