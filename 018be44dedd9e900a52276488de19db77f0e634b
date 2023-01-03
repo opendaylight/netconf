@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ee46b5b_8c4fc1ab",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2023-01-03T02:02:31Z",
+      "side": 1,
+      "message": "removed DeviceNotificationListenerAdaptor class",
+      "parentUuid": "e0496cc3_2d3eb9db",
+      "range": {
+        "startLine": 25,
+        "startChar": 19,
+        "endLine": 25,
+        "endChar": 55
+      },
+      "revId": "018be44dedd9e900a52276488de19db77f0e634b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d7af353c_4b124061",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-12-31T14:55:11Z",
       "side": 1,
       "message": "the big question is right here: how is uniqueness guaranteed here?\nif it is not, then we can easily replace the an existing listener and then we fail to shut it down...",
+      "range": {
+        "startLine": 39,
+        "startChar": 17,
+        "endLine": 39,
+        "endChar": 20
+      },
+      "revId": "018be44dedd9e900a52276488de19db77f0e634b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c95d552_822afff8",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2023-01-03T02:02:31Z",
+      "side": 1,
+      "message": "removed DeviceNotificationListenerAdaptor class",
+      "parentUuid": "d7af353c_4b124061",
       "range": {
         "startLine": 39,
         "startChar": 17,

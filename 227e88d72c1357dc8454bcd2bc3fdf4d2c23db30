@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "811266d6_7585d776",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 46
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2023-01-03T02:02:31Z",
+      "side": 1,
+      "message": "removed DeviceNotificationListenerAdaptor class, please review. ",
+      "revId": "227e88d72c1357dc8454bcd2bc3fdf4d2c23db30",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
