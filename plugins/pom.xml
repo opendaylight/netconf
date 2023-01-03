@@ -29,6 +29,7 @@
     </properties>
 
     <modules>
+        <module>netconf-dom-api</module>
         <module>sal-netconf-connector</module>
     </modules>
 </project>
