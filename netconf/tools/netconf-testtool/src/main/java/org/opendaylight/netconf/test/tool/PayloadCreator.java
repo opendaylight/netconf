@@ -47,21 +47,23 @@ final class PayloadCreator {
     private static final QName TOPOLOGY_ID_QNAME = QName.create(Topology.QNAME, "topology-id").intern();
     private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id").intern();
 
-    private static final NodeIdentifier PORT_NODE_IDENTIFIER = NodeIdentifier
-            .create(QName.create(NetconfNodeFields.QNAME, "port"));
-    private static final NodeIdentifier HOST_NODE_IDENTIFIER = NodeIdentifier
-            .create(QName.create(NetconfNodeFields.QNAME,"host"));
-    private static final NodeIdentifier USERNAME_NODE_IDENTIFIER = NodeIdentifier
-            .create(QName.create(NetconfNodeFields.QNAME,"username"));
-    private static final NodeIdentifier PASSWORD_NODE_IDENTIFIER = NodeIdentifier
-            .create(QName.create(NetconfNodeFields.QNAME, "password"));
-    private static final NodeIdentifier CREDENTIALS_NODE_IDENTIFIER = NodeIdentifier.create(Credentials.QNAME);
-    private static final NodeIdentifier TCP_ONLY_NODE_IDENTIFIER = NodeIdentifier
-            .create(QName.create(NetconfNodeFields.QNAME, "tcp-only"));
-    private static final NodeIdentifier KEEPALIVE_DELAY_NODE_IDENTIFIER = NodeIdentifier
-            .create(QName.create(NetconfNodeFields.QNAME, "keepalive-delay"));
-    private static final NodeIdentifier SCHEMALESS_NODE_IDENTIFIER = NodeIdentifier
-            .create(QName.create(NetconfNodeFields.QNAME, "schemaless"));
+    private static final NodeIdentifier PORT_NODE_IDENTIFIER =
+        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "port").intern());
+    private static final NodeIdentifier HOST_NODE_IDENTIFIER =
+        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME,"host").intern());
+    private static final NodeIdentifier USERNAME_NODE_IDENTIFIER =
+        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME,"username").intern());
+    private static final NodeIdentifier PASSWORD_NODE_IDENTIFIER =
+        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "password").intern());
+    private static final NodeIdentifier CREDENTIALS_NODE_IDENTIFIER =
+        // Note: this is an instantiated container, we need to use the proper namespace
+        NodeIdentifier.create(Credentials.QNAME.bindTo(NetconfNodeFields.QNAME.getModule()).intern());
+    private static final NodeIdentifier TCP_ONLY_NODE_IDENTIFIER =
+        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "tcp-only").intern());
+    private static final NodeIdentifier KEEPALIVE_DELAY_NODE_IDENTIFIER =
+        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "keepalive-delay").intern());
+    private static final NodeIdentifier SCHEMALESS_NODE_IDENTIFIER =
+        NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "schemaless").intern());
     private static final String DEFAULT_TOPOLOGY_ID = "topology-netconf";
     private static final String DEFAULT_NODE_PASSWORD = "admin";
     private static final String DEFAULT_NODE_USERNAME = "admin";
