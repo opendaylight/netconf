@@ -30,5 +30,8 @@
 
     <modules>
         <module>netconf-api</module>
+        <module>netconf-client</module>
+        <module>netconf-impl</module>
+        <module>netconf-util</module>
     </modules>
 </project>
