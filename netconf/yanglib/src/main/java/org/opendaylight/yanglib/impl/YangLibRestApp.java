@@ -13,7 +13,7 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.yanglib.api.YangLibService;
 
-public class YangLibRestApp extends Application {
+public final class YangLibRestApp extends Application {
     private final YangLibService yangLibService;
 
     public YangLibRestApp(final YangLibService yangLibService) {

@@ -7,31 +7,43 @@
  */
 package org.opendaylight.yanglib.impl;
 
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletException;
-import javax.ws.rs.core.Application;
 import org.opendaylight.aaa.web.ServletDetails;
 import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
+import org.opendaylight.yanglib.api.YangLibService;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Initializes the wep app.
  *
  * @author Thomas Pantelis
  */
-public final class WebInitializer implements AutoCloseable {
+@Singleton
+@Component(service = { })
+public final class JaxRsYangLib implements AutoCloseable {
     private final Registration registration;
 
-    public WebInitializer(final WebServer webServer,  final WebContextSecurer webContextSecurer,
-            final ServletSupport servletSupport, final Application webApp) throws ServletException {
+    @Activate
+    @Inject
+    public JaxRsYangLib(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
+            @Reference final ServletSupport servletSupport, @Reference final YangLibService yangLibService)
+                throws ServletException {
         final var webContextBuilder = WebContext.builder()
             .name("RFC8525 YANG Library")
             .contextPath("/yanglib")
             .supportsSessions(true)
             .addServlet(ServletDetails.builder()
-                .servlet(servletSupport.createHttpServletBuilder(webApp).build())
+                .servlet(servletSupport.createHttpServletBuilder(new YangLibRestApp(yangLibService)).build())
                 .addUrlPattern("/*")
                 .build());
 
@@ -40,6 +52,8 @@ public final class WebInitializer implements AutoCloseable {
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
 
+    @PreDestroy
+    @Deactivate
     @Override
     public void close() {
         registration.close();
