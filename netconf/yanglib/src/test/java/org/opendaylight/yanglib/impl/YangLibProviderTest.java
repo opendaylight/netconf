@@ -37,7 +37,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -62,13 +61,8 @@ public class YangLibProviderTest {
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
 
-        final var yanglibConfig = new YanglibConfigBuilder().setBindingAddr("www.fake.com")
-            .setBindingPort(Uint32.valueOf(300))
-            .setCacheFolder(YangLibProviderTest.class.getResource("/model").getPath())
-            .build();
-        yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker, new DefaultYangParserFactory());
-        // this will automatically register all models from /model directory
-        yangLibProvider.init();
+        yangLibProvider = new YangLibProvider(dataBroker, new DefaultYangParserFactory(),
+            YangLibProviderTest.class.getResource("/model").getPath(), "www.fake.com", Uint32.valueOf(300));
     }
 
     @Test
