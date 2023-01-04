@@ -90,7 +90,7 @@ public final class ApiPath implements Immutable {
 
         @Override
         public boolean equals(final @Nullable Object obj) {
-            return this == obj || obj instanceof ApiIdentifier && equals((ApiIdentifier) obj);
+            return this == obj || obj instanceof ApiIdentifier other && equals(other);
         }
     }
 
@@ -116,14 +116,8 @@ public final class ApiPath implements Immutable {
 
         @Override
         public boolean equals(final @Nullable Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (!(obj instanceof ListInstance)) {
-                return false;
-            }
-            final var other = (ListInstance) obj;
-            return equals(other) && keyValues.equals(other.keyValues);
+            return this == obj || obj instanceof ListInstance other && equals(other)
+                && keyValues.equals(other.keyValues);
         }
 
         @Override
@@ -237,7 +231,7 @@ public final class ApiPath implements Immutable {
 
     @Override
     public boolean equals(final @Nullable Object obj) {
-        return obj == this || obj instanceof ApiPath && steps.equals(((ApiPath) obj).steps());
+        return obj == this || obj instanceof ApiPath other && steps.equals(other.steps());
     }
 
     private static ApiPath parseString(final ApiPathParser parser, final String str) throws ParseException {
