@@ -5,36 +5,36 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api.query;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 
 /**
- * OpenDaylight extension parameter. When used as {@code odl-pretty-print=true}, it will instruct outbound XML/JSON
- * formatters to make the output easier for humans to understand.
+ * OpenDaylight extension parameter. When used as {@code odl-skip-notification-data=true}, it will instruct the listener
+ * streams to prune data from notifications.
  */
-public final class PrettyPrintParam implements RestconfQueryParam<PrettyPrintParam> {
+public final class SkipNotificationDataParam implements RestconfQueryParam<SkipNotificationDataParam> {
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
-    public static final String uriName = "odl-pretty-print";
+    public static final String uriName = "odl-skip-notification-data";
 
     private static final @NonNull URI CAPABILITY =
-        URI.create("urn:opendaylight:params:restconf:capability:pretty-print:1.0");
-    private static final @NonNull PrettyPrintParam FALSE = new PrettyPrintParam(false);
-    private static final @NonNull PrettyPrintParam TRUE = new PrettyPrintParam(true);
+        URI.create("urn:opendaylight:params:restconf:capability:skip-notification-data:1.0");
+    private static final @NonNull SkipNotificationDataParam FALSE = new SkipNotificationDataParam(false);
+    private static final @NonNull SkipNotificationDataParam TRUE = new SkipNotificationDataParam(true);
 
     private final boolean value;
 
-    private PrettyPrintParam(final boolean value) {
+    private SkipNotificationDataParam(final boolean value) {
         this.value = value;
     }
 
-    public static @NonNull PrettyPrintParam of(final boolean value) {
+    public static @NonNull SkipNotificationDataParam of(final boolean value) {
         return value ? TRUE : FALSE;
     }
 
-    public static @NonNull PrettyPrintParam forUriValue(final String uriValue) {
+    public static @NonNull SkipNotificationDataParam forUriValue(final String uriValue) {
         switch (uriValue) {
             case "false":
                 return FALSE;
@@ -46,8 +46,8 @@ public final class PrettyPrintParam implements RestconfQueryParam<PrettyPrintPar
     }
 
     @Override
-    public Class<@NonNull PrettyPrintParam> javaClass() {
-        return PrettyPrintParam.class;
+    public Class<org.opendaylight.restconf.api.query.SkipNotificationDataParam> javaClass() {
+        return SkipNotificationDataParam.class;
     }
 
     @Override
