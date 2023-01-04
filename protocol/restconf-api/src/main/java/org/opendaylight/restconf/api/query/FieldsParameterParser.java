@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api.query;
 
 import com.google.common.collect.ImmutableList;
 import java.text.ParseException;
@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
-import org.opendaylight.restconf.nb.rfc8040.FieldsParam.NodeSelector;
+import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
+import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.yangtools.yang.common.YangNames;
 
 /**
@@ -175,20 +175,12 @@ final class FieldsParameterParser {
                 }
                 path.add(new ApiIdentifier(null, first));
 
-                switch (ch) {
-                    case ';':
-                    case ')':
-                        // End of this selector, return
-                        return idx;
-                    case '/':
-                        // Process next step
-                        return parsePathStepFirst(str, idx + 1);
-                    case '(':
-                        // Process at least one sub-selector
-                        return parseSubSelectors(str, idx + 1);
-                    default:
-                        throw new ParseException("Expecting [a-zA-Z_.-/(:;], not '" + ch + "'", idx);
-                }
+                return switch (ch) {
+                    case ';', ')' -> /* End of this selector, return */ idx;
+                    case '/' -> /* Process next step */ parsePathStepFirst(str, idx + 1);
+                    case '(' -> /* Process at least one sub-selector */ parseSubSelectors(str, idx + 1);
+                    default -> throw new ParseException("Expecting [a-zA-Z_.-/(:;], not '" + ch + "'", idx);
+                };
             }
         }
 
@@ -212,20 +204,12 @@ final class FieldsParameterParser {
                 }
                 path.add(new ApiIdentifier(module, str.substring(offset, idx)));
 
-                switch (ch) {
-                    case ';':
-                    case ')':
-                        // End of this selector, return
-                        return idx;
-                    case '/':
-                        // Process next step
-                        return parsePathStepFirst(str, idx + 1);
-                    case '(':
-                        // Process at least one sub-selector
-                        return parseSubSelectors(str, idx + 1);
-                    default:
-                        throw new ParseException("Expecting [a-zA-Z_.-/(:;], not '" + ch + "'", idx);
-                }
+                return switch (ch) {
+                    case ';', ')' -> /* End of this selector, return */ idx;
+                    case '/' -> /* Process next step */ parsePathStepFirst(str, idx + 1);
+                    case '(' -> /* Process at least one sub-selector */ parseSubSelectors(str, idx + 1);
+                    default -> throw new ParseException("Expecting [a-zA-Z_.-/(:;], not '" + ch + "'", idx);
+                };
             }
         }
 

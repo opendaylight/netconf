@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,9 +16,9 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath.ListInstance;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath.Step;
+import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
+import org.opendaylight.restconf.api.ApiPath.ListInstance;
+import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 
 public class ApiPathTest {

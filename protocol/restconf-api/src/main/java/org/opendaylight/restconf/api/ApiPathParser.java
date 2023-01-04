@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api;
 
 import static com.google.common.base.Verify.verify;
 import static com.google.common.base.Verify.verifyNotNull;
@@ -17,9 +17,9 @@ import java.text.ParseException;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath.ListInstance;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath.Step;
+import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
+import org.opendaylight.restconf.api.ApiPath.ListInstance;
+import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.yangtools.yang.common.YangNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +65,7 @@ class ApiPathParser {
         }
     }
 
-    private static final Supplier<@NonNull ApiPathParser> URL_FACTORY;
+    private static final Supplier<org.opendaylight.restconf.api.ApiPathParser> URL_FACTORY;
 
     static {
         // Select the correct parser implementation where consecutive slashes are concerned. We default to lenient

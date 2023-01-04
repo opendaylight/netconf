@@ -13,6 +13,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.MoreObjects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
+import org.opendaylight.restconf.api.query.FilterParam;
+import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
+import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
+import org.opendaylight.restconf.api.query.StartTimeParam;
+import org.opendaylight.restconf.api.query.StopTimeParam;
 import org.opendaylight.yangtools.concepts.Immutable;
 
 /**

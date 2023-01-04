@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api.query;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -15,9 +15,8 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import java.text.ParseException;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
+import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
@@ -122,7 +121,7 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
     }
 
     @Override
-    public Class<@NonNull FieldsParam> javaClass() {
+    public Class<FieldsParam> javaClass() {
         return FieldsParam.class;
     }
 

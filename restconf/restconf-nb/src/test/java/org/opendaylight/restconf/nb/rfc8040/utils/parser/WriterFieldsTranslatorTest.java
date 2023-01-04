@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Set;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.FieldsParam;
 import org.opendaylight.yangtools.yang.common.QName;
 
 /**

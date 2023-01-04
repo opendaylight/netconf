@@ -531,6 +531,11 @@
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-common</artifactId>
                 <version>${project.version}</version>
             </dependency>

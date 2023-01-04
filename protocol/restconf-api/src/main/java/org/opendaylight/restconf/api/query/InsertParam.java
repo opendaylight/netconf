@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api.query;
 
 import static java.util.Objects.requireNonNull;
 
@@ -44,7 +44,7 @@ public enum InsertParam implements RestconfQueryParam<InsertParam> {
     }
 
     @Override
-    public Class<@NonNull InsertParam> javaClass() {
+    public Class<InsertParam> javaClass() {
         return InsertParam.class;
     }
 

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api.query;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
@@ -35,18 +35,15 @@ public final class LeafNodesOnlyParam implements RestconfQueryParam<LeafNodesOnl
     }
 
     public static @NonNull LeafNodesOnlyParam forUriValue(final String uriValue) {
-        switch (uriValue) {
-            case "false":
-                return FALSE;
-            case "true":
-                return TRUE;
-            default:
-                throw new IllegalArgumentException("Value can be 'false' or 'true', not '" + uriValue + "'");
-        }
+        return switch (uriValue) {
+            case "false" -> FALSE;
+            case "true" -> TRUE;
+            default -> throw new IllegalArgumentException("Value can be 'false' or 'true', not '" + uriValue + "'");
+        };
     }
 
     @Override
-    public Class<@NonNull LeafNodesOnlyParam> javaClass() {
+    public Class<LeafNodesOnlyParam> javaClass() {
         return LeafNodesOnlyParam.class;
     }
 

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -13,8 +13,9 @@ import static org.junit.Assert.assertThrows;
 import java.text.ParseException;
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
-import org.opendaylight.restconf.nb.rfc8040.FieldsParam.NodeSelector;
+import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
+import org.opendaylight.restconf.api.query.FieldsParam;
+import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 
 public class FieldsParamTest {
     // https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3:

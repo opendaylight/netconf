@@ -1,40 +1,40 @@
 /*
- * Copyright (c) 2022 FRINX s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2021 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api.query;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 
 /**
- * OpenDaylight extension parameter. When used as {@code changed-leaf-nodes-only=true}, it will instruct the listener
- * streams to only emit leaf nodes.
+ * OpenDaylight extension parameter. When used as {@code odl-pretty-print=true}, it will instruct outbound XML/JSON
+ * formatters to make the output easier for humans to understand.
  */
-public final class ChangedLeafNodesOnlyParam implements RestconfQueryParam<ChangedLeafNodesOnlyParam> {
+public final class PrettyPrintParam implements RestconfQueryParam<PrettyPrintParam> {
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
-    public static final String uriName = "changed-leaf-nodes-only";
+    public static final String uriName = "odl-pretty-print";
 
     private static final @NonNull URI CAPABILITY =
-            URI.create("urn:opendaylight:params:restconf:capability:changed-leaf-nodes-only:1.0");
-    private static final @NonNull ChangedLeafNodesOnlyParam FALSE = new ChangedLeafNodesOnlyParam(false);
-    private static final @NonNull ChangedLeafNodesOnlyParam TRUE = new ChangedLeafNodesOnlyParam(true);
+        URI.create("urn:opendaylight:params:restconf:capability:pretty-print:1.0");
+    private static final @NonNull PrettyPrintParam FALSE = new PrettyPrintParam(false);
+    private static final @NonNull PrettyPrintParam TRUE = new PrettyPrintParam(true);
 
     private final boolean value;
 
-    private ChangedLeafNodesOnlyParam(final boolean value) {
+    private PrettyPrintParam(final boolean value) {
         this.value = value;
     }
 
-    public static @NonNull ChangedLeafNodesOnlyParam of(final boolean value) {
+    public static @NonNull PrettyPrintParam of(final boolean value) {
         return value ? TRUE : FALSE;
     }
 
-    public static @NonNull ChangedLeafNodesOnlyParam forUriValue(final String uriValue) {
+    public static @NonNull PrettyPrintParam forUriValue(final String uriValue) {
         return switch (uriValue) {
             case "false" -> FALSE;
             case "true" -> TRUE;
@@ -43,8 +43,8 @@ public final class ChangedLeafNodesOnlyParam implements RestconfQueryParam<Chang
     }
 
     @Override
-    public Class<@NonNull ChangedLeafNodesOnlyParam> javaClass() {
-        return ChangedLeafNodesOnlyParam.class;
+    public Class<PrettyPrintParam> javaClass() {
+        return PrettyPrintParam.class;
     }
 
     @Override
