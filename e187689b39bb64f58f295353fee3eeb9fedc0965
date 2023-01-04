@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9dc14968_8072fc03",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-04T11:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ca57a6f_24f3dce8",
+      "range": {
+        "startLine": 383,
+        "startChar": 39,
+        "endLine": 383,
+        "endChar": 49
+      },
+      "revId": "e187689b39bb64f58f295353fee3eeb9fedc0965",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5b2e82c_3952754f",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8997b97_c59faf69",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-04T11:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5b2e82c_3952754f",
+      "range": {
+        "startLine": 385,
+        "startChar": 20,
+        "endLine": 385,
+        "endChar": 47
+      },
+      "revId": "e187689b39bb64f58f295353fee3eeb9fedc0965",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb6469a7_eb06ca28",
@@ -60,6 +108,30 @@
       "writtenOn": "2023-01-03T11:19:52Z",
       "side": 1,
       "message": "rendering this cast unneeded",
+      "range": {
+        "startLine": 386,
+        "startChar": 29,
+        "endLine": 386,
+        "endChar": 52
+      },
+      "revId": "e187689b39bb64f58f295353fee3eeb9fedc0965",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "353e5894_fd24a267",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-04T11:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb6469a7_eb06ca28",
       "range": {
         "startLine": 386,
         "startChar": 29,
