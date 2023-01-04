@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "801f4c17_18da81e6",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-04T17:33:34Z",
+      "side": 1,
+      "message": "This QNames in all tests should be class constants. Move it to AbstractBodyReaderTest class and then can be reused also in JsonBodyReaderTest.\n\nPlease also rename it to something like:\n`DATA -\u003e DATA_LEAF_QNAME`",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f75e5553_e29d60b2",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-04T17:33:34Z",
+      "side": 1,
+      "message": "Please remove these comments and use instead javadoc. Something like:\n```\n    /**\n     * Test of Yang Patch on the leaf set node element.\n     * TODO: Remove ignore when NETCONF-937 will be resolved\n     */\n    @Ignore\n    @Test\n    public void modulePatchTargetLeafSetNodeTest() throws Exception {\n```",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3e5ce2b_b6271fae",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-04T17:33:34Z",
+      "side": 1,
+      "message": "Please remove these comments and use instead javadoc. Something like:\n```\n    /**\n     * Test of Yang Patch on the top choice node element.\n     * TODO: Remove ignore when NETCONF-937 will be resolved\n     */\n    @Ignore\n    @Test\n    public void moduleTargetChoiceNodeTest() throws Exception {\n```",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70304e02_6482c8cc",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/xml/xmlPATCHdataChoiceNode.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-04T17:33:34Z",
+      "side": 1,
+      "message": "Fix wrong namespace:\n `\u003ccase-cont1 xmlns\u003d\"choice:ns\"\u003e`",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f9406ae_25c2a72a",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/xml/xmlPATCHdataLeafSetNode.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-04T17:33:34Z",
+      "side": 1,
+      "message": "Remove superfluous leaf-list element in value:\n` \u003cmy-set xmlns\u003d\"set:ns\"\u003edata2\u003c/my-set\u003e`",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d001423d_8fa28c55",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/choice-model.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-04T17:33:34Z",
+      "side": 1,
+      "message": "Please merge this models (choice-model.yang, leaf-set-model.yang, map-model.yang, unkeyed-list-model.yang) to one yang model.\n\nIt would be better to have one model with 4 nodes than vice versa.",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
