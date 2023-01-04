@@ -13,6 +13,11 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.api.query.ContentParam;
+import org.opendaylight.restconf.api.query.DepthParam;
+import org.opendaylight.restconf.api.query.FieldsParam;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.yangtools.concepts.Immutable;
 
 /**

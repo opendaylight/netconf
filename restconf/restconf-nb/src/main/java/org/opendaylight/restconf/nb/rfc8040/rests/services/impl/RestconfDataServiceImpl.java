@@ -131,6 +131,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final ReadDataParams readParams = QueryParams.newReadDataParams(uriInfo);
 
         final EffectiveModelContext schemaContextRef = databindProvider.currentContext().modelContext();
+        // FIXME: go through
         final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef, Optional.of(mountPointService));
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();

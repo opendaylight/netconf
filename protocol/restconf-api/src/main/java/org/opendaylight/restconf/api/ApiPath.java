@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
@@ -16,13 +16,9 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableList;
 import java.text.ParseException;
 import java.util.Objects;
-import javax.ws.rs.PathParam;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.concepts.Immutable;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 
@@ -79,7 +75,7 @@ public final class ApiPath implements Immutable {
      * An {@code api-identifier} step in a {@link ApiPath}.
      */
     public static final class ApiIdentifier extends Step {
-        ApiIdentifier(final @Nullable String module, final String identifier) {
+        public ApiIdentifier(final @Nullable String module, final String identifier) {
             super(module, identifier);
         }
 
@@ -169,28 +165,6 @@ public final class ApiPath implements Immutable {
      */
     public static ApiPath parseUrl(final String str) throws ParseException {
         return str.isEmpty() ? EMPTY : parseString(ApiPathParser.newUrl(), str);
-    }
-
-    /**
-     * Parse an {@link ApiPath} from a raw Request URI. The string is expected to contain percent-encoded bytes. Any
-     * sequence of such bytes is interpreted as a {@code UTF-8}-encoded string. Invalid sequences are rejected.
-     *
-     * @param str Request URI part
-     * @return An {@link ApiPath}
-     * @throws RestconfDocumentedException if the string cannot be parsed
-     * @see PathParam
-     */
-    public static ApiPath valueOf(final @Nullable String str) {
-        if (str == null) {
-            return EMPTY;
-        }
-
-        try {
-            return parseUrl(str);
-        } catch (ParseException e) {
-            throw new RestconfDocumentedException("Invalid path '" + str + "'", ErrorType.APPLICATION,
-                ErrorTag.MALFORMED_MESSAGE, e);
-        }
     }
 
     public ImmutableList<Step> steps() {

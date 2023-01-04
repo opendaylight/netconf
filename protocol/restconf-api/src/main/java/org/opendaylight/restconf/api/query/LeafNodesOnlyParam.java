@@ -5,36 +5,36 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api.query;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 
 /**
- * OpenDaylight extension parameter. When used as {@code odl-skip-notification-data=true}, it will instruct the listener
- * streams to prune data from notifications.
+ * OpenDaylight extension parameter. When used as {@code odl-leaf-nodes-only=true}, it will instruct the listener
+ * streams to only emit leaf nodes.
  */
-public final class SkipNotificationDataParam implements RestconfQueryParam<SkipNotificationDataParam> {
+public final class LeafNodesOnlyParam implements RestconfQueryParam<LeafNodesOnlyParam> {
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
-    public static final String uriName = "odl-skip-notification-data";
+    public static final String uriName = "odl-leaf-nodes-only";
 
     private static final @NonNull URI CAPABILITY =
-        URI.create("urn:opendaylight:params:restconf:capability:skip-notification-data:1.0");
-    private static final @NonNull SkipNotificationDataParam FALSE = new SkipNotificationDataParam(false);
-    private static final @NonNull SkipNotificationDataParam TRUE = new SkipNotificationDataParam(true);
+        URI.create("urn:opendaylight:params:restconf:capability:leaf-nodes-only:1.0");
+    private static final @NonNull LeafNodesOnlyParam FALSE = new LeafNodesOnlyParam(false);
+    private static final @NonNull LeafNodesOnlyParam TRUE = new LeafNodesOnlyParam(true);
 
     private final boolean value;
 
-    private SkipNotificationDataParam(final boolean value) {
+    private LeafNodesOnlyParam(final boolean value) {
         this.value = value;
     }
 
-    public static @NonNull SkipNotificationDataParam of(final boolean value) {
+    public static @NonNull LeafNodesOnlyParam of(final boolean value) {
         return value ? TRUE : FALSE;
     }
 
-    public static @NonNull SkipNotificationDataParam forUriValue(final String uriValue) {
+    public static @NonNull LeafNodesOnlyParam forUriValue(final String uriValue) {
         switch (uriValue) {
             case "false":
                 return FALSE;
@@ -46,8 +46,8 @@ public final class SkipNotificationDataParam implements RestconfQueryParam<SkipN
     }
 
     @Override
-    public Class<@NonNull SkipNotificationDataParam> javaClass() {
-        return SkipNotificationDataParam.class;
+    public Class<org.opendaylight.restconf.api.query.LeafNodesOnlyParam> javaClass() {
+        return LeafNodesOnlyParam.class;
     }
 
     @Override

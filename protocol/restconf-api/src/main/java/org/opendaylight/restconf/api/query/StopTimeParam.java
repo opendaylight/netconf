@@ -5,31 +5,31 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api.query;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 
 /**
- * This class represents a {@code start-time} parameter as defined in
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.7">RFC8040 section 4.8.7</a>.
+ * This class represents a {@code stop-time} parameter as defined in
+ * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.8">RFC8040 section 4.8.8</a>.
  */
-public final class StartTimeParam extends AbstractReplayParam<StartTimeParam> {
+public final class StopTimeParam extends AbstractReplayParam<StopTimeParam> {
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
-    public static final @NonNull String uriName = "start-time";
+    public static final @NonNull String uriName = "stop-time";
 
-    private StartTimeParam(final DateAndTime value) {
+    private StopTimeParam(final DateAndTime value) {
         super(value);
     }
 
-    public static @NonNull StartTimeParam of(final DateAndTime value) {
-        return new StartTimeParam(value);
+    public static @NonNull StopTimeParam of(final DateAndTime value) {
+        return new StopTimeParam(value);
     }
 
     @Override
-    public Class<@NonNull StartTimeParam> javaClass() {
-        return StartTimeParam.class;
+    public Class<org.opendaylight.restconf.api.query.StopTimeParam> javaClass() {
+        return StopTimeParam.class;
     }
 
     @Override
@@ -37,7 +37,7 @@ public final class StartTimeParam extends AbstractReplayParam<StartTimeParam> {
         return uriName;
     }
 
-    public static @NonNull StartTimeParam forUriValue(final String uriValue) {
+    public static @NonNull StopTimeParam forUriValue(final String uriValue) {
         return of(new DateAndTime(uriValue));
     }
 }

@@ -5,36 +5,36 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.api.query;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 
 /**
- * OpenDaylight extension parameter. When used as {@code odl-leaf-nodes-only=true}, it will instruct the listener
- * streams to only emit leaf nodes.
+ * OpenDaylight extension parameter. When used as {@code odl-pretty-print=true}, it will instruct outbound XML/JSON
+ * formatters to make the output easier for humans to understand.
  */
-public final class LeafNodesOnlyParam implements RestconfQueryParam<LeafNodesOnlyParam> {
+public final class PrettyPrintParam implements RestconfQueryParam<PrettyPrintParam> {
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
-    public static final String uriName = "odl-leaf-nodes-only";
+    public static final String uriName = "odl-pretty-print";
 
     private static final @NonNull URI CAPABILITY =
-        URI.create("urn:opendaylight:params:restconf:capability:leaf-nodes-only:1.0");
-    private static final @NonNull LeafNodesOnlyParam FALSE = new LeafNodesOnlyParam(false);
-    private static final @NonNull LeafNodesOnlyParam TRUE = new LeafNodesOnlyParam(true);
+        URI.create("urn:opendaylight:params:restconf:capability:pretty-print:1.0");
+    private static final @NonNull PrettyPrintParam FALSE = new PrettyPrintParam(false);
+    private static final @NonNull PrettyPrintParam TRUE = new PrettyPrintParam(true);
 
     private final boolean value;
 
-    private LeafNodesOnlyParam(final boolean value) {
+    private PrettyPrintParam(final boolean value) {
         this.value = value;
     }
 
-    public static @NonNull LeafNodesOnlyParam of(final boolean value) {
+    public static @NonNull PrettyPrintParam of(final boolean value) {
         return value ? TRUE : FALSE;
     }
 
-    public static @NonNull LeafNodesOnlyParam forUriValue(final String uriValue) {
+    public static @NonNull PrettyPrintParam forUriValue(final String uriValue) {
         switch (uriValue) {
             case "false":
                 return FALSE;
@@ -46,8 +46,8 @@ public final class LeafNodesOnlyParam implements RestconfQueryParam<LeafNodesOnl
     }
 
     @Override
-    public Class<@NonNull LeafNodesOnlyParam> javaClass() {
-        return LeafNodesOnlyParam.class;
+    public Class<org.opendaylight.restconf.api.query.PrettyPrintParam> javaClass() {
+        return PrettyPrintParam.class;
     }
 
     @Override
