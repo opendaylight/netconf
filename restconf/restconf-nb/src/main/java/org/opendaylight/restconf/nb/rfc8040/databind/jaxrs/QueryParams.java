@@ -161,19 +161,20 @@ public final class QueryParams {
                     case WithDefaultsParam.uriName:
                         final var defaultsVal = optionalParam(WithDefaultsParam::forUriValue, paramName, paramValues);
                         if (defaultsVal != null) {
-                            switch (defaultsVal) {
-                                case REPORT_ALL:
+                            tagged = switch (defaultsVal) {
+                                case REPORT_ALL -> {
                                     withDefaults = null;
-                                    tagged = false;
-                                    break;
-                                case REPORT_ALL_TAGGED:
+                                    yield false;
+                                }
+                                case REPORT_ALL_TAGGED -> {
                                     withDefaults = null;
-                                    tagged = true;
-                                    break;
-                                default:
+                                    yield true;
+                                }
+                                default -> {
                                     withDefaults = defaultsVal;
-                                    tagged = false;
-                            }
+                                    yield false;
+                                }
+                            };
                         }
                         break;
                     case PrettyPrintParam.uriName:
@@ -233,15 +234,13 @@ public final class QueryParams {
 
     @VisibleForTesting
     static @Nullable String optionalParam(final String name, final List<String> values) {
-        switch (values.size()) {
-            case 0:
-                return null;
-            case 1:
-                return requireNonNull(values.get(0));
-            default:
-                throw new RestconfDocumentedException("Parameter " + name + " can appear at most once in request URI",
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
+        return switch (values.size()) {
+            case 0 -> null;
+            case 1 -> requireNonNull(values.get(0));
+            default -> throw new RestconfDocumentedException(
+                "Parameter " + name + " can appear at most once in request URI",
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        };
     }
 
     private static <T> @Nullable T optionalParam(final Function<String, @NonNull T> factory, final String name,
