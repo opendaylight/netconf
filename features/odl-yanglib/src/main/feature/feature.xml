@@ -10,8 +10,5 @@
     <feature name="odl-yanglib" version="${project.version}">
         <feature version="[13,14)">odl-karaf-feat-jetty</feature>
         <feature version="[12,13)">odl-mdsal-model-rfc8525</feature>
-        <configfile finalname="etc/opendaylight/datastore/initial/config/yanglib-config.xml">
-            mvn:org.opendaylight.netconf/yanglib/${project.version}/xml/config
-        </configfile>
     </feature>
 </features>
