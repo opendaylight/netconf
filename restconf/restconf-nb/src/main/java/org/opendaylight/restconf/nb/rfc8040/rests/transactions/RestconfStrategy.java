@@ -15,6 +15,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.nb.rfc8040.nmda.FragmentService;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -26,7 +27,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  */
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
-public abstract class RestconfStrategy {
+public abstract class RestconfStrategy implements FragmentService {
     RestconfStrategy() {
         // Hidden on purpose
     }
