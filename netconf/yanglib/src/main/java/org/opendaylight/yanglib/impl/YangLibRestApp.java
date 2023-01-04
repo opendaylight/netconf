@@ -10,13 +10,22 @@ package org.opendaylight.yanglib.impl;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Application;
 import org.opendaylight.yanglib.api.YangLibService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
+@Singleton
+@Component(service = {Application.class})
 public class YangLibRestApp extends Application {
     private final YangLibService yangLibService;
 
-    public YangLibRestApp(final YangLibService yangLibService) {
+    @Activate
+    @Inject
+    public YangLibRestApp(@Reference final YangLibService yangLibService) {
         this.yangLibService = requireNonNull(yangLibService);
     }
 
