@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<yanglib-config xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">
-    <cache-folder>cache/schema</cache-folder>
-    <binding-addr>localhost</binding-addr>
-    <binding-port>8181</binding-port>
-</yanglib-config>

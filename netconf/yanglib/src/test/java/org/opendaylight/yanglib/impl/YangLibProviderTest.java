@@ -16,9 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,8 +35,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangIRSchemaSource;
@@ -62,38 +60,27 @@ public class YangLibProviderTest {
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
 
-        final var yanglibConfig = new YanglibConfigBuilder().setBindingAddr("www.fake.com")
-            .setBindingPort(Uint32.valueOf(300))
-            .setCacheFolder(YangLibProviderTest.class.getResource("/model").getPath())
-            .build();
-        yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker, new DefaultYangParserFactory());
-        // this will automatically register all models from /model directory
-        yangLibProvider.init();
+        yangLibProvider = new YangLibProvider(dataBroker, new DefaultYangParserFactory(),
+            YangLibProviderTest.class.getResource("/model").getPath(), "www.fake.com", Uint32.valueOf(300));
     }
 
     @Test
     public void testSchemaSourceRegistered() {
         // test that initial models are registered
-        final var newModulesMap = new HashMap<ModuleKey, Module>();
-
-        final var model1 = new ModuleBuilder()
-            .setName(new YangIdentifier("model1"))
-            .setRevision(new Revision(new RevisionIdentifier("2023-02-21")))
-            .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/model1/2023-02-21"))
-            .build();
-        newModulesMap.put(model1.key(), model1);
-
-        final var model2 = new ModuleBuilder()
-            .setName(new YangIdentifier("model2"))
-            .setRevision(LegacyRevisionUtils.emptyRevision())
-            .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/model2"))
-            .build();
-        newModulesMap.put(model2.key(), model2);
-
         verify(dataBroker).newWriteOnlyTransaction();
         verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),
             eq(InstanceIdentifier.create(ModulesState.class)),
-            eq(new ModulesStateBuilder().setModule(newModulesMap).build()));
+            eq(new ModulesStateBuilder()
+                .setModule(BindingMap.of(new ModuleBuilder()
+                    .setName(new YangIdentifier("model1"))
+                    .setRevision(new Revision(new RevisionIdentifier("2023-02-21")))
+                    .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/model1/2023-02-21"))
+                    .build(), new ModuleBuilder()
+                    .setName(new YangIdentifier("model2"))
+                    .setRevision(LegacyRevisionUtils.emptyRevision())
+                    .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/model2"))
+                    .build()))
+                .build()));
         verify(writeTransaction).commit();
     }
 
@@ -102,7 +89,7 @@ public class YangLibProviderTest {
         clearInvocations(dataBroker, writeTransaction);
 
         // test empty list of schema sources registered
-        yangLibProvider.schemaSourceRegistered(Collections.emptyList());
+        yangLibProvider.schemaSourceRegistered(List.of());
         // expected behavior is to do nothing
         verifyNoMoreInteractions(dataBroker, writeTransaction);
     }
@@ -112,12 +99,11 @@ public class YangLibProviderTest {
         clearInvocations(dataBroker, writeTransaction);
 
         // test list of non yang schema sources registered
-        final var nonYangSources = new ArrayList<PotentialSchemaSource<?>>();
-        nonYangSources.add(PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
-            YinSchemaSourceRepresentation.class, Costs.IMMEDIATE.getValue()));
-        nonYangSources.add(PotentialSchemaSource.create(new SourceIdentifier("asts-schema-source"),
-            YangIRSchemaSource.class, Costs.IMMEDIATE.getValue()));
-        yangLibProvider.schemaSourceRegistered(nonYangSources);
+        yangLibProvider.schemaSourceRegistered(List.of(
+            PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
+                YinSchemaSourceRepresentation.class, Costs.IMMEDIATE.getValue()),
+            PotentialSchemaSource.create(new SourceIdentifier("asts-schema-source"),
+                YangIRSchemaSource.class, Costs.IMMEDIATE.getValue())));
 
         // expected behavior is to do nothing
         verifyNoMoreInteractions(dataBroker, writeTransaction);

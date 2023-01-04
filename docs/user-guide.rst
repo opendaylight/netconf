@@ -1137,37 +1137,34 @@ To start this plugin, you have to install odl-yanglib feature. Then you
 have to configure YANGLIB either through RESTCONF or NETCONF. We will
 show how to configure YANGLIB through RESTCONF.
 
-YANGLIB configuration through RESTCONF
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+YANGLIB configuration
+~~~~~~~~~~~~~~~~~~~~~
+YANGLIB configuration works through OSGi Configuration Admin interface, in the
+``org.opendaylight.netconf.yanglib`` configuration PID. There are three tuneables you can
+set:
 
-You have to specify what local YANG modules directory you want to provide.
-Then you have to specify address and port whre you want to provide YANG
-sources. For example, we want to serve yang sources from folder /sources
-on localhost:8181 adress. The configuration for this scenario will be
-as follows:
+* ``cache-folder``, which defaults to ``cache/schema``
+* ``binding-address``, which defaults to ``localhost``
+* ``binding-port``, which defaults to ``8181``
 
-::
-
-    PUT  http://localhost:8181/rests/data/yanglib:yanglib-config
-
-Headers:
-
--  Accept: application/xml
-
--  Content-Type: application/xml
-
-Payload:
+In order to change these settings, you can either modify the corresponding configuration
+file, ``etc/org.opendaylight.netconf.yanglib.cfg``, for example:
 
 ::
+    cache-folder = cache/newSchema
+    binding-address = localhost
+    binding-port = 8181
 
-    <yanglib-config xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">
-        <cache-folder>cache/newSchema</cache-folder>
-        <binding-addr>localhost</binding-addr>
-        <binding-port>8181</binding-port>
-    </yanglib-config>
+Or use Karaf CLI:
 
-This should result in a 2xx response and new YANGLIB instance should be
-created. This YANGLIB takes all YANG sources from /sources folder and
+::
+    opendaylight-user@root>config:edit org.opendaylight.netconf.yanglib
+    opendaylight-user@root>config:property-set cache-folder cache/newSchema
+    opendaylight-user@root>config:property-set binding-address localhost
+    opendaylight-user@root>config:property-set binding-port 8181
+    opendaylight-user@root>config:update
+
+This YANGLIB takes all YANG sources from the configured sources folder and
 for each generates URL in form:
 
 ::
