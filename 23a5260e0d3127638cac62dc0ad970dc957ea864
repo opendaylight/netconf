@@ -191,6 +191,24 @@
       "message": "Please merge this models (choice-model.yang, leaf-set-model.yang, map-model.yang, unkeyed-list-model.yang) to one yang model.\n\nIt would be better to have one model with 4 nodes than vice versa.",
       "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2d9bd0c_4b93a2e1",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/choice-model.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-05T09:43:28Z",
+      "side": 1,
+      "message": "Its OK like this.",
+      "parentUuid": "d001423d_8fa28c55",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
