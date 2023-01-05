@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cdac1d0_05b7b9ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-05T12:53:32Z",
+      "side": 1,
+      "message": "After installing odl-yanglib feature this component is not initialized. So this patch is not working even after my recommended fixes. Try to figure out how to fix this.\n\n1) Install it with:\nopendaylight-user@root\u003efeature:install odl-netconf-topology odl-restconf-all odl-yanglib \n\n2) Check Karaf logs and debug YangLibProvider if some break-point will be activated.",
+      "revId": "a53e04c7c6a8739f30c9214a7d4f86e012601e9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e82a6001_5242ce5c",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-05T12:53:32Z",
+      "side": 1,
+      "message": "I think this should be:\n@Component(service \u003d {SchemaSourceListener.class, YangLibService.class})",
+      "revId": "a53e04c7c6a8739f30c9214a7d4f86e012601e9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d05dd156_43891f42",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-05T12:53:32Z",
+      "side": 1,
+      "message": "Missing @Deactivate",
+      "revId": "a53e04c7c6a8739f30c9214a7d4f86e012601e9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06a4b419_7fb811a8",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-05T12:53:32Z",
+      "side": 1,
+      "message": "Missing @Activate",
+      "revId": "a53e04c7c6a8739f30c9214a7d4f86e012601e9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
