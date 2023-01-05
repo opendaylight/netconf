@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64b7c3c3_f1f42151",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/xml/xmlPATCHdataAugmentedElement.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-05T16:08:38Z",
+      "side": 1,
+      "message": "Please add copyright header when the file is created. It means in th eprevious patch: `git rebase --interactive HEAD~2`",
+      "revId": "2aa508addfadc7ece7a50086c4fdb79c689a5ceb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
