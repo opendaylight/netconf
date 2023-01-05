@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "082cf60cea141264b9af046647bcce0d41802d6c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8671fa4_f7856007",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-05T13:49:25Z",
+      "side": 1,
+      "message": "This QNames in all tests should be class constants. Move it to AbstractBodyReaderTest class and then can be reused also in JsonPatcBodyReaderTest.\n\nPlease rename it properly.",
+      "revId": "082cf60cea141264b9af046647bcce0d41802d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
