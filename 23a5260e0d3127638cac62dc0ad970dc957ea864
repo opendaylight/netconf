@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42da962d_11890dce",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-05T09:21:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "801f4c17_18da81e6",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f75e5553_e29d60b2",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-01-04T17:33:34Z",
       "side": 1,
       "message": "Please remove these comments and use instead javadoc. Something like:\n```\n    /**\n     * Test of Yang Patch on the leaf set node element.\n     * TODO: Remove ignore when NETCONF-937 will be resolved\n     */\n    @Ignore\n    @Test\n    public void modulePatchTargetLeafSetNodeTest() throws Exception {\n```",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2809154_69089a44",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-05T09:21:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f75e5553_e29d60b2",
       "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87c5c052_371582f9",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-05T09:21:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3e5ce2b_b6271fae",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70304e02_6482c8cc",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cb1532d_8fe34b3e",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/xml/xmlPATCHdataChoiceNode.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-05T09:21:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70304e02_6482c8cc",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f9406ae_25c2a72a",
@@ -82,6 +154,24 @@
       "writtenOn": "2023-01-04T17:33:34Z",
       "side": 1,
       "message": "Remove superfluous leaf-list element in value:\n` \u003cmy-set xmlns\u003d\"set:ns\"\u003edata2\u003c/my-set\u003e`",
+      "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8d56352_e84d54d5",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/xml/xmlPATCHdataLeafSetNode.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-05T09:21:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f9406ae_25c2a72a",
       "revId": "23a5260e0d3127638cac62dc0ad970dc957ea864",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
