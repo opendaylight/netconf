@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5eaf429_42bcd9fd",
+        "filename": "netconf/yanglib/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-05T08:45:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40b9b2b1_0e53be08",
+      "range": {
+        "startLine": 75,
+        "startChar": 12,
+        "endLine": 76,
+        "endChar": 34
+      },
+      "revId": "56fa2598d50b2eb2c81e6e2f6be9a33bddfa49e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "78445c2c_52ad6d40",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-01-04T18:55:15Z",
       "side": 1,
       "message": "missing @Singleton, @Component and should be a final class",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 6
+      },
+      "revId": "56fa2598d50b2eb2c81e6e2f6be9a33bddfa49e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42cbf16b_71055fe4",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-05T08:45:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78445c2c_52ad6d40",
       "range": {
         "startLine": 65,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce101c78_bd47335d",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-05T08:45:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a4366f4_26998b9e",
+      "range": {
+        "startLine": 91,
+        "startChar": 33,
+        "endLine": 91,
+        "endChar": 69
+      },
+      "revId": "56fa2598d50b2eb2c81e6e2f6be9a33bddfa49e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f651d17_81892b88",
@@ -83,6 +155,30 @@
       "writtenOn": "2023-01-04T18:55:15Z",
       "side": 1,
       "message": "all dependencies should be @Reference",
+      "range": {
+        "startLine": 92,
+        "startChar": 27,
+        "endLine": 92,
+        "endChar": 44
+      },
+      "revId": "56fa2598d50b2eb2c81e6e2f6be9a33bddfa49e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5c523e6_7956cc8a",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-05T08:45:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f651d17_81892b88",
       "range": {
         "startLine": 92,
         "startChar": 27,
