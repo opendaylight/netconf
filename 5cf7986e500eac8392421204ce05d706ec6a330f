@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a88586c_fdc62ac5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 36
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-09T16:26:00Z",
+      "side": 1,
+      "message": "Because only them have this problem. All other mixin nodes works fine or was already fixed(like Choice Node that was fixed in NETCONF-631). I already described why this is happening it comments here: NETCONF-747.",
+      "parentUuid": "d708d887_7e9a1413",
+      "revId": "5cf7986e500eac8392421204ce05d706ec6a330f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12f086f1_63c77403",
