@@ -16,6 +16,24 @@
       "message": "The last patch overrides last changes from Ivan. Please move it back:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/102227/30..31",
       "revId": "f64c55bd87d0c06f401749fef2b37d968e98cb37",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "626f854b_4f819a73",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 34
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-09T11:23:20Z",
+      "side": 1,
+      "message": "Done :)",
+      "parentUuid": "cb116a5b_6671774d",
+      "revId": "f64c55bd87d0c06f401749fef2b37d968e98cb37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
