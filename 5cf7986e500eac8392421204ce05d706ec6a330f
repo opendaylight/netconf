@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d708d887_7e9a1413",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 36
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-09T16:07:35Z",
+      "side": 1,
+      "message": "JsonNormalizedNodeBodyReader is using `while (result instanceof AugmentationNode || result instanceof ChoiceNode) {`. Why do we need just condition for augmentation?",
+      "revId": "5cf7986e500eac8392421204ce05d706ec6a330f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12f086f1_63c77403",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-09T16:07:35Z",
+      "side": 1,
+      "message": "You can use text block instead of `jsonPATCHdataAugmentedElement`.",
+      "revId": "5cf7986e500eac8392421204ce05d706ec6a330f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b135cd0_4d405221",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-09T16:07:35Z",
+      "side": 1,
+      "message": "You can use text block instead of `xmlPATCHdataAugmentedElement`.",
+      "revId": "5cf7986e500eac8392421204ce05d706ec6a330f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
