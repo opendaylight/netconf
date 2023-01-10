@@ -159,11 +159,16 @@ final class CreateStreamUtil {
             .map(DataContainerChild::body)
             .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
                 ErrorTag.OPERATION_FAILED));
+
+        // FIXME: just beautiful: a ClassCastException if it is something different!
+        final String deviceName =
+            ((YangInstanceIdentifier.NodeIdentifierWithPredicates.Singleton)value.getLastPathArgument())
+            .values().getElement().toString();
+
         final DOMMountPoint mountPoint = mountPointService.getMountPoint(value)
             .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
                 ErrorTag.OPERATION_FAILED));
 
-        final String deviceName = extractDeviceName(value);
         final NotificationOutputType outputType = prepareOutputType(data);
 
         // FIXME: what is the relationship to the unused refSchemaCtx?
@@ -192,11 +197,6 @@ final class CreateStreamUtil {
             .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH, baseUrl + deviceName
                 + "?" + RestconfStreamsConstants.NOTIFICATION_TYPE + "=" + RestconfStreamsConstants.DEVICE))
             .build());
-    }
-
-    private static String extractDeviceName(final YangInstanceIdentifier iid) {
-        return ((YangInstanceIdentifier.NodeIdentifierWithPredicates.Singleton)iid.getLastPathArgument())
-            .values().getElement().toString();
     }
 
     /**
