@@ -153,12 +153,14 @@ final class CreateStreamUtil {
             final EffectiveModelContext refSchemaCtx, final SubscribeToStreamUtil streamUtil,
             final DOMMountPointService mountPointService) {
         // parsing out of container with settings and path
+        // FIXME: ugly cast
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
+        // FIXME: ugly cast
         final YangInstanceIdentifier value =
             (YangInstanceIdentifier) data.findChildByArg(DEVICE_NOTIFICATION_PATH_NODEID)
-            .map(DataContainerChild::body)
-            .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
-                ErrorTag.OPERATION_FAILED));
+                .map(DataContainerChild::body)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                    ErrorTag.OPERATION_FAILED));
 
         // FIXME: just beautiful: a ClassCastException if it is something different!
         final String deviceName =
