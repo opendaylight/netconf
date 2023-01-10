@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.StampedLock;
-import java.util.function.Function;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -66,13 +66,16 @@ public final class ListenersBroker {
      * Gets {@link ListenerAdapter} specified by stream identification.
      *
      * @param streamName Stream name.
-     * @return {@link ListenerAdapter} specified by stream name wrapped in {@link Optional} or {@link Optional#empty()}
-     *     if listener with specified stream name doesn't exist.
+     * @return {@link ListenerAdapter} specified by stream name or {@code null} if listener with specified stream name
+     *         does not exist.
+     * @throws NullPointerException in {@code streamName} is {@code null}
      */
-    public Optional<ListenerAdapter> getDataChangeListenerFor(final String streamName) {
+    public @Nullable ListenerAdapter dataChangeListenerFor(final String streamName) {
+        requireNonNull(streamName);
+
         final long stamp = dataChangeListenersLock.readLock();
         try {
-            return Optional.ofNullable(dataChangeListeners.get(requireNonNull(streamName)));
+            return dataChangeListeners.get(streamName);
         } finally {
             dataChangeListenersLock.unlockRead(stamp);
         }
@@ -82,13 +85,16 @@ public final class ListenersBroker {
      * Gets {@link NotificationListenerAdapter} specified by stream name.
      *
      * @param streamName Stream name.
-     * @return {@link NotificationListenerAdapter} specified by stream name wrapped in {@link Optional}
-     *     or {@link Optional#empty()} if listener with specified stream name doesn't exist.
+     * @return {@link NotificationListenerAdapter} specified by stream name or {@code null} if listener with specified
+     *         stream name does not exist.
+     * @throws NullPointerException in {@code streamName} is {@code null}
      */
-    public Optional<NotificationListenerAdapter> getNotificationListenerFor(final String streamName) {
+    public @Nullable NotificationListenerAdapter notificationListenerFor(final String streamName) {
+        requireNonNull(streamName);
+
         final long stamp = notificationListenersLock.readLock();
         try {
-            return Optional.ofNullable(notificationListeners.get(requireNonNull(streamName)));
+            return notificationListeners.get(streamName);
         } finally {
             notificationListenersLock.unlockRead(stamp);
         }
@@ -98,13 +104,16 @@ public final class ListenersBroker {
      * Get listener for device path.
      *
      * @param path name.
-     * @return {@link NotificationListenerAdapter} or {@link ListenerAdapter} object wrapped in {@link Optional}
-     *     or {@link Optional#empty()} if listener with specified path doesn't exist.
+     * @return {@link BaseListenerInterface} specified by stream name or {@code null} if listener with specified
+     *         stream name does not exist.
+     * @throws NullPointerException in {@code path} is {@code null}
      */
-    public Optional<BaseListenerInterface> getDeviceNotificationListenerFor(final String path) {
+    public @Nullable BaseListenerInterface deviceNotificationListenerFor(final String path) {
+        requireNonNull(path);
+
         final long stamp = deviceNotificationListenersLock.readLock();
         try {
-            return Optional.ofNullable(deviceNotificationListeners.get(requireNonNull(path)));
+            return deviceNotificationListeners.get(path);
         } finally {
             deviceNotificationListenersLock.unlockRead(stamp);
         }
@@ -117,13 +126,13 @@ public final class ListenersBroker {
      * @return {@link NotificationListenerAdapter} or {@link ListenerAdapter} object wrapped in {@link Optional}
      *     or {@link Optional#empty()} if listener with specified stream name doesn't exist.
      */
-    public Optional<BaseListenerInterface> getListenerFor(final String streamName) {
+    public @Nullable BaseListenerInterface listenerFor(final String streamName) {
         if (streamName.startsWith(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-            return getNotificationListenerFor(streamName).map(Function.identity());
+            return notificationListenerFor(streamName);
         } else if (streamName.startsWith(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            return getDataChangeListenerFor(streamName).map(Function.identity());
+            return dataChangeListenerFor(streamName);
         } else {
-            return Optional.empty();
+            return null;
         }
     }
 
