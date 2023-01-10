@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4bc96f9_4fa8ac40",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-10T13:44:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b2b112eb_8d7a3825",
+      "revId": "e8fea0228ee50a7b21e14c2c80a96fe120e7ba37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d22a5c0b_3303037b",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1956c6c_b105d077",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-10T13:44:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d22a5c0b_3303037b",
+      "revId": "e8fea0228ee50a7b21e14c2c80a96fe120e7ba37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e44ea792_732a53b0",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-01-10T11:50:46Z",
       "side": 1,
       "message": "We do not need commented methods, remove it.",
+      "revId": "e8fea0228ee50a7b21e14c2c80a96fe120e7ba37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad704a8d_802b4705",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-10T13:44:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e44ea792_732a53b0",
       "revId": "e8fea0228ee50a7b21e14c2c80a96fe120e7ba37",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

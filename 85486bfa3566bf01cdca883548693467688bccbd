@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d183d14_d439e78f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-10T13:44:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9e786bf_08fab05b",
+      "revId": "85486bfa3566bf01cdca883548693467688bccbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94f4c9ac_94358a74",
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d30cf26a_4582fb99",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-10T13:44:26Z",
+      "side": 1,
+      "message": "Cannot make it static because inside of this method we use a non-static method",
+      "parentUuid": "94f4c9ac_94358a74",
+      "revId": "85486bfa3566bf01cdca883548693467688bccbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "35aea0fe_61301c36",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
         "patchSetId": 3
@@ -48,6 +84,24 @@
       "writtenOn": "2023-01-10T11:50:46Z",
       "side": 1,
       "message": "`final String identifier`",
+      "revId": "85486bfa3566bf01cdca883548693467688bccbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f89651fe_95a1a630",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-10T13:44:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35aea0fe_61301c36",
       "revId": "85486bfa3566bf01cdca883548693467688bccbd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
