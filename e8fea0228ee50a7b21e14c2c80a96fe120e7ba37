@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2b112eb_8d7a3825",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-10T11:50:46Z",
+      "side": 1,
+      "message": "Try to follow unified style, `final var` everywhere.",
+      "revId": "e8fea0228ee50a7b21e14c2c80a96fe120e7ba37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d22a5c0b_3303037b",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-10T11:50:46Z",
+      "side": 1,
+      "message": "Parameters should be `final`. In ODL we use `final` everywhere.",
+      "revId": "e8fea0228ee50a7b21e14c2c80a96fe120e7ba37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e44ea792_732a53b0",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-10T11:50:46Z",
+      "side": 1,
+      "message": "We do not need commented methods, remove it.",
+      "revId": "e8fea0228ee50a7b21e14c2c80a96fe120e7ba37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

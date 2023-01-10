@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9e786bf_08fab05b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-10T11:50:46Z",
+      "side": 1,
+      "message": "This line is too long, 72 chars max.",
+      "revId": "85486bfa3566bf01cdca883548693467688bccbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94f4c9ac_94358a74",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-10T11:50:46Z",
+      "side": 1,
+      "message": "Every time method can be `static`, make it `static.`",
+      "revId": "85486bfa3566bf01cdca883548693467688bccbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35aea0fe_61301c36",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-10T11:50:46Z",
+      "side": 1,
+      "message": "`final String identifier`",
+      "revId": "85486bfa3566bf01cdca883548693467688bccbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
