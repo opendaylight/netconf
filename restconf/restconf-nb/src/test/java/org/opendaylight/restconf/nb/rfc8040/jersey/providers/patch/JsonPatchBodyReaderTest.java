@@ -168,6 +168,13 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
 
         final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
+        final var expected = Builders.leafBuilder()
+                .withValue("my-leaf20")
+                .withNodeIdentifier(NodeIdentifier.create(LEAF_NAME_QNAME))
+                .build();
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(LEAF_NAME_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expected, data);
     }
 
     /**
