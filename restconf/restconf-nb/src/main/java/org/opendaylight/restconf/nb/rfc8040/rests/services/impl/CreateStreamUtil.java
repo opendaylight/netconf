@@ -169,7 +169,9 @@ final class CreateStreamUtil {
             .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
                 ErrorTag.OPERATION_FAILED));
 
-        final NotificationOutputType outputType = prepareOutputType(data);
+        final DOMNotificationService mountNotifService = mountPoint.getService(DOMNotificationService.class)
+            .orElseThrow(() -> new RestconfDocumentedException("Mount point does not support notifications",
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED));
 
         // FIXME: what is the relationship to the unused refSchemaCtx?
         final EffectiveModelContext mountModelContext = mountPoint.getService(DOMSchemaService.class)
@@ -187,9 +189,9 @@ final class CreateStreamUtil {
             .collect(Collectors.toUnmodifiableSet());
 
         final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
-            .registerDeviceNotificationListener(deviceName, outputType, mountModelContext, mountPointService,
-                mountPoint.getIdentifier());
-        notificationListenerAdapter.listen(mountPoint.getService(DOMNotificationService.class).get(), absolutes);
+            .registerDeviceNotificationListener(deviceName, prepareOutputType(data), mountModelContext,
+                mountPointService, mountPoint.getIdentifier());
+        notificationListenerAdapter.listen(mountNotifService, absolutes);
 
         // building of output
         return new DefaultDOMRpcResult(Builders.containerBuilder()
