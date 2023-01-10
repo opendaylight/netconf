@@ -38,10 +38,14 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentif
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public abstract class AbstractBodyReaderTest {
+    public static final QName LEAF_NAME_QNAME = QName.create("instance:identifier:patch:module", "2015-11-21","name")
+            .intern();
+
     protected final MediaType mediaType;
     protected final DatabindProvider databindProvider;
     protected final DOMMountPointService mountPointService;
