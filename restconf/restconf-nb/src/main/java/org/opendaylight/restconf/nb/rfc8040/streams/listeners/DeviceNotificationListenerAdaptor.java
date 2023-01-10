@@ -27,17 +27,15 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link DeviceNotificationListenerAdaptor} is responsible to track events on notifications.
  */
-public final class DeviceNotificationListenerAdaptor extends AbstractNotificationListenerAdaptor implements
-    DOMMountPointListener {
-
+public final class DeviceNotificationListenerAdaptor extends AbstractNotificationListenerAdaptor
+        implements DOMMountPointListener {
     private static final Logger LOG = LoggerFactory.getLogger(DeviceNotificationListenerAdaptor.class);
-    private final @NonNull EffectiveModelContext effectiveModel;
 
-    private  final @NonNull DOMMountPointService mountPointService;
+    private final @NonNull EffectiveModelContext effectiveModel;
+    private final @NonNull DOMMountPointService mountPointService;
+    private final @NonNull YangInstanceIdentifier instanceIdentifier;
 
     private ListenerRegistration<DOMMountPointListener> reg;
-    private final YangInstanceIdentifier instanceIdentifier;
-
 
     public DeviceNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType,
             final EffectiveModelContext effectiveModel, final DOMMountPointService mountPointService,
@@ -92,5 +90,4 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
             resetListenerRegistration();
         }
     }
-
 }
