@@ -119,6 +119,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8799ce6_320153ac",
+        "filename": "restconf/restconf-common-models/src/main/yang/device-notification.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-01-10T21:26:53Z",
+      "side": 1,
+      "message": "let\u0027s look at them separately",
+      "parentUuid": "91174271_2bf5c7bf",
+      "range": {
+        "startLine": 22,
+        "startChar": 21,
+        "endLine": 22,
+        "endChar": 28
+      },
+      "revId": "1ef422a516f06a058159f3393cc749f38c0ebbef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32f5eae0_7204013b",
