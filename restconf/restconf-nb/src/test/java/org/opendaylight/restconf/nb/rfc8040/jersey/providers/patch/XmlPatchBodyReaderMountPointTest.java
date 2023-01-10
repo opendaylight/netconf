@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -135,5 +136,17 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
             XmlBodyReaderTest.class.getResourceAsStream(
                 "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml")));
+    }
+
+    /**
+     * Test reading simple leaf value.
+     */
+    @Test
+    public void modulePatchSimpleLeafValueTest() throws Exception {
+        mockBodyReader("instance-identifier-patch-module:patch-cont/my-list1=leaf1", xmlToPatchBodyReader, false);
+        final var inputStream = JsonBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/xml/xmlPATCHSimpleLeafValue.xml");
+        final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
     }
 }
