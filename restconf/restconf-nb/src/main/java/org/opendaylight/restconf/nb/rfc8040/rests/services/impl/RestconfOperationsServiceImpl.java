@@ -72,11 +72,21 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
     }
 
     @Override
+    public String getOperationJSONByIdentifier(String identifier) {
+        return OperationsContent.JSON.bodyFor(databindProvider.currentContext().modelContext(), identifier);
+    }
+
+    @Override
     public String getOperationsXML() {
         return OperationsContent.XML.bodyFor(databindProvider.currentContext().modelContext());
     }
 
     @Override
+    public String getOperationXMLByIdentifier(String identifier) {
+        return OperationsContent.XML.bodyFor(databindProvider.currentContext().modelContext(), identifier);
+    }
+
+    /*@Override
     public NormalizedNodePayload getOperations(final String identifier, final UriInfo uriInfo) {
         if (!identifier.contains(RestconfConstants.MOUNT)) {
             final var errMsg = """
@@ -91,7 +101,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         final var entry = contextForModelContext(modelContext(mountPoint), mountPoint);
         return NormalizedNodePayload.of(entry.getKey(), entry.getValue());
-    }
+    }*/
 
     private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
         return mountPoint.getService(DOMSchemaService.class)
