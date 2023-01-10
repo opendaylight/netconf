@@ -53,18 +53,17 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
         final String notificaionType =
             uriInfo.getQueryParameters().getFirst(RestconfStreamsConstants.NOTIFICATION_TYPE);
         if (notificaionType != null && notificaionType.equals(RestconfStreamsConstants.DEVICE)) {
-            listener = listenersBroker.getDeviceNotificationListenerFor(streamName)
-                .orElseThrow(() -> {
-                    LOG.debug("Listener for device path with name {} was not found.", streamName);
-                    throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION,
-                        ErrorTag.DATA_MISSING);
-                });
+            listener = listenersBroker.deviceNotificationListenerFor(streamName);
+            if (listener == null) {
+                LOG.debug("Listener for device path with name {} was not found.", streamName);
+                throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+            }
         } else {
-            listener = listenersBroker.getListenerFor(streamName)
-                .orElseThrow(() -> {
-                    LOG.debug("Listener for stream with name {} was not found.", streamName);
-                    throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
-                });
+            listener = listenersBroker.listenerFor(streamName);
+            if (listener == null) {
+                LOG.debug("Listener for stream with name {} was not found.", streamName);
+                throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+            }
         }
 
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);

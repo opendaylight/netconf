@@ -123,10 +123,11 @@ abstract class SubscribeToStreamUtil {
         }
 
         final NotificationListenerAdapter notificationListenerAdapter = ListenersBroker.getInstance()
-            .getNotificationListenerFor(streamName)
-            .orElseThrow(() -> new RestconfDocumentedException(
-                String.format("Stream with name %s was not found.", streamName),
-                ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT));
+            .notificationListenerFor(streamName);
+        if (notificationListenerAdapter == null) {
+            throw new RestconfDocumentedException(String.format("Stream with name %s was not found.", streamName),
+                ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
+        }
 
         final EffectiveModelContext schemaContext = handlersHolder.getDatabindProvider().currentContext()
             .modelContext();
@@ -176,9 +177,12 @@ abstract class SubscribeToStreamUtil {
         }
 
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        final ListenerAdapter listener = ListenersBroker.getInstance().getDataChangeListenerFor(streamName)
-            .orElseThrow(() -> new RestconfDocumentedException("No listener found for stream " + streamName,
-                ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
+        final ListenerAdapter listener = ListenersBroker.getInstance().dataChangeListenerFor(streamName);
+        if (listener == null) {
+            throw new RestconfDocumentedException("No listener found for stream " + streamName,
+                ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+        }
+
         listener.setQueryParams(notificationQueryParams);
 
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();

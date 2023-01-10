@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.Nullable;
@@ -279,12 +278,14 @@ final class CreateStreamUtil {
      */
     static NotificationListenerAdapter createYangNotifiStream(final NotificationDefinition notificationDefinition,
             final EffectiveModelContext refSchemaCtx, final NotificationOutputType outputType) {
-        final String streamName = parseNotificationStreamName(requireNonNull(notificationDefinition),
+        final var streamName = parseNotificationStreamName(requireNonNull(notificationDefinition),
                 requireNonNull(refSchemaCtx), requireNonNull(outputType.getName()));
-        final Optional<NotificationListenerAdapter> listenerForStreamName = ListenersBroker.getInstance()
-                .getNotificationListenerFor(streamName);
-        return listenerForStreamName.orElseGet(() -> ListenersBroker.getInstance().registerNotificationListener(
-                Absolute.of(notificationDefinition.getQName()), streamName, outputType));
+        final var listenersBroker = ListenersBroker.getInstance();
+
+        final var existing = listenersBroker.notificationListenerFor(streamName);
+        return existing != null ? existing
+            : listenersBroker.registerNotificationListener(
+                Absolute.of(notificationDefinition.getQName()), streamName, outputType);
     }
 
     private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,

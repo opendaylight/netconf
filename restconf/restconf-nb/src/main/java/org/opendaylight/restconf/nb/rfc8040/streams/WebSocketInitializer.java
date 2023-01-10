@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,7 +19,6 @@ import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,10 +45,10 @@ public final class WebSocketInitializer extends WebSocketServlet {
      */
     @Inject
     public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool, final Configuration configuration) {
-        this.executorService = scheduledThreadPool.getExecutor();
-        this.maximumFragmentLength = configuration.getMaximumFragmentLength();
-        this.heartbeatInterval = configuration.getHeartbeatInterval();
-        this.idleTimeoutMillis = configuration.getIdleTimeout();
+        executorService = scheduledThreadPool.getExecutor();
+        maximumFragmentLength = configuration.getMaximumFragmentLength();
+        heartbeatInterval = configuration.getHeartbeatInterval();
+        idleTimeoutMillis = configuration.getIdleTimeout();
     }
 
     /**
@@ -104,25 +102,24 @@ public final class WebSocketInitializer extends WebSocketServlet {
         @Override
         public Object createWebSocket(final ServletUpgradeRequest servletUpgradeRequest,
                 final ServletUpgradeResponse servletUpgradeResponse) {
-            final String requestUri = servletUpgradeRequest.getRequestURI().getRawPath();
-            final String streamName = ListenersBroker.createStreamNameFromUri(requestUri);
+            final var streamName = ListenersBroker.createStreamNameFromUri(
+                servletUpgradeRequest.getRequestURI().getRawPath());
 
-            final Optional<BaseListenerInterface> listener = listenersBroker.getListenerFor(streamName);
-            if (listener.isPresent()) {
-                LOG.debug("Listener for stream with name {} has been found, web-socket session handler will be created",
-                        streamName);
-                servletUpgradeResponse.setSuccess(true);
-                servletUpgradeResponse.setStatusCode(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
-                // note: every web-socket manages PING process individually because this approach scales better than
-                //       sending of PING frames at once over all web-socket sessions
-                return new WebSocketSessionHandler(executorService, listener.get(), maximumFragmentLength,
-                        heartbeatInterval);
-            } else {
+            final var listener = listenersBroker.listenerFor(streamName);
+            if (listener == null) {
                 LOG.debug("Listener for stream with name {} was not found.", streamName);
                 servletUpgradeResponse.setSuccess(false);
                 servletUpgradeResponse.setStatusCode(HttpServletResponse.SC_NOT_FOUND);
                 return null;
             }
+
+            LOG.debug("Listener for stream with name {} has been found, web-socket session handler will be created",
+                streamName);
+            servletUpgradeResponse.setSuccess(true);
+            servletUpgradeResponse.setStatusCode(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
+            // note: every web-socket manages PING process individually because this approach scales better than
+            //       sending of PING frames at once over all web-socket sessions
+            return new WebSocketSessionHandler(executorService, listener, maximumFragmentLength, heartbeatInterval);
         }
     }
 }
