@@ -25,7 +25,7 @@ public class RestconfOperationsServiceTest {
     public void getOperationsTest() throws IOException {
         final var context = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
         final var oper = new RestconfOperationsServiceImpl(() -> DatabindContext.ofModel(context),
-            mock(DOMMountPointService.class));
+                mock(DOMMountPointService.class));
 
         assertEquals("{\n"
             + "  \"ietf-restconf:operations\" : {\n"

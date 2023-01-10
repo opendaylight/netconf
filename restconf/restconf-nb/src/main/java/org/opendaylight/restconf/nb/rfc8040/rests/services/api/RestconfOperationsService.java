@@ -20,6 +20,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 /**
  * Container that provides access to the data-model specific operations supported by the server.
  */
+
 public interface RestconfOperationsService {
     /**
      * List RPC and action operations in RFC7951 format.
@@ -31,6 +32,11 @@ public interface RestconfOperationsService {
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
     String getOperationsJSON();
 
+    @GET
+    @Path("/operations/{identifier:.+}")
+    @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
+    String getOperationJSON(@PathParam("identifier") String identifier);
+
     /**
      * List RPC and action operations in RFC8040 XML format.
      *
@@ -41,15 +47,13 @@ public interface RestconfOperationsService {
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     String getOperationsXML();
 
-    /**
-     * Valid for mount points. List of operations supported by the server.
-     *
-     * @param identifier path parameter
-     * @param uriInfo URI information
-     * @return {@link NormalizedNodePayload}
-     */
     @GET
     @Path("/operations/{identifier:.+}")
+    @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    String getOperationXML(@PathParam("identifier") String identifier);
+
+    @GET
+    @Path("/operations/{identifier:.+yang-ext:mount}")
     @Produces({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML,
