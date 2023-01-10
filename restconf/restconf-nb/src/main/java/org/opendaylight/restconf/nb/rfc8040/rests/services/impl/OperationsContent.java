@@ -12,8 +12,10 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
@@ -110,25 +112,52 @@ enum OperationsContent {
             return emptyBody;
         }
 
-        final var moduleRpcs = modules.values().stream()
-            // Extract XMLNamespaces
-            .map(module -> module.localQNameModule().getNamespace())
-            // Make sure each is XMLNamespace unique
-            .distinct()
-            // Find the most recent module with that namespace. This needed so we expose the right set of RPCs,
-            // as we always pick the latest revision to resolve prefix (or module name).
-            .map(namespace -> context.findModuleStatements(namespace).iterator().next())
-            // Convert to module prefix + List<String> with RPC names
-            .map(module -> Map.entry(prefix(module), module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
-                .map(rpc -> rpc.argument().getLocalName())
-                .toList()))
-            // Skip prefixes which do not have any RPCs
-            .filter(entry -> !entry.getValue().isEmpty())
-            // Ensure stability: sort by prefix
-            .sorted(Entry.comparingByKey())
-            .toList();
+        final var moduleRpcs = getModuleRpcs(context, modules);
 
         return moduleRpcs.isEmpty() ? emptyBody : createBody(moduleRpcs);
+    }
+
+    public final @NonNull String bodyFor(final @Nullable EffectiveModelContext context, String identifier) {
+        if (context == null) {
+            // Defensive, return empty content
+            return emptyBody;
+        }
+        final var modules = context.getModuleStatements();
+        if (modules.isEmpty()) {
+            // No modules, return empty content
+            return emptyBody;
+        }
+
+        final String[] splitIdentifier = identifier.split(":");
+        final var moduleRpcs = getModuleRpcs(context, modules);
+        List<Entry<@NonNull String, List<String>>> entries = moduleRpcs.stream()
+                .filter(entry -> entry.getKey().equals(splitIdentifier[0]))
+                .filter(entry -> entry.getValue()
+                        .stream()
+                        .anyMatch(s -> s.equals(splitIdentifier[1])))
+                .toList();
+        return moduleRpcs.isEmpty() ? emptyBody : createBody(moduleRpcs);
+    }
+
+    private List<Entry<@NonNull String, List<String>>> getModuleRpcs(EffectiveModelContext context, Map<QNameModule, ModuleEffectiveStatement> modules) {
+        final var moduleRpcs = modules.values().stream()
+                // Extract XMLNamespaces
+                .map(module -> module.localQNameModule().getNamespace())
+                // Make sure each is XMLNamespace unique
+                .distinct()
+                // Find the most recent module with that namespace. This needed so we expose the right set of RPCs,
+                // as we always pick the latest revision to resolve prefix (or module name).
+                .map(namespace -> context.findModuleStatements(namespace).iterator().next())
+                // Convert to module prefix + List<String> with RPC names
+                .map(module -> Map.entry(prefix(module), module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
+                        .map(rpc -> rpc.argument().getLocalName())
+                        .toList()))
+                // Skip prefixes which do not have any RPCs
+                .filter(entry -> !entry.getValue().isEmpty())
+                // Ensure stability: sort by prefix
+                .sorted(Entry.comparingByKey())
+                .toList();
+        return moduleRpcs;
     }
 
     abstract @NonNull String createBody(List<Entry<String, List<String>>> rpcsByPrefix);

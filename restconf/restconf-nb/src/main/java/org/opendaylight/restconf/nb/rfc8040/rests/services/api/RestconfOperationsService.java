@@ -11,9 +11,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
@@ -31,6 +29,11 @@ public interface RestconfOperationsService {
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
     String getOperationsJSON();
 
+    @GET
+    @Path("/operations/{identifier}")
+    @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
+    String getOperationJSONByIdentifier(@PathParam("identifier") String identifier);
+
     /**
      * List RPC and action operations in RFC8040 XML format.
      *
@@ -41,6 +44,11 @@ public interface RestconfOperationsService {
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     String getOperationsXML();
 
+    @GET
+    @Path("/operations/{identifier}")
+    @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    String getOperationXMLByIdentifier(@PathParam("identifier") String identifier);
+
     /**
      * Valid for mount points. List of operations supported by the server.
      *
@@ -48,7 +56,7 @@ public interface RestconfOperationsService {
      * @param uriInfo URI information
      * @return {@link NormalizedNodePayload}
      */
-    @GET
+    /*@GET
     @Path("/operations/{identifier:.+}")
     @Produces({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
@@ -57,5 +65,5 @@ public interface RestconfOperationsService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    NormalizedNodePayload getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodePayload getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);*/
 }
