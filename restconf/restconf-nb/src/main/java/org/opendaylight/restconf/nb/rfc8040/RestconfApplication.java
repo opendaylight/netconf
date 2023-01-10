@@ -38,7 +38,7 @@ public class RestconfApplication extends AbstractRestconfApplication {
             new RestconfDataServiceImpl(databindProvider, dataBroker, mountPointService, streamSubscription,
                 actionService, configuration),
             new RestconfInvokeOperationsServiceImpl(rpcService, mountPointService, configuration),
-            new RestconfOperationsServiceImpl(databindProvider, mountPointService),
+            new RestconfOperationsServiceImpl(databindProvider),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
             new RestconfImpl(databindProvider)));
     }

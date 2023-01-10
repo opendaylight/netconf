@@ -8,13 +8,11 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -24,8 +22,7 @@ public class RestconfOperationsServiceTest {
     @Test
     public void getOperationsTest() throws IOException {
         final var context = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
-        final var oper = new RestconfOperationsServiceImpl(() -> DatabindContext.ofModel(context),
-            mock(DOMMountPointService.class));
+        final var oper = new RestconfOperationsServiceImpl(() -> DatabindContext.ofModel(context));
 
         assertEquals("{\n"
             + "  \"ietf-restconf:operations\" : {\n"
