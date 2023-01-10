@@ -12,10 +12,8 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Function;
@@ -62,30 +60,6 @@ public final class ListenersBroker {
      */
     public static ListenersBroker getInstance() {
         return Holder.INSTANCE;
-    }
-
-    /**
-     * Returns set of all data-change-event streams.
-     */
-    public Set<String> getDataChangeStreams() {
-        final long stamp = dataChangeListenersLock.readLock();
-        try {
-            return ImmutableSet.copyOf(dataChangeListeners.keySet());
-        } finally {
-            dataChangeListenersLock.unlockRead(stamp);
-        }
-    }
-
-    /**
-     * Returns set of all notification streams.
-     */
-    public Set<String> getNotificationStreams() {
-        final long stamp = notificationListenersLock.readLock();
-        try {
-            return ImmutableSet.copyOf(notificationListeners.keySet());
-        } finally {
-            notificationListenersLock.unlockRead(stamp);
-        }
     }
 
     /**
