@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f2584c8_e0f044b4",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-10T10:29:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12f086f1_63c77403",
+      "revId": "5cf7986e500eac8392421204ce05d706ec6a330f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b135cd0_4d405221",
@@ -66,6 +84,24 @@
       "writtenOn": "2023-01-09T16:07:35Z",
       "side": 1,
       "message": "You can use text block instead of `xmlPATCHdataAugmentedElement`.",
+      "revId": "5cf7986e500eac8392421204ce05d706ec6a330f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82f416aa_37adde4a",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-10T10:29:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b135cd0_4d405221",
       "revId": "5cf7986e500eac8392421204ce05d706ec6a330f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
