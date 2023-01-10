@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.Nullable;
@@ -49,6 +48,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,20 +178,19 @@ final class CreateStreamUtil {
             .orElseThrow(() -> new RestconfDocumentedException("Mount point schema not available",
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED))
             .getGlobalContext();
-        final Collection<? extends NotificationDefinition> notifications = mountModelContext.getNotifications();
-        if (notifications.isEmpty()) {
+        final Set<Absolute> notificationPaths = mountModelContext.getModuleStatements().values().stream()
+            .flatMap(module -> module.streamEffectiveSubstatements(NotificationEffectiveStatement.class))
+            .map(notification -> Absolute.of(notification.argument()))
+            .collect(Collectors.toUnmodifiableSet());
+        if (notificationPaths.isEmpty()) {
             throw new RestconfDocumentedException("Device does not support notification", ErrorType.APPLICATION,
                 ErrorTag.OPERATION_FAILED);
         }
 
-        final Set<Absolute> absolutes = notifications.stream()
-            .map(notificationDefinition -> Absolute.of(notificationDefinition.getQName()))
-            .collect(Collectors.toUnmodifiableSet());
-
         final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
             .registerDeviceNotificationListener(deviceName, prepareOutputType(data), mountModelContext,
                 mountPointService, mountPoint.getIdentifier());
-        notificationListenerAdapter.listen(mountNotifService, absolutes);
+        notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 
         // building of output
         return new DefaultDOMRpcResult(Builders.containerBuilder()
