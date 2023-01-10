@@ -11,32 +11,63 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class Netconf822Test {
-    private static EffectiveModelContext CONTEXT;
+    private static InstanceIdentifierContext INSTANCE_IDENTIFIER_CONTEXT;
 
     @BeforeClass
     public static void beforeClass() {
-        CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/nc822");
+        final var context = YangParserTestUtils.parseYangResourceDirectory("/nc822");
+        final var stack = SchemaInferenceStack.of(context, Absolute.of(QName.create("foo", "new1",
+            Revision.of("2021-09-30"))));
+        INSTANCE_IDENTIFIER_CONTEXT = InstanceIdentifierContext.ofStack(stack);
     }
 
     @Test
     public void testOperationsContentJSON() {
-        assertEquals("{\n"
-            + "  \"ietf-restconf:operations\" : {\n"
-            + "    \"foo:new\": [null]\n"
-            + "  }\n"
-            + "}", OperationsContent.JSON.bodyFor(CONTEXT));
+        assertEquals("""
+            {
+              "ietf-restconf:operations" : {
+                "foo:new": [null],
+                "foo:new1": [null]
+              }
+            }""", OperationsContent.JSON.bodyFor(INSTANCE_IDENTIFIER_CONTEXT.getSchemaContext()));
+    }
+
+    @Test
+    public void testOperationsContentByIdentifierJSON() {
+        assertEquals("""
+            {
+              "ietf-restconf:operations" : {
+                "foo:new1": [null]
+              }
+            }""", OperationsContent.JSON.bodyFor(INSTANCE_IDENTIFIER_CONTEXT));
     }
 
     @Test
     public void testOperationsContentXML() {
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<operations xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"\n"
-            + "            xmlns:ns0=\"foo\" >\n"
-            + "  <ns0:new/>\n"
-            + "</operations>", OperationsContent.XML.bodyFor(CONTEXT));
+        assertEquals("""
+            <?xml version="1.0" encoding="UTF-8"?>
+            <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"
+                        xmlns:ns0="foo" >
+              <ns0:new/>
+              <ns0:new1/>
+            </operations>""", OperationsContent.XML.bodyFor(INSTANCE_IDENTIFIER_CONTEXT.getSchemaContext()));
+    }
+
+    @Test
+    public void testOperationsContentByIdentifierXML() {
+        assertEquals("""
+            <?xml version="1.0" encoding="UTF-8"?>
+            <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"
+                        xmlns:ns0="foo" >
+              <ns0:new1/>
+            </operations>""", OperationsContent.XML.bodyFor(INSTANCE_IDENTIFIER_CONTEXT));
     }
 }
