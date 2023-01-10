@@ -310,6 +310,11 @@
       <version>2.36.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-test-models</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
