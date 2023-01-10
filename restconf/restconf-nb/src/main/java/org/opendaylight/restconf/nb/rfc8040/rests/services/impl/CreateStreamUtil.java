@@ -165,22 +165,24 @@ final class CreateStreamUtil {
 
         final String deviceName = extractDeviceName(value);
         final NotificationOutputType outputType = prepareOutputType(data);
-        EffectiveModelContext effectiveModelContext = mountPoint.getService(DOMSchemaService.class).get()
+
+        // FIXME: what is the relationship to the unused refSchemaCtx?
+        final EffectiveModelContext mountModelContext = mountPoint.getService(DOMSchemaService.class)
+            .orElseThrow(() -> new RestconfDocumentedException("Mount point schema not available",
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED))
             .getGlobalContext();
-        Collection<? extends NotificationDefinition> notificationDefinitions = mountPoint.getService(
-                DOMSchemaService.class).get().getGlobalContext()
-            .getNotifications();
-        if (notificationDefinitions == null || notificationDefinitions.isEmpty()) {
+        final Collection<? extends NotificationDefinition> notifications = mountModelContext.getNotifications();
+        if (notifications.isEmpty()) {
             throw new RestconfDocumentedException("Device does not support notification", ErrorType.APPLICATION,
                 ErrorTag.OPERATION_FAILED);
         }
 
-        Set<Absolute> absolutes = notificationDefinitions.stream()
+        final Set<Absolute> absolutes = notifications.stream()
             .map(notificationDefinition -> Absolute.of(notificationDefinition.getQName()))
             .collect(Collectors.toUnmodifiableSet());
 
         final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
-            .registerDeviceNotificationListener(deviceName, outputType, effectiveModelContext, mountPointService,
+            .registerDeviceNotificationListener(deviceName, outputType, mountModelContext, mountPointService,
                 mountPoint.getIdentifier());
         notificationListenerAdapter.listen(mountPoint.getService(DOMNotificationService.class).get(), absolutes);
 
