@@ -195,6 +195,7 @@ final class CreateStreamUtil {
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
+        // FIXME: just beautiful: a ClassCastException if it is something different!
         return ((YangInstanceIdentifier.NodeIdentifierWithPredicates.Singleton)iid.getLastPathArgument())
             .values().getElement().toString();
     }
