@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
@@ -100,35 +102,75 @@ enum OperationsContent {
      * @return Content of HTTP GET operation as a String
      */
     public final @NonNull String bodyFor(final @Nullable EffectiveModelContext context) {
-        if (context == null) {
-            // Defensive, return empty content
-            return emptyBody;
-        }
-        final var modules = context.getModuleStatements();
-        if (modules.isEmpty()) {
-            // No modules, return empty content
+        if (!isValidContext(context)) {
+            // No modules, or defensive return empty content
             return emptyBody;
         }
 
-        final var moduleRpcs = modules.values().stream()
-            // Extract XMLNamespaces
-            .map(module -> module.localQNameModule().getNamespace())
-            // Make sure each is XMLNamespace unique
-            .distinct()
-            // Find the most recent module with that namespace. This needed so we expose the right set of RPCs,
-            // as we always pick the latest revision to resolve prefix (or module name).
-            .map(namespace -> context.findModuleStatements(namespace).iterator().next())
-            // Convert to module prefix + List<String> with RPC names
-            .map(module -> Map.entry(prefix(module), module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
-                .map(rpc -> rpc.argument().getLocalName())
-                .toList()))
-            // Skip prefixes which do not have any RPCs
-            .filter(entry -> !entry.getValue().isEmpty())
-            // Ensure stability: sort by prefix
-            .sorted(Entry.comparingByKey())
-            .toList();
-
+        final var moduleRpcs = getModuleRpcs(context, context.getModuleStatements());
         return moduleRpcs.isEmpty() ? emptyBody : createBody(moduleRpcs);
+    }
+
+    /**
+     * Return content with RPCs and actions for a particular {@link InstanceIdentifierContext}.
+     *
+     * @param identifierContext InstanceIdentifierContext to use
+     * @return Content of HTTP GET operation as a String
+     */
+    public final @NonNull String bodyFor(final @NonNull InstanceIdentifierContext identifierContext) {
+        final var context = identifierContext.getSchemaContext();
+        if (!isValidContext(context)) {
+            // No modules, or defensive return empty content
+            return emptyBody;
+        }
+
+        final var moduleRpcs = getModuleRpcs(context, context.getModuleStatements());
+        final var key = prefix(identifierContext.inference().toSchemaInferenceStack().currentModule());
+        final var rpc = identifierContext.getSchemaNode().getQName().getLocalName();
+        final var filteredModuleRpcs = moduleRpcs.stream()
+                .filter(m -> key.equals(m.getKey()))
+                .map(e -> Map.entry(key, e.getValue()
+                        .stream().filter(p -> rpc.equals(p))
+                        .toList()))
+                .toList();
+
+        return filteredModuleRpcs.isEmpty() ? emptyBody : createBody(filteredModuleRpcs);
+    }
+
+    /**
+     * Returns a list of entries, where each entry contains a module prefix and a list of RPC names.
+     *
+     * @param context the effective model context
+     * @param modules the map of QNameModule to ModuleEffectiveStatement
+     * @return a list of entries, where each entry contains a module prefix and a list of RPC names
+     */
+    private List<Entry<@NonNull String, List<String>>> getModuleRpcs(final EffectiveModelContext context,
+            final Map<QNameModule, ModuleEffectiveStatement> modules) {
+        return modules.values().stream()
+                // Extract XMLNamespaces
+                .map(module -> module.localQNameModule().getNamespace())
+                // Make sure each is XMLNamespace unique
+                .distinct()
+                // Find the most recent module with that namespace. This needed so we expose the right set of RPCs,
+                // as we always pick the latest revision to resolve prefix (or module name).
+                .map(namespace -> context.findModuleStatements(namespace).iterator().next())
+                // Convert to module prefix + List<String> with RPC names
+                .map(module -> Map.entry(prefix(module),
+                        module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
+                        .map(rpc -> rpc.argument().getLocalName())
+                        .toList()))
+                // Skip prefixes which do not have any RPCs
+                .filter(entry -> !entry.getValue().isEmpty())
+                // Ensure stability: sort by prefix
+                .sorted(Entry.comparingByKey())
+                .toList();
+    }
+
+    private static boolean isValidContext(final EffectiveModelContext context) {
+        if (context == null) {
+            return false;
+        }
+        return !context.getModuleStatements().isEmpty();
     }
 
     abstract @NonNull String createBody(List<Entry<String, List<String>>> rpcsByPrefix);
