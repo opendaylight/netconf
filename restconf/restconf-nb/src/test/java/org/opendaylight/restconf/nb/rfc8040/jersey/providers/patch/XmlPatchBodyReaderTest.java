@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
@@ -176,9 +175,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
 
     /**
      * Test of Yang Patch on the leaf set node element.
-     * TODO: Remove ignore when NETCONF-937 will be resolved
      */
-    @Ignore
     @Test
     public void modulePatchTargetLeafSetNodeTest() throws Exception {
         mockBodyReader("", xmlToPatchBodyReader, false);

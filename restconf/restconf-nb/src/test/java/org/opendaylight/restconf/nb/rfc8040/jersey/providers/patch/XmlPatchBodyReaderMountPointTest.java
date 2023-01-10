@@ -10,7 +10,9 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,6 +21,8 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
@@ -135,5 +139,36 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
             XmlBodyReaderTest.class.getResourceAsStream(
                 "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml")));
+    }
+
+    /**
+     * Test reading simple leaf value.
+     */
+    @Test
+    public void modulePatchSimpleLeafValueTest() throws Exception {
+        mockBodyReader("instance-identifier-patch-module:patch-cont/my-list1=leaf1", xmlToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream("""
+                <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                    <patch-id>test-patch</patch-id>
+                    <comment>this is test patch</comment>
+                    <edit>
+                        <edit-id>edit1</edit-id>
+                        <operation>replace</operation>
+                        <target>/my-list2=my-leaf20/name</target>
+                        <value>
+                            <name xmlns="instance:identifier:patch:module">my-leaf20</name>
+                        </value>
+                    </edit>
+                </yang-patch>
+                """.getBytes(StandardCharsets.UTF_8));
+        final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var expected = Builders.leafBuilder()
+                .withValue("my-leaf20")
+                .withNodeIdentifier(NodeIdentifier.create(LEAF_NAME_QNAME))
+                .build();
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(LEAF_NAME_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expected, data);
     }
 }

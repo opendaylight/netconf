@@ -52,6 +52,8 @@ public abstract class AbstractBodyReaderTest {
     protected static final QName LIST_LEAF2_QNAME = QName.create("list:ns", "leaf2").intern();
     protected static final QName CHOICE_CONT_QNAME = QName.create("choice:ns", "case-cont1").intern();
     protected static final QName CASE_LEAF1_QNAME = QName.create("choice:ns", "case-leaf1").intern();
+    protected static final QName LEAF_NAME_QNAME = QName.create("instance:identifier:patch:module",
+            "2015-11-21", "name").intern();
 
     protected final MediaType mediaType;
     protected final DatabindProvider databindProvider;
