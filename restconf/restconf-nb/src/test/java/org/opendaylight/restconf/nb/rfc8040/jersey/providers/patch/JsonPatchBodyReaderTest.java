@@ -168,6 +168,9 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
 
         final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(LEAF_NAME_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf20"), data);
     }
 
     /**
@@ -254,7 +257,7 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
         final var expectedData = Builders.leafSetBuilder()
                 .withNodeIdentifier(new NodeIdentifier(LEAF_SET_QNAME))
                 .withChild(Builders.leafSetEntryBuilder()
-                        .withNodeIdentifier(new NodeWithValue(LEAF_SET_QNAME, "data1"))
+                        .withNodeIdentifier(new NodeWithValue<>(LEAF_SET_QNAME, "data1"))
                         .withValue("data1")
                         .build())
                 .build();

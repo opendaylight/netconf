@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
@@ -176,9 +175,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
 
     /**
      * Test of Yang Patch on the leaf set node element.
-     * TODO: Remove ignore when NETCONF-937 will be resolved
      */
-    @Ignore
     @Test
     public void modulePatchTargetLeafSetNodeTest() throws Exception {
         mockBodyReader("", xmlToPatchBodyReader, false);
@@ -199,7 +196,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
         final var expectedData = Builders.leafSetBuilder()
                 .withNodeIdentifier(new NodeIdentifier(LEAF_SET_QNAME))
                 .withChild(Builders.leafSetEntryBuilder()
-                        .withNodeIdentifier(new NodeWithValue(LEAF_SET_QNAME, "data1"))
+                        .withNodeIdentifier(new NodeWithValue<>(LEAF_SET_QNAME, "data1"))
                         .withValue("data1")
                         .build())
                 .build();
@@ -279,5 +276,32 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
         final var data = returnValue.getData().get(0).getNode();
         assertEquals(CHOICE_CONT_QNAME, data.getIdentifier().getNodeType());
         assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test reading simple leaf value.
+     */
+    @Test
+    public void modulePatchSimpleLeafValueTest() throws Exception {
+        mockBodyReader("instance-identifier-patch-module:patch-cont/my-list1=leaf1", xmlToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream("""
+                <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                    <patch-id>test-patch</patch-id>
+                    <comment>this is test patch</comment>
+                    <edit>
+                        <edit-id>edit1</edit-id>
+                        <operation>replace</operation>
+                        <target>/my-list2=my-leaf20/name</target>
+                        <value>
+                            <name xmlns="instance:identifier:patch:module">my-leaf20</name>
+                        </value>
+                    </edit>
+                </yang-patch>
+                """.getBytes(StandardCharsets.UTF_8));
+        final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(LEAF_NAME_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf20"), data);
     }
 }
