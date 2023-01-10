@@ -22,12 +22,13 @@ public interface RestconfStreamsSubscriptionService {
     /**
      * Subscribing to receive notification from stream support.
      *
-     * @param identifier
-     *             name of stream
-     * @param uriInfo
-     *             URI info
+     * @param identifier name of stream
+     * @param uriInfo URI info
      * @return {@link NormalizedNodePayload}
      */
+    // FIXME: this is a REST violation: GET does not transfer state! This should work in terms of
+    //        https://datatracker.ietf.org/doc/html/rfc8639#section-2.4, i.e. when we have that, aggressively deprecate
+    //        and remove this special case. Besides it routes to a very bad thing in RestconfDataServiceImpl
     @GET
     @Path("data/ietf-restconf-monitoring:restconf-state/streams/stream/{identifier:.+}")
     NormalizedNodePayload subscribeToStream(@Encoded @PathParam("identifier") String identifier,
