@@ -20,6 +20,8 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
@@ -161,6 +163,13 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
 
         final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
+        final var expected = Builders.leafBuilder()
+                .withValue("my-leaf20")
+                .withNodeIdentifier(NodeIdentifier.create(NAME_QNAME))
+                .build();
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(NAME_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expected, data);
     }
 
     /**

@@ -19,7 +19,6 @@ import java.util.Locale;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
@@ -37,15 +36,11 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
@@ -85,13 +80,12 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
     }
 
     private static PatchContext parse(final InstanceIdentifierContext pathContext, final Document doc)
-            throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
+            throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final List<PatchEntity> resultCollection = new ArrayList<>();
         final String patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final NodeList editNodes = doc.getElementsByTagName("edit");
 
         for (int i = 0; i < editNodes.getLength(); i++) {
-            DataSchemaNode schemaNode = (DataSchemaNode) pathContext.getSchemaNode();
             final Element element = (Element) editNodes.item(i);
             final String operation = element.getElementsByTagName("operation").item(0).getFirstChild().getNodeValue();
             final PatchEditOperation oper = PatchEditOperation.valueOf(operation.toUpperCase(Locale.ROOT));
@@ -117,7 +111,6 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 final var lookup = DataSchemaContextTree.from(pathContext.getSchemaContext())
                     .enterPath(targetII).orElseThrow();
 
-                schemaNode = lookup.node().getDataSchemaNode();
                 final var stack = lookup.stack();
                 inference = stack.toInference();
                 if (!stack.isEmpty()) {
@@ -140,23 +133,15 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             }
 
             if (oper.isWithValue()) {
-                final NormalizedNode parsed;
-                if (schemaNode instanceof  ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
-                    final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
-                    final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                    final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
-                    xmlParser.traverse(new DOMSource(firstValueElement));
-                    parsed = resultHolder.getResult();
-                } else {
-                    parsed = null;
-                }
-
+                final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+                final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+                final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
+                xmlParser.traverse(new DOMSource(firstValueElement));
                 // for lists allow to manipulate with list items through their parent
                 if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
                     targetII = targetII.getParent();
                 }
-
-                resultCollection.add(new PatchEntity(editId, oper, targetII, parsed));
+                resultCollection.add(new PatchEntity(editId, oper, targetII, resultHolder.getResult()));
             } else {
                 resultCollection.add(new PatchEntity(editId, oper, targetII));
             }
