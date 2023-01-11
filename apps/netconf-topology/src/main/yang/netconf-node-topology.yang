@@ -23,6 +23,7 @@ module netconf-node-topology {
     }
 
     rpc create-device {
+        status deprecated;
         input {
             uses netconf-node-fields;
             uses nno:netconf-node-augmented-optional-fields;
@@ -33,6 +34,7 @@ module netconf-node-topology {
     }
 
     rpc delete-device {
+        status deprecated;
         input {
             leaf node-id {
                 type string;
