@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a184707b_01de1ed1",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-11T12:07:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82a6001_5242ce5c",
+      "revId": "a53e04c7c6a8739f30c9214a7d4f86e012601e9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d05dd156_43891f42",
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "172d678b_6c5bc01d",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-11T12:07:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d05dd156_43891f42",
+      "revId": "a53e04c7c6a8739f30c9214a7d4f86e012601e9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06a4b419_7fb811a8",
@@ -65,6 +101,24 @@
       "writtenOn": "2023-01-05T12:53:32Z",
       "side": 1,
       "message": "Missing @Activate",
+      "revId": "a53e04c7c6a8739f30c9214a7d4f86e012601e9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77ff686e_d00cf05f",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-11T12:07:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06a4b419_7fb811a8",
       "revId": "a53e04c7c6a8739f30c9214a7d4f86e012601e9c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
