@@ -47,6 +47,7 @@ public final class WebInitializer implements AutoCloseable {
             final CustomFilterAdapterConfiguration customFilterAdapterConfig,
             final WebSocketInitializer webSocketServlet) throws ServletException {
         final var restconfBuilder = WebContext.builder()
+            .name("RFC8040 RESTCONF")
             .contextPath("/" + BASE_URI_PATTERN)
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
@@ -78,6 +79,7 @@ public final class WebInitializer implements AutoCloseable {
         restconfReg = webServer.registerWebContext(restconfBuilder.build());
 
         final var discoveryBuilder = WebContext.builder()
+            .name("RFC6415 Web Host Metadata")
             .contextPath("/.well-known")
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()

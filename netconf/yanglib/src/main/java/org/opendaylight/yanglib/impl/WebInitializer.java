@@ -26,7 +26,10 @@ public final class WebInitializer implements AutoCloseable {
 
     public WebInitializer(final WebServer webServer,  final WebContextSecurer webContextSecurer,
             final ServletSupport servletSupport, final Application webApp) throws ServletException {
-        final var webContextBuilder = WebContext.builder().contextPath("/yanglib").supportsSessions(true)
+        final var webContextBuilder = WebContext.builder()
+            .name("RFC8525 YANG Library")
+            .contextPath("/yanglib")
+            .supportsSessions(true)
             .addServlet(ServletDetails.builder()
                 .servlet(servletSupport.createHttpServletBuilder(webApp).build())
                 .addUrlPattern("/*")
