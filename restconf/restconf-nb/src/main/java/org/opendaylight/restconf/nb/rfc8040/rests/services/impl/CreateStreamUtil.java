@@ -39,6 +39,7 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -156,18 +157,23 @@ final class CreateStreamUtil {
         // FIXME: ugly cast
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
         // FIXME: ugly cast
-        final YangInstanceIdentifier value =
+        final YangInstanceIdentifier path =
             (YangInstanceIdentifier) data.findChildByArg(DEVICE_NOTIFICATION_PATH_NODEID)
                 .map(DataContainerChild::body)
-                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
-                    ErrorTag.OPERATION_FAILED));
+                .orElseThrow(() -> new RestconfDocumentedException("No path specified", ErrorType.APPLICATION,
+                    ErrorTag.DATA_MISSING));
 
-        // FIXME: just beautiful: a ClassCastException if it is something different!
-        final String deviceName =
-            ((YangInstanceIdentifier.NodeIdentifierWithPredicates.Singleton)value.getLastPathArgument())
-            .values().getElement().toString();
+        if (!(path.getLastPathArgument() instanceof NodeIdentifierWithPredicates listId)) {
+            throw new RestconfDocumentedException("Path does not refer to a list item", ErrorType.APPLICATION,
+                ErrorTag.INVALID_VALUE);
+        }
+        if (listId.size() != 1) {
+            throw new RestconfDocumentedException("Target list uses multiple keys", ErrorType.APPLICATION,
+                ErrorTag.INVALID_VALUE);
+        }
+        final String deviceName = listId.values().iterator().next().toString();
 
-        final DOMMountPoint mountPoint = mountPointService.getMountPoint(value)
+        final DOMMountPoint mountPoint = mountPointService.getMountPoint(path)
             .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
                 ErrorTag.OPERATION_FAILED));
 
