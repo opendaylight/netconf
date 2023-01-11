@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -85,8 +86,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                 .when(dataBroker).getExtensions();
 
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        // FIXME: just mock UriInfo here
-        doReturn(new LocalUriInfo().getBaseUriBuilder()).when(uriInfo).getBaseUriBuilder();
+        doReturn(UriBuilder.fromUri("http://localhost:8181")).when(uriInfo).getBaseUriBuilder();
         doReturn(new URI("http://127.0.0.1/" + URI)).when(uriInfo).getAbsolutePath();
 
         modelContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications"));
