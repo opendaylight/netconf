@@ -145,14 +145,12 @@ final class CreateStreamUtil {
      *
      * @param baseUrl base Url
      * @param payload data
-     * @param refSchemaCtx Reference to {@link EffectiveModelContext}.
      * @param streamUtil stream utility
      * @param mountPointService dom mount point service
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
     static DOMRpcResult createDeviceNotificationListener(final String baseUrl, final NormalizedNodePayload payload,
-            final EffectiveModelContext refSchemaCtx, final SubscribeToStreamUtil streamUtil,
-            final DOMMountPointService mountPointService) {
+            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
@@ -181,7 +179,6 @@ final class CreateStreamUtil {
             .orElseThrow(() -> new RestconfDocumentedException("Mount point does not support notifications",
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED));
 
-        // FIXME: what is the relationship to the unused refSchemaCtx?
         final EffectiveModelContext mountModelContext = mountPoint.getService(DOMSchemaService.class)
             .orElseThrow(() -> new RestconfDocumentedException("Mount point schema not available",
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED))
