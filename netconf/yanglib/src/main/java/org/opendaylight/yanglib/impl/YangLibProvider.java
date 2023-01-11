@@ -13,13 +13,12 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -180,11 +179,17 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         final ListenableFuture<YangTextSchemaSource> sourceFuture = schemaRepository.getSchemaSource(sourceId,
             YangTextSchemaSource.class);
 
+        final YangTextSchemaSource source;
         try {
-            final YangTextSchemaSource source = sourceFuture.get();
-            return new String(ByteStreams.toByteArray(source.openStream()), Charset.defaultCharset());
-        } catch (InterruptedException | ExecutionException | IOException e) {
+            source = sourceFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
             throw new IllegalStateException("Unable to get schema " + sourceId, e);
+        }
+
+        try {
+            return source.asCharSource(StandardCharsets.UTF_8).read();
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to read schema " + sourceId, e);
         }
     }
 
