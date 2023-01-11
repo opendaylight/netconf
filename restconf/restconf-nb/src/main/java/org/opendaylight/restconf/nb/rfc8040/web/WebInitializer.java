@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.web;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.DATA_SUBSCRIPTION;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
 import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.BASE_URI_PATTERN;
+import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.NOTIF;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -54,7 +55,7 @@ public final class WebInitializer implements AutoCloseable {
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern("/notif/*")
+                .addUrlPattern(NOTIF + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(webAppNotif).build())
                 .name("notificationServlet")
                 .asyncSupported(true)
