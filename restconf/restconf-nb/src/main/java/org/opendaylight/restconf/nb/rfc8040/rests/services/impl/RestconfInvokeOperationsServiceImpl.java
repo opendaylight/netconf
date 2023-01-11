@@ -98,9 +98,8 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             } else if (DEVICE_NOTIFICATION_NAMESPACE.equals(rpcName.getModule())) {
                 // FIXME: this should be a match on RPC QName
                 final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
-                future = Futures.immediateFuture(
-                    CreateStreamUtil.createDeviceNotificationListener(baseUrl, payload, schemaContext, streamUtils,
-                        mountPointService));
+                future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, payload,
+                    streamUtils, mountPointService));
             } else {
                 future = invokeRpc((ContainerNode)payload.getData(), rpcName, rpcService);
             }
