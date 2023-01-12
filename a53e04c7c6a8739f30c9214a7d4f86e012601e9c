@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ac792e7_50ed98ca",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-12T17:19:31Z",
+      "side": 1,
+      "message": "Nope, my bad. These services were not defined in blueprint before. Should be reverted.",
+      "parentUuid": "a184707b_01de1ed1",
+      "revId": "a53e04c7c6a8739f30c9214a7d4f86e012601e9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d05dd156_43891f42",
