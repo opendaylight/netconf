@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54317ce4_a290babc",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-13T15:31:15Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d30cf26a_4582fb99",
+      "revId": "85486bfa3566bf01cdca883548693467688bccbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35aea0fe_61301c36",
