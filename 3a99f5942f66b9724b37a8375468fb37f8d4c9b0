@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03fd8424_dd991009",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-13T15:41:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8363f82_cf9d4eb3",
+      "revId": "3a99f5942f66b9724b37a8375468fb37f8d4c9b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7626501_e2c495a3",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-01-13T15:21:22Z",
       "side": 1,
       "message": "We cannot test Choice. We are testing case - please rename test.",
+      "revId": "3a99f5942f66b9724b37a8375468fb37f8d4c9b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a0b65c2_6b87ae09",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-13T15:41:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7626501_e2c495a3",
       "revId": "3a99f5942f66b9724b37a8375468fb37f8d4c9b0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e58a0226_71b0d2bd",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-13T15:41:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "305cc91c_0554cb83",
+      "revId": "3a99f5942f66b9724b37a8375468fb37f8d4c9b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "65e39d35_432a2e61",
@@ -82,6 +136,24 @@
       "writtenOn": "2023-01-13T15:21:22Z",
       "side": 1,
       "message": "We cannot test choice - we are testing case - please rename test.",
+      "revId": "3a99f5942f66b9724b37a8375468fb37f8d4c9b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2953de48_7bdf0f1f",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-13T15:41:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65e39d35_432a2e61",
       "revId": "3a99f5942f66b9724b37a8375468fb37f8d4c9b0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8f05d48_2a0c40ec",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/test/AbstractBodyReaderTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-13T15:41:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba864b95_139d4479",
+      "revId": "3a99f5942f66b9724b37a8375468fb37f8d4c9b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4edb02de_7a428db6",
@@ -116,6 +206,24 @@
       "writtenOn": "2023-01-13T15:21:22Z",
       "side": 1,
       "message": "Delete this one :D",
+      "revId": "3a99f5942f66b9724b37a8375468fb37f8d4c9b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6633cea6_2c5a7ac4",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/json/jsonPATCHdataMapNode.json",
+        "patchSetId": 23
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-13T15:41:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4edb02de_7a428db6",
       "revId": "3a99f5942f66b9724b37a8375468fb37f8d4c9b0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
