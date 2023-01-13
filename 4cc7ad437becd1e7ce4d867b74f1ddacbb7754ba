@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea8600dc_e0f09bdc",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/test/AbstractBodyReaderTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-13T14:47:17Z",
+      "side": 1,
+      "message": "`LEAF_NAME_QNAME`",
+      "revId": "4cc7ad437becd1e7ce4d867b74f1ddacbb7754ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
