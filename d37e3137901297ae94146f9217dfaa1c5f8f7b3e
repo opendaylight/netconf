@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8fcf953_18c8213e",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfOperationsService.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-13T15:45:02Z",
+      "side": 1,
+      "message": "The original value was `/operations/{identifier:.+}`",
+      "revId": "d37e3137901297ae94146f9217dfaa1c5f8f7b3e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4842af95_de3e5cd7",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfOperationsService.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-13T15:45:02Z",
+      "side": 1,
+      "message": "IMO adding `ByIdentifier` is not needed. Method is distinguished enough by additional parameter.",
+      "revId": "d37e3137901297ae94146f9217dfaa1c5f8f7b3e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14e030b3_566339e7",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfOperationsService.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-13T15:45:02Z",
+      "side": 1,
+      "message": "The original value was `/operations/{identifier:.+}`",
+      "revId": "d37e3137901297ae94146f9217dfaa1c5f8f7b3e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0aa5ef2f_77c206b3",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfOperationsService.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-13T15:45:02Z",
+      "side": 1,
+      "message": "IMO adding `ByIdentifier` is not needed. Method is distinguished enough by additional parameter.",
+      "revId": "d37e3137901297ae94146f9217dfaa1c5f8f7b3e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "747e2caa_9f3c8b8b",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-13T15:45:02Z",
+      "side": 1,
+      "message": "Duplicate code. Needs some \"common/parent\" method...",
+      "revId": "d37e3137901297ae94146f9217dfaa1c5f8f7b3e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3bf5fa2_f40431b9",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-13T15:45:02Z",
+      "side": 1,
+      "message": "This is not sufficient when using mount points. We need use something like `ParserIdentifier.toInstanceIdentifier`",
+      "revId": "d37e3137901297ae94146f9217dfaa1c5f8f7b3e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9c6a927_f5505793",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-13T15:45:02Z",
+      "side": 1,
+      "message": "Redundant variable - we can just write return here.",
+      "revId": "d37e3137901297ae94146f9217dfaa1c5f8f7b3e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

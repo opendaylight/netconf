@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33c05105_dc4b2193",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-13T15:45:02Z",
+      "side": 0,
+      "message": "We will probably need `mountPointService` one day.",
+      "revId": "12161f0e29296d943befb3f0a142c7d4c3b91b6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
