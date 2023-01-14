@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "419f8775_b3ca9e78",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2023-01-14T10:44:44Z",
+      "side": 1,
+      "message": "Agreed to throw an exception if DomNotificationService is not available",
+      "range": {
+        "startLine": 171,
+        "startChar": 0,
+        "endLine": 174,
+        "endChar": 67
+      },
+      "revId": "0648bcc7381dc2802e2131bb4c9419548d08b7e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e87585c_8ba6e745",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2023-01-14T10:44:44Z",
+      "side": 1,
+      "message": "Agreed.",
+      "range": {
+        "startLine": 191,
+        "startChar": 7,
+        "endLine": 194,
+        "endChar": 73
+      },
+      "revId": "0648bcc7381dc2802e2131bb4c9419548d08b7e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
