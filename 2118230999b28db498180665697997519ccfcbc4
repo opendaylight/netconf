@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea6357db_44e92fb9",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationListenerAdaptor.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2023-01-14T10:31:25Z",
+      "side": 1,
+      "message": "Agreed. Thanks for cleaning up",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 69
+      },
+      "revId": "2118230999b28db498180665697997519ccfcbc4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
