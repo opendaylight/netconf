@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "d35e16fb_0a3c83d2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T15:45:59Z",
+      "side": 1,
+      "message": ".. if model is ..",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "7866d7a2_fc3d8239",
@@ -14,6 +31,125 @@
       "writtenOn": "2023-01-16T13:25:20Z",
       "side": 1,
       "message": "Needs manual rebase",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44cbbcb0_6fcb6cca",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T15:45:59Z",
+      "side": 1,
+      "message": "final",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae8b8b8f_b00f9af4",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T15:45:59Z",
+      "side": 1,
+      "message": "I am unsure if `debug` is enough as a reaction to exception: https://docs.opendaylight.org/en/latest/developer-guides/logging-subsystem.html",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9da10257_14762e42",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T15:45:59Z",
+      "side": 1,
+      "message": "final",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45326c80_eb65cc91",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T15:45:59Z",
+      "side": 1,
+      "message": "final",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83770fdc_51d0944a",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T15:45:59Z",
+      "side": 1,
+      "message": "In addition, we are missing logging here",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00e21444_9a3ad1ac",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T15:45:59Z",
+      "side": 1,
+      "message": "IMO: I would prefer if we can do this in @BeforeClass",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c351aec_6bc56e84",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T15:45:59Z",
+      "side": 1,
+      "message": "In general, try to prefer `doReturn().when()`",
       "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
