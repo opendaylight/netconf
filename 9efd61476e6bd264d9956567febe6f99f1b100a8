@@ -16,6 +16,24 @@
       "message": "This will be NETCONF-943",
       "revId": "9efd61476e6bd264d9956567febe6f99f1b100a8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53c37f40_7e9245de",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 25
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-16T13:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09aa87ac_dd09c821",
+      "revId": "9efd61476e6bd264d9956567febe6f99f1b100a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

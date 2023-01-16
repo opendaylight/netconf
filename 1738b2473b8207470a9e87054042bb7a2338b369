@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "556cae6f_09a792af",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-16T13:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45ae7271_06591f95",
+      "revId": "1738b2473b8207470a9e87054042bb7a2338b369",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0738c6ea_7818f567",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-01-16T12:17:21Z",
       "side": 1,
       "message": "We are using 4 spaces as indent",
+      "revId": "1738b2473b8207470a9e87054042bb7a2338b369",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1f3254f_a8721e64",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/choice-model.yang",
+        "patchSetId": 24
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-16T13:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0738c6ea_7818f567",
       "revId": "1738b2473b8207470a9e87054042bb7a2338b369",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ed13e13_72a39f2d",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/leaf-set-model.yang",
+        "patchSetId": 24
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-16T13:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d685a862_a20de0ab",
+      "revId": "1738b2473b8207470a9e87054042bb7a2338b369",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e9ede65_a4259236",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "352ac151_8a273854",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/map-model.yang",
+        "patchSetId": 24
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-16T13:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e9ede65_a4259236",
+      "revId": "1738b2473b8207470a9e87054042bb7a2338b369",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "41162403_4b9d60bc",
@@ -82,6 +154,24 @@
       "writtenOn": "2023-01-16T12:17:21Z",
       "side": 1,
       "message": "Use 4 spaces as indent",
+      "revId": "1738b2473b8207470a9e87054042bb7a2338b369",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01dff9b9_f234b884",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/unkeyed-list-model.yang",
+        "patchSetId": 24
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-01-16T13:21:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "41162403_4b9d60bc",
       "revId": "1738b2473b8207470a9e87054042bb7a2338b369",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
