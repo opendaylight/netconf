@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70377e45_640b9310",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReaderTest.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T12:48:14Z",
+      "side": 1,
+      "message": "This can be `\"edit\": [`",
+      "revId": "926cf7d4c2b65a39f1e9451945df6622e7ecfa5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79ae1558_afe83a2c",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/test-model-aug.yang",
+        "patchSetId": 44
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T12:48:14Z",
+      "side": 1,
+      "message": "Please use 4 spaces as indent",
+      "revId": "926cf7d4c2b65a39f1e9451945df6622e7ecfa5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9841a364_731c521b",
+        "filename": "restconf/restconf-nb/src/test/resources/instanceidentifier/yang/test-model.yang",
+        "patchSetId": 44
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-16T12:48:14Z",
+      "side": 1,
+      "message": "Please use 4 spaces as indent",
+      "revId": "926cf7d4c2b65a39f1e9451945df6622e7ecfa5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
