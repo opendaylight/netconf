@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "047e2f6d_396444d0",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T08:17:28Z",
+      "side": 1,
+      "message": "Please create patch now and rebase it on NETCONF-937 patch.",
+      "revId": "9b856a099b6b89f208ba5e40d1d2d689d89e5875",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a526262b_303f1d9f",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T08:17:28Z",
+      "side": 1,
+      "message": "Sometimes you are using blank line - sometimes not.",
+      "revId": "9b856a099b6b89f208ba5e40d1d2d689d89e5875",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a16b38e_42541a21",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T08:17:28Z",
+      "side": 1,
+      "message": "Not everything is `This test patch for augmented element`... You can create something like `YANG patch comment`.",
+      "revId": "9b856a099b6b89f208ba5e40d1d2d689d89e5875",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
