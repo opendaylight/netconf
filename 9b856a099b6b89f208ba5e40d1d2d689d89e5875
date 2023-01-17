@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9978ccb7_43cce837",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T11:36:42Z",
+      "side": 1,
+      "message": "Resolved in: https://git.opendaylight.org/gerrit/c/netconf/+/103970",
+      "parentUuid": "047e2f6d_396444d0",
+      "revId": "9b856a099b6b89f208ba5e40d1d2d689d89e5875",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a526262b_303f1d9f",
         "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderTest.java",
         "patchSetId": 27
