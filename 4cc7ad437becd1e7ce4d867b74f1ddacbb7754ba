@@ -16,6 +16,24 @@
       "message": "`LEAF_NAME_QNAME`",
       "revId": "4cc7ad437becd1e7ce4d867b74f1ddacbb7754ba",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8223e39e_6d36620d",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/test/AbstractBodyReaderTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T11:38:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea8600dc_e0f09bdc",
+      "revId": "4cc7ad437becd1e7ce4d867b74f1ddacbb7754ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
