@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1379a961_4d0e9f3f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T11:21:20Z",
+      "side": 1,
+      "message": "Too long line..",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "126a99a9_f98c746b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T11:21:20Z",
+      "side": 1,
+      "message": "... it was not possible ...",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e25f081_f84890f9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T11:21:20Z",
+      "side": 1,
+      "message": "we will have:\nJIRA: NETCONF-928\nJIRA: NETCONF-929",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0996493c_d885a9c6",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfOperationsService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T11:21:20Z",
+      "side": 1,
+      "message": "Delete this line...",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90a01ad9_b3401c09",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T11:21:20Z",
+      "side": 1,
+      "message": "static",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7544205b_ee3eda2e",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T11:21:20Z",
+      "side": 1,
+      "message": "This should be:\n```\n        final var identifierContext \u003d ParserIdentifier.toInstanceIdentifier(identifier,\n                databindProvider.currentContext().modelContext(), Optional.of(mountPointService));\n        return OperationsContent.JSON.bodyFor(identifierContext);\n```",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bae478a_d885a528",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T11:21:20Z",
+      "side": 1,
+      "message": "This should be:\n```\n        final var identifierContext \u003d ParserIdentifier.toInstanceIdentifier(identifier,\n                databindProvider.currentContext().modelContext(), Optional.of(mountPointService));\n        return OperationsContent.XML.bodyFor(identifierContext);\n```",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
