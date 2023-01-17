@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b51ac712_f49afa50",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T15:42:47Z",
+      "side": 1,
+      "message": "Change this to:\n`public final @NonNull String bodyFor(final @Nonnull InstanceIdentifierContext context)`",
+      "revId": "22574a1443216dd9e36864f2bf4be31f652d6e13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6852d28_18b68602",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T15:42:47Z",
+      "side": 1,
+      "message": "Then from `InstanceIdentifierContext` you can get: effective model context and yang instance identifier",
+      "revId": "22574a1443216dd9e36864f2bf4be31f652d6e13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1bc4585_7edb9f47",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-17T15:42:47Z",
+      "side": 1,
+      "message": "and finally you replace `final var splitIdentifier \u003d identifier.split(\":\");` with: `final var rpcQname \u003d context.getInstanceIdentifier().getLastPathArgument().getNodeType();` then you will adapt filtering.",
+      "revId": "22574a1443216dd9e36864f2bf4be31f652d6e13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
