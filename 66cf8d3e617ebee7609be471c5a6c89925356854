@@ -34,6 +34,24 @@
       "parentUuid": "74b9e16f_4aae9007",
       "revId": "66cf8d3e617ebee7609be471c5a6c89925356854",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9aab8c7c_3378e2e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-18T13:03:10Z",
+      "side": 1,
+      "message": "Its expected to fail because purpose of this patch is to reproduce the issue. Now we are trying to find out the way how to fix it. Build will pass when we are done :)",
+      "parentUuid": "0451d0d3_eb3dfd38",
+      "revId": "66cf8d3e617ebee7609be471c5a6c89925356854",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
