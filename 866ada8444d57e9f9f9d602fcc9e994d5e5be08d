@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "282c87f3_13aa2e5f",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfOperationsService.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-18T15:59:16Z",
+      "side": 1,
+      "message": "Can you add some javadocs to methods that you have added",
+      "revId": "866ada8444d57e9f9f9d602fcc9e994d5e5be08d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1128794f_320b1936",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-18T15:59:16Z",
+      "side": 1,
+      "message": "This can throw null pointer exception",
+      "revId": "866ada8444d57e9f9f9d602fcc9e994d5e5be08d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3962fd63_f0c5743d",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-18T15:59:16Z",
+      "side": 1,
+      "message": "I was expecting `rpcQname.getNamespace` :(",
+      "revId": "866ada8444d57e9f9f9d602fcc9e994d5e5be08d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f060c45_60b50fea",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-18T15:59:16Z",
+      "side": 1,
+      "message": "The previous formatting was better",
+      "revId": "866ada8444d57e9f9f9d602fcc9e994d5e5be08d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
