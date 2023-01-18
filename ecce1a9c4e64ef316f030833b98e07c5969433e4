@@ -35,6 +35,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec1f08a7_ae6461f9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-18T14:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "126a99a9_f98c746b",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "867891d4_8630d1a8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-18T14:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1379a961_4d0e9f3f",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e25f081_f84890f9",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-01-17T11:21:20Z",
       "side": 1,
       "message": "we will have:\nJIRA: NETCONF-928\nJIRA: NETCONF-929",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f6f8646_7876101b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-18T14:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e25f081_f84890f9",
       "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c11ef53e_19e074dd",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfOperationsService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-18T14:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0996493c_d885a9c6",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90a01ad9_b3401c09",
@@ -82,6 +154,24 @@
       "writtenOn": "2023-01-17T11:21:20Z",
       "side": 1,
       "message": "static",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ef974cb_9da1bdae",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-18T14:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "90a01ad9_b3401c09",
       "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "088ac043_2c8405f8",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-18T14:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7544205b_ee3eda2e",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9bae478a_d885a528",
@@ -116,6 +224,24 @@
       "writtenOn": "2023-01-17T11:21:20Z",
       "side": 1,
       "message": "This should be:\n```\n        final var identifierContext \u003d ParserIdentifier.toInstanceIdentifier(identifier,\n                databindProvider.currentContext().modelContext(), Optional.of(mountPointService));\n        return OperationsContent.XML.bodyFor(identifierContext);\n```",
+      "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "599e2246_f9fb185c",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-18T14:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9bae478a_d885a528",
       "revId": "ecce1a9c4e64ef316f030833b98e07c5969433e4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

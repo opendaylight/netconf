@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b4f5c1e_2ff17208",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-18T14:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b51ac712_f49afa50",
+      "revId": "22574a1443216dd9e36864f2bf4be31f652d6e13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6852d28_18b68602",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5a44f14_63791444",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-18T14:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6852d28_18b68602",
+      "revId": "22574a1443216dd9e36864f2bf4be31f652d6e13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a1bc4585_7edb9f47",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-01-17T15:42:47Z",
       "side": 1,
       "message": "and finally you replace `final var splitIdentifier \u003d identifier.split(\":\");` with: `final var rpcQname \u003d context.getInstanceIdentifier().getLastPathArgument().getNodeType();` then you will adapt filtering.",
+      "revId": "22574a1443216dd9e36864f2bf4be31f652d6e13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d679c96_c45daf4a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-18T14:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1bc4585_7edb9f47",
       "revId": "22574a1443216dd9e36864f2bf4be31f652d6e13",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
