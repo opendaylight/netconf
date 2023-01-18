@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b002698a_0b5d22b6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-18T18:44:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d35e16fb_0a3c83d2",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "7866d7a2_fc3d8239",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 6
@@ -31,6 +49,24 @@
       "writtenOn": "2023-01-16T13:25:20Z",
       "side": 1,
       "message": "Needs manual rebase",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30430254_445de640",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-18T18:44:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7866d7a2_fc3d8239",
       "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "85e4c6d1_e8cf4c7c",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-18T18:44:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44cbbcb0_6fcb6cca",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae8b8b8f_b00f9af4",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-01-16T15:45:59Z",
       "side": 1,
       "message": "I am unsure if `debug` is enough as a reaction to exception: https://docs.opendaylight.org/en/latest/developer-guides/logging-subsystem.html",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33254e9f_f4920472",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-18T18:44:21Z",
+      "side": 1,
+      "message": "Replaced with `info`",
+      "parentUuid": "ae8b8b8f_b00f9af4",
       "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "598e7620_4a73fc8a",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-18T18:44:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9da10257_14762e42",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45326c80_eb65cc91",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-01-16T15:45:59Z",
       "side": 1,
       "message": "final",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e3c3e31_08495be2",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-18T18:44:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45326c80_eb65cc91",
       "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddd3a645_7b46d794",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-18T18:44:21Z",
+      "side": 1,
+      "message": "Added message to IllegalStateException",
+      "parentUuid": "83770fdc_51d0944a",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00e21444_9a3ad1ac",
@@ -137,6 +263,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38cdf9c0_350adaf8",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-18T18:44:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00e21444_9a3ad1ac",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c351aec_6bc56e84",
@@ -150,6 +294,24 @@
       "writtenOn": "2023-01-16T15:45:59Z",
       "side": 1,
       "message": "In general, try to prefer `doReturn().when()`",
+      "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f5977c5_27ae8224",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-18T18:44:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c351aec_6bc56e84",
       "revId": "c56722d1f45471a8285676d5013f40fdf58c4777",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
