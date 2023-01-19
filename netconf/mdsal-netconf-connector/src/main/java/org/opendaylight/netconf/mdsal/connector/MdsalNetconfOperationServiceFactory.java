@@ -30,6 +30,7 @@ import org.opendaylight.netconf.api.capability.YangModuleCapability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
@@ -166,7 +167,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+    public Registration registerCapabilityListener(final CapabilityListener listener) {
         // Advertise validate capability only if DOMDataBroker provides DOMDataTransactionValidator
         if (dataBroker.getExtensions().get(DOMDataTransactionValidator.class) != null) {
             listener.onCapabilitiesChanged(Collections.singleton(VALIDATE_CAPABILITY), Collections.emptySet());
