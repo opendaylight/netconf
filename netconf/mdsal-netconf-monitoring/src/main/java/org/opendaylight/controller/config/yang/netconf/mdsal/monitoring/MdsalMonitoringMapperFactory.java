@@ -15,6 +15,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
+import org.opendaylight.yangtools.concepts.Registration;
 
 public final class MdsalMonitoringMapperFactory implements NetconfOperationServiceFactory, AutoCloseable {
     private final MonitoringToMdsalWriter monitoringToMdsalWriter;
@@ -56,7 +57,7 @@ public final class MdsalMonitoringMapperFactory implements NetconfOperationServi
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+    public Registration registerCapabilityListener(final CapabilityListener listener) {
         return () -> { };
     }
 

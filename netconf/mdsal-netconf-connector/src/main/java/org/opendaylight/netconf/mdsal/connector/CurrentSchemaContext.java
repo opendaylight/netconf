@@ -73,7 +73,7 @@ public class CurrentSchemaContext implements EffectiveModelContextListener, Auto
         currentContext.set(null);
     }
 
-    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+    public Registration registerCapabilityListener(final CapabilityListener listener) {
         listener.onCapabilitiesChanged(MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(),
                 rootSchemaSourceProvider), Collections.emptySet());
         listeners1.add(listener);

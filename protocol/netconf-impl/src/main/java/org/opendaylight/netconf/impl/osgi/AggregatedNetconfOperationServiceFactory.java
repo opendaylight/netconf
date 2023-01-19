@@ -25,6 +25,8 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.netconf.util.CloseableUtil;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,21 +86,24 @@ public final class AggregatedNetconfOperationServiceFactory
     }
 
     @Override
-    public synchronized AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        final Map<NetconfOperationServiceFactory, AutoCloseable> regs = new HashMap<>();
+    public synchronized Registration registerCapabilityListener(final CapabilityListener listener) {
+        final Map<NetconfOperationServiceFactory, Registration> regs = new HashMap<>();
 
         for (final NetconfOperationServiceFactory factory : factories) {
-            final AutoCloseable reg = factory.registerCapabilityListener(listener);
-            regs.put(factory, reg);
+            regs.put(factory, factory.registerCapabilityListener(listener));
         }
         listeners.add(listener);
 
-        return () -> {
-            synchronized (AggregatedNetconfOperationServiceFactory.this) {
-                listeners.remove(listener);
-                CloseableUtil.closeAll(regs.values());
-                for (final Map.Entry<NetconfOperationServiceFactory, AutoCloseable> reg : regs.entrySet()) {
-                    registrations.remove(reg.getKey(), reg.getValue());
+        return new AbstractRegistration() {
+
+            @Override
+            protected void removeRegistration() {
+                synchronized (AggregatedNetconfOperationServiceFactory.this) {
+                    listeners.remove(listener);
+                    regs.values().forEach(Registration::close);
+                    for (var reg : regs.entrySet()) {
+                        registrations.remove(reg.getKey(), reg.getValue());
+                    }
                 }
             }
         };

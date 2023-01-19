@@ -73,6 +73,7 @@ import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -283,9 +284,9 @@ public class ConcurrentClientsTest {
         }
 
         @Override
-        public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-            return () -> {
-            };
+        public Registration registerCapabilityListener(final CapabilityListener listener) {
+            // No-op
+            return () -> { };
         }
 
         @Override
