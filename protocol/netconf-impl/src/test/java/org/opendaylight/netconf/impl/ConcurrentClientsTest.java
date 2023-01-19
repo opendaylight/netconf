@@ -30,7 +30,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -104,7 +103,7 @@ public class ConcurrentClientsTest {
             { 4, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
             { 1, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
             // empty set of capabilities = only base 1.0 netconf capability
-            { 4, TestingNetconfClientRunnable.class, Collections.emptySet()},
+            { 4, TestingNetconfClientRunnable.class, Set.of()},
             { 4, TestingNetconfClientRunnable.class, getOnlyExiServerCaps()},
             { 4, TestingNetconfClientRunnable.class, getOnlyChunkServerCaps()},
             { 4, BlockingClientRunnable.class, getOnlyExiServerCaps()},
@@ -280,12 +279,11 @@ public class ConcurrentClientsTest {
 
         @Override
         public Set<Capability> getCapabilities() {
-            return Collections.emptySet();
+            return Set.of();
         }
 
         @Override
         public Registration registerCapabilityListener(final CapabilityListener listener) {
-            // No-op
             return () -> { };
         }
 
