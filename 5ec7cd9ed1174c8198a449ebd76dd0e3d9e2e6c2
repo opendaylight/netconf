@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6890c9b7_db695b9b",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-19T11:46:01Z",
+      "side": 1,
+      "message": "We do not need this one time constant.",
+      "revId": "5ec7cd9ed1174c8198a449ebd76dd0e3d9e2e6c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3533c5e_54cac129",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-19T11:46:01Z",
+      "side": 1,
+      "message": "I am unsure of illegal state, but anyway LOG the problem here.",
+      "revId": "5ec7cd9ed1174c8198a449ebd76dd0e3d9e2e6c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f375788a_ac13a333",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-19T11:46:01Z",
+      "side": 1,
+      "message": "Why doe we need empty set as constant?",
+      "revId": "5ec7cd9ed1174c8198a449ebd76dd0e3d9e2e6c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
