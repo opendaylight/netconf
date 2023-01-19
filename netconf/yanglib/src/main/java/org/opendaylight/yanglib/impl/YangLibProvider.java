@@ -90,7 +90,12 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         }
 
         final File cacheFolderFile = new File(yanglibConfig.getCacheFolder());
-        checkArgument(cacheFolderFile.exists(), "cache-folder %s does not exist", cacheFolderFile);
+        if (cacheFolderFile.exists()) {
+            LOG.info("cache-folder {} already exists", cacheFolderFile);
+        } else {
+            checkArgument(cacheFolderFile.mkdirs(), "cache-folder %s cannot be created", cacheFolderFile);
+            LOG.info("cache-folder {} was created", cacheFolderFile);
+        }
         checkArgument(cacheFolderFile.isDirectory(), "cache-folder %s is not a directory", cacheFolderFile);
 
         final FilesystemSchemaSourceCache<YangTextSchemaSource> cache =
