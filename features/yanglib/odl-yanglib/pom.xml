@@ -26,6 +26,13 @@
             <artifactId>yanglib</artifactId>
         </dependency>
         <dependency>
+            <!-- finalname="etc/opendaylight/datastore/initial/config/yanglib-config.xml" -->
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>yanglib</artifactId>
+            <type>xml</type>
+            <classifier>config</classifier>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-restconf</artifactId>
             <type>xml</type>
