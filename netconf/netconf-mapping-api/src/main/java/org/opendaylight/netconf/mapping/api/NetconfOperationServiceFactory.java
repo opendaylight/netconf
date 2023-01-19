@@ -5,12 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mapping.api;
 
 import java.util.Set;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
+import org.opendaylight.yangtools.concepts.Registration;
 
 /**
  * Factory that must be registered in OSGi service registry in order to be used
@@ -18,18 +19,16 @@ import org.opendaylight.netconf.api.monitoring.CapabilityListener;
  * {@link NetconfOperationService}.
  */
 public interface NetconfOperationServiceFactory {
-
     /**
      * Get capabilities supported by current operation service.
      */
-    Set<Capability> getCapabilities();
+    @NonNull Set<Capability> getCapabilities();
 
     /**
      * Supported capabilities may change over time, registering a listener allows for push based information
      * retrieval about current notifications.
      */
-    AutoCloseable registerCapabilityListener(CapabilityListener listener);
+    @NonNull Registration registerCapabilityListener(CapabilityListener listener);
 
-    NetconfOperationService createService(String netconfSessionIdForReporting);
-
+    @NonNull NetconfOperationService createService(String netconfSessionIdForReporting);
 }
