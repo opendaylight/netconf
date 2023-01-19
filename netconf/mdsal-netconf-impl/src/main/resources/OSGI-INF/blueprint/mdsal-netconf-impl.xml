@@ -39,23 +39,22 @@
 
     <!--NetconfServerDispatcher -->
 
-    <bean id="sessionIdProvider"
-          class="org.opendaylight.netconf.impl.SessionIdProvider"/>
-
-    <bean id="netconfServerSessionNegotiatorFactory"
-          class="org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory">
-        <argument ref="global-timer"/>
-        <argument ref="aggregatedNetconfOperationServiceFactoryMappers"/>
-        <argument ref="sessionIdProvider"/>
-        <argument value="${connection-timeout-millis}"/>
-        <argument ref="netconfMonitoringService"/>
-    </bean>
-
     <bean id="netconfServerDispatcherImpl"
           class="org.opendaylight.netconf.impl.NetconfServerDispatcherImpl">
         <argument>
             <bean id="serverChannelInitializer"  class="org.opendaylight.netconf.impl.ServerChannelInitializer">
-                <argument ref="netconfServerSessionNegotiatorFactory"/>
+                <argument>
+                    <bean id="netconfServerSessionNegotiatorFactory"
+                          class="org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory">
+                        <argument ref="global-timer"/>
+                        <argument ref="aggregatedNetconfOperationServiceFactoryMappers"/>
+                        <argument>
+                            <bean id="sessionIdProvider" class="org.opendaylight.netconf.impl.SessionIdProvider"/>
+                        </argument>
+                        <argument value="${connection-timeout-millis}"/>
+                        <argument ref="netconfMonitoringService"/>
+                    </bean>
+                </argument>
             </bean>
         </argument>
         <argument ref="globalBossGroup"/>
