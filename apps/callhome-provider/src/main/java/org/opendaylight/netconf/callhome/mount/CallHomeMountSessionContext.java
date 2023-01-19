@@ -99,6 +99,7 @@ class CallHomeMountSessionContext {
                                 .setUsername("omitted")
                                 .setPassword("omitted")
                                 .build())
+                        .setLockDatastore(true)
                     .build())
                 .build();
     }
