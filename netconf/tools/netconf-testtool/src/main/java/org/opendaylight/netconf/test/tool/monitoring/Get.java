@@ -74,16 +74,17 @@ public class Get extends AbstractNetconfOperation {
         }
     }
 
+    @Override
+    protected Element handle(final Document document, final XmlElement message,
+                             final NetconfOperationChainedExecution subsequentOperation) {
+        throw new UnsupportedOperationException("Never gets called");
+    }
+
+
     private static Element getPlaceholder(final Document innerResult) throws DocumentedException {
         return XmlElement.fromDomElementWithExpected(innerResult.getDocumentElement(),
             XmlNetconfConstants.RPC_REPLY_KEY, XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0)
             .getOnlyChildElement(XmlNetconfConstants.DATA_KEY)
             .getDomElement();
-    }
-
-    @Override
-    protected Element handle(final Document document, final XmlElement message,
-                             final NetconfOperationChainedExecution subsequentOperation) {
-        throw new UnsupportedOperationException("Never gets called");
     }
 }

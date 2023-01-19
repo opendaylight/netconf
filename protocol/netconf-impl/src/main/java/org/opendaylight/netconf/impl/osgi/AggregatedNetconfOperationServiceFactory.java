@@ -26,10 +26,15 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListen
 import org.opendaylight.netconf.util.CloseableUtil;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * NetconfOperationService aggregator. Makes a collection of operation services accessible as one.
  */
+@Component(service = NetconfOperationServiceFactory.class, property = "type=mapper-aggregator-registry")
 public final class AggregatedNetconfOperationServiceFactory
         implements NetconfOperationServiceFactory, NetconfOperationServiceFactoryListener, AutoCloseable {
     private final Set<NetconfOperationServiceFactory> factories = ConcurrentHashMap.newKeySet();
@@ -38,10 +43,21 @@ public final class AggregatedNetconfOperationServiceFactory
     private final Set<CapabilityListener> listeners = ConcurrentHashMap.newKeySet();
 
     public AggregatedNetconfOperationServiceFactory() {
+        // Empty
     }
 
-    public AggregatedNetconfOperationServiceFactory(final List<NetconfOperationServiceFactory> mappers) {
+    @Activate
+    public AggregatedNetconfOperationServiceFactory(@Reference final List<NetconfOperationServiceFactory> mappers) {
         mappers.forEach(this::onAddNetconfOperationServiceFactory);
+    }
+
+    @Deactivate
+    @Override
+    public synchronized void close() {
+        factories.clear();
+        registrations.values().forEach(Registration::close);
+        registrations.clear();
+        listeners.clear();
     }
 
     @Override
@@ -78,7 +94,6 @@ public final class AggregatedNetconfOperationServiceFactory
         listeners.add(listener);
 
         return new AbstractRegistration() {
-
             @Override
             protected void removeRegistration() {
                 synchronized (AggregatedNetconfOperationServiceFactory.this) {
@@ -95,14 +110,6 @@ public final class AggregatedNetconfOperationServiceFactory
     @Override
     public synchronized NetconfOperationService createService(final String netconfSessionIdForReporting) {
         return new AggregatedNetconfOperation(factories, netconfSessionIdForReporting);
-    }
-
-    @Override
-    public synchronized void close() {
-        factories.clear();
-        registrations.values().forEach(Registration::close);
-        registrations.clear();
-        listeners.clear();
     }
 
     private static final class AggregatedNetconfOperation implements NetconfOperationService {
