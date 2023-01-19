@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f25815ee_2754d21b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-19T11:37:29Z",
+      "side": 1,
+      "message": "which rejects",
+      "revId": "d26761762299d79c3f48cafc255eb6d8f10d4c98",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "844611cc_cb1c2e70",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-19T11:37:29Z",
+      "side": 1,
+      "message": "... from XML.",
+      "revId": "d26761762299d79c3f48cafc255eb6d8f10d4c98",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "619a9042_be3a5a3b",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReaderMountPointTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-19T11:37:29Z",
+      "side": 1,
+      "message": "wrong class, usually we add new tests to XmlPatchBodyReaderTest.java",
+      "revId": "d26761762299d79c3f48cafc255eb6d8f10d4c98",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
