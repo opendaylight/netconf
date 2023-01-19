@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abd17368_ba814c68",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfOperationsService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-19T11:42:05Z",
+      "side": 1,
+      "message": "Valid for mount points. - this is no more valid.\n\n`Retrieve list of operations and action supported by the server or device.`",
+      "revId": "4cfd960f082f24665d915543ce6ed7f4a2777bea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f11f36f6_8b6f279b",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfOperationsService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-19T11:42:05Z",
+      "side": 1,
+      "message": "What is the content of document?",
+      "revId": "4cfd960f082f24665d915543ce6ed7f4a2777bea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cf40080_7daba85e",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RestconfOperationsService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-19T11:42:05Z",
+      "side": 1,
+      "message": "No more valid description, see above.",
+      "revId": "4cfd960f082f24665d915543ce6ed7f4a2777bea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "567cd316_1248ff94",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-19T11:42:05Z",
+      "side": 1,
+      "message": "Content with RPCs and actions.",
+      "revId": "4cfd960f082f24665d915543ce6ed7f4a2777bea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
