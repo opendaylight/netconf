@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mapping.api;
 
 import java.util.Set;
@@ -14,7 +13,6 @@ import java.util.Set;
  * Service of netconf operations.
  */
 public interface NetconfOperationService extends AutoCloseable {
-
     /**
      * Get set of netconf operations that are handled by this service.
      */
@@ -25,5 +23,4 @@ public interface NetconfOperationService extends AutoCloseable {
      */
     @Override
     void close();
-
 }

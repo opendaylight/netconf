@@ -13,6 +13,7 @@ import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.yangtools.concepts.Registration;
 
 
 public class OperationsProvider implements NetconfOperationServiceFactory {
@@ -37,7 +38,7 @@ public class OperationsProvider implements NetconfOperationServiceFactory {
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+    public Registration registerCapabilityListener(final CapabilityListener listener) {
         listener.onCapabilitiesChanged(caps, Set.of());
         return () -> { };
     }

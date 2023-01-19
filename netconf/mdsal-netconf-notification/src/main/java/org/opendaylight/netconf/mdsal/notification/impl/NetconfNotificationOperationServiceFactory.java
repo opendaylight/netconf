@@ -16,6 +16,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
+import org.opendaylight.yangtools.concepts.Registration;
 
 public final class NetconfNotificationOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
     private final NetconfNotificationRegistry netconfNotificationRegistry;
@@ -46,7 +47,7 @@ public final class NetconfNotificationOperationServiceFactory implements Netconf
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+    public Registration registerCapabilityListener(final CapabilityListener listener) {
         return () -> { };
     }
 

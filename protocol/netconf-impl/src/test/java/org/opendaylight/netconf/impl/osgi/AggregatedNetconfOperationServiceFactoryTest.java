@@ -25,6 +25,7 @@ import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.yangtools.concepts.Registration;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AggregatedNetconfOperationServiceFactoryTest {
@@ -43,11 +44,11 @@ public class AggregatedNetconfOperationServiceFactoryTest {
     @Mock
     private NetconfOperationServiceFactory factory2;
     @Mock
-    private AutoCloseable autoCloseable1;
+    private Registration reg1;
     @Mock
-    private AutoCloseable autoCloseable2;
+    private Registration reg2;
     @Mock
-    private AutoCloseable autoCloseable3;
+    private Registration reg3;
 
     private AggregatedNetconfOperationServiceFactory aggregatedFactory;
 
@@ -64,19 +65,19 @@ public class AggregatedNetconfOperationServiceFactoryTest {
         aggregatedFactory.registerCapabilityListener(listener1);
         aggregatedFactory.registerCapabilityListener(listener2);
 
-        doReturn(autoCloseable1).when(factory1).registerCapabilityListener(listener1);
-        doReturn(autoCloseable2).when(factory1).registerCapabilityListener(listener2);
+        doReturn(reg1).when(factory1).registerCapabilityListener(listener1);
+        doReturn(reg2).when(factory1).registerCapabilityListener(listener2);
         doReturn(factory1Caps).when(factory1).getCapabilities();
 
-        doReturn(autoCloseable1).when(factory2).registerCapabilityListener(listener1);
-        doReturn(autoCloseable2).when(factory2).registerCapabilityListener(listener2);
+        doReturn(reg1).when(factory2).registerCapabilityListener(listener1);
+        doReturn(reg2).when(factory2).registerCapabilityListener(listener2);
         doReturn(factory2Caps).when(factory2).getCapabilities();
 
-        doNothing().when(autoCloseable1).close();
-        doNothing().when(autoCloseable2).close();
+        doNothing().when(reg1).close();
+        doNothing().when(reg2).close();
 
-        doReturn(autoCloseable3).when(factory1).registerCapabilityListener(listener3);
-        doReturn(autoCloseable3).when(factory2).registerCapabilityListener(listener3);
+        doReturn(reg3).when(factory1).registerCapabilityListener(listener3);
+        doReturn(reg3).when(factory2).registerCapabilityListener(listener3);
     }
 
     @Test
@@ -92,8 +93,8 @@ public class AggregatedNetconfOperationServiceFactoryTest {
         aggregatedFactory.onRemoveNetconfOperationServiceFactory(factory1);
         aggregatedFactory.onRemoveNetconfOperationServiceFactory(factory2);
 
-        verify(autoCloseable1, times(2)).close();
-        verify(autoCloseable2, times(2)).close();
+        verify(reg1, times(2)).close();
+        verify(reg2, times(2)).close();
     }
 
     @Test
@@ -120,7 +121,7 @@ public class AggregatedNetconfOperationServiceFactoryTest {
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory1);
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory2);
         aggregatedFactory.close();
-        verify(autoCloseable1, times(2)).close();
-        verify(autoCloseable2, times(2)).close();
+        verify(reg1, times(2)).close();
+        verify(reg2, times(2)).close();
     }
 }
