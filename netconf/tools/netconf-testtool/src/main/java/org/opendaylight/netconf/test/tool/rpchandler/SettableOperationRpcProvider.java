@@ -8,32 +8,30 @@
 
 package org.opendaylight.netconf.test.tool.rpchandler;
 
-import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.yangtools.concepts.Registration;
 
 public class SettableOperationRpcProvider implements NetconfOperationServiceFactory {
 
     private final RpcHandler rpcHandler;
 
-    public SettableOperationRpcProvider(RpcHandler rpcHandler) {
+    public SettableOperationRpcProvider(final RpcHandler rpcHandler) {
         this.rpcHandler = rpcHandler;
     }
 
     @Override
     public Set<Capability> getCapabilities() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        return () -> {
-            //no op
-        };
+    public Registration registerCapabilityListener(final CapabilityListener listener) {
+        return () -> { };
     }
 
     @Override
@@ -42,16 +40,15 @@ public class SettableOperationRpcProvider implements NetconfOperationServiceFact
     }
 
     private static class SettableOperationService implements NetconfOperationService {
-
         private final SettableRpc rpc;
 
-        SettableOperationService(RpcHandler rpcHandler) {
-            this.rpc = new SettableRpc(rpcHandler);
+        SettableOperationService(final RpcHandler rpcHandler) {
+            rpc = new SettableRpc(rpcHandler);
         }
 
         @Override
         public Set<NetconfOperation> getNetconfOperations() {
-            return Collections.singleton(rpc);
+            return Set.of(rpc);
         }
 
         @Override

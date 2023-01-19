@@ -5,20 +5,18 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.customrpc;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.yangtools.concepts.Registration;
 
 public class SettableOperationProvider implements NetconfOperationServiceFactory {
-
     private final File rpcConfig;
 
     public SettableOperationProvider(final File rpcConfig) {
@@ -27,14 +25,12 @@ public class SettableOperationProvider implements NetconfOperationServiceFactory
 
     @Override
     public Set<Capability> getCapabilities() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        return () -> {
-            //no op
-        };
+    public Registration registerCapabilityListener(final CapabilityListener listener) {
+        return () -> { };
     }
 
     @Override
@@ -43,16 +39,15 @@ public class SettableOperationProvider implements NetconfOperationServiceFactory
     }
 
     private static class SettableOperationService implements NetconfOperationService {
-
         private final SettableRpc rpc;
 
         SettableOperationService(final File rpcConfig) {
-            this.rpc = new SettableRpc(rpcConfig);
+            rpc = new SettableRpc(rpcConfig);
         }
 
         @Override
         public Set<NetconfOperation> getNetconfOperations() {
-            return Collections.singleton(rpc);
+            return Set.of(rpc);
         }
 
         @Override

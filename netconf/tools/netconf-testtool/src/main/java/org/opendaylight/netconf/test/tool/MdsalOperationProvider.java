@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.test.tool;
 
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -43,6 +42,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -85,10 +85,9 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+    public Registration registerCapabilityListener(final CapabilityListener listener) {
         listener.onCapabilitiesChanged(caps, Set.of());
-        return () -> {
-        };
+        return () -> { };
     }
 
     @Override
@@ -143,7 +142,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             final Unlock unLock = new Unlock(currentSessionId);
             final DiscardChanges discardChanges = new DiscardChanges(currentSessionId, transactionProvider);
 
-            return Sets.newHashSet(get, getConfig, editConfig, commit, lock, unLock, discardChanges);
+            return Set.of(get, getConfig, editConfig, commit, lock, unLock, discardChanges);
         }
 
         @Override

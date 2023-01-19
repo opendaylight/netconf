@@ -9,7 +9,6 @@ package org.opendaylight.netconf.test.tool;
 
 import com.google.common.collect.Sets;
 import java.io.File;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
@@ -27,6 +26,7 @@ import org.opendaylight.netconf.test.tool.rpc.SimulatedGet;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedGetConfig;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedLock;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedUnLock;
+import org.opendaylight.yangtools.concepts.Registration;
 
 class SimulatedOperationProvider implements NetconfOperationServiceFactory {
     private final Set<Capability> caps;
@@ -47,11 +47,9 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(
-            final CapabilityListener listener) {
-        listener.onCapabilitiesChanged(caps, Collections.emptySet());
-        return () -> {
-        };
+    public Registration registerCapabilityListener(final CapabilityListener listener) {
+        listener.onCapabilitiesChanged(caps, Set.of());
+        return () -> { };
     }
 
     @Override

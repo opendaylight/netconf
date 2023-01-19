@@ -33,14 +33,6 @@ public class Get extends AbstractNetconfOperation {
         this.netconfMonitor = netconfMonitor;
     }
 
-    private Element getPlaceholder(final Document innerResult)
-            throws DocumentedException {
-        final XmlElement rootElement = XmlElement.fromDomElementWithExpected(
-                innerResult.getDocumentElement(), XmlNetconfConstants.RPC_REPLY_KEY,
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
-        return rootElement.getOnlyChildElement(XmlNetconfConstants.DATA_KEY).getDomElement();
-    }
-
     @Override
     protected String getOperationName() {
         return XmlNetconfConstants.GET;
@@ -80,6 +72,13 @@ public class Get extends AbstractNetconfOperation {
                     // FIXME: i.e. <error>e.getMessage()</error> ?
                     Map.of(ErrorSeverity.ERROR.elementBody(), e.getMessage()));
         }
+    }
+
+    private static Element getPlaceholder(final Document innerResult) throws DocumentedException {
+        return XmlElement.fromDomElementWithExpected(innerResult.getDocumentElement(),
+            XmlNetconfConstants.RPC_REPLY_KEY, XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0)
+            .getOnlyChildElement(XmlNetconfConstants.DATA_KEY)
+            .getDomElement();
     }
 
     @Override
