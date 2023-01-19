@@ -236,6 +236,13 @@
                 <artifactId>yanglib</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>yanglib</artifactId>
+                <version>${project.version}</version>
+                <classifier>config</classifier>
+                <type>xml</type>
+            </dependency>
 
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
