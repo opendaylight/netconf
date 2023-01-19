@@ -26,6 +26,9 @@
     <reference id="scheduledThreadPool"
                interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
                odl:type="global-netconf-ssh-scheduled-executor"/>
+    <reference id="aggregatedNetconfOperationServiceFactory"
+               interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener"
+               odl:type="mapper-aggregator-registry"/>
 
     <cm:property-placeholder persistent-id="org.opendaylight.netconf.impl" update-strategy="none">
         <cm:default-properties>
