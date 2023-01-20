@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -42,42 +42,41 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
     private final Set<NetconfManagementSession> changedSessions = new HashSet<>();
     private final Set<NetconfMonitoringService.SessionsListener> listeners = new HashSet<>();
     private final ScheduledExecutorService executor;
-    private final long updateInterval;
+    private final long updateIntervalSeconds;
     private boolean running;
 
     /**
      * Constructor for {@code NetconfSessionMonitoringService}.
      *
-     * @param schedulingThreadPool thread pool for scheduling session stats updates. If not present, updates won't be
-     *                             scheduled.
-     * @param updateInterval       update interval. If is less than 0, updates won't be scheduled
+     * @param schedulingThreadPool  thread pool for scheduling session stats updates. If not present, updates won't be
+     *                              scheduled.
+     * @param updateIntervalSeconds update interval. If is less than 0, updates won't be scheduled
      */
     NetconfSessionMonitoringService(final Optional<ScheduledThreadPool> schedulingThreadPool,
-            final long updateInterval) {
-        this.updateInterval = updateInterval;
-        if (schedulingThreadPool.isPresent() && updateInterval > 0) {
-            this.executor = schedulingThreadPool.get().getExecutor();
-            LOG.info("/netconf-state/sessions will be updated every {} seconds.", updateInterval);
+            final long updateIntervalSeconds) {
+        this.updateIntervalSeconds = updateIntervalSeconds;
+        if (schedulingThreadPool.isPresent() && updateIntervalSeconds > 0) {
+            executor = schedulingThreadPool.get().getExecutor();
+            LOG.info("/netconf-state/sessions will be updated every {} seconds.", updateIntervalSeconds);
         } else {
-            LOG.info("Scheduling thread pool is present = {}, "
-                    + "update interval {}: /netconf-state/sessions won't be updated.",
-                    schedulingThreadPool.isPresent(), updateInterval);
-            this.executor = null;
+            LOG.info(
+                "Scheduling thread pool is present = {}, update interval {}: /netconf-state/sessions won't be updated.",
+                schedulingThreadPool.isPresent(), updateIntervalSeconds);
+            executor = null;
         }
     }
 
     synchronized Sessions getSessions() {
-        final Collection<Session> managementSessions = Collections2.transform(sessions,
-                NetconfManagementSession::toManagementSession);
         return new SessionsBuilder()
-                .setSession(Maps.uniqueIndex(managementSessions, Session::key))
+                .setSession(Maps.uniqueIndex(
+                    Collections2.transform(sessions, NetconfManagementSession::toManagementSession), Session::key))
                 .build();
     }
 
     @Override
     public synchronized void onSessionUp(final NetconfManagementSession session) {
         LOG.debug("Session {} up", session);
-        Preconditions.checkState(!sessions.contains(session), "Session %s was already added", session);
+        checkState(!sessions.contains(session), "Session %s was already added", session);
         sessions.add(session);
         notifySessionUp(session);
     }
@@ -85,7 +84,7 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
     @Override
     public synchronized void onSessionDown(final NetconfManagementSession session) {
         LOG.debug("Session {} down", session);
-        Preconditions.checkState(sessions.contains(session), "Session %s not present", session);
+        checkState(sessions.contains(session), "Session %s not present", session);
         sessions.remove(session);
         changedSessions.remove(session);
         notifySessionDown(session);
@@ -141,7 +140,7 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
 
     private void startUpdateSessionStats() {
         if (executor != null) {
-            executor.scheduleAtFixedRate(this::updateSessionStats, 1, updateInterval, TimeUnit.SECONDS);
+            executor.scheduleAtFixedRate(this::updateSessionStats, 1, updateIntervalSeconds, TimeUnit.SECONDS);
             running = true;
         }
     }

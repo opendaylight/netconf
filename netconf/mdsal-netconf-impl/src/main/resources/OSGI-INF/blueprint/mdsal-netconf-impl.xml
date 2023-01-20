@@ -37,34 +37,6 @@
         </cm:default-properties>
     </cm:property-placeholder>
 
-    <!--NetconfServerDispatcher -->
-
-    <bean id="netconfServerDispatcherImpl"
-          class="org.opendaylight.netconf.impl.NetconfServerDispatcherImpl">
-        <argument>
-            <bean id="serverChannelInitializer"  class="org.opendaylight.netconf.impl.ServerChannelInitializer">
-                <argument>
-                    <bean id="netconfServerSessionNegotiatorFactory"
-                          class="org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory">
-                        <argument ref="global-timer"/>
-                        <argument ref="aggregatedNetconfOperationServiceFactoryMappers"/>
-                        <argument>
-                            <bean id="sessionIdProvider" class="org.opendaylight.netconf.impl.SessionIdProvider"/>
-                        </argument>
-                        <argument value="${connection-timeout-millis}"/>
-                        <argument ref="netconfMonitoringService"/>
-                    </bean>
-                </argument>
-            </bean>
-        </argument>
-        <argument ref="globalBossGroup"/>
-        <argument ref="globalWorkerGroup"/>
-    </bean>
-    <service ref="netconfServerDispatcherImpl"
-             interface="org.opendaylight.netconf.api.NetconfServerDispatcher"
-             odl:type="netconf-server-dispatcher">
-    </service>
-
     <!--NetconfServerMonitoring -->
 
     <bean id="netconfMonitoringService"

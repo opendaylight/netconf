@@ -18,25 +18,24 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 
 public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, AutoCloseable {
-
     private final NetconfCapabilityMonitoringService capabilityMonitoring;
     private final NetconfSessionMonitoringService sessionMonitoring;
 
-    public NetconfMonitoringServiceImpl(NetconfOperationServiceFactory opProvider) {
+    public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider) {
         this(opProvider, Optional.empty(), 0);
     }
 
-    public NetconfMonitoringServiceImpl(NetconfOperationServiceFactory opProvider,
-                                        ScheduledThreadPool threadPool,
-                                        long updateInterval) {
+    public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider,
+                                        final ScheduledThreadPool threadPool,
+                                        final long updateInterval) {
         this(opProvider, Optional.ofNullable(threadPool), updateInterval);
     }
 
-    public NetconfMonitoringServiceImpl(NetconfOperationServiceFactory opProvider,
-                                        Optional<ScheduledThreadPool> threadPool,
-                                        long updateInterval) {
-        this.capabilityMonitoring = new NetconfCapabilityMonitoringService(opProvider);
-        this.sessionMonitoring = new NetconfSessionMonitoringService(threadPool, updateInterval);
+    public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider,
+                                        final Optional<ScheduledThreadPool> threadPool,
+                                        final long updateInterval) {
+        capabilityMonitoring = new NetconfCapabilityMonitoringService(opProvider);
+        sessionMonitoring = new NetconfSessionMonitoringService(threadPool, updateInterval);
 
     }
 
@@ -56,7 +55,7 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     }
 
     @Override
-    public String getSchemaForCapability(String moduleName, Optional<String> revision) {
+    public String getSchemaForCapability(final String moduleName, final Optional<String> revision) {
         return capabilityMonitoring.getSchemaForModuleRevision(moduleName, revision);
     }
 
@@ -66,17 +65,17 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     }
 
     @Override
-    public AutoCloseable registerCapabilitiesListener(CapabilitiesListener listener) {
+    public AutoCloseable registerCapabilitiesListener(final CapabilitiesListener listener) {
         return capabilityMonitoring.registerListener(listener);
     }
 
     @Override
-    public AutoCloseable registerSessionsListener(SessionsListener listener) {
+    public AutoCloseable registerSessionsListener(final SessionsListener listener) {
         return sessionMonitoring.registerListener(listener);
     }
 
-    public void setNotificationPublisher(BaseNotificationPublisherRegistration notificationPublisher) {
-        this.capabilityMonitoring.setNotificationPublisher(notificationPublisher);
+    public void setNotificationPublisher(final BaseNotificationPublisherRegistration notificationPublisher) {
+        capabilityMonitoring.setNotificationPublisher(notificationPublisher);
     }
 
     @Override

@@ -5,13 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class SessionIdProvider {
-
     private final AtomicLong sessionCounter = new AtomicLong(0);
 
     public long getNextSessionId() {
