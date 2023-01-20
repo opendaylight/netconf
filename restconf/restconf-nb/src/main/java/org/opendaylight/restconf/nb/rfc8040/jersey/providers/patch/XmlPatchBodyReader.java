@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
-import static com.google.common.base.Verify.verify;
-
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +39,6 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,14 +90,11 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             final List<Element> values = readValueNodes(element, oper);
             final Element firstValueElement = values != null ? values.get(0) : null;
 
-            // find complete path to target and target schema node
-            // target can be also empty (only slash)
-            YangInstanceIdentifier targetII;
-            final SchemaNode targetNode;
+            // find complete path to target, it can be also empty (only slash)
+            final YangInstanceIdentifier targetII;
             final Inference inference;
             if (target.equals("/")) {
                 targetII = pathContext.getInstanceIdentifier();
-                targetNode = pathContext.getSchemaContext();
                 inference = pathContext.inference();
             } else {
                 // interpret as simple context
@@ -116,20 +109,6 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 if (!stack.isEmpty()) {
                     stack.exit();
                 }
-
-                if (stack.isEmpty()) {
-                    targetNode = pathContext.getSchemaContext();
-                } else {
-                    final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
-                    verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
-                    targetNode = (SchemaNode) parentStmt;
-                }
-            }
-
-            if (targetNode == null) {
-                LOG.debug("Target node {} not found in path {} ", target, pathContext.getSchemaNode());
-                throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL,
-                        ErrorTag.MALFORMED_MESSAGE);
             }
 
             if (oper.isWithValue()) {
@@ -137,11 +116,13 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                 final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
                 xmlParser.traverse(new DOMSource(firstValueElement));
+
                 // for lists allow to manipulate with list items through their parent
                 if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                    targetII = targetII.getParent();
+                    resultCollection.add(new PatchEntity(editId, oper, targetII.getParent(), resultHolder.getResult()));
+                } else {
+                    resultCollection.add(new PatchEntity(editId, oper, targetII, resultHolder.getResult()));
                 }
-                resultCollection.add(new PatchEntity(editId, oper, targetII, resultHolder.getResult()));
             } else {
                 resultCollection.add(new PatchEntity(editId, oper, targetII));
             }
