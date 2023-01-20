@@ -53,9 +53,18 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
     /**
      * Invoked using blueprint.
      */
+    public void start() {
+        // FIXME: close registrations
+        serverMonitoringDependency.registerCapabilitiesListener(this);
+        serverMonitoringDependency.registerSessionsListener(this);
+    }
+
+    /**
+     * Invoked using blueprint.
+     */
     @Override
     public void close() {
-        runTransaction((tx) -> tx.delete(LogicalDatastoreType.OPERATIONAL,
+        runTransaction(tx -> tx.delete(LogicalDatastoreType.OPERATIONAL,
                 InstanceIdentifier.create(NetconfState.class)));
     }
 
@@ -63,38 +72,30 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
     public void onSessionStarted(final Session session) {
         final InstanceIdentifier<Session> sessionPath =
                 SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key());
-        runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, sessionPath, session));
+        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL, sessionPath, session));
     }
 
     @Override
     public void onSessionEnded(final Session session) {
         final InstanceIdentifier<Session> sessionPath =
                 SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key());
-        runTransaction((tx) -> tx.delete(LogicalDatastoreType.OPERATIONAL, sessionPath));
+        runTransaction(tx -> tx.delete(LogicalDatastoreType.OPERATIONAL, sessionPath));
     }
 
     @Override
     public void onSessionsUpdated(final Collection<Session> sessions) {
-        runTransaction((tx) -> updateSessions(tx, sessions));
+        runTransaction(tx -> updateSessions(tx, sessions));
     }
 
     @Override
     public void onCapabilitiesChanged(final Capabilities capabilities) {
-        runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, CAPABILITIES_INSTANCE_IDENTIFIER,
+        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL, CAPABILITIES_INSTANCE_IDENTIFIER,
                 capabilities));
     }
 
     @Override
     public void onSchemasChanged(final Schemas schemas) {
-        runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, SCHEMAS_INSTANCE_IDENTIFIER, schemas));
-    }
-
-    /**
-     * Invoked using blueprint.
-     */
-    public void start() {
-        serverMonitoringDependency.registerCapabilitiesListener(this);
-        serverMonitoringDependency.registerSessionsListener(this);
+        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL, SCHEMAS_INSTANCE_IDENTIFIER, schemas));
     }
 
     private void runTransaction(final Consumer<WriteTransaction> txUser) {
