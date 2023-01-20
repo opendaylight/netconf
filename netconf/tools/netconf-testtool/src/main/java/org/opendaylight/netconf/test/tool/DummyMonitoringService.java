@@ -36,6 +36,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema.Location.Enumeration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaKey;
+import org.opendaylight.yangtools.concepts.NoOpObjectRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 
 public class DummyMonitoringService implements NetconfMonitoringService {
 
@@ -133,13 +135,12 @@ public class DummyMonitoringService implements NetconfMonitoringService {
     }
 
     @Override
-    public AutoCloseable registerCapabilitiesListener(final CapabilitiesListener listener) {
-        return null;
+    public Registration registerCapabilitiesListener(final CapabilitiesListener listener) {
+        return NoOpObjectRegistration.of(listener);
     }
 
     @Override
-    public AutoCloseable registerSessionsListener(final SessionsListener listener) {
-        return null;
+    public Registration registerSessionsListener(final SessionsListener listener) {
+        return NoOpObjectRegistration.of(listener);
     }
-
 }

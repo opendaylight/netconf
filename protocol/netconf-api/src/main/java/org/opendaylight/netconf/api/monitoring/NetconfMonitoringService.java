@@ -13,6 +13,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
+import org.opendaylight.yangtools.concepts.Registration;
 
 public interface NetconfMonitoringService {
 
@@ -39,7 +40,7 @@ public interface NetconfMonitoringService {
      * @param listener Monitoring listener
      * @return listener registration
      */
-    AutoCloseable registerCapabilitiesListener(CapabilitiesListener listener);
+    Registration registerCapabilitiesListener(CapabilitiesListener listener);
 
     /**
      * Allows push based sessions information transfer.
@@ -47,7 +48,7 @@ public interface NetconfMonitoringService {
      * @param listener Monitoring listener
      * @return listener registration
      */
-    AutoCloseable registerSessionsListener(SessionsListener listener);
+    Registration registerSessionsListener(SessionsListener listener);
 
     interface CapabilitiesListener {
 

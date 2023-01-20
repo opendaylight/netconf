@@ -41,6 +41,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 final class NetconfCapabilityMonitoringService implements CapabilityListener, AutoCloseable {
@@ -127,13 +129,16 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
         return new CapabilitiesBuilder().setCapability(Set.copyOf(capabilities.keySet())).build();
     }
 
-    synchronized AutoCloseable registerListener(final NetconfMonitoringService.CapabilitiesListener listener) {
+    synchronized Registration registerListener(final NetconfMonitoringService.CapabilitiesListener listener) {
         listeners.add(listener);
         listener.onCapabilitiesChanged(getCapabilities());
         listener.onSchemasChanged(getSchemas());
-        return () -> {
-            synchronized (NetconfCapabilityMonitoringService.this) {
-                listeners.remove(listener);
+        return new AbstractRegistration() {
+            @Override
+            protected void removeRegistration() {
+                synchronized (NetconfCapabilityMonitoringService.this) {
+                    listeners.remove(listener);
+                }
             }
         };
     }

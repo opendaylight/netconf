@@ -124,9 +124,8 @@ public class ConcurrentClientsTest {
         doNothing().when(sessionListener).onSessionUp(any(NetconfServerSession.class));
         doNothing().when(sessionListener).onSessionDown(any(NetconfServerSession.class));
         doNothing().when(sessionListener).onSessionEvent(any(SessionEvent.class));
-        doReturn((AutoCloseable) () -> {
-
-        }).when(monitoring).registerCapabilitiesListener(any(NetconfMonitoringService.CapabilitiesListener.class));
+        doReturn((Registration) () -> { }).when(monitoring)
+            .registerCapabilitiesListener(any(NetconfMonitoringService.CapabilitiesListener.class));
         doReturn(sessionListener).when(monitoring).getSessionListener();
         doReturn(new CapabilitiesBuilder().setCapability(Set.of()).build()).when(monitoring).getCapabilities();
         return monitoring;

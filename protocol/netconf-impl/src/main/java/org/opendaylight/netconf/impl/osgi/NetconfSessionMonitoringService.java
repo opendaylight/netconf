@@ -27,6 +27,8 @@ import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SessionsBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,13 +58,13 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
             final long updateInterval) {
         this.updateInterval = updateInterval;
         if (schedulingThreadPool.isPresent() && updateInterval > 0) {
-            this.executor = schedulingThreadPool.get().getExecutor();
+            executor = schedulingThreadPool.get().getExecutor();
             LOG.info("/netconf-state/sessions will be updated every {} seconds.", updateInterval);
         } else {
             LOG.info("Scheduling thread pool is present = {}, "
                     + "update interval {}: /netconf-state/sessions won't be updated.",
                     schedulingThreadPool.isPresent(), updateInterval);
-            this.executor = null;
+            executor = null;
         }
     }
 
@@ -96,12 +98,17 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
         changedSessions.add(event.getSession());
     }
 
-    synchronized AutoCloseable registerListener(final NetconfMonitoringService.SessionsListener listener) {
+    synchronized Registration registerListener(final NetconfMonitoringService.SessionsListener listener) {
         listeners.add(listener);
         if (!running) {
             startUpdateSessionStats();
         }
-        return () -> listeners.remove(listener);
+        return new AbstractRegistration() {
+            @Override
+            protected void removeRegistration() {
+                listeners.remove(listener);
+            }
+        };
     }
 
     @Override
