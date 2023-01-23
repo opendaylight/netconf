@@ -250,6 +250,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .setSalFacade(salFacade)
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
+                .setNotificationStream(nodeOptional.getNotification().getStreamName())
+                .setNotificationSubscribe(nodeOptional.getNotification().getSubscribe())
                 .build();
             yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
         }

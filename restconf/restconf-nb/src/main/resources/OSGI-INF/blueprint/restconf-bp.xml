@@ -71,6 +71,10 @@
     <argument ref="scheduledThreadPool"/>
     <argument ref="configuration"/>
   </bean>
+  <bean id="deviceNotificationSubscriber" class="org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationSubscriber" init-method="init">
+    <argument ref="dOMMountPointService"/>
+    <argument ref="dOMDataBroker"/>
+  </bean>
   <reference id="databindProvider" interface="org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider"/>
   <reference id="customFilterAdapterConfiguration" interface="org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration"/>
   <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
