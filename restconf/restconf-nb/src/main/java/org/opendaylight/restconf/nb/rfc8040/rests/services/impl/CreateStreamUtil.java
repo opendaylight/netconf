@@ -9,10 +9,12 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -20,6 +22,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationListenerAdaptor;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
@@ -46,11 +49,13 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.slf4j.Logger;
 
 /**
  * Utility class for creation of data-change-event or YANG notification streams.
  */
-final class CreateStreamUtil {
+public final class CreateStreamUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(CreateStreamUtil.class);
     private static final QNameModule SAL_REMOTE_AUGMENT = NotificationOutputTypeGrouping.QNAME.getModule();
 
     private static final QNameModule DEVICE_NOTIFICATION_MODULE = SubscribeDeviceNotificationInput.QNAME.getModule();
@@ -135,14 +140,67 @@ final class CreateStreamUtil {
     /**
      * Create device notification stream.
      *
+     * @param mountPointService dom mount point service
+     * @return {@link DOMRpcResult} - Output of RPC - example in JSON
+     */
+    public static DOMRpcResult createDeviceNotificationListenerOnMountPoint(
+            final DOMMountPointService mountPointService, final DOMDataBroker domDataBroker,
+            final YangInstanceIdentifier path) {
+        final DOMMountPoint mountPoint = mountPointService.getMountPoint(path)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED));
+        if (!(path.getLastPathArgument() instanceof NodeIdentifierWithPredicates listId)) {
+            throw new RestconfDocumentedException("Path does not refer to a list item", ErrorType.APPLICATION,
+                    ErrorTag.INVALID_VALUE);
+        }
+        if (listId.size() != 1) {
+            throw new RestconfDocumentedException("Target list uses multiple keys", ErrorType.APPLICATION,
+                    ErrorTag.INVALID_VALUE);
+        }
+        final String deviceName = listId.values().iterator().next().toString();
+        final NotificationOutputType outputType = NotificationOutputType.JSON;
+        final EffectiveModelContext effectiveModelContext = mountPoint.getService(DOMSchemaService.class)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point schema not available",
+                        ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED))
+                .getGlobalContext();
+        Collection<? extends NotificationDefinition> notificationDefinitions = effectiveModelContext
+                .getNotifications();
+        if (notificationDefinitions == null || notificationDefinitions.isEmpty()) {
+            throw new RestconfDocumentedException("Device does not support notification", ErrorType.APPLICATION,
+                    ErrorTag.OPERATION_FAILED);
+        }
+        final DOMNotificationService domNotificationService   = mountPoint.getService(DOMNotificationService.class)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED));
+        Set<Absolute> absolutes = notificationDefinitions.stream()
+                .map(notificationDefinition -> Absolute.of(notificationDefinition.getQName()))
+                .collect(Collectors.toUnmodifiableSet());
+
+        final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
+                .registerDeviceNotificationListener(deviceName, outputType, effectiveModelContext, mountPointService,
+                        mountPoint.getIdentifier(), domDataBroker);
+        notificationListenerAdapter.listen(domNotificationService, absolutes);
+
+        // building of output
+        return new DefaultDOMRpcResult(Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
+                .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH, "/" + deviceName
+                        + "?" + RestconfStreamsConstants.NOTIFICATION_TYPE + "=" + RestconfStreamsConstants.DEVICE))
+                .build());
+    }
+
+    /**
+     * Create device notification stream.
+     *
      * @param baseUrl base Url
      * @param input RPC input
      * @param streamUtil stream utility
      * @param mountPointService dom mount point service
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
-    static DOMRpcResult createDeviceNotificationListener(final String baseUrl, final ContainerNode input,
-            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService) {
+    static DOMRpcResult createDeviceNotificationListener(final String baseUrl, final NormalizedNodePayload payload,
+            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService,
+            final DOMDataBroker domDataBroker) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
         final YangInstanceIdentifier path =
@@ -183,8 +241,8 @@ final class CreateStreamUtil {
         }
 
         final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
-            .registerDeviceNotificationListener(deviceName, prepareOutputType(input), mountModelContext,
-                mountPointService, mountPoint.getIdentifier());
+            .registerDeviceNotificationListener(deviceName, prepareOutputType(data), mountModelContext,
+                mountPointService, mountPoint.getIdentifier(), domDataBroker);
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 
         // building of output
