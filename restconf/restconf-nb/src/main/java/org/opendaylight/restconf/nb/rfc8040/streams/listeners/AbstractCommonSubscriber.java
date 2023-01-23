@@ -110,6 +110,13 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
         subscribers.clear();
     }
 
+    public final void resetRegistration() {
+        if (registration != null) {
+            registration.close();
+            registration = null;
+        }
+    }
+
     @Override
     public synchronized void addSubscriber(final StreamSessionHandler subscriber) {
         final boolean isConnected = subscriber.isConnected();
