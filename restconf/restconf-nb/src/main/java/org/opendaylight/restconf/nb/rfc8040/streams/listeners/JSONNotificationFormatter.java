@@ -51,7 +51,8 @@ final class JSONNotificationFormatter extends NotificationFormatter {
 
     @Override
     String createText(final EffectiveModelContext schemaContext, final DOMNotification input, final Instant now,
-                      final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly)
+                      final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly,
+                      final String deviceId)
             throws IOException {
         final Writer writer = new StringWriter();
         final JsonWriter jsonWriter = new JsonWriter(writer).beginObject();
@@ -59,7 +60,13 @@ final class JSONNotificationFormatter extends NotificationFormatter {
         writeNotificationBody(JSONNormalizedNodeStreamWriter.createNestedWriter(
                 codecSupplier.getShared(schemaContext), input.getType(), null, jsonWriter), input.getBody());
         jsonWriter.endObject();
-        jsonWriter.name("event-time").value(toRFC3339(now)).endObject();
+        jsonWriter.name("event-time").value(toRFC3339(now));
+
+        if (deviceId != null) {
+            jsonWriter.name("node-id").value(deviceId).endObject();
+        } else {
+            jsonWriter.endObject();
+        }
         jsonWriter.close();
         return writer.toString();
     }
