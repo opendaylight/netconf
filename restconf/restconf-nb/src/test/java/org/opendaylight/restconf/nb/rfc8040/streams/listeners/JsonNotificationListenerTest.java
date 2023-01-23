@@ -186,6 +186,6 @@ public class JsonNotificationListenerTest {
         final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
                 schemaPathNotifi, "json-stream", NotificationOutputType.JSON);
         return notifiAdapter.formatter()
-                .eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false, false, false).orElseThrow();
+                .eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false, false, false, null).orElseThrow();
     }
 }

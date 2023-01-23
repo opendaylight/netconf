@@ -35,6 +35,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
@@ -89,7 +90,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     @Before
     public void setup() {
         invokeOperationsService = new RestconfInvokeOperationsServiceImpl(rpcService, mountPointService,
-            new StreamsConfiguration(0, 1, 0, false));
+            new StreamsConfiguration(0, 1, 0, false),  mock(DOMDataBroker.class));
     }
 
     @Test

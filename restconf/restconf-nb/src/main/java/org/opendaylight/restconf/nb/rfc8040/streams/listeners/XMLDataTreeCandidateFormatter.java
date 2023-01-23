@@ -47,11 +47,11 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
     @Override
     String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
                       final Instant now, final boolean leafNodesOnly, final boolean skipData,
-                      final boolean changedLeafNodesOnly) throws Exception {
+                      final boolean changedLeafNodesOnly, final String deviceId) throws Exception {
         final var writer = new StringWriter();
         boolean nonEmpty = false;
         try {
-            final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now);
+            final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now, deviceId);
 
             xmlStreamWriter.setDefaultNamespace(SAL_REMOTE_NAMESPACE);
             xmlStreamWriter.writeStartElement(SAL_REMOTE_NAMESPACE, DATA_CHANGED_NOTIFICATION_ELEMENT);
