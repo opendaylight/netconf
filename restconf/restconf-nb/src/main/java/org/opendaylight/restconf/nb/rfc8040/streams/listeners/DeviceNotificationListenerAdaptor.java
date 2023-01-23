@@ -9,17 +9,25 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.streams.SSESessionHandler;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +78,9 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
 
     @Override
     public void onMountPointCreated(final YangInstanceIdentifier path) {
-        // No-op
+        if (instanceIdentifier.equals(path)) {
+            reRegisterDeviceNotification(path);
+        }
     }
 
     @Override
@@ -88,9 +98,28 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
                     }
                 }
             });
-            ListenersBroker.getInstance().removeAndCloseDeviceNotificationListener(this);
-            resetListenerRegistration();
         }
+    }
+
+    private void reRegisterDeviceNotification(YangInstanceIdentifier path) {
+        final DOMMountPoint mountPoint = mountPointService.getMountPoint(path)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED));
+        Collection<? extends NotificationDefinition> notificationDefinitions = mountPoint.getService(
+                        DOMSchemaService.class).get().getGlobalContext()
+                .getNotifications();
+        if (notificationDefinitions == null || notificationDefinitions.isEmpty()) {
+            throw new RestconfDocumentedException("Device does not support notification", ErrorType.APPLICATION,
+                    ErrorTag.OPERATION_FAILED);
+        }
+
+        final Set<Absolute> absolutes = notificationDefinitions.stream()
+                .map(notificationDefinition -> Absolute.of(notificationDefinition.getQName()))
+                .collect(Collectors.toUnmodifiableSet());
+        resetListenerRegistration();
+        resetRegistration();
+        listen(this.mountPointService.getMountPoint(path).get().getService(DOMNotificationService.class).get(),
+                absolutes);
     }
 
 }
