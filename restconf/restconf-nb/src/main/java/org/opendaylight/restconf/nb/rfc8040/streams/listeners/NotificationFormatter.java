@@ -112,4 +112,16 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
         xmlStreamWriter.writeEndElement();
         return xmlStreamWriter;
     }
+
+    static @NonNull XMLStreamWriter createStreamWriterWithNotification(final Writer writer, final Instant now,
+            final String deviceId)
+            throws XMLStreamException {
+        XMLStreamWriter xmlStreamWriter = createStreamWriterWithNotification(writer, now);
+        if (deviceId != null) {
+            xmlStreamWriter.writeStartElement("deviceId");
+            xmlStreamWriter.writeCharacters(deviceId);
+            xmlStreamWriter.writeEndElement();
+        }
+        return xmlStreamWriter;
+    }
 }

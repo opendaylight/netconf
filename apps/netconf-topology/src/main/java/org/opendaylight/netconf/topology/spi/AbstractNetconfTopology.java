@@ -224,9 +224,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         // Setup reconnection on empty context, if so configured
-        if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
+        if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources() != null
+                && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
             LOG.warn("Ignoring missing schema sources is not currently implemented for {}", deviceId);
         }
+        final boolean isNotificationSubscriptionEnabled = nodeOptional != null && nodeOptional.getNotification() != null
+                ? true : false;
 
         final RemoteDevice<NetconfDeviceCommunicator> device;
         final List<SchemaSourceRegistration<?>> yanglibRegistrations;
@@ -244,6 +247,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .setSalFacade(salFacade)
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
+                .setNotificationStream(isNotificationSubscriptionEnabled ? nodeOptional.getNotification()
+                        .getStreamName() : "NETCONF")
+                .setNotificationSubscribe(isNotificationSubscriptionEnabled ? nodeOptional.getNotification()
+                        .getSubscribe() : false)
                 .build();
             yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
         }

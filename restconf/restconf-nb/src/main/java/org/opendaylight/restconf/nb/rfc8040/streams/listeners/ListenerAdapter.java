@@ -76,7 +76,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTre
         final Optional<String> maybeData;
         try {
             maybeData = formatter().eventData(databindProvider.currentContext().modelContext(), dataTreeCandidates, now,
-                getLeafNodesOnly(), isSkipNotificationData(), getChangedLeafNodesOnly());
+                getLeafNodesOnly(), isSkipNotificationData(), getChangedLeafNodesOnly(), null);
         } catch (final Exception e) {
             LOG.error("Failed to process notification {}",
                     dataTreeCandidates.stream().map(Object::toString).collect(Collectors.joining(",")), e);

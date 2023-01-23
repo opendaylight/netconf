@@ -10,10 +10,12 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -29,6 +31,8 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListen
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -37,7 +41,6 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
@@ -57,7 +60,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility class for creation of data-change-event or YANG notification streams.
  */
-final class CreateStreamUtil {
+public final class CreateStreamUtil {
     private static final Logger LOG = LoggerFactory.getLogger(CreateStreamUtil.class);
     private static final QNameModule SAL_REMOTE_AUGMENT = NotificationOutputTypeGrouping.QNAME.getModule();
 
@@ -77,8 +80,15 @@ final class CreateStreamUtil {
     private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(OUTPUT_TYPE_QNAME);
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
         NodeIdentifier.create(DEVICE_NOTIFICATION_PATH_QNAME);
-    private static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER = new AugmentationIdentifier(
-        ImmutableSet.of(SCOPE_QNAME, DATASTORE_QNAME, OUTPUT_TYPE_QNAME));
+    private static final YangInstanceIdentifier.AugmentationIdentifier
+            SAL_REMOTE_AUG_IDENTIFIER = new YangInstanceIdentifier.AugmentationIdentifier(
+            ImmutableSet.of(SCOPE_QNAME, DATASTORE_QNAME, OUTPUT_TYPE_QNAME));
+    private static final NodeIdentifier SAL_REMOTE_OUTPUT_NODEID =
+        NodeIdentifier.create(CreateDataChangeEventSubscriptionOutput.QNAME);
+    private static final NodeIdentifier PATH_NODEID =
+        NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionInput.QNAME, "path").intern());
+    private static final NodeIdentifier STREAM_NAME_NODEID =
+        NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionOutput.QNAME, "stream-name").intern());
 
     private CreateStreamUtil() {
         // Hidden on purpose
@@ -131,13 +141,62 @@ final class CreateStreamUtil {
         ListenersBroker.getInstance().registerDataChangeListener(path, streamName, outputType);
 
         // building of output
-        final QName outputQname = QName.create(qname, "output");
-        final QName streamNameQname = QName.create(qname, "stream-name");
-
         return new DefaultDOMRpcResult(Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(outputQname))
-            .withChild(ImmutableNodes.leafNode(streamNameQname, streamName))
+            .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
+            .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, streamName))
             .build());
+    }
+
+    /**
+     * Create device notification stream.
+     *
+     * @param mountPointService dom mount point service
+     * @return {@link DOMRpcResult} - Output of RPC - example in JSON
+     */
+    public static DOMRpcResult createDeviceNotificationListenerOnMountPoint(
+            final DOMMountPointService mountPointService, final DOMDataBroker domDataBroker,
+            final YangInstanceIdentifier path) {
+        final DOMMountPoint mountPoint = mountPointService.getMountPoint(path)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED));
+        if (!(path.getLastPathArgument() instanceof NodeIdentifierWithPredicates listId)) {
+            throw new RestconfDocumentedException("Path does not refer to a list item", ErrorType.APPLICATION,
+                    ErrorTag.INVALID_VALUE);
+        }
+        if (listId.size() != 1) {
+            throw new RestconfDocumentedException("Target list uses multiple keys", ErrorType.APPLICATION,
+                    ErrorTag.INVALID_VALUE);
+        }
+        final String deviceName = listId.values().iterator().next().toString();
+        final NotificationOutputType outputType = NotificationOutputType.JSON;
+        final EffectiveModelContext effectiveModelContext = mountPoint.getService(DOMSchemaService.class)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point schema not available",
+                        ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED))
+                .getGlobalContext();
+        Collection<? extends NotificationDefinition> notificationDefinitions = effectiveModelContext
+                .getNotifications();
+        if (notificationDefinitions == null || notificationDefinitions.isEmpty()) {
+            throw new RestconfDocumentedException("Device does not support notification", ErrorType.APPLICATION,
+                    ErrorTag.OPERATION_FAILED);
+        }
+        final DOMNotificationService domNotificationService   = mountPoint.getService(DOMNotificationService.class)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED));
+        Set<Absolute> absolutes = notificationDefinitions.stream()
+                .map(notificationDefinition -> Absolute.of(notificationDefinition.getQName()))
+                .collect(Collectors.toUnmodifiableSet());
+
+        final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
+                .registerDeviceNotificationListener(deviceName, outputType, effectiveModelContext, mountPointService,
+                        mountPoint.getIdentifier(), domDataBroker);
+        notificationListenerAdapter.listen(domNotificationService, absolutes);
+
+        // building of output
+        return new DefaultDOMRpcResult(Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
+                .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH, "/" + deviceName
+                        + "?" + RestconfStreamsConstants.NOTIFICATION_TYPE + "=" + RestconfStreamsConstants.DEVICE))
+                .build());
     }
 
     /**
@@ -150,7 +209,8 @@ final class CreateStreamUtil {
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
     static DOMRpcResult createDeviceNotificationListener(final String baseUrl, final NormalizedNodePayload payload,
-            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService) {
+            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService,
+            final DOMDataBroker domDataBroker) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
@@ -194,7 +254,7 @@ final class CreateStreamUtil {
 
         final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
             .registerDeviceNotificationListener(deviceName, prepareOutputType(data), mountModelContext,
-                mountPointService, mountPoint.getIdentifier());
+                mountPointService, mountPoint.getIdentifier(), domDataBroker);
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 
         // building of output
