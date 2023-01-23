@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.StampedLock;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -113,7 +114,7 @@ public final class ListenersBroker {
 
         final long stamp = deviceNotificationListenersLock.readLock();
         try {
-            return deviceNotificationListeners.get(path);
+            return (BaseListenerInterface)deviceNotificationListeners.values().toArray()[0];
         } finally {
             deviceNotificationListenersLock.unlockRead(stamp);
         }
@@ -196,13 +197,14 @@ public final class ListenersBroker {
      */
     public DeviceNotificationListenerAdaptor registerDeviceNotificationListener(final String streamName,
         final NotificationOutputType outputType, final EffectiveModelContext refSchemaCtx,
-        final DOMMountPointService mountPointService, final YangInstanceIdentifier path) {
+        final DOMMountPointService mountPointService, final YangInstanceIdentifier path,
+        final DOMDataBroker domDataBroker) {
 
         final long stamp = deviceNotificationListenersLock.writeLock();
         try {
             return deviceNotificationListeners.computeIfAbsent(streamName,
                 stream -> new DeviceNotificationListenerAdaptor(streamName, outputType, refSchemaCtx,
-                    mountPointService, path));
+                    mountPointService, path, domDataBroker));
         } finally {
             deviceNotificationListenersLock.unlockWrite(stamp);
         }
