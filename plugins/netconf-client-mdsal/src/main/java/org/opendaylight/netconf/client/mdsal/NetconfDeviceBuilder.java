@@ -18,6 +18,8 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 
 public class NetconfDeviceBuilder {
     private boolean reconnectOnSchemasChange;
+    private String notificationStream;
+    private boolean isNotificationSubscribe;
     private SchemaResourcesDTO schemaResourcesDTO;
     private RemoteDeviceId id;
     private RemoteDeviceHandler salFacade;
@@ -60,10 +62,21 @@ public class NetconfDeviceBuilder {
         return this;
     }
 
+    public NetconfDeviceBuilder setNotificationStream(String notificationStream) {
+        this.notificationStream = notificationStream;
+        return this;
+    }
+
+    public NetconfDeviceBuilder setNotificationSubscribe(boolean notificationSubscribe) {
+        this.isNotificationSubscribe = notificationSubscribe;
+        return this;
+    }
+
     public NetconfDevice build() {
         validation();
         return new NetconfDevice(schemaResourcesDTO, baseSchemas, id, salFacade,
-            globalProcessingExecutor, reconnectOnSchemasChange, deviceActionFactory);
+            globalProcessingExecutor, reconnectOnSchemasChange, deviceActionFactory, notificationStream,
+                isNotificationSubscribe);
     }
 
     private void validation() {
