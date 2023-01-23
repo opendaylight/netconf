@@ -23,6 +23,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
@@ -65,9 +66,12 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     private final DOMRpcService rpcService;
     private final DOMMountPointService mountPointService;
     private final SubscribeToStreamUtil streamUtils;
+    private final DOMDataBroker domDataBroker;
 
     public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService,
-            final DOMMountPointService mountPointService, final StreamsConfiguration configuration) {
+            final DOMMountPointService mountPointService, final StreamsConfiguration configuration,
+            final DOMDataBroker dataBroker) {
+        this.domDataBroker = dataBroker;
         this.rpcService = requireNonNull(rpcService);
         this.mountPointService = requireNonNull(mountPointService);
         streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
@@ -99,7 +103,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                 // FIXME: this should be a match on RPC QName
                 final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
                 future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, payload,
-                    streamUtils, mountPointService));
+                    streamUtils, mountPointService, domDataBroker));
             } else {
                 future = invokeRpc((ContainerNode)payload.getData(), rpcName, rpcService);
             }

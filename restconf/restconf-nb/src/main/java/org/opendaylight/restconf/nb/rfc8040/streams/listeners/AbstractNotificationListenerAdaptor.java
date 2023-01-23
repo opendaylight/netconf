@@ -44,7 +44,7 @@ abstract class AbstractNotificationListenerAdaptor extends AbstractCommonSubscri
 
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public final void onNotification(final DOMNotification notification) {
+    public void onNotification(final DOMNotification notification) {
         final var eventInstant = notification instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now();
         if (!checkStartStop(eventInstant)) {
             return;
@@ -53,7 +53,7 @@ abstract class AbstractNotificationListenerAdaptor extends AbstractCommonSubscri
         final Optional<String> maybeOutput;
         try {
             maybeOutput = formatter().eventData(effectiveModel(), notification, eventInstant, getLeafNodesOnly(),
-                isSkipNotificationData(), getChangedLeafNodesOnly());
+                isSkipNotificationData(), getChangedLeafNodesOnly(), streamName);
         } catch (Exception e) {
             LOG.error("Failed to process notification {}", notification, e);
             return;
