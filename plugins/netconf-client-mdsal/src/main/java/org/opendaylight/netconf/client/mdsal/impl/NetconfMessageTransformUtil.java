@@ -83,6 +83,9 @@ public final class NetconfMessageTransformUtil {
 
     public static final @NonNull QName CREATE_SUBSCRIPTION_RPC_QNAME =
             QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
+
+    public static final QName STREAM_NAME = QName.create(CREATE_SUBSCRIPTION_RPC_QNAME, "stream-name");
+
     private static final String SUBTREE = "subtree";
 
     // Blank document used for creation of new DOM nodes
