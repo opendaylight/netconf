@@ -24,6 +24,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+<<<<<<< PATCH SET (6af299 Resubscribe Device Notification when Device gets reconnect ()
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+=======
+>>>>>>> BASE      (8c0006 Refactor EventFormatter constants)
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
@@ -57,17 +63,63 @@ public final class RestconfInvokeOperationsServiceImpl {
     private final MdsalRestconfServer server;
     @Deprecated(forRemoval = true)
     private final DOMMountPointService mountPointService;
+<<<<<<< PATCH SET (6af299 Resubscribe Device Notification when Device gets reconnect ()
+    private final SubscribeToStreamUtil streamUtils;
+    private final DOMDataBroker domDataBroker;
+=======
     private final ListenersBroker listenersBroker;
+>>>>>>> BASE      (8c0006 Refactor EventFormatter constants)
 
+<<<<<<< PATCH SET (6af299 Resubscribe Device Notification when Device gets reconnect ()
+    public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService,
+            final DOMMountPointService mountPointService, final StreamsConfiguration configuration,
+            final DOMDataBroker dataBroker) {
+        this.domDataBroker = dataBroker;
+        this.rpcService = requireNonNull(rpcService);
+=======
     public RestconfInvokeOperationsServiceImpl(final DatabindProvider databindProvider,
             final MdsalRestconfServer server, final DOMMountPointService mountPointService,
             final ListenersBroker listenersBroker) {
         this.databindProvider = requireNonNull(databindProvider);
         this.server = requireNonNull(server);
+>>>>>>> BASE      (8c0006 Refactor EventFormatter constants)
         this.mountPointService = requireNonNull(mountPointService);
         this.listenersBroker = requireNonNull(listenersBroker);
     }
 
+<<<<<<< PATCH SET (6af299 Resubscribe Device Notification when Device gets reconnect ()
+    @Override
+    public void invokeRpc(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo,
+            final AsyncResponse ar) {
+        final InstanceIdentifierContext context = payload.getInstanceIdentifierContext();
+        final EffectiveModelContext schemaContext = context.getSchemaContext();
+        final DOMMountPoint mountPoint = context.getMountPoint();
+        final SchemaNode schema = context.getSchemaNode();
+        final QName rpcName = schema.getQName();
+
+        final ListenableFuture<? extends DOMRpcResult> future;
+        if (mountPoint == null) {
+            // FIXME: this really should be a normal RPC invocation service which has its own interface with JAX-RS,
+            //        except ... we check 'identifier' for .contains() instead of exact RPC name!
+            if (SAL_REMOTE_NAMESPACE.equals(rpcName.getModule())) {
+                if (identifier.contains("create-data-change-event-subscription")) {
+                    future = Futures.immediateFuture(
+                        CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContext));
+                } else {
+                    future = Futures.immediateFailedFuture(new RestconfDocumentedException("Unsupported operation",
+                        ErrorType.RPC, ErrorTag.OPERATION_NOT_SUPPORTED));
+                }
+            } else if (DEVICE_NOTIFICATION_NAMESPACE.equals(rpcName.getModule())) {
+                // FIXME: this should be a match on RPC QName
+                final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
+                future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, payload,
+                    streamUtils, mountPointService, domDataBroker));
+            } else {
+                future = invokeRpc((ContainerNode)payload.getData(), rpcName, rpcService);
+            }
+        } else {
+            future = invokeRpc(payload.getData(), rpcName, mountPoint);
+=======
     /**
      * Invoke RPC operation.
      *
@@ -95,6 +147,7 @@ public final class RestconfInvokeOperationsServiceImpl {
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlOperationInputBody(body)) {
             invokeRpc(identifier, uriInfo, ar, xmlBody);
+>>>>>>> BASE      (8c0006 Refactor EventFormatter constants)
         }
     }
 

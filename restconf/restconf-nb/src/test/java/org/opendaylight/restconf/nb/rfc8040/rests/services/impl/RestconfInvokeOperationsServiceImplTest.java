@@ -87,9 +87,14 @@ public class RestconfInvokeOperationsServiceImplTest {
 
     @Before
     public void setup() {
+<<<<<<< PATCH SET (6af299 Resubscribe Device Notification when Device gets reconnect ()
+        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(rpcService, mountPointService,
+            new StreamsConfiguration(0, 1, 0, false),  mock(DOMDataBroker.class));
+=======
         server = new MdsalRestconfServer(dataBroker, rpcService, mountPointService);
         invokeOperationsService = new RestconfInvokeOperationsServiceImpl(() -> CONTEXT, server, mountPointService,
             new ListenersBroker.WebSockets(dataBroker));
+>>>>>>> BASE      (8c0006 Refactor EventFormatter constants)
     }
 
     @Test

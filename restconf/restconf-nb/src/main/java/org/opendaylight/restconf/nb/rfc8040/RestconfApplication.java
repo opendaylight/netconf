@@ -30,6 +30,21 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperatio
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
 
+<<<<<<< PATCH SET (6af299 Resubscribe Device Notification when Device gets reconnect ()
+@Singleton
+public class RestconfApplication extends AbstractRestconfApplication {
+    private RestconfApplication(final DatabindProvider databindProvider, final DOMMountPointService mountPointService,
+            final RestconfStreamsSubscriptionService streamSubscription, final DOMDataBroker dataBroker,
+            final DOMRpcService rpcService, final DOMActionService actionService,
+            final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
+            final StreamsConfiguration configuration) {
+        super(databindProvider, mountPointService, List.of(
+            streamSubscription,
+            new RestconfDataServiceImpl(databindProvider, dataBroker, mountPointService, streamSubscription,
+                actionService, configuration),
+            new RestconfInvokeOperationsServiceImpl(rpcService, mountPointService, configuration, dataBroker),
+            new RestconfOperationsServiceImpl(databindProvider, mountPointService),
+=======
 final class RestconfApplication extends Application {
     private final Set<Object> singletons;
 
@@ -42,6 +57,7 @@ final class RestconfApplication extends Application {
             new RestconfDataServiceImpl(databindProvider, server, actionService),
             new RestconfInvokeOperationsServiceImpl(databindProvider, server, mountPointService, listenersBroker),
             new RestconfOperationsServiceImpl(databindProvider, server),
+>>>>>>> BASE      (8c0006 Refactor EventFormatter constants)
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
             new RestconfImpl(databindProvider));
     }
