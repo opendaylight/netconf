@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5402f5eb_a85b4aba",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-23T09:36:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc2f8710_a0c0f0c5",
+      "revId": "5ec7cd9ed1174c8198a449ebd76dd0e3d9e2e6c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f375788a_ac13a333",
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "Because this way it can stay as constant. Elements are initialized in @BeforeClass as you requested in comment before.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/103126/comments/00e21444_9a3ad1ac",
       "parentUuid": "f375788a_ac13a333",
+      "revId": "5ec7cd9ed1174c8198a449ebd76dd0e3d9e2e6c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f6761a9_b68b0453",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-23T09:36:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99ad561f_65a5a1bd",
       "revId": "5ec7cd9ed1174c8198a449ebd76dd0e3d9e2e6c2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
