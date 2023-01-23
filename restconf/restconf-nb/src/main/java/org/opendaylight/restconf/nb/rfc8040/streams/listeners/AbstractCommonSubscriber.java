@@ -54,10 +54,9 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
 
     private final EventFormatterFactory<T> formatterFactory;
     private final NotificationOutputType outputType;
-    private final String streamName;
+    protected final String streamName;
 
-    @GuardedBy("this")
-    private final Set<StreamSessionHandler> subscribers = new HashSet<>();
+    private static final Set<StreamSessionHandler> SUBSCRIBERS = new HashSet<>();
     @GuardedBy("this")
     private Registration registration;
 
@@ -92,12 +91,12 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
 
     @Override
     public final synchronized boolean hasSubscribers() {
-        return !subscribers.isEmpty();
+        return !SUBSCRIBERS.isEmpty();
     }
 
     @Override
     public final synchronized Set<StreamSessionHandler> getSubscribers() {
-        return new HashSet<>(subscribers);
+        return new HashSet<>(SUBSCRIBERS);
     }
 
     @Override
@@ -107,7 +106,14 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
             registration = null;
         }
         deleteDataInDS().get();
-        subscribers.clear();
+        SUBSCRIBERS.clear();
+    }
+
+    public final void resetRegistration() {
+        if (registration != null) {
+            registration.close();
+            registration = null;
+        }
     }
 
     @Override
@@ -115,12 +121,12 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
         final boolean isConnected = subscriber.isConnected();
         checkState(isConnected);
         LOG.debug("Subscriber {} is added.", subscriber);
-        subscribers.add(subscriber);
+        SUBSCRIBERS.add(subscriber);
     }
 
     @Override
     public synchronized void removeSubscriber(final StreamSessionHandler subscriber) {
-        subscribers.remove(subscriber);
+        SUBSCRIBERS.remove(subscriber);
         LOG.debug("Subscriber {} is removed", subscriber);
         if (!hasSubscribers()) {
             ListenersBroker.getInstance().removeAndCloseListener(this);
@@ -222,7 +228,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
      * @param data Data of incoming notifications.
      */
     synchronized void post(final String data) {
-        final Iterator<StreamSessionHandler> iterator = subscribers.iterator();
+        final Iterator<StreamSessionHandler> iterator = SUBSCRIBERS.iterator();
         while (iterator.hasNext()) {
             final StreamSessionHandler subscriber = iterator.next();
             final boolean isConnected = subscriber.isConnected();

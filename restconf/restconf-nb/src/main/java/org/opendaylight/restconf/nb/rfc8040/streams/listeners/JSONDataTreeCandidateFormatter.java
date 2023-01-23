@@ -55,7 +55,7 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
     @Override
     String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
                       final Instant now, final boolean leafNodesOnly, final boolean skipData,
-                      final boolean changedLeafNodesOnly)
+                      final boolean changedLeafNodesOnly, final String deviceId)
             throws IOException {
         final Writer writer = new StringWriter();
         final JsonWriter jsonWriter = new JsonWriter(writer).beginObject();
@@ -76,6 +76,10 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
         jsonWriter.endObject();
 
         jsonWriter.name("event-time").value(toRFC3339(now));
+
+        if (deviceId != null) {
+            jsonWriter.name("node-id").value(deviceId);
+        }
         jsonWriter.endObject();
 
         // notification

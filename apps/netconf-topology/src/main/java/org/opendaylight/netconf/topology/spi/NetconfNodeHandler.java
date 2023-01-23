@@ -93,9 +93,12 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
         // Setup reconnection on empty context, if so configured
         // FIXME: NETCONF-925: implement this
-        if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
+        if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources() != null
+                && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
             LOG.warn("Ignoring missing schema sources is not currently implemented for {}", deviceId);
         }
+        final boolean isNotificationSubscriptionEnabled = nodeOptional != null && nodeOptional.getNotification() != null
+                ? true : false;
 
         // The facade we are going it present to NetconfDevice
         RemoteDeviceHandler salFacade;
@@ -124,6 +127,10 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                 .setSalFacade(salFacade)
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
+                .setNotificationStream(isNotificationSubscriptionEnabled ? nodeOptional.getNotification()
+                        .getStreamName() : "NETCONF")
+                .setNotificationSubscribe(isNotificationSubscriptionEnabled ? nodeOptional.getNotification()
+                        .getSubscribe() : false)
                 .build();
             yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
         }
