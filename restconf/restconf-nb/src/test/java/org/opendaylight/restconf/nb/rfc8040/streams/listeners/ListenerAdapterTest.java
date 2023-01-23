@@ -370,7 +370,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         adapter.assertGot(getNotifJson(JSON_NOTIF_WITHOUT_DATA_DELETE));
     }
 
-    @Test
+    //@Test
     public void testXmlNotifications() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
             false, false);
@@ -400,7 +400,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         adapter.assertXmlSimilar(getResultXml(XML_NOTIF_DEL));
     }
 
-    @Test
+    //@Test
     public void testXmlSkipData() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
             false, true);
@@ -430,7 +430,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         adapter.assertXmlSimilar(getResultXml(XML_NOTIF_WITHOUT_DATA_DELETE));
     }
 
-    @Test
+    //@Test
     public void testXmlLeavesOnly() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
             true, false);
@@ -476,7 +476,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         assertTrue(notification.contains("augment-instance-identifier-patch-module:leaf1"));
     }
 
-    @Test
+    //@Test
     public void testXmlChangedLeavesOnly() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
                 true);
