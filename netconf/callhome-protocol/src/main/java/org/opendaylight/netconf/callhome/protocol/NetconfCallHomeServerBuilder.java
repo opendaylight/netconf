@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientBuilder;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 
 public class NetconfCallHomeServerBuilder {
@@ -104,7 +105,7 @@ public class NetconfCallHomeServerBuilder {
     }
 
     private static SshClient defaultSshClient() {
-        return SshClient.setUpDefaultClient();
+        return new NetconfClientBuilder().build();
     }
 
     private static NetconfClientSessionNegotiatorFactory defaultNegotiationFactory() {
