@@ -16,6 +16,24 @@
       "message": "I am afraid it will not work with call-home device. Please see again `NetconfNodeUtils`.",
       "revId": "67d7b92652cb3449f83b638f44b26c9164757a01",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a85d0e02_1651efe7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-25T13:00:06Z",
+      "side": 1,
+      "message": "I tested connecting device with call-home and device session ID was 2. I added a breakpoint to the method extractUserCapabilities() in the relevant class, but it was not triggered during the process of connecting the call-home device.",
+      "parentUuid": "668ef2b2_32a7c968",
+      "revId": "67d7b92652cb3449f83b638f44b26c9164757a01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
