@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18b2b3af_286ec55e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-26T09:27:21Z",
+      "side": 1,
+      "message": "You have to add:\n```\n        \u003cdependency\u003e\n            \u003cgroupId\u003eorg.opendaylight.netconf\u003c/groupId\u003e\n            \u003cartifactId\u003eyanglib\u003c/artifactId\u003e\n            \u003cversion\u003e${project.version}\u003c/version\u003e\n            \u003cclassifier\u003econfig\u003c/classifier\u003e\n            \u003ctype\u003exml\u003c/type\u003e\n        \u003c/dependency\u003e\n```\nto aaa-artifacts pom.xml.",
+      "revId": "e5c7ce6511a682c0d191e1d90adbfba7558eefdc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
