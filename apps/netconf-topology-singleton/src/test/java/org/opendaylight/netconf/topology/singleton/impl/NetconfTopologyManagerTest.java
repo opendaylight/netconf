@@ -37,7 +37,6 @@ import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -79,6 +78,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -177,9 +177,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testOnDataTreeChanged() throws Exception {
-
         // Notify of 2 created Node objects.
-
         final NodeId nodeId1 = new NodeId("node-id-1");
         final InstanceIdentifier<Node> nodeInstanceId1 = NetconfTopologyUtils.createTopologyNodeListPath(
                 new NodeKey(nodeId1), TOPOLOGY_ID);
@@ -246,21 +244,13 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         verify(clusterSingletonServiceProvider).registerClusterSingletonService(mockContext2);
 
         // Notify of Node 1 replaced and Node 2 subtree modified.
-
         mockContextMap.clear();
 
-        final NetconfNode updatedNetconfNode1 = new NetconfNodeBuilder(netconfNode1)
-                .setPort(new PortNumber(Uint16.valueOf(33333))).build();
-        final Node updatedNode1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(updatedNetconfNode1).build();
-
         doReturn(WRITE).when(dataObjectModification1).getModificationType();
-        doReturn(updatedNode1).when(dataObjectModification1).getDataAfter();
-
         doReturn(SUBTREE_MODIFIED).when(dataObjectModification2).getModificationType();
-        doReturn(node2).when(dataObjectModification2).getDataAfter();
 
-        doNothing().when(mockContext1).refresh(any());
-        doNothing().when(mockContext2).refresh(any());
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(mockContext1).closeServiceInstance();
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(mockContext2).closeServiceInstance();
 
         netconfTopologyManager.onDataTreeChanged(Arrays.asList(
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
@@ -268,16 +258,11 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId2), dataObjectModification2)));
 
-        ArgumentCaptor<NetconfTopologySetup> mockContext1Setup = ArgumentCaptor.forClass(NetconfTopologySetup.class);
-        verify(mockContext1).refresh(mockContext1Setup.capture());
-        assertEquals(updatedNode1, mockContext1Setup.getValue().getNode());
-
-        verify(mockContext2).refresh(any());
-
+        verify(mockContext1).instantiateServiceInstance();
+        verify(mockContext2).instantiateServiceInstance();
         verifyNoMoreInteractions(clusterSingletonServiceProvider);
 
         // Notify of Node 1 deleted.
-
         doReturn(DELETE).when(dataObjectModification1).getModificationType();
 
         netconfTopologyManager.onDataTreeChanged(Arrays.asList(
@@ -289,7 +274,6 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         verifyNoMoreInteractions(clusterSingletonServiceProvider, mockClusterRegistration2, mockContext2);
 
         // Notify of Node 1 created again.
-
         reset(clusterSingletonServiceProvider);
 
         final NetconfTopologyContext newMockContext1 = mock(NetconfTopologyContext.class);
@@ -313,12 +297,10 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                         nodeInstanceId1), dataObjectModification1)));
 
         verify(clusterSingletonServiceProvider, times(2)).registerClusterSingletonService(newMockContext1);
-
         verifyNoMoreInteractions(mockClusterRegistration1, mockContext1, mockClusterRegistration2, mockContext2,
                 newMockContext1, newMockClusterRegistration1, clusterSingletonServiceProvider);
 
         // Test close.
-
         netconfTopologyManager.close();
 
         verify(newMockClusterRegistration1).close();
