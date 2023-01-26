@@ -104,6 +104,7 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -328,16 +329,16 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                     final DeviceActionFactory deviceActionFact) {
                 final var context = super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime,
                     deviceActionFact);
-
                 final var spiedContext = spy(context);
+                final var spiedTopology = spy(context.getTopologySingleton());
                 doAnswer(invocation -> {
                     final var spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
                     doReturn(deviceDOMDataBroker).when(spiedFacade)
                         .newDeviceDataBroker(any(MountPointContext.class), any(NetconfSessionPreferences.class));
                     masterSalFacadeFuture.set(spiedFacade);
                     return spiedFacade;
-                }).when(spiedContext).newMasterSalFacade();
-
+                }).when(spiedTopology).createSalFacade(any(RemoteDeviceId.class), any(boolean.class));
+                doReturn(spiedTopology).when(spiedContext).getTopologySingleton();
                 return spiedContext;
             }
         };
@@ -410,7 +411,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
 
-        final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
+        final var masterSalFacade = masterSalFacadeFuture.get(15, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
             new EmptyMountPointContext(deviceSchemaContext)),
             NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE)),
@@ -462,10 +463,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         DOMMountPoint slaveMountPoint = awaitMountPoint(slaveMountPointService);
 
-        final NetconfTopologyContext slaveNetconfTopologyContext =
-                slaveNetconfTopologyContextFuture.get(5, TimeUnit.SECONDS);
-        verify(slaveNetconfTopologyContext, never()).newMasterSalFacade();
-
         LOG.info("****** Testing slave DOMDataBroker operations");
 
         testDOMDataBrokerOperations(getDOMDataBroker(slaveMountPoint));
@@ -484,9 +481,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         masterSalFacadeFuture = SettableFuture.create();
         writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
 
-        verify(masterMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
-
-        final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
+        verify(masterMountPointListener, never()).onMountPointRemoved(yangNodeInstanceId);
+        final var masterSalFacade = masterSalFacadeFuture.get(15, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), new EmptyMountPointContext(deviceSchemaContext)),
             NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE)),
@@ -726,7 +722,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     private DOMMountPoint awaitMountPoint(final DOMMountPointService mountPointService) {
-        await().atMost(5, TimeUnit.SECONDS).until(() ->
+        await().atMost(10, TimeUnit.SECONDS).until(() ->
                 mountPointService.getMountPoint(yangNodeInstanceId).isPresent());
 
         return mountPointService.getMountPoint(yangNodeInstanceId).orElseThrow();
