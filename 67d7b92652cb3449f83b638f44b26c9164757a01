@@ -34,6 +34,24 @@
       "parentUuid": "668ef2b2_32a7c968",
       "revId": "67d7b92652cb3449f83b638f44b26c9164757a01",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6575034c_c51346ce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-01-26T10:07:07Z",
+      "side": 1,
+      "message": "Correction this method is triggered but return null at the beginning of the method.\n```\n        if (moduleCaps \u003d\u003d null \u0026\u0026 nonModuleCaps \u003d\u003d null) {\n            // if none of yang-module-capabilities or non-module-capabilities is specified\n            return null;\n        }\n```",
+      "parentUuid": "a85d0e02_1651efe7",
+      "revId": "67d7b92652cb3449f83b638f44b26c9164757a01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
