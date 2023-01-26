@@ -18,7 +18,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -104,6 +103,7 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -276,8 +276,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         setupSlave();
 
         yangNodeInstanceId = bindingToNormalized.toYangInstanceIdentifier(NODE_INSTANCE_ID);
-
-        doReturn(mock(ReconnectFuture.class)).when(mockClientDispatcher).createReconnectingClient(any());
+        final var future = mock(ReconnectFuture.class);
+        doReturn(future).when(mockClientDispatcher).createReconnectingClient(any());
+        doReturn(future).when(future).firstSessionFuture();
 
         LOG.info("****** Setup complete");
     }
@@ -328,16 +329,16 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                     final DeviceActionFactory deviceActionFact) {
                 final var context = super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime,
                     deviceActionFact);
-
                 final var spiedContext = spy(context);
+                final var spiedTopology = spy(context.getTopologySingleton());
                 doAnswer(invocation -> {
                     final var spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
                     doReturn(deviceDOMDataBroker).when(spiedFacade)
                         .newDeviceDataBroker(any(MountPointContext.class), any(NetconfSessionPreferences.class));
                     masterSalFacadeFuture.set(spiedFacade);
                     return spiedFacade;
-                }).when(spiedContext).newMasterSalFacade();
-
+                }).when(spiedTopology).createSalFacade(any(RemoteDeviceId.class), any(boolean.class));
+                doReturn(spiedTopology).when(spiedContext).getTopologySingleton();
                 return spiedContext;
             }
         };
@@ -462,10 +463,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         DOMMountPoint slaveMountPoint = awaitMountPoint(slaveMountPointService);
 
-        final NetconfTopologyContext slaveNetconfTopologyContext =
-                slaveNetconfTopologyContextFuture.get(5, TimeUnit.SECONDS);
-        verify(slaveNetconfTopologyContext, never()).newMasterSalFacade();
-
         LOG.info("****** Testing slave DOMDataBroker operations");
 
         testDOMDataBrokerOperations(getDOMDataBroker(slaveMountPoint));
@@ -485,7 +482,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
 
         verify(masterMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
-
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), new EmptyMountPointContext(deviceSchemaContext)),
