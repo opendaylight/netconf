@@ -209,17 +209,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
 
-        final var deviceSalFacade = new NetconfTopologyDeviceSalFacade(deviceId, mountPointService,
-            node.requireLockDatastore(), dataBroker);
+        RemoteDeviceHandler salFacade = createSalFacade(deviceId, node.requireLockDatastore());
         // The facade we are going it present to NetconfDevice
-        RemoteDeviceHandler salFacade;
         final KeepaliveSalFacade keepAliveFacade;
         if (keepaliveDelay > 0) {
             LOG.info("Adding keepalive facade, for device {}", nodeId);
-            salFacade = keepAliveFacade = new KeepaliveSalFacade(deviceId, deviceSalFacade,
-                keepaliveExecutor.getExecutor(), keepaliveDelay, node.requireDefaultRequestTimeoutMillis().toJava());
+            salFacade = keepAliveFacade = new KeepaliveSalFacade(deviceId, salFacade, keepaliveExecutor.getExecutor(),
+                    keepaliveDelay, node.requireDefaultRequestTimeoutMillis().toJava());
         } else {
-            salFacade = deviceSalFacade;
             keepAliveFacade = null;
         }
 
@@ -356,4 +353,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
     }
+
+    protected abstract RemoteDeviceHandler createSalFacade(final RemoteDeviceId id, final boolean lockDatastore);
 }
