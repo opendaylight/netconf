@@ -209,8 +209,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
 
-        final var deviceSalFacade = new NetconfTopologyDeviceSalFacade(deviceId, mountPointService,
-            node.requireLockDatastore(), dataBroker);
+        final var deviceSalFacade = createSalFacade(deviceId, node.requireLockDatastore());
         // The facade we are going it present to NetconfDevice
         RemoteDeviceHandler salFacade;
         final KeepaliveSalFacade keepAliveFacade;
@@ -261,6 +260,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, yanglibRegistrations);
+    }
+
+    protected RemoteDeviceHandler createSalFacade(RemoteDeviceId deviceId, boolean lockDatastore) {
+        return new NetconfTopologyDeviceSalFacade(deviceId, mountPointService, lockDatastore, dataBroker);
     }
 
     private static List<SchemaSourceRegistration<?>> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
