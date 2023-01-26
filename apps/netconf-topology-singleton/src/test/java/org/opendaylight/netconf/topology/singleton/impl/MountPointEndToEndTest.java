@@ -321,19 +321,18 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                     final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
                     final DeviceActionFactory deviceActionFact) {
-                final var context = super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime,
-                    deviceActionFact);
-
-                final var spiedContext = spy(context);
+                final var context = spy(super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime,
+                    deviceActionFact));
+                final var topology = spy(context.getTopologySingleton());
                 doAnswer(invocation -> {
                     final var spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
                     doReturn(deviceDOMDataBroker).when(spiedFacade)
                         .newDeviceDataBroker(any(MountPointContext.class), any(NetconfSessionPreferences.class));
                     masterSalFacadeFuture.set(spiedFacade);
                     return spiedFacade;
-                }).when(spiedContext).newMasterSalFacade();
+                }).when(topology).createSalFacade(any(), any());
 
-                return spiedContext;
+                return context;
             }
         };
 
@@ -404,6 +403,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         LOG.info("****** Testing master");
 
         writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
+        // FIXME AbstractNetconfTopology#connectNode is not invoked!
+        // FIXME we have to make invocation of NetconfTopologySingletonImpl#becomeTopologyLeader
 
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
@@ -460,7 +461,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         final NetconfTopologyContext slaveNetconfTopologyContext =
                 slaveNetconfTopologyContextFuture.get(5, TimeUnit.SECONDS);
-        verify(slaveNetconfTopologyContext, never()).newMasterSalFacade();
+        final var topology = slaveNetconfTopologyContext.getTopologySingleton();
+        verify(topology, never()).createSalFacade(any(), any());
 
         LOG.info("****** Testing slave DOMDataBroker operations");
 
