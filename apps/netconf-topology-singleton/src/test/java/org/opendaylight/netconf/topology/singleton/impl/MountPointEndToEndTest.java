@@ -325,13 +325,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                     deviceActionFact);
 
                 final var spiedContext = spy(context);
-                doAnswer(invocation -> {
-                    final var spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
-                    doReturn(deviceDOMDataBroker).when(spiedFacade)
-                        .newDeviceDataBroker(any(MountPointContext.class), any(NetconfSessionPreferences.class));
-                    masterSalFacadeFuture.set(spiedFacade);
-                    return spiedFacade;
-                }).when(spiedContext).newMasterSalFacade();
 
                 return spiedContext;
             }
@@ -460,7 +453,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         final NetconfTopologyContext slaveNetconfTopologyContext =
                 slaveNetconfTopologyContextFuture.get(5, TimeUnit.SECONDS);
-        verify(slaveNetconfTopologyContext, never()).newMasterSalFacade();
 
         LOG.info("****** Testing slave DOMDataBroker operations");
 

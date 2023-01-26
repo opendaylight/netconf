@@ -15,8 +15,14 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
+import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
 public class CallHomeTopology extends BaseCallHomeTopology {
 
@@ -41,5 +47,11 @@ public class CallHomeTopology extends BaseCallHomeTopology {
         super(topologyId, clientDispatcher, eventExecutor,
                 keepaliveExecutor, processingExecutor, schemaRepositoryProvider,
                 dataBroker, mountPointService, encryptionService, deviceActionFactory, baseSchemas);
+    }
+
+    @Override
+    protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId id, final boolean lockDatastore) {
+        return new NetconfDeviceSalFacade(id, mountPointService,
+                NetconfNodeUtils.defaultTopologyMountPath(id), lockDatastore);
     }
 }
