@@ -27,7 +27,10 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
@@ -185,5 +188,10 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     static KeyedInstanceIdentifier<Topology, TopologyKey> createTopologyListPath(final String topologyId) {
         final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
         return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+    }
+
+    @Override
+    protected RemoteDeviceHandler createSalFacade(RemoteDeviceId id) {
+        return new NetconfDeviceSalFacade(id, mountPointService, NetconfNodeUtils.defaultTopologyMountPath(id), false);
     }
 }
