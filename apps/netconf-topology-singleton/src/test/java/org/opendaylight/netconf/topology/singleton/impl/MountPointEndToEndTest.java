@@ -15,10 +15,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -138,7 +136,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.DataObject;
@@ -325,13 +322,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                     deviceActionFact);
 
                 final var spiedContext = spy(context);
-                doAnswer(invocation -> {
-                    final var spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
-                    doReturn(deviceDOMDataBroker).when(spiedFacade)
-                        .newDeviceDataBroker(any(MountPointContext.class), any(NetconfSessionPreferences.class));
-                    masterSalFacadeFuture.set(spiedFacade);
-                    return spiedFacade;
-                }).when(spiedContext).newMasterSalFacade();
 
                 return spiedContext;
             }
@@ -460,7 +450,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         final NetconfTopologyContext slaveNetconfTopologyContext =
                 slaveNetconfTopologyContextFuture.get(5, TimeUnit.SECONDS);
-        verify(slaveNetconfTopologyContext, never()).newMasterSalFacade();
 
         LOG.info("****** Testing slave DOMDataBroker operations");
 
