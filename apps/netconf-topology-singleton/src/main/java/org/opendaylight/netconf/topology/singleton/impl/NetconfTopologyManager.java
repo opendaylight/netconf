@@ -81,8 +81,10 @@ public class NetconfTopologyManager
     private final DOMRpcProviderService rpcProviderRegistry;
     private final DOMActionProviderService actionProviderRegistry;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-    private final ScheduledExecutorService keepaliveExecutor;
-    private final ListeningExecutorService processingExecutor;
+    private final ScheduledThreadPool keepaliveExecutor;
+    private final ScheduledExecutorService keepaliveExecutorService;
+    private final ThreadPool processingExecutor;
+    private final ListeningExecutorService processingExecutorService;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher clientDispatcher;
@@ -117,8 +119,10 @@ public class NetconfTopologyManager
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
         actionProviderRegistry = requireNonNull(actionProviderService);
         this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
-        this.keepaliveExecutor = keepaliveExecutor.getExecutor();
-        this.processingExecutor = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
+        this.keepaliveExecutor = keepaliveExecutor;
+        this.keepaliveExecutorService = keepaliveExecutor.getExecutor();
+        this.processingExecutor = processingExecutor;
+        this.processingExecutorService = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
         actorSystem = requireNonNull(actorSystemProvider).getActorSystem();
         this.eventExecutor = requireNonNull(eventExecutor);
         this.clientDispatcher = requireNonNull(clientDispatcher);
@@ -147,16 +151,16 @@ public class NetconfTopologyManager
             switch (rootNode.getModificationType()) {
                 case SUBTREE_MODIFIED:
                     LOG.debug("Config for node {} updated", nodeId);
-                    refreshNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
+                    stopNetconfDeviceContext(dataModifIdent);
+                    startNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
                     break;
                 case WRITE:
+                    LOG.debug("Config for node {} created", nodeId);
                     if (contexts.containsKey(dataModifIdent)) {
                         LOG.debug("RemoteDevice{{}} was already configured, reconfiguring node...", nodeId);
-                        refreshNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
-                    } else {
-                        LOG.debug("Config for node {} created", nodeId);
-                        startNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
+                        stopNetconfDeviceContext(dataModifIdent);
                     }
+                    startNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
                     break;
                 case DELETE:
                     LOG.debug("Config for node {} deleted", nodeId);
@@ -166,11 +170,6 @@ public class NetconfTopologyManager
                     LOG.warn("Unknown operation for {}.", nodeId);
             }
         }
-    }
-
-    private void refreshNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
-        final NetconfTopologyContext context = contexts.get(instanceIdentifier);
-        context.refresh(createSetup(instanceIdentifier, node));
     }
 
     // ClusterSingletonServiceRegistration registerClusterSingletonService method throws a Runtime exception if there
@@ -223,8 +222,13 @@ public class NetconfTopologyManager
     protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
             final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
             final DeviceActionFactory deviceActionFact) {
-        return new NetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, mountPointService,
-            deviceActionFact);
+        return new NetconfTopologyContext(setup.getTopologyId(), setup.getNetconfClientDispatcher(),
+                setup.getEventExecutor(), keepaliveExecutor,
+                processingExecutor, resourceManager,
+                dataBroker, mountPointService,
+                encryptionService, deviceActionFactory,
+                baseSchemas, actorResponseWaitTime,
+                serviceGroupIdent, setup);
     }
 
     @Override
@@ -297,7 +301,7 @@ public class NetconfTopologyManager
         final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
         final RemoteDeviceId deviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), netconfNode);
 
-        return NetconfTopologySetupBuilder.create()
+        final NetconfTopologySetupBuilder builder =  NetconfTopologySetupBuilder.create()
                 .setClusterSingletonServiceProvider(clusterSingletonServiceProvider)
                 .setBaseSchemas(baseSchemas)
                 .setDataBroker(dataBroker)
@@ -307,8 +311,8 @@ public class NetconfTopologyManager
                 .setNode(node)
                 .setActorSystem(actorSystem)
                 .setEventExecutor(eventExecutor)
-                .setKeepaliveExecutor(keepaliveExecutor)
-                .setProcessingExecutor(processingExecutor)
+                .setKeepaliveExecutor(keepaliveExecutorService)
+                .setProcessingExecutor(processingExecutorService)
                 .setTopologyId(topologyId)
                 .setNetconfClientDispatcher(clientDispatcher)
                 .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode.getSchemaCacheDirectory(),
@@ -316,7 +320,7 @@ public class NetconfTopologyManager
                 .setIdleTimeout(writeTxIdleTimeout)
                 .setPrivateKeyPath(privateKeyPath)
                 .setPrivateKeyPassphrase(privateKeyPassphrase)
-                .setEncryptionService(encryptionService)
-                .build();
+                .setEncryptionService(encryptionService);
+        return builder.build();
     }
 }
