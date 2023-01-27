@@ -16,6 +16,24 @@
       "message": "The namespace is urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl",
       "revId": "f46f978d8a8077126a1cf17d2ed8afa1a2aa9d54",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "647a74ef_72240785",
+        "filename": "netconf/yanglib/src/main/resources/initial/yanglib-config.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-01-27T12:20:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "407bd41a_d90c0be5",
+      "revId": "f46f978d8a8077126a1cf17d2ed8afa1a2aa9d54",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
