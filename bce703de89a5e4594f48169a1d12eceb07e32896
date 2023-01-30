@@ -16,6 +16,23 @@
       "message": "// TODO we have to deal with https://github.com/opendaylight/netconf/commit/8ee723df4a40d2634a521c82efa5f878aa28d4aa\n// and changed logic of AbstractNetconfTopology#createDeviceCommunicator",
       "revId": "bce703de89a5e4594f48169a1d12eceb07e32896",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f70a5309_d586be0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-01-30T11:18:05Z",
+      "side": 1,
+      "message": "In addition we have to deal with: netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MountPointEndToEndTest.java",
+      "revId": "bce703de89a5e4594f48169a1d12eceb07e32896",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
