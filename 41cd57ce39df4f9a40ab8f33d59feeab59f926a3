@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e228d36c_e8fde1d1",
+        "filename": "plugins/sal-netconf-connector/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 24
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-01-30T15:12:25Z",
+      "side": 1,
+      "message": "so this maps to \u003cxs:simpleType name\u003d\"SessionId\"\u003e from RFC6241, so I would prefer we do not use magic (and default) 0.\n\nlet\u0027s use range \"1..max\" and do *not* set it for the case we are disconnected or not supplied by the server...",
+      "range": {
+        "startLine": 224,
+        "startChar": 6,
+        "endLine": 224,
+        "endChar": 18
+      },
+      "revId": "41cd57ce39df4f9a40ab8f33d59feeab59f926a3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
