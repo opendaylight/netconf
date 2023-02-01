@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a719afef_f2f67006",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-01T16:46:32Z",
+      "side": 1,
+      "message": "This code is not handling option that folder will not be created.\nTry something like this:\n```\n            checkArgument(cacheFolderFile.mkdirs(), \"cache-folder {} can not be created\", cacheFolderFile);\n            LOG.info(\"cache-folder {} was created\", cacheFolderFile);\n```",
+      "revId": "2315764521fd33a57bd6f5aa969cd063caa117c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f0748d0_a2fcf241",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-01T16:46:32Z",
+      "side": 1,
+      "message": "If the model does not have a revision, the request should be sent as follows:\n`http://localhost:8181/yanglib/schemas/ietf-yang-types/`\n\nNote that if the URL does not end with a `/`, it will result in a 500 error. Is this the correct approach?\n\nIs it possible to make this request valid as well?\n`http://localhost:8181/yanglib/schemas/ietf-yang-types`",
+      "revId": "2315764521fd33a57bd6f5aa969cd063caa117c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8353a07_d16eb040",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-01T16:46:32Z",
+      "side": 1,
+      "message": "If the source is not found, the application will return a 500 error. Is this the correct approach?",
+      "revId": "2315764521fd33a57bd6f5aa969cd063caa117c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
