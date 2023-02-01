@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b75175d_196f67ba",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyPipelineAwareChannelSubsystem.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-01T09:01:01Z",
+      "side": 1,
+      "message": "No, we need to use NettyAwareChannelSubsystem unless there is another solution that I am unaware of.\nPreviously, AsyncSshHandlerReader was used for reading, which did not require ChannelHandlerContext.\nWithout AsyncSshHandlerReader, we need to create a ChannelSubsystem with the ChannelHandlerContext, which we can only obtain after creating and calling the open listener on the ChannelSubsystem.\n\nCurrent solution is to utilize pipelines from MinaSshNettyChannel. The logic from MinaSshNettyChannel has been moved to CallHomeSessionContext, where a ChannelOutboundHandlerAdapter is created and added as the first in the pipeline. This call will create the ChannelHandlerContext in the pipeline, and it can be used later inside the ChannelSubsystem.",
+      "parentUuid": "d66dfeff_33808c16",
+      "revId": "23f88e50829cf37bf7b58805bae078d69ae1128d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d8606d7_3bb1565b",
