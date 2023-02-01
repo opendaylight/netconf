@@ -221,7 +221,7 @@ public final class TesttoolParameters {
                 .help("the maximum time in seconds for executing each PATCH request")
                 .dest("time-out");
 
-        parser.addArgument("-ip")
+        parser.addArgument("--ip")
                 .type(String.class)
                 .setDefault("0.0.0.0")
                 .help("Ip address which will be used for creating a socket address."
