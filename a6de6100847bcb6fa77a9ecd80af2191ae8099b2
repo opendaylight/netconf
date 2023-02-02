@@ -16,6 +16,24 @@
       "message": "`cache/schema`\n\nThis way you can:\n```\n1. run karaf\n2. install odl-netconf-topology odl-restconf-nb odl-yanglib\n3. connect testool (it will download its models to cache/schema)\n4. shutdown karaf\n5. run karaf again\n6. access, for example: http://localhost:5000/yanglib/schemas/ietf-yang-types/2013-07-15\n7. if not working, try to use 8181 as binding-port",
       "revId": "a6de6100847bcb6fa77a9ecd80af2191ae8099b2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8075f48c_f681ea3f",
+        "filename": "netconf/yanglib/src/main/resources/initial/yanglib-config.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-02T09:26:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10714ad0_a9dd0248",
+      "revId": "a6de6100847bcb6fa77a9ecd80af2191ae8099b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
