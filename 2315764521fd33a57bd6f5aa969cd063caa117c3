@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6c1f1b3_0d756f2c",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-02T09:26:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a719afef_f2f67006",
+      "revId": "2315764521fd33a57bd6f5aa969cd063caa117c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f0748d0_a2fcf241",
