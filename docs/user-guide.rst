@@ -769,7 +769,7 @@ for each generates URL in form:
 
 ::
 
-    http://localhost:5000/schemas/{modelName}/{revision}
+    http://localhost:8181/schemas/{modelName}/{revision}
 
 On this URL will be hosted YANG source for particular module.
 
