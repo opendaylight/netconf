@@ -734,7 +734,7 @@ YANGLIB configuration through RESTCONF
 You have to specify what local YANG modules directory you want to provide.
 Then you have to specify address and port whre you want to provide YANG
 sources. For example, we want to serve yang sources from folder /sources
-on localhost:5000 adress. The configuration for this scenario will be
+on localhost:8181 adress. The configuration for this scenario will be
 as follows:
 
 ::
@@ -760,7 +760,7 @@ Payload:
      </broker>
      <cache-folder xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">/sources</cache-folder>
      <binding-addr xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">localhost</binding-addr>
-     <binding-port xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">5000</binding-port>
+     <binding-port xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">8181</binding-port>
    </module>
 
 This should result in a 2xx response and new YANGLIB instance should be
@@ -769,7 +769,7 @@ for each generates URL in form:
 
 ::
 
-    http://localhost:5000/schemas/{modelName}/{revision}
+    http://localhost:8181/schemas/{modelName}/{revision}
 
 On this URL will be hosted YANG source for particular module.
 
