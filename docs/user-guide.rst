@@ -734,12 +734,12 @@ YANGLIB configuration through RESTCONF
 You have to specify what local YANG modules directory you want to provide.
 Then you have to specify address and port whre you want to provide YANG
 sources. For example, we want to serve yang sources from folder /sources
-on localhost:5000 adress. The configuration for this scenario will be
+on localhost:8181 adress. The configuration for this scenario will be
 as follows:
 
 ::
 
-    PUT  http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/controller-config/yang-ext:mount/config:modules/module/yanglib:yanglib/example
+    PUT  http://localhost:8181/rests/data/yanglib:yanglib-config
 
 Headers:
 
@@ -751,17 +751,11 @@ Payload:
 
 ::
 
-   <module xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
-     <name>example</name>
-     <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">prefix:yanglib</type>
-     <broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">
-       <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">prefix:binding-broker-osgi-registry</type>
-       <name>binding-osgi-broker</name>
-     </broker>
-     <cache-folder xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">/sources</cache-folder>
-     <binding-addr xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">localhost</binding-addr>
-     <binding-port xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">5000</binding-port>
-   </module>
+    <yanglib-config xmlns="urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl">
+        <cache-folder>cache/newSchema</cache-folder>
+        <binding-addr>localhost</binding-addr>
+        <binding-port>8181</binding-port>
+    </yanglib-config>
 
 This should result in a 2xx response and new YANGLIB instance should be
 created. This YANGLIB takes all YANG sources from /sources folder and
@@ -769,7 +763,7 @@ for each generates URL in form:
 
 ::
 
-    http://localhost:5000/schemas/{modelName}/{revision}
+    http://localhost:8181/schemas/{modelName}/{revision}
 
 On this URL will be hosted YANG source for particular module.
 
