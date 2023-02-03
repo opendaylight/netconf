@@ -16,7 +16,7 @@
       <cm:property name="idle-timeout" value="30000"/>
       <cm:property name="ping-executor-name-prefix" value="ping-executor"/>
       <cm:property name="max-thread-count" value="1"/>
-      <cm:property name="use-sse" value="true"/>
+      <cm:property name="use-sse" value="false"/>
     </cm:default-properties>
   </cm:property-placeholder>
 

@@ -734,7 +734,7 @@ YANGLIB configuration through RESTCONF
 You have to specify what local YANG modules directory you want to provide.
 Then you have to specify address and port whre you want to provide YANG
 sources. For example, we want to serve yang sources from folder /sources
-on localhost:5000 adress. The configuration for this scenario will be
+on localhost:8181 adress. The configuration for this scenario will be
 as follows:
 
 ::
@@ -769,7 +769,7 @@ for each generates URL in form:
 
 ::
 
-    http://localhost:5000/schemas/{modelName}/{revision}
+    http://localhost:8181/schemas/{modelName}/{revision}
 
 On this URL will be hosted YANG source for particular module.
 
