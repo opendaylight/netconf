@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 import jdk.net.ExtendedSocketOptions;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev220524.tcp.common.grouping.Keepalives;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev221212.tcp.common.grouping.Keepalives;
 
 @NonNullByDefault
 final class NioNettyImpl extends AbstractNettyImpl {
