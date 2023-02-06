@@ -48,7 +48,7 @@ module ietf-crypto-types {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2022-07-07 {
+  revision 2022-12-12 {
     description
       "Initial version";
     reference
@@ -94,6 +94,7 @@ module ietf-crypto-types {
       "Indicates that the server supports the
        'cms-encrypted-data-format' identity.";
   }
+
   feature csr-generation {
     description
       "Indicates that the server implements the
@@ -142,6 +143,7 @@ module ietf-crypto-types {
   /*************************************************/
   /*   Base Identities for Key Format Structures   */
   /*************************************************/
+
   identity symmetric-key-format {
     description
       "Base key-format identity for symmetric keys.";
@@ -444,7 +446,6 @@ module ietf-crypto-types {
   /***************************************************/
   /*   Typedefs for ASN.1 structures from RFC 6960   */
   /***************************************************/
-
   typedef oscp-request {
     type binary;
     description
