@@ -23,6 +23,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -39,10 +42,16 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.Tls;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, AutoCloseable {
+@Singleton
+@Component(service = TlsAllowedDevicesMonitor.class, immediate = true, property = "type=default")
+public final class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(TlsAllowedDevicesMonitorImpl.class);
 
     private final ConcurrentMap<String, String> deviceToPrivateKey = new ConcurrentHashMap<>();
@@ -51,7 +60,9 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
     private final Registration allowedDevicesReg;
     private final Registration certificatesReg;
 
-    public TlsAllowedDevicesMonitorImpl(final DataBroker dataBroker) {
+    @Inject
+    @Activate
+    public TlsAllowedDevicesMonitorImpl(@Reference final DataBroker dataBroker) {
         allowedDevicesReg = dataBroker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                 InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class)),
@@ -59,6 +70,14 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
         certificatesReg = dataBroker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
             new CertificatesMonitor());
+    }
+
+    @PreDestroy
+    @Deactivate
+    @Override
+    public void close() {
+        allowedDevicesReg.close();
+        certificatesReg.close();
     }
 
     @Override
@@ -90,12 +109,6 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
     @Override
     public Set<String> findAllowedKeys() {
         return Set.copyOf(deviceToPrivateKey.values());
-    }
-
-    @Override
-    public void close() {
-        allowedDevicesReg.close();
-        certificatesReg.close();
     }
 
     private final class CertificatesMonitor implements ClusteredDataTreeChangeListener<Keystore> {

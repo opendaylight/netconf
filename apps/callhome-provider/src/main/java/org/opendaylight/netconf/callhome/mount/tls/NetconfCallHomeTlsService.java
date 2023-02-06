@@ -33,6 +33,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
 
     public NetconfCallHomeTlsService(final Configuration config,
                                      final DataBroker dataBroker,
+                                     final TlsAllowedDevicesMonitor allowedDevicesMonitor,
                                      final CallHomeNetconfSubsystemListener subsystemListener,
                                      final EventLoopGroup bossGroup,
                                      final EventLoopGroup workerGroup) {
@@ -40,8 +41,8 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
         this.subsystemListener = requireNonNull(subsystemListener);
         this.bossGroup = requireNonNull(bossGroup);
         this.workerGroup = requireNonNull(workerGroup);
-        this.allowedDevicesMonitor = new TlsAllowedDevicesMonitorImpl(dataBroker);
-        this.sslHandlerFactory = new SslHandlerFactoryAdapter(dataBroker, allowedDevicesMonitor);
+        this.allowedDevicesMonitor = requireNonNull(allowedDevicesMonitor);
+        sslHandlerFactory = new SslHandlerFactoryAdapter(dataBroker, allowedDevicesMonitor);
     }
 
     public void init() {
@@ -66,6 +67,5 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
     @Override
     public void close() {
         server.stop();
-        allowedDevicesMonitor.close();
     }
 }
