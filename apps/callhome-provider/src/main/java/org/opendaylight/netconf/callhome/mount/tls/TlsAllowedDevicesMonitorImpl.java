@@ -39,33 +39,28 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.Tls;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.tls.TlsClientParams;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(TlsAllowedDevicesMonitorImpl.class);
-
-    private static final InstanceIdentifier<Device> ALLOWED_DEVICES_PATH =
-        InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class);
-    private static final DataTreeIdentifier<Device> ALLOWED_DEVICES =
-        DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, ALLOWED_DEVICES_PATH);
-    private static final InstanceIdentifier<Keystore> KEYSTORE_PATH = InstanceIdentifier.create(Keystore.class);
-    private static final DataTreeIdentifier<Keystore> KEYSTORE = DataTreeIdentifier.create(
-        LogicalDatastoreType.CONFIGURATION, KEYSTORE_PATH);
-
     private static final ConcurrentMap<String, String> DEVICE_TO_PRIVATE_KEY = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, String> DEVICE_TO_CERTIFICATE = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, PublicKey> CERTIFICATE_TO_PUBLIC_KEY = new ConcurrentHashMap<>();
 
-    private final ListenerRegistration<AllowedDevicesMonitor> allowedDevicesReg;
-    private final ListenerRegistration<CertificatesMonitor> certificatesReg;
+    private final Registration allowedDevicesReg;
+    private final Registration certificatesReg;
 
     public TlsAllowedDevicesMonitorImpl(final DataBroker dataBroker) {
-        allowedDevicesReg = dataBroker.registerDataTreeChangeListener(ALLOWED_DEVICES, new AllowedDevicesMonitor());
-        certificatesReg = dataBroker.registerDataTreeChangeListener(KEYSTORE, new CertificatesMonitor());
+        allowedDevicesReg = dataBroker.registerDataTreeChangeListener(
+            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
+                InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class)),
+            new AllowedDevicesMonitor());
+        certificatesReg = dataBroker.registerDataTreeChangeListener(
+            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
+            new CertificatesMonitor());
     }
 
     @Override
