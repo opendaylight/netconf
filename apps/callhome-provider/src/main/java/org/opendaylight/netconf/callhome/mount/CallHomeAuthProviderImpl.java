@@ -16,6 +16,7 @@ import java.security.PublicKey;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
@@ -41,23 +42,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeAuthProviderImpl.class);
-    private static final InstanceIdentifier<Global> GLOBAL_PATH =
-            InstanceIdentifier.create(NetconfCallhomeServer.class).child(Global.class);
-    private static final DataTreeIdentifier<Global> GLOBAL =
-            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, GLOBAL_PATH);
 
-    private static final InstanceIdentifier<Device> ALLOWED_DEVICES_PATH =
-            InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class);
-    private static final DataTreeIdentifier<Device> ALLOWED_DEVICES =
-            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, ALLOWED_DEVICES_PATH);
-    private static final DataTreeIdentifier<Device> ALLOWED_OP_DEVICES =
-            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, ALLOWED_DEVICES_PATH);
-
-    private final GlobalConfig globalConfig = new GlobalConfig();
-    private final DeviceConfig deviceConfig = new DeviceConfig();
-    private final DeviceOp deviceOp = new DeviceOp();
+    private final @NonNull GlobalConfig globalConfig = new GlobalConfig();
+    private final @NonNull DeviceConfig deviceConfig = new DeviceConfig();
+    private final @NonNull DeviceOp deviceOp = new DeviceOp();
     private final ListenerRegistration<GlobalConfig> configReg;
     private final ListenerRegistration<DeviceConfig> deviceReg;
     private final ListenerRegistration<DeviceOp> deviceOpReg;
@@ -65,9 +54,20 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     private final CallhomeStatusReporter statusReporter;
 
     CallHomeAuthProviderImpl(final DataBroker broker) {
-        configReg = broker.registerDataTreeChangeListener(GLOBAL, globalConfig);
-        deviceReg = broker.registerDataTreeChangeListener(ALLOWED_DEVICES, deviceConfig);
-        deviceOpReg = broker.registerDataTreeChangeListener(ALLOWED_OP_DEVICES, deviceOp);
+        configReg = broker.registerDataTreeChangeListener(
+            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
+                InstanceIdentifier.create(NetconfCallhomeServer.class).child(Global.class)),
+            globalConfig);
+
+        final var allowedDeviceWildcard =
+            InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class);
+
+        deviceReg = broker.registerDataTreeChangeListener(
+            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, allowedDeviceWildcard),
+            deviceConfig);
+        deviceOpReg = broker.registerDataTreeChangeListener(
+            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, allowedDeviceWildcard),
+            deviceOp);
         statusReporter = new CallhomeStatusReporter(broker);
     }
 
@@ -124,19 +124,13 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     }
 
     private String fromRemoteAddress(final SocketAddress remoteAddress) {
-        if (remoteAddress instanceof InetSocketAddress) {
-            InetSocketAddress socketAddress = (InetSocketAddress) remoteAddress;
-            String ip = socketAddress.getAddress().getHostAddress();
-
-            final MountPointNamingStrategy strat = globalConfig.getMountPointNamingStrategy();
-            switch (strat) {
-                case IPONLY:
-                    return ip;
-                case IPPORT:
-                    return ip + ":" + socketAddress.getPort();
-                default:
-                    throw new IllegalStateException("Unhandled naming strategy " + strat);
-            }
+        if (remoteAddress instanceof InetSocketAddress socketAddress) {
+            final var hostAddress = socketAddress.getAddress().getHostAddress();
+            final var strategy = globalConfig.getMountPointNamingStrategy();
+            return switch (strategy) {
+                case IPONLY -> hostAddress;
+                case IPPORT -> hostAddress + ":" + socketAddress.getPort();
+            };
         }
         return remoteAddress.toString();
     }
