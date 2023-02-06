@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.callhome.mount.tls;
 
+import static java.util.Objects.requireNonNull;
+
 import io.netty.handler.ssl.SslHandler;
 import java.util.Set;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -24,9 +26,8 @@ public class SslHandlerFactoryAdapter implements SslHandlerFactory {
     private final SslHandlerFactory sslHandlerFactory;
 
     public SslHandlerFactoryAdapter(final DataBroker dataBroker, final TlsAllowedDevicesMonitor allowedDevicesMonitor) {
-        final NetconfKeystoreAdapter keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
-        this.sslHandlerFactory = new SslHandlerFactoryImpl(keystoreAdapter);
-        this.allowedDevicesMonitor = allowedDevicesMonitor;
+        this.allowedDevicesMonitor = requireNonNull(allowedDevicesMonitor);
+        sslHandlerFactory = new SslHandlerFactoryImpl(new NetconfKeystoreAdapter(dataBroker));
     }
 
     @Override
