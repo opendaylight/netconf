@@ -66,10 +66,6 @@
         <argument ref="deviceActionFactory"/>
     </bean>
 
-    <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>
-    <service ref="netconfConnectorFactory" interface="org.opendaylight.netconf.topology.api.NetconfConnectorFactory"
-             odl:type="default"/>
-
     <bean id="netconfKeystoreProvider"
           class="org.opendaylight.netconf.sal.connect.util.NetconfSalKeystoreService">
         <argument ref="dataBroker"/>
