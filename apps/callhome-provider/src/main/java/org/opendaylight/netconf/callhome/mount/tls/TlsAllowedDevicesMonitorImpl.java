@@ -38,7 +38,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.AllowedDevices;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.Tls;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.tls.TlsClientParams;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
@@ -46,10 +45,10 @@ import org.slf4j.LoggerFactory;
 
 public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(TlsAllowedDevicesMonitorImpl.class);
-    private static final ConcurrentMap<String, String> DEVICE_TO_PRIVATE_KEY = new ConcurrentHashMap<>();
-    private static final ConcurrentMap<String, String> DEVICE_TO_CERTIFICATE = new ConcurrentHashMap<>();
-    private static final ConcurrentMap<String, PublicKey> CERTIFICATE_TO_PUBLIC_KEY = new ConcurrentHashMap<>();
 
+    private final ConcurrentMap<String, String> deviceToPrivateKey = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, String> deviceToCertificate = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, PublicKey> certificateToPublicKey = new ConcurrentHashMap<>();
     private final Registration allowedDevicesReg;
     private final Registration certificatesReg;
 
@@ -66,13 +65,13 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
     @Override
     public Optional<String> findDeviceIdByPublicKey(final PublicKey key) {
         // Find certificate names by the public key
-        final Set<String> certificates = CERTIFICATE_TO_PUBLIC_KEY.entrySet().stream()
+        final Set<String> certificates = certificateToPublicKey.entrySet().stream()
             .filter(v -> key.equals(v.getValue()))
             .map(Map.Entry::getKey)
             .collect(Collectors.toSet());
 
         // Find devices names associated with a certificate name
-        final Set<String> deviceNames = DEVICE_TO_CERTIFICATE.entrySet().stream()
+        final Set<String> deviceNames = deviceToCertificate.entrySet().stream()
             .filter(v -> certificates.contains(v.getValue()))
             .map(Map.Entry::getKey)
             .collect(Collectors.toSet());
@@ -91,7 +90,7 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
 
     @Override
     public Set<String> findAllowedKeys() {
-        return new HashSet<>(DEVICE_TO_PRIVATE_KEY.values());
+        return new HashSet<>(deviceToPrivateKey.values());
     }
 
     @Override
@@ -100,8 +99,7 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
         certificatesReg.close();
     }
 
-    private static class CertificatesMonitor implements ClusteredDataTreeChangeListener<Keystore> {
-
+    private final class CertificatesMonitor implements ClusteredDataTreeChangeListener<Keystore> {
         @Override
         public void onDataTreeChanged(@NonNull final Collection<DataTreeModification<Keystore>> changes) {
             changes.stream().map(DataTreeModification::getRootNode)
@@ -112,8 +110,7 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
         }
 
         private void updateCertificate(final DataObjectModification<TrustedCertificate> change) {
-            final DataObjectModification.ModificationType modType = change.getModificationType();
-            switch (modType) {
+            switch (change.getModificationType()) {
                 case DELETE:
                     deleteCertificate(change.getDataBefore());
                     break;
@@ -130,14 +127,14 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
         private void deleteCertificate(final TrustedCertificate dataBefore) {
             if (dataBefore != null) {
                 LOG.debug("Removing public key mapping for certificate {}", dataBefore.getName());
-                CERTIFICATE_TO_PUBLIC_KEY.remove(dataBefore.getName());
+                certificateToPublicKey.remove(dataBefore.getName());
             }
         }
 
         private void writeCertificate(final TrustedCertificate dataAfter) {
             if (dataAfter != null) {
                 LOG.debug("Adding public key mapping for certificate {}", dataAfter.getName());
-                CERTIFICATE_TO_PUBLIC_KEY.putIfAbsent(dataAfter.getName(), buildPublicKey(dataAfter.getCertificate()));
+                certificateToPublicKey.putIfAbsent(dataAfter.getName(), buildPublicKey(dataAfter.getCertificate()));
             }
         }
 
@@ -153,17 +150,14 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
             }
             return null;
         }
-
     }
 
-    private static class AllowedDevicesMonitor implements ClusteredDataTreeChangeListener<Device> {
-
+    private final class AllowedDevicesMonitor implements ClusteredDataTreeChangeListener<Device> {
         @Override
-        public final void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
+        public void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
             for (final DataTreeModification<Device> dataTreeModification : mods) {
                 final DataObjectModification<Device> deviceMod = dataTreeModification.getRootNode();
-                final DataObjectModification.ModificationType modType = deviceMod.getModificationType();
-                switch (modType) {
+                switch (deviceMod.getModificationType()) {
                     case DELETE:
                         deleteDevice(deviceMod.getDataBefore());
                         break;
@@ -181,17 +175,17 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
         private void deleteDevice(final Device dataBefore) {
             if (dataBefore != null && dataBefore.getTransport() instanceof Tls) {
                 LOG.debug("Removing device {}", dataBefore.getUniqueId());
-                DEVICE_TO_PRIVATE_KEY.remove(dataBefore.getUniqueId());
-                DEVICE_TO_CERTIFICATE.remove(dataBefore.getUniqueId());
+                deviceToPrivateKey.remove(dataBefore.getUniqueId());
+                deviceToCertificate.remove(dataBefore.getUniqueId());
             }
         }
 
         private void writeDevice(final Device dataAfter) {
-            if (dataAfter != null && dataAfter.getTransport() instanceof Tls) {
+            if (dataAfter != null && dataAfter.getTransport() instanceof Tls tls) {
                 LOG.debug("Adding device {}", dataAfter.getUniqueId());
-                final TlsClientParams clientParams = ((Tls) dataAfter.getTransport()).getTlsClientParams();
-                DEVICE_TO_PRIVATE_KEY.putIfAbsent(dataAfter.getUniqueId(), clientParams.getKeyId());
-                DEVICE_TO_CERTIFICATE.putIfAbsent(dataAfter.getUniqueId(), clientParams.getCertificateId());
+                final var tlsClientParams = tls.getTlsClientParams();
+                deviceToPrivateKey.putIfAbsent(dataAfter.getUniqueId(), tlsClientParams.getKeyId());
+                deviceToCertificate.putIfAbsent(dataAfter.getUniqueId(), tlsClientParams.getCertificateId());
             }
         }
     }
