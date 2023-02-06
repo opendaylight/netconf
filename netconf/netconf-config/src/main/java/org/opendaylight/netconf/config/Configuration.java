@@ -1,0 +1,27 @@
+/*
+ * Copyright (c) 2023 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.netconf.config;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
+
+@NonNullByDefault
+@ObjectClassDefinition
+public @interface Configuration {
+    @AttributeDefinition(name = "name-prefix", min = "1")
+    String namePrefix() default GlobalNetconfThreadFactory.DEFAULT_NAME_PREFIX;
+    @AttributeDefinition(name = "min-thread-count-flexible-thread-pool", min = "0")
+    int minThreadCountFlexibleThreadPool() default GlobalNetconfProcessingExecutor.DEFAULT_MIN_THREAD_COUNT;
+    @AttributeDefinition(name = "max-thread-count-flexible-thread-pool", min = "1")
+    int maxThreadCountFlexibleThreadPool() default GlobalNetconfProcessingExecutor.DEFAULT_MAX_THREAD_COUNT;
+    @AttributeDefinition(name = "keep-alive-millis-flexible-thread-pool", min = "0")
+    long keepAliveMillisFlexibleThreadPool() default GlobalNetconfProcessingExecutor.DEFAULT_KEEPALIVE_MILLIS;
+    @AttributeDefinition(name = "max-thread-count-scheduled-thread-pool", min = "1")
+    int maxThreadCountScheduledThreadPool() default GlobalNetconfSshScheduledExecutor.DEFAULT_MAX_THREAD_COUNT;
+}
