@@ -19,7 +19,8 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CallHomeMountSessionManager implements CallHomeMountSessionContext.CloseCallback {
+// Non-final for testing
+class CallHomeMountSessionManager implements CallHomeMountSessionContext.CloseCallback {
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountSessionManager.class);
 
     private final ConcurrentMap<SocketAddress, CallHomeMountSessionContext> contextByAddress =
