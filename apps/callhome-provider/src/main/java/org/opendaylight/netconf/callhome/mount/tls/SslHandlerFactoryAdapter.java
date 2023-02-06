@@ -36,14 +36,16 @@ public class SslHandlerFactoryAdapter implements SslHandlerFactory {
 
     @Override
     public SslHandler createSslHandler(final Set<String> allowedKeys) {
+        // FIXME: we are ignoring passed in keys?!
         return createSslHandlerFilteredByKeys();
     }
 
     private SslHandler createSslHandlerFilteredByKeys() {
-        if (allowedDevicesMonitor.findAllowedKeys().isEmpty()) {
+        final var allowedKeys = allowedDevicesMonitor.findAllowedKeys();
+        if (allowedKeys.isEmpty()) {
             LOG.error("No associated keys for TLS authentication were found");
             throw new IllegalStateException("No associated keys for TLS authentication were found");
         }
-        return sslHandlerFactory.createSslHandler(allowedDevicesMonitor.findAllowedKeys());
+        return sslHandlerFactory.createSslHandler(allowedKeys);
     }
 }

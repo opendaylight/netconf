@@ -17,7 +17,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -90,7 +89,7 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
 
     @Override
     public Set<String> findAllowedKeys() {
-        return new HashSet<>(deviceToPrivateKey.values());
+        return Set.copyOf(deviceToPrivateKey.values());
     }
 
     @Override
