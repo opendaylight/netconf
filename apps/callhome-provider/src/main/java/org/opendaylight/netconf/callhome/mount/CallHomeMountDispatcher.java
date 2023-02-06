@@ -14,6 +14,8 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.FailedFuture;
 import io.netty.util.concurrent.Future;
 import java.net.InetSocketAddress;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -31,11 +33,17 @@ import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
+import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
+@Component(service = CallHomeNetconfSubsystemListener.class, immediate = true)
 // Non-final for testing
 public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHomeNetconfSubsystemListener {
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountDispatcher.class);
@@ -61,21 +69,26 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final DeviceActionFactory deviceActionFactory;
     private final BaseNetconfSchemas baseSchemas;
 
-    public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
-                                   final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                                   final SchemaResourceManager schemaRepositoryProvider,
-                                   final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
-                                   final DOMMountPointService mountService,
-                                   final AAAEncryptionService encryptionService) {
-        this(topologyId, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider, baseSchemas,
-            dataBroker, mountService, encryptionService, null);
+    @Inject
+    @Activate
+    public CallHomeMountDispatcher(
+            @Reference(target = "(type=global-event-executor)") final EventExecutor eventExecutor,
+            @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
+                final ScheduledThreadPool keepaliveExecutor,
+            @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingExecutor,
+            @Reference final SchemaResourceManager schemaRepositoryProvider,
+            @Reference final BaseNetconfSchemas baseSchemas, @Reference final DataBroker dataBroker,
+            @Reference final DOMMountPointService mountService, @Reference final AAAEncryptionService encryptionService,
+            @Reference final DeviceActionFactory deviceActionFactory) {
+        this(eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider, baseSchemas, dataBroker,
+            mountService, encryptionService, deviceActionFactory, NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME);
     }
 
-    public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
-            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-            final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
-            final DataBroker dataBroker, final DOMMountPointService mountService,
-            final AAAEncryptionService encryptionService, final DeviceActionFactory deviceActionFactory) {
+    public CallHomeMountDispatcher(final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
+            final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
+            final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker, final DOMMountPointService mountService,
+            final AAAEncryptionService encryptionService, final DeviceActionFactory deviceActionFactory,
+            final String topologyId) {
         this.topologyId = topologyId;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
