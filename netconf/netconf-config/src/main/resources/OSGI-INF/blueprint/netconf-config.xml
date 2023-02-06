@@ -49,16 +49,4 @@
     <service ref="flexibleThreadPool"
              interface="org.opendaylight.controller.config.threadpool.ThreadPool"
              odl:type="global-netconf-processing-executor"/>
-
-    <!-- Scheduled Thread Pool -->
-
-    <bean id="scheduleThreadPool"
-          class="org.opendaylight.controller.config.threadpool.util.ScheduledThreadPoolWrapper">
-        <argument value="${max-thread-count-scheduled-thread-pool}"/>
-        <argument ref="namingThreadPoolFactory"/>
-    </bean>
-    <service ref="scheduleThreadPool"
-             interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
-             odl:type="global-netconf-ssh-scheduled-executor"/>
-
 </blueprint>
