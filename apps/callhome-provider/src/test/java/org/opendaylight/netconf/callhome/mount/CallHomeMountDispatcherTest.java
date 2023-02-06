@@ -72,9 +72,9 @@ public class CallHomeMountDispatcherTest {
         mockEncryptionService = mock(AAAEncryptionService.class);
         mockBaseSchemas = mock(BaseNetconfSchemas.class);
 
-        instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
-                mockProcessingExecutor, mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount,
-                mockEncryptionService) {
+        instance = new CallHomeMountDispatcher(mockExecutor, mockKeepAlive, mockProcessingExecutor,
+                mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount, mockEncryptionService, null,
+                topologyId) {
             @Override
             CallHomeMountSessionManager sessionManager() {
                 return mockSessMgr;
