@@ -16,27 +16,37 @@
     <reference id="processingExecutor"
                interface="org.opendaylight.controller.config.threadpool.ThreadPool"
                odl:type="global-netconf-processing-executor"/>
+    <!-- OK -->
     <reference id="eventExecutor"
                interface="io.netty.util.concurrent.EventExecutor"
                odl:type="global-event-executor"/>
+    <!-- OK -->
     <reference id="dataBroker"
                interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
+    <!-- OK -->
     <reference id="domMountPointService"
                interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
+    <!-- OK -->
     <reference id="encryptionService"
                interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
+    <!-- OK -->
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
+    <!-- OK -->
     <reference id="schemaManager"
                interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
+    <!-- OK -->
     <reference id="baseSchemas"
                interface="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas"/>
+    <!-- OK -->
     <reference id="globalBossGroup"
                interface="io.netty.channel.EventLoopGroup"
                odl:type="global-boss-group"/>
+    <!-- OK -->
     <reference id="globalWorkerGroup"
                interface="io.netty.channel.EventLoopGroup"
                odl:type="global-worker-group"/>
+    <!-- OK -->
     <reference id="allowedDevicesMonitor"
                interface="org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor"/>
 
