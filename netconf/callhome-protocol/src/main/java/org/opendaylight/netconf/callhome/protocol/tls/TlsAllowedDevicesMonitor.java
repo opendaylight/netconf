@@ -11,8 +11,7 @@ import java.security.PublicKey;
 import java.util.Optional;
 import java.util.Set;
 
-public interface TlsAllowedDevicesMonitor extends AutoCloseable {
-
+public interface TlsAllowedDevicesMonitor {
     /**
      * Returns a Call-Home Device ID by the public key.
      */
@@ -22,8 +21,4 @@ public interface TlsAllowedDevicesMonitor extends AutoCloseable {
      * Returns a set of IDs for the keys associated with Call-Home devices.
      */
     Set<String> findAllowedKeys();
-
-    @Override
-    void close();
-
 }
