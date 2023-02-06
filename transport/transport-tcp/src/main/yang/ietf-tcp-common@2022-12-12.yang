@@ -41,7 +41,7 @@ module ietf-tcp-common {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2022-05-24 {
+  revision 2022-12-12 {
     description
       "Initial version";
     reference
@@ -56,7 +56,6 @@ module ietf-tcp-common {
   }
 
   // Groupings
-
   grouping tcp-common-grouping {
     description
       "A reusable grouping for configuring TCP parameters common
