@@ -76,13 +76,13 @@ public class CallHomeMountDispatcherTest {
                 mockProcessingExecutor, mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount,
                 mockEncryptionService) {
             @Override
-            public CallHomeMountSessionManager getSessionManager() {
+            CallHomeMountSessionManager sessionManager() {
                 return mockSessMgr;
             }
 
             @Override
             void createTopology() {
-                this.topology = mockTopology;
+                topology = mockTopology;
             }
         };
     }

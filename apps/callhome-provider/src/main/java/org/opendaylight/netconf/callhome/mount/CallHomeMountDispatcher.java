@@ -9,6 +9,7 @@ package org.opendaylight.netconf.callhome.mount;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.FailedFuture;
 import io.netty.util.concurrent.Future;
@@ -35,16 +36,16 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// Non-final for testing
 public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHomeNetconfSubsystemListener {
-
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountDispatcher.class);
 
+    private final CallHomeMountSessionManager sessionManager = new CallHomeMountSessionManager();
     private final String topologyId;
     private final EventExecutor eventExecutor;
     private final ScheduledThreadPool keepaliveExecutor;
     private final ThreadPool processingExecutor;
     private final SchemaResourceManager schemaRepositoryProvider;
-    private final CallHomeMountSessionManager sessionManager;
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
     private final AAAEncryptionService encryptionService;
@@ -81,7 +82,6 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         this.processingExecutor = processingExecutor;
         this.schemaRepositoryProvider = schemaRepositoryProvider;
         this.deviceActionFactory = deviceActionFactory;
-        this.sessionManager = new CallHomeMountSessionManager();
         this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = dataBroker;
         this.mountService = mountService;
@@ -100,23 +100,16 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
 
     private Future<NetconfClientSession> activateChannel(final NetconfClientConfiguration conf) {
         final InetSocketAddress remoteAddr = conf.getAddress();
-        final CallHomeMountSessionContext context = getSessionManager().getByAddress(remoteAddr);
+        final CallHomeMountSessionContext context = sessionManager().getByAddress(remoteAddr);
         LOG.info("Activating NETCONF channel for ip {} device context {}", remoteAddr, context);
         return context == null ? new FailedFuture<>(eventExecutor, new NullPointerException())
             : context.activateNetconfChannel(conf.getSessionListener());
     }
 
-    void createTopology() {
-        this.topology = new CallHomeTopology(topologyId, this, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountService, encryptionService, baseSchemas,
-                deviceActionFactory);
-    }
-
     @Override
     public void onNetconfSubsystemOpened(final CallHomeProtocolSessionContext session,
                                          final CallHomeChannelActivator activator) {
-        final CallHomeMountSessionContext deviceContext =
-                getSessionManager().createSession(session, activator, onCloseHandler);
+        final var deviceContext = sessionManager().createSession(session, activator, onCloseHandler);
         if (deviceContext != null) {
             final NodeId nodeId = deviceContext.getId();
             final Node configNode = deviceContext.getConfigNode();
@@ -125,7 +118,15 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         }
     }
 
-    public CallHomeMountSessionManager getSessionManager() {
+    @VisibleForTesting
+    void createTopology() {
+        topology = new CallHomeTopology(topologyId, this, eventExecutor, keepaliveExecutor, processingExecutor,
+                schemaRepositoryProvider, dataBroker, mountService, encryptionService, baseSchemas,
+                deviceActionFactory);
+    }
+
+    @VisibleForTesting
+    CallHomeMountSessionManager sessionManager() {
         return sessionManager;
     }
 }
