@@ -30,7 +30,10 @@ import org.opendaylight.yangtools.concepts.Registration;
 /**
  * NetconfOperationService aggregator. Makes a collection of operation services accessible as one.
  */
-public final class AggregatedNetconfOperationServiceFactory
+// Non-final for OSGi DS
+// FIXME: split into abstract class for the multiple uses we have, which really is about which construct is being
+//        invoked
+public class AggregatedNetconfOperationServiceFactory
         implements NetconfOperationServiceFactory, NetconfOperationServiceFactoryListener, AutoCloseable {
     private final Set<NetconfOperationServiceFactory> factories = ConcurrentHashMap.newKeySet();
     private final Multimap<NetconfOperationServiceFactory, Registration> registrations =
@@ -45,7 +48,7 @@ public final class AggregatedNetconfOperationServiceFactory
     }
 
     @Override
-    public synchronized void onAddNetconfOperationServiceFactory(final NetconfOperationServiceFactory service) {
+    public final synchronized void onAddNetconfOperationServiceFactory(final NetconfOperationServiceFactory service) {
         factories.add(service);
 
         for (final CapabilityListener listener : listeners) {
@@ -54,13 +57,14 @@ public final class AggregatedNetconfOperationServiceFactory
     }
 
     @Override
-    public synchronized void onRemoveNetconfOperationServiceFactory(final NetconfOperationServiceFactory service) {
+    public final synchronized void onRemoveNetconfOperationServiceFactory(
+            final NetconfOperationServiceFactory service) {
         factories.remove(service);
         registrations.removeAll(service).forEach(Registration::close);
     }
 
     @Override
-    public Set<Capability> getCapabilities() {
+    public final Set<Capability> getCapabilities() {
         final Set<Capability> capabilities = new HashSet<>();
         for (final NetconfOperationServiceFactory factory : factories) {
             capabilities.addAll(factory.getCapabilities());
@@ -69,7 +73,7 @@ public final class AggregatedNetconfOperationServiceFactory
     }
 
     @Override
-    public synchronized Registration registerCapabilityListener(final CapabilityListener listener) {
+    public final synchronized Registration registerCapabilityListener(final CapabilityListener listener) {
         final Map<NetconfOperationServiceFactory, Registration> regs = new HashMap<>();
 
         for (final NetconfOperationServiceFactory factory : factories) {
@@ -93,7 +97,7 @@ public final class AggregatedNetconfOperationServiceFactory
     }
 
     @Override
-    public synchronized NetconfOperationService createService(final String netconfSessionIdForReporting) {
+    public final synchronized NetconfOperationService createService(final String netconfSessionIdForReporting) {
         return new AggregatedNetconfOperation(factories, netconfSessionIdForReporting);
     }
 
