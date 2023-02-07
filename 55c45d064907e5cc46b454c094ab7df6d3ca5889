@@ -16,6 +16,24 @@
       "message": "OK, personally, I would prefer just to move constant do constructor as local variables.",
       "revId": "55c45d064907e5cc46b454c094ab7df6d3ca5889",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0213e15e_171a7312",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-02-07T13:01:45Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1a9f0ee8_baf21fe8",
+      "revId": "55c45d064907e5cc46b454c094ab7df6d3ca5889",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
