@@ -16,6 +16,24 @@
       "message": "`final @NonNull TlsAllowedDevicesMonitor allowedDevicesMonitor`",
       "revId": "8e2078e2860bc212b8dca95db1e9bc8fe70e2a65",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a129687f_545c9c4d",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/tls/SslHandlerFactoryAdapter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-02-07T09:44:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "163d3f4e_97611fa4",
+      "revId": "8e2078e2860bc212b8dca95db1e9bc8fe70e2a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
