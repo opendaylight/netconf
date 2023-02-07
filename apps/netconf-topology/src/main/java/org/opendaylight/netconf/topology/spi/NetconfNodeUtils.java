@@ -118,6 +118,9 @@ public final class NetconfNodeUtils {
             overrideNonModuleCaps = false;
         }
 
+        // FIXME: UserPreferences is constructor parameter of NetconfDeviceCommunicator and NetconfSessionPreferences
+        // are created in NetconfDeviceCommunicator#onSessionUp from session. What are we doing here?
+        // IMO we should rework UserPreferences and NetconfSessionPreferences and this method.
         return new UserPreferences(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined),
             overrideYangModuleCaps, overrideNonModuleCaps);
     }
