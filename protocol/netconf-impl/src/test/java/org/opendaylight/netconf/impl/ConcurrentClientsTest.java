@@ -158,7 +158,7 @@ public class ConcurrentClientsTest {
         factoriesListener.onAddNetconfOperationServiceFactory(
                 new TestingOperationServiceFactory(testingNetconfOperation));
 
-        SessionIdProvider idProvider = new SessionIdProvider();
+        SessionIdProvider idProvider = new DefaultSessionIdProvider();
 
         NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new
                 NetconfServerSessionNegotiatorFactoryBuilder()
