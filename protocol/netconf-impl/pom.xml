@@ -22,10 +22,17 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>threadpool-config-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.netconf.model</groupId>
       <artifactId>rfc6022</artifactId>
     </dependency>
-    <!-- compile dependencies -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-api</artifactId>
@@ -47,22 +54,18 @@
       <artifactId>netconf-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
+      <groupId>com.guicedee.services</groupId>
+      <artifactId>javax.inject</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>threadpool-config-api</artifactId>
-    </dependency>
-    <!-- test dependencies -->
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>mockito-configuration</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>mockito-configuration</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -81,7 +84,6 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-legacy</artifactId>

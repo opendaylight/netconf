@@ -38,6 +38,7 @@ import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.capability.YangModuleCapability;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
 import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.impl.ServerChannelInitializer;
@@ -110,7 +111,7 @@ public class NetconfDeviceSimulator implements Closeable {
         }));
         transformedCapabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
         final NetconfMonitoringService monitoringService1 = new DummyMonitoringService(transformedCapabilities);
-        final SessionIdProvider idProvider = new SessionIdProvider();
+        final SessionIdProvider idProvider = new DefaultSessionIdProvider();
 
         final NetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(
             sourceProvider, transformedCapabilities, monitoringService1, idProvider);
