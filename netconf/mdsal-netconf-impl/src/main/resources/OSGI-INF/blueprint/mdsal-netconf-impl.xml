@@ -26,6 +26,8 @@
     <reference id="scheduledThreadPool"
                interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
                odl:type="global-netconf-ssh-scheduled-executor"/>
+    <reference id="sessionIdProvider"
+               interface="org.opendaylight.netconf.impl.SessionIdProvider"/>
 
     <cm:property-placeholder persistent-id="org.opendaylight.netconf.impl" update-strategy="none">
         <cm:default-properties>
@@ -46,9 +48,6 @@
     </service>
 
     <!--NetconfServerDispatcher -->
-
-    <bean id="sessionIdProvider"
-          class="org.opendaylight.netconf.impl.SessionIdProvider"/>
 
     <bean id="aggregatedNetconfOperationServiceFactoryMappers"
           class="org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory"
