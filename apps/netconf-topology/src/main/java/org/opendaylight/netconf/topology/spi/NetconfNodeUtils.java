@@ -102,7 +102,8 @@ public final class NetconfNodeUtils {
         }
 
         //non-module capabilities should not exist in yang module capabilities
-        final var sessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
+        final var sessionPreferences = NetconfSessionPreferences.fromStrings(capabilities,
+            CapabilityOrigin.DeviceAdvertised);
         final var nonModulePrefs = sessionPreferences.nonModuleCaps();
         if (!nonModulePrefs.isEmpty()) {
             throw new IllegalArgumentException("List yang-module-capabilities/capability should contain only module "
