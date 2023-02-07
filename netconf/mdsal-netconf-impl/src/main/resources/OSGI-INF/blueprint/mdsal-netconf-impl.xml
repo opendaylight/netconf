@@ -28,6 +28,9 @@
                odl:type="global-netconf-ssh-scheduled-executor"/>
     <reference id="sessionIdProvider"
                interface="org.opendaylight.netconf.impl.SessionIdProvider"/>
+    <reference id="aggregatedNetconfOperationServiceFactory"
+               interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener"
+               odl:type="mapper-aggregator-registry"/>
 
     <cm:property-placeholder persistent-id="org.opendaylight.netconf.impl" update-strategy="none">
         <cm:default-properties>
@@ -35,17 +38,6 @@
             <cm:property name="monitoring-update-interval" value="6"/>
         </cm:default-properties>
     </cm:property-placeholder>
-
-    <!--NetconfMapperAggregator -->
-
-    <bean id="aggregatedNetconfOperationServiceFactory"
-          class="org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory"
-          destroy-method="close">
-    </bean>
-    <service ref="aggregatedNetconfOperationServiceFactory"
-             interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener"
-             odl:type="mapper-aggregator-registry">
-    </service>
 
     <!--NetconfServerDispatcher -->
 
