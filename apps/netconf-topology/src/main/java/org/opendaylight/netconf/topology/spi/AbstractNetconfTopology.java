@@ -206,10 +206,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return future;
     }
 
-    protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node) {
-        return createDeviceCommunicator(nodeId, node, null);
-    }
-
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
         final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
