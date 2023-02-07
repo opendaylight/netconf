@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f5b5b27_0914b811",
+        "filename": "netconf/yanglib/src/main/resources/initial/yanglib-config.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-07T09:05:49Z",
+      "side": 1,
+      "message": "Inside commit message is:\n```\nWere set default cache-folder to cache/schema, binding-addr to\nlocalhost and binding-port port 5000 by creating new config\nfile.\n```\n\nHere is set binding port to 8181. Please fix commit message or default configuration.",
+      "revId": "868b073701a0b0495a9ad96f15070726f0ba2b52",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
