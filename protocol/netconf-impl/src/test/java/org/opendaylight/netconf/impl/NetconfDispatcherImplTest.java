@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
 import io.netty.channel.ChannelFuture;
@@ -19,11 +18,9 @@ import org.junit.Test;
 import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
 
 public class NetconfDispatcherImplTest {
-
     private EventLoopGroup nettyGroup;
     private NetconfServerDispatcherImpl dispatch;
     private HashedWheelTimer hashedWheelTimer;
-
 
     @Before
     public void setUp() throws Exception {
@@ -31,7 +28,7 @@ public class NetconfDispatcherImplTest {
 
         AggregatedNetconfOperationServiceFactory factoriesListener = new AggregatedNetconfOperationServiceFactory();
 
-        SessionIdProvider idProvider = new SessionIdProvider();
+        SessionIdProvider idProvider = new DefaultSessionIdProvider();
         hashedWheelTimer = new HashedWheelTimer();
 
         NetconfServerSessionNegotiatorFactory serverNegotiatorFactory =
