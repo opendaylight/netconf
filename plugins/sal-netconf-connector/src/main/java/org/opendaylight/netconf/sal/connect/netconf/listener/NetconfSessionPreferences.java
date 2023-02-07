@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
@@ -48,6 +49,7 @@ public record NetconfSessionPreferences(
         return fromStrings(session.getServerCapabilities());
     }
 
+    @VisibleForTesting
     public static @NonNull NetconfSessionPreferences fromStrings(final Collection<String> capabilities) {
         // we do not know origin of capabilities from only Strings, so we set it to default value
         return fromStrings(capabilities, CapabilityOrigin.DeviceAdvertised);
