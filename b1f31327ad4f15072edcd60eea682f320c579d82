@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85a76940_de8f36b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-07T09:29:56Z",
+      "side": 1,
+      "message": "Just change port to new default. Other parts of documentation will be reworked later.",
+      "revId": "b1f31327ad4f15072edcd60eea682f320c579d82",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c75cd19_3d30ae13",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-07T09:29:56Z",
+      "side": 1,
+      "message": "5000 -\u003e 8181",
+      "revId": "b1f31327ad4f15072edcd60eea682f320c579d82",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
