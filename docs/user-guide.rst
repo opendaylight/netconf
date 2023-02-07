@@ -518,6 +518,89 @@ http://localhost:8181/restconf/operations/network-topology:network-topology/topo
 This call should fetch the source for ietf-yang-types YANG model from
 the mounted device.
 
+Receving Netconf Device Notifications on a http client
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Devices emit netconf alarms and notifictions on certain situtations, which can demand 
+attention from Device Administration. The notifications are received as Netconf messages on an
+active Netconf session.
+
+Opendaylight provides the way to stream the device notifications over a http session.
+
+- Step 1: Mount the device (assume node name is test_device)
+
+- Step 2: Wait for the device to be connected.
+
+- Step 3: Create the Subscription for notification on the active session.
+
+ .. code-block::
+
+    POST
+    http://localhost:8181/rests/operations/network-topology:network-topology/topology=topology-netconf/node=test_device/yang-ext:mount/notifications:create-subscription
+    Content-Type: application/json
+    Accept: application/json
+
+ .. code-block:: json
+
+    {
+      "input": {
+        "stream": "NETCONF"
+       }
+    }
+
+- Step 4: Create the http Stream for the events.
+
+.. code-block::
+
+    POST
+    http://localhost:8181/rests/operations/odl-device-notification:subscribe-device-notification
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+    {
+      "input": {
+         "path":"/network-topology:network-topology/topology[topology-id='topology-netconf']/node[node-id='test_device']"
+      }
+    }
+
+The response suggests the http url for reading the notifications.
+
+.. code-block:: json
+
+    {
+       "odl-device-notification:output": {
+            "stream-path": "http://localhost:8181/rests/notif/test_device?notificationType=test_device"
+        }
+    }
+
+- Step 5: User can access the url in the response and the notifications will be as follows.
+
+.. code-block::
+
+    GET
+    http://localhost:8181/rests/notif/test_device?notificationType=test_device
+    Content-Type: application/xml
+    Accept: application/xml
+
+
+.. code-block:: xml
+
+: ping
+
+: ping
+
+: ping
+
+: ping
+
+: ping
+
+data: <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0"><eventTime>2022-06-17T07:01:08.60228Z</eventTime><netconf-session-start xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-notifications"><username>root</username><source-host>127.0.0.1</source-host><session-id>2</session-id></netconf-session-start></notification>
+
+data: <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0"><eventTime>2022-06-17T07:01:12.458258Z</eventTime><netconf-session-end xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-notifications"><username>root</username><source-host>127.0.0.1</source-host><termination-reason>closed</termination-reason><session-id>2</session-id></netconf-session-end></notification>
+
 Netconf-connector + Netopeer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
