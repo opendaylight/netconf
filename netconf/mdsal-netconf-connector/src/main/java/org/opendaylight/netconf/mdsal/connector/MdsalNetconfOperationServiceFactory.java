@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.mdsal.connector;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.io.CharStreams;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -39,11 +37,15 @@ import org.opendaylight.yangtools.yang.model.api.Submodule;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(service = NetconfOperationServiceFactory.class, immediate = true, property = "type=mdsal-netconf-connector")
 public final class MdsalNetconfOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(MdsalNetconfOperationServiceFactory.class);
     private static final BasicCapability VALIDATE_CAPABILITY =
             new BasicCapability("urn:ietf:params:netconf:capability:validate:1.0");
@@ -55,54 +57,33 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
-    private MdsalNetconfOperationServiceFactory(
-            final DOMSchemaService schemaService,
-            final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
-            final DOMDataBroker dataBroker,
-            final DOMRpcService rpcService) {
-
-        this.dataBroker = dataBroker;
-        this.rpcService = rpcService;
+    @Activate
+    public MdsalNetconfOperationServiceFactory(@Reference final DOMSchemaService schemaService,
+            @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
+            @Reference(target = "(type=mapper-aggregator-registry)")
+            final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener) {
+        this.dataBroker = requireNonNull(dataBroker);
+        this.rpcService = requireNonNull(rpcService);
+        this.netconfOperationServiceFactoryListener = requireNonNull(netconfOperationServiceFactoryListener);
 
         rootSchemaSourceProviderDependency = schemaService.getExtensions()
                 .getInstance(DOMYangTextSourceProvider.class);
         currentSchemaContext = CurrentSchemaContext.create(requireNonNull(schemaService),
                 rootSchemaSourceProviderDependency);
-        this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
+        netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
     }
 
-    // keep spotbugs from complaining about overridable method in constructor
-    public static MdsalNetconfOperationServiceFactory create(
-            final DOMSchemaService schemaService,
-            final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
-            final DOMDataBroker dataBroker,
-            final DOMRpcService rpcService) {
-
-        var factory = new MdsalNetconfOperationServiceFactory(schemaService, netconfOperationServiceFactoryListener,
-                dataBroker, rpcService);
-        netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(factory);
-
-        return factory;
+    @Deactivate
+    @Override
+    public void close() {
+        netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
+        currentSchemaContext.close();
     }
 
     @Override
     public MdsalNetconfOperationService createService(final String netconfSessionIdForReporting) {
-        checkState(dataBroker != null, "MD-SAL provider not yet initialized");
         return new MdsalNetconfOperationService(currentSchemaContext, netconfSessionIdForReporting, dataBroker,
                 rpcService);
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    @Override
-    public void close() {
-        try {
-            currentSchemaContext.close();
-            if (netconfOperationServiceFactoryListener != null) {
-                netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
-            }
-        } catch (Exception e) {
-            LOG.error("Failed to close resources correctly - ignore", e);
-        }
     }
 
     @Override
@@ -170,7 +151,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     public Registration registerCapabilityListener(final CapabilityListener listener) {
         // Advertise validate capability only if DOMDataBroker provides DOMDataTransactionValidator
         if (dataBroker.getExtensions().get(DOMDataTransactionValidator.class) != null) {
-            listener.onCapabilitiesChanged(Collections.singleton(VALIDATE_CAPABILITY), Collections.emptySet());
+            listener.onCapabilitiesChanged(Set.of(VALIDATE_CAPABILITY), Set.of());
         }
         // Advertise namespaces of supported YANG models as NETCONF capabilities
         return currentSchemaContext.registerCapabilityListener(listener);

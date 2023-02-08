@@ -84,9 +84,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             return HandlingPriority.CANNOT_HANDLE;
         }
 
-        getRpcDefinitionFromModule(module.get(), namespaceURI, netconfOperationName);
+        getRpcDefinitionFromModule(module.orElseThrow(), namespaceURI, netconfOperationName);
         return HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY;
-
     }
 
     @Override
@@ -137,7 +136,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
                     ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
         }
 
-        final Optional<RpcDefinition> rpcDefinitionOptional = getRpcDefinitionFromModule(moduleOptional.get(),
+        final Optional<RpcDefinition> rpcDefinitionOptional = getRpcDefinitionFromModule(moduleOptional.orElseThrow(),
                 namespaceURI, netconfOperationName);
 
         if (rpcDefinitionOptional.isEmpty()) {
@@ -147,7 +146,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
                     ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
         }
 
-        final RpcDefinition rpcDefinition = rpcDefinitionOptional.get();
+        final RpcDefinition rpcDefinition = rpcDefinitionOptional.orElseThrow();
         final ContainerNode inputNode = rpcToNNode(operationElement, rpcDefinition);
 
         final DOMRpcResult result;
@@ -156,11 +155,11 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         } catch (final InterruptedException | ExecutionException e) {
             throw DocumentedException.wrap(e);
         }
-        if (result.getResult() == null) {
+        if (result.value() == null) {
             return XmlUtil.createElement(document, XmlNetconfConstants.OK,
                 Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
         }
-        return transformNormalizedNode(document, result.getResult(),
+        return transformNormalizedNode(document, result.value(),
                 Absolute.of(rpcDefinition.getQName(), rpcDefinition.getOutput().getQName()));
     }
 
