@@ -38,16 +38,6 @@
     <argument value="${use-sse}" />
   </bean>
 
-  <bean id="restconfApplication" class="org.opendaylight.restconf.nb.rfc8040.RestconfApplication">
-    <argument ref="databindProvider"/>
-    <argument ref="dOMMountPointService"/>
-    <argument ref="dOMDataBroker"/>
-    <argument ref="dOMRpcService"/>
-    <argument ref="dOMActionService"/>
-    <argument ref="dOMNotificationService"/>
-    <argument ref="dOMSchemaService"/>
-    <argument ref="configuration"/>
-  </bean>
   <bean id="restconfDataStreamServiceImpl" class="org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl">
     <argument ref="scheduledThreadPool"/>
     <argument ref="configuration"/>
@@ -56,7 +46,18 @@
     <argument ref="webServer"/>
     <argument ref="webContextSecurer"/>
     <argument ref="servletSupport"/>
-    <argument ref="restconfApplication"/>
+    <argument>
+      <bean class="org.opendaylight.restconf.nb.rfc8040.RestconfApplication">
+        <argument ref="databindProvider"/>
+        <argument ref="dOMMountPointService"/>
+        <argument ref="dOMDataBroker"/>
+        <argument ref="dOMRpcService"/>
+        <argument ref="dOMActionService"/>
+        <argument ref="dOMNotificationService"/>
+        <argument ref="dOMSchemaService"/>
+        <argument ref="configuration"/>
+      </bean>
+    </argument>
     <argument>
       <bean id="dataStreamApplication" class="org.opendaylight.restconf.nb.rfc8040.DataStreamApplication">
         <argument ref="databindProvider"/>
