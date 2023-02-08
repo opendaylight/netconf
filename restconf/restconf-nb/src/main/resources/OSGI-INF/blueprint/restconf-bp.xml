@@ -67,11 +67,12 @@
       </bean>
     </argument>
     <argument ref="customFilterAdapterConfiguration"/>
-    <argument ref="webSocketInitializer"/>
-  </bean>
-  <bean id="webSocketInitializer" class="org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer">
-    <argument ref="scheduledThreadPool"/>
-    <argument ref="configuration"/>
+    <argument>
+      <bean id="webSocketInitializer" class="org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer">
+        <argument ref="scheduledThreadPool"/>
+        <argument ref="configuration"/>
+      </bean>
+    </argument>
   </bean>
   <reference id="databindProvider" interface="org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider"/>
   <reference id="customFilterAdapterConfiguration" interface="org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration"/>
