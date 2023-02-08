@@ -18,9 +18,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
@@ -29,11 +26,9 @@ import org.opendaylight.netconf.shaded.sshd.common.util.security.SecurityUtils;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.util.NetconfConfiguration;
-import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SSHServerTest {
     private static final String USER = "netconf";
     private static final String PASSWORD = "netconf";
@@ -44,8 +39,6 @@ public class SSHServerTest {
     private File sshKeyPair;
     private SshProxyServer server;
 
-    @Mock
-    private BundleContext mockedContext;
     private final ExecutorService nioExec = Executors.newFixedThreadPool(1);
     private final EventLoopGroup clientGroup = new NioEventLoopGroup();
     private final ScheduledExecutorService minaTimerEx = Executors.newScheduledThreadPool(1);
@@ -88,5 +81,4 @@ public class SSHServerTest {
             nioExec.shutdownNow();
         }
     }
-
 }

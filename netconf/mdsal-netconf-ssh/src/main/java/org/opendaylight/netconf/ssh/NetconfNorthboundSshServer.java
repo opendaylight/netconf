@@ -12,59 +12,75 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
-import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfNorthboundSshServer {
+/**
+ * NETCONF server for MD-SAL (listening by default on port 2830).
+ */
+@Component(service = { }, configurationPid = "org.opendaylight.netconf.ssh")
+@Designate(ocd = NetconfNorthboundSshServer.Configuration.class)
+public final class NetconfNorthboundSshServer implements AutoCloseable {
+    @ObjectClassDefinition
+    public @interface Configuration {
+        @AttributeDefinition
+        String bindingAddress() default "0.0.0.0";
+        @AttributeDefinition(min = "1", max = "65535")
+        int portNumber() default 2830;
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNorthboundSshServer.class);
-
-    // Do not store unencrypted private key
-    private static final String DEFAULT_PRIVATE_KEY_PATH = null;
-    private static final String DEFAULT_ALGORITHM = "RSA";
-    private static final int DEFAULT_KEY_SIZE = 4096;
 
     private final ChannelFuture localServer;
     private final SshProxyServer sshProxyServer;
 
-    public NetconfNorthboundSshServer(final NetconfServerDispatcher netconfServerDispatcher,
-                                      final EventLoopGroup workerGroup,
-                                      final EventExecutor eventExecutor,
-                                      final String bindingAddress,
-                                      final String portNumber,
-                                      final AuthProvider authProvider) {
+    @Activate
+    public NetconfNorthboundSshServer(
+            @Reference final NetconfServerDispatcher netconfServerDispatcher,
+            @Reference(target = "(type=global-worker-group)") final EventLoopGroup workerGroup,
+            @Reference(target = "(type=global-event-executor)") final EventExecutor eventExecutor,
+            @Reference(target = "(type=netconf-auth-provider)") final AuthProvider authProvider,
+            final Configuration configuration) {
+        this(netconfServerDispatcher, workerGroup, eventExecutor, authProvider, configuration.bindingAddress(),
+            configuration.portNumber());
+    }
 
-        final LocalAddress localAddress = new LocalAddress(portNumber);
+    public NetconfNorthboundSshServer(final NetconfServerDispatcher netconfServerDispatcher,
+            final EventLoopGroup workerGroup, final EventExecutor eventExecutor, final AuthProvider authProvider,
+            final String bindingAddress, final int portNumber) {
+        final LocalAddress localAddress = new LocalAddress(String.valueOf(portNumber));
+        final var sshProxyServerConfiguration = new SshProxyServerConfigurationBuilder()
+            .setBindingAddress(getInetAddress(bindingAddress, portNumber))
+            .setLocalAddress(localAddress)
+            .setAuthenticator(authProvider)
+            .setIdleTimeout(Integer.MAX_VALUE)
+            .setKeyPairProvider(new SimpleGeneratorHostKeyProvider())
+            .createSshProxyServerConfiguration();
 
         localServer = netconfServerDispatcher.createLocalServer(localAddress);
         sshProxyServer = new SshProxyServer(Executors.newScheduledThreadPool(1), workerGroup, eventExecutor);
 
-        final InetSocketAddress inetAddress = getInetAddress(bindingAddress, portNumber);
-        final SshProxyServerConfigurationBuilder sshProxyServerConfigurationBuilder =
-                new SshProxyServerConfigurationBuilder();
-        sshProxyServerConfigurationBuilder.setBindingAddress(inetAddress);
-        sshProxyServerConfigurationBuilder.setLocalAddress(localAddress);
-        sshProxyServerConfigurationBuilder.setAuthenticator(authProvider);
-        sshProxyServerConfigurationBuilder.setIdleTimeout(Integer.MAX_VALUE);
-        sshProxyServerConfigurationBuilder.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
-
         localServer.addListener(future -> {
             if (future.isDone() && !future.isCancelled()) {
                 try {
-                    sshProxyServer.bind(sshProxyServerConfigurationBuilder.createSshProxyServerConfiguration());
-                    LOG.info("Netconf SSH endpoint started successfully at {}", bindingAddress);
+                    sshProxyServer.bind(sshProxyServerConfiguration);
                 } catch (final IOException e) {
                     throw new IllegalStateException("Unable to start SSH netconf server", e);
                 }
+                LOG.info("Netconf SSH endpoint started successfully at {}", bindingAddress);
             } else {
                 LOG.warn("Unable to start SSH netconf server at {}", bindingAddress, future.cause());
                 throw new IllegalStateException("Unable to start SSH netconf server", future.cause());
@@ -72,12 +88,8 @@ public class NetconfNorthboundSshServer {
         });
     }
 
-    private static InetSocketAddress getInetAddress(final String bindingAddress, final String portNumber) {
-        final IpAddress ipAddress = IetfInetUtil.ipAddressFor(bindingAddress);
-        final InetAddress inetAd = IetfInetUtil.INSTANCE.inetAddressFor(ipAddress);
-        return new InetSocketAddress(inetAd, Integer.parseInt(portNumber));
-    }
-
+    @Deactivate
+    @Override
     public void close() throws IOException {
         sshProxyServer.close();
 
@@ -88,17 +100,8 @@ public class NetconfNorthboundSshServer {
         }
     }
 
-    /*
-     * Called when the underlying reference to EventExecutor is about to be removed from the container allowing
-     * us to close the ssh server while it still exists.
-     */
-    public void unbind(final ServiceReference<?> reference) {
-        LOG.debug("EventExecutor is being removed, closing netconf ssh server. {}", reference);
-
-        try {
-            close();
-        } catch (final IOException e) {
-            LOG.error("Closing of ssh server failed while unbinding reference listener.", e);
-        }
+    private static InetSocketAddress getInetAddress(final String bindingAddress, final int portNumber) {
+        final var ipAddress = IetfInetUtil.ipAddressFor(bindingAddress);
+        return new InetSocketAddress(IetfInetUtil.INSTANCE.inetAddressFor(ipAddress), portNumber);
     }
 }
