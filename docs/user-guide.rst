@@ -68,11 +68,11 @@ focuses on RESTCONF.
     - | ``http://localhost:8181/restconf`` is related to `draft-bierman-netconf-restconf-02 <https://tools.ietf.org/html/draft-bierman-netconf-restconf-02>`__,
       | can be activated by installing ``odl-restconf-nb-bierman02``
        Karaf feature.
-      | This user guide uses this approach.
 
     - | ``http://localhost:8181/rests`` is related to `RFC-8040 <https://tools.ietf.org/html/rfc8040>`__,
-      | can be activated by installing ``odl-restconf-nb-rfc8040``
+      | can be activated by installing ``odl-restconf-nb``
        Karaf feature.
+      | This user guide uses this approach.
 
     | In case of `RFC-8040 <https://tools.ietf.org/html/rfc8040>`__
      resources for configuration and operational datastores start
@@ -221,9 +221,9 @@ be:
 
 Headers:
 
--  Accept: application/yang.patch-status+json
+-  Accept: application/yang-data+json
 
--  Content-Type: application/yang.patch+json
+-  Content-Type: application/yang-patch+json
 
 Example JSON payload to modify the password entry:
 
@@ -453,10 +453,10 @@ Reading data from the device
 Just invoke (no body needed):
 
 GET
-http://localhost:8080/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/new-netconf-device/yang-ext:mount/
+http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device/yang-ext:mount?content=nonconfig
 
 This will return the entire content of operation datastore from the
-device. To view just the configuration datastore, change **operational**
+device. To view just the configuration datastore, change **nonconfig**
 in this URL to **config**.
 
 Writing configuration data to the device
@@ -470,7 +470,7 @@ In fact this request comes from the tutorial dedicated to the
 **ncmount** tutorial app.
 
 POST
-http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/new-netconf-device/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations
+http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations?content=config
 
 ::
 
@@ -506,7 +506,7 @@ shows how to invoke the get-schema RPC (get-schema is quite common among
 netconf devices). Invoke:
 
 POST
-http://localhost:8181/restconf/operations/network-topology:network-topology/topology/topology-netconf/node/new-netconf-device/yang-ext:mount/ietf-netconf-monitoring:get-schema
+http://localhost:8181/rests/operations/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device/yang-ext:mount/ietf-netconf-monitoring:get-schema
 
 ::
 
@@ -658,7 +658,7 @@ After netopeer is mounted successfully, its configuration can be read
 using RESTCONF by invoking:
 
 GET
-http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/netopeer/yang-ext:mount/
+http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
 
 Northbound (NETCONF servers)
 ----------------------------
@@ -780,7 +780,7 @@ Now the MD-SAL’s datastore can be read over RESTCONF via NETCONF by
 invoking:
 
 GET
-http://localhost:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/controller-mdsal/yang-ext:mount
+http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=controller-mdsal/yang-ext:mount?content:nonconfig
 
 .. note::
 
@@ -868,7 +868,7 @@ XML
 ::
 
     <yang-library xmlns="urn:opendaylight:netconf-node-topology">
-      <yang-library-url xmlns="urn:opendaylight:netconf-node-topology">http://localhost:8181/restconf/operational/ietf-yang-library:modules-state</yang-library-url>
+      <yang-library-url xmlns="urn:opendaylight:netconf-node-topology">http://localhost:8181/rests/data/ietf-yang-library:modules-state</yang-library-url>
       <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
       <password xmlns="urn:opendaylight:netconf-node-topology">admin</password>
     </yang-library>
@@ -927,7 +927,7 @@ with username and passwords specified.
 .. code-block::
 
     PUT
-    /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/global/credentials HTTP/1.1
+    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/global/credentials HTTP/1.1
     Content-Type: application/json
     Accept: application/json
 
@@ -963,8 +963,8 @@ to the log.
 
 .. code-block::
 
-    POST
-    /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/global HTTP/1.1
+    PUT
+    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/global HTTP/1.1
     Content-Type: application/json
     Accept: application/json
 
@@ -1001,7 +1001,7 @@ Configuring Device with Device-specific Credentials
 '''''''''''''''''''''''''''''''''''''''''''''''''''
 
 Adding specific device to the allowed list is done by creating
-``/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/{device}``
+``/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device={device}``
 with device-id and connection parameters inside the ssh-client-params container.
 
 *Configuring Device with Credentials*
@@ -1009,7 +1009,7 @@ with device-id and connection parameters inside the ssh-client-params container.
 .. code-block::
 
     PUT
-    /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/example HTTP/1.1
+    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example HTTP/1.1
     Content-Type: application/json
     Accept: application/json
 
@@ -1023,7 +1023,7 @@ with device-id and connection parameters inside the ssh-client-params container.
             "username": "example",
             "passwords": [ "password" ]
           },
-          "ssh-host-key": "AAAAB3NzaC1yc2EAAAADAQABAAABAQDHoH1jMjltOJnCt999uaSfc48ySutaD3ISJ9fSECe1Spdq9o9mxj0kBTTTq+2V8hPspuW75DNgN+V/rgJeoUewWwCAasRx9X4eTcRrJrwOQKzb5Fk+UKgQmenZ5uhLAefi2qXX/agFCtZi99vw+jHXZStfHm9TZCAf2zi+HIBzoVksSNJD0VvPo66EAvLn5qKWQD4AdpQQbKqXRf5/W8diPySbYdvOP2/7HFhDukW8yV/7ZtcywFUIu3gdXsrzwMnTqnATSLPPuckoi0V2jd8dQvEcu1DY+rRqmqu0tEkFBurlRZDf1yhNzq5xWY3OXcjgDGN+RxwuWQK3cRimcosH"
+          "host-key": "AAAAB3NzaC1yc2EAAAADAQABAAABAQDHoH1jMjltOJnCt999uaSfc48ySutaD3ISJ9fSECe1Spdq9o9mxj0kBTTTq+2V8hPspuW75DNgN+V/rgJeoUewWwCAasRx9X4eTcRrJrwOQKzb5Fk+UKgQmenZ5uhLAefi2qXX/agFCtZi99vw+jHXZStfHm9TZCAf2zi+HIBzoVksSNJD0VvPo66EAvLn5qKWQD4AdpQQbKqXRf5/W8diPySbYdvOP2/7HFhDukW8yV/7ZtcywFUIu3gdXsrzwMnTqnATSLPPuckoi0V2jd8dQvEcu1DY+rRqmqu0tEkFBurlRZDf1yhNzq5xWY3OXcjgDGN+RxwuWQK3cRimcosH"
         }
       }
     }
@@ -1039,7 +1039,7 @@ in such case values from global credentials will be used.
 .. code-block::
 
     PUT
-    /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/example HTTP/1.1
+    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example HTTP/1.1
     Content-Type: application/json
     Accept: application/json
 
@@ -1069,7 +1069,7 @@ Configuring Device with Global Credentials
 .. code-block::
 
     PUT
-    /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/example HTTP/1.1
+    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example HTTP/1.1
     Content-Type: application/json
     Accept: application/json
 
@@ -1094,7 +1094,7 @@ device-specific configuration. Format is same as in global credentials.
 .. code-block::
 
     PUT
-    /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/example HTTP/1.1
+    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example HTTP/1.1
     Content-Type: application/json
     Accept: application/json
 
@@ -1206,7 +1206,7 @@ among the allowed devices.
 .. code-block::
 
     PUT
-    /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/example-device HTTP/1.1
+    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example HTTP/1.1
     Content-Type: application/json
     Accept: application/json
 
@@ -1214,7 +1214,7 @@ among the allowed devices.
 
   {
     "device": {
-      "unique-id": "example-device",
+      "unique-id": "example",
       "tls-client-params": {
         "key-id": "example-client-key-id",
         "certificate-id": "example-server-certificate"
@@ -1295,6 +1295,74 @@ Next advantages:
 Preparation of data
 ~~~~~~~~~~~~~~~~~~~
 
+For demonstration, we will define next YANG model:
+
+::
+
+    module test-module {
+        yang-version 1;
+        namespace "urn:opendaylight:test-module";
+        prefix "tm";
+        revision "2023-02-16";
+
+        container root {
+            container simple-root {
+                leaf leaf-a {
+                    type string;
+                }
+                leaf leaf-b {
+                    type string;
+                }
+                leaf-list ll {
+                    type string;
+                }
+                container nested {
+                    leaf sample-x {
+                        type boolean;
+                    }
+                    leaf sample-y {
+                        type boolean;
+                    }
+                }
+            }
+
+            container list-root {
+                leaf branch-ab {
+                    type int32;
+                }
+                list top-list {
+                    key "key-1 key-2";
+                    ordered-by user;
+                    leaf key-1 {
+                        type string;
+                    }
+                    leaf key-2 {
+                        type string;
+                    }
+                    container next-data {
+                        leaf switch-1 {
+                            type empty;
+                        }
+                        leaf switch-2 {
+                            type empty;
+                        }
+                    }
+                    list nested-list {
+                        key "identifier";
+                        leaf identifier {
+                            type string;
+                        }
+                        leaf foo {
+                            type int32;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+Follow the `instructions <https://docs.opendaylight.org/projects/netconf/en/latest/testtool.html#executing-operations-via-restconf-on-a-mounted-simulated-device>`__ to save this schema and run it with testtool.
+
 Mounting NETCONF device that runs on NETCONF testtool:
 
 .. code-block:: bash
@@ -1307,7 +1375,7 @@ Mounting NETCONF device that runs on NETCONF testtool:
           {
               "node-id": "testtool",
               "netconf-node-topology:host": "127.0.0.1",
-              "netconf-node-topology:port": 36000,
+              "netconf-node-topology:port": 17830,
               "netconf-node-topology:keepalive-delay": 100,
               "netconf-node-topology:tcp-only": false,
               "netconf-node-topology:username": "admin",
