@@ -7,6 +7,8 @@
  */
 package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
@@ -16,21 +18,31 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
+@Component(service = { })
 public final class MdsalMonitoringMapperFactory implements NetconfOperationServiceFactory, AutoCloseable {
-    private final MonitoringToMdsalWriter monitoringToMdsalWriter;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
     private final NetconfMonitoringService netconfMonitoringService;
 
+    @Activate
     public MdsalMonitoringMapperFactory(
+            @Reference(target = "(type=mapper-aggregator-registry)")
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
-            final NetconfMonitoringService netconfMonitoringService,
-            final MonitoringToMdsalWriter monitoringToMdsalWriter) {
-
-        this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
-        this.netconfMonitoringService = netconfMonitoringService;
-        this.monitoringToMdsalWriter = monitoringToMdsalWriter;
+            @Reference(target = "(type=netconf-server-monitoring)")
+            final NetconfMonitoringService netconfMonitoringService) {
+        this.netconfOperationServiceFactoryListener = requireNonNull(netconfOperationServiceFactoryListener);
+        this.netconfMonitoringService = requireNonNull(netconfMonitoringService);
         this.netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
+    }
+
+    @Deactivate
+    @Override
+    public void close() {
+        netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
     }
 
     @Override
@@ -60,14 +72,4 @@ public final class MdsalMonitoringMapperFactory implements NetconfOperationServi
     public Registration registerCapabilityListener(final CapabilityListener listener) {
         return () -> { };
     }
-
-    /**
-     * Invoked using blueprint.
-     */
-    @Override
-    public void close() {
-        monitoringToMdsalWriter.close();
-        netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
-    }
-
 }

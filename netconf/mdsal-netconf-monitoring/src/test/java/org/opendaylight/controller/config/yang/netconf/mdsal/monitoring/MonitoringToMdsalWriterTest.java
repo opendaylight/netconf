@@ -15,7 +15,6 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,12 +63,11 @@ public class MonitoringToMdsalWriterTest {
         doNothing().when(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL), any());
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();
 
-        writer = new MonitoringToMdsalWriter(monitoring, dataBroker);
+        writer = new MonitoringToMdsalWriter(dataBroker, monitoring);
     }
 
     @Test
     public void testClose() throws Exception {
-        writer.start();
         writer.close();
         InOrder inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).delete(LogicalDatastoreType.OPERATIONAL, INSTANCE_IDENTIFIER);
@@ -80,7 +78,6 @@ public class MonitoringToMdsalWriterTest {
     public void testOnCapabilityChanged() throws Exception {
         final InstanceIdentifier<Capabilities> capabilitiesId =
                 InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
-        writer.start();
         final Capabilities capabilities = new CapabilitiesBuilder().build();
         writer.onCapabilitiesChanged(capabilities);
         InOrder inOrder = inOrder(writeTransaction);
@@ -92,7 +89,6 @@ public class MonitoringToMdsalWriterTest {
     public void testOnSchemasChanged() throws Exception {
         final InstanceIdentifier<Schemas> schemasId =
                 InstanceIdentifier.create(NetconfState.class).child(Schemas.class);
-        writer.start();
         final Schemas schemas = new SchemasBuilder().build();
         writer.onSchemasChanged(schemas);
         InOrder inOrder = inOrder(writeTransaction);
@@ -109,7 +105,6 @@ public class MonitoringToMdsalWriterTest {
                 InstanceIdentifier.create(NetconfState.class)
                         .child(Sessions.class)
                         .child(Session.class, session.key());
-        writer.start();
         writer.onSessionStarted(session);
         InOrder inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, id, session);
@@ -125,7 +120,6 @@ public class MonitoringToMdsalWriterTest {
                 InstanceIdentifier.create(NetconfState.class)
                         .child(Sessions.class)
                         .child(Session.class, session.key());
-        writer.start();
         writer.onSessionEnded(session);
         InOrder inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).delete(LogicalDatastoreType.OPERATIONAL, id);
@@ -140,9 +134,6 @@ public class MonitoringToMdsalWriterTest {
         Session session2 = new SessionBuilder()
                 .setSessionId(Uint32.valueOf(2))
                 .build();
-        List<Session> sessions = new ArrayList<>();
-        sessions.add(session1);
-        sessions.add(session2);
         final InstanceIdentifier<Session> id1 =
                 InstanceIdentifier.create(NetconfState.class)
                         .child(Sessions.class)
@@ -151,8 +142,7 @@ public class MonitoringToMdsalWriterTest {
                 InstanceIdentifier.create(NetconfState.class)
                         .child(Sessions.class)
                         .child(Session.class, session2.key());
-        writer.start();
-        writer.onSessionsUpdated(sessions);
+        writer.onSessionsUpdated(List.of(session1, session2));
         InOrder inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, id1, session1);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, id2, session2);
@@ -161,7 +151,6 @@ public class MonitoringToMdsalWriterTest {
 
     @Test
     public void testOnSessionInitiated() throws Exception {
-        writer.start();
         verify(monitoring).registerCapabilitiesListener(writer);
     }
 }
