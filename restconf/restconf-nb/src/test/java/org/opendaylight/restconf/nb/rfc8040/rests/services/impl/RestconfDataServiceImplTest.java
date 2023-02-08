@@ -65,7 +65,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSu
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -124,8 +124,6 @@ public class RestconfDataServiceImplTest {
     private DOMActionService actionService;
     @Mock
     private RestconfStreamsSubscriptionService delegRestconfSubscrService;
-    @Mock
-    private Configuration configuration;
     @Mock
     private MultivaluedMap<String, String> queryParamenters;
 
@@ -191,7 +189,7 @@ public class RestconfDataServiceImplTest {
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
 
         dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(contextRef), mockDataBroker,
-                mountPointService, delegRestconfSubscrService, actionService, configuration);
+                mountPointService, delegRestconfSubscrService, actionService, new StreamsConfiguration(0, 1, 0, false));
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(contextRef))).when(mountPoint)

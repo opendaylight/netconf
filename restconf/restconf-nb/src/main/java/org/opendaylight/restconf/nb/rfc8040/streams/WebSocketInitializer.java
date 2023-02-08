@@ -44,11 +44,12 @@ public final class WebSocketInitializer extends WebSocketServlet {
      * @param configuration          Web-socket configuration holder.
      */
     @Inject
-    public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool, final Configuration configuration) {
+    public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool,
+            final StreamsConfiguration configuration) {
         executorService = scheduledThreadPool.getExecutor();
-        maximumFragmentLength = configuration.getMaximumFragmentLength();
-        heartbeatInterval = configuration.getHeartbeatInterval();
-        idleTimeoutMillis = configuration.getIdleTimeout();
+        maximumFragmentLength = configuration.maximumFragmentLength();
+        heartbeatInterval = configuration.heartbeatInterval();
+        idleTimeoutMillis = configuration.idleTimeout();
     }
 
     /**
