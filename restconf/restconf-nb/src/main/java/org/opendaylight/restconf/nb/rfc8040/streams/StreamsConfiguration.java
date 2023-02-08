@@ -19,8 +19,12 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @param useSSE                when is {@code true} use SSE else use WS
  */
 public record StreamsConfiguration(int maximumFragmentLength, int idleTimeout, int heartbeatInterval, boolean useSSE) {
+    // FIXME: can this be 64KiB exactly? if so, maximumFragmentLength should become a Uint16 and validation should be
+    //        pushed out to users
+    public static final int MAXIMUM_FRAGMENT_LENGTH_LIMIT = 65534;
+
     public StreamsConfiguration {
-        checkArgument(maximumFragmentLength >= 0 && maximumFragmentLength < 65535,
+        checkArgument(maximumFragmentLength >= 0 && maximumFragmentLength <= MAXIMUM_FRAGMENT_LENGTH_LIMIT,
             "Maximum fragment length must be disabled (0) or specified by positive value less than 64KiB");
         checkArgument(idleTimeout > 0, "Idle timeout must be specified by positive value.");
         checkArgument(heartbeatInterval >= 0,

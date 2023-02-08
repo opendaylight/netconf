@@ -35,14 +35,57 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStre
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 /**
  * Main entrypoint into RFC8040 northbound. Take care of wiring up all applications activating them through JAX-RS.
  */
 @Beta
+@Component(service = { }, configurationPid = "org.opendaylight.restconf.nb.rfc8040")
+@Designate(ocd = JaxRsNorthbound.Configuration.class)
 public final class JaxRsNorthbound implements AutoCloseable {
+    @ObjectClassDefinition
+    public @interface Configuration {
+        @AttributeDefinition(min = "0", max = "" + StreamsConfiguration.MAXIMUM_FRAGMENT_LENGTH_LIMIT)
+        int maximum$_$fragment$_$length() default 0;
+        @AttributeDefinition(min = "0")
+        int heartbeat$_$interval() default 10000;
+        @AttributeDefinition(min = "1")
+        int idle$_$timeout() default 30000;
+        @AttributeDefinition(min = "1")
+        String ping$_$executor$_$name$_$prefix() default "ping-executor";
+        // FIXME: this is a misnomer: it specifies the core pool size, i.e. minimum thread count, the maximum is set to
+        //        Integer.MAX_VALUE, which is not what we want
+        @AttributeDefinition(min = "0")
+        int max$_$thread$_$count() default 1;
+        @AttributeDefinition
+        boolean use$_$sse() default true;
+    }
+
     private final Registration discoveryReg;
     private final Registration restconfReg;
+
+    @Activate
+    public JaxRsNorthbound(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
+            @Reference final ServletSupport servletSupport,
+            @Reference final CustomFilterAdapterConfiguration filterAdapterConfiguration,
+            @Reference final DOMActionService actionService, @Reference final DOMDataBroker dataBroker,
+            @Reference final DOMMountPointService mountPointService,
+            @Reference final DOMNotificationService notificationService, @Reference final DOMRpcService rpcService,
+            @Reference final DOMSchemaService schemaService, @Reference final DatabindProvider databindProvider,
+            final Configuration configuration) throws ServletException {
+        this(webServer, webContextSecurer, servletSupport, filterAdapterConfiguration, actionService, dataBroker,
+            mountPointService, notificationService, rpcService, schemaService, databindProvider,
+            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
+            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.heartbeat$_$interval(),
+                configuration.idle$_$timeout(), configuration.use$_$sse()));
+    }
 
     public JaxRsNorthbound(final WebServer webServer, final WebContextSecurer webContextSecurer,
             final ServletSupport servletSupport, final CustomFilterAdapterConfiguration filterAdapterConfiguration,
@@ -50,10 +93,8 @@ public final class JaxRsNorthbound implements AutoCloseable {
             final DOMMountPointService mountPointService, final DOMNotificationService notificationService,
             final DOMRpcService rpcService, final DOMSchemaService schemaService,
             final DatabindProvider databindProvider,
-            final String pingNamePrefix, final int pingMaxThreadCount, final int maximumFragmentLength,
-            final int heartbeatInterval, final int idleTimeout, final boolean useSSE) throws ServletException {
-        final var streamsConfiguration = new StreamsConfiguration(maximumFragmentLength, idleTimeout, heartbeatInterval,
-            useSSE);
+            final String pingNamePrefix, final int pingMaxThreadCount,
+            final StreamsConfiguration streamsConfiguration) throws ServletException {
         final var scheduledThreadPool = new ScheduledThreadPoolWrapper(pingMaxThreadCount,
             new NamingThreadPoolFactory(pingNamePrefix));
 
@@ -108,6 +149,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
         discoveryReg = webServer.registerWebContext(discoveryBuilder.build());
     }
 
+    @Deactivate
     @Override
     public void close() {
         discoveryReg.close();
