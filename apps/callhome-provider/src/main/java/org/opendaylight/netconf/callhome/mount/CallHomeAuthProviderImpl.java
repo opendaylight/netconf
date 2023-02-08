@@ -79,8 +79,8 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         if (deviceSpecific != null) {
             sessionName = deviceSpecific.getUniqueId();
-            if (deviceSpecific.getTransport() instanceof Ssh) {
-                final SshClientParams clientParams = ((Ssh) deviceSpecific.getTransport()).getSshClientParams();
+            if (deviceSpecific.getTransport() instanceof Ssh ssh) {
+                final SshClientParams clientParams = ssh.getSshClientParams();
                 deviceCred = clientParams.getCredentials();
             } else {
                 deviceCred = deviceSpecific.getCredentials();
@@ -178,9 +178,9 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
             }
         }
 
-        private String getHostPublicKey(final Device device) {
-            if (device.getTransport() instanceof Ssh) {
-                return ((Ssh) device.getTransport()).getSshClientParams().getHostKey();
+        private static String getHostPublicKey(final Device device) {
+            if (device.getTransport() instanceof Ssh ssh) {
+                return ssh.getSshClientParams().getHostKey();
             } else {
                 return device.getSshHostKey();
             }
