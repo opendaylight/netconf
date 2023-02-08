@@ -17,8 +17,8 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStreamService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.SSESessionHandler;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -40,10 +40,10 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
 
     @Inject
     public RestconfDataStreamServiceImpl(final ScheduledThreadPool scheduledThreadPool,
-            final Configuration configuration) {
+            final StreamsConfiguration configuration) {
         executorService = scheduledThreadPool.getExecutor();
-        heartbeatInterval = configuration.getHeartbeatInterval();
-        maximumFragmentLength = configuration.getMaximumFragmentLength();
+        heartbeatInterval = configuration.heartbeatInterval();
+        maximumFragmentLength = configuration.maximumFragmentLength();
     }
 
     @Override

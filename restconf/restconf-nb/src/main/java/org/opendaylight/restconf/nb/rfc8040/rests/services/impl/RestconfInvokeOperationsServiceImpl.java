@@ -33,7 +33,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -67,10 +67,10 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     private final SubscribeToStreamUtil streamUtils;
 
     public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService,
-            final DOMMountPointService mountPointService, final Configuration configuration) {
+            final DOMMountPointService mountPointService, final StreamsConfiguration configuration) {
         this.rpcService = requireNonNull(rpcService);
         this.mountPointService = requireNonNull(mountPointService);
-        streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
+        streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
             : SubscribeToStreamUtil.webSockets();
     }
 

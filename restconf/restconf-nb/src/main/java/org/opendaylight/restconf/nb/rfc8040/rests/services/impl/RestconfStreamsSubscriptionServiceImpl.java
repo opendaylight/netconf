@@ -20,7 +20,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -48,13 +48,13 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * @param dataBroker {@link DOMDataBroker}
      * @param notificationService {@link DOMNotificationService}
      * @param databindProvider a {@link DatabindProvider}
-     * @param configuration configuration for RESTCONF {@link Configuration}}
+     * @param configuration configuration for RESTCONF {@link StreamsConfiguration}}
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
             final DOMNotificationService notificationService, final DatabindProvider databindProvider,
-            final Configuration configuration) {
+            final StreamsConfiguration configuration) {
         handlersHolder = new HandlersHolder(dataBroker, notificationService, databindProvider);
-        streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
+        streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
     }
 

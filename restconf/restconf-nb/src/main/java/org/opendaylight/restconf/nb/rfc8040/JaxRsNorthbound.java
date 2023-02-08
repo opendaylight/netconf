@@ -32,7 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.yangtools.concepts.Registration;
 
@@ -52,7 +52,8 @@ public final class JaxRsNorthbound implements AutoCloseable {
             final DatabindProvider databindProvider,
             final String pingNamePrefix, final int pingMaxThreadCount, final int maximumFragmentLength,
             final int heartbeatInterval, final int idleTimeout, final boolean useSSE) throws ServletException {
-        final var configuration = new Configuration(maximumFragmentLength, idleTimeout, heartbeatInterval, useSSE);
+        final var streamsConfiguration = new StreamsConfiguration(maximumFragmentLength, idleTimeout, heartbeatInterval,
+            useSSE);
         final var scheduledThreadPool = new ScheduledThreadPoolWrapper(pingMaxThreadCount,
             new NamingThreadPoolFactory(pingNamePrefix));
 
@@ -64,21 +65,21 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .addUrlPattern("/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new RestconfApplication(databindProvider, mountPointService, dataBroker, rpcService, actionService,
-                        notificationService,schemaService, configuration)).build())
+                        notificationService,schemaService, streamsConfiguration)).build())
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/" + NOTIF + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new DataStreamApplication(databindProvider, mountPointService,
-                        new RestconfDataStreamServiceImpl(scheduledThreadPool, configuration))).build())
+                        new RestconfDataStreamServiceImpl(scheduledThreadPool, streamsConfiguration))).build())
                 .name("notificationServlet")
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/" + DATA_SUBSCRIPTION + "/*")
                 .addUrlPattern("/" + NOTIFICATION_STREAM + "/*")
-                .servlet(new WebSocketInitializer(scheduledThreadPool, configuration))
+                .servlet(new WebSocketInitializer(scheduledThreadPool, streamsConfiguration))
                 .build())
 
             // Allows user to add javax.servlet.Filter(s) in front of REST services

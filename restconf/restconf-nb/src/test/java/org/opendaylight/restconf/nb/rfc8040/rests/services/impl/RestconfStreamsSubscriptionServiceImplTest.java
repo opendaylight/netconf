@@ -38,7 +38,7 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -66,8 +66,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     @Mock
     private DOMNotificationService notificationService;
 
-    private Configuration configurationWs;
-    private Configuration configurationSse;
+    private StreamsConfiguration configurationWs;
+    private StreamsConfiguration configurationSse;
 
     private EffectiveModelContext modelContext;
     private DatabindProvider databindProvider;
@@ -91,8 +91,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
         modelContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications"));
         databindProvider = () -> DatabindContext.ofModel(modelContext);
-        configurationWs = new Configuration(0, 100, 10, false);
-        configurationSse = new Configuration(0, 100, 10, true);
+        configurationWs = new StreamsConfiguration(0, 100, 10, false);
+        configurationSse = new StreamsConfiguration(0, 100, 10, true);
     }
 
     @BeforeClass
