@@ -20,6 +20,18 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
+  <reference id="databindProvider" interface="org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider"/>
+  <reference id="customFilterAdapterConfiguration" interface="org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration"/>
+  <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
+  <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
+  <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport"/>
+  <reference id="dOMActionService" interface="org.opendaylight.mdsal.dom.api.DOMActionService"/>
+  <reference id="dOMDataBroker" interface="org.opendaylight.mdsal.dom.api.DOMDataBroker"/>
+  <reference id="dOMMountPointService" interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
+  <reference id="dOMNotificationService" interface="org.opendaylight.mdsal.dom.api.DOMNotificationService"/>
+  <reference id="dOMRpcService" interface="org.opendaylight.mdsal.dom.api.DOMRpcService"/>
+  <reference id="dOMSchemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
+
   <bean id="scheduledThreadPool"
         class="org.opendaylight.controller.config.threadpool.util.ScheduledThreadPoolWrapper">
     <argument value="${max-thread-count}"/>
@@ -74,15 +86,4 @@
       </bean>
     </argument>
   </bean>
-  <reference id="databindProvider" interface="org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider"/>
-  <reference id="customFilterAdapterConfiguration" interface="org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration"/>
-  <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
-  <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
-  <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport"/>
-  <reference id="dOMActionService" interface="org.opendaylight.mdsal.dom.api.DOMActionService"/>
-  <reference id="dOMDataBroker" interface="org.opendaylight.mdsal.dom.api.DOMDataBroker"/>
-  <reference id="dOMMountPointService" interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
-  <reference id="dOMNotificationService" interface="org.opendaylight.mdsal.dom.api.DOMNotificationService"/>
-  <reference id="dOMRpcService" interface="org.opendaylight.mdsal.dom.api.DOMRpcService"/>
-  <reference id="dOMSchemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
 </blueprint>
