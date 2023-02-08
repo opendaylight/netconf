@@ -7,7 +7,8 @@
  */
 package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
@@ -17,21 +18,26 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService.CapabilitiesListener;
+import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService.SessionsListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Writes netconf server state changes received from NetconfMonitoringService to netconf-state datastore subtree.
  */
-public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringService.CapabilitiesListener,
-        NetconfMonitoringService.SessionsListener {
-
+@Component(service = { })
+public final class MonitoringToMdsalWriter implements AutoCloseable, CapabilitiesListener, SessionsListener {
     private static final Logger LOG = LoggerFactory.getLogger(MonitoringToMdsalWriter.class);
 
     private static final InstanceIdentifier<Capabilities> CAPABILITIES_INSTANCE_IDENTIFIER =
@@ -41,27 +47,20 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
     private static final InstanceIdentifier<Sessions> SESSIONS_INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(NetconfState.class).child(Sessions.class);
 
-    private final NetconfMonitoringService serverMonitoringDependency;
     private final DataBroker dataBroker;
 
-    public MonitoringToMdsalWriter(final NetconfMonitoringService serverMonitoringDependency,
-                                   final DataBroker dataBroker) {
-        this.serverMonitoringDependency = serverMonitoringDependency;
-        this.dataBroker = dataBroker;
-    }
+    @Activate
+    public MonitoringToMdsalWriter(@Reference final DataBroker dataBroker,
+            @Reference(target = "(type=netconf-server-monitoring)")
+            final NetconfMonitoringService serverMonitoringDependency) {
+        this.dataBroker = requireNonNull(dataBroker);
 
-    /**
-     * Invoked using blueprint.
-     */
-    public void start() {
         // FIXME: close registrations
         serverMonitoringDependency.registerCapabilitiesListener(this);
         serverMonitoringDependency.registerSessionsListener(this);
     }
 
-    /**
-     * Invoked using blueprint.
-     */
+    @Deactivate
     @Override
     public void close() {
         runTransaction(tx -> tx.delete(LogicalDatastoreType.OPERATIONAL,
@@ -70,16 +69,14 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
 
     @Override
     public void onSessionStarted(final Session session) {
-        final InstanceIdentifier<Session> sessionPath =
-                SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key());
-        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL, sessionPath, session));
+        runTransaction(tx -> tx.put(LogicalDatastoreType.OPERATIONAL,
+            SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key()), session));
     }
 
     @Override
     public void onSessionEnded(final Session session) {
-        final InstanceIdentifier<Session> sessionPath =
-                SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key());
-        runTransaction(tx -> tx.delete(LogicalDatastoreType.OPERATIONAL, sessionPath));
+        runTransaction(tx -> tx.delete(LogicalDatastoreType.OPERATIONAL,
+            SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key())));
     }
 
     @Override
@@ -99,7 +96,6 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
     }
 
     private void runTransaction(final Consumer<WriteTransaction> txUser) {
-        Preconditions.checkState(dataBroker != null);
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
         txUser.accept(tx);
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
@@ -117,9 +113,8 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
 
     private static void updateSessions(final WriteTransaction tx, final Collection<Session> sessions) {
         for (Session session : sessions) {
-            final InstanceIdentifier<Session> sessionPath =
-                    SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key());
-            tx.put(LogicalDatastoreType.OPERATIONAL, sessionPath, session);
+            tx.put(LogicalDatastoreType.OPERATIONAL, SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key()),
+                session);
         }
     }
 }
