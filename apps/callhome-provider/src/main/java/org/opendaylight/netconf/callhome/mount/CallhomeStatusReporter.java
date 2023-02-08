@@ -37,10 +37,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.DeviceBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.DeviceKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.Transport;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.Ssh;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.SshBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParams;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -196,14 +194,14 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
         } catch (IOException e) {
             LOG.warn("Unable to encode public key to ssh format.", e);
         }
-        final SshClientParams sshParams = new SshClientParamsBuilder().setHostKey(sshEncodedKey).build();
-        final Transport transport = new SshBuilder().setSshClientParams(sshParams).build();
         return new DeviceBuilder()
-                .setUniqueId(id)
-                .withKey(new DeviceKey(id))
-                .setTransport(transport)
-                .addAugmentation(new Device1Builder().setDeviceStatus(status).build())
-                .build();
+            .setUniqueId(id)
+            .withKey(new DeviceKey(id))
+            .setTransport(new SshBuilder()
+                .setSshClientParams(new SshClientParamsBuilder().setHostKey(sshEncodedKey).build())
+                .build())
+            .addAugmentation(new Device1Builder().setDeviceStatus(status).build())
+            .build();
     }
 
     private Device readAndGetDevice(final NodeId nodeId) {
