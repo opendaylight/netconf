@@ -51,22 +51,21 @@
         </argument>
     </bean>
 
-    <bean id="serverChannelInitializer"
-          class="org.opendaylight.netconf.impl.ServerChannelInitializer">
-        <argument>
-            <bean class="org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory">
-                <argument ref="global-timer"/>
-                <argument ref="aggregatedNetconfOperationServiceFactoryMappers"/>
-                <argument ref="sessionIdProvider"/>
-                <argument value="${connection-timeout-millis}"/>
-                <argument ref="netconfMonitoringService"/>
-            </bean>
-        </argument>
-    </bean>
-
     <bean id="netconfServerDispatcherImpl"
           class="org.opendaylight.netconf.impl.NetconfServerDispatcherImpl">
-        <argument ref="serverChannelInitializer"/>
+        <argument>
+            <bean class="org.opendaylight.netconf.impl.ServerChannelInitializer">
+                <argument>
+                    <bean class="org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory">
+                        <argument ref="global-timer"/>
+                        <argument ref="aggregatedNetconfOperationServiceFactoryMappers"/>
+                        <argument ref="sessionIdProvider"/>
+                        <argument value="${connection-timeout-millis}"/>
+                        <argument ref="netconfMonitoringService"/>
+                    </bean>
+                </argument>
+            </bean>
+        </argument>
         <argument ref="globalBossGroup"/>
         <argument ref="globalWorkerGroup"/>
     </bean>
