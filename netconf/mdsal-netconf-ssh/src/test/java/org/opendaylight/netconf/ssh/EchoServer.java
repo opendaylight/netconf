@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.netty;
+package org.opendaylight.netconf.ssh;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -44,7 +44,7 @@ public class EchoServer implements Runnable {
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<LocalChannel>() {
                         @Override
-                        public void initChannel(final LocalChannel ch) throws Exception {
+                        public void initChannel(final LocalChannel ch) {
                             ch.pipeline().addLast(new EchoServerHandler());
                         }
                     });

@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.netty;
+package org.opendaylight.netconf.ssh;
 
 import com.google.common.base.Splitter;
 import io.netty.buffer.ByteBuf;
@@ -28,14 +27,14 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     private final Splitter splitter = Splitter.onPattern("\r?\n");
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(final ChannelHandlerContext ctx) throws Exception {
         LOG.debug("sleep start");
         Thread.sleep(1000);
         LOG.debug("sleep done");
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
         ByteBuf byteBuf = (ByteBuf) msg;
         String message = byteBuf.toString(StandardCharsets.UTF_8);
         LOG.info("writing back '{}'", message);
@@ -55,7 +54,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    public void channelReadComplete(final ChannelHandlerContext ctx) {
         LOG.debug("flushing");
         ctx.flush();
     }

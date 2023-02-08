@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.netty;
+package org.opendaylight.netconf.ssh;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
@@ -29,18 +28,18 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     private Channel clientChannel;
 
-    public ProxyServerHandler(EventLoopGroup bossGroup, LocalAddress localAddress) {
+    public ProxyServerHandler(final EventLoopGroup bossGroup, final LocalAddress localAddress) {
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(bossGroup).channel(LocalChannel.class);
         this.localAddress = localAddress;
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext remoteCtx) {
+    public void channelActive(final ChannelHandlerContext remoteCtx) {
         final ProxyClientHandler clientHandler = new ProxyClientHandler(remoteCtx);
         clientBootstrap.handler(new ChannelInitializer<LocalChannel>() {
             @Override
-            public void initChannel(LocalChannel ch) throws Exception {
+            public void initChannel(final LocalChannel ch) {
                 ch.pipeline().addLast(clientHandler);
             }
         });
@@ -50,25 +49,25 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
+    public void channelInactive(final ChannelHandlerContext ctx) {
         LOG.info("channelInactive - closing client connection");
         clientChannel.close();
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, final Object msg) {
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
         LOG.debug("Writing to client {}", msg);
         clientChannel.write(msg);
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
+    public void channelReadComplete(final ChannelHandlerContext ctx) {
         LOG.debug("flushing");
         clientChannel.flush();
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
         // Close the connection when an exception is raised.
         LOG.warn("Unexpected exception from downstream.", cause);
         ctx.close();

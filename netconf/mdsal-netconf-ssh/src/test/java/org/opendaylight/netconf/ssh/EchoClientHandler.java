@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.netty;
+package org.opendaylight.netconf.ssh;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -26,20 +25,18 @@ import org.slf4j.LoggerFactory;
  * the server.
  */
 public class EchoClientHandler extends ChannelInboundHandlerAdapter implements ChannelFutureListener {
-    private static final Logger LOG = LoggerFactory.getLogger(EchoClientHandler.class);
-
-    private ChannelHandlerContext context;
-    private final StringBuilder fromServer = new StringBuilder();
-
     public enum State {
         CONNECTING, CONNECTED, FAILED_TO_CONNECT, CONNECTION_CLOSED
     }
 
+    private static final Logger LOG = LoggerFactory.getLogger(EchoClientHandler.class);
 
+    private final StringBuilder fromServer = new StringBuilder();
+    private ChannelHandlerContext context;
     private State state = State.CONNECTING;
 
     @Override
-    public synchronized void channelActive(ChannelHandlerContext ctx) {
+    public synchronized void channelActive(final ChannelHandlerContext ctx) {
         checkState(context == null);
         LOG.info("channelActive");
         context = ctx;
@@ -47,12 +44,12 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter implements C
     }
 
     @Override
-    public synchronized void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public synchronized void channelInactive(final ChannelHandlerContext ctx) throws Exception {
         state = State.CONNECTION_CLOSED;
     }
 
     @Override
-    public synchronized void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public synchronized void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         ByteBuf bb = (ByteBuf) msg;
         String string = bb.toString(UTF_8);
         fromServer.append(string);
@@ -61,7 +58,7 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter implements C
     }
 
     @Override
-    public synchronized void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    public synchronized void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
         // Close the connection when an exception is raised.
         LOG.warn("Unexpected exception from downstream.", cause);
         checkState(context.equals(ctx));
@@ -69,7 +66,7 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter implements C
         context = null;
     }
 
-    public synchronized void write(String message) {
+    public synchronized void write(final String message) {
         ByteBuf byteBuf = Unpooled.copiedBuffer(message.getBytes());
         context.writeAndFlush(byteBuf);
     }
@@ -83,7 +80,7 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter implements C
     }
 
     @Override
-    public synchronized void operationComplete(ChannelFuture future) throws Exception {
+    public synchronized void operationComplete(final ChannelFuture future) throws Exception {
         checkState(state == State.CONNECTING);
         if (future.isSuccess()) {
             LOG.trace("Successfully connected, state will be switched in channelActive");
