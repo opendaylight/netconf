@@ -20,15 +20,14 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <bean id="threadPoolFactory"
-        class="org.opendaylight.controller.config.threadpool.util.NamingThreadPoolFactory">
-    <argument value="${ping-executor-name-prefix}"/>
-  </bean>
-
   <bean id="scheduledThreadPool"
         class="org.opendaylight.controller.config.threadpool.util.ScheduledThreadPoolWrapper">
     <argument value="${max-thread-count}"/>
-    <argument ref="threadPoolFactory"/>
+    <argument>
+      <bean class="org.opendaylight.controller.config.threadpool.util.NamingThreadPoolFactory">
+        <argument value="${ping-executor-name-prefix}"/>
+      </bean>
+    </argument>
   </bean>
 
   <bean id="configuration"
