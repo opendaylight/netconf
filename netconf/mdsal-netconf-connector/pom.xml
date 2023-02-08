@@ -22,42 +22,94 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-data-util</artifactId>
+      <artifactId>concepts</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>rfc7952-data-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-data-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-data-codec-xml</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-data-impl</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-api</artifactId>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-data-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-mapping-api</artifactId>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-model-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-util</artifactId>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-model-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-repo-api</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-repo-spi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.mdsal</groupId>
+      <artifactId>mdsal-common-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.opendaylight.mdsal</groupId>
       <artifactId>mdsal-dom-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>mockito-configuration</artifactId>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-mapping-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-util</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf.model</groupId>
       <artifactId>rfc6241</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>mockito-configuration</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>util</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-test-util</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.mdsal</groupId>
@@ -66,11 +118,16 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.mdsal</groupId>
+      <artifactId>mdsal-dom-spi</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.mdsal</groupId>
       <artifactId>mdsal-dom-inmemory-datastore</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-util</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
@@ -79,14 +136,6 @@
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-legacy</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-test-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-data-codec-xml</artifactId>
     </dependency>
   </dependencies>
 </project>
