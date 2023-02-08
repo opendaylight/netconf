@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.netty;
+package org.opendaylight.netconf.ssh;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
