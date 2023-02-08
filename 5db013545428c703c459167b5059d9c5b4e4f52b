@@ -16,6 +16,24 @@
       "message": "Ivan, can we look at this?",
       "revId": "5db013545428c703c459167b5059d9c5b4e4f52b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e9a81f5_37692418",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-08T08:22:21Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "4c61a9b9_f5a493b7",
+      "revId": "5db013545428c703c459167b5059d9c5b4e4f52b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
