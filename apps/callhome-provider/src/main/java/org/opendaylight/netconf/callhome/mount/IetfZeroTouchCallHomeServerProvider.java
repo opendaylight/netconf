@@ -30,7 +30,6 @@ import org.opendaylight.mdsal.binding.api.ReadWriteTransaction;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.callhome.protocol.CallHomeAuthorizationProvider;
 import org.opendaylight.netconf.callhome.protocol.NetconfCallHomeServer;
 import org.opendaylight.netconf.callhome.protocol.NetconfCallHomeServerBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1;
@@ -74,6 +73,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             final CallHomeMountDispatcher mountDispacher) {
         this.dataBroker = dataBroker;
         this.mountDispacher = mountDispacher;
+        // FIXME: these should be separate components
         authProvider = new CallHomeAuthProviderImpl(dataBroker);
         statusReporter = new CallhomeStatusReporter(dataBroker);
     }
@@ -102,15 +102,10 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         }
     }
 
-    private CallHomeAuthorizationProvider getCallHomeAuthorization() {
-        return new CallHomeAuthProviderImpl(dataBroker);
-    }
-
     private void initializeServer() throws IOException {
         LOG.info("Initializing Call Home server instance");
-        CallHomeAuthorizationProvider provider = getCallHomeAuthorization();
-        NetconfCallHomeServerBuilder builder = new NetconfCallHomeServerBuilder(provider, mountDispacher,
-                                                                                statusReporter);
+        NetconfCallHomeServerBuilder builder = new NetconfCallHomeServerBuilder(authProvider, mountDispacher,
+            statusReporter);
         if (port > 0) {
             builder.setBindAddress(new InetSocketAddress(port));
         }
@@ -221,7 +216,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         final Device1 devStatus;
         Optional<Device> opDevGet = deviceFuture.get();
         if (opDevGet.isPresent()) {
-            devStatus = opDevGet.get().augmentation(Device1.class);
+            devStatus = opDevGet.orElseThrow().augmentation(Device1.class);
         } else {
             devStatus = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.DISCONNECTED).build();
         }
@@ -241,12 +236,12 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         }, MoreExecutors.directExecutor());
     }
 
-    private Device createOperationalDevice(final Device cfgDevice, final Device1 devStatus) {
+    private static Device createOperationalDevice(final Device cfgDevice, final Device1 devStatus) {
         final DeviceBuilder deviceBuilder = new DeviceBuilder()
             .addAugmentation(devStatus)
             .setUniqueId(cfgDevice.getUniqueId());
-        if (cfgDevice.getTransport() instanceof Ssh) {
-            final String hostKey = ((Ssh) cfgDevice.getTransport()).getSshClientParams().getHostKey();
+        if (cfgDevice.getTransport() instanceof Ssh ssh) {
+            final String hostKey = ssh.getSshClientParams().getHostKey();
             final SshClientParams params = new SshClientParamsBuilder().setHostKey(hostKey).build();
             final Transport sshTransport = new SshBuilder().setSshClientParams(params).build();
             deviceBuilder.setTransport(sshTransport);
