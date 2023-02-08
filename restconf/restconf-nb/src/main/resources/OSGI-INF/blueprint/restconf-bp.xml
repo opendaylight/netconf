@@ -38,10 +38,6 @@
     <argument value="${use-sse}" />
   </bean>
 
-  <bean id="restconfDataStreamServiceImpl" class="org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl">
-    <argument ref="scheduledThreadPool"/>
-    <argument ref="configuration"/>
-  </bean>
   <bean id="webInitializer" class="org.opendaylight.restconf.nb.rfc8040.web.WebInitializer" destroy-method="close">
     <argument ref="webServer"/>
     <argument ref="webContextSecurer"/>
@@ -62,7 +58,12 @@
       <bean class="org.opendaylight.restconf.nb.rfc8040.DataStreamApplication">
         <argument ref="databindProvider"/>
         <argument ref="dOMMountPointService"/>
-        <argument ref="restconfDataStreamServiceImpl"/>
+        <argument>
+          <bean class="org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl">
+            <argument ref="scheduledThreadPool"/>
+            <argument ref="configuration"/>
+          </bean>
+        </argument>
       </bean>
     </argument>
     <argument ref="customFilterAdapterConfiguration"/>
