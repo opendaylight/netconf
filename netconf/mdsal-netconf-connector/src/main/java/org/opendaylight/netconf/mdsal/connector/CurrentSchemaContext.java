@@ -62,7 +62,7 @@ public class CurrentSchemaContext implements EffectiveModelContextListener, Auto
         final Set<Capability> addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(
                 currentContext.get(), rootSchemaSourceProvider);
         for (final CapabilityListener listener : listeners1) {
-            listener.onCapabilitiesChanged(addedCaps, Collections.emptySet());
+            listener.onCapabilitiesChanged(addedCaps, Set.of());
         }
     }
 
@@ -75,7 +75,7 @@ public class CurrentSchemaContext implements EffectiveModelContextListener, Auto
 
     public Registration registerCapabilityListener(final CapabilityListener listener) {
         listener.onCapabilitiesChanged(MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(),
-                rootSchemaSourceProvider), Collections.emptySet());
+                rootSchemaSourceProvider), Set.of());
         listeners1.add(listener);
         return () -> listeners1.remove(listener);
     }

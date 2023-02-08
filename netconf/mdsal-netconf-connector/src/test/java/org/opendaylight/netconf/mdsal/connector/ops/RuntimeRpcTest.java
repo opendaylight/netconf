@@ -13,12 +13,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteSource;
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -88,8 +87,8 @@ public class RuntimeRpcTest {
 
     private static final DOMRpcService RPC_SERVICE_VOID_INVOKER = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
-            return immediateFluentFuture(new DefaultDOMRpcResult(null, List.of()));
+        public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
+            return Futures.immediateFuture(new DefaultDOMRpcResult(null, List.of()));
         }
 
         @Override
@@ -100,8 +99,8 @@ public class RuntimeRpcTest {
 
     private static final DOMRpcService RPC_SERVICE_FAILED_INVOCATION = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
-            return immediateFailedFluentFuture(new DOMRpcException("rpc invocation not implemented yet") {
+        public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
+            return Futures.immediateFailedFuture(new DOMRpcException("rpc invocation not implemented yet") {
                 private static final long serialVersionUID = 1L;
             });
         }
@@ -114,7 +113,7 @@ public class RuntimeRpcTest {
 
     private final DOMRpcService rpcServiceSuccessfulInvocation = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
+        public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
             final Collection<DataContainerChild> children = input.body();
             final Module module = SCHEMA_CONTEXT.findModules(type.getNamespace()).stream()
                 .findFirst().orElse(null);
@@ -125,7 +124,7 @@ public class RuntimeRpcTest {
                     .withValue(children)
                     .build();
 
-            return immediateFluentFuture(new DefaultDOMRpcResult(node));
+            return Futures.immediateFuture(new DefaultDOMRpcResult(node));
         }
 
         @Override
@@ -171,7 +170,7 @@ public class RuntimeRpcTest {
             final SourceIdentifier sId = (SourceIdentifier) invocationOnMock.getArguments()[0];
             final YangTextSchemaSource yangTextSchemaSource =
                     YangTextSchemaSource.delegateForByteSource(sId, ByteSource.wrap("module test".getBytes()));
-            return immediateFluentFuture(yangTextSchemaSource);
+            return Futures.immediateFuture(yangTextSchemaSource);
         }).when(sourceProvider).getSource(any(SourceIdentifier.class));
 
         currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
