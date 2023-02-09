@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.mdsal.notification.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
@@ -21,7 +23,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
  * @param <T> data object class
  */
 abstract class OperationalDatastoreListener<T extends DataObject> implements DataTreeChangeListener<T> {
-
     private final InstanceIdentifier<T> instanceIdentifier;
 
     /**
@@ -30,7 +31,7 @@ abstract class OperationalDatastoreListener<T extends DataObject> implements Dat
      * @param instanceIdentifier instance identifier of subtree, on which this instance should listen on changes.
      */
     OperationalDatastoreListener(final InstanceIdentifier<T> instanceIdentifier) {
-        this.instanceIdentifier = instanceIdentifier;
+        this.instanceIdentifier = requireNonNull(instanceIdentifier);
     }
 
     /**

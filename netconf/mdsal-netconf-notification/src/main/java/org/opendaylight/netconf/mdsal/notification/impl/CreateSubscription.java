@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.mdsal.notification.impl.ops;
+package org.opendaylight.netconf.mdsal.notification.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -19,7 +19,6 @@ import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
-import org.opendaylight.netconf.mdsal.notification.impl.NetconfNotificationManager;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.notifications.NetconfNotificationListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
