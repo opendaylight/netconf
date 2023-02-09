@@ -74,8 +74,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     private final NetconfTopologySetup netconfTopologyDeviceSetup;
     private final RemoteDeviceId remoteDeviceId;
-    private final String privateKeyPath;
-    private final String privateKeyPassphrase;
     private final AAAEncryptionService encryptionService;
     private final NetconfKeystoreAdapter keystoreAdapter;
     private final DeviceActionFactory deviceActionFactory;
@@ -89,8 +87,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         this.netconfTopologyDeviceSetup = requireNonNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
-        privateKeyPath = netconfTopologyDeviceSetup.getPrivateKeyPath();
-        privateKeyPassphrase = netconfTopologyDeviceSetup.getPrivateKeyPassphrase();
         encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
         keystoreAdapter = new NetconfKeystoreAdapter(netconfTopologyDeviceSetup.getDataBroker());
     }
