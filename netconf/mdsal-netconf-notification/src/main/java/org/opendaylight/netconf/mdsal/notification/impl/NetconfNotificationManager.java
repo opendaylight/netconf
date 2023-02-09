@@ -21,9 +21,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory;
+import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
 import org.opendaylight.netconf.mdsal.notification.impl.ops.NotificationsTransformUtil;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotification;
@@ -47,6 +50,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
 import org.opendaylight.yangtools.yang.binding.Notification;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.parser.api.YangParserException;
+import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +63,10 @@ import org.slf4j.LoggerFactory;
  *  A thread-safe implementation NetconfNotificationRegistry.
  */
 @Singleton
-public class NetconfNotificationManager implements NetconfNotificationCollector, NetconfNotificationRegistry,
+@Component(service = { NetconfNotificationCollector.class, NetconfNotificationRegistry.class }, immediate = true,
+           property = "type=netconf-notification-manager")
+public final class NetconfNotificationManager implements NetconfNotificationCollector, NetconfNotificationRegistry,
         NetconfNotificationListener, AutoCloseable {
-
     public static final StreamNameType BASE_STREAM_NAME = new StreamNameType("NETCONF");
     public static final Stream BASE_NETCONF_STREAM = new StreamBuilder()
                 .setName(BASE_STREAM_NAME)
@@ -90,8 +100,33 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     private final NotificationsTransformUtil transformUtil;
 
     @Inject
-    public NetconfNotificationManager(final NotificationsTransformUtil transformUtil) {
-        this.transformUtil = requireNonNull(transformUtil);
+    @Activate
+    public NetconfNotificationManager(@Reference final YangParserFactory parserFactory,
+            @Reference final BindingRuntimeGenerator generator, @Reference final BindingDOMCodecFactory codecFactory)
+                throws YangParserException {
+        transformUtil = new NotificationsTransformUtil(parserFactory, generator, codecFactory);
+    }
+
+    @PreDestroy
+    @Deactivate
+    @Override
+    public synchronized void close() {
+        // Unregister all listeners
+        // Use new list to avoid ConcurrentModificationException
+        for (final GenericNotificationListenerReg listenerReg : new ArrayList<>(notificationListeners.values())) {
+            listenerReg.close();
+        }
+        notificationListeners.clear();
+
+        // Unregister all publishers
+        // Use new list to avoid ConcurrentModificationException
+        for (final GenericNotificationPublisherReg notificationPublisher : new ArrayList<>(notificationPublishers)) {
+            notificationPublisher.close();
+        }
+        notificationPublishers.clear();
+
+        // Clear stream Listeners
+        streamListeners.clear();
     }
 
     @Override
@@ -154,26 +189,6 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
                 streamListeners.remove(listener);
             }
         };
-    }
-
-    @Override
-    public synchronized void close() {
-        // Unregister all listeners
-        // Use new list to avoid ConcurrentModificationException
-        for (final GenericNotificationListenerReg listenerReg : new ArrayList<>(notificationListeners.values())) {
-            listenerReg.close();
-        }
-        notificationListeners.clear();
-
-        // Unregister all publishers
-        // Use new list to avoid ConcurrentModificationException
-        for (final GenericNotificationPublisherReg notificationPublisher : new ArrayList<>(notificationPublishers)) {
-            notificationPublisher.close();
-        }
-        notificationPublishers.clear();
-
-        // Clear stream Listeners
-        streamListeners.clear();
     }
 
     @Override

@@ -10,7 +10,6 @@ package org.opendaylight.netconf.mdsal.notification.impl;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
@@ -26,6 +25,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,21 +36,34 @@ import org.slf4j.LoggerFactory;
  * Listens on capabilities changes in data store and publishes them to base
  * netconf notification stream listener.
  */
+@Component(service = { })
 public final class CapabilityChangeNotificationProducer extends OperationalDatastoreListener<Capabilities>
-    implements AutoCloseable {
-
-    private static final InstanceIdentifier<Capabilities> CAPABILITIES_INSTANCE_IDENTIFIER =
-            InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
+        implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityChangeNotificationProducer.class);
+    private static final InstanceIdentifier<Capabilities> CAPABILITIES_INSTANCE_IDENTIFIER =
+            InstanceIdentifier.builder(NetconfState.class).child(Capabilities.class).build();
 
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
     private final ListenerRegistration<?> capabilityChangeListenerRegistration;
 
-    public CapabilityChangeNotificationProducer(final NetconfNotificationCollector netconfNotificationCollector,
-                                                final DataBroker dataBroker) {
+    @Activate
+    public CapabilityChangeNotificationProducer(
+            @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
+            @Reference final DataBroker dataBroker) {
         super(CAPABILITIES_INSTANCE_IDENTIFIER);
-        baseNotificationPublisherRegistration = netconfNotificationCollector.registerBaseNotificationPublisher();
+        baseNotificationPublisherRegistration = notifManager.registerBaseNotificationPublisher();
         capabilityChangeListenerRegistration = registerOnChanges(dataBroker);
+    }
+
+    @Deactivate
+    @Override
+    public void close() {
+        if (baseNotificationPublisherRegistration != null) {
+            baseNotificationPublisherRegistration.close();
+        }
+        if (capabilityChangeListenerRegistration != null) {
+            capabilityChangeListenerRegistration.close();
+        }
     }
 
     @Override
@@ -59,10 +75,10 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
                 case WRITE: {
                     final Capabilities dataAfter = rootNode.getDataAfter();
                     final Capabilities dataBefore = rootNode.getDataBefore();
-                    final Set<Uri> before = dataBefore != null ? ImmutableSet.copyOf(dataBefore.getCapability()) :
-                            Collections.emptySet();
-                    final Set<Uri> after = dataAfter != null ? ImmutableSet.copyOf(dataAfter.getCapability()) :
-                            Collections.emptySet();
+                    final Set<Uri> before = dataBefore != null ? ImmutableSet.copyOf(dataBefore.getCapability())
+                        : Set.of();
+                    final Set<Uri> after = dataAfter != null ? ImmutableSet.copyOf(dataAfter.getCapability())
+                        : Set.of();
                     final Set<Uri> added = Sets.difference(after, before);
                     final Set<Uri> removed = Sets.difference(before, after);
                     publishNotification(added, removed);
@@ -72,7 +88,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
                     final Capabilities dataBeforeDelete = rootNode.getDataBefore();
                     if (dataBeforeDelete != null) {
                         final Set<Uri> removed = ImmutableSet.copyOf(dataBeforeDelete.getCapability());
-                        publishNotification(Collections.emptySet(), removed);
+                        publishNotification(Set.of(), removed);
                     }
                     break;
                 }
@@ -80,7 +96,6 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
                     LOG.debug("Received intentionally unhandled type: {}.", modificationType);
             }
         }
-
     }
 
     private void publishNotification(final Set<Uri> added, final Set<Uri> removed) {
@@ -93,18 +108,5 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
             // TODO modified should be computed ... but why ?
             .setModifiedCapability(Set.of())
             .build());
-    }
-
-    /**
-     * Invoked by blueprint.
-     */
-    @Override
-    public void close() {
-        if (baseNotificationPublisherRegistration != null) {
-            baseNotificationPublisherRegistration.close();
-        }
-        if (capabilityChangeListenerRegistration != null) {
-            capabilityChangeListenerRegistration.close();
-        }
     }
 }

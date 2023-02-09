@@ -58,7 +58,6 @@ public class NotificationToMdsalWriterTest {
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
 
         writer = new NotificationToMdsalWriter(notificationCollector, dataBroker);
-        writer.start();
     }
 
     @Test
