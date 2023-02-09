@@ -31,7 +31,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.dom.codec.impl.di.DefaultBindingDOMCodecFactory;
 import org.opendaylight.mdsal.binding.generator.impl.DefaultBindingRuntimeGenerator;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.mdsal.notification.impl.ops.NotificationsTransformUtil;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
@@ -246,7 +245,7 @@ public class NetconfNotificationManagerTest {
     }
 
     private static NetconfNotificationManager createManager() throws YangParserException {
-        return new NetconfNotificationManager(new NotificationsTransformUtil(new DefaultYangParserFactory(),
-            new DefaultBindingRuntimeGenerator(), new DefaultBindingDOMCodecFactory()));
+        return new NetconfNotificationManager(new DefaultYangParserFactory(),
+            new DefaultBindingRuntimeGenerator(), new DefaultBindingDOMCodecFactory());
     }
 }
