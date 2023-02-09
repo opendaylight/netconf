@@ -12,7 +12,6 @@ import static com.google.common.base.Verify.verify;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
-import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
@@ -35,7 +34,6 @@ import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.w3c.dom.Document;
 
-@Singleton
 public final class NotificationsTransformUtil {
     private final EffectiveModelContext schemaContext;
     private final BindingNormalizedNodeSerializer serializer;
