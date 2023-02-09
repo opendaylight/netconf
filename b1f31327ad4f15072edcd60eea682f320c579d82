@@ -33,6 +33,24 @@
       "message": "5000 -\u003e 8181",
       "revId": "b1f31327ad4f15072edcd60eea682f320c579d82",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67bea27f_476c232b",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-09T18:51:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c75cd19_3d30ae13",
+      "revId": "b1f31327ad4f15072edcd60eea682f320c579d82",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
