@@ -54,13 +54,4 @@
         <argument ref="baseSchemas"/>
         <argument ref="deviceActionFactory"/>
     </bean>
-
-    <bean id="netconfKeystoreProvider"
-          class="org.opendaylight.netconf.sal.connect.util.NetconfSalKeystoreService">
-        <argument ref="dataBroker"/>
-        <argument ref="encryptionService"/>
-    </bean>
-
-    <odl:rpc-implementation ref="netconfKeystoreProvider"/>
-
 </blueprint>
