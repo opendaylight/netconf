@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b7adf21_ae191788",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-09T15:21:14Z",
+      "side": 1,
+      "message": "It would be better to fix it in a separate task.",
+      "parentUuid": "5f0748d0_a2fcf241",
+      "revId": "2315764521fd33a57bd6f5aa969cd063caa117c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8353a07_d16eb040",
@@ -66,6 +84,24 @@
       "writtenOn": "2023-02-01T16:46:32Z",
       "side": 1,
       "message": "If the source is not found, the application will return a 500 error. Is this the correct approach?",
+      "revId": "2315764521fd33a57bd6f5aa969cd063caa117c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c575609a_94b9f6f0",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-09T15:21:14Z",
+      "side": 1,
+      "message": "It would be better to fix it in a separate task.",
+      "parentUuid": "c8353a07_d16eb040",
       "revId": "2315764521fd33a57bd6f5aa969cd063caa117c3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
