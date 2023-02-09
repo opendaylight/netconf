@@ -37,29 +37,39 @@
             <artifactId>mdsal-binding-runtime-spi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>rfc5277</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-notifications-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-mapping-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>rfc5277</artifactId>
         </dependency>
         <dependency>
             <groupId>com.guicedee.services</groupId>
             <artifactId>javax.inject</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
         </dependency>
 
         <dependency>
@@ -78,5 +88,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>
