@@ -95,8 +95,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected final DataBroker dataBroker;
     protected final DOMMountPointService mountPointService;
     protected final String topologyId;
-    protected String privateKeyPath;
-    protected String privateKeyPassphrase;
     protected final AAAEncryptionService encryptionService;
     protected final HashMap<NodeId, NetconfConnectorDTO> activeConnectors = new HashMap<>();
 
@@ -296,20 +294,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         return List.of();
-    }
-
-    /**
-     * Sets the private key path from location specified in configuration file using blueprint.
-     */
-    public void setPrivateKeyPath(final String privateKeyPath) {
-        this.privateKeyPath = privateKeyPath;
-    }
-
-    /**
-     * Sets the private key passphrase from location specified in configuration file using blueprint.
-     */
-    public void setPrivateKeyPassphrase(final String privateKeyPassphrase) {
-        this.privateKeyPassphrase = privateKeyPassphrase;
     }
 
     public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
