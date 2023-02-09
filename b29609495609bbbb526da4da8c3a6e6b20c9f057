@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e7ef9d8_0eb48adb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-02-09T00:15:54Z",
+      "side": 1,
+      "message": "Needs to be based on top of https://git.opendaylight.org/gerrit/c/netconf/+/104087",
+      "revId": "b29609495609bbbb526da4da8c3a6e6b20c9f057",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
