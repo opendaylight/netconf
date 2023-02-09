@@ -314,8 +314,6 @@ public class NetconfTopologyManager
                 .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode.getSchemaCacheDirectory(),
                     deviceId))
                 .setIdleTimeout(writeTxIdleTimeout)
-                .setPrivateKeyPath(privateKeyPath)
-                .setPrivateKeyPassphrase(privateKeyPassphrase)
                 .setEncryptionService(encryptionService)
                 .build();
     }

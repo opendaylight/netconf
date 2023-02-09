@@ -41,30 +41,26 @@ public class NetconfTopologySetup {
     private final String topologyId;
     private final NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
     private final Duration idleTimeout;
-    private final String privateKeyPath;
-    private final String privateKeyPassphrase;
     private final AAAEncryptionService encryptionService;
     private final BaseNetconfSchemas baseSchemas;
 
     NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
-        this.clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
-        this.rpcProviderRegistry = builder.getRpcProviderRegistry();
-        this.actionProviderRegistry = builder.getActionProviderRegistry();
-        this.dataBroker = builder.getDataBroker();
-        this.instanceIdentifier = builder.getInstanceIdentifier();
-        this.node = builder.getNode();
-        this.keepaliveExecutor = builder.getKeepaliveExecutor();
-        this.processingExecutor = builder.getProcessingExecutor();
-        this.actorSystem = builder.getActorSystem();
-        this.eventExecutor = builder.getEventExecutor();
-        this.netconfClientDispatcher = builder.getNetconfClientDispatcher();
-        this.topologyId = builder.getTopologyId();
-        this.schemaResourceDTO = builder.getSchemaResourceDTO();
-        this.idleTimeout = builder.getIdleTimeout();
-        this.privateKeyPath = builder.getPrivateKeyPath();
-        this.privateKeyPassphrase = builder.getPrivateKeyPassphrase();
-        this.encryptionService = builder.getEncryptionService();
-        this.baseSchemas = builder.getBaseSchemas();
+        clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
+        rpcProviderRegistry = builder.getRpcProviderRegistry();
+        actionProviderRegistry = builder.getActionProviderRegistry();
+        dataBroker = builder.getDataBroker();
+        instanceIdentifier = builder.getInstanceIdentifier();
+        node = builder.getNode();
+        keepaliveExecutor = builder.getKeepaliveExecutor();
+        processingExecutor = builder.getProcessingExecutor();
+        actorSystem = builder.getActorSystem();
+        eventExecutor = builder.getEventExecutor();
+        netconfClientDispatcher = builder.getNetconfClientDispatcher();
+        topologyId = builder.getTopologyId();
+        schemaResourceDTO = builder.getSchemaResourceDTO();
+        idleTimeout = builder.getIdleTimeout();
+        encryptionService = builder.getEncryptionService();
+        baseSchemas = builder.getBaseSchemas();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -121,14 +117,6 @@ public class NetconfTopologySetup {
 
     public Duration getIdleTimeout() {
         return idleTimeout;
-    }
-
-    public String getPrivateKeyPath() {
-        return privateKeyPath;
-    }
-
-    public String getPrivateKeyPassphrase() {
-        return privateKeyPassphrase;
     }
 
     public AAAEncryptionService getEncryptionService() {
@@ -282,7 +270,7 @@ public class NetconfTopologySetup {
         }
 
         public NetconfTopologySetupBuilder setNetconfClientDispatcher(final NetconfClientDispatcher clientDispatcher) {
-            this.netconfClientDispatcher = clientDispatcher;
+            netconfClientDispatcher = clientDispatcher;
             return this;
         }
 
@@ -305,26 +293,8 @@ public class NetconfTopologySetup {
             return idleTimeout;
         }
 
-        public NetconfTopologySetupBuilder setPrivateKeyPath(final String privateKeyPath) {
-            this.privateKeyPath = privateKeyPath;
-            return this;
-        }
-
-        public String getPrivateKeyPath() {
-            return this.privateKeyPath;
-        }
-
-        public NetconfTopologySetupBuilder setPrivateKeyPassphrase(final String privateKeyPassphrase) {
-            this.privateKeyPassphrase = privateKeyPassphrase;
-            return this;
-        }
-
-        public String getPrivateKeyPassphrase() {
-            return this.privateKeyPassphrase;
-        }
-
         AAAEncryptionService getEncryptionService() {
-            return this.encryptionService;
+            return encryptionService;
         }
 
         public NetconfTopologySetupBuilder setEncryptionService(final AAAEncryptionService encryptionService) {
