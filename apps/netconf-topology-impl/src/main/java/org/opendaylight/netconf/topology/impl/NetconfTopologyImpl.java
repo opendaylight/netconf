@@ -7,11 +7,13 @@
  */
 package org.opendaylight.netconf.topology.impl;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.annotations.VisibleForTesting;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -29,6 +31,7 @@ import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
+import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -38,22 +41,44 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.concepts.ObjectRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// Non-final for testing
+@Singleton
+@Component(service = { })
 public class NetconfTopologyImpl extends AbstractNetconfTopology
         implements DataTreeChangeListener<Node>, AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyImpl.class);
 
-    private final RpcProviderService rpcProviderService;
-    private ListenerRegistration<NetconfTopologyImpl> datastoreListenerRegistration = null;
-    private ObjectRegistration<?> rpcReg = null;
+    private Registration dtclReg;
+    private Registration rpcReg;
+
+    @Inject
+    @Activate
+    public NetconfTopologyImpl(
+            @Reference(target = "(type=netconf-client-dispatcher)") final NetconfClientDispatcher clientDispatcher,
+            @Reference(target = "(type=global-event-executor)") final EventExecutor eventExecutor,
+            @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
+            final ScheduledThreadPool keepaliveExecutor,
+            @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingExecutor,
+            @Reference final SchemaResourceManager schemaRepositoryProvider, @Reference final DataBroker dataBroker,
+            @Reference final DOMMountPointService mountPointService,
+            @Reference final AAAEncryptionService encryptionService,
+            @Reference final RpcProviderService rpcProviderService, @Reference final BaseNetconfSchemas baseSchemas,
+            @Reference final DeviceActionFactory deviceActionFactory) {
+        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, clientDispatcher, eventExecutor, keepaliveExecutor,
+            processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService, encryptionService,
+            rpcProviderService, baseSchemas, deviceActionFactory);
+    }
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
@@ -66,6 +91,8 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
                 baseSchemas, null);
     }
 
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
+        justification = "DTCL registration of 'this'")
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
@@ -75,9 +102,16 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory,
                 baseSchemas);
-        this.rpcProviderService = requireNonNull(rpcProviderService);
+
+        LOG.debug("Registering datastore listener");
+        dtclReg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(
+            LogicalDatastoreType.CONFIGURATION, createTopologyListPath(topologyId).child(Node.class)), this);
+        rpcReg = rpcProviderService.registerRpcImplementation(NetconfNodeTopologyService.class,
+            new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId));
     }
 
+    @PreDestroy
+    @Deactivate
     @Override
     public void close() {
         if (rpcReg != null) {
@@ -91,21 +125,10 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
         }
         activeConnectors.clear();
 
-        if (datastoreListenerRegistration != null) {
-            datastoreListenerRegistration.close();
-            datastoreListenerRegistration = null;
+        if (dtclReg != null) {
+            dtclReg.close();
+            dtclReg = null;
         }
-    }
-
-    /**
-     * Invoked by blueprint.
-     */
-    public void init() {
-        LOG.debug("Registering datastore listener");
-        datastoreListenerRegistration = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(
-            LogicalDatastoreType.CONFIGURATION, createTopologyListPath(topologyId).child(Node.class)), this);
-        rpcReg = rpcProviderService.registerRpcImplementation(NetconfNodeTopologyService.class,
-            new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId));
     }
 
     @Override
