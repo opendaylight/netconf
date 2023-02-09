@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.mdsal.notification.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.ExecutionException;
@@ -15,6 +17,7 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
+import org.opendaylight.netconf.notifications.NetconfNotificationCollector.NetconfNotificationStreamListener;
 import org.opendaylight.netconf.notifications.NotificationRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
@@ -22,32 +25,38 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Listens on changes in netconf notification stream availability and writes
- * changes to the data store.
+ * Listens on changes in netconf notification stream availability and writes changes to the data store.
  */
-public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNotificationCollector
-        .NetconfNotificationStreamListener {
-
+@Component(service = { })
+public final class NotificationToMdsalWriter implements NetconfNotificationStreamListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationToMdsalWriter.class);
-    private static final InstanceIdentifier<Streams> STREAMS = InstanceIdentifier.builder(Netconf.class)
-            .child(Streams.class).build();
+    private static final InstanceIdentifier<Streams> STREAMS =
+        InstanceIdentifier.builder(Netconf.class).child(Streams.class).build();
 
-    private final NetconfNotificationCollector netconfNotificationCollector;
     private final DataBroker dataBroker;
-    private NotificationRegistration notificationRegistration;
+    private final NotificationRegistration notificationRegistration;
 
-    public NotificationToMdsalWriter(final NetconfNotificationCollector netconfNotificationCollector,
-                                     final DataBroker dataBroker) {
-        this.netconfNotificationCollector = netconfNotificationCollector;
-        this.dataBroker = dataBroker;
+    @Activate
+    public NotificationToMdsalWriter(
+            @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
+            @Reference final DataBroker dataBroker) {
+        this.dataBroker = requireNonNull(dataBroker);
+        notificationRegistration = notifManager.registerStreamListener(this);
     }
 
+    @Deactivate
     @Override
     public void close() {
+        notificationRegistration.close();
+
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(Netconf.class));
 
@@ -62,15 +71,6 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
                 LOG.warn("Unable to clear streams", throwable);
             }
         }, MoreExecutors.directExecutor());
-
-        notificationRegistration.close();
-    }
-
-    /**
-     * Invoked by blueprint.
-     */
-    public void start() {
-        notificationRegistration = netconfNotificationCollector.registerStreamListener(this);
     }
 
     @Override
@@ -91,9 +91,7 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
     public void onStreamUnregistered(final StreamNameType stream) {
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
 
-        final InstanceIdentifier<Stream> streamIdentifier = STREAMS.child(Stream.class, new StreamKey(stream));
-
-        tx.delete(LogicalDatastoreType.OPERATIONAL, streamIdentifier);
+        tx.delete(LogicalDatastoreType.OPERATIONAL, STREAMS.child(Stream.class, new StreamKey(stream)));
 
         try {
             tx.commit().get();
