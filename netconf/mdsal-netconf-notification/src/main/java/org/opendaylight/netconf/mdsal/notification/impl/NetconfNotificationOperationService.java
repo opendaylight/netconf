@@ -5,42 +5,29 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.notification.impl;
 
-import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.mdsal.notification.impl.ops.CreateSubscription;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 
-public class NetconfNotificationOperationService implements NetconfOperationService {
-    private final Set<NetconfOperation> netconfOperations;
+public final class NetconfNotificationOperationService implements NetconfOperationService {
+    private final CreateSubscription createSubscription;
 
-    public NetconfNotificationOperationService(String netconfSessionIdForReporting, NetconfNotificationRegistry
-            netconfNotificationRegistry) {
-        this.netconfOperations = Collections.singleton(new CreateSubscription(netconfSessionIdForReporting,
-                netconfNotificationRegistry));
+    public NetconfNotificationOperationService(final String netconfSessionIdForReporting,
+            final NetconfNotificationRegistry netconfNotificationRegistry) {
+        createSubscription = new CreateSubscription(netconfSessionIdForReporting, netconfNotificationRegistry);
     }
-
 
     @Override
     public Set<NetconfOperation> getNetconfOperations() {
-        return netconfOperations;
+        return Set.of(createSubscription);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void close() {
-        for (NetconfOperation netconfOperation : netconfOperations) {
-            if (netconfOperation instanceof AutoCloseable) {
-                try {
-                    ((AutoCloseable) netconfOperation).close();
-                } catch (Exception e) {
-                    throw new IllegalStateException("Exception while closing " + netconfOperation, e);
-                }
-            }
-        }
+        createSubscription.close();
     }
 }

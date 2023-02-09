@@ -27,7 +27,6 @@ import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
-import org.opendaylight.netconf.mdsal.notification.impl.ops.NotificationsTransformUtil;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;

@@ -16,6 +16,7 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -30,12 +31,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class OperationalDatastoreListenerTest {
     @Mock
     private DataBroker dataBroker;
+    @Captor
+    private ArgumentCaptor<DataTreeIdentifier<?>> argumentId;
 
     @Test
     public void testDataStoreListener() {
         final InstanceIdentifier<TestInterface> instanceIdentifier = InstanceIdentifier.create(TestInterface.class);
-        final DataTreeIdentifier<TestInterface> testId =
-                DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, instanceIdentifier);
 
         final var op = new OperationalDatastoreListener<>(instanceIdentifier) {
             @Override
@@ -45,12 +46,11 @@ public class OperationalDatastoreListenerTest {
         };
         doReturn(null).when(dataBroker).registerDataTreeChangeListener(any(), any());
 
-        ArgumentCaptor<DataTreeIdentifier> argumentId = ArgumentCaptor.forClass(DataTreeIdentifier.class);
         op.registerOnChanges(dataBroker);
         verify(dataBroker).registerDataTreeChangeListener(argumentId.capture(), any());
 
-        assertEquals(testId, argumentId.getValue());
-
+        assertEquals(DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, instanceIdentifier),
+            argumentId.getValue());
     }
 
     interface TestInterface extends ChildOf<DataRoot> {
