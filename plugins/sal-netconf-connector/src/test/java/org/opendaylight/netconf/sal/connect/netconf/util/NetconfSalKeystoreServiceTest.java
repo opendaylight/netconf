@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -25,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -33,12 +35,14 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.NetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateKey;
+import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.w3c.dom.Document;
@@ -61,36 +65,42 @@ public class NetconfSalKeystoreServiceTest {
     private DataBroker dataBroker;
     @Mock
     private AAAEncryptionService encryptionService;
+    @Mock
+    private RpcProviderService rpcProvider;
+    @Mock
+    private ObjectRegistration<?> rpcReg;
 
     @Before
     public void setUp() {
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(writeTx)
             .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
+        doReturn(rpcReg).when(rpcProvider).registerRpcImplementation(eq(NetconfKeystoreService.class), any());
+        doNothing().when(rpcReg).close();
     }
 
     @Test
     public void testAddPrivateKey() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
-        NetconfSalKeystoreService keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService);
+        try (var keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService, rpcProvider)) {
+            final AddPrivateKeyInput input = getPrivateKeyInput();
+            keystoreService.addPrivateKey(input);
 
-        final AddPrivateKeyInput input = getPrivateKeyInput();
-        keystoreService.addPrivateKey(input);
-
-        verify(writeTx, times(input.getPrivateKey().size() + 1))
-            .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
+            verify(writeTx, times(input.nonnullPrivateKey().size()))
+                .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
+        }
     }
 
     @Test
     public void testAddTrustedCertificate() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
-        NetconfSalKeystoreService keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService);
+        try (var keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService, rpcProvider)) {
+            final AddTrustedCertificateInput input = getTrustedCertificateInput();
+            keystoreService.addTrustedCertificate(input);
 
-        final AddTrustedCertificateInput input = getTrustedCertificateInput();
-        keystoreService.addTrustedCertificate(input);
-
-        verify(writeTx, times(input.getTrustedCertificate().size() + 1))
-            .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
+            verify(writeTx, times(input.nonnullTrustedCertificate().size()))
+                .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
+        }
     }
 
     private AddPrivateKeyInput getPrivateKeyInput() throws Exception {
