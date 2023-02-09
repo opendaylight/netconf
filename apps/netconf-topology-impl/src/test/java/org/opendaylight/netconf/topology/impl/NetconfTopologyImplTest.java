@@ -114,18 +114,12 @@ public class NetconfTopologyImplTest {
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
             mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker, mountPointService,
             encryptionService, rpcProviderService);
-
-        spyTopology = spy(topology);
-    }
-
-    @Test
-    public void testInit() {
-        topology.init();
-
         //verify initialization of topology
         verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.builder(NetworkTopology.class)
                 .child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))).build(),
                 new TopologyBuilder().setTopologyId(new TopologyId(TOPOLOGY_ID)).build());
+
+        spyTopology = spy(topology);
     }
 
     @Test
@@ -237,7 +231,7 @@ public class NetconfTopologyImplTest {
                                           final RpcProviderService rpcProviderService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
                   processingExecutor, schemaRepositoryProvider, dataBroker,
-                  mountPointService, encryptionService, rpcProviderService, BASE_SCHEMAS);
+                  mountPointService, encryptionService, rpcProviderService, BASE_SCHEMAS, null);
         }
 
         @Override
