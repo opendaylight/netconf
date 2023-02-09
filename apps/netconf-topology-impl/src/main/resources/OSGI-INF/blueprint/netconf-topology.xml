@@ -38,18 +38,9 @@
     <reference id="baseSchemas"
                interface="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas"/>
 
-    <cm:property-placeholder persistent-id="org.opendaylight.netconf.topology.sb.keypair" update-strategy="none">
-      <cm:default-properties>
-        <cm:property name="private-key-path" value=""/>
-        <cm:property name="private-key-passphrase" value=""/>
-      </cm:default-properties>
-    </cm:property-placeholder>
-
     <bean id="netconfTopology" class="org.opendaylight.netconf.topology.impl.NetconfTopologyImpl"
           init-method="init"
           destroy-method="close">
-        <cm:managed-properties persistent-id="org.opendaylight.netconf.topology.sb.keypair"
-                           update-strategy="container-managed"/>
         <argument value="topology-netconf"/>
         <argument ref="clientDispatcherDependency"/>
         <argument ref="eventExecutor"/>
@@ -58,8 +49,6 @@
         <argument ref="schemaManager"/>
         <argument ref="dataBroker"/>
         <argument ref="mountPointService"/>
-        <property name="privateKeyPath" value="${private-key-path}"/>
-        <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
         <argument ref="encryptionService" />
         <argument ref="rpcProviderService" />
         <argument ref="baseSchemas"/>
