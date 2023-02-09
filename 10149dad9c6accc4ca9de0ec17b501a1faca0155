@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c10470f9_31967be8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-09T15:32:43Z",
+      "side": 1,
+      "message": "- Please rebase this commit on top of the following:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/104087\n\nThis commit is dependent on commit 104087 and should not be merged before it.\n\n- If the only change in this commit is the port change from 5000 to 8181, please mention it in the commit description.\"",
+      "revId": "10149dad9c6accc4ca9de0ec17b501a1faca0155",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
