@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "448df483_69d1f824",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/OperationsContent.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-10T11:02:50Z",
+      "side": 1,
+      "message": "If identifier is \"network-topology:network-topology/topology\u003dtopology-netconf/node\u003d36001-sim-device/yang-ext:mount\"\n\nThen identifierContext path is \"/\". So this line will throw Method throw\u0027s IllegalStateException \"Cannot execute on empty stack\"",
+      "revId": "011e44e9735c86c1e416fe1bfa2dcd9c47a79f4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "37887b43_e2dbb866",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
         "patchSetId": 16
