@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "52707e14_5e4d10d3",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/Netconf822Test.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-10T09:35:00Z",
+      "side": 1,
+      "message": "Remove this. We are not using mocks here.",
+      "revId": "011e44e9735c86c1e416fe1bfa2dcd9c47a79f4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1c8a65bd_f0840237",
         "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/Netconf822Test.java",
         "patchSetId": 16
