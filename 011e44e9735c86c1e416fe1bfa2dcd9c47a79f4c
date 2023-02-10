@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51a2819d_21333d5e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-10T08:36:52Z",
+      "side": 1,
+      "message": "NETCONF-928 is not fixed with this patch.\nSteps to reproduce:\n1) Install karaf with \"feature:install odl-restconf-nb odl-netconf-topology\"\n2) Start netconf-testtol\n3) Sent GET to: /rests/operations/network-topology:network-topology/topology\u003dtopology-netconf/node\u003d36001-sim-device/yang-ext:mount\n\n",
+      "revId": "011e44e9735c86c1e416fe1bfa2dcd9c47a79f4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37887b43_e2dbb866",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-10T08:36:52Z",
+      "side": 1,
+      "message": "These methods have not been tested. Please add tests for these new methods.\n\nYou can either add them here or create a new test.\nhttps://github.com/opendaylight/netconf/blob/master/restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceTest.java#L25",
+      "revId": "011e44e9735c86c1e416fe1bfa2dcd9c47a79f4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c8a65bd_f0840237",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/Netconf822Test.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-10T08:36:52Z",
+      "side": 1,
+      "message": "If you don\u0027t intend to add any further tests in this location, please remove the TODO comment. Also, once the test is completed, remove the TODO from the commit message.",
+      "revId": "011e44e9735c86c1e416fe1bfa2dcd9c47a79f4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75a694de_168dedd0",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/Netconf822Test.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-10T08:36:52Z",
+      "side": 1,
+      "message": "Similar test for OperationsContent.XML is not required?",
+      "revId": "011e44e9735c86c1e416fe1bfa2dcd9c47a79f4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
