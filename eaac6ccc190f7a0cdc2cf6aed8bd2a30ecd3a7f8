@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d488fa8_a28c6e1f",
+        "filename": "restconf/restconf-nb/src/test/resources/modules/mount-points-operations/module1.yang",
+        "patchSetId": 24
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-13T19:21:01Z",
+      "side": 1,
+      "message": "We already have some models behind mount point - please reuse that.",
+      "revId": "eaac6ccc190f7a0cdc2cf6aed8bd2a30ecd3a7f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
