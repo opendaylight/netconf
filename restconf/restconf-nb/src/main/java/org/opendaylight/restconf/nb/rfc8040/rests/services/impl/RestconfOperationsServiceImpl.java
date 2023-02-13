@@ -23,15 +23,11 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfOperationsService;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
@@ -78,14 +74,6 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
 
     @Override
     public NormalizedNodePayload getOperations(final String identifier, final UriInfo uriInfo) {
-        if (!identifier.contains(RestconfConstants.MOUNT)) {
-            final var errMsg = """
-                    URI has bad format. If operations behind mount point should be showed, URI has to end with %s.
-                    """.formatted(RestconfConstants.MOUNT);
-            LOG.debug("{} for {}", errMsg, identifier);
-            throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-
         final InstanceIdentifierContext mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), Optional.of(mountPointService));
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
