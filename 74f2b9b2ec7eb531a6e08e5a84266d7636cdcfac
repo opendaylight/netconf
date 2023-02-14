@@ -16,6 +16,24 @@
       "message": "We can remove `CONTEXT` field and get `EffectiveMOdelContext` from `INSTANCE_IDENTIFIER_CONTEXT`.",
       "revId": "74f2b9b2ec7eb531a6e08e5a84266d7636cdcfac",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14be9e3a_2abf94b2",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/Netconf822Test.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-14T12:09:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37244d9a_f6f5530c",
+      "revId": "74f2b9b2ec7eb531a6e08e5a84266d7636cdcfac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
