@@ -16,6 +16,24 @@
       "message": "We already have some models behind mount point - please reuse that.",
       "revId": "eaac6ccc190f7a0cdc2cf6aed8bd2a30ecd3a7f8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95e26dca_e80eb5c4",
+        "filename": "restconf/restconf-nb/src/test/resources/modules/mount-points-operations/module1.yang",
+        "patchSetId": 24
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-14T10:00:44Z",
+      "side": 1,
+      "message": "ACK, its better to have separate models for this test and do not mix them with models for other tests.",
+      "parentUuid": "2d488fa8_a28c6e1f",
+      "revId": "eaac6ccc190f7a0cdc2cf6aed8bd2a30ecd3a7f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
