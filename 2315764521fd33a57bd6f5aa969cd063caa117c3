@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fa4b5ee_707030d6",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-14T07:51:07Z",
+      "side": 1,
+      "message": "In fact, it works I am able to access: `http://localhost:8181/yanglib/schemas/test-model/`.\n\nhttps://jira.opendaylight.org/browse/NETCONF-968",
+      "parentUuid": "7b7adf21_ae191788",
+      "revId": "2315764521fd33a57bd6f5aa969cd063caa117c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8353a07_d16eb040",
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "It would be better to fix it in a separate task.",
       "parentUuid": "c8353a07_d16eb040",
+      "revId": "2315764521fd33a57bd6f5aa969cd063caa117c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5554e79_36861239",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-14T07:51:07Z",
+      "side": 1,
+      "message": "This code is not modified in this patch.\nAnd yes this is reason why we need to restart karaf to make yanglib work.\n\nSee: https://jira.opendaylight.org/browse/NETCONF-967",
+      "parentUuid": "c575609a_94b9f6f0",
       "revId": "2315764521fd33a57bd6f5aa969cd063caa117c3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
