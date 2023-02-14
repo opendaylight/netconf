@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>feature-parent</artifactId>
-        <version>5.0.2-SNAPSHOT</version>
+        <version>5.0.3-SNAPSHOT</version>
         <relativePath>../../parent</relativePath>
     </parent>
 
