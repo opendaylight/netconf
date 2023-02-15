@@ -212,6 +212,10 @@
       <groupId>org.eclipse.jetty.websocket</groupId>
       <artifactId>websocket-servlet</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-server</artifactId>
+    </dependency>
 
     <!-- Testing Dependencies -->
     <dependency>
@@ -303,6 +307,7 @@
         <configuration>
           <instructions>
             <Bundle-Name>MD SAL Restconf Connector</Bundle-Name>
+            <Import-Package>org.eclipse.jetty.websocket.server, *</Import-Package>
           </instructions>
         </configuration>
       </plugin>
