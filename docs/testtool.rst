@@ -148,19 +148,17 @@ Testtool help
     usage: netconf testtool [-h] [--edit-content EDIT-CONTENT] [--async-requests {true,false}]
                             [--thread-amount THREAD-AMOUNT] [--throttle THROTTLE]
                             [--controller-auth-username CONTROLLER-AUTH-USERNAME]
-                            [--controller-auth-password CONTROLLER-AUTH-PASSWORD]
-                            [--controller-ip CONTROLLER-IP] [--controller-port CONTROLLER-PORT]
-                            [--device-count DEVICES-COUNT] [--devices-per-port DEVICES-PER-PORT]
-                            [--schemas-dir SCHEMAS-DIR] [--notification-file NOTIFICATION-FILE]
-                            [--initial-config-xml-file INITIAL-CONFIG-XML-FILE]
-                            [--starting-port STARTING-PORT]
+                            [--controller-auth-password CONTROLLER-AUTH-PASSWORD] [--controller-ip CONTROLLER-IP]
+                            [--controller-port CONTROLLER-PORT] [--device-count DEVICES-COUNT]
+                            [--devices-per-port DEVICES-PER-PORT] [--schemas-dir SCHEMAS-DIR]
+                            [--notification-file NOTIFICATION-FILE]
+                            [--initial-config-xml-file INITIAL-CONFIG-XML-FILE] [--starting-port STARTING-PORT]
                             [--generate-config-connection-timeout GENERATE-CONFIG-CONNECTION-TIMEOUT]
                             [--generate-config-address GENERATE-CONFIG-ADDRESS]
                             [--generate-configs-batch-size GENERATE-CONFIGS-BATCH-SIZE]
-                            [--distribution-folder DISTRO-FOLDER] [--ssh {true,false}]
-                            [--exi {true,false}] [--debug {true,false}] [--md-sal {true,false}]
-                            [--time-out TIME-OUT] [-ip IP] [--thread-pool-size THREAD-POOL-SIZE]
-                            [--rpc-config RPC-CONFIG]
+                            [--distribution-folder DISTRO-FOLDER] [--ssh {true,false}] [--exi {true,false}]
+                            [--debug {true,false}] [--md-sal {true,false}] [--time-out TIME-OUT] [--ip IP]
+                            [--thread-pool-size THREAD-POOL-SIZE] [--rpc-config RPC-CONFIG]
 
     netconf testtool
 
@@ -168,64 +166,64 @@ Testtool help
       -h, --help             show this help message and exit
       --edit-content EDIT-CONTENT
       --async-requests {true,false}
+                             (default: false)
       --thread-amount THREAD-AMOUNT
-                             The number of threads to use for configuring devices.
-      --throttle THROTTLE    Maximum amount of  async  requests  that  can  be  open  at  a  time, with
-                             mutltiple threads this gets divided among all threads
+                             The number of threads to use for configuring devices. (default: 1)
+      --throttle THROTTLE    Maximum amount of async requests that  can  be  open  at  a time, with mutltiple threads
+                             this gets divided among all threads (default: 5000)
       --controller-auth-username CONTROLLER-AUTH-USERNAME
-                             Username for HTTP basic authentication to destination controller.
+                             Username for HTTP basic authentication to destination controller. (default: admin)
       --controller-auth-password CONTROLLER-AUTH-PASSWORD
-                             Password for HTTP basic authentication to destination controller.
+                             Password for HTTP basic authentication to destination controller. (default: admin)
       --controller-ip CONTROLLER-IP
-                             Ip of controller  if  available  it  will  be  used  for  spawning netconf
-                             connectors via topology configuration as a part of URI(http://<controller-
-                             ip>:<controller-port>/rests/data/...)  otherwise   it   will   just  start
-                             simulated devices and skip the execution of PATCH requests
+                             Ip of controller if  available  it  will  be  used  for  spawning netconf connectors via
+                             topology   configuration   as   a    part   of   URI(http://<controller-ip>:<controller-
+                             port>/rests/data/...) otherwise it  will  just  start  simulated  devices  and  skip the
+                             execution of PATCH requests
       --controller-port CONTROLLER-PORT
-                             Port of controller if  available  it  will  be  used  for spawning netconf
-                             connectors via topology configuration as a part of URI(http://<controller-
-                             ip>:<controller-port>/rests/data/...)  otherwise   it   will   just  start
-                             simulated devices and skip the execution of PATCH requests
+                             Port of controller if available  it  will  be  used  for spawning netconf connectors via
+                             topology   configuration   as   a    part   of   URI(http://<controller-ip>:<controller-
+                             port>/rests/data/...) otherwise it  will  just  start  simulated  devices  and  skip the
+                             execution of PATCH requests
       --device-count DEVICES-COUNT
-                             Number of simulated netconf devices to spin.  This is the number of actual
-                             ports open for the devices.
+                             Number of simulated netconf devices to  spin.  This  is  the number of actual ports open
+                             for the devices. (default: 1)
       --devices-per-port DEVICES-PER-PORT
-                             Amount of config files generated per  port  to spoof more devices than are
-                             actually running
+                             Amount of config files  generated  per  port  to  spoof  more  devices than are actually
+                             running (default: 1)
       --schemas-dir SCHEMAS-DIR
-                             Directory containing yang  schemas  to  describe  simulated  devices. Some
-                             schemas e.g. netconf monitoring and inet types are included by default
+                             Directory containing yang  schemas  to  describe  simulated  devices.  Some schemas e.g.
+                             netconf monitoring and inet types are included by default
       --notification-file NOTIFICATION-FILE
-                             Xml file containing notifications  that  should  be  sent to clients after
-                             create subscription is called
+                             Xml  file  containing  notifications  that  should  be  sent  to  clients  after  create
+                             subscription is called
       --initial-config-xml-file INITIAL-CONFIG-XML-FILE
-                             Xml file containing initial  simulatted  configuration  to be returned via
-                             get-config rpc
+                             Xml file containing initial simulatted configuration to be returned via get-config rpc
       --starting-port STARTING-PORT
-                             First port for simulated device.  Each  other  device will have previous+1
-                             port number
+                             First port for simulated device.  Each  other  device  will  have previous+1 port number
+                             (default: 17830)
       --generate-config-connection-timeout GENERATE-CONFIG-CONNECTION-TIMEOUT
-                             Timeout to be generated in initial config files
+                             Timeout to be generated in initial config files (default: 1800000)
       --generate-config-address GENERATE-CONFIG-ADDRESS
-                             Address to be placed in generated configs
+                             Address to be placed in generated configs (default: 127.0.0.1)
       --generate-configs-batch-size GENERATE-CONFIGS-BATCH-SIZE
-                             Number of connector configs per generated file
+                             Number of connector configs per generated file (default: 1)
       --distribution-folder DISTRO-FOLDER
                              Directory where the karaf distribution for controller is located
-      --ssh {true,false}     Whether to use ssh for transport or just pure tcp
-      --exi {true,false}     Whether to use exi to transport xml content
-      --debug {true,false}   Whether to use debug log level instead of INFO
-      --md-sal {true,false}  Whether to use md-sal datastore instead of default simulated datastore.
-      --time-out TIME-OUT    the maximum time in seconds for executing each PATCH request
-      -ip IP                 Ip address which will be used for  creating a socket address.It can either
-                             be a machine name, such  as  java.sun.com,  or a textual representation of
-                             its IP address.
+      --ssh {true,false}     Whether to use ssh for transport or just pure tcp (default: true)
+      --exi {true,false}     Whether to use exi to transport xml content (default: true)
+      --debug {true,false}   Whether to use debug log level instead of INFO (default: false)
+      --md-sal {true,false}  Whether to use md-sal datastore instead of default simulated datastore. (default: false)
+      --time-out TIME-OUT    the maximum time in seconds for executing each PATCH request (default: 20)
+      -ip IP                 Ip address which will be used for creating  a  socket address.It can either be a machine
+                             name, such as java.sun.com, or  a  textual  representation  of its IP address. (default:
+                             0.0.0.0)
       --thread-pool-size THREAD-POOL-SIZE
-                             The number of  threads  to  keep  in  the  pool,  when  creating  a device
-                             simulator. Even if they are idle.
+                             The number of threads to keep in  the  pool,  when  creating a device simulator. Even if
+                             they are idle. (default: 8)
       --rpc-config RPC-CONFIG
-                             Rpc config file.  It  can  be  used  to  define  custom  rpc  behavior, or
-                             override the default one.Usable for testing buggy device behavior.
+                             Rpc config file. It can be used to  define  custom rpc behavior, or override the default
+                             one.Usable for testing buggy device behavior.
 
 
 
