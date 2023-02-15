@@ -22,11 +22,6 @@ NETCONF testtool
 These jars are part of OpenDaylight’s controller project and are built
 from the NETCONF codebase in OpenDaylight.
 
-.. tip::
-
-    Download the Sodium SR2 testtool from OpenDaylight Nexus at:
-    https://nexus.opendaylight.org/content/repositories/public/org/opendaylight/netconf/netconf-testtool/1.7.2/
-
 **Nexus contains 3 executable tools:**
 
 -  executable.jar - device simulator
@@ -51,8 +46,8 @@ NETCONF testtool (or NETCONF device simulator) is a tool that
 
 -  Uses core implementation of NETCONF server from OpenDaylight
 
--  Generates configuration files for controller so that the OpenDaylight
-   distribution (Karaf) can easily connect to all simulated devices
+-  Allows for automatic sending of connector configurations through RESTCONF to the controller. This makes it easy for
+   the OpenDaylight distribution (Karaf) to connect to all simulated devices once the simulator starts.
 
 -  Provides broad configuration options
 
@@ -83,14 +78,14 @@ Running testtool
 
 1. After successfully building or downloading, move into the
    ``opendaylight/netconf/tools/netconf-testtool/target/`` folder and
-   there is file ``netconf-testtool-1.1.0-SNAPSHOT-executable.jar`` (or
-   if downloaded from nexus just take that jar file)
+   there is file ``netconf-testtool-[VERSION]-executable.jar`` (or
+   if downloaded from nexus just take that \*-executable.jar file)
 
 2. Execute this file using, e.g.:
 
    ::
 
-       java -jar netconf-testtool-1.1.0-SNAPSHOT-executable.jar
+       java -jar netconf-testtool-[VERSION]-executable.jar
 
    This execution runs the testtool with default for all parameters and
    you should see this log output from the testtool :
@@ -122,8 +117,7 @@ The default parameters for testtool are:
 
 -  Debug level is set to false
 
--  No distribution is modified to connect automatically to the NETCONF
-   testtool
+-  Other default parameters can be seen with ``--help`` option
 
 Verifying testtool
 ^^^^^^^^^^^^^^^^^^
@@ -148,17 +142,19 @@ Testtool help
     usage: netconf testtool [-h] [--edit-content EDIT-CONTENT] [--async-requests {true,false}]
                             [--thread-amount THREAD-AMOUNT] [--throttle THROTTLE]
                             [--controller-auth-username CONTROLLER-AUTH-USERNAME]
-                            [--controller-auth-password CONTROLLER-AUTH-PASSWORD] [--controller-ip CONTROLLER-IP]
-                            [--controller-port CONTROLLER-PORT] [--device-count DEVICES-COUNT]
-                            [--devices-per-port DEVICES-PER-PORT] [--schemas-dir SCHEMAS-DIR]
-                            [--notification-file NOTIFICATION-FILE]
-                            [--initial-config-xml-file INITIAL-CONFIG-XML-FILE] [--starting-port STARTING-PORT]
+                            [--controller-auth-password CONTROLLER-AUTH-PASSWORD]
+                            [--controller-ip CONTROLLER-IP] [--controller-port CONTROLLER-PORT]
+                            [--device-count DEVICES-COUNT] [--devices-per-port DEVICES-PER-PORT]
+                            [--schemas-dir SCHEMAS-DIR] [--notification-file NOTIFICATION-FILE]
+                            [--initial-config-xml-file INITIAL-CONFIG-XML-FILE]
+                            [--starting-port STARTING-PORT]
                             [--generate-config-connection-timeout GENERATE-CONFIG-CONNECTION-TIMEOUT]
                             [--generate-config-address GENERATE-CONFIG-ADDRESS]
                             [--generate-configs-batch-size GENERATE-CONFIGS-BATCH-SIZE]
-                            [--distribution-folder DISTRO-FOLDER] [--ssh {true,false}] [--exi {true,false}]
-                            [--debug {true,false}] [--md-sal {true,false}] [--time-out TIME-OUT] [--ip IP]
-                            [--thread-pool-size THREAD-POOL-SIZE] [--rpc-config RPC-CONFIG]
+                            [--distribution-folder DISTRO-FOLDER] [--ssh {true,false}]
+                            [--exi {true,false}] [--debug {true,false}] [--md-sal {true,false}]
+                            [--time-out TIME-OUT] [--ip IP] [--thread-pool-size THREAD-POOL-SIZE]
+                            [--rpc-config RPC-CONFIG]
 
     netconf testtool
 
@@ -169,39 +165,46 @@ Testtool help
                              (default: false)
       --thread-amount THREAD-AMOUNT
                              The number of threads to use for configuring devices. (default: 1)
-      --throttle THROTTLE    Maximum amount of async requests that  can  be  open  at  a time, with mutltiple threads
-                             this gets divided among all threads (default: 5000)
+      --throttle THROTTLE    Maximum amount of async requests that  can  be  open at a time, with
+                             mutltiple threads this  gets  divided  among  all  threads (default:
+                             5000)
       --controller-auth-username CONTROLLER-AUTH-USERNAME
-                             Username for HTTP basic authentication to destination controller. (default: admin)
+                             Username for HTTP  basic  authentication  to destination controller.
+                             (default: admin)
       --controller-auth-password CONTROLLER-AUTH-PASSWORD
-                             Password for HTTP basic authentication to destination controller. (default: admin)
+                             Password for HTTP  basic  authentication  to destination controller.
+                             (default: admin)
       --controller-ip CONTROLLER-IP
-                             Ip of controller if  available  it  will  be  used  for  spawning netconf connectors via
-                             topology   configuration   as   a    part   of   URI(http://<controller-ip>:<controller-
-                             port>/rests/data/...) otherwise it  will  just  start  simulated  devices  and  skip the
-                             execution of PATCH requests
+                             Ip of controller if available it  will  be used for spawning netconf
+                             connectors  via  topology  configuration  as  a  part  of  URI(http:
+                             //<controller-ip>:<controller-port>/rests/data/...)   otherwise   it
+                             will just start simulated devices  and  skip  the execution of PATCH
+                             requests
       --controller-port CONTROLLER-PORT
-                             Port of controller if available  it  will  be  used  for spawning netconf connectors via
-                             topology   configuration   as   a    part   of   URI(http://<controller-ip>:<controller-
-                             port>/rests/data/...) otherwise it  will  just  start  simulated  devices  and  skip the
-                             execution of PATCH requests
+                             Port of  controller  if  available  it  will  be  used  for spawning
+                             netconf connectors via topology configuration as a part of URI(http:
+                             //<controller-ip>:<controller-port>/rests/data/...)   otherwise   it
+                             will just start simulated devices  and  skip  the execution of PATCH
+                             requests
       --device-count DEVICES-COUNT
-                             Number of simulated netconf devices to  spin.  This  is  the number of actual ports open
-                             for the devices. (default: 1)
+                             Number of simulated netconf devices to  spin.  This is the number of
+                             actual ports open for the devices. (default: 1)
       --devices-per-port DEVICES-PER-PORT
-                             Amount of config files  generated  per  port  to  spoof  more  devices than are actually
-                             running (default: 1)
+                             Amount of config files  generated  per  port  to  spoof more devices
+                             than are actually running (default: 1)
       --schemas-dir SCHEMAS-DIR
-                             Directory containing yang  schemas  to  describe  simulated  devices.  Some schemas e.g.
-                             netconf monitoring and inet types are included by default
+                             Directory containing yang  schemas  to  describe  simulated devices.
+                             Some schemas e.g. netconf monitoring and  inet types are included by
+                             default
       --notification-file NOTIFICATION-FILE
-                             Xml  file  containing  notifications  that  should  be  sent  to  clients  after  create
-                             subscription is called
+                             Xml file containing notifications  that  should  be  sent to clients
+                             after create subscription is called
       --initial-config-xml-file INITIAL-CONFIG-XML-FILE
-                             Xml file containing initial simulatted configuration to be returned via get-config rpc
+                             Xml file containing initial simulatted  configuration to be returned
+                             via get-config rpc
       --starting-port STARTING-PORT
-                             First port for simulated device.  Each  other  device  will  have previous+1 port number
-                             (default: 17830)
+                             First port  for  simulated  device.  Each  other  device  will  have
+                             previous+1 port number (default: 17830)
       --generate-config-connection-timeout GENERATE-CONFIG-CONNECTION-TIMEOUT
                              Timeout to be generated in initial config files (default: 1800000)
       --generate-config-address GENERATE-CONFIG-ADDRESS
@@ -213,18 +216,19 @@ Testtool help
       --ssh {true,false}     Whether to use ssh for transport or just pure tcp (default: true)
       --exi {true,false}     Whether to use exi to transport xml content (default: true)
       --debug {true,false}   Whether to use debug log level instead of INFO (default: false)
-      --md-sal {true,false}  Whether to use md-sal datastore instead of default simulated datastore. (default: false)
-      --time-out TIME-OUT    the maximum time in seconds for executing each PATCH request (default: 20)
-      -ip IP                 Ip address which will be used for creating  a  socket address.It can either be a machine
-                             name, such as java.sun.com, or  a  textual  representation  of its IP address. (default:
-                             0.0.0.0)
+      --md-sal {true,false}  Whether  to  use  md-sal  datastore  instead  of  default  simulated
+                             datastore. (default: false)
+      --time-out TIME-OUT    the maximum  time  in  seconds  for  executing  each  PATCH  request
+                             (default: 20)
+      --ip IP                Ip address which will be used  for  creating a socket address.It can
+                             either be  a  machine  name,  such  as  java.sun.com,  or  a textual
+                             representation of its IP address. (default: 0.0.0.0)
       --thread-pool-size THREAD-POOL-SIZE
-                             The number of threads to keep in  the  pool,  when  creating a device simulator. Even if
-                             they are idle. (default: 8)
+                             The number of threads to keep  in  the  pool, when creating a device
+                             simulator. Even if they are idle. (default: 8)
       --rpc-config RPC-CONFIG
-                             Rpc config file. It can be used to  define  custom rpc behavior, or override the default
-                             one.Usable for testing buggy device behavior.
-
+                             Rpc config file. It can be  used  to  define custom rpc behavior, or
+                             override the default one.Usable for testing buggy device behavior.
 
 
 Supported operations
@@ -268,7 +272,7 @@ not supported when testtool is running with the MD-SAL datastore.
 Notification support
 ^^^^^^^^^^^^^^^^^^^^
 
-Testtool supports notifications via the --notification-file switch. To
+Testtool supports notifications via the ``--notification-file`` switch. To
 trigger the notification feed, create-subscription operation has to be
 invoked. The XML file provided should look like this example file:
 
@@ -329,22 +333,14 @@ Connecting testtool with controller Karaf distribution
 Auto connect to OpenDaylight
 ''''''''''''''''''''''''''''
 
-It is possible to make OpenDaylight auto connect to the simulated
-devices spawned by testtool (so user does not have to post a
-configuration for every NETCONF connector via RESTCONF). The testtool is
-able to modify the OpenDaylight distribution to auto connect to the
-simulated devices after feature ``odl-netconf-connector-all`` is
-installed. When running testtool, issue this command (just point the
-testool to the distribution:
+You can set up the testtool to automatically connect to the Controller. When you provide
+the ``--controller-ip`` and ``--controller-port`` parameters, the testtool will send a POST request to the Controller
+with the device connector configuration.
 
 ::
 
-    java -jar netconf-testtool-1.1.0-SNAPSHOT-executable.jar --device-count 10 --distribution-folder ~/distribution-karaf-0.4.0-SNAPSHOT/ --debug true
+    java -jar netconf-testtool-[VERSION]-executable.jar --device-count 10 --controller-ip 127.0.0.1 --controller-port 8181 --debug true
 
-With the distribution-folder parameter, the testtool will modify the
-distribution to include configuration for netconf-connector to connect
-to all simulated devices. So there is no need to spawn
-netconf-connectors via RESTCONF.
 
 Running testtool and OpenDaylight on different machines
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -392,24 +388,21 @@ directory called test-schemas/, e.g., your home folder.
 Editing data for simulated device
 '''''''''''''''''''''''''''''''''
 
+-  Start OpenDaylight
+
+-  Install odl-netconf-topology and odl-restconf-nb features
+
 -  Start the device with following command:
 
    ::
 
-       java -jar netconf-testtool-1.1.0-SNAPSHOT-executable.jar --device-count 10 --distribution-folder ~/distribution-karaf-0.4.0-SNAPSHOT/ --debug true --schemas-dir ~/test-schemas/
+       java -jar netconf-testtool-[VERSION]-executable.jar --controller-ip 127.0.0.1 --controller-port 8181 --debug true --schemas-dir ~/test-schemas/
 
--  Start OpenDaylight
-
--  Install odl-netconf-connector-all feature
-
--  Install odl-restconf feature
-
--  Check that you can see config data for simulated device by executing
-   GET request to
+-  Check that you can see config data for simulated device by executing GET request to:
 
    ::
 
-       http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/17830-sim-device/yang-ext:mount/
+       http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount?content=config
 
 -  The data should be just and empty data container
 
@@ -417,7 +410,7 @@ Editing data for simulated device
 
    ::
 
-       http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/17830-sim-device/yang-ext:mount
+       http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount
 
    with headers:
 
@@ -433,20 +426,21 @@ Editing data for simulated device
        <cont xmlns="urn:opendaylight:test">
          <l>Content</l>
        </cont>
+- Response should be 201 with empty body
 
 -  Check that you can see modified config data for simulated device by
    executing GET request to
 
    ::
 
-       http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/17830-sim-device/yang-ext:mount/
+       http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount?content=config
 
 -  Check that you can see the same modified data in operational for
    simulated device by executing GET request to
 
    ::
 
-       http://localhost:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/17830-sim-device/yang-ext:mount/
+       http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount?content=noconfig
 
 .. warning::
 
@@ -463,13 +457,7 @@ with parameter ``--schemas-dir``.
 The input and output of the custom RPC should be provided with ``--rpc-config`` parameter as a path to the file containing
 definition of input and output. The format of the custom RPC file is xml as shown below.
 
-Start the device with following command:
-
-::
-
-    java -jar netconf/tools/netconf-testtool/target/netconf-testtool-1.7.0-SNAPSHOT-executable.jar --schemas-dir ~/test-schemas/ --rpc-config ~/tmp/customrpc.xml --debug=true
-
-Example YANG model file:
+Example YANG model file (stored in folder ~/test-schemas/):
 
 ::
 
@@ -508,7 +496,7 @@ Example YANG model file:
        }
 
 
-Example payload (RPC config file customrpc.xml):
+Example payload (RPC config file ~/tmp/customrpc.xml):
 
 ::
 
@@ -528,15 +516,31 @@ Example payload (RPC config file customrpc.xml):
       </rpc>
     </rpcs>
 
+Start the device with following command:
+
+::
+
+    java -jar netconf-testtool-[VERSION]-executable.jar --controller-ip 127.0.0.1 --controller-port 8181 --schemas-dir ~/test-schemas/ --rpc-config ~/tmp/customrpc.xml --debug=true
+
 
 
 Example of use:
 
 ::
 
-    POST http://localhost:8181/restconf/operations/network-topology:network-topology/topology/topology-netconf/node/new-netconf-device/yang-ext:mount/example-ops:get-reboot-info
+    POST http://localhost:8181/rests/operations/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount/example-ops:reboot
 
-If successful the command will return code 200.
+    With body:
+
+::
+
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <input xmlns="urn:example-ops:reboot">
+      <delay>300</delay>
+      <message>message</message>
+    </input>
+
+If successful the response should be 204.
 
 
 
