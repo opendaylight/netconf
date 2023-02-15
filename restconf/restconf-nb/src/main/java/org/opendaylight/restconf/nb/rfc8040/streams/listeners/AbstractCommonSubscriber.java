@@ -120,10 +120,8 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
 
     @Override
     public synchronized void removeSubscriber(final StreamSessionHandler subscriber) {
-        final boolean isConnected = subscriber.isConnected();
-        checkState(isConnected);
-        LOG.debug("Subscriber {} is removed", subscriber);
         subscribers.remove(subscriber);
+        LOG.debug("Subscriber {} is removed", subscriber);
         if (!hasSubscribers()) {
             ListenersBroker.getInstance().removeAndCloseListener(this);
         }
