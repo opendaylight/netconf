@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import org.eclipse.jetty.websocket.api.CloseException;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
@@ -122,9 +124,14 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
      */
     @OnWebSocketError
     public synchronized void onWebSocketError(final Throwable error) {
-        LOG.warn("An error occurred on web-socket: ", error);
+        if (error instanceof CloseException && error.getCause() instanceof TimeoutException) {
+            // do not stacktrace timeout exception, it's expected behavior not error
+            LOG.info("Web-socket closed by timeout: {}", error.getCause().getMessage());
+        } else {
+            LOG.warn("An error occurred on web-socket: ", error);
+        }
         if (session != null) {
-            LOG.warn("Trying to close web-socket session {} gracefully after error.", session);
+            LOG.info("Trying to close web-socket session {} gracefully after error.", session);
             listener.removeSubscriber(this);
             if (session.isOpen()) {
                 session.close();
