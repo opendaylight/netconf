@@ -29,5 +29,7 @@ public record StreamsConfiguration(int maximumFragmentLength, int idleTimeout, i
         checkArgument(idleTimeout > 0, "Idle timeout must be specified by positive value.");
         checkArgument(heartbeatInterval >= 0,
             "Heartbeat ping interval must be disabled (0) or specified by positive value.");
+        checkArgument(idleTimeout > heartbeatInterval, // avoid socket timeout before ping is sent
+                "Idle timeout must be greater than heartbeat ping interval.");
     }
 }
