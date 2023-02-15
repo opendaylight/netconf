@@ -79,7 +79,7 @@ public final class TesttoolParameters {
 
     @SuppressWarnings("checkstyle:lineLength")
     static ArgumentParser getParser() {
-        final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf testtool");
+        final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf testtool").defaultHelp(true);
 
         parser.description("netconf testtool");
 
