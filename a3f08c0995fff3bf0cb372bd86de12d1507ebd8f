@@ -33,6 +33,24 @@
       "message": "Please split those unrelated fixes into separate patches",
       "revId": "a3f08c0995fff3bf0cb372bd86de12d1507ebd8f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71907ed3_6e3fe6c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-02-16T10:59:33Z",
+      "side": 1,
+      "message": "Done https://git.opendaylight.org/gerrit/c/netconf/+/104423",
+      "parentUuid": "ca25af34_04d35da9",
+      "revId": "a3f08c0995fff3bf0cb372bd86de12d1507ebd8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
