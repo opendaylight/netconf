@@ -100,9 +100,9 @@ public final class ScaleUtil {
                     root.warn(status);
                 } while (status.startsWith("Failed to get the session"));
                 root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath()
-                    + "/bin/client feature:install odl-restconf-nb-rfc8040 odl-netconf-topology");
+                    + "/bin/client feature:install odl-restconf-nb odl-netconf-topology");
                 final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath()
-                    + "/bin/client feature:install odl-restconf-nb-rfc8040 odl-netconf-topology");
+                    + "/bin/client feature:install odl-restconf-nb odl-netconf-topology");
                 root.warn(
                     CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
                 root.warn(
