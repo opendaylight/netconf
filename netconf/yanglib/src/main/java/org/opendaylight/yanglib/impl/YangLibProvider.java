@@ -198,13 +198,29 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         }
     }
 
+    @Override
+    public String getSchema(final String name) {
+        LOG.debug("Attempting load for schema source {}: no-revision", name);
+        final var sourceId = new SourceIdentifier(name);
+        final var yangTextSchemaFuture = schemaRepository.getSchemaSource(sourceId, YangTextSchemaSource.class);
+
+        try {
+            final var yangTextSchemaSource = yangTextSchemaFuture.get();
+            return yangTextSchemaSource.asCharSource(StandardCharsets.UTF_8).read();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new IllegalStateException("Unable to get schema " + sourceId, e);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to read schema " + sourceId, e);
+        }
+    }
+
     private Uri getUrlForModule(final SourceIdentifier sourceIdentifier) {
         return new Uri("http://" + yanglibConfig.getBindingAddr() + ':' + yanglibConfig.getBindingPort()
-                + "/yanglib/schemas/" + sourceIdentifier.name().getLocalName() + '/' + revString(sourceIdentifier));
+                + "/yanglib/schemas/" + sourceIdentifier.name().getLocalName()  + revString(sourceIdentifier));
     }
 
     private static String revString(final SourceIdentifier id) {
         final var rev = id.revision();
-        return rev != null ? rev.toString() : "";
+        return rev != null ? "/" + rev : "";
     }
 }
