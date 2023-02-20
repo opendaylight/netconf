@@ -1,0 +1,10 @@
+module model2 {
+  namespace "model:with:no:revision";
+  prefix mwnr;
+
+  container test {
+    leaf test-leaf {
+      type string;
+    }
+  }
+}
