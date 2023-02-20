@@ -1,0 +1,15 @@
+module model1 {
+  namespace "model:with:revision";
+  prefix mwr;
+
+  revision 2023-02-21 {
+    description
+      "Initial revision;";
+  }
+
+  container test {
+    leaf test-leaf {
+      type string;
+    }
+  }
+}
