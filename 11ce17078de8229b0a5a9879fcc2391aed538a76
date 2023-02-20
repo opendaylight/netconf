@@ -16,6 +16,24 @@
       "message": "\u003e\u003e looks like TAB",
       "revId": "11ce17078de8229b0a5a9879fcc2391aed538a76",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40be7cbe_7a94b49b",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 1314,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-20T08:22:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1eb7d00c_37d77082",
+      "revId": "11ce17078de8229b0a5a9879fcc2391aed538a76",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
