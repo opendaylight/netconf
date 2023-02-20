@@ -30,4 +30,13 @@ public interface YangLibService {
     @GET
     @Path("/schemas/{modelName}/{revision:([0-9\\-]*)}")
     String getSchema(@PathParam("modelName") String name, @PathParam("revision") String revision);
+
+    /**
+     * Get module's source for each module from yang library without a revision.
+     * @param name Module's name
+     * @return Module's source
+     */
+    @GET
+    @Path("/schemas/{modelName}")
+    String getSchema(@PathParam("modelName") String name);
 }
