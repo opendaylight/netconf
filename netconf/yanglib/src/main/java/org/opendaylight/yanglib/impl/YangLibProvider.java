@@ -179,20 +179,24 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     @Override
     public String getSchema(final String name, final String revision) {
         LOG.debug("Attempting load for schema source {}:{}", name, revision);
-        final SourceIdentifier sourceId = new SourceIdentifier(name, revision.isEmpty() ? null : revision);
+        final var sourceId = new SourceIdentifier(name, revision.isEmpty() ? null : revision);
+        return getYangModel(sourceId);
+    }
 
-        final ListenableFuture<YangTextSchemaSource> sourceFuture = schemaRepository.getSchemaSource(sourceId,
-            YangTextSchemaSource.class);
+    @Override
+    public String getSchema(final String name) {
+        LOG.debug("Attempting load for schema source {}: no-revision", name);
+        final var sourceId = new SourceIdentifier(name);
+        return getYangModel(sourceId);
+    }
 
-        final YangTextSchemaSource source;
+    private String getYangModel(final SourceIdentifier sourceId) {
+        final var yangTextSchemaFuture = schemaRepository.getSchemaSource(sourceId, YangTextSchemaSource.class);
         try {
-            source = sourceFuture.get();
+            final var yangTextSchemaSource = yangTextSchemaFuture.get();
+            return yangTextSchemaSource.asCharSource(StandardCharsets.UTF_8).read();
         } catch (InterruptedException | ExecutionException e) {
             throw new IllegalStateException("Unable to get schema " + sourceId, e);
-        }
-
-        try {
-            return source.asCharSource(StandardCharsets.UTF_8).read();
         } catch (IOException e) {
             throw new IllegalStateException("Unable to read schema " + sourceId, e);
         }
@@ -200,11 +204,11 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
 
     private Uri getUrlForModule(final SourceIdentifier sourceIdentifier) {
         return new Uri("http://" + yanglibConfig.getBindingAddr() + ':' + yanglibConfig.getBindingPort()
-                + "/yanglib/schemas/" + sourceIdentifier.name().getLocalName() + '/' + revString(sourceIdentifier));
+                + "/yanglib/schemas/" + sourceIdentifier.name().getLocalName() + revString(sourceIdentifier));
     }
 
     private static String revString(final SourceIdentifier id) {
         final var rev = id.revision();
-        return rev != null ? rev.toString() : "";
+        return rev != null ? "/" + rev : "";
     }
 }
