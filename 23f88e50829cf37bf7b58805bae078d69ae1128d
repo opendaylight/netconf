@@ -54,6 +54,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "105c6685_aec7b99b",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyPipelineAwareChannelSubsystem.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-20T08:38:39Z",
+      "side": 1,
+      "message": "OK, add these finding to commit msg, please.",
+      "parentUuid": "0b75175d_196f67ba",
+      "revId": "23f88e50829cf37bf7b58805bae078d69ae1128d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d8606d7_3bb1565b",
