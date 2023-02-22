@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ff8fc83_0d5df9d0",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1196,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-22T16:12:54Z",
+      "side": 1,
+      "message": "IMO `example-device` was better.",
+      "revId": "32d84072082ae4d53386c6de1ca273c714bab57d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9907ac05_1ae39ed8",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1283,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-22T16:12:54Z",
+      "side": 1,
+      "message": "Can we use YANG 1.1?",
+      "revId": "32d84072082ae4d53386c6de1ca273c714bab57d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7353462e_821d5ada",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1344,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-22T16:12:54Z",
+      "side": 1,
+      "message": "This is probably not correct way to refer another document. We have different versions - not `latest` only.\n\nTry to refer document in \"RST way\", see `index.rst` for example.",
+      "revId": "32d84072082ae4d53386c6de1ca273c714bab57d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
