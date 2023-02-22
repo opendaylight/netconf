@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "574e6568_d0b9368c",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-22T13:20:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3767bdbb_b33930bb",
+      "revId": "a4110e111cc4fcc0b7455d4ee3a5c9a57576e5e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "374dda64_05a28ab2",
@@ -31,6 +49,41 @@
       "writtenOn": "2023-02-22T09:12:17Z",
       "side": 1,
       "message": "Remove all \"restconf/config\" and \"draft-bierman-netconf-restconf-02\" references from this documentation.",
+      "revId": "a4110e111cc4fcc0b7455d4ee3a5c9a57576e5e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12f18d1c_0ceda086",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-22T13:20:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "374dda64_05a28ab2",
+      "revId": "a4110e111cc4fcc0b7455d4ee3a5c9a57576e5e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ace9ce78_5faa89fc",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-22T13:20:35Z",
+      "side": 1,
+      "message": "odl-restconf-nb",
       "revId": "a4110e111cc4fcc0b7455d4ee3a5c9a57576e5e1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

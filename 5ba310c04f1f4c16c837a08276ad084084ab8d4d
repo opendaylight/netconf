@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82c05113_1ee361c1",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 597,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-22T13:20:35Z",
+      "side": 1,
+      "message": "Can you please update this wrong link to netopeer device with:\nhttps://hub.docker.com/r/sysrepo/sysrepo-netopeer2\n\nAlso fix other steps with:\n2) docker run -it --name sysrepo -p 830:830 --rm sysrepo/sysrepo-netopeer2:latest\n3) ssh root@localhost -p 830 -s netconf",
+      "revId": "5ba310c04f1f4c16c837a08276ad084084ab8d4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de75e5c6_bd8b3a12",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 910,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-22T13:20:35Z",
+      "side": 1,
+      "message": "Is it necessary to include \u0027HTTP/1.1\u0027 at the end of the URI request?\nI have noticed that I sometimes copy the entire line without realizing that the URI ends before \u0027HTTP/1.1\u0027.\n\nI would prefer to move it to the line above (\"PUT HTTP/1.1\") or remove it altogether.",
+      "revId": "5ba310c04f1f4c16c837a08276ad084084ab8d4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
