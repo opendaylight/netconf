@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3767bdbb_b33930bb",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-22T09:12:17Z",
+      "side": 1,
+      "message": "Now is only one. Remove Bierman references as you described in commit message.",
+      "revId": "a4110e111cc4fcc0b7455d4ee3a5c9a57576e5e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "374dda64_05a28ab2",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-22T09:12:17Z",
+      "side": 1,
+      "message": "Remove all \"restconf/config\" and \"draft-bierman-netconf-restconf-02\" references from this documentation.",
+      "revId": "a4110e111cc4fcc0b7455d4ee3a5c9a57576e5e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
