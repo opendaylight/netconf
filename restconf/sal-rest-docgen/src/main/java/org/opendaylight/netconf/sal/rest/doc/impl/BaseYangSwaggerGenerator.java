@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
-import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.DEFAULT_PAGESIZE;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildDelete;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildGet;
@@ -28,9 +27,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import java.io.IOException;
-import java.net.URI;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,8 +47,6 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Components;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Info;
 import org.opendaylight.netconf.sal.rest.doc.swagger.OpenApiObject;
-import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
-import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Server;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
@@ -95,54 +90,6 @@ public abstract class BaseYangSwaggerGenerator {
 
     public DOMSchemaService getSchemaService() {
         return schemaService;
-    }
-
-    public ResourceList getResourceListing(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
-                                           final String context, final OAversion oaversion) {
-        return getResourceListing(uriInfo, schemaContext, context, 0, true, oaversion);
-    }
-
-    /**
-     * Return list of modules converted to swagger compliant resource list.
-     */
-    public ResourceList getResourceListing(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
-                                           final String context, final int pageNum, final boolean all,
-                                           final OAversion oaversion) {
-        final ResourceList resourceList = createResourceList();
-
-        final Set<Module> modules = getSortedModules(schemaContext);
-
-        final List<Resource> resources = new ArrayList<>(DEFAULT_PAGESIZE);
-
-        LOG.info("Modules found [{}]", modules.size());
-        final int start = DEFAULT_PAGESIZE * pageNum;
-        final int end = start + DEFAULT_PAGESIZE;
-        int count = 0;
-        for (final Module module : modules) {
-            final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
-
-            LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
-            final SwaggerObject doc = getApiDeclaration(module.getName(), revisionString, uriInfo, schemaContext,
-                    context, oaversion);
-            if (doc != null) {
-                count++;
-                if (count >= start && count < end || all) {
-                    final Resource resource = new Resource();
-                    resource.setPath(generatePath(uriInfo, module.getName(), revisionString));
-                    resources.add(resource);
-                }
-
-                if (count >= end && !all) {
-                    break;
-                }
-            } else {
-                LOG.warn("Could not generate doc for {},{}", module.getName(), revisionString);
-            }
-        }
-
-        resourceList.setApis(resources);
-
-        return resourceList;
     }
 
     public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames,
@@ -220,18 +167,6 @@ public abstract class BaseYangSwaggerGenerator {
         }
     }
 
-    public ResourceList createResourceList() {
-        final ResourceList resourceList = new ResourceList();
-        resourceList.setApiVersion(API_VERSION);
-        resourceList.setSwaggerVersion(SWAGGER_VERSION);
-        return resourceList;
-    }
-
-    public String generatePath(final UriInfo uriInfo, final String name, final String revision) {
-        final URI uri = uriInfo.getRequestUriBuilder().replaceQuery("").path(generateCacheKey(name, revision)).build();
-        return uri.toASCIIString();
-    }
-
     public CommonApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
                                              final OAversion oaversion) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
@@ -287,7 +222,6 @@ public abstract class BaseYangSwaggerGenerator {
         return getSwaggerDocSpec(module, context, Optional.empty(), schemaContext, oaversion, definitionNames, doc,
             true);
     }
-
 
     public SwaggerObject getSwaggerDocSpec(final Module module, final String context, final Optional<String> deviceName,
                                            final EffectiveModelContext schemaContext, final OAversion oaversion,
