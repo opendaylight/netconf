@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "673acd01_3111a280",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/api/YangLibService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-22T16:15:38Z",
+      "side": 1,
+      "message": "IMO we do not need new API. IIRC {} means something not mandatory :D",
+      "revId": "3e7479dab3e8eccf59d0b2da1928ea5ba4e68ae6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
