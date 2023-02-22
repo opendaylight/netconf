@@ -17,19 +17,9 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
+import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 
-public class CallHomeTopology extends BaseCallHomeTopology {
-
-    public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-            final EventExecutor eventExecutor,
-            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-            final SchemaResourceManager schemaRepositoryProvider,
-            final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas) {
-        this(topologyId, clientDispatcher, eventExecutor,
-                keepaliveExecutor, processingExecutor, schemaRepositoryProvider,
-                dataBroker, mountPointService, encryptionService, baseSchemas, null);
-    }
+public final class CallHomeTopology extends AbstractNetconfTopology {
 
     public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                             final EventExecutor eventExecutor,
