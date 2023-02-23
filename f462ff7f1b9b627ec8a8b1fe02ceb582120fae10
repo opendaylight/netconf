@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca66fe94_b32ed688",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractCommonSubscriber.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-23T16:58:18Z",
+      "side": 1,
+      "message": "no more string :D",
+      "revId": "f462ff7f1b9b627ec8a8b1fe02ceb582120fae10",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
