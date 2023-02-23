@@ -66,6 +66,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     private final YanglibConfig yanglibConfig;
     private final SharedSchemaRepository schemaRepository;
     private SchemaListenerRegistration schemaListenerRegistration;
+    private File cacheFolderFile;
 
     public YangLibProvider(final YanglibConfig yanglibConfig, final DataBroker dataBroker,
             final YangParserFactory parserFactory) {
@@ -87,7 +88,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
             return;
         }
 
-        final File cacheFolderFile = new File(yanglibConfig.getCacheFolder());
+       cacheFolderFile = new File(yanglibConfig.getCacheFolder());
         if (cacheFolderFile.exists()) {
             LOG.info("cache-folder {} already exists", cacheFolderFile);
         } else {
@@ -95,12 +96,6 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
             LOG.info("cache-folder {} was created", cacheFolderFile);
         }
         checkArgument(cacheFolderFile.isDirectory(), "cache-folder %s is not a directory", cacheFolderFile);
-
-        final FilesystemSchemaSourceCache<YangTextSchemaSource> cache =
-                new FilesystemSchemaSourceCache<>(schemaRepository, YangTextSchemaSource.class, cacheFolderFile);
-        schemaRepository.registerSchemaSourceListener(cache);
-
-        schemaListenerRegistration = schemaRepository.registerSchemaSourceListener(this);
 
         LOG.info("Started yang library with sources from {}", cacheFolderFile);
     }
@@ -178,9 +173,14 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
 
     @Override
     public String getSchema(final String name, final String revision) {
+        checkArgument(cacheFolderFile != null, "cache-folder can not be empty.");
+        LOG.debug("Registering sources from folder {}", cacheFolderFile);
+        final FilesystemSchemaSourceCache<YangTextSchemaSource> cache =
+            new FilesystemSchemaSourceCache<>(schemaRepository, YangTextSchemaSource.class, cacheFolderFile);
+        schemaRepository.registerSchemaSourceListener(cache);
+
         LOG.debug("Attempting load for schema source {}:{}", name, revision);
         final SourceIdentifier sourceId = new SourceIdentifier(name, revision.isEmpty() ? null : revision);
-
         final ListenableFuture<YangTextSchemaSource> sourceFuture = schemaRepository.getSchemaSource(sourceId,
             YangTextSchemaSource.class);
 
