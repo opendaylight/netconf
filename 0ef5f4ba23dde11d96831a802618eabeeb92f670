@@ -16,6 +16,24 @@
       "message": "than\n\nWhat is hearbeat is negative?",
       "revId": "0ef5f4ba23dde11d96831a802618eabeeb92f670",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "478323fe_aa244bab",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/StreamsConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-02-23T12:16:10Z",
+      "side": 1,
+      "message": "it\u0027s validated in the line above",
+      "parentUuid": "caf62142_e07a31ff",
+      "revId": "0ef5f4ba23dde11d96831a802618eabeeb92f670",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
