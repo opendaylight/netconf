@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9680d47f_a0edd56e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-23T19:08:34Z",
+      "side": 1,
+      "message": "Please remove part:\n```\nSince Nitrogen release, there is performance regression in NETCONF servers accepting SSH connections. While opening a connection takes less than 10 seconds on Carbon, on Nitrogen time can increase up to 60 seconds. Please see https://bugs.opendaylight.org/show_bug.cgi?id\u003d9020\n```",
+      "revId": "222d815305fbcb27999eb81d70739c033e2cabab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
