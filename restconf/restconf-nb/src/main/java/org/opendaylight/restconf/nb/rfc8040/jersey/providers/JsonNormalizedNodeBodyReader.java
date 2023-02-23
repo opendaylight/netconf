@@ -8,13 +8,13 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.gson.stream.JsonReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -28,21 +28,15 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
-import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamPushTask;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
-import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree.NodeAndStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,62 +55,35 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
     protected NormalizedNodePayload readBody(final InstanceIdentifierContext path, final InputStream entityStream)
             throws WebApplicationException {
         try {
-            return readFrom(path, entityStream, isPost());
+            return readFrom(path, entityStream);
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null;
         }
     }
 
-    public static NormalizedNodePayload readFrom(
-            final InstanceIdentifierContext path, final InputStream entityStream, final boolean isPost) {
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
-        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+    public static NormalizedNodePayload readFrom(final InstanceIdentifierContext path, final InputStream entityStream)
+            throws IOException {
+        final var resultHolder = new NormalizedNodeResult();
+        final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+        final var jsonCodecFactory = JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext());
 
-        final Inference parentSchema;
-        if (isPost) {
-            parentSchema = path.inference();
-        } else {
-            final var stack = path.inference().toSchemaInferenceStack();
-            if (!stack.isEmpty()) {
-                stack.exit();
-            }
-            parentSchema = stack.toInference();
-        }
+        final var jsonStreamPushTask = JSONNormalizedNodeStreamPushTask.builder()
+            .withCodecFactory(jsonCodecFactory)
+            .withInference(path.inference())
+            .withWriter(writer)
+            .build();
+        final var pathArguments = jsonStreamPushTask.execute();
+        final var yangInstanceIdentifier = YangInstanceIdentifier.create(pathArguments);
+        final var nodeAndStack = DataSchemaContextTree.from(path.getSchemaContext())
+            .enterPath(yangInstanceIdentifier).orElseThrow();
 
-        final JsonParserStream jsonParser = JsonParserStream.create(writer,
-            JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()), parentSchema);
-
-        final JsonReader reader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
-        jsonParser.parse(reader);
-
-        NormalizedNode result = resultHolder.getResult();
-        final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
-
-        while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
-            final var childNode = ((DataContainerNode) result).body().iterator().next();
-            if (isPost) {
-                iiToDataList.add(result.getIdentifier());
-            }
-            result = childNode;
-        }
-
-        if (isPost) {
-            if (result instanceof MapEntryNode) {
-                iiToDataList.add(new NodeIdentifier(result.getIdentifier().getNodeType()));
-                iiToDataList.add(result.getIdentifier());
-            } else {
-                final var parentPath = parentSchema.statementPath();
-                if (parentPath.isEmpty() || !(parentPath.get(parentPath.size() - 1) instanceof OperationDefinition)) {
-                    iiToDataList.add(result.getIdentifier());
-                }
-            }
-        } else if (result instanceof MapNode map) {
-            result = Iterables.getOnlyElement(map.body());
-        }
+        final var jsonParser = JsonParserStream.create(writer, jsonCodecFactory, nodeAndStack.stack().toInference());
+        final var jsonReader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
+        jsonParser.parse(jsonReader);
 
         // FIXME: can result really be null?
-        return NormalizedNodePayload.ofNullable(path.withConcatenatedArgs(iiToDataList), result);
+        return NormalizedNodePayload.ofNullable(path.withConcatenatedArgs(pathArguments), resultHolder.getResult());
     }
 
     private static void propagateExceptionAs(final Exception exception) throws RestconfDocumentedException {
