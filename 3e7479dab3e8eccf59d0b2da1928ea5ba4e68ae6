@@ -16,6 +16,24 @@
       "message": "IMO we do not need new API. IIRC {} means something not mandatory :D",
       "revId": "3e7479dab3e8eccf59d0b2da1928ea5ba4e68ae6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61ad4525_0e6cbc2c",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/api/YangLibService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-23T08:33:55Z",
+      "side": 1,
+      "message": "I only found REGEX hacks...\nhttps://szymonlis.wordpress.com/2014/03/27/optional-path-parameter-in-jax-rs\n\nhttps://nakov.com/blog/2009/07/15/jax-rs-path-pathparam-and-optional-parameters/",
+      "parentUuid": "673acd01_3111a280",
+      "revId": "3e7479dab3e8eccf59d0b2da1928ea5ba4e68ae6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
