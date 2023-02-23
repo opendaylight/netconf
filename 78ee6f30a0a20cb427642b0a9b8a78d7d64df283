@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05284327_f01e7fca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-23T11:41:02Z",
+      "side": 1,
+      "message": "We prefer `Signed-off-by: Yaroslav Lastivka \u003cyaroslav.lastivka@pantheon.tech\u003e` to be the last line.",
+      "revId": "78ee6f30a0a20cb427642b0a9b8a78d7d64df283",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98ad29d3_a59eab32",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeTopology.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-23T11:41:02Z",
+      "side": 1,
+      "message": "`public final`",
+      "revId": "78ee6f30a0a20cb427642b0a9b8a78d7d64df283",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
