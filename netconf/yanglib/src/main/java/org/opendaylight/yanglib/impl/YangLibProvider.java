@@ -40,13 +40,16 @@ import org.opendaylight.yanglib.api.YangLibService;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangIRSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaListenerRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
+import org.opendaylight.yangtools.yang.model.repo.spi.SoftSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +69,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     private final YanglibConfig yanglibConfig;
     private final SharedSchemaRepository schemaRepository;
     private SchemaListenerRegistration schemaListenerRegistration;
+    private File cacheFolderFile;
 
     public YangLibProvider(final YanglibConfig yanglibConfig, final DataBroker dataBroker,
             final YangParserFactory parserFactory) {
@@ -87,7 +91,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
             return;
         }
 
-        final File cacheFolderFile = new File(yanglibConfig.getCacheFolder());
+        cacheFolderFile = new File(yanglibConfig.getCacheFolder());
         if (cacheFolderFile.exists()) {
             LOG.info("cache-folder {} already exists", cacheFolderFile);
         } else {
@@ -95,12 +99,6 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
             LOG.info("cache-folder {} was created", cacheFolderFile);
         }
         checkArgument(cacheFolderFile.isDirectory(), "cache-folder %s is not a directory", cacheFolderFile);
-
-        final FilesystemSchemaSourceCache<YangTextSchemaSource> cache =
-                new FilesystemSchemaSourceCache<>(schemaRepository, YangTextSchemaSource.class, cacheFolderFile);
-        schemaRepository.registerSchemaSourceListener(cache);
-
-        schemaListenerRegistration = schemaRepository.registerSchemaSourceListener(this);
 
         LOG.info("Started yang library with sources from {}", cacheFolderFile);
     }
@@ -178,9 +176,11 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
 
     @Override
     public String getSchema(final String name, final String revision) {
+        checkArgument(cacheFolderFile != null, "cache-folder can not be empty.");
+        LOG.debug("Registering sources from folder {}", cacheFolderFile);
+        updateResources();
         LOG.debug("Attempting load for schema source {}:{}", name, revision);
         final SourceIdentifier sourceId = new SourceIdentifier(name, revision.isEmpty() ? null : revision);
-
         final ListenableFuture<YangTextSchemaSource> sourceFuture = schemaRepository.getSchemaSource(sourceId,
             YangTextSchemaSource.class);
 
@@ -196,6 +196,17 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         } catch (IOException e) {
             throw new IllegalStateException("Unable to read schema " + sourceId, e);
         }
+    }
+
+    private void updateResources() {
+        schemaRepository.registerSchemaSourceListener(TextToIRTransformer.create(schemaRepository, schemaRepository));
+
+        schemaRepository.registerSchemaSourceListener(
+                new SoftSchemaSourceCache<>(schemaRepository, YangIRSchemaSource.class));
+
+        final FilesystemSchemaSourceCache<YangTextSchemaSource> cache =
+                new FilesystemSchemaSourceCache<>(schemaRepository, YangTextSchemaSource.class, cacheFolderFile);
+        schemaRepository.registerSchemaSourceListener(cache);
     }
 
     private Uri getUrlForModule(final SourceIdentifier sourceIdentifier) {
