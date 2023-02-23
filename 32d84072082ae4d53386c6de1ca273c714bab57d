@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90eb2e27_dc562ac2",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1196,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-23T09:01:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ff8fc83_0d5df9d0",
+      "revId": "32d84072082ae4d53386c6de1ca273c714bab57d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9907ac05_1ae39ed8",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6adf318f_fa997e31",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1283,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-23T09:01:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9907ac05_1ae39ed8",
+      "revId": "32d84072082ae4d53386c6de1ca273c714bab57d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7353462e_821d5ada",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-02-22T16:12:54Z",
       "side": 1,
       "message": "This is probably not correct way to refer another document. We have different versions - not `latest` only.\n\nTry to refer document in \"RST way\", see `index.rst` for example.",
+      "revId": "32d84072082ae4d53386c6de1ca273c714bab57d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4170c7e6_ef07f6e6",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1344,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-23T09:01:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7353462e_821d5ada",
       "revId": "32d84072082ae4d53386c6de1ca273c714bab57d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
