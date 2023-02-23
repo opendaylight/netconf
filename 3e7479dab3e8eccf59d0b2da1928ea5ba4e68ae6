@@ -34,6 +34,24 @@
       "parentUuid": "673acd01_3111a280",
       "revId": "3e7479dab3e8eccf59d0b2da1928ea5ba4e68ae6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1771718e_fa28c40a",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/api/YangLibService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-23T09:43:12Z",
+      "side": 1,
+      "message": "OK, you are right :D we need another one API.\n\nBut anyway your implementation is just duplicity - refactor it.",
+      "parentUuid": "61ad4525_0e6cbc2c",
+      "revId": "3e7479dab3e8eccf59d0b2da1928ea5ba4e68ae6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
