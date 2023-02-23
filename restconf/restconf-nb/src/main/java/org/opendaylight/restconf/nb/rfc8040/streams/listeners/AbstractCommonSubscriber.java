@@ -146,13 +146,13 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
         stop = stopTime == null ? null : parseDateAndTime(stopTime.value());
 
         final var leafNodes = params.leafNodesOnly();
-        leafNodesOnly = leafNodes == null ? false : leafNodes.value();
+        leafNodesOnly = leafNodes != null && leafNodes.value();
 
         final var skipData = params.skipNotificationData();
-        skipNotificationData = skipData == null ? false : skipData.value();
+        skipNotificationData = skipData != null && skipData.value();
 
         final var changedLeafNodes = params.changedLeafNodesOnly();
-        changedLeafNodesOnly = changedLeafNodes == null ? false : changedLeafNodes.value();
+        changedLeafNodesOnly = changedLeafNodes != null && changedLeafNodes.value();
 
         final var filter = params.filter();
         final String filterValue = filter == null ? null : filter.paramValue();
@@ -277,7 +277,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
      * Parse input of query parameters - start-time or stop-time - from {@link DateAndTime} format
      * to {@link Instant} format.
      *
-     * @param uriValue Start-time or stop-time as string in {@link DateAndTime} format.
+     * @param dateAndTime Start-time or stop-time as {@link DateAndTime} object.
      * @return Parsed {@link Instant} by entry.
      */
     private static @NonNull Instant parseDateAndTime(final DateAndTime dateAndTime) {
