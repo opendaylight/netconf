@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -184,6 +187,13 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         final ListenableFuture<YangTextSchemaSource> sourceFuture = schemaRepository.getSchemaSource(sourceId,
             YangTextSchemaSource.class);
 
+        try {
+            final Future<?> updateFuture = updateModule(new File(yanglibConfig.getCacheFolder()));
+            updateFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+
         final YangTextSchemaSource source;
         try {
             source = sourceFuture.get();
@@ -196,6 +206,19 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         } catch (IOException e) {
             throw new IllegalStateException("Unable to read schema " + sourceId, e);
         }
+    }
+
+    private Future<?> updateModule(final File cacheFolderFile) {
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        return threadPool.submit(() -> update(cacheFolderFile));
+    }
+
+    private void update(final File cacheFolderFile) {
+        final FilesystemSchemaSourceCache<YangTextSchemaSource> cache =
+                new FilesystemSchemaSourceCache<>(schemaRepository, YangTextSchemaSource.class, cacheFolderFile);
+        schemaRepository.registerSchemaSourceListener(cache);
+
+        schemaListenerRegistration = schemaRepository.registerSchemaSourceListener(this);
     }
 
     private Uri getUrlForModule(final SourceIdentifier sourceIdentifier) {
