@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bb50841_3018987e",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-23T11:38:28Z",
+      "side": 1,
+      "message": "This is no more true - remove it.\n\nNow it configures netconf topology with REST API.",
+      "revId": "eb13a0e0eb278320d01283bfe9a316cd3b5cb75f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20faef96_56cd754b",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-23T11:38:28Z",
+      "side": 1,
+      "message": "This way we see in docs `–help`.\n\nUse something like: ``--rpc-config``",
+      "revId": "eb13a0e0eb278320d01283bfe9a316cd3b5cb75f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2881bb74_98ebecdc",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-23T11:38:28Z",
+      "side": 1,
+      "message": "In browser I see `–controller-ip and –controller-port parameters`. Fix that.\n\nUse something like: ``--rpc-config``",
+      "revId": "eb13a0e0eb278320d01283bfe9a316cd3b5cb75f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
