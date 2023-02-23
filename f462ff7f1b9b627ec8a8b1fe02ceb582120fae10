@@ -16,6 +16,24 @@
       "message": "no more string :D",
       "revId": "f462ff7f1b9b627ec8a8b1fe02ceb582120fae10",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8e4747e_906012ed",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractCommonSubscriber.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-23T17:55:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca66fe94_b32ed688",
+      "revId": "f462ff7f1b9b627ec8a8b1fe02ceb582120fae10",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
