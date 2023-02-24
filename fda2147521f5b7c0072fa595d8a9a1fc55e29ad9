@@ -16,6 +16,24 @@
       "message": "Remove this section the same \"hint\" is also in \"Downloading testtool\".",
       "revId": "fda2147521f5b7c0072fa595d8a9a1fc55e29ad9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0898e991_f0d221b2",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-24T10:28:19Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "b25ad3b9_d881e8e7",
+      "revId": "fda2147521f5b7c0072fa595d8a9a1fc55e29ad9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

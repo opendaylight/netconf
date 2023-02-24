@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a43c7ec6_202cbbef",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-24T10:28:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4bb50841_3018987e",
+      "revId": "eb13a0e0eb278320d01283bfe9a316cd3b5cb75f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20faef96_56cd754b",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a560633_0c9ce203",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-24T10:28:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20faef96_56cd754b",
+      "revId": "eb13a0e0eb278320d01283bfe9a316cd3b5cb75f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2881bb74_98ebecdc",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-02-23T11:38:28Z",
       "side": 1,
       "message": "In browser I see `–controller-ip and –controller-port parameters`. Fix that.\n\nUse something like: ``--rpc-config``",
+      "revId": "eb13a0e0eb278320d01283bfe9a316cd3b5cb75f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be3395cd_632d7dc1",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-24T10:28:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2881bb74_98ebecdc",
       "revId": "eb13a0e0eb278320d01283bfe9a316cd3b5cb75f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
