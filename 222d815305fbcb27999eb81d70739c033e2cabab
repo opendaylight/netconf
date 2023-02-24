@@ -50,6 +50,24 @@
       "message": "This is incorrect formatting, correct way is ``username`` ...",
       "revId": "222d815305fbcb27999eb81d70739c033e2cabab",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4d70f35_2b193e61",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 1012,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-24T09:34:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00a35e1e_c332d2bd",
+      "revId": "222d815305fbcb27999eb81d70739c033e2cabab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
