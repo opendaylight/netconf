@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4e8ab048_6c4a47ae",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 947,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-24T18:34:07Z",
+      "side": 1,
+      "message": "IMO its better to use: `/rests/data/odl-netconf-callhome-server:netconf-callhome-server/global/accept-all-ssh-keys` because that way we do not override the whole container.",
+      "revId": "222d815305fbcb27999eb81d70739c033e2cabab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "00a35e1e_c332d2bd",
         "filename": "docs/user-guide.rst",
         "patchSetId": 10

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8870fae9_58a0678e",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-24T18:34:07Z",
+      "side": 1,
+      "message": "Always download the latest version of your patch - you have removed some stuff from patch set 10 and in patch set 11 you did not follow review comments.",
+      "revId": "0c37c1470274db2c0ee927d75e6c9f3cb477d5fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b18769a_dc47df56",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-24T18:34:07Z",
+      "side": 1,
+      "message": "Replace with RFC - there are 2 occurrences in this document.",
+      "revId": "0c37c1470274db2c0ee927d75e6c9f3cb477d5fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d2e21d9_0281ea65",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-24T18:34:07Z",
+      "side": 1,
+      "message": "Replace with: `Since 2022.09 Chlorine there is only one RESTCONF endpoint:`",
+      "revId": "0c37c1470274db2c0ee927d75e6c9f3cb477d5fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73c1d3a8_4293575d",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 954,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-24T18:34:07Z",
+      "side": 1,
+      "message": "Use just:\n```\n{\n  \"accept-all-ssh-keys\": \"true\"\n}\n```",
+      "revId": "0c37c1470274db2c0ee927d75e6c9f3cb477d5fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
