@@ -16,6 +16,24 @@
       "message": "Please use logic as in DefaultSchemaResourceManager.",
       "revId": "b61cd7257c6e1da6b2b4c602fc3f0e34b2699265",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db52bbf7_bd8d07df",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-02-24T17:44:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28166e58_dbc42ec8",
+      "revId": "b61cd7257c6e1da6b2b4c602fc3f0e34b2699265",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
