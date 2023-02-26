@@ -1,0 +1,9 @@
+Verified+1: jenkins-releng ODL
+Code-Review+2: Robert Varga <nite@hq.sk>
+Code-Review+1: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Code-Review+1: Oleksandr Zharov <oleksandr.zharov@pantheon.tech>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Sun, 26 Feb 2023 13:41:14 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/104403
+Project: netconf
+Branch: refs/heads/master
