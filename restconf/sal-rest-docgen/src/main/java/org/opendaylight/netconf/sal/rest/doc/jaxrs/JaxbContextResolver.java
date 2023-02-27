@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.util.ObjectMapperInitializer;
 
 @Provider
 @Consumes(MediaType.APPLICATION_JSON)
@@ -23,7 +24,7 @@ public class JaxbContextResolver implements ContextResolver<ObjectMapper> {
     private final ObjectMapper ctx;
 
     public JaxbContextResolver() {
-        ctx = new ObjectMapper();
+        ctx = ObjectMapperInitializer.getMapper();
     }
 
     @Override

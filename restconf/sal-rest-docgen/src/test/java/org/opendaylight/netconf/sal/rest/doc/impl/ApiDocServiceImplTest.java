@@ -20,6 +20,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
+import org.opendaylight.netconf.sal.rest.doc.util.ObjectMapperInitializer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -50,8 +51,13 @@ public final class ApiDocServiceImplTest extends AbstractApiDocTest {
     public void getListOfMounts() throws Exception {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         // simulate the behavior of JacksonJaxbJsonProvider
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = ObjectMapperInitializer.getMapper();
         final String result = mapper.writer().writeValueAsString(apiDocService.getListOfMounts(mockInfo).getEntity());
-        assertEquals("[{\"instance\":\"/nodes/node=123/\",\"id\":1}]", result);
+        assertEquals("""
+    [ {
+      \"instance\" : \"/nodes/node=123/\",
+      \"id\" : 1
+    } ]
+    """, result);
     }
 }

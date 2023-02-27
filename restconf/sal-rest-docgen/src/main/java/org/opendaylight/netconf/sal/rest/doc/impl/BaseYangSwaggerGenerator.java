@@ -55,6 +55,7 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Server;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
+import org.opendaylight.netconf.sal.rest.doc.util.ObjectMapperInitializer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -82,7 +83,7 @@ public abstract class BaseYangSwaggerGenerator {
 
     private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = ObjectMapperInitializer.getMapper();
     private final DOMSchemaService schemaService;
 
     public static final String BASE_PATH = "/";
