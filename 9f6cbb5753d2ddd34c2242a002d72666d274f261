@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d43ce6f7_20db0e94",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-27T15:59:49Z",
+      "side": 1,
+      "message": "This REST API needs to provide YANG model as a response. Getting YANG model in asynchronous call doesn\u0027t make sense.",
+      "parentUuid": "b6bcb84b_12fef220",
+      "revId": "9f6cbb5753d2ddd34c2242a002d72666d274f261",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eea2adcb_724c2ba5",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60db88f4_94dd12e0",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-27T15:59:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eea2adcb_724c2ba5",
+      "revId": "9f6cbb5753d2ddd34c2242a002d72666d274f261",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "49ed93c7_68a8c352",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-02-27T12:56:30Z",
       "side": 1,
       "message": "Why do we have 3 commits now?",
+      "revId": "9f6cbb5753d2ddd34c2242a002d72666d274f261",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7fdd327_7025472e",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-02-27T15:59:49Z",
+      "side": 1,
+      "message": "Because it will create 3 commits.\nThe first commit is created with `yangLibProvider.init();` In \"setUp\" method.\nThis was not executed before because initial YangLib cacheFolder was empty.\n\nTwo others are made inside tests with a method \"yangLibProvider.schemaSourceUnregistered(schemaSource*);\"",
+      "parentUuid": "49ed93c7_68a8c352",
       "revId": "9f6cbb5753d2ddd34c2242a002d72666d274f261",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
