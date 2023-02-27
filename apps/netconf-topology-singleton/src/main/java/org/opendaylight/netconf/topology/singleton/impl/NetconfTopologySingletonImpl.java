@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import akka.actor.ActorRef;
 import akka.cluster.Cluster;
 import akka.util.Timeout;
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -18,7 +19,6 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
@@ -26,6 +26,7 @@ import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 
 final class NetconfTopologySingletonImpl extends AbstractNetconfTopology implements AutoCloseable {
     private final RemoteDeviceId remoteDeviceId;
@@ -58,8 +59,8 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
         // create master actor reference
         final String masterAddress = Cluster.get(setup.getActorSystem()).selfAddress().toString();
         masterActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, remoteDeviceId,
-                        actorResponseWaitTime, mountPointService), NetconfTopologyUtils.createMasterActorName(
-                                remoteDeviceId.name(), masterAddress));
+                actorResponseWaitTime, mountPointService), NetconfTopologyUtils.createMasterActorName(
+                remoteDeviceId.name(), masterAddress));
 
         // setup connection to device
         connectNode(setup.getNode().getNodeId(), setup.getNode());
@@ -97,10 +98,16 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
         }
     }
 
-    @Override
-    public RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final boolean lockDatastore) {
-        masterSalFacade = new MasterSalFacade(deviceId, setup.getActorSystem(), masterActorRef, actorResponseWaitTime,
-            mountPointService, dataBroker, lockDatastore);
+//    @VisibleForTesting
+//    protected MasterSalFacade getMasterSalFacade() {
+//        return masterSalFacade;
+//    }
+
+    @VisibleForTesting
+    protected MasterSalFacade newSalFacade() {
+        masterSalFacade = new MasterSalFacade(remoteDeviceId, setup.getActorSystem(), masterActorRef,
+                actorResponseWaitTime, mountPointService, dataBroker,
+                setup.getNode().augmentation(NetconfNode.class).getLockDatastore());
         return masterSalFacade;
     }
 }
