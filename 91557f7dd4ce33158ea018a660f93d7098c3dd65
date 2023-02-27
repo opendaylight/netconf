@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "850c2271_1a5cfa8c",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-27T13:23:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c5c3dcd_214c9050",
+      "revId": "91557f7dd4ce33158ea018a660f93d7098c3dd65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2106b1c_bc656249",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-02-27T08:57:39Z",
       "side": 1,
       "message": "?content is not correct parameter for POST requests.",
+      "revId": "91557f7dd4ce33158ea018a660f93d7098c3dd65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38b29a1b_c8890641",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-27T13:23:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2106b1c_bc656249",
       "revId": "91557f7dd4ce33158ea018a660f93d7098c3dd65",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
