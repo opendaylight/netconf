@@ -79,18 +79,20 @@ public abstract class BaseYangSwaggerGenerator {
     private static final String API_VERSION = "1.0.0";
     private static final String SWAGGER_VERSION = "2.0";
     private static final String OPEN_API_VERSION = "3.0.3";
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
-
-    private final ObjectMapper mapper = new ObjectMapper();
     private final DOMSchemaService schemaService;
 
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
 
+    static {
+        MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+    }
+
     protected BaseYangSwaggerGenerator(final Optional<DOMSchemaService> schemaService) {
         this.schemaService = schemaService.orElse(null);
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
 
     public DOMSchemaService getSchemaService() {
@@ -306,7 +308,7 @@ public abstract class BaseYangSwaggerGenerator {
                 addFields(doc.getDefinitions(), definitions.fields());
             }
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Document: {}", mapper.writeValueAsString(doc));
+                LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
             }
         } catch (final IOException e) {
             LOG.error("Exception occured in DefinitionGenerator", e);
