@@ -262,7 +262,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, yanglibRegistrations);
     }
 
-    protected RemoteDeviceHandler createSalFacade(RemoteDeviceId deviceId, boolean lockDatastore) {
+    public RemoteDeviceHandler createSalFacade(RemoteDeviceId deviceId, boolean lockDatastore) {
         return new NetconfTopologyDeviceSalFacade(deviceId, mountPointService, lockDatastore, dataBroker);
     }
 
