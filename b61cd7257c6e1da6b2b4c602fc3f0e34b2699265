@@ -34,6 +34,24 @@
       "parentUuid": "28166e58_dbc42ec8",
       "revId": "b61cd7257c6e1da6b2b4c602fc3f0e34b2699265",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ac4be1e_73e3d39d",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T13:22:34Z",
+      "side": 1,
+      "message": "Where? When? Just copy\u0026paste is expected.",
+      "parentUuid": "db52bbf7_bd8d07df",
+      "revId": "b61cd7257c6e1da6b2b4c602fc3f0e34b2699265",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
