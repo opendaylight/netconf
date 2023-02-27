@@ -16,6 +16,24 @@
       "message": "Hello, here! Replace me with RFC :)",
       "revId": "32c8c6032c6ed2eb6aa6711f237f36311b4d77a4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "483b9ca3_77ac3b47",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 714,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-27T07:45:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10f1016b_956348ef",
+      "revId": "32c8c6032c6ed2eb6aa6711f237f36311b4d77a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

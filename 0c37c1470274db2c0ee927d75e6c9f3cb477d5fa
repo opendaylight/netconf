@@ -35,6 +35,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8319bb4d_83f64aec",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-27T07:45:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8870fae9_58a0678e",
+      "revId": "0c37c1470274db2c0ee927d75e6c9f3cb477d5fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5efd3314_3b9181d3",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-27T07:45:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b18769a_dc47df56",
+      "revId": "0c37c1470274db2c0ee927d75e6c9f3cb477d5fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9d2e21d9_0281ea65",
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd33a319_b9d49c92",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-27T07:45:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d2e21d9_0281ea65",
+      "revId": "0c37c1470274db2c0ee927d75e6c9f3cb477d5fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "73c1d3a8_4293575d",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-02-24T18:34:07Z",
       "side": 1,
       "message": "Use just:\n```\n{\n  \"accept-all-ssh-keys\": \"true\"\n}\n```",
+      "revId": "0c37c1470274db2c0ee927d75e6c9f3cb477d5fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9352277_fa3a8087",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 954,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-02-27T07:45:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73c1d3a8_4293575d",
       "revId": "0c37c1470274db2c0ee927d75e6c9f3cb477d5fa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
