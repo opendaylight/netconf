@@ -29,6 +29,7 @@ public final class ApiDocServiceImplTest extends AbstractApiDocTest {
             .node(QName.create("", "nodes"))
             .node(QName.create("", "node"))
             .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private ApiDocService apiDocService;
 
@@ -50,8 +51,8 @@ public final class ApiDocServiceImplTest extends AbstractApiDocTest {
     public void getListOfMounts() throws Exception {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         // simulate the behavior of JacksonJaxbJsonProvider
-        final ObjectMapper mapper = new ObjectMapper();
-        final String result = mapper.writer().writeValueAsString(apiDocService.getListOfMounts(mockInfo).getEntity());
+
+        final String result = MAPPER.writer().writeValueAsString(apiDocService.getListOfMounts(mockInfo).getEntity());
         assertEquals("[{\"instance\":\"/nodes/node=123/\",\"id\":1}]", result);
     }
 }
