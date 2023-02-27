@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6bcb84b_12fef220",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T12:56:30Z",
+      "side": 1,
+      "message": "Please rework this using callback in follow-up patch.",
+      "revId": "9f6cbb5753d2ddd34c2242a002d72666d274f261",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eea2adcb_724c2ba5",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T12:56:30Z",
+      "side": 1,
+      "message": "Please rework this with StringBuilder in follow-up patch.",
+      "revId": "9f6cbb5753d2ddd34c2242a002d72666d274f261",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49ed93c7_68a8c352",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T12:56:30Z",
+      "side": 1,
+      "message": "Why do we have 3 commits now?",
+      "revId": "9f6cbb5753d2ddd34c2242a002d72666d274f261",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
