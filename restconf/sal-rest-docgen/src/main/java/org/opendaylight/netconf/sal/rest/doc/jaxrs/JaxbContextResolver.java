@@ -20,16 +20,12 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 @Produces(MediaType.APPLICATION_JSON)
 public class JaxbContextResolver implements ContextResolver<ObjectMapper> {
 
-    private final ObjectMapper ctx;
-
-    public JaxbContextResolver() {
-        ctx = new ObjectMapper();
-    }
+    private static final ObjectMapper CTX = new ObjectMapper();
 
     @Override
     public ObjectMapper getContext(final Class<?> klass) {
         if (SwaggerObject.class.isAssignableFrom(klass)) {
-            return ctx;
+            return CTX;
         }
 
         return null; // must return null so that JAX-RS can continue context search
