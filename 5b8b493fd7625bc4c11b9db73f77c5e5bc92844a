@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fe7bbb4_61b808e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T09:07:39Z",
+      "side": 1,
+      "message": "Contains a lot of changes which are not necessary.",
+      "revId": "5b8b493fd7625bc4c11b9db73f77c5e5bc92844a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "882fb6f1_6ac5ad7f",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T09:07:39Z",
+      "side": 1,
+      "message": "Revert this back.",
+      "revId": "5b8b493fd7625bc4c11b9db73f77c5e5bc92844a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "882977c5_93489a83",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T09:07:39Z",
+      "side": 1,
+      "message": "These chnages looks not interned?",
+      "revId": "5b8b493fd7625bc4c11b9db73f77c5e5bc92844a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec6aa84b_202b0520",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T09:07:39Z",
+      "side": 1,
+      "message": "PATCH requests into netconf-topology.",
+      "revId": "5b8b493fd7625bc4c11b9db73f77c5e5bc92844a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33e931ad_890956a2",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T09:07:39Z",
+      "side": 1,
+      "message": "With the distribution-folder parameter we can tell testtool to start that distribution automatically.",
+      "revId": "5b8b493fd7625bc4c11b9db73f77c5e5bc92844a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed6b5eab_52fd8625",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T09:07:39Z",
+      "side": 1,
+      "message": "IMO 200, 201 on subsequent calls.",
+      "revId": "5b8b493fd7625bc4c11b9db73f77c5e5bc92844a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
