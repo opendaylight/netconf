@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebb31f05_c0f92aa9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T13:57:40Z",
+      "side": 1,
+      "message": "This will be part of NETCONF-938.",
+      "revId": "0a6c31b23ee833cd086caf3b07e3892d95b456ef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0479cd04_126f4c5c",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-27T13:57:40Z",
+      "side": 1,
+      "message": "Revert this back.",
+      "revId": "0a6c31b23ee833cd086caf3b07e3892d95b456ef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
