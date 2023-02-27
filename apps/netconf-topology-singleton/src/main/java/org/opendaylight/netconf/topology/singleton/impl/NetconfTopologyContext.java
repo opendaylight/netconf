@@ -27,7 +27,6 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
-import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
@@ -59,7 +58,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     }
 
     @VisibleForTesting
-    public AbstractNetconfTopology getTopologySingleton() {
+    protected NetconfTopologySingletonImpl getTopologySingleton() {
         return topologySingleton;
     }
 
