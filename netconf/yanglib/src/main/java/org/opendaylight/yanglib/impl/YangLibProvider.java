@@ -44,7 +44,6 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangIRSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaListenerRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
 import org.opendaylight.yangtools.yang.model.repo.spi.SoftSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
@@ -59,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * along with source identifier to
  * ietf-netconf-yang-library/modules-state/module list.
  */
-public class YangLibProvider implements AutoCloseable, SchemaSourceListener, YangLibService {
+public final class YangLibProvider implements SchemaSourceListener, YangLibService {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibProvider.class);
 
     private static final Predicate<PotentialSchemaSource<?>> YANG_SCHEMA_SOURCE =
@@ -68,7 +67,6 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     private final DataBroker dataBroker;
     private final YanglibConfig yanglibConfig;
     private final SharedSchemaRepository schemaRepository;
-    private SchemaListenerRegistration schemaListenerRegistration;
     private File cacheFolderFile;
 
     public YangLibProvider(final YanglibConfig yanglibConfig, final DataBroker dataBroker,
@@ -76,13 +74,6 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         this.yanglibConfig = requireNonNull(yanglibConfig);
         this.dataBroker = requireNonNull(dataBroker);
         schemaRepository = new SharedSchemaRepository("yang-library", parserFactory);
-    }
-
-    @Override
-    public void close() {
-        if (schemaListenerRegistration != null) {
-            schemaListenerRegistration.close();
-        }
     }
 
     public void init() {
