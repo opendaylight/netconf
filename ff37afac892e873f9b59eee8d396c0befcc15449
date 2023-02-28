@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b30eb65_5995cde0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-28T11:40:36Z",
+      "side": 1,
+      "message": "What to do with `private SchemaListenerRegistration schemaListenerRegistration;`? Its never used.",
+      "revId": "ff37afac892e873f9b59eee8d396c0befcc15449",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
