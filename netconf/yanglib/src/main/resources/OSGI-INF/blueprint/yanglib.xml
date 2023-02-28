@@ -19,8 +19,7 @@
   <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />
   <reference id="parserFactory" interface="org.opendaylight.yangtools.yang.parser.api.YangParserFactory" />
 
-  <bean id="yangLibProvider" class="org.opendaylight.yanglib.impl.YangLibProvider"
-          init-method="init" destroy-method="close">
+  <bean id="yangLibProvider" class="org.opendaylight.yanglib.impl.YangLibProvider" init-method="init">
     <argument ref="yanglibConfig"/>
     <argument ref="dataBroker"/>
     <argument ref="parserFactory"/>
