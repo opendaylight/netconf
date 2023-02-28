@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3096a871_bf919960",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-02-28T11:31:58Z",
+      "side": 1,
+      "message": "Still conflated things:\n- order of arguments and StreamsConfiguration (i.e. introduced in 5.0.2)\n- the actual fix\n- the change of what we log and how\n\nEach of these should be a separate patch, as this makes it hard to backport and separate things out.\n",
+      "revId": "380e4bf69e67f6a3c7d8c8850141b47790089a0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
