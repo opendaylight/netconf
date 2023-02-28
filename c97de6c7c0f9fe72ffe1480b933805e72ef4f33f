@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae3ec306_327464ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-02-28T11:47:26Z",
+      "side": 1,
+      "message": "In addition, I would like to add logic to deal with: `new File(rootDirectory + File.separator + subdir)));`. We also have cache/schema path.",
+      "revId": "c97de6c7c0f9fe72ffe1480b933805e72ef4f33f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
