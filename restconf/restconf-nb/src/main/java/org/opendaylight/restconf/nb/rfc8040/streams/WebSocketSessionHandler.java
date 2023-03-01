@@ -226,10 +226,6 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
 
     @Override
     public synchronized boolean isConnected() {
-        if (session != null && session.isOpen()) {
-            return true;
-        } else {
-            return false;
-        }
+        return session != null && session.isOpen();
     }
 }
