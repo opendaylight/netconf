@@ -36,9 +36,11 @@ public class Configuration {
             final boolean useSSE) {
         checkArgument(idleTimeout > 0, "Idle timeout must be specified by positive value.");
         checkArgument(maximumFragmentLength >= 0 && maximumFragmentLength < MAX_FRAGMENT_LENGTH,
-                "Maximum fragment length must be disabled (0) or specified by positive value less than 64 KB.");
-        checkArgument(heartbeatInterval >= 0, "Heartbeat ping interval must be "
-                + "disabled (0) or specified by positive value.");
+            "Maximum fragment length must be disabled (0) or specified by positive value less than 64 KB.");
+        checkArgument(heartbeatInterval >= 0,
+            "Heartbeat ping interval must be disabled (0) or specified by positive value.");
+        // we need at least one heartbeat before we time out the socket
+        checkArgument(idleTimeout > heartbeatInterval, "Idle timeout must be greater than heartbeat ping interval.");
 
         this.maximumFragmentLength = maximumFragmentLength;
         this.idleTimeout = idleTimeout;
