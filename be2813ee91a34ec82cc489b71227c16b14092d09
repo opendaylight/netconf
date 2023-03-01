@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f185c58_173bffe5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-01T13:20:09Z",
+      "side": 1,
+      "message": "This needs WAY better analysis. So, where does the cache directory point to, really?",
+      "revId": "be2813ee91a34ec82cc489b71227c16b14092d09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "016a32ae_b96f4c66",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-01T13:20:09Z",
+      "side": 1,
+      "message": "so we do this on every GET now? what happens if I do a 10_000 GETs?",
+      "range": {
+        "startLine": 203,
+        "startChar": 8,
+        "endLine": 203,
+        "endChar": 118
+      },
+      "revId": "be2813ee91a34ec82cc489b71227c16b14092d09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
