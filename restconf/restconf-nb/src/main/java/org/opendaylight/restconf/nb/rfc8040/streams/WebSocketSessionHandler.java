@@ -9,13 +9,11 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import com.google.common.base.Strings;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -214,21 +212,6 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
             parts.add(inputMessage.substring(i, Math.min(length, i + maximumFragmentLength)));
         }
         return parts;
-    }
-
-    /**
-     * Get remote endpoint address of the current web-socket session.
-     *
-     * @return If the session exists and is open the {@link InetSocketAddress} wrapped in {@link Optional} is returned.
-     *     Otherwise, {@link Optional#empty()} is returned.
-     */
-    // FIXME: remove this method?
-    public synchronized Optional<InetSocketAddress> getRemoteEndpointAddress() {
-        if (session != null && session.isOpen()) {
-            return Optional.of(session.getRemote().getInetSocketAddress());
-        } else {
-            return Optional.empty();
-        }
     }
 
     @Override
