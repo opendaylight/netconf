@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4093fec1_8edb768d",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-01T11:28:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f964bc2d_a139e466",
+      "revId": "68cae5b3c073133d1bcf4640f26ba2dc019d6a19",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a26fec0f_bcb9d405",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-03-01T09:22:36Z",
       "side": 1,
       "message": "How we know it was not found? Isn\u0027t this illegal state, too?",
+      "revId": "68cae5b3c073133d1bcf4640f26ba2dc019d6a19",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77746308_fc937a71",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-01T11:28:06Z",
+      "side": 1,
+      "message": "Not for this use-case.\nThis exception is thrown by ListenableFeature.get() method. Therefore, if we fail to obtain \"YangTextSchemaSource\" for any reason, it will result in returning empty sets of features, just as it was set before.\n\nIf there are other reasons why this state may be illegal, it should be handled in the appropriate place.",
+      "parentUuid": "a26fec0f_bcb9d405",
       "revId": "68cae5b3c073133d1bcf4640f26ba2dc019d6a19",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
