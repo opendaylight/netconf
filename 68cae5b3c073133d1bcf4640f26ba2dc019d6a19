@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f964bc2d_a139e466",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-01T09:22:36Z",
+      "side": 1,
+      "message": "Why do we need to stream? Can we use Optional#map instead?",
+      "revId": "68cae5b3c073133d1bcf4640f26ba2dc019d6a19",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a26fec0f_bcb9d405",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-01T09:22:36Z",
+      "side": 1,
+      "message": "How we know it was not found? Isn\u0027t this illegal state, too?",
+      "revId": "68cae5b3c073133d1bcf4640f26ba2dc019d6a19",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
