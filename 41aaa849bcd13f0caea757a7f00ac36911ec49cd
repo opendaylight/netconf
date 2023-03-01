@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3abfc8da_eb036b7e",
+        "filename": "apps/netconf-topology-impl/src/main/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImpl.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-01T15:08:16Z",
+      "side": 1,
+      "message": "this is duplicate code: how about making this the default implementation and then overriding it in netconf-topology-singleton?",
+      "range": {
+        "startLine": 194,
+        "startChar": 4,
+        "endLine": 194,
+        "endChar": 96
+      },
+      "revId": "41aaa849bcd13f0caea757a7f00ac36911ec49cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
