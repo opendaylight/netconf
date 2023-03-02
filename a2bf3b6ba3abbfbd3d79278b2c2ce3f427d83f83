@@ -16,6 +16,24 @@
       "message": "Why do we need ietf-inet-types/network-topology models copied here?",
       "revId": "a2bf3b6ba3abbfbd3d79278b2c2ce3f427d83f83",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb6d3080_9b62d66b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-02T09:24:37Z",
+      "side": 1,
+      "message": "We are conducting tests on the Mountpoint operation using the following identifier:\n```network-topology:network-topology/topology\u003dtopology-netconf/node\u003ddevice/yang-ext:mount```\nThis string identifier is used to convert to InstanceIdentifierContext, which is then used to retrieve device operations:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/103969/28/restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceImpl.java#47\n\n\nFor testing purposes, I used copies of these models without modifying them. This is because a modified version could potentially miss a bug in the future due to differences with the actual model used in reality. Additionally, a modified version could cause problems in the future, as the version that now passes tests may miss important data or fail in some assertions that are not currently needed inside the toInstanceIdentifier(...) method:\nhttps://github.com/opendaylight/netconf/blob/master/restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java#L88\n\nHowever, if these reasons are not sufficient, I can remove all unnecessary data from those models and tag them as \"modified for tests\".",
+      "parentUuid": "60492f4f_97719dbb",
+      "revId": "a2bf3b6ba3abbfbd3d79278b2c2ce3f427d83f83",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
