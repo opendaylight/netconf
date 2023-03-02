@@ -16,6 +16,24 @@
       "message": "All we need here is: https://git.opendaylight.org/gerrit/c/netconf/+/102227/47/restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/test/AbstractBodyReaderTest.java",
       "revId": "d36d93cd20aff417a61c2873d0db496f41dd2e4c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5768521_7266c34d",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/test/AbstractBodyReaderTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-02T11:27:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20632b8d_04878f80",
+      "revId": "d36d93cd20aff417a61c2873d0db496f41dd2e4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
