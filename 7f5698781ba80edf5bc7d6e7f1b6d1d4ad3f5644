@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58a8bc04_2cc20351",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-02T11:26:53Z",
+      "side": 1,
+      "message": "Still we have to deal with non-functional end-to-end tests.",
+      "revId": "7f5698781ba80edf5bc7d6e7f1b6d1d4ad3f5644",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
