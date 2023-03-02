@@ -34,6 +34,24 @@
       "parentUuid": "60492f4f_97719dbb",
       "revId": "a2bf3b6ba3abbfbd3d79278b2c2ce3f427d83f83",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3ff4f7e_5bac2ad0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-02T12:19:26Z",
+      "side": 1,
+      "message": "Right, but we should be able to pick those models up from dependencies, where they are already packaged, right?",
+      "parentUuid": "cb6d3080_9b62d66b",
+      "revId": "a2bf3b6ba3abbfbd3d79278b2c2ce3f427d83f83",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
