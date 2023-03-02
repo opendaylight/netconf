@@ -52,6 +52,24 @@
       "parentUuid": "cb6d3080_9b62d66b",
       "revId": "a2bf3b6ba3abbfbd3d79278b2c2ce3f427d83f83",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bd02b33_de44f2e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-02T14:45:38Z",
+      "side": 1,
+      "message": "Well, it is possible, but currently, I am not aware of an ODL Test Utility tool that can create a SchemaContext from the models provided by the path and those available in dependencies. The current solution creates SchemaContext only from models provided in path:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/103969/28/restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceTest.java#57\n\n\nSo we need to create such a tool, and if it is successful, we can apply it to other tests. For instance, the \u0027ietf-inet-types\u0027 model is already stored seven times in restconf-nb test resources.",
+      "parentUuid": "a3ff4f7e_5bac2ad0",
+      "revId": "a2bf3b6ba3abbfbd3d79278b2c2ce3f427d83f83",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
