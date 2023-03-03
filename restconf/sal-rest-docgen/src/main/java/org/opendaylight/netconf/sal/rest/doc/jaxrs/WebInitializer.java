@@ -45,12 +45,11 @@ public final class WebInitializer implements AutoCloseable {
             .supportsSessions(true)
             .addServlet(ServletDetails.builder()
                 .servlet(servletSupport.createHttpServletBuilder(new ApiDocApplication(apiDocService)).build())
-                .addUrlPattern("/swagger2/apis/*")
                 .addUrlPattern("/openapi3/apis/*")
                 .build())
             .addResource(ResourceDetails.builder().name("/explorer").build());
 
-        webContextSecurer.requireAuthentication(webContextBuilder, "/swagger2/*", "/openapi3/*");
+        webContextSecurer.requireAuthentication(webContextBuilder, "/openapi3/*");
 
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
