@@ -42,7 +42,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Components;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Info;
@@ -94,17 +93,15 @@ public abstract class BaseYangSwaggerGenerator {
         return schemaService;
     }
 
-    public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames,
-            final OAversion oaversion) {
+    public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getAllModulesDoc(uriInfo, Optional.empty(), schemaContext, Optional.empty(), "", definitionNames,
-                oaversion);
+        return getAllModulesDoc(uriInfo, Optional.empty(), schemaContext, Optional.empty(), "", definitionNames);
     }
 
     public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final Optional<Range<Integer>> range,
             final EffectiveModelContext schemaContext, final Optional<String> deviceName, final String context,
-            final DefinitionNames definitionNames, final OAversion oaversion) {
+            final DefinitionNames definitionNames) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
         String name = "Controller";
@@ -117,14 +114,14 @@ public abstract class BaseYangSwaggerGenerator {
         doc.setDefinitions(JsonNodeFactory.instance.objectNode());
         doc.setPaths(JsonNodeFactory.instance.objectNode());
 
-        fillDoc(doc, range, schemaContext, context, deviceName, oaversion, definitionNames);
+        fillDoc(doc, range, schemaContext, context, deviceName, definitionNames);
 
         return doc;
     }
 
     public void fillDoc(final SwaggerObject doc, final Optional<Range<Integer>> range,
-            final EffectiveModelContext schemaContext, final String context,  final Optional<String> deviceName,
-            final OAversion oaversion, final DefinitionNames definitionNames) {
+            final EffectiveModelContext schemaContext, final String context, final Optional<String> deviceName,
+            final DefinitionNames definitionNames) {
         final SortedSet<Module> modules = getSortedModules(schemaContext);
         final Set<Module> filteredModules;
         if (range.isPresent()) {
@@ -138,7 +135,7 @@ public abstract class BaseYangSwaggerGenerator {
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
 
-            getSwaggerDocSpec(module, context, deviceName, schemaContext, oaversion, definitionNames, doc, false);
+            getSwaggerDocSpec(module, context, deviceName, schemaContext, definitionNames, doc, false);
         }
     }
 
@@ -167,16 +164,15 @@ public abstract class BaseYangSwaggerGenerator {
         }
     }
 
-    public CommonApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
-            final OAversion oaversion) {
+    public CommonApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        final SwaggerObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "", oaversion);
-        return getAppropriateDoc(doc, oaversion);
+        final SwaggerObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "");
+        return convertToOpenApi(doc);
     }
 
     public SwaggerObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
-            final EffectiveModelContext schemaContext, final String context, final OAversion oaversion) {
+            final EffectiveModelContext schemaContext, final String context) {
         final Optional<Revision> rev;
 
         try {
@@ -189,15 +185,15 @@ public abstract class BaseYangSwaggerGenerator {
         Preconditions.checkArgument(module != null,
                 "Could not find module by name,revision: " + moduleName + "," + revision);
 
-        return getApiDeclaration(module, uriInfo, context, schemaContext, oaversion);
+        return getApiDeclaration(module, uriInfo, context, schemaContext);
     }
 
     public SwaggerObject getApiDeclaration(final Module module, final UriInfo uriInfo, final String context,
-            final EffectiveModelContext schemaContext, final OAversion oaversion) {
+            final EffectiveModelContext schemaContext) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
 
-        return getSwaggerDocSpec(module, schema, host, BASE_PATH, context, schemaContext, oaversion);
+        return getSwaggerDocSpec(module, schema, host, BASE_PATH, context, schemaContext);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -214,27 +210,23 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     public SwaggerObject getSwaggerDocSpec(final Module module, final String schema, final String host,
-            final String basePath, final String context, final EffectiveModelContext schemaContext,
-            final OAversion oaversion) {
+            final String basePath, final String context, final EffectiveModelContext schemaContext) {
         final SwaggerObject doc = createSwaggerObject(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getSwaggerDocSpec(module, context, Optional.empty(), schemaContext, oaversion, definitionNames, doc,
-            true);
+        return getSwaggerDocSpec(module, context, Optional.empty(), schemaContext, definitionNames, doc, true);
     }
 
     public SwaggerObject getSwaggerDocSpec(final Module module, final String context, final Optional<String> deviceName,
-            final EffectiveModelContext schemaContext, final OAversion oaversion, final DefinitionNames definitionNames,
-            final SwaggerObject doc, final boolean isForSingleModule) {
+            final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final SwaggerObject doc,
+            final boolean isForSingleModule) {
         final ObjectNode definitions;
 
         try {
             if (isForSingleModule) {
-                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
-                        true);
+                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, true);
                 doc.setDefinitions(definitions);
             } else {
-                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
-                        false);
+                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, false);
                 addFields(doc.getDefinitions(), definitions.fields());
             }
             if (LOG.isDebugEnabled()) {
@@ -270,22 +262,22 @@ public abstract class BaseYangSwaggerGenerator {
                      */
                     if (isForSingleModule && !hasAddRootPostLink) {
                         LOG.debug("Has added root post link for module {}", module.getName());
-                        addRootPostLink(module, deviceName, pathParams, resourcePath, paths, oaversion);
+                        addRootPostLink(module, deviceName, pathParams, resourcePath, paths);
 
                         hasAddRootPostLink = true;
                     }
 
-                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
+                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName);
                     addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, true, module.getName(),
-                        definitionNames, oaversion, resolvedPath);
+                        definitionNames, resolvedPath);
                 }
                 pathParams = JsonNodeFactory.instance.arrayNode();
                 resourcePath = getResourcePath("operational", context);
 
                 if (!node.isConfiguration()) {
-                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
+                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName);
                     addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, false, moduleName,
-                        definitionNames, oaversion, resolvedPath);
+                        definitionNames, resolvedPath);
                 }
             }
         }
@@ -293,8 +285,8 @@ public abstract class BaseYangSwaggerGenerator {
         for (final RpcDefinition rpcDefinition : module.getRpcs()) {
             final String resolvedPath = getResourcePath("operations", context) + "/" + moduleName + ":"
                     + rpcDefinition.getQName().getLocalName();
-            addOperations(rpcDefinition, moduleName, deviceName, paths, module.getName(), definitionNames, oaversion,
-                    resolvedPath);
+            addOperations(rpcDefinition, moduleName, deviceName, paths, module.getName(), definitionNames,
+                resolvedPath);
         }
 
         LOG.debug("Number of Paths found [{}]", paths.size());
@@ -309,13 +301,13 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     private static void addRootPostLink(final Module module, final Optional<String> deviceName,
-            final ArrayNode pathParams, final String resourcePath, final ObjectNode paths, final OAversion oaversion) {
+            final ArrayNode pathParams, final String resourcePath, final ObjectNode paths) {
         if (containsListOrContainer(module.getChildNodes())) {
             final ObjectNode post = JsonNodeFactory.instance.objectNode();
             final String moduleName = module.getName();
             final String name = moduleName + MODULE_NAME_SUFFIX;
             post.set("post", buildPost("", name, "", moduleName, deviceName,
-                    module.getDescription().orElse(""), pathParams, oaversion));
+                    module.getDescription().orElse(""), pathParams));
             paths.set(resourcePath, post);
         }
     }
@@ -335,14 +327,7 @@ public abstract class BaseYangSwaggerGenerator {
         return doc;
     }
 
-    public static CommonApiObject getAppropriateDoc(final SwaggerObject swaggerObject, final OAversion oaversion) {
-        if (oaversion.equals(OAversion.V3_0)) {
-            return convertToOpenApi(swaggerObject);
-        }
-        return swaggerObject;
-    }
-
-    private static OpenApiObject convertToOpenApi(final SwaggerObject swaggerObject) {
+    public static OpenApiObject convertToOpenApi(final SwaggerObject swaggerObject) {
         final OpenApiObject doc = new OpenApiObject();
         doc.setOpenapi(OPEN_API_VERSION);
         doc.setInfo(swaggerObject.getInfo());
@@ -367,7 +352,7 @@ public abstract class BaseYangSwaggerGenerator {
     private void addPaths(final DataSchemaNode node, final Optional<String> deviceName, final String moduleName,
             final ObjectNode paths, final ArrayNode parentPathParams, final EffectiveModelContext schemaContext,
             final boolean isConfig, final String parentName, final DefinitionNames definitionNames,
-            final OAversion oaversion, final String resourcePath) {
+            final String resourcePath) {
         LOG.debug("Adding path: [{}]", resourcePath);
 
         final ArrayNode pathParams = JsonUtil.copy(parentPathParams);
@@ -378,16 +363,14 @@ public abstract class BaseYangSwaggerGenerator {
         }
 
         final ObjectNode path = JsonNodeFactory.instance.objectNode();
-        path.setAll(operations(node, moduleName, deviceName, pathParams, isConfig, parentName, definitionNames,
-                oaversion));
+        path.setAll(operations(node, moduleName, deviceName, pathParams, isConfig, parentName, definitionNames));
         paths.set(resourcePath, path);
 
         if (node instanceof ActionNodeContainer) {
             ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
                 final String resolvedPath = "rests/operations" + resourcePath.substring(11)
                         + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
-                addOperations(actionDef, moduleName, deviceName, paths, parentName, definitionNames, oaversion,
-                        resolvedPath);
+                addOperations(actionDef, moduleName, deviceName, paths, parentName, definitionNames, resolvedPath);
             });
         }
 
@@ -395,11 +378,10 @@ public abstract class BaseYangSwaggerGenerator {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 final String newParent = parentName + "_" + node.getQName().getLocalName();
                 final String localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
-                final String newResourcePath = resourcePath + "/" + createPath(childNode, pathParams, oaversion,
-                        localName);
+                final String newResourcePath = resourcePath + "/" + createPath(childNode, pathParams, localName);
                 final boolean newIsConfig = isConfig && childNode.isConfiguration();
                 addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
-                    newIsConfig, newParent, definitionNames, oaversion, newResourcePath);
+                    newIsConfig, newParent, definitionNames, newResourcePath);
             }
         }
     }
@@ -415,35 +397,34 @@ public abstract class BaseYangSwaggerGenerator {
 
     private static Map<String, ObjectNode> operations(final DataSchemaNode node, final String moduleName,
             final Optional<String> deviceName, final ArrayNode pathParams, final boolean isConfig,
-            final String parentName, final DefinitionNames definitionNames, final OAversion oaversion) {
+            final String parentName, final DefinitionNames definitionNames) {
         final Map<String, ObjectNode> operations = new HashMap<>();
         final String discriminator = definitionNames.getDiscriminator(node);
 
         final String nodeName = node.getQName().getLocalName();
 
         final String defName = parentName + "_" + nodeName + TOP + discriminator;
-        final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig, oaversion);
+        final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig);
         operations.put("get", get);
 
 
         if (isConfig) {
             final ObjectNode put = buildPut(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams, oaversion);
+                    node.getDescription().orElse(""), pathParams);
             operations.put("put", put);
 
-            final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams, oaversion);
+            final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams);
             operations.put("delete", delete);
 
             operations.put("post", buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams, oaversion));
+                    node.getDescription().orElse(""), pathParams));
         }
         return operations;
     }
 
     protected abstract ListPathBuilder newListPathBuilder();
 
-    private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams,
-            final OAversion oaversion, final String localName) {
+    private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams, final String localName) {
         final StringBuilder path = new StringBuilder();
         path.append(localName);
 
@@ -461,7 +442,7 @@ public abstract class BaseYangSwaggerGenerator {
                 ((DataNodeContainer) schemaNode).findDataChildByName(listKey).flatMap(DataSchemaNode::getDescription)
                         .ifPresent(desc -> pathParam.put("description", desc));
 
-                final ObjectNode typeParent = getTypeParentNode(pathParam, oaversion);
+                final ObjectNode typeParent = getTypeParentNode(pathParam);
 
                 typeParent.put("type", "string");
                 pathParam.put("in", "path");
@@ -522,10 +503,9 @@ public abstract class BaseYangSwaggerGenerator {
 
     private static void addOperations(final OperationDefinition operDef, final String moduleName,
             final Optional<String> deviceName, final ObjectNode paths, final String parentName,
-            final DefinitionNames definitionNames, final OAversion oaversion, final String resourcePath) {
+            final DefinitionNames definitionNames, final String resourcePath) {
         final ObjectNode operations = JsonNodeFactory.instance.objectNode();
-        operations.set("post", buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames,
-                oaversion));
+        operations.set("post", buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames));
         paths.set(resourcePath, operations);
     }
 
