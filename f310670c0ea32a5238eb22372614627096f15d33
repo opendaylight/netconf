@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "737c4edd_f56e5092",
+        "filename": "apps/netconf-topology/src/main/yang/module1.yang",
+        "patchSetId": 29
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-03T18:51:49Z",
+      "side": 1,
+      "message": "`netconf-topology` is a production code. Not intended for test models.",
+      "revId": "f310670c0ea32a5238eb22372614627096f15d33",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
