@@ -34,7 +34,6 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
@@ -135,7 +134,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     }
 
     public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
-                                            final String revision, final OAversion oaversion) {
+                                            final String revision) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -149,12 +148,11 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
             return generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
         }
         final SwaggerObject swaggerObject = swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context,
-                urlPrefix, oaversion);
-        return BaseYangSwaggerGenerator.getAppropriateDoc(swaggerObject, oaversion);
+                urlPrefix);
+        return BaseYangSwaggerGenerator.convertToOpenApi(swaggerObject);
     }
 
-    public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum,
-                                            final OAversion oaversion) {
+    public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -183,7 +181,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         final SwaggerObject doc;
 
         final SwaggerObject swaggerObject = swaggerGenerator.getAllModulesDoc(uriInfo, range, context,
-                Optional.of(deviceName), urlPrefix, definitionNames, oaversion);
+                Optional.of(deviceName), urlPrefix, definitionNames);
 
         if (includeDataStore) {
             doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
@@ -194,7 +192,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
             doc = swaggerObject;
         }
 
-        return BaseYangSwaggerGenerator.getAppropriateDoc(doc, oaversion);
+        return BaseYangSwaggerGenerator.convertToOpenApi(doc);
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
