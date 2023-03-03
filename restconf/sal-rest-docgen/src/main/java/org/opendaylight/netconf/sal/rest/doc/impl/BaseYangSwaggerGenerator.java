@@ -17,9 +17,10 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,6 +28,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -77,6 +79,7 @@ public abstract class BaseYangSwaggerGenerator {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
+
     private final DOMSchemaService schemaService;
 
     public static final String BASE_PATH = "/";
@@ -229,24 +232,29 @@ public abstract class BaseYangSwaggerGenerator {
                                            final EffectiveModelContext schemaContext, final OAversion oaversion,
                                            final DefinitionNames definitionNames, final SwaggerObject doc,
                                            final boolean isForSingleModule) {
-        final ObjectNode definitions;
-
-        try {
+        JsonFactory factory = new JsonFactory();
+        JsonGenerator generator;
+        try (final var jsonObjectWriter = new StringWriter()) {
+            generator = factory.createGenerator(jsonObjectWriter);
             if (isForSingleModule) {
-                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
-                        true);
-                doc.setDefinitions(definitions);
+                generator = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
+                        true, generator);
+                doc.setDefinitions(generator);
             } else {
-                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
+                generator = jsonConverter.convertToJsonSchema(module, schemaContext, generator, definitionNames, oaversion,
                         false);
-                addFields(doc.getDefinitions(), definitions.fields());
+                // TODO:  StringWriter could be passed to multiple JsonGenerator objects.
+//                addFields(doc.getDefinitions(), definitions.fields());
             }
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
+                LOG.debug("Document: {}", doc);
             }
         } catch (final IOException e) {
             LOG.error("Exception occured in DefinitionGenerator", e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
 
         final ObjectNode paths = JsonNodeFactory.instance.objectNode();
         final String moduleName = module.getName();
