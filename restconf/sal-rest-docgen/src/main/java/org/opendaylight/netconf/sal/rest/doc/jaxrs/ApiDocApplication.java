@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.rest.doc.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
@@ -24,6 +23,6 @@ public final class ApiDocApplication extends Application {
 
     @Override
     public Set<Object> getSingletons() {
-        return Set.of(apiDocService, new JaxbContextResolver(), new JacksonJaxbJsonProvider());
+        return Set.of(apiDocService);
     }
 }
