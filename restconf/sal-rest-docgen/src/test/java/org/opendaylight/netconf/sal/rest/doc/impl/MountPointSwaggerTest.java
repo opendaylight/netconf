@@ -74,7 +74,7 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
 
         final SwaggerObject mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-",
-            OAversion.V2_0);
+            OAversion.V3_0);
         assertNotNull("failed to find Datastore API", mountPointApi);
 
         final ObjectNode pathsObject = mountPointApi.getPaths();

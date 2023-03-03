@@ -150,7 +150,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         }
         final SwaggerObject swaggerObject = swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context,
                 urlPrefix, oaversion);
-        return BaseYangSwaggerGenerator.getAppropriateDoc(swaggerObject, oaversion);
+        return BaseYangSwaggerGenerator.convertToOpenApi(swaggerObject);
     }
 
     public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum,
@@ -194,7 +194,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
             doc = swaggerObject;
         }
 
-        return BaseYangSwaggerGenerator.getAppropriateDoc(doc, oaversion);
+        return BaseYangSwaggerGenerator.convertToOpenApi(doc);
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {

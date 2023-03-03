@@ -51,7 +51,7 @@ public final class ApiDocServiceImpl implements ApiDocService {
     // Query parameter
     private static final String PAGE_NUM = "pageNum";
 
-    public enum OAversion { V2_0, V3_0 }
+    public enum OAversion { V3_0 }
 
     private final MountPointSwagger mountPointSwaggerRFC8040;
     private final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040;
@@ -73,11 +73,10 @@ public final class ApiDocServiceImpl implements ApiDocService {
 
     @Override
     public synchronized Response getAllModulesDoc(final UriInfo uriInfo) {
-        final OAversion oaversion = identifyOpenApiVersion(uriInfo);
         final DefinitionNames definitionNames = new DefinitionNames();
-        final SwaggerObject doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames, oaversion);
+        final SwaggerObject doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames, OAversion.V3_0);
 
-        return Response.ok(BaseYangSwaggerGenerator.getAppropriateDoc(doc, oaversion)).build();
+        return Response.ok(BaseYangSwaggerGenerator.convertToOpenApi(doc)).build();
     }
 
     /**
@@ -86,7 +85,7 @@ public final class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
         return Response.ok(
-            apiDocGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, identifyOpenApiVersion(uriInfo)))
+            apiDocGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, OAversion.V3_0))
             .build();
     }
 
@@ -109,27 +108,18 @@ public final class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getMountDocByModule(final String instanceNum, final String module,
                                                      final String revision, final UriInfo uriInfo) {
-        final OAversion oaversion = identifyOpenApiVersion(uriInfo);
         final CommonApiObject api = mountPointSwaggerRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
-            module, revision, oaversion);
+            module, revision, OAversion.V3_0);
         return Response.ok(api).build();
     }
 
     @Override
     public synchronized Response getMountDoc(final String instanceNum, final UriInfo uriInfo) {
         final CommonApiObject api;
-        final OAversion oaversion = identifyOpenApiVersion(uriInfo);
         final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
         final Optional<Integer> pageNum = stringPageNum != null ? Optional.of(Integer.valueOf(stringPageNum))
                 : Optional.empty();
-        api = mountPointSwaggerRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), pageNum, oaversion);
+        api = mountPointSwaggerRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), pageNum, OAversion.V3_0);
         return Response.ok(api).build();
-    }
-
-    private static OAversion identifyOpenApiVersion(final UriInfo uriInfo) {
-        if (uriInfo.getBaseUri().toString().contains("/swagger2/")) {
-            return OAversion.V2_0;
-        }
-        return OAversion.V3_0;
     }
 }

@@ -8,13 +8,13 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.COMPONENTS_PREFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.NAME_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.POST_SUFFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_SUFFIX;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getAppropriateModelPrefix;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -187,7 +187,7 @@ public class DefinitionGenerator {
                     for (final DataSchemaNode childNode : ((DataNodeContainer) node).getChildNodes()) {
                         final ObjectNode childNodeProperties = JsonNodeFactory.instance.objectNode();
 
-                        final String ref = getAppropriateModelPrefix(oaversion)
+                        final String ref = COMPONENTS_PREFIX
                                 + moduleName + CONFIG
                                 + "_" + localName
                                 + definitionNames.getDiscriminator(node);
@@ -313,7 +313,7 @@ public class DefinitionGenerator {
             final ObjectNode definitions, final SchemaNode schemaNode, final OAversion oaversion) {
         final ObjectNode dataNodeProperties = JsonNodeFactory.instance.objectNode();
         final String name = filename + discriminator;
-        final String ref = getAppropriateModelPrefix(oaversion) + name;
+        final String ref = COMPONENTS_PREFIX + name;
         final String topName = filename + TOP;
 
         if (schemaNode instanceof ListSchemaNode) {
@@ -416,7 +416,7 @@ public class DefinitionGenerator {
                 definitions.set(truePostNodeName, postSchema);
 
                 final ObjectNode postXmlSchema = JsonNodeFactory.instance.objectNode();
-                postXmlSchema.put(REF_KEY, getAppropriateModelPrefix(oaversion) + truePostNodeName);
+                postXmlSchema.put(REF_KEY, COMPONENTS_PREFIX + truePostNodeName);
                 definitions.set(postXmlNodeName + discriminator, postXmlSchema);
             }
 
@@ -739,7 +739,7 @@ public class DefinitionGenerator {
             final SchemaNode node = leafTypeDef.getIdentities().iterator().next();
             definitionName = node.getQName().getLocalName() + definitionNames.getDiscriminator(node);
         }
-        property.put(REF_KEY, getAppropriateModelPrefix(oaversion) + definitionName);
+        property.put(REF_KEY, COMPONENTS_PREFIX + definitionName);
         return STRING_TYPE;
     }
 

@@ -174,7 +174,7 @@ public abstract class BaseYangSwaggerGenerator {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
         final SwaggerObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "", oaversion);
-        return getAppropriateDoc(doc, oaversion);
+        return convertToOpenApi(doc);
     }
 
     public SwaggerObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
@@ -319,7 +319,7 @@ public abstract class BaseYangSwaggerGenerator {
             final String moduleName = module.getName();
             final String name = moduleName + MODULE_NAME_SUFFIX;
             post.set("post", buildPost("", name, "", moduleName, deviceName,
-                    module.getDescription().orElse(""), pathParams, oaversion));
+                    module.getDescription().orElse(""), pathParams));
             paths.set(resourcePath, post);
         }
     }
@@ -339,14 +339,7 @@ public abstract class BaseYangSwaggerGenerator {
         return doc;
     }
 
-    public static CommonApiObject getAppropriateDoc(final SwaggerObject swaggerObject, final OAversion oaversion) {
-        if (oaversion.equals(OAversion.V3_0)) {
-            return convertToOpenApi(swaggerObject);
-        }
-        return swaggerObject;
-    }
-
-    private static OpenApiObject convertToOpenApi(final SwaggerObject swaggerObject) {
+    public static OpenApiObject convertToOpenApi(final SwaggerObject swaggerObject) {
         final OpenApiObject doc = new OpenApiObject();
         doc.setOpenapi(OPEN_API_VERSION);
         doc.setInfo(swaggerObject.getInfo());
@@ -428,20 +421,20 @@ public abstract class BaseYangSwaggerGenerator {
         final String nodeName = node.getQName().getLocalName();
 
         final String defName = parentName + "_" + nodeName + TOP + discriminator;
-        final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig, oaversion);
+        final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig);
         operations.put("get", get);
 
 
         if (isConfig) {
             final ObjectNode put = buildPut(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams, oaversion);
+                    node.getDescription().orElse(""), pathParams);
             operations.put("put", put);
 
-            final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams, oaversion);
+            final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams);
             operations.put("delete", delete);
 
             operations.put("post", buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams, oaversion));
+                    node.getDescription().orElse(""), pathParams));
         }
         return operations;
     }
@@ -467,7 +460,7 @@ public abstract class BaseYangSwaggerGenerator {
                 ((DataNodeContainer) schemaNode).findDataChildByName(listKey).flatMap(DataSchemaNode::getDescription)
                         .ifPresent(desc -> pathParam.put("description", desc));
 
-                final ObjectNode typeParent = getTypeParentNode(pathParam, oaversion);
+                final ObjectNode typeParent = getTypeParentNode(pathParam);
 
                 typeParent.put("type", "string");
                 pathParam.put("in", "path");
@@ -530,8 +523,7 @@ public abstract class BaseYangSwaggerGenerator {
             final Optional<String> deviceName, final ObjectNode paths, final String parentName,
             final DefinitionNames definitionNames, final OAversion oaversion, final String resourcePath) {
         final ObjectNode operations = JsonNodeFactory.instance.objectNode();
-        operations.set("post", buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames,
-                oaversion));
+        operations.set("post", buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames));
         paths.set(resourcePath, operations);
     }
 

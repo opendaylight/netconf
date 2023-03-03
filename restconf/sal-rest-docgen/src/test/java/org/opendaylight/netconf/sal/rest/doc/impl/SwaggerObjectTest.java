@@ -20,7 +20,7 @@ public final class SwaggerObjectTest extends AbstractApiDocTest {
         final var module = CONTEXT.findModule("opflex", Revision.of("2014-05-28")).orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
         final ObjectNode jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
-            ApiDocServiceImpl.OAversion.V2_0, true);
+            ApiDocServiceImpl.OAversion.V3_0, true);
         assertNotNull(jsonObject);
     }
 
@@ -29,7 +29,7 @@ public final class SwaggerObjectTest extends AbstractApiDocTest {
         final var module = CONTEXT.findModule("action-types").orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
         final ObjectNode jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
-            ApiDocServiceImpl.OAversion.V2_0, true);
+            ApiDocServiceImpl.OAversion.V3_0, true);
         assertNotNull(jsonObject);
     }
 
@@ -38,7 +38,7 @@ public final class SwaggerObjectTest extends AbstractApiDocTest {
         final var module = CONTEXT.findModule("string-types").orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
         final ObjectNode jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
-            ApiDocServiceImpl.OAversion.V2_0, true);
+            ApiDocServiceImpl.OAversion.V3_0, true);
         assertNotNull(jsonObject);
     }
 }

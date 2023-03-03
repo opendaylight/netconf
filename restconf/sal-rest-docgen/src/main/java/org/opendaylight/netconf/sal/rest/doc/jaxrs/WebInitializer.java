@@ -45,7 +45,6 @@ public final class WebInitializer implements AutoCloseable {
             .supportsSessions(true)
             .addServlet(ServletDetails.builder()
                 .servlet(servletSupport.createHttpServletBuilder(new ApiDocApplication(apiDocService)).build())
-                .addUrlPattern("/swagger2/apis/*")
                 .addUrlPattern("/openapi3/apis/*")
                 .build())
             .addResource(ResourceDetails.builder().name("/explorer").build());
