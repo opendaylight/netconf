@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6bd7fe02_60534810",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceTest.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-06T13:27:48Z",
+      "side": 1,
+      "message": "Capital letter only are for `static final`. Just static member can use \"normal\" camel case convention.",
+      "revId": "818ae6adfefd276fed95e5be79447d49cff2d157",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d6d60d3b_26c898dc",
         "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceTest.java",
         "patchSetId": 30
@@ -14,6 +31,23 @@
       "writtenOn": "2023-03-06T13:25:34Z",
       "side": 1,
       "message": "Hmm, we do not need *augmented* test data. Just use original NetworkTopology.",
+      "revId": "818ae6adfefd276fed95e5be79447d49cff2d157",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2c9ede5_f2db8b57",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceTest.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-06T13:27:48Z",
+      "side": 1,
+      "message": "I am unsure if this has any sense. What\u0027s your opinion?",
       "revId": "818ae6adfefd276fed95e5be79447d49cff2d157",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
