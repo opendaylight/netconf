@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "52ee5039_8b1f3044",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceTest.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-06T15:16:28Z",
+      "side": 1,
+      "message": "In this case, I need to add original NetworkTopology.yang to netconf-test-models package",
+      "parentUuid": "d6d60d3b_26c898dc",
+      "revId": "818ae6adfefd276fed95e5be79447d49cff2d157",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c2c9ede5_f2db8b57",
         "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceTest.java",
         "patchSetId": 30
@@ -48,6 +66,24 @@
       "writtenOn": "2023-03-06T13:27:48Z",
       "side": 1,
       "message": "I am unsure if this has any sense. What\u0027s your opinion?",
+      "revId": "818ae6adfefd276fed95e5be79447d49cff2d157",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2137c77a_311e9c23",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceTest.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-06T15:16:28Z",
+      "side": 1,
+      "message": "Yes, it is unnecessary",
+      "parentUuid": "c2c9ede5_f2db8b57",
       "revId": "818ae6adfefd276fed95e5be79447d49cff2d157",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
