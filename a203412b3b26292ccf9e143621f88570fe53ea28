@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5cb17cc_060bed0e",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/api/YangLibService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-07T17:35:51Z",
+      "side": 1,
+      "message": "how would an optional PathParam (via a regex) look above?",
+      "range": {
+        "startLine": 40,
+        "startChar": 4,
+        "endLine": 40,
+        "endChar": 33
+      },
+      "revId": "a203412b3b26292ccf9e143621f88570fe53ea28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08662e8f_0091e543",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-07T17:35:51Z",
+      "side": 1,
+      "message": "common code: just pass name + null to getYangModel() and let it create the SourceIdentifier",
+      "range": {
+        "startLine": 188,
+        "startChar": 18,
+        "endLine": 188,
+        "endChar": 56
+      },
+      "revId": "a203412b3b26292ccf9e143621f88570fe53ea28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e42fba7_169184d7",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-07T17:35:51Z",
+      "side": 1,
+      "message": "please keep the string concat: it is significantly faster than String.format().\n\nOnce we have string interpolation in java we will switch to that.",
+      "range": {
+        "startLine": 205,
+        "startChar": 23,
+        "endLine": 205,
+        "endChar": 72
+      },
+      "revId": "a203412b3b26292ccf9e143621f88570fe53ea28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fdc5894_ea432901",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-07T17:35:51Z",
+      "side": 1,
+      "message": "same as above: this should be a simple concat",
+      "range": {
+        "startLine": 211,
+        "startChar": 29,
+        "endLine": 211,
+        "endChar": 54
+      },
+      "revId": "a203412b3b26292ccf9e143621f88570fe53ea28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
