@@ -7,15 +7,10 @@
  */
 package org.opendaylight.yanglib.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import java.io.File;
@@ -31,7 +26,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -56,6 +50,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangIRSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YinSchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource.Costs;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -92,6 +87,9 @@ public class YangLibProviderTest {
             // Ignore
         }
 
+        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
+        doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
+
         final YanglibConfig yanglibConfig = new YanglibConfigBuilder().setBindingAddr("www.fake.com")
                 .setBindingPort(Uint32.valueOf(300)).setCacheFolder(CACHE_DIR.getAbsolutePath()).build();
         yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker, new DefaultYangParserFactory());
@@ -100,9 +98,6 @@ public class YangLibProviderTest {
     @Test
     public void testSchemaSourceRegistered() {
         yangLibProvider.init();
-        when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
-        doNothing().when(writeTransaction)
-                .merge(eq(LogicalDatastoreType.OPERATIONAL), eq(InstanceIdentifier.create(ModulesState.class)), any());
 
         List<PotentialSchemaSource<?>> list = new ArrayList<>();
         list.add(
@@ -113,7 +108,6 @@ public class YangLibProviderTest {
                 PotentialSchemaSource.create(new SourceIdentifier("with-revision", "2016-04-28"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
-        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         yangLibProvider.schemaSourceRegistered(list);
 
         Map<ModuleKey, Module> newModulesList = new HashMap<>();
@@ -142,43 +136,68 @@ public class YangLibProviderTest {
     }
 
     @Test
-    public void testFilteringNonYangSchemaSourceRegistered() {
+    public void testFilteringEmptySchemaSourceRegistered() {
         yangLibProvider.init();
 
         // test empty list of schema sources registered
-        List<PotentialSchemaSource<?>> potentialSources = Collections.emptyList();
-        yangLibProvider.schemaSourceRegistered(potentialSources);
-
+        yangLibProvider.schemaSourceRegistered(Collections.emptyList());
+        // expected behavior is to do nothing
         verifyNoMoreInteractions(dataBroker, writeTransaction);
+    }
+
+    @Test
+    public void testFilteringNonYangSchemaSourceRegistered() {
+        yangLibProvider.init();
 
         // test list of non yang schema sources registered
+        final var nonYangSources = new ArrayList<PotentialSchemaSource<?>>();
+        nonYangSources.add(PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
+            YinSchemaSourceRepresentation.class, Costs.IMMEDIATE.getValue()));
+        nonYangSources.add(PotentialSchemaSource.create(new SourceIdentifier("asts-schema-source"),
+            YangIRSchemaSource.class, Costs.IMMEDIATE.getValue()));
+        yangLibProvider.schemaSourceRegistered(nonYangSources);
+
         // expected behavior is to do nothing
-        potentialSources = new ArrayList<>();
-        potentialSources.add(
-                PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
-                        YinSchemaSourceRepresentation.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
-
-        potentialSources.add(
-                PotentialSchemaSource.create(new SourceIdentifier("asts-schema-source"),
-                        YangIRSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
-
-        yangLibProvider.schemaSourceRegistered(potentialSources);
         verifyNoMoreInteractions(dataBroker, writeTransaction);
+    }
 
-        // add yang schema source to list
-        potentialSources.add(
-                PotentialSchemaSource.create(new SourceIdentifier("yang-schema-source"),
-                        YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
+    @Test
+    public void testSchemaSourceWithRevisionUnregistered() {
+        yangLibProvider.init();
 
-        when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
-        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
-        yangLibProvider.schemaSourceRegistered(potentialSources);
+        // try to unregister YANG source with revision
+        final var schemaSourceWithRevision = PotentialSchemaSource.create(
+            new SourceIdentifier("unregistered-yang-with-revision", "2016-04-28"),
+            YangTextSchemaSource.class, Costs.LOCAL_IO.getValue());
+        yangLibProvider.schemaSourceUnregistered(schemaSourceWithRevision);
+
+        // source is unregistered
         verify(dataBroker).newWriteOnlyTransaction();
+        verify(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL),
+            eq(InstanceIdentifier.create(ModulesState.class)
+                .child(Module.class,
+                    new ModuleKey(new YangIdentifier("unregistered-yang-with-revision"),
+                        new Revision(new RevisionIdentifier("2016-04-28"))))));
+        verify(writeTransaction).commit();
+    }
 
-        ArgumentCaptor<ModulesState> modulesStateCaptor = ArgumentCaptor.forClass(ModulesState.class);
-        verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),
-                eq(InstanceIdentifier.create(ModulesState.class)), modulesStateCaptor.capture());
-        assertEquals(modulesStateCaptor.getValue().getModule().size(), 1);
+    @Test
+    public void testSchemaSourceWithoutRevisionUnregistered() {
+        yangLibProvider.init();
+
+        // try to unregister YANG source without revision
+        final var schemaSourceWithoutRevision = PotentialSchemaSource.create(
+            new SourceIdentifier("unregistered-yang-schema-without-revision"), YangTextSchemaSource.class,
+            Costs.LOCAL_IO.getValue());
+        yangLibProvider.schemaSourceUnregistered(schemaSourceWithoutRevision);
+
+        // source is unregistered
+        verify(dataBroker).newWriteOnlyTransaction();
+        verify(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL),
+            eq(InstanceIdentifier.create(ModulesState.class)
+                .child(Module.class,
+                    new ModuleKey(new YangIdentifier("unregistered-yang-schema-without-revision"),
+                        LegacyRevisionUtils.emptyRevision()))));
         verify(writeTransaction).commit();
     }
 
@@ -186,54 +205,12 @@ public class YangLibProviderTest {
     public void testNonYangSchemaSourceUnregistered() {
         yangLibProvider.init();
 
-        final PotentialSchemaSource<YinSchemaSourceRepresentation> nonYangSource =
-            PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
-                YinSchemaSourceRepresentation.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue());
-
-        yangLibProvider.schemaSourceUnregistered(nonYangSource);
+        // try to unregister non-YANG source
+        final var nonYangSources = PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
+            YinSchemaSourceRepresentation.class, Costs.IMMEDIATE.getValue());
+        yangLibProvider.schemaSourceUnregistered(nonYangSources);
 
         // expected behaviour is to do nothing if non yang based source is unregistered
         verifyNoMoreInteractions(dataBroker, writeTransaction);
-    }
-
-    @Test
-    public void testSchemaSourceUnregistered() {
-        yangLibProvider.init();
-
-        when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
-        doNothing().when(writeTransaction)
-                .delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
-
-        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
-
-        PotentialSchemaSource<YangTextSchemaSource> yangUnregistererSource =
-            PotentialSchemaSource.create(new SourceIdentifier("unregistered-yang-schema-without-revision"),
-                YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
-
-        yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);
-
-        verify(dataBroker).newWriteOnlyTransaction();
-        verify(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL),
-                eq(InstanceIdentifier.create(ModulesState.class)
-                        .child(Module.class,
-                                new ModuleKey(new YangIdentifier("unregistered-yang-schema-without-revision"),
-                                        LegacyRevisionUtils.emptyRevision()))));
-
-        verify(writeTransaction).commit();
-
-        yangUnregistererSource =
-                PotentialSchemaSource.create(new SourceIdentifier("unregistered-yang-with-revision", "2016-04-28"),
-                        YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
-
-        yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);
-
-        verify(dataBroker, times(2)).newWriteOnlyTransaction();
-        verify(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL),
-                eq(InstanceIdentifier.create(ModulesState.class)
-                        .child(Module.class,
-                                new ModuleKey(new YangIdentifier("unregistered-yang-with-revision"),
-                                        new Revision(new RevisionIdentifier("2016-04-28"))))));
-
-        verify(writeTransaction, times(2)).commit();
     }
 }
