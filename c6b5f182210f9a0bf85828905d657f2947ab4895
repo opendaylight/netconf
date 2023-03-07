@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "063fe539_a3c02421",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 54
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-03-07T10:45:05Z",
+      "side": 1,
+      "message": "mostly cosmetic imperfections, consider changing them accordingly",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "691df1e4_ff9532e6",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/CompositeX509TrustManager.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-03-07T10:45:05Z",
+      "side": 1,
+      "message": "check{Client|Server}Trusted(...) are argument-wise and also implementation wise-exactly the same. Why not f.e.:\npublic void checkServerTrusted(final X509Certificate[] chain, final String authType) throws CertificateException {\n    return checkClientTrusted(chain, authType);\n}",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50742a42_b6b197c0",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/SSLEngineFactory.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-03-07T10:45:05Z",
+      "side": 1,
+      "message": "unused parameter",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd37982a_734650ad",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/TLSTransportStack.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-03-07T10:45:05Z",
+      "side": 1,
+      "message": "redundant final in static method definition, as all static methods are by default final",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c731f6c_ab969a17",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TestUtils.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-03-07T10:45:05Z",
+      "side": 1,
+      "message": "unused variable",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80b68fdf_367df518",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TestUtils.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-03-07T10:45:05Z",
+      "side": 1,
+      "message": "consider exchanging for:\n        return Objects.requireNonNull(TestUtils.class.getResourceAsStream(resource)).readAllBytes();",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cb02427_60f797ed",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/config/ConfigUtilsTest.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-03-07T10:45:05Z",
+      "side": 1,
+      "message": "unused parameter",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
