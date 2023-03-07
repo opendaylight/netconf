@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d169b00d_9ad1d2c6",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfOperationsServiceTest.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-07T13:40:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52ee5039_8b1f3044",
+      "revId": "818ae6adfefd276fed95e5be79447d49cff2d157",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2c9ede5_f2db8b57",
