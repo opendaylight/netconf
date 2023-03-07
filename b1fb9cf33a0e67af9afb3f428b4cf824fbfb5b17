@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3a0dc76_357d0278",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-07T09:15:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9d468de_e383cbbb",
+      "revId": "b1fb9cf33a0e67af9afb3f428b4cf824fbfb5b17",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5be763cb_6b132f80",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-03-07T09:15:38Z",
       "side": 1,
       "message": "`doNothing` is default mockito action, no need to specify it.",
+      "revId": "b1fb9cf33a0e67af9afb3f428b4cf824fbfb5b17",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02338ed6_28ff3450",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibProviderTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-07T09:15:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5be763cb_6b132f80",
       "revId": "b1fb9cf33a0e67af9afb3f428b4cf824fbfb5b17",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
