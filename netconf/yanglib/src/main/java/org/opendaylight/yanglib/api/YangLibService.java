@@ -5,18 +5,20 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.yanglib.api;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 
 /**
  * Service provides YANG schema sources for modules from yang library.
  */
 @Path("/")
+@Produces({ MediaType.TEXT_PLAIN, YangConstants.RFC6020_YANG_MEDIA_TYPE })
 public interface YangLibService {
 
     /**
@@ -26,7 +28,6 @@ public interface YangLibService {
      * @return Module's source
      */
     @GET
-    @Produces("text/plain")
     @Path("/schemas/{modelName}/{revision:([0-9\\-]*)}")
     String getSchema(@PathParam("modelName") String name, @PathParam("revision") String revision);
 }
