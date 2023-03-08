@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fd73adf_13265bc1",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/CompositeX509TrustManager.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-08T15:05:55Z",
+      "side": 1,
+      "message": "this artifact is not used, removed as extra",
+      "parentUuid": "691df1e4_ff9532e6",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50742a42_b6b197c0",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-03-07T10:45:05Z",
       "side": 1,
       "message": "unused parameter",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2166e26e_18a85af1",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/SSLEngineFactory.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-08T15:05:55Z",
+      "side": 1,
+      "message": "because current authentication method is not implemented",
+      "parentUuid": "50742a42_b6b197c0",
       "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb63cdb5_637fb91a",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/TLSTransportStack.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-08T15:05:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd37982a_734650ad",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c731f6c_ab969a17",
@@ -82,6 +136,24 @@
       "writtenOn": "2023-03-07T10:45:05Z",
       "side": 1,
       "message": "unused variable",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "158685a6_6cfab027",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TestUtils.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-08T15:05:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c731f6c_ab969a17",
       "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "677abb15_a8c3e0ea",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TestUtils.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-08T15:05:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80b68fdf_367df518",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4cb02427_60f797ed",
@@ -116,6 +206,24 @@
       "writtenOn": "2023-03-07T10:45:05Z",
       "side": 1,
       "message": "unused parameter",
+      "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "846e26cf_1d1cbdb4",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/config/ConfigUtilsTest.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-08T15:05:55Z",
+      "side": 1,
+      "message": "it\u0027s used to parameterized test name",
+      "parentUuid": "4cb02427_60f797ed",
       "revId": "c6b5f182210f9a0bf85828905d657f2947ab4895",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
