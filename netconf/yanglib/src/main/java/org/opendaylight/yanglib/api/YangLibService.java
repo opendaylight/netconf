@@ -12,11 +12,13 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 
 /**
  * Service provides YANG schema sources for modules from yang library.
  */
 @Path("/")
+@Produces("text/plain")
 public interface YangLibService {
 
     /**
@@ -26,7 +28,7 @@ public interface YangLibService {
      * @return Module's source
      */
     @GET
-    @Produces("text/plain")
+    @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
     @Path("/schemas/{modelName}/{revision:([0-9\\-]*)}")
     String getSchema(@PathParam("modelName") String name, @PathParam("revision") String revision);
 
@@ -36,7 +38,7 @@ public interface YangLibService {
      * @return Module's source
      */
     @GET
-    @Produces("text/plain")
+    @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
     @Path("/schemas/{modelName}")
     String getSchema(@PathParam("modelName") String name);
 }
