@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "60b316f4_c5e74639",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/api/YangLibService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-09T09:04:45Z",
+      "side": 1,
+      "message": "The optional PathParam will look like this:\n`@Path(\"/schemas/{modelName}{revision:([/?0-9\\\\-]*)}\")`\n\nhttps://nakov.com/blog/2009/07/15/jax-rs-path-pathparam-and-optional-parameters/\n\nHowever, I have an issue with the fact that the forward slash \u0027/\u0027 will become part of the revision string. As a result, extra checks and removal will be necessary to ensure proper handling of the revision strings.",
+      "parentUuid": "e5cb17cc_060bed0e",
+      "range": {
+        "startLine": 40,
+        "startChar": 4,
+        "endLine": 40,
+        "endChar": 33
+      },
+      "revId": "a203412b3b26292ccf9e143621f88570fe53ea28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "08662e8f_0091e543",
         "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
         "patchSetId": 9
@@ -37,6 +61,30 @@
       "writtenOn": "2023-03-07T17:35:51Z",
       "side": 1,
       "message": "common code: just pass name + null to getYangModel() and let it create the SourceIdentifier",
+      "range": {
+        "startLine": 188,
+        "startChar": 18,
+        "endLine": 188,
+        "endChar": 56
+      },
+      "revId": "a203412b3b26292ccf9e143621f88570fe53ea28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db8e882c_82d6ad3c",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-09T09:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08662e8f_0091e543",
       "range": {
         "startLine": 188,
         "startChar": 18,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bd0d8db_5ed0b1a5",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-09T09:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e42fba7_169184d7",
+      "range": {
+        "startLine": 205,
+        "startChar": 23,
+        "endLine": 205,
+        "endChar": 72
+      },
+      "revId": "a203412b3b26292ccf9e143621f88570fe53ea28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fdc5894_ea432901",
@@ -83,6 +155,30 @@
       "writtenOn": "2023-03-07T17:35:51Z",
       "side": 1,
       "message": "same as above: this should be a simple concat",
+      "range": {
+        "startLine": 211,
+        "startChar": 29,
+        "endLine": 211,
+        "endChar": 54
+      },
+      "revId": "a203412b3b26292ccf9e143621f88570fe53ea28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "502ceeab_cdac42a3",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-09T09:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fdc5894_ea432901",
       "range": {
         "startLine": 211,
         "startChar": 29,
