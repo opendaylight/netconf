@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96d09a23_05f3d46e",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManagerTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-09T08:40:13Z",
+      "side": 1,
+      "message": "This is the point of failure.",
+      "revId": "6d1119cfea313a9e4dc136365d60beade916727f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a6f9abe_3d63be4b",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManagerTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-09T08:40:13Z",
+      "side": 1,
+      "message": "This is the point of failure.",
+      "revId": "6d1119cfea313a9e4dc136365d60beade916727f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
