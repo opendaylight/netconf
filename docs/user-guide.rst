@@ -581,6 +581,353 @@ The response suggests the http url for reading the notifications.
 
     data: <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0"><eventTime>2022-06-17T07:01:12.458258Z</eventTime><netconf-session-end xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-notifications"><username>root</username><source-host>127.0.0.1</source-host><termination-reason>closed</termination-reason><session-id>2</session-id></netconf-session-end></notification>
 
+Change event notification subscription tutorial
+-----------------------------------------------
+
+Subscribing to data change notifications makes it possible to obtain
+notifications about data manipulation (insert, change, delete) which are
+done on any specified **path** of any specified **datastore** with
+specific **scope**. In following examples *{odlAddress}* is address of
+server where ODL is running and *{odlPort}* is port on which
+OpenDaylight is running. OpenDaylight offers two methods for receiving notifications:
+Server-Sent Events (SSE) and WebSocket. SSE is the default notification mechanism used in OpenDaylight.
+
+SSE notifications subscription process
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this section we will learn what steps need to be taken in order to
+successfully subscribe to data change event notifications.
+
+Create stream
+^^^^^^^^^^^^^
+
+In order to use event notifications you first need to call RPC that
+creates notification stream that you can later listen to. You need to
+provide three parameters to this RPC:
+
+-  **path**: data store path that you plan to listen to. You can
+   register listener on containers, lists and leaves.
+
+-  **datastore**: data store type. *OPERATIONAL* or *CONFIGURATION*.
+
+-  **scope**: Represents scope of data change. Possible options are:
+
+   -  BASE: only changes directly to the data tree node specified in the
+      path will be reported
+
+   -  ONE: changes to the node and to direct child nodes will be
+      reported
+
+   -  SUBTREE: changes anywhere in the subtree starting at the node will
+      be reported
+
+The RPC to create the stream can be invoked via RESTCONF like this:
+
+::
+
+    OPERATION: POST
+    URI:  http://{odlAddress}:{odlPort}/rests/operations/sal-remote:create-data-change-event-subscription
+    HEADER: Content-Type=application/json
+            Accept=application/json
+
+-  DATA:
+
+   .. code:: json
+
+       {
+           "input": {
+               "path": "/toaster:toaster/toaster:toasterStatus",
+               "sal-remote-augment:datastore": "OPERATIONAL",
+               "sal-remote-augment:scope": "ONE"
+           }
+       }
+
+The response should look something like this:
+
+.. code:: json
+
+    {
+        "sal-remote:output": {
+            "stream-name": "data-change-event-subscription/toaster:toaster/toaster:toasterStatus/datastore=CONFIGURATION/scope=SUBTREE"
+        }
+    }
+
+**stream-name** is important because you will need to use it when you
+subscribe to the stream in the next step.
+
+.. note::
+
+    Internally, this will create a new listener for *stream-name* if it
+    did not already exist.
+
+Subscribe to stream
+^^^^^^^^^^^^^^^^^^^
+
+In order to subscribe to stream and obtain SSE location you need
+to call *GET* on your stream path. The URI should generally be
+`http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/{streamName}`,
+where *{streamName}* is the *stream-name* parameter contained in
+response from *create-data-change-event-subscription* RPC from the
+previous step.
+
+::
+
+   OPERATION: GET
+   URI: http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=SUBTREE
+
+The subscription call may be modified with the following query parameters defined in the RESTCONF RFC:
+
+-  `filter <https://tools.ietf.org/html/draft-ietf-netconf-restconf-05#section-4.8.6>`__
+
+-  `start-time <https://tools.ietf.org/html/draft-ietf-netconf-restconf-05#section-4.8.7>`__
+
+-  `end-time <https://tools.ietf.org/html/draft-ietf-netconf-restconf-05#section-4.8.8>`__
+
+In addition, the following ODL extension query parameter is supported:
+
+:odl-leaf-nodes-only:
+  If this parameter is set to "true", create and update notifications will only
+  contain the leaf nodes modified instead of the entire subscription subtree.
+  This can help in reducing the size of the notifications.
+
+:odl-skip-notification-data:
+  If this parameter is set to "true", create and update notifications will only
+  contain modified leaf nodes without data.
+  This can help in reducing the size of the notifications.
+
+The response should look something like this:
+
+.. code:: json
+
+    {
+        "subscribe-to-notification:location": "http://localhost:8181/rests/notif/data-change-event-subscription/network-topology:network-topology/datastore=CONFIGURATION/scope=SUBTREE"
+    }
+
+.. note::
+
+    During this phase there is an internal check for to see if a
+    listener for the *stream-name* from the URI exists. If not, new a
+    new listener is registered with the DOM data broker.
+
+Receive notifications
+^^^^^^^^^^^^^^^^^^^^^
+
+Once you got SSE location you can now connect to it and
+start receiving data change events. The request should look something like this:
+
+::
+
+    curl -v -X GET  http://localhost:8181/rests/notif/data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE  -H "Content-Type: text/event-stream" -H "Authorization: Basic YWRtaW46YWRtaW4="
+
+
+WebSocket notifications subscription process
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Enabling WebSocket notifications in OpenDaylight requires a manual setup before starting the application.
+The following steps can be followed to enable WebSocket notifications in OpenDaylight:
+
+1. Open the file `restconf8040.cfg`, at `etc/` folder inside your Karaf distribution.
+2. Locate the `use-sse` configuration parameter and change its value from `true` to `false`.
+3. Uncomment the `use-sse` parameter if it is commented out.
+4. Save the changes made to the `restconf8040.cfg` file.
+5. Restart OpenDaylight if it is already running.
+
+Once these steps are completed, WebSocket notifications will be enabled in OpenDaylight,
+and they can be used for receiving notifications instead of SSE.
+
+WebSocket Notifications subscription process is the same as SSE until you receive a location of WebSocket.
+You can follow steps given above and after subscribing to a notification stream over WebSocket,
+you will receive a response indicating that the subscription was successful:
+
+.. code:: json
+
+    {
+        "subscribe-to-notification:location": "ws://localhost:8181/rests/notif/data-change-event-subscription/network-topology:network-topology/datastore=CONFIGURATION/scope=SUBTREE"
+    }
+
+You can use this WebSocket to listen to data
+change notifications. To listen to notifications you can use a
+JavaScript client or if you are using chrome browser you can use the
+`Simple WebSocket
+Client <https://chrome.google.com/webstore/detail/simple-websocket-client/pfdhoblngboilpfeibdedpjgfnlcodoo>`__.
+
+Also, for testing purposes, there is simple Java application named
+WebSocketClient. The application is placed in the
+*/restconf/websocket-client* project. It accepts a WebSocket URI
+as and input parameter. After starting the utility (WebSocketClient
+class directly in Eclipse/InteliJ Idea) received notifications should be
+displayed in console.
+
+Notifications are always in XML format and look like this:
+
+.. code:: xml
+
+    <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+        <eventTime>2014-09-11T09:58:23+02:00</eventTime>
+        <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
+            <data-change-event>
+                <path xmlns:meae="http://netconfcentral.org/ns/toaster">/meae:toaster</path>
+                <operation>updated</operation>
+                <data>
+                   <!-- updated data -->
+                </data>
+            </data-change-event>
+        </data-changed-notification>
+    </notification>
+
+Example use case
+~~~~~~~~~~~~~~~~
+
+The typical use case is listening to data change events to update web
+page data in real-time. In this tutorial we will be using toaster as the
+base.
+
+When you call *make-toast* RPC, it sets *toasterStatus* to "down" to
+reflect that the toaster is busy making toast. When it finishes,
+*toasterStatus* is set to "up" again. We will listen to this toaster
+status changes in data store and will reflect it on our web page in
+real-time thanks to WebSocket data change notification.
+
+Simple javascript client implementation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We will create simple JavaScript web application that will listen
+updates on *toasterStatus* leaf and update some element of our web page
+according to new toaster status state.
+
+Create stream
+^^^^^^^^^^^^^
+
+First you need to create stream that you are planing to subscribe to.
+This can be achieved by invoking "create-data-change-event-subscription"
+RPC on RESTCONF via AJAX request. You need to provide data store
+**path** that you plan to listen on, **data store type** and **scope**.
+If the request is successful you can extract the **stream-name** from
+the response and use that to subscribe to the newly created stream. The
+*{username}* and *{password}* fields represent your credentials that you
+use to connect to OpenDaylight via RESTCONF:
+
+.. note::
+
+    The default user name and password are "admin".
+
+.. code:: javascript
+
+    function createStream() {
+        $.ajax(
+            {
+                url: 'http://{odlAddress}:{odlPort}/rests/operations/sal-remote:create-data-change-event-subscription',
+                type: 'POST',
+                headers: {
+                  'Authorization': 'Basic ' + btoa('{username}:{password}'),
+                  'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(
+                    {
+                        'input': {
+                            'path': '/toaster:toaster/toaster:toasterStatus',
+                            'sal-remote-augment:datastore': 'OPERATIONAL',
+                            'sal-remote-augment:scope': 'ONE'
+                        }
+                    }
+                )
+            }).done(function (data) {
+                // this function will be called when ajax call is executed successfully
+                subscribeToStream(data.output['stream-name']);
+            }).fail(function (data) {
+                // this function will be called when ajax call fails
+                console.log("Create stream call unsuccessful");
+            })
+    }
+
+Subscribe to stream
+^^^^^^^^^^^^^^^^^^^
+
+The Next step is to subscribe to the stream. To subscribe to the stream
+you need to call *GET* on
+*http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/{stream-name}*.
+If the call is successful, you get WebSocket address for this stream in
+**Location** parameter inside response header. You can get response
+header by calling *getResponseHeader(\ *Location*)* on HttpRequest
+object inside *done()* function call:
+
+.. code:: javascript
+
+    function subscribeToStream(streamName) {
+        $.ajax(
+            {
+                url: 'http://{odlAddress}:{odlPort}/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/' + streamName;
+                type: 'GET',
+                headers: {
+                  'Authorization': 'Basic ' + btoa('{username}:{password}'),
+                }
+            }
+        ).done(function (data, textStatus, httpReq) {
+            // we need function that has http request object parameter in order to access response headers.
+            listenToNotifications(httpReq.getResponseHeader('Location'));
+        }).fail(function (data) {
+            console.log("Subscribe to stream call unsuccessful");
+        });
+    }
+
+Receive notifications
+^^^^^^^^^^^^^^^^^^^^^
+
+Once you got WebSocket server location you can now connect to it and
+start receiving data change events. You need to define functions that
+will handle events on WebSocket. In order to process incoming events
+from OpenDaylight you need to provide a function that will handle
+*onmessage* events. The function must have one parameter that represents
+the received event object. The event data will be stored in
+*event.data*. The data will be in an XML format that you can then easily
+parse using jQuery.
+
+.. code:: javascript
+
+    function listenToNotifications(socketLocation) {
+        try {
+            var notificatinSocket = new WebSocket(socketLocation);
+
+            notificatinSocket.onmessage = function (event) {
+                // we process our received event here
+                console.log('Received toaster data change event.');
+                $($.parseXML(event.data)).find('data-change-event').each(
+                    function (index) {
+                        var operation = $(this).find('operation').text();
+                        if (operation == 'updated') {
+                            // toaster status was updated so we call function that gets the value of toasterStatus leaf
+                            updateToasterStatus();
+                            return false;
+                        }
+                    }
+                );
+            }
+            notificatinSocket.onerror = function (error) {
+                console.log("Socket error: " + error);
+            }
+            notificatinSocket.onopen = function (event) {
+                console.log("Socket connection opened.");
+            }
+            notificatinSocket.onclose = function (event) {
+                console.log("Socket connection closed.");
+            }
+            // if there is a problem on socket creation we get exception (i.e. when socket address is incorrect)
+        } catch(e) {
+            alert("Error when creating WebSocket" + e );
+        }
+    }
+
+The *updateToasterStatus()* function represents function that calls
+*GET* on the path that was modified and sets toaster status in some web
+page element according to received data. After the WebSocket connection
+has been established you can test events by calling make-toast RPC via
+RESTCONF.
+
+.. note::
+
+    for more information about WebSockets in JavaScript visit `Writing
+    WebSocket client
+    applications <https://developer.mozilla.org/en-US/docs/WebSockets/Writing_WebSocket_client_applications>`__
 
 Netconf-connector + Netopeer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
