@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f309b4f2_25100f2b",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-10T12:45:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0431f15c_c54aadf3",
+      "revId": "d964ed59bb1b4f9a7f3f3193dd9807a38292eba2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74a23321_06ccfe8d",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-03-06T17:38:16Z",
       "side": 1,
       "message": "Remove swagger 2.",
+      "revId": "d964ed59bb1b4f9a7f3f3193dd9807a38292eba2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b592eed5_83b673db",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/jaxrs/WebInitializer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-10T12:45:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74a23321_06ccfe8d",
       "revId": "d964ed59bb1b4f9a7f3f3193dd9807a38292eba2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
