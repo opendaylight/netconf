@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51e876eb_d5fc1c26",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-10T14:21:24Z",
+      "side": 1,
+      "message": "The tests from 104617 has to be adapted, too.",
+      "revId": "5453b96728da1f1faea99a7b7a61cba2e7ba2950",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
