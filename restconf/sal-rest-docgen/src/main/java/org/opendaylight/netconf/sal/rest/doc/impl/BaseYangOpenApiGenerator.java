@@ -21,6 +21,7 @@ import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveP
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -87,6 +88,9 @@ public abstract class BaseYangOpenApiGenerator {
 
     static {
         MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(MapperGeneratorRecord.class, new DefinitionGenerator());
+        MAPPER.registerModule(module);
     }
 
     protected BaseYangOpenApiGenerator(final Optional<DOMSchemaService> schemaService) {
@@ -135,7 +139,6 @@ public abstract class BaseYangOpenApiGenerator {
             final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
-
             getOpenApiDocSpec(module, context, deviceName, schemaContext, definitionNames, doc, false);
         }
     }
@@ -224,10 +227,16 @@ public abstract class BaseYangOpenApiGenerator {
                 new SecuritySchemes(OPEN_API_BASIC_AUTH));
         try {
             if (isForSingleModule) {
-                components.setSchemas(jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, true));
+                MapperGeneratorRecord generatorClass = new MapperGeneratorRecord(module, schemaContext, definitionNames,
+                        true);
+                components.setSchemas(MAPPER.convertValue(generatorClass, ObjectNode.class));
                 doc.setComponents(components);
             } else {
-                components.setSchemas(jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, false));
+                MapperGeneratorRecord generatorClass = new MapperGeneratorRecord(module, schemaContext, definitionNames,
+                        false);
+                components.setSchemas(MAPPER.convertValue(generatorClass, ObjectNode.class));
+                // If there are multiple models, then the ObjectNode(definition) is appended to the ObjectNode
+                // that is already stored in the SwaggerObject(doc).
                 addFields(doc.getComponents().getSchemas(), components.getSchemas().fields());
             }
             if (LOG.isDebugEnabled()) {
@@ -513,4 +522,7 @@ public abstract class BaseYangOpenApiGenerator {
     protected interface ListPathBuilder {
         String nextParamIdentifier(String key);
     }
+
+    public record MapperGeneratorRecord(Module module, EffectiveModelContext schemaContext,
+            DefinitionNames definitionNames, boolean isForSingleModule){}
 }
