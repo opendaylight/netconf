@@ -20,6 +20,7 @@ import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveP
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -84,6 +85,9 @@ public abstract class BaseYangSwaggerGenerator {
 
     static {
         MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(MapperGeneratorRecord.class, new DefinitionGenerator());
+        MAPPER.registerModule(module);
     }
 
     protected BaseYangSwaggerGenerator(final Optional<DOMSchemaService> schemaService) {
@@ -139,7 +143,7 @@ public abstract class BaseYangSwaggerGenerator {
             final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
-
+            // Fill SwaggerObject with parsed ObjectNodes
             getSwaggerDocSpec(module, context, deviceName, schemaContext, oaversion, definitionNames, doc, false);
         }
     }
@@ -233,12 +237,16 @@ public abstract class BaseYangSwaggerGenerator {
 
         try {
             if (isForSingleModule) {
-                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
-                        true);
+                MapperGeneratorRecord generatorClass = new MapperGeneratorRecord(module, schemaContext, definitionNames,
+                        oaversion, true);
+                definitions = MAPPER.convertValue(generatorClass, ObjectNode.class);
                 doc.setDefinitions(definitions);
             } else {
-                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
-                        false);
+                MapperGeneratorRecord generatorClass = new MapperGeneratorRecord(module, schemaContext, definitionNames,
+                        oaversion, false);
+                definitions = MAPPER.convertValue(generatorClass, ObjectNode.class);
+                // If there are multiple models, then the ObjectNode(definition) is appended to the ObjectNode
+                // that is already stored in the SwaggerObject(doc).
                 addFields(doc.getDefinitions(), definitions.fields());
             }
             if (LOG.isDebugEnabled()) {
@@ -248,6 +256,7 @@ public abstract class BaseYangSwaggerGenerator {
             LOG.error("Exception occured in DefinitionGenerator", e);
         }
 
+        // This is where all URL paths are created that can be used with the provided models.
         final ObjectNode paths = JsonNodeFactory.instance.objectNode();
         final String moduleName = module.getName();
 
@@ -303,6 +312,8 @@ public abstract class BaseYangSwaggerGenerator {
 
         LOG.debug("Number of Paths found [{}]", paths.size());
 
+        // If there are multiple models, then the created ObjectNode is merged with the ObjectNode
+        // inside the SwaggerObject(doc).
         if (isForSingleModule) {
             doc.setPaths(paths);
         } else {
@@ -560,4 +571,7 @@ public abstract class BaseYangSwaggerGenerator {
     protected interface ListPathBuilder {
         String nextParamIdentifier(String key);
     }
+
+    public record MapperGeneratorRecord(Module module, EffectiveModelContext schemaContext,
+            DefinitionNames definitionNames, OAversion oaversion, boolean isForSingleModule){}
 }

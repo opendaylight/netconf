@@ -77,6 +77,7 @@ public final class ApiDocServiceImpl implements ApiDocService {
         final DefinitionNames definitionNames = new DefinitionNames();
         final SwaggerObject doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames, oaversion);
 
+        // REST API RESPONSE with SwaggerObject
         return Response.ok(BaseYangSwaggerGenerator.getAppropriateDoc(doc, oaversion)).build();
     }
 
