@@ -13,26 +13,33 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getAppropriateModelPrefix;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.mifmif.common.regex.Generex;
 import java.io.IOException;
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
+import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator.MapperGeneratorRecord;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.AnydataSchemaNode;
@@ -86,9 +93,12 @@ import org.slf4j.LoggerFactory;
 /**
  * Generates JSON Schema for data defined in YANG. This class is not thread-safe.
  */
-public class DefinitionGenerator {
+public class DefinitionGenerator extends StdSerializer<MapperGeneratorRecord> {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefinitionGenerator.class);
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private static final String UNIQUE_ITEMS_KEY = "uniqueItems";
     private static final String MAX_ITEMS = "maxItems";
@@ -122,10 +132,46 @@ public class DefinitionGenerator {
     // See https://www.brics.dk/automaton/doc/dk/brics/automaton/RegExp.html
     private static final Pattern AUTOMATON_SPECIAL_CHARACTERS = Pattern.compile("[@&\"<>#~]");
 
-    private Module topLevelModule;
+    private QNameModule qnameModule;
+
 
     public DefinitionGenerator() {
+        this(null);
     }
+
+    public DefinitionGenerator(final Class<MapperGeneratorRecord> recordClass) {
+        super(recordClass);
+    }
+
+    @Override
+    public void serialize(final MapperGeneratorRecord value, final JsonGenerator gen, final SerializerProvider provider)
+            throws IOException {
+        gen.writeStartObject();
+        if (value.isForSingleModule()) {
+            value.definitionNames().addUnlinkedName(value.module().getName() + MODULE_NAME_SUFFIX);
+        }
+        convertToJsonSchema(value.module(), value.schemaContext(), gen, value.definitionNames(), value.oaversion(),
+                value.isForSingleModule());
+        gen.writeEndObject();
+    }
+
+
+    public JsonGenerator convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
+            final JsonGenerator generator, final DefinitionNames definitionNames, final OAversion oaversion,
+            final boolean isForSingleModule) throws IOException {
+        qnameModule = module.getQNameModule();
+
+        processIdentities(module, generator, definitionNames, schemaContext);
+        processContainersAndLists(module, generator, definitionNames, schemaContext, oaversion);
+        processRPCs(module, generator, definitionNames, schemaContext, oaversion);
+
+        if (isForSingleModule) {
+            processModule(module, generator, definitionNames, schemaContext, oaversion);
+        }
+
+        return generator;
+    }
+
 
     /**
      * Creates Json definitions from provided module according to swagger spec.
@@ -141,7 +187,7 @@ public class DefinitionGenerator {
     public ObjectNode convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
             final ObjectNode definitions, final DefinitionNames definitionNames, final OAversion oaversion,
             final boolean isForSingleModule) throws IOException {
-        topLevelModule = module;
+        qnameModule = module.getQNameModule();
         final DefinitionObject base = new DefinitionObject();
         processIdentities(module, base, definitionNames, schemaContext);
         processContainersAndLists(module, base, definitionNames, schemaContext, oaversion);
@@ -152,7 +198,7 @@ public class DefinitionGenerator {
         }
 
         final ObjectNode jsonNodes = base.convertToObjectNode();
-        final Iterator<Map.Entry<String, JsonNode>> fields = jsonNodes.fields();
+        final Iterator<Entry<String, JsonNode>> fields = jsonNodes.fields();
         while (fields.hasNext()) {
             final Map.Entry<String, JsonNode> field = fields.next();
             definitions.set(field.getKey(), field.getValue());
@@ -169,6 +215,63 @@ public class DefinitionGenerator {
             definitionNames.addUnlinkedName(module.getName() + MODULE_NAME_SUFFIX);
         }
         return convertToJsonSchema(module, schemaContext, definitions, definitionNames, oaversion, isForSingleModule);
+    }
+
+    private void processModule(final Module module, final JsonGenerator generator,
+            final DefinitionNames definitionNames, final EffectiveModelContext schemaContext, final OAversion oaversion)
+            throws IOException {
+        final String moduleName = module.getName();
+        final String definitionName = moduleName + MODULE_NAME_SUFFIX;
+        generator.writeObjectFieldStart(definitionName); // definition
+        generator.writeStringField(TITLE_KEY, definitionName);
+        generator.writeStringField(TYPE_KEY, OBJECT_TYPE);
+        generator.writeObjectFieldStart(PROPERTIES_KEY); // properties
+        DefinitionObject definitionObject = new DefinitionObject();
+        final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
+        for (final DataSchemaNode node : module.getChildNodes()) {
+            stack.enterSchemaTree(node.getQName());
+            final String localName = node.getQName().getLocalName();
+            if (node.isConfiguration()) {
+                if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
+                    for (final DataSchemaNode childNode : ((DataNodeContainer) node).getChildNodes()) {
+                        generator.writeObjectFieldStart(localName);  // childNodeProperties
+                        final String ref = getAppropriateModelPrefix(oaversion)
+                                + moduleName + CONFIG
+                                + "_" + localName
+                                + definitionNames.getDiscriminator(node);
+
+                        if (node instanceof ListSchemaNode) {
+                            generator.writeStringField(TYPE_KEY, ARRAY_TYPE);
+                            generator.writeObjectFieldStart(ITEMS_KEY);
+                            generator.writeStringField(REF_KEY, ref);
+                            generator.writeEndObject();
+                            generator.writeStringField(DESCRIPTION_KEY, childNode.getDescription().orElse(""));
+                            generator.writeStringField(TITLE_KEY, localName + CONFIG);
+                        } else {
+                         /*
+                            Description can't be added, because nothing allowed alongside $ref.
+                            allOf is not an option, because ServiceNow can't parse it.
+                          */
+                            generator.writeStringField(REF_KEY, ref);
+                        }
+                        //add module name prefix to property name, when ServiceNow can process colons
+                        generator.writeEndObject();
+                    }
+                } else if (node instanceof LeafSchemaNode leafNode) {
+                    /*
+                        Add module name prefix to property name, when ServiceNow can process colons(second parameter
+                        of processLeafNode).
+                     */
+
+                    processLeafNode(leafNode, localName, stack, definitionNames, oaversion, definitionObject);
+                }
+            }
+            stack.exit();
+        }
+        generator.writeEndObject();
+        generator.writeStringField(DESCRIPTION_KEY, module.getDescription().orElse(""));
+        generator.writeEndObject();
+        definitionObject.writeDataToJsonGenerator(generator);
     }
 
     private void processModule(final Module module, final DefinitionObject defObj,final DefinitionNames defNames,
@@ -227,9 +330,31 @@ public class DefinitionGenerator {
         defObj.addData(definitionName, definition);
     }
 
+    private void processContainersAndLists(final Module module, final JsonGenerator gen,
+            final DefinitionNames definitionNames, final EffectiveModelContext schemaContext, final OAversion oaversion)
+            throws IOException {
+        final String moduleName = module.getName();
+        final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
+        for (final DataSchemaNode childNode : module.getChildNodes()) {
+            stack.enterSchemaTree(childNode.getQName());
+            // For every container and list in the module
+            if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
+                DefinitionObject definitionObject = new DefinitionObject();
+                processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitionNames,
+                        stack, oaversion, definitionObject);
+                definitionObject.writeDataToJsonGenerator(gen);
+
+                definitionObject = new DefinitionObject();
+                processActionNodeContainer(childNode, moduleName, definitionNames, stack, oaversion, definitionObject);
+                definitionObject.writeDataToJsonGenerator(gen);
+            }
+            stack.exit();
+        }
+    }
+
     private void processContainersAndLists(final Module module, final DefinitionObject defObj,
             final DefinitionNames definitionNames, final EffectiveModelContext schemaContext, final OAversion oaversion)
-                throws IOException {
+            throws IOException {
         final String moduleName = module.getName();
         final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
         for (final DataSchemaNode childNode : module.getChildNodes()) {
@@ -252,6 +377,19 @@ public class DefinitionGenerator {
             processOperations(actionDef, moduleName, definitionNames, stack, oaversion, defObj);
             stack.exit();
         }
+    }
+
+    private void processRPCs(final Module module, final JsonGenerator gen, final DefinitionNames definitionNames,
+            final EffectiveModelContext schemaContext, final OAversion oaversion) throws IOException {
+        final String moduleName = module.getName();
+        final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
+        final DefinitionObject definitionObject = new DefinitionObject();
+        for (final RpcDefinition rpcDefinition : module.getRpcs()) {
+            stack.enterSchemaTree(rpcDefinition.getQName());
+            processOperations(rpcDefinition, moduleName, definitionNames, stack, oaversion, definitionObject);
+            stack.exit();
+        }
+        definitionObject.writeDataToJsonGenerator(gen);
     }
 
     private void processRPCs(final Module module, final DefinitionObject defObj, final DefinitionNames definitionNames,
@@ -319,6 +457,24 @@ public class DefinitionGenerator {
         return dataNodePropObj;
     }
 
+
+    private static void processIdentities(final Module module, final JsonGenerator generator,
+            final DefinitionNames definitionNames, final EffectiveModelContext context)
+            throws IOException {
+        final String moduleName = module.getName();
+        final Collection<? extends IdentitySchemaNode> idNodes = module.getIdentities();
+        LOG.debug("Processing Identities for module {} . Found {} identity statements", moduleName, idNodes.size());
+
+        for (final IdentitySchemaNode idNode : idNodes) {
+            final String idName = idNode.getQName().getLocalName();
+            final String discriminator = definitionNames.pickDiscriminator(idNode, List.of(idName));
+            final String name = idName + discriminator;
+            generator.writeObjectFieldStart(name);
+            buildIdentityObject(generator, idNode, context);
+            generator.writeEndObject();
+        }
+    }
+
     /**
      * Processes the 'identity' statement in a yang model and maps it to a 'model' in the Swagger JSON spec.
      * @param module          The module from which the identity stmt will be processed
@@ -345,6 +501,14 @@ public class DefinitionGenerator {
         for (final IdentitySchemaNode derivedId : derivedIds) {
             enumPayload.add(derivedId.getQName().getLocalName());
             populateEnumWithDerived(context.getDerivedIdentities(derivedId), enumPayload, context);
+        }
+    }
+
+    private static void populateEnumWithDerived(final Collection<? extends IdentitySchemaNode> derivedIds,
+            final JsonGenerator generator, final EffectiveModelContext context) throws IOException {
+        for (final IdentitySchemaNode derivedId : derivedIds) {
+            generator.writeString(derivedId.getQName().getLocalName());
+            populateEnumWithDerived(context.getDerivedIdentities(derivedId), generator, context);
         }
     }
 
@@ -636,6 +800,26 @@ public class DefinitionGenerator {
         }
     }
 
+    private static JsonGenerator buildIdentityObject(final JsonGenerator generator, final IdentitySchemaNode idNode,
+            final EffectiveModelContext context) throws IOException {
+        final String identityName = idNode.getQName().getLocalName();
+        LOG.debug("Processing Identity: {}", identityName);
+
+        generator.writeStringField(TITLE_KEY, identityName);
+        generator.writeStringField(DESCRIPTION_KEY,idNode.getDescription().orElse(""));
+
+        final Collection<? extends IdentitySchemaNode> derivedIds = context.getDerivedIdentities(idNode);
+
+        generator.writeArrayFieldStart(ENUM_KEY);
+        populateEnumWithDerived(derivedIds, generator, context);
+        generator.writeString(identityName);
+        generator.writeEndArray();
+
+        generator.writeStringField(TYPE_KEY, STRING_TYPE);
+
+        return generator;
+    }
+
     private static DefinitionObject buildIdentityDefObject(final IdentitySchemaNode idNode,
             final EffectiveModelContext context, final DefinitionObject defObj) {
         final DefinitionObject identityDefObj = new DefinitionObject(defObj);
@@ -656,7 +840,7 @@ public class DefinitionGenerator {
     }
 
     private boolean isImported(final IdentityrefTypeDefinition leafTypeDef) {
-        return !leafTypeDef.getQName().getModule().equals(topLevelModule.getQNameModule());
+        return !leafTypeDef.getQName().getModule().equals(qnameModule);
     }
 
     private static String processBitsType(final BitsTypeDefinition bitsType, final DefinitionObject defObj) {
