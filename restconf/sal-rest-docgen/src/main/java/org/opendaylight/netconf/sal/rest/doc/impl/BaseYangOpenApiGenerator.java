@@ -21,6 +21,7 @@ import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveP
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -86,6 +87,9 @@ public abstract class BaseYangOpenApiGenerator {
 
     static {
         MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(MapperGeneratorRecord.class, new DefinitionGenerator());
+        MAPPER.registerModule(module);
     }
 
     protected BaseYangOpenApiGenerator(final Optional<DOMSchemaService> schemaService) {
@@ -218,13 +222,14 @@ public abstract class BaseYangOpenApiGenerator {
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
         try {
-            final ObjectNode schema;
+            final MapperGeneratorRecord generatorClass = new MapperGeneratorRecord(module, schemaContext,
+                    definitionNames, isForSingleModule);
+            final ObjectNode schema = MAPPER.convertValue(generatorClass, ObjectNode.class);
             if (isForSingleModule) {
-                schema = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, true);
+                doc.getComponents().setSchemas(schema);
             } else {
-                schema = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, false);
+                addFields(doc.getComponents().getSchemas(), schema.fields());
             }
-            addFields(doc.getComponents().getSchemas(), schema.fields());
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
             }
@@ -505,4 +510,7 @@ public abstract class BaseYangOpenApiGenerator {
     protected interface ListPathBuilder {
         String nextParamIdentifier(String key);
     }
+
+    public record MapperGeneratorRecord(Module module, EffectiveModelContext schemaContext,
+            DefinitionNames definitionNames, boolean isForSingleModule){}
 }
