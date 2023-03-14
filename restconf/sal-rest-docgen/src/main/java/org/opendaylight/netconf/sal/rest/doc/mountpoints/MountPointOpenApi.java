@@ -185,7 +185,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 Optional.of(deviceName), urlPrefix, definitionNames);
 
         if (includeDataStore) {
-            doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
+            doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName, openApiObject);
             var paths = new HashMap<>(doc.getPaths()); // Creating mutable copy of map
             paths.putAll(openApiObject.getPaths());
             doc.setPaths(paths);
@@ -222,7 +222,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var paths = Map.of(openApiGenerator.getResourcePath("data", context), data,
                 openApiGenerator.getResourcePath("operations", context), operations);
         declaration.setPaths(paths);
-        declaration.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
+        declaration.setComponents(new Components("",
                 new SecuritySchemes(BaseYangOpenApiGenerator.OPEN_API_BASIC_AUTH)));
 
         return declaration;
