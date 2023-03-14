@@ -17,7 +17,6 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TAGS_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildTagsValue;
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -36,10 +35,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
-import org.opendaylight.netconf.sal.rest.doc.openapi.Components;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
-import org.opendaylight.netconf.sal.rest.doc.openapi.SecuritySchemes;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -185,12 +182,11 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 Optional.of(deviceName), urlPrefix, definitionNames);
 
         if (includeDataStore) {
-            doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
+            doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName, openApiObject);
             var paths = new HashMap<>(doc.getPaths()); // Creating mutable copy of map
             paths.putAll(openApiObject.getPaths());
             doc.setPaths(paths);
             doc.getInfo().setTitle(openApiObject.getInfo().getTitle());
-            addFields(doc.getComponents().getSchemas(), openApiObject.getComponents().getSchemas().fields());
         } else {
             doc = openApiObject;
         }
@@ -205,11 +201,20 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     private OpenApiObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
             final String deviceName) {
-        final OpenApiObject declaration = openApiGenerator.createOpenApiObject(
-                openApiGenerator.createSchemaFromUriInfo(uriInfo),
-                openApiGenerator.createHostFromUriInfo(uriInfo),
-                BASE_PATH,
-                context);
+        return generateDataStoreApiDoc(uriInfo, context, deviceName, new OpenApiObject());
+    }
+
+    private OpenApiObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
+            final String deviceName, final OpenApiObject openApiObject) {
+        final OpenApiObject declaration;
+        if (openApiObject.getComponents() == null) {
+            declaration = openApiGenerator.createOpenApiObject(
+                    openApiGenerator.createSchemaFromUriInfo(uriInfo),
+                    openApiGenerator.createHostFromUriInfo(uriInfo),
+                    BASE_PATH, context);
+        } else {
+            declaration = openApiObject;
+        }
 
         final var data = new Path();
         data.setGet(createGetPathItem("data",
@@ -222,8 +227,6 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var paths = Map.of(openApiGenerator.getResourcePath("data", context), data,
                 openApiGenerator.getResourcePath("operations", context), operations);
         declaration.setPaths(paths);
-        declaration.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
-                new SecuritySchemes(BaseYangOpenApiGenerator.OPEN_API_BASIC_AUTH)));
 
         return declaration;
     }
