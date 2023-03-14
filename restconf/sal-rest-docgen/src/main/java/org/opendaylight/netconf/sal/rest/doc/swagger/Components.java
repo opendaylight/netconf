@@ -7,24 +7,22 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.swagger;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 public class Components {
-    private ObjectNode schemas;
+    private String schemas;
 
     public Components() {
 
     }
 
-    public Components(ObjectNode schemas) {
+    public Components(final String schemas) {
         this.schemas = schemas;
     }
 
-    public ObjectNode getSchemas() {
+    public String getSchemas() {
         return schemas;
     }
 
-    public void setSchemas(ObjectNode schemas) {
+    public void setSchemas(String schemas) {
         this.schemas = schemas;
     }
 }
