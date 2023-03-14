@@ -13,9 +13,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
@@ -87,8 +90,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testSchemas() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final var schemas = doc.getComponents().getSchemas();
 
-        final ObjectNode schemas = doc.getComponents().getSchemas();
         assertNotNull(schemas);
 
         final JsonNode configLst = schemas.get("toaster2_config_lst");
@@ -121,10 +124,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var module = CONTEXT.findModule(NAME_2, Revision.of(REVISION_DATE_2)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
         assertNotNull(doc);
+        final var schemas = doc.getComponents().getSchemas();
 
-        final ObjectNode schemas = doc.getComponents().getSchemas();
-        final JsonNode inputTop = schemas.get("toaster_make-toast_input");
-        assertNotNull(inputTop);
         final JsonNode input = schemas.get("toaster_make-toast_input");
         final JsonNode properties = input.get("properties");
         assertTrue(properties.has("toasterDoneness"));
@@ -136,8 +137,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var module = CONTEXT.findModule(CHOICE_TEST_MODULE).orElseThrow();
         final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
         assertNotNull(doc);
-
         final var schemas = doc.getComponents().getSchemas();
+
         JsonNode firstContainer = schemas.get("choice-test_config_first-container");
         assertEquals("default-value",
                 firstContainer.get(PROPERTIES).get("leaf-default").get("default").asText());
@@ -152,6 +153,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testSimpleSwaggerObjects() {
         final var module = CONTEXT.findModule(MY_YANG, Revision.of(MY_YANG_REVISION)).orElseThrow();
         final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+
         assertEquals(Set.of("/rests/data", "/rests/data/my-yang:data"),
                 doc.getPaths().keySet());
         final var jsonNodeMyYangData = doc.getPaths().get("/rests/data/my-yang:data");
@@ -161,10 +163,11 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         verifyRequestRef(jsonNodeMyYangData.getGet(), myYangData, myYangData);
 
         // Test `components/schemas` objects
-        final var definitions = doc.getComponents().getSchemas();
-        assertEquals(2, definitions.size());
-        assertTrue(definitions.has("my-yang_config_data"));
-        assertTrue(definitions.has("my-yang_module"));
+       final var schemas = doc.getComponents().getSchemas();
+
+        assertEquals(2, schemas.size());
+        assertTrue(schemas.containsKey("my-yang_config_data"));
+        assertTrue(schemas.containsKey("my-yang_module"));
     }
 
     @Test
@@ -222,8 +225,9 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertEquals(2, xmlSchema.size());
 
         // Test `components/schemas` objects
-        final var definitions = doc.getComponents().getSchemas();
-        assertEquals(18, definitions.size());
+       final var schemas = doc.getComponents().getSchemas();
+
+        assertEquals(18, schemas.size());
     }
 
     /**
