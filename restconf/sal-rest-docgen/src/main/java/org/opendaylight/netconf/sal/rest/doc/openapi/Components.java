@@ -8,29 +8,29 @@
 package org.opendaylight.netconf.sal.rest.doc.openapi;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Components {
-    private ObjectNode schemas;
-    private SecuritySchemes securitySchemes;
 
-    public Components(ObjectNode schemas, SecuritySchemes securitySchemes) {
-        this.schemas = schemas;
+    private final Map<String, ObjectNode> schemas;
+    private final SecuritySchemes securitySchemes;
+
+    public Components(final SecuritySchemes securitySchemes) {
         this.securitySchemes = securitySchemes;
+        this.schemas = new HashMap<>();
     }
 
-    public ObjectNode getSchemas() {
+    public Map<String, ObjectNode> getSchemas() {
         return schemas;
     }
 
-    public void setSchemas(ObjectNode schemas) {
-        this.schemas = schemas;
+    public void setSchemas(final Map<String, ObjectNode> newSchema) {
+        schemas.clear();
+        schemas.putAll(newSchema);
     }
 
     public SecuritySchemes getSecuritySchemes() {
         return securitySchemes;
-    }
-
-    public void setSecuritySchemes(SecuritySchemes securitySchemes) {
-        this.securitySchemes = securitySchemes;
     }
 }
