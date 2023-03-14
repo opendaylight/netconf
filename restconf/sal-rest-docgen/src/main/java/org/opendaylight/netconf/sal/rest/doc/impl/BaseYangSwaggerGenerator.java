@@ -21,7 +21,6 @@ import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveP
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -87,9 +86,6 @@ public abstract class BaseYangSwaggerGenerator {
 
     static {
         MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(MapperGeneratorRecord.class, new DefinitionGenerator());
-        MAPPER.registerModule(module);
     }
 
     protected BaseYangSwaggerGenerator(final Optional<DOMSchemaService> schemaService) {
@@ -120,17 +116,20 @@ public abstract class BaseYangSwaggerGenerator {
 
         final String title = name + " modules of RESTCONF";
         final SwaggerObject doc = createSwaggerObject(schema, host, BASE_PATH, title);
-        doc.setDefinitions(JsonNodeFactory.instance.objectNode());
         doc.setPaths(JsonNodeFactory.instance.objectNode());
 
-        fillDoc(doc, range, schemaContext, context, deviceName, oaversion, definitionNames);
+        try {
+            fillDoc(doc, range, schemaContext, context, deviceName, oaversion, definitionNames);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
 
         return doc;
     }
 
     public void fillDoc(final SwaggerObject doc, final Optional<Range<Integer>> range,
             final EffectiveModelContext schemaContext, final String context,  final Optional<String> deviceName,
-            final OAversion oaversion, final DefinitionNames definitionNames) {
+            final OAversion oaversion, final DefinitionNames definitionNames) throws IOException {
         final SortedSet<Module> modules = getSortedModules(schemaContext);
         final Set<Module> filteredModules;
         if (range.isPresent()) {
@@ -138,7 +137,7 @@ public abstract class BaseYangSwaggerGenerator {
         } else {
             filteredModules = modules;
         }
-
+        doc.getDefinitions().writeStartObject();
         for (final Module module : filteredModules) {
             final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
 
@@ -146,6 +145,8 @@ public abstract class BaseYangSwaggerGenerator {
             // Fill SwaggerObject with parsed ObjectNodes
             getSwaggerDocSpec(module, context, deviceName, schemaContext, oaversion, definitionNames, doc, false);
         }
+        doc.getDefinitions().writeEndObject();
+        doc.getDefinitions().close();
     }
 
     private static Set<Module> filterByRange(final SortedSet<Module> modules, final Range<Integer> range) {
@@ -203,7 +204,11 @@ public abstract class BaseYangSwaggerGenerator {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
 
-        return getSwaggerDocSpec(module, schema, host, BASE_PATH, context, schemaContext, oaversion);
+        try {
+            return getSwaggerDocSpec(module, schema, host, BASE_PATH, context, schemaContext, oaversion);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -221,32 +226,26 @@ public abstract class BaseYangSwaggerGenerator {
 
     public SwaggerObject getSwaggerDocSpec(final Module module, final String schema, final String host,
             final String basePath, final String context, final EffectiveModelContext schemaContext,
-            final OAversion oaversion) {
+            final OAversion oaversion) throws IOException {
         final SwaggerObject doc = createSwaggerObject(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getSwaggerDocSpec(module, context, Optional.empty(), schemaContext, oaversion, definitionNames, doc,
-            true);
+        doc.getDefinitions().writeStartObject();
+        final SwaggerObject swaggerDocSpec =
+                getSwaggerDocSpec(module, context, Optional.empty(), schemaContext, oaversion, definitionNames, doc,
+                        true);
+        doc.getDefinitions().writeEndObject();
+        doc.getDefinitions().close();
+        return swaggerDocSpec;
     }
 
     public SwaggerObject getSwaggerDocSpec(final Module module, final String context, final Optional<String> deviceName,
             final EffectiveModelContext schemaContext, final OAversion oaversion, final DefinitionNames definitionNames,
             final SwaggerObject doc, final boolean isForSingleModule) {
-        final ObjectNode definitions;
-
         try {
-            if (isForSingleModule) {
-                MapperGeneratorRecord generatorClass = new MapperGeneratorRecord(module, schemaContext, definitionNames,
-                        oaversion, true);
-                definitions = MAPPER.convertValue(generatorClass, ObjectNode.class);
-                doc.setDefinitions(definitions);
-            } else {
-                MapperGeneratorRecord generatorClass = new MapperGeneratorRecord(module, schemaContext, definitionNames,
-                        oaversion, false);
-                definitions = MAPPER.convertValue(generatorClass, ObjectNode.class);
-                // If there are multiple models, then the ObjectNode(definition) is appended to the ObjectNode
-                // that is already stored in the SwaggerObject(doc).
-                addFields(doc.getDefinitions(), definitions.fields());
-            }
+            // If there are multiple models, then the ObjectNode(definition) is appended to the ObjectNode
+            // that is already stored in the SwaggerObject(doc).
+            jsonConverter.convertToJsonSchema(module, schemaContext, doc.getDefinitions(), definitionNames, oaversion,
+                    isForSingleModule);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
             }
@@ -334,8 +333,7 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     public SwaggerObject createSwaggerObject(final String schema, final String host, final String basePath,
-            final String title) {
-        final SwaggerObject doc = new SwaggerObject();
+            final String title, SwaggerObject doc) {
         doc.setSwagger(SWAGGER_VERSION);
         final Info info = new Info();
         info.setTitle(title);
@@ -348,21 +346,32 @@ public abstract class BaseYangSwaggerGenerator {
         return doc;
     }
 
+    public SwaggerObject createSwaggerObject(final String schema, final String host, final String basePath,
+                                             final String title) {
+        return createSwaggerObject(schema, host, basePath, title, new SwaggerObject());
+    }
+
     public static CommonApiObject getAppropriateDoc(final SwaggerObject swaggerObject, final OAversion oaversion) {
         if (oaversion.equals(OAversion.V3_0)) {
-            return convertToOpenApi(swaggerObject);
+            try {
+                return convertToOpenApi(swaggerObject);
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e);
+            }
         }
         return swaggerObject;
     }
 
-    private static OpenApiObject convertToOpenApi(final SwaggerObject swaggerObject) {
+    private static OpenApiObject convertToOpenApi(final SwaggerObject swaggerObject) throws IOException {
         final OpenApiObject doc = new OpenApiObject();
         doc.setOpenapi(OPEN_API_VERSION);
         doc.setInfo(swaggerObject.getInfo());
         doc.setServers(convertToServers(swaggerObject.getSchemes(), swaggerObject.getHost(),
                 swaggerObject.getBasePath()));
         doc.setPaths(swaggerObject.getPaths());
-        doc.setComponents(new Components(swaggerObject.getDefinitions()));
+        swaggerObject.getDefinitions().close();
+        doc.setComponents(new Components(swaggerObject.getJsonObjectWriter().toString()));
+        swaggerObject.close();
         return doc;
     }
 
@@ -570,7 +579,4 @@ public abstract class BaseYangSwaggerGenerator {
     protected interface ListPathBuilder {
         String nextParamIdentifier(String key);
     }
-
-    public record MapperGeneratorRecord(Module module, EffectiveModelContext schemaContext,
-            DefinitionNames definitionNames, OAversion oaversion, boolean isForSingleModule){}
 }

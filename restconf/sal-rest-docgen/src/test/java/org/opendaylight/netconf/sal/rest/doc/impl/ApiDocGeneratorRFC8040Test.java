@@ -13,9 +13,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.util.List;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
@@ -36,7 +40,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
      * Test that paths are generated according to the model.
      */
     @Test
-    public void testPaths() {
+    public void testPaths() throws IOException {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
             ApiDocServiceImpl.OAversion.V2_0);
@@ -60,7 +64,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
      * Test that generated configuration paths allow to use operations: get, put, patch, delete and post.
      */
     @Test
-    public void testConfigPaths() {
+    public void testConfigPaths() throws IOException {
         final List<String> configPaths = List.of("/rests/data/toaster2:lst",
                 "/rests/data/toaster2:lst/cont1",
                 "/rests/data/toaster2:lst/cont1/cont11",
@@ -85,12 +89,17 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
      * Test that generated document contains the following definitions.
      */
     @Test
-    public void testDefinitions() {
+    public void testDefinitions() throws IOException {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
             ApiDocServiceImpl.OAversion.V2_0);
 
-        final ObjectNode definitions = doc.getDefinitions();
+        final JsonFactory factory = new JsonFactory();
+        final JsonParser parser = factory.createParser(doc.getJsonObjectWriter().toString());
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final ObjectNode definitions = objectMapper.readTree(parser);
+        doc.close();
         assertNotNull(definitions);
 
         final JsonNode configLst = definitions.get("toaster2_config_lst");
@@ -117,15 +126,19 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
      * Test that generated document contains RPC definition for "make-toast" with correct input.
      */
     @Test
-    public void testRPC() {
+    public void testRPC() throws IOException {
         final var module = CONTEXT.findModule(NAME_2, Revision.of(REVISION_DATE_2)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
             ApiDocServiceImpl.OAversion.V2_0);
         assertNotNull(doc);
 
-        final ObjectNode definitions = doc.getDefinitions();
-        final JsonNode inputTop = definitions.get("toaster_make-toast_input");
-        assertNotNull(inputTop);
+        final JsonFactory factory = new JsonFactory();
+        final JsonParser parser = factory.createParser(doc.getJsonObjectWriter().toString());
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final ObjectNode definitions = objectMapper.readTree(parser);
+        doc.close();
+
         final JsonNode input = definitions.get("toaster_make-toast_input");
         final JsonNode properties = input.get("properties");
         assertTrue(properties.has("toasterDoneness"));
@@ -133,7 +146,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     }
 
     @Test
-    public void testSimpleSwaggerObjects() {
+    public void testSimpleSwaggerObjects() throws IOException {
         final var module = CONTEXT.findModule(MY_YANG, Revision.of(MY_YANG_REVISION)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
                 OAversion.V3_0);
@@ -146,14 +159,20 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         verifyGetRef(jsonNodeMyYangData, myYangData, myYangData);
 
         // Test `components/schemas` objects
-        final var definitions = doc.getDefinitions();
+        final var factory = new JsonFactory();
+        final var parser = factory.createParser(doc.getJsonObjectWriter().toString());
+        final var objectMapper = new ObjectMapper();
+
+        final ObjectNode definitions = objectMapper.readTree(parser);
+        doc.close();
+
         assertEquals(2, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
         assertTrue(definitions.has("my-yang_module"));
     }
 
     @Test
-    public void testToaster2SwaggerObjects() {
+    public void testToaster2SwaggerObjects() throws IOException {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
                 OAversion.V3_0);
@@ -208,7 +227,12 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertEquals(2, xmlSchema.size());
 
         // Test `components/schemas` objects
-        final var definitions = doc.getDefinitions();
+        final var factory = new JsonFactory();
+        final var parser = factory.createParser(doc.getJsonObjectWriter().toString());
+        final var objectMapper = new ObjectMapper();
+        final ObjectNode definitions = objectMapper.readTree(parser);
+        doc.close();
+
         assertEquals(18, definitions.size());
     }
 

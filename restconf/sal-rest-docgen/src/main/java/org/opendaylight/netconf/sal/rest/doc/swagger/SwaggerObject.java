@@ -7,10 +7,15 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.swagger;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 
-public class SwaggerObject implements CommonApiObject {
+public class SwaggerObject implements CommonApiObject, Closeable {
     private String swagger;
     private Info info;
     private List<String> schemes;
@@ -18,14 +23,25 @@ public class SwaggerObject implements CommonApiObject {
     private String basePath;
     private List<String> produces;
     private ObjectNode paths;
-    private ObjectNode definitions;
+    private final JsonGenerator definitions;
+    private final StringWriter jsonObjectWriter;
 
-    public ObjectNode getDefinitions() {
+    public SwaggerObject() {
+        final JsonFactory factory = new JsonFactory();
+        jsonObjectWriter = new StringWriter();
+        try {
+            definitions = factory.createGenerator(jsonObjectWriter);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public JsonGenerator getDefinitions() {
         return definitions;
     }
 
-    public void setDefinitions(ObjectNode definitions) {
-        this.definitions = definitions;
+    public StringWriter getJsonObjectWriter() {
+        return jsonObjectWriter;
     }
 
     public String getBasePath() {
@@ -82,5 +98,10 @@ public class SwaggerObject implements CommonApiObject {
 
     public void setSwagger(String swagger) {
         this.swagger = swagger;
+    }
+
+    @Override
+    public void close() throws IOException {
+        jsonObjectWriter.close();
     }
 }
