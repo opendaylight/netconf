@@ -18,17 +18,14 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.mifmif.common.regex.Generex;
 import java.io.IOException;
-import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,7 +39,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
-import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator.MapperGeneratorRecord;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionObject.DataType;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -100,12 +96,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Generates JSON Schema for data defined in YANG. This class is not thread-safe.
  */
-public class DefinitionGenerator extends StdSerializer<MapperGeneratorRecord> {
+public class DefinitionGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefinitionGenerator.class);
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     private static final String UNIQUE_ITEMS_KEY = "uniqueItems";
     private static final String MAX_ITEMS = "maxItems";
@@ -142,44 +135,6 @@ public class DefinitionGenerator extends StdSerializer<MapperGeneratorRecord> {
     private QNameModule qnameModule;
 
 
-    public DefinitionGenerator() {
-        this(null);
-    }
-
-    public DefinitionGenerator(final Class<MapperGeneratorRecord> recordClass) {
-        super(recordClass);
-    }
-
-    @Override
-    public void serialize(final MapperGeneratorRecord value, final JsonGenerator gen, final SerializerProvider provider)
-            throws IOException {
-        gen.writeStartObject();
-        if (value.isForSingleModule()) {
-            value.definitionNames().addUnlinkedName(value.module().getName() + MODULE_NAME_SUFFIX);
-        }
-        convertToJsonSchema(value.module(), value.schemaContext(), gen, value.definitionNames(), value.oaversion(),
-                value.isForSingleModule());
-        gen.writeEndObject();
-    }
-
-
-    public JsonGenerator convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
-            final JsonGenerator generator, final DefinitionNames definitionNames,
-            final OAversion oaversion, final boolean isForSingleModule)
-            throws IOException {
-        qnameModule = module.getQNameModule();
-
-        processIdentities(module, generator, definitionNames, schemaContext);
-        processContainersAndLists(module, generator, definitionNames, schemaContext, oaversion);
-        processRPCs(module, generator, definitionNames, schemaContext, oaversion);
-
-        if (isForSingleModule) {
-            processModule(module, generator, definitionNames, schemaContext, oaversion);
-        }
-
-        return generator;
-    }
-
 
     /**
      * Creates Json definitions from provided module according to swagger spec.
@@ -190,41 +145,23 @@ public class DefinitionGenerator extends StdSerializer<MapperGeneratorRecord> {
      * @return ObjectNode containing data used for creating examples and definitions in Api Doc
      * @throws IOException if I/O operation fails
      */
-
-
-    public ObjectNode convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
-                                          final ObjectNode definitions, final DefinitionNames definitionNames,
-                                          final OAversion oaversion, final boolean isForSingleModule)
+    public JsonGenerator convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
+            final JsonGenerator gen, final DefinitionNames definitionNames,
+            final OAversion oaversion, final boolean isForSingleModule)
             throws IOException {
-        qnameModule = module.getQNameModule();
-        final DefinitionObject base = new DefinitionObject();
-        processIdentities(module, base, definitionNames, schemaContext);
-        processContainersAndLists(module, base, definitionNames, schemaContext, oaversion);
-        processRPCs(module, base, definitionNames, schemaContext, oaversion);
-
-        if (isForSingleModule) {
-            processModule(module, base, definitionNames, schemaContext, oaversion);
-        }
-
-        final ObjectNode jsonNodes = base.convertToObjectNode();
-        final Iterator<Entry<String, JsonNode>> fields = jsonNodes.fields();
-        while (fields.hasNext()) {
-            final Map.Entry<String, JsonNode> field = fields.next();
-            definitions.set(field.getKey(), field.getValue());
-        }
-
-        return definitions;
-    }
-
-    public ObjectNode convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
-                                          final DefinitionNames definitionNames, final OAversion oaversion,
-                                          final boolean isForSingleModule)
-            throws IOException {
-        final ObjectNode definitions = JsonNodeFactory.instance.objectNode();
         if (isForSingleModule) {
             definitionNames.addUnlinkedName(module.getName() + MODULE_NAME_SUFFIX);
         }
-        return convertToJsonSchema(module, schemaContext, definitions, definitionNames, oaversion, isForSingleModule);
+        qnameModule = module.getQNameModule();
+
+        processIdentities(module, gen, definitionNames, schemaContext);
+        processContainersAndLists(module, gen, definitionNames, schemaContext, oaversion);
+        processRPCs(module, gen, definitionNames, schemaContext, oaversion);
+
+        if (isForSingleModule) {
+            processModule(module, gen, definitionNames, schemaContext, oaversion);
+        }
+        return gen;
     }
 
     private void processModule(final Module module, final JsonGenerator generator,
@@ -284,62 +221,6 @@ public class DefinitionGenerator extends StdSerializer<MapperGeneratorRecord> {
         definitionObject.writeDataToJsonGenerator(generator);
     }
 
-    private void processModule(final Module module, final DefinitionObject defObj,final DefinitionNames defNames,
-                               final EffectiveModelContext schemaContext, final OAversion oaversion) {
-        DefinitionObject definition = new DefinitionObject(defObj);
-        DefinitionObject properties = new DefinitionObject(definition);
-
-        final String moduleName = module.getName();
-        final String definitionName = moduleName + MODULE_NAME_SUFFIX;
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
-        for (final DataSchemaNode node : module.getChildNodes()) {
-            stack.enterSchemaTree(node.getQName());
-            final String localName = node.getQName().getLocalName();
-            if (node.isConfiguration()) {
-                if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
-                    for (final DataSchemaNode childNode : ((DataNodeContainer) node).getChildNodes()) {
-                        DefinitionObject childNodeProp = new DefinitionObject(properties);
-
-                        final String ref = getAppropriateModelPrefix(oaversion)
-                                + moduleName + CONFIG
-                                + "_" + localName
-                                + defNames.getDiscriminator(node);
-
-                        if (node instanceof ListSchemaNode) {
-                            childNodeProp.addData(TYPE_KEY, ARRAY_TYPE);
-                            DefinitionObject items = new DefinitionObject(childNodeProp);
-                            items.addData(REF_KEY, ref);
-                            childNodeProp.addData(ITEMS_KEY, items);
-                            childNodeProp.addData(DESCRIPTION_KEY, childNode.getDescription().orElse(""));
-                            childNodeProp.addData(TITLE_KEY, localName + CONFIG);
-                        } else {
-                         /*
-                            Description can't be added, because nothing allowed alongside $ref.
-                            allOf is not an option, because ServiceNow can't parse it.
-                          */
-                            childNodeProp.addData(REF_KEY, ref);
-                        }
-                        //add module name prefix to property name, when ServiceNow can process colons
-                        properties.addData(localName, childNodeProp);
-                    }
-                } else if (node instanceof LeafSchemaNode) {
-                    /*
-                        Add module name prefix to property name, when ServiceNow can process colons(second parameter
-                        of processLeafNode).
-                     */
-                    processLeafNode((LeafSchemaNode) node, localName, stack, defNames, oaversion, defObj);
-                }
-            }
-            stack.exit();
-        }
-        definition.addData(TITLE_KEY, definitionName);
-        definition.addData(TYPE_KEY, OBJECT_TYPE);
-        definition.addData(PROPERTIES_KEY, properties);
-        definition.addData(DESCRIPTION_KEY, module.getDescription().orElse(""));
-
-        defObj.addData(definitionName, definition);
-    }
-
     private void processContainersAndLists(final Module module, final JsonGenerator gen,
             final DefinitionNames definitionNames, final EffectiveModelContext schemaContext, final OAversion oaversion)
             throws IOException {
@@ -363,27 +244,6 @@ public class DefinitionGenerator extends StdSerializer<MapperGeneratorRecord> {
                 definitionObject = new DefinitionObject();
                 processActionNodeContainer(childNode, moduleName, definitionNames, stack, oaversion, definitionObject);
                 definitionObject.writeDataToJsonGenerator(gen);
-            }
-            stack.exit();
-        }
-    }
-
-    private void processContainersAndLists(final Module module, final DefinitionObject defObj,
-            final DefinitionNames definitionNames, final EffectiveModelContext schemaContext, final OAversion oaversion)
-                throws IOException {
-        final String moduleName = module.getName();
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
-        for (final DataSchemaNode childNode : module.getChildNodes()) {
-            stack.enterSchemaTree(childNode.getQName());
-            // For every container and list in the module
-            if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
-                if (childNode.isConfiguration()) {
-                    processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitionNames,
-                            true, stack, oaversion, defObj);
-                }
-                processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitionNames,
-                        false, stack, oaversion, defObj);
-                processActionNodeContainer(childNode, moduleName, definitionNames, stack, oaversion, defObj);
             }
             stack.exit();
         }
@@ -413,17 +273,6 @@ public class DefinitionGenerator extends StdSerializer<MapperGeneratorRecord> {
             stack.exit();
         }
         definitionObject.writeDataToJsonGenerator(gen);
-    }
-
-    private void processRPCs(final Module module, final DefinitionObject defObj, final DefinitionNames definitionNames,
-                             final EffectiveModelContext schemaContext, final OAversion oaversion) throws IOException {
-        final String moduleName = module.getName();
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
-        for (final RpcDefinition rpcDefinition : module.getRpcs()) {
-            stack.enterSchemaTree(rpcDefinition.getQName());
-            processOperations(rpcDefinition, moduleName, definitionNames, stack, oaversion, defObj);
-            stack.exit();
-        }
     }
 
     private void processOperations(final OperationDefinition operationDef, final String parentName,
@@ -519,35 +368,6 @@ public class DefinitionGenerator extends StdSerializer<MapperGeneratorRecord> {
             generator.writeObjectFieldStart(name);
             buildIdentityObject(generator, idNode, context);
             generator.writeEndObject();
-        }
-    }
-
-    /**
-     * Processes the 'identity' statement in a yang model and maps it to a 'model' in the Swagger JSON spec.
-     * @param module          The module from which the identity stmt will be processed
-     * @param definitions     The ObjectNode in which the parsed identity will be put as a 'model' obj
-     * @param definitionNames Store for definition names
-     */
-    private static DefinitionObject processIdentities(final Module module, DefinitionObject defObj,
-                                          final DefinitionNames definitionNames, final EffectiveModelContext context) {
-        final String moduleName = module.getName();
-        final Collection<? extends IdentitySchemaNode> idNodes = module.getIdentities();
-        LOG.debug("Processing Identities for module {} . Found {} identity statements", moduleName, idNodes.size());
-        for (final IdentitySchemaNode idNode : idNodes) {
-            final DefinitionObject identityDefObject = buildIdentityDefObject(idNode, context, defObj);
-            final String idName = idNode.getQName().getLocalName();
-            final String discriminator = definitionNames.pickDiscriminator(idNode, List.of(idName));
-            final String name = idName + discriminator;
-            defObj.addData(name, identityDefObject);
-        }
-        return defObj;
-    }
-
-    private static void populateEnumWithDerived(final Collection<? extends IdentitySchemaNode> derivedIds,
-                                                final ArrayNode enumPayload, final EffectiveModelContext context) {
-        for (final IdentitySchemaNode derivedId : derivedIds) {
-            enumPayload.add(derivedId.getQName().getLocalName());
-            populateEnumWithDerived(context.getDerivedIdentities(derivedId), enumPayload, context);
         }
     }
 

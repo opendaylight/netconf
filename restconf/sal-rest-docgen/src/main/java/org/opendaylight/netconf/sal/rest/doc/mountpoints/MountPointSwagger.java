@@ -186,9 +186,8 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
                 Optional.of(deviceName), urlPrefix, definitionNames, oaversion);
 
         if (includeDataStore) {
-            doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
-            addFields(doc.getPaths() ,swaggerObject.getPaths().fields());
-            addFields(doc.getDefinitions() ,swaggerObject.getDefinitions().fields());
+            doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName, swaggerObject);
+            addFields(doc.getPaths(), swaggerObject.getPaths().fields());
             doc.getInfo().setTitle(swaggerObject.getInfo().getTitle());
         } else {
             doc = swaggerObject;
@@ -203,6 +202,17 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     }
 
     private SwaggerObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
+            final String deviceName, final SwaggerObject swaggerObject) {
+        final SwaggerObject declaration = swaggerGenerator.createSwaggerObject(
+                swaggerGenerator.createSchemaFromUriInfo(uriInfo),
+                swaggerGenerator.createHostFromUriInfo(uriInfo),
+                BASE_PATH,
+                context, swaggerObject);
+
+        return setPathsToSwagerObject(context, deviceName, declaration);
+    }
+
+    private SwaggerObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
                                                   final String deviceName) {
         final SwaggerObject declaration = swaggerGenerator.createSwaggerObject(
                 swaggerGenerator.createSchemaFromUriInfo(uriInfo),
@@ -210,6 +220,10 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
                 BASE_PATH,
                 context);
 
+        return setPathsToSwagerObject(context, deviceName, declaration);
+    }
+
+    private SwaggerObject setPathsToSwagerObject(String context, String deviceName, SwaggerObject declaration) {
         final ObjectNode pathsObject = JsonNodeFactory.instance.objectNode();
         createGetPathItem("config", "Queries the config (startup) datastore on the mounted hosted.",
                 context, deviceName, pathsObject);
@@ -219,7 +233,6 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
                 context, deviceName, pathsObject);
 
         declaration.setPaths(pathsObject);
-        declaration.setDefinitions(JsonNodeFactory.instance.objectNode());
 
         return declaration;
     }
