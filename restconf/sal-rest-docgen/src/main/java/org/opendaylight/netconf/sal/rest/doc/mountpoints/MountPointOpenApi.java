@@ -17,7 +17,6 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TAGS_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildTagsValue;
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -190,7 +189,6 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             paths.putAll(openApiObject.getPaths());
             doc.setPaths(paths);
             doc.getInfo().setTitle(openApiObject.getInfo().getTitle());
-            addFields(doc.getComponents().getSchemas(), openApiObject.getComponents().getSchemas().fields());
         } else {
             doc = openApiObject;
         }
@@ -222,8 +220,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var paths = Map.of(openApiGenerator.getResourcePath("data", context), data,
                 openApiGenerator.getResourcePath("operations", context), operations);
         declaration.setPaths(paths);
-        declaration.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
-                new SecuritySchemes(BaseYangOpenApiGenerator.OPEN_API_BASIC_AUTH)));
+        declaration.setComponents(new Components(new SecuritySchemes(BaseYangOpenApiGenerator.OPEN_API_BASIC_AUTH)));
 
         return declaration;
     }

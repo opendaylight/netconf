@@ -13,8 +13,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -37,7 +41,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
      * Test that paths are generated according to the model.
      */
     @Test
-    public void testPaths() {
+    public void testPaths() throws IOException {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
@@ -60,7 +64,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
      * Test that generated configuration paths allow to use operations: get, put, patch, delete and post.
      */
     @Test
-    public void testConfigPaths() {
+    public void testConfigPaths() throws IOException {
         final List<String> configPaths = List.of("/rests/data/toaster2:lst",
                 "/rests/data/toaster2:lst/cont1",
                 "/rests/data/toaster2:lst/cont1/cont11",
@@ -84,11 +88,16 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
      * Test that generated document contains the following schemas.
      */
     @Test
-    public void testSchemas() {
+    public void testSchemas() throws IOException {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        doc.getComponents().close();
 
-        final ObjectNode schemas = doc.getComponents().getSchemas();
+        final JsonFactory factory = new JsonFactory();
+        final JsonParser parser = factory.createParser(doc.getComponents().getSchemas());
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final ObjectNode schemas = objectMapper.readTree(parser);
         assertNotNull(schemas);
 
         final JsonNode configLst = schemas.get("toaster2_config_lst");
@@ -117,14 +126,18 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
      * Test that generated document contains RPC schemas for "make-toast" with correct input.
      */
     @Test
-    public void testRPC() {
+    public void testRPC() throws IOException {
         final var module = CONTEXT.findModule(NAME_2, Revision.of(REVISION_DATE_2)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        doc.getComponents().close();
         assertNotNull(doc);
 
-        final ObjectNode schemas = doc.getComponents().getSchemas();
-        final JsonNode inputTop = schemas.get("toaster_make-toast_input");
-        assertNotNull(inputTop);
+        final JsonFactory factory = new JsonFactory();
+        final JsonParser parser = factory.createParser(doc.getComponents().getSchemas());
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final ObjectNode schemas = objectMapper.readTree(parser);
+
         final JsonNode input = schemas.get("toaster_make-toast_input");
         final JsonNode properties = input.get("properties");
         assertTrue(properties.has("toasterDoneness"));
@@ -132,12 +145,17 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     }
 
     @Test
-    public void testChoice() {
+    public void testChoice() throws IOException {
         final var module = CONTEXT.findModule(CHOICE_TEST_MODULE).orElseThrow();
         final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        doc.getComponents().close();
         assertNotNull(doc);
 
-        final var schemas = doc.getComponents().getSchemas();
+        final var factory = new JsonFactory();
+        final var parser = factory.createParser(doc.getComponents().getSchemas());
+        final var objectMapper = new ObjectMapper();
+
+        final ObjectNode schemas = objectMapper.readTree(parser);
         JsonNode firstContainer = schemas.get("choice-test_config_first-container");
         assertEquals("default-value",
                 firstContainer.get(PROPERTIES).get("leaf-default").get("default").asText());
@@ -149,9 +167,11 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     }
 
     @Test
-    public void testSimpleSwaggerObjects() {
+    public void testSimpleSwaggerObjects() throws IOException {
         final var module = CONTEXT.findModule(MY_YANG, Revision.of(MY_YANG_REVISION)).orElseThrow();
         final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        doc.getComponents().close();
+
         assertEquals(Set.of("/rests/data", "/rests/data/my-yang:data"),
                 doc.getPaths().keySet());
         final var jsonNodeMyYangData = doc.getPaths().get("/rests/data/my-yang:data");
@@ -161,16 +181,22 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         verifyRequestRef(jsonNodeMyYangData.getGet(), myYangData, myYangData);
 
         // Test `components/schemas` objects
-        final var definitions = doc.getComponents().getSchemas();
+        final var factory = new JsonFactory();
+        final var parser = factory.createParser(doc.getComponents().getSchemas());
+        final var objectMapper = new ObjectMapper();
+
+        final ObjectNode definitions = objectMapper.readTree(parser);
+
         assertEquals(2, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
         assertTrue(definitions.has("my-yang_module"));
     }
 
     @Test
-    public void testToaster2SwaggerObjects() {
+    public void testToaster2SwaggerObjects() throws IOException {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        doc.getComponents().close();
 
         final var jsonNodeToaster = doc.getPaths().get("/rests/data/toaster2:toaster");
         final var toaster2 = "#/components/schemas/toaster2_config_toaster";
@@ -222,7 +248,11 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertEquals(2, xmlSchema.size());
 
         // Test `components/schemas` objects
-        final var definitions = doc.getComponents().getSchemas();
+        final var factory = new JsonFactory();
+        final var parser = factory.createParser(doc.getComponents().getSchemas());
+        final var objectMapper = new ObjectMapper();
+        final ObjectNode definitions = objectMapper.readTree(parser);
+
         assertEquals(18, definitions.size());
     }
 

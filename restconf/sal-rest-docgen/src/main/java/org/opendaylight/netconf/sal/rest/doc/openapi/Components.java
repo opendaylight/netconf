@@ -7,22 +7,34 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.openapi;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import java.io.IOException;
+import java.io.StringWriter;
 
-public class Components {
-    private ObjectNode schemas;
-    private SecuritySchemes securitySchemes;
+public class Components implements AutoCloseable {
+    private String schemas;
 
-    public Components(ObjectNode schemas, SecuritySchemes securitySchemes) {
-        this.schemas = schemas;
+    private final JsonGenerator jsonGenerator;
+    private final SecuritySchemes securitySchemes;
+    private final StringWriter jsonObjectWriter;
+
+    public Components(final SecuritySchemes securitySchemes) {
         this.securitySchemes = securitySchemes;
+        final JsonFactory factory = new JsonFactory();
+        jsonObjectWriter = new StringWriter();
+        try {
+            jsonGenerator = factory.createGenerator(jsonObjectWriter);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public ObjectNode getSchemas() {
+    public String getSchemas() {
         return schemas;
     }
 
-    public void setSchemas(ObjectNode schemas) {
+    public void setSchemas(final String schemas) {
         this.schemas = schemas;
     }
 
@@ -30,7 +42,14 @@ public class Components {
         return securitySchemes;
     }
 
-    public void setSecuritySchemes(SecuritySchemes securitySchemes) {
-        this.securitySchemes = securitySchemes;
+    public JsonGenerator getJsonGenerator() {
+        return jsonGenerator;
+    }
+
+    @Override
+    public void close() throws IOException {
+        jsonGenerator.close();
+        jsonObjectWriter.close();
+        schemas = jsonObjectWriter.toString();
     }
 }
