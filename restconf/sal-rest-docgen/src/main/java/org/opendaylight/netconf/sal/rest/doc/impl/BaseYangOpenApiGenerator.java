@@ -15,13 +15,11 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPostOperation;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPut;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getTypeParentNode;
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -88,9 +86,6 @@ public abstract class BaseYangOpenApiGenerator {
 
     static {
         MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(MapperGeneratorRecord.class, new DefinitionGenerator());
-        MAPPER.registerModule(module);
     }
 
     protected BaseYangOpenApiGenerator(final Optional<DOMSchemaService> schemaService) {
@@ -115,18 +110,21 @@ public abstract class BaseYangOpenApiGenerator {
 
         final String title = name + " modules of RESTCONF";
         final OpenApiObject doc = createOpenApiObject(schema, host, BASE_PATH, title);
-        doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
-                new SecuritySchemes(OPEN_API_BASIC_AUTH)));
+        doc.setComponents(new Components(new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         doc.setPaths(new HashMap<>());
 
-        fillDoc(doc, range, schemaContext, context, deviceName, definitionNames);
+        try {
+            fillDoc(doc, range, schemaContext, context, deviceName, definitionNames);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
 
         return doc;
     }
 
     public void fillDoc(final OpenApiObject doc, final Optional<Range<Integer>> range,
             final EffectiveModelContext schemaContext, final String context, final Optional<String> deviceName,
-            final DefinitionNames definitionNames) {
+            final DefinitionNames definitionNames) throws IOException {
         final SortedSet<Module> modules = getSortedModules(schemaContext);
         final Set<Module> filteredModules;
         if (range.isPresent()) {
@@ -134,13 +132,14 @@ public abstract class BaseYangOpenApiGenerator {
         } else {
             filteredModules = modules;
         }
-
+        doc.getComponents().getJsonGenerator().writeStartObject();
         for (final Module module : filteredModules) {
             final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
             getOpenApiDocSpec(module, context, deviceName, schemaContext, definitionNames, doc, false);
         }
+        doc.getComponents().getJsonGenerator().writeEndObject();
     }
 
     private static Set<Module> filterByRange(final SortedSet<Module> modules, final Range<Integer> range) {
@@ -197,7 +196,11 @@ public abstract class BaseYangOpenApiGenerator {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
 
-        return getOpenApiDocSpec(module, schema, host, BASE_PATH, context, schemaContext);
+        try {
+            return getOpenApiDocSpec(module, schema, host, BASE_PATH, context, schemaContext);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -214,31 +217,24 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public OpenApiObject getOpenApiDocSpec(final Module module, final String schema, final String host,
-            final String basePath, final String context, final EffectiveModelContext schemaContext) {
+            final String basePath, final String context, final EffectiveModelContext schemaContext) throws IOException {
         final OpenApiObject doc = createOpenApiObject(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getOpenApiDocSpec(module, context, Optional.empty(), schemaContext, definitionNames, doc, true);
+        doc.getComponents().getJsonGenerator().writeStartObject();
+        final OpenApiObject openApiDocSpec =
+                getOpenApiDocSpec(module, context, Optional.empty(), schemaContext, definitionNames, doc, true);
+        doc.getComponents().getJsonGenerator().writeEndObject();
+        return openApiDocSpec;
     }
 
     public OpenApiObject getOpenApiDocSpec(final Module module, final String context, final Optional<String> deviceName,
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
-        final Components components = new Components(JsonNodeFactory.instance.objectNode(),
-                new SecuritySchemes(OPEN_API_BASIC_AUTH));
         try {
-            if (isForSingleModule) {
-                MapperGeneratorRecord generatorClass = new MapperGeneratorRecord(module, schemaContext, definitionNames,
-                        true);
-                components.setSchemas(MAPPER.convertValue(generatorClass, ObjectNode.class));
-                doc.setComponents(components);
-            } else {
-                MapperGeneratorRecord generatorClass = new MapperGeneratorRecord(module, schemaContext, definitionNames,
-                        false);
-                components.setSchemas(MAPPER.convertValue(generatorClass, ObjectNode.class));
-                // If there are multiple models, then the ObjectNode(definition) is appended to the ObjectNode
-                // that is already stored in the SwaggerObject(doc).
-                addFields(doc.getComponents().getSchemas(), components.getSchemas().fields());
-            }
+            // If there are multiple models, then the ObjectNode(definition) is appended to the ObjectNode
+            // that is already stored in the SwaggerObject(doc).
+            jsonConverter.convertToJsonSchema(module, schemaContext, doc.getComponents().getJsonGenerator(),
+                    definitionNames, isForSingleModule);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
             }
@@ -316,13 +312,18 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public OpenApiObject createOpenApiObject(final String schema, final String host, final String basePath,
-                                             final String title) {
-        final OpenApiObject doc = new OpenApiObject();
+            final String title) {
+        return createOpenApiObject(schema, host, basePath, title, new OpenApiObject());
+    }
+
+    public OpenApiObject createOpenApiObject(final String schema, final String host, final String basePath,
+            final String title, final OpenApiObject doc) {
         doc.setOpenapi(OPEN_API_VERSION);
         final Info info = new Info();
         info.setTitle(title);
         info.setVersion(API_VERSION);
         doc.setInfo(info);
+        doc.setComponents(new Components(new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         doc.setServers(convertToServers(ImmutableList.of(schema), host, basePath));
         doc.setSecurity(SECURITY);
         return doc;
@@ -522,7 +523,4 @@ public abstract class BaseYangOpenApiGenerator {
     protected interface ListPathBuilder {
         String nextParamIdentifier(String key);
     }
-
-    public record MapperGeneratorRecord(Module module, EffectiveModelContext schemaContext,
-            DefinitionNames definitionNames, boolean isForSingleModule){}
 }
