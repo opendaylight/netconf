@@ -14,7 +14,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -89,8 +88,8 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
     public void testSchemas() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final var schemas = doc.getComponents().getSchemas();
 
-        final ObjectNode schemas = doc.getComponents().getSchemas();
         assertNotNull(schemas);
 
         final JsonNode configLst = schemas.get("toaster2_config_lst");
@@ -123,10 +122,8 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         final var module = CONTEXT.findModule(NAME_2, Revision.of(REVISION_DATE_2)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
         assertNotNull(doc);
+        final var schemas = doc.getComponents().getSchemas();
 
-        final ObjectNode schemas = doc.getComponents().getSchemas();
-        final JsonNode inputTop = schemas.get("toaster_make-toast_input");
-        assertNotNull(inputTop);
         final JsonNode input = schemas.get("toaster_make-toast_input");
         final JsonNode properties = input.get("properties");
         assertTrue(properties.has("toasterDoneness"));
@@ -138,8 +135,8 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         final var module = CONTEXT.findModule(CHOICE_TEST_MODULE).orElseThrow();
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
         assertNotNull(doc);
-
         final var schemas = doc.getComponents().getSchemas();
+
         JsonNode firstContainer = schemas.get("choice-test_config_first-container");
         assertEquals("default-value",
                 firstContainer.get(PROPERTIES).get("leaf-default").get("default").asText());
@@ -163,10 +160,10 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         verifyRequestRef(jsonNodeMyYangData.getGet(), myYangData, myYangData);
 
         // Test `components/schemas` objects
-        final var definitions = doc.getComponents().getSchemas();
-        assertEquals(2, definitions.size());
-        assertTrue(definitions.has("my-yang_config_data"));
-        assertTrue(definitions.has("my-yang_module"));
+        final var schemas = doc.getComponents().getSchemas();
+        assertEquals(2, schemas.size());
+        assertTrue(schemas.containsKey("my-yang_config_data"));
+        assertTrue(schemas.containsKey("my-yang_module"));
     }
 
     @Test
@@ -224,8 +221,8 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         assertEquals(2, xmlSchema.size());
 
         // Test `components/schemas` objects
-        final var definitions = doc.getComponents().getSchemas();
-        assertEquals(18, definitions.size());
+        final var schemas = doc.getComponents().getSchemas();
+        assertEquals(18, schemas.size());
     }
 
     /**

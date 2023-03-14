@@ -15,13 +15,11 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.b
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPostOperation;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPut;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.getTypeParentNode;
-import static org.opendaylight.restconf.openapi.util.JsonUtil.addFields;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -73,8 +71,6 @@ public abstract class BaseYangOpenApiGenerator {
     private static final String API_VERSION = "1.0.0";
     private static final String OPEN_API_VERSION = "3.0.3";
     private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
     private final DOMSchemaService schemaService;
 
     public static final String BASE_PATH = "/";
@@ -87,9 +83,6 @@ public abstract class BaseYangOpenApiGenerator {
 
     static {
         MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(MapperGeneratorRecord.class, new DefinitionGenerator());
-        MAPPER.registerModule(module);
     }
 
     protected BaseYangOpenApiGenerator(final Optional<DOMSchemaService> schemaService) {
@@ -222,13 +215,12 @@ public abstract class BaseYangOpenApiGenerator {
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
         try {
-            final MapperGeneratorRecord generatorClass = new MapperGeneratorRecord(module, schemaContext,
-                    definitionNames, isForSingleModule);
-            final ObjectNode schema = MAPPER.convertValue(generatorClass, ObjectNode.class);
+            final var schema = DefinitionGenerator.getSchema(module, schemaContext, definitionNames, isForSingleModule,
+                    MAPPER);
             if (isForSingleModule) {
                 doc.getComponents().setSchemas(schema);
             } else {
-                addFields(doc.getComponents().getSchemas(), schema.fields());
+                doc.getComponents().getSchemas().putAll(schema);
             }
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
@@ -315,8 +307,7 @@ public abstract class BaseYangOpenApiGenerator {
         info.setVersion(API_VERSION);
         doc.setInfo(info);
         doc.setServers(List.of(new Server(schema + "://" + host + basePath)));
-        doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
-                new SecuritySchemes(OPEN_API_BASIC_AUTH)));
+        doc.setComponents(new Components(new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         doc.setSecurity(SECURITY);
         return doc;
     }
@@ -510,7 +501,4 @@ public abstract class BaseYangOpenApiGenerator {
     protected interface ListPathBuilder {
         String nextParamIdentifier(String key);
     }
-
-    public record MapperGeneratorRecord(Module module, EffectiveModelContext schemaContext,
-            DefinitionNames definitionNames, boolean isForSingleModule){}
 }

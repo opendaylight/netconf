@@ -13,22 +13,26 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.C
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.NAME_KEY;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.XML_KEY;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.mifmif.common.regex.Generex;
 import java.io.IOException;
-import java.io.Serial;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.MapperGeneratorRecord;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -85,12 +89,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Generates JSON Schema for data defined in YANG. This class is not thread-safe.
  */
-public class DefinitionGenerator extends StdSerializer<MapperGeneratorRecord> {
+public final class DefinitionGenerator implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefinitionGenerator.class);
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     private static final String UNIQUE_ITEMS_KEY = "uniqueItems";
     private static final String MAX_ITEMS = "maxItems";
@@ -123,55 +124,82 @@ public class DefinitionGenerator extends StdSerializer<MapperGeneratorRecord> {
     // Special characters used in automaton inside Generex.
     // See https://www.brics.dk/automaton/doc/dk/brics/automaton/RegExp.html
     private static final Pattern AUTOMATON_SPECIAL_CHARACTERS = Pattern.compile("[@&\"<>#~]");
+    private static final JsonFactory JSON_FACTORY = new JsonFactory();
+
+    private final JsonGenerator jsonGenerator;
+    private final StringWriter jsonObjectWriter;
 
     private QNameModule qnameModule;
-
-
-    public DefinitionGenerator() {
-        this(null);
-    }
-
-    public DefinitionGenerator(final Class<MapperGeneratorRecord> recordClass) {
-        super(recordClass);
-    }
-
-    @Override
-    public void serialize(final MapperGeneratorRecord value, final JsonGenerator gen, final SerializerProvider provider)
-            throws IOException {
-        gen.writeStartObject();
-        if (value.isForSingleModule()) {
-            value.definitionNames().addUnlinkedName(value.module().getName() + MODULE_NAME_SUFFIX);
-        }
-        convertToJsonSchema(value.module(), value.schemaContext(), gen, value.definitionNames(),
-                value.isForSingleModule());
-        gen.writeEndObject();
-    }
 
     /**
      * Creates Json schema definitions from provided module according to OpenApi spec.
      *
      * @param module            - Yang module to be converted
      * @param schemaContext     - SchemaContext of all Yang files used by Api Doc
-     * @param generator         - Appending here new Json nodes
      * @param definitionNames   - Store for definition names
      * @param isForSingleModule - If true, creates also json node for module
-     * @return JsonGenerator containing data used for creating examples and definitions in Api Doc
+     * @param mapper            - ObjectMapper
+     * @return Map containing data used for creating examples and definitions in Api Doc
      * @throws IOException if I/O operation fails
      */
-    public JsonGenerator convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
-            final JsonGenerator generator, final DefinitionNames definitionNames, final boolean isForSingleModule)
+    public static Map<String, ObjectNode> getSchema(final Module module, final EffectiveModelContext schemaContext,
+            final DefinitionNames definitionNames, final boolean isForSingleModule, final ObjectMapper mapper)
             throws IOException {
+        final StringWriter stringWriter;
+        try (DefinitionGenerator definitionGenerator = new DefinitionGenerator()) {
+            stringWriter = definitionGenerator.convertToJsonSchema(module, schemaContext, definitionNames,
+                    isForSingleModule);
+        }
+        return convertDataToSchema(stringWriter.toString(), mapper);
+    }
+
+    private static Map<String, ObjectNode> convertDataToSchema(final String schema, final ObjectMapper mapper)
+            throws IOException {
+        final Map<String, ObjectNode> map = new HashMap<>();
+        try (JsonParser parser = JSON_FACTORY.createParser(schema)) {
+            while (parser.nextToken() != null) {
+                if (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+                    final String fieldName = parser.getText();
+                    parser.nextToken();
+                    map.put(fieldName, mapper.readTree(parser));
+                }
+            }
+        }
+        return map;
+    }
+
+    private DefinitionGenerator() {
+        jsonObjectWriter = new StringWriter();
+        try {
+            jsonGenerator = JSON_FACTORY.createGenerator(jsonObjectWriter);
+            jsonGenerator.writeStartObject();
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        jsonGenerator.writeEndObject();
+        jsonGenerator.close();
+        jsonObjectWriter.close();
+    }
+
+    private StringWriter convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
+            final DefinitionNames definitionNames, final boolean isForSingleModule) throws IOException {
+        if (isForSingleModule) {
+            definitionNames.addUnlinkedName(module.getName() + MODULE_NAME_SUFFIX);
+        }
         qnameModule = module.getQNameModule();
 
-        processIdentities(module, generator, definitionNames, schemaContext);
-        processContainersAndLists(module, generator, definitionNames, schemaContext);
-        processRPCs(module, generator, definitionNames, schemaContext);
+        processIdentities(module, jsonGenerator, definitionNames, schemaContext);
+        processContainersAndLists(module, jsonGenerator, definitionNames, schemaContext);
+        processRPCs(module, jsonGenerator, definitionNames, schemaContext);
 
         if (isForSingleModule) {
-            processModule(module, generator, definitionNames, schemaContext);
+            processModule(module, jsonGenerator, definitionNames, schemaContext);
         }
-
-        return generator;
+        return jsonObjectWriter;
     }
 
     private void processModule(final Module module, final JsonGenerator generator,
