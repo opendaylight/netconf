@@ -10,10 +10,7 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import static org.junit.Assert.assertNotNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.BeforeClass;
+import java.io.IOException;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.AbstractApiDocTest;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -23,26 +20,23 @@ public final class DefinitionGeneratorTest extends AbstractApiDocTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
-    public void testConvertToJsonSchema() {
+    public void testConvertToJsonSchema() throws IOException {
         final var module = CONTEXT.findModule("opflex", Revision.of("2014-05-28")).orElseThrow();
-        final var generatorClass = new MapperGeneratorRecord(module, CONTEXT, new DefinitionNames(), true);
-        final ObjectNode jsonObject = MAPPER.convertValue(generatorClass, ObjectNode.class);
-        assertNotNull(jsonObject);
+        final var result = DefinitionGenerator.getSchema(module, CONTEXT, new DefinitionNames(), true, MAPPER);
+        assertNotNull(result);
     }
 
     @Test
-    public void testActionTypes() {
+    public void testActionTypes() throws IOException {
         final var module = CONTEXT.findModule("action-types").orElseThrow();
-        final var generatorClass = new MapperGeneratorRecord(module, CONTEXT, new DefinitionNames(), true);
-        final ObjectNode jsonObject = MAPPER.convertValue(generatorClass, ObjectNode.class);
-        assertNotNull(jsonObject);
+        final var result = DefinitionGenerator.getSchema(module, CONTEXT, new DefinitionNames(), true, MAPPER);
+        assertNotNull(result);
     }
 
     @Test
-    public void testStringTypes() {
+    public void testStringTypes() throws IOException {
         final var module = CONTEXT.findModule("string-types").orElseThrow();
-        final var generatorClass = new MapperGeneratorRecord(module, CONTEXT, new DefinitionNames(), true);
-        final ObjectNode jsonObject = MAPPER.convertValue(generatorClass, ObjectNode.class);
-        assertNotNull(jsonObject);
+        final var result = DefinitionGenerator.getSchema(module, CONTEXT, new DefinitionNames(), true, MAPPER);
+        assertNotNull(result);
     }
 }
