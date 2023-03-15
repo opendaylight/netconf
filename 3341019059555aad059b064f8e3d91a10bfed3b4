@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8d72e50_c81d99c3",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-15T12:48:34Z",
+      "side": 1,
+      "message": "The \u0027parameters\u0027 variable is only required in this line. Furthermore, as the `pathParams` array is not updated here, creating a copy of it is unnecessary.\n\nReplace this line with:\n`value.set(PARAMETERS_KEY, pathParams);`",
+      "revId": "3341019059555aad059b064f8e3d91a10bfed3b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22a0ba92_7f488f4f",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-15T12:48:34Z",
+      "side": 1,
+      "message": "Same here.\n`value.set(PARAMETERS_KEY, pathParams);`",
+      "revId": "3341019059555aad059b064f8e3d91a10bfed3b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57677e91_e21c298e",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-15T12:48:34Z",
+      "side": 1,
+      "message": "Here are parameters not aligned with previous line. I would replace this code-style with:\n```\n    private static void insertRequestBodyParameter(final ObjectNode operation, final String defName,\n            final String xmlDefName, final String name) {\n```\nTo prevent masking changes made in this commit, it would be more appropriate to create a separate commit before these changes.",
+      "revId": "3341019059555aad059b064f8e3d91a10bfed3b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
