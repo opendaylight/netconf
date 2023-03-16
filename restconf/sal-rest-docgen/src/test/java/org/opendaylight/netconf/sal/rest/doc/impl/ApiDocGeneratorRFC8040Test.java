@@ -53,7 +53,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     }
 
     /**
-     * Test that generated configuration paths allow to use operations: get, put, delete and post.
+     * Test that generated configuration paths allow to use operations: get, put, patch, delete and post.
      */
     @Test
     public void testConfigPaths() {
@@ -73,6 +73,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
             assertFalse(node.path("put").isMissingNode());
             assertFalse(node.path("delete").isMissingNode());
             assertFalse(node.path("post").isMissingNode());
+            assertFalse(node.path("patch").isMissingNode());
         }
     }
 

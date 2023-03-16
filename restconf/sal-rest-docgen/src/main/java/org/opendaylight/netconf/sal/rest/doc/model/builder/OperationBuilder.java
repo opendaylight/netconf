@@ -12,6 +12,7 @@ import static org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator.INP
 import static org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator.INPUT_SUFFIX;
 import static org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator.OUTPUT_SUFFIX;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -172,6 +173,30 @@ public final class OperationBuilder {
         return value;
     }
 
+    public static ObjectNode buildPatch(final String parentName, final String nodeName, final String moduleName,
+            final Optional<String> deviceName, final String description, final ArrayNode pathParams,
+            final OAversion oaversion) {
+        final ObjectNode value = JsonNodeFactory.instance.objectNode();
+        value.put(DESCRIPTION_KEY, description);
+        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName));
+        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        final ArrayNode parameters = JsonUtil.copy(pathParams);
+        final String defName = parentName + CONFIG + "_" + nodeName + TOP;
+        final String xmlDefName = parentName + CONFIG + "_" + nodeName;
+        insertRequestBodyParameter(parameters, value, defName, xmlDefName, nodeName + CONFIG, oaversion);
+        value.set(PARAMETERS_KEY, parameters);
+
+        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
+        responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
+                buildResponse(Response.Status.OK.getReasonPhrase(), Optional.empty(), oaversion));
+        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
+                buildResponse("Updated", Optional.empty(), oaversion));
+
+        value.set(RESPONSES_KEY, responses);
+        setConsumesIfNeeded(value, oaversion);
+        return value;
+    }
+
     public static ObjectNode buildDelete(final DataSchemaNode node, final String moduleName,
                                          final Optional<String> deviceName, final ArrayNode pathParams,
                                          final OAversion oaversion) {
@@ -271,8 +296,14 @@ public final class OperationBuilder {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         if (oaversion.equals(OAversion.V3_0)) {
             final ObjectNode content = JsonNodeFactory.instance.objectNode();
-            content.set(MediaType.APPLICATION_JSON, buildMimeTypeValue(defName));
-            content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(xmlDefName));
+            final JsonNode node = operation.get(SUMMARY_KEY);
+            if (node != null && node.asText().contains(HttpMethod.PATCH)) {
+                content.set("application/yang-data+json", buildMimeTypeValue(defName));
+                content.set("application/yang-data+xml", buildMimeTypeValue(xmlDefName));
+            } else {
+                content.set(MediaType.APPLICATION_JSON, buildMimeTypeValue(defName));
+                content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(xmlDefName));
+            }
             payload.set(CONTENT_KEY, content);
             payload.put(DESCRIPTION_KEY, name);
             operation.set(REQUEST_BODY_KEY, payload);
