@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "0aad3d6942c8c318bb2c35eb12dd365ae6acf9e6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "672d2990_ceaf3ef0",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-16T15:13:36Z",
+      "side": 1,
+      "message": "Exception could be moved to previous line",
+      "revId": "0aad3d6942c8c318bb2c35eb12dd365ae6acf9e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b29b4409_bc12d27c",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-16T15:13:36Z",
+      "side": 1,
+      "message": "Exception could be moved to previous line",
+      "revId": "0aad3d6942c8c318bb2c35eb12dd365ae6acf9e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fef03e5c_5ba5f797",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-16T15:13:36Z",
+      "side": 1,
+      "message": "```\n    private void processChildNode(final DataSchemaNode node, final String parentName, final ObjectNode definitions,\n            final DefinitionNames definitionNames, final boolean isConfig, final SchemaInferenceStack stack,\n            final ObjectNode properties, final OAversion oaversion) throws IOException {\n```",
+      "revId": "0aad3d6942c8c318bb2c35eb12dd365ae6acf9e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
