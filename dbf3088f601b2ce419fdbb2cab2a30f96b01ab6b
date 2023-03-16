@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a7f5576_47a92d9f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-16T13:19:45Z",
+      "side": 1,
+      "message": "Needs to be completed and squashed with previous patch.",
+      "revId": "dbf3088f601b2ce419fdbb2cab2a30f96b01ab6b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
