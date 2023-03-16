@@ -173,8 +173,7 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildDelete(final DataSchemaNode node, final String moduleName,
-                                         final Optional<String> deviceName, final ArrayNode pathParams,
-                                         final OAversion oaversion) {
+            final Optional<String> deviceName, final ArrayNode pathParams, final OAversion oaversion) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
                 node.getQName().getLocalName()));
@@ -192,8 +191,8 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildPostOperation(final OperationDefinition operDef, final String moduleName,
-                                                final Optional<String> deviceName, final String parentName,
-                                                final DefinitionNames definitionNames, final OAversion oaversion) {
+            final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames,
+            final OAversion oaversion) {
         final ObjectNode postOperation = JsonNodeFactory.instance.objectNode();
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode();
         final String operName = operDef.getQName().getLocalName();
@@ -266,8 +265,7 @@ public final class OperationBuilder {
     }
 
     private static void insertRequestBodyParameter(final ArrayNode parameters, final ObjectNode operation,
-                                                   final String defName, final String xmlDefName,
-                                                   final String name, final OAversion oaversion) {
+            final String defName, final String xmlDefName, final String name, final OAversion oaversion) {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         if (oaversion.equals(OAversion.V3_0)) {
             final ObjectNode content = JsonNodeFactory.instance.objectNode();
@@ -297,7 +295,7 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildResponse(final String description, final Optional<ObjectNode> schema,
-                                           final OAversion oaversion) {
+            final OAversion oaversion) {
         final ObjectNode response = JsonNodeFactory.instance.objectNode();
 
         if (schema.isPresent()) {
@@ -325,7 +323,7 @@ public final class OperationBuilder {
     }
 
     private static String buildSummaryValue(final String httpMethod, final String moduleName,
-                                            final Optional<String> deviceName, final String nodeName) {
+            final Optional<String> deviceName, final String nodeName) {
         return httpMethod + SUMMARY_SEPARATOR + deviceName.map(s -> s + SUMMARY_SEPARATOR).orElse("")
                 + moduleName + SUMMARY_SEPARATOR + nodeName;
     }

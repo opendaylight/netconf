@@ -69,7 +69,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     private ListenerRegistration<DOMMountPointListener> registration;
 
     public MountPointSwagger(final DOMSchemaService globalSchema, final DOMMountPointService mountService,
-                             final BaseYangSwaggerGenerator swaggerGenerator) {
+            final BaseYangSwaggerGenerator swaggerGenerator) {
         this.globalSchema = requireNonNull(globalSchema);
         this.mountService = requireNonNull(mountService);
         this.swaggerGenerator = requireNonNull(swaggerGenerator);
@@ -135,7 +135,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     }
 
     public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
-                                            final String revision, final OAversion oaversion) {
+            final String revision, final OAversion oaversion) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -154,7 +154,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     }
 
     public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum,
-                                            final OAversion oaversion) {
+            final OAversion oaversion) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -203,7 +203,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     }
 
     private SwaggerObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
-                                                  final String deviceName) {
+            final String deviceName) {
         final SwaggerObject declaration = swaggerGenerator.createSwaggerObject(
                 swaggerGenerator.createSchemaFromUriInfo(uriInfo),
                 swaggerGenerator.createHostFromUriInfo(uriInfo),
@@ -225,7 +225,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     }
 
     private void createGetPathItem(final String resourceType, final String description, final String context,
-                                   final String deviceName, final ObjectNode pathsObject) {
+            final String deviceName, final ObjectNode pathsObject) {
         final ObjectNode pathItem = JsonNodeFactory.instance.objectNode();
         final ObjectNode operationObject = JsonNodeFactory.instance.objectNode();
         pathItem.set("get", operationObject);
