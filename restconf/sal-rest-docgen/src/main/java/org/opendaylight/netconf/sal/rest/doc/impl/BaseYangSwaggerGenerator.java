@@ -28,7 +28,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
@@ -75,6 +75,7 @@ public abstract class BaseYangSwaggerGenerator {
     private static final String SWAGGER_VERSION = "2.0";
     private static final String OPEN_API_VERSION = "3.0.3";
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final List<String> PRODUCES = List.of(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON);
 
     private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
     private final DOMSchemaService schemaService;
@@ -331,7 +332,7 @@ public abstract class BaseYangSwaggerGenerator {
         doc.setSchemes(ImmutableList.of(schema));
         doc.setHost(host);
         doc.setBasePath(basePath);
-        doc.setProduces(Arrays.asList("application/xml", "application/json"));
+        doc.setProduces(PRODUCES);
         return doc;
     }
 
