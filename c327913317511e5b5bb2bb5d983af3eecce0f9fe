@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3f658f4_4773d34d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-16T08:23:30Z",
+      "side": 1,
+      "message": "This will be https://jira.opendaylight.org/browse/NETCONF-981",
+      "revId": "c327913317511e5b5bb2bb5d983af3eecce0f9fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
