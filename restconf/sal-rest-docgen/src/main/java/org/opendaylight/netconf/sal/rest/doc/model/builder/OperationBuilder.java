@@ -172,6 +172,29 @@ public final class OperationBuilder {
         return value;
     }
 
+    public static ObjectNode buildPatch(final String parentName, final String nodeName, final String moduleName,
+            final Optional<String> deviceName, final String description, final ArrayNode pathParams,
+            final OAversion oaversion) {
+        final ObjectNode value = JsonNodeFactory.instance.objectNode();
+        value.put(DESCRIPTION_KEY, description);
+        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName));
+        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        final String defName = parentName + CONFIG + "_" + nodeName + TOP;
+        final String xmlDefName = parentName + CONFIG + "_" + nodeName;
+        insertRequestBodyParameter(pathParams, value, defName, xmlDefName, nodeName + CONFIG, oaversion);
+        value.set(PARAMETERS_KEY, pathParams);
+
+        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
+        responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
+                buildResponse(Response.Status.OK.getReasonPhrase(), Optional.empty(), oaversion));
+        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
+                buildResponse("Updated", Optional.empty(), oaversion));
+
+        value.set(RESPONSES_KEY, responses);
+        setConsumesIfNeeded(value, oaversion);
+        return value;
+    }
+
     public static ObjectNode buildDelete(final DataSchemaNode node, final String moduleName,
                                          final Optional<String> deviceName, final ArrayNode pathParams,
                                          final OAversion oaversion) {
