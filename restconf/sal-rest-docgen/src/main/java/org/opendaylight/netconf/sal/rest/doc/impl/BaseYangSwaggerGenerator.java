@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildDelete;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildGet;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPatch;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPost;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPostOperation;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPut;
@@ -431,6 +432,10 @@ public abstract class BaseYangSwaggerGenerator {
             final ObjectNode put = buildPut(parentName, nodeName, discriminator, moduleName, deviceName,
                     node.getDescription().orElse(""), pathParams, oaversion);
             operations.put("put", put);
+
+            final ObjectNode patch = buildPatch(parentName, nodeName, moduleName, deviceName,
+                    node.getDescription().orElse(""), pathParams, oaversion);
+            operations.put("patch", patch);
 
             final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams, oaversion);
             operations.put("delete", delete);
