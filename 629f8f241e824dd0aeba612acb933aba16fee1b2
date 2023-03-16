@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07b1d521_438c3a04",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-16T15:13:48Z",
+      "side": 1,
+      "message": "Formatting should be in previous commit",
+      "revId": "629f8f241e824dd0aeba612acb933aba16fee1b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
