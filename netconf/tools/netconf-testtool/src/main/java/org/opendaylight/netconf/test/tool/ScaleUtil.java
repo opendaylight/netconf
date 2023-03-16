@@ -33,6 +33,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.ws.rs.core.MediaType;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.slf4j.Logger;
@@ -220,8 +221,8 @@ public final class ScaleUtil {
         final HttpRequest request = HttpRequest.newBuilder(URI.create(String.format(RESTCONF_URL, params.controllerIp,
                         params.controllerPort)))
                 .GET()
-                .header("Content-Type", "application/json")
-                .header("Accept", "application/json")
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .header("Accept", MediaType.APPLICATION_JSON)
                 .build();
         try {
             return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -256,8 +257,8 @@ public final class ScaleUtil {
             request = HttpRequest.newBuilder(URI.create(String.format(RESTCONF_URL, params.controllerIp,
                             params.controllerPort)))
                     .GET()
-                    .header("Content-Type", "application/xml")
-                    .header("Accept", "application/xml")
+                    .header("Content-Type", MediaType.APPLICATION_XML)
+                    .header("Accept", MediaType.APPLICATION_XML)
                     .build();
         }
 

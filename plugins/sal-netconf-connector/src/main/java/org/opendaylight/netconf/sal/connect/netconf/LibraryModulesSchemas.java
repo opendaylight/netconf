@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
+import javax.ws.rs.core.MediaType;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
@@ -146,7 +147,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             final URLConnection connection = urlConnection.openConnection();
 
             if (connection instanceof HttpURLConnection) {
-                connection.setRequestProperty("Accept", "application/xml");
+                connection.setRequestProperty("Accept", MediaType.APPLICATION_XML);
                 final String userpass = username + ":" + password;
                 connection.setRequestProperty("Authorization",
                     "Basic " + Base64.getEncoder().encodeToString(userpass.getBytes(StandardCharsets.UTF_8)));
@@ -229,7 +230,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         }
 
         if (connection instanceof HttpURLConnection) {
-            connection.setRequestProperty("Accept", "application/xml");
+            connection.setRequestProperty("Accept", MediaType.APPLICATION_XML);
         }
         return createFromURLConnection(connection);
     }
@@ -252,16 +253,16 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         // TODO try to guess Json also from intput stream
         if (guessJsonFromFileName(connection.getURL().getFile())) {
-            contentType = "application/json";
+            contentType = MediaType.APPLICATION_JSON;
         }
 
         requireNonNull(contentType, "Content type unknown");
-        checkState(contentType.equals("application/json") || contentType.equals("application/xml"),
+        checkState(contentType.equals(MediaType.APPLICATION_JSON) || contentType.equals(MediaType.APPLICATION_XML),
                 "Only XML and JSON types are supported.");
 
         Optional<NormalizedNode> optionalModulesStateNode = Optional.empty();
         try (InputStream in = connection.getInputStream()) {
-            optionalModulesStateNode = contentType.equals("application/json") ? readJson(in) : readXml(in);
+            optionalModulesStateNode = contentType.equals(MediaType.APPLICATION_JSON) ? readJson(in) : readXml(in);
         } catch (final IOException e) {
             LOG.warn("Unable to download yang library from {}", connection.getURL(), e);
         }

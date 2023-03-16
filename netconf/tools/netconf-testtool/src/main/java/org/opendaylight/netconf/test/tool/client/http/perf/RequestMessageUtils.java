@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.nio.charset.StandardCharsets;
+import javax.ws.rs.core.MediaType;
 import org.opendaylight.netconf.test.tool.TestToolUtils;
 
 public final class RequestMessageUtils {
@@ -94,8 +95,8 @@ public final class RequestMessageUtils {
     public static HttpRequest formRequest(final String url, final String msg) {
         return HttpRequest.newBuilder(URI.create(url))
             .POST(BodyPublishers.ofString(msg, StandardCharsets.UTF_8))
-            .header("content-type", "application/json")
-            .header("Accept", "application/xml")
+            .header("content-type", MediaType.APPLICATION_JSON)
+            .header("Accept", MediaType.APPLICATION_XML)
             .build();
     }
 }

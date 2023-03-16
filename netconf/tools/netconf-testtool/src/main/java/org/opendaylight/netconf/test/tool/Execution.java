@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
+import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,8 +130,8 @@ final class Execution implements Callable<Void> {
         LOG.info("Creating request to: {} with payload: {}", destination, payload);
         return HttpRequest.newBuilder(URI.create(destination))
                 .method("PATCH", BodyPublishers.ofString(payload, StandardCharsets.UTF_8))
-                .header("Content-Type", "application/json")
-                .header("Accept", "application/json")
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .header("Accept", MediaType.APPLICATION_JSON)
                 .build();
     }
 }

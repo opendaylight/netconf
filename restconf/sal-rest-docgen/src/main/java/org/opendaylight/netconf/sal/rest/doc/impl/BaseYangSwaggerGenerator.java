@@ -40,6 +40,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
@@ -335,7 +336,7 @@ public abstract class BaseYangSwaggerGenerator {
         doc.setSchemes(ImmutableList.of(schema));
         doc.setHost(host);
         doc.setBasePath(basePath);
-        doc.setProduces(Arrays.asList("application/xml", "application/json"));
+        doc.setProduces(Arrays.asList(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON));
         return doc;
     }
 
