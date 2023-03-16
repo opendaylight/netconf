@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "62712e7d_ab756d83",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-16T07:28:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8d72e50_c81d99c3",
+      "revId": "3341019059555aad059b064f8e3d91a10bfed3b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "22a0ba92_7f488f4f",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-03-15T12:48:34Z",
       "side": 1,
       "message": "Same here.\n`value.set(PARAMETERS_KEY, pathParams);`",
+      "revId": "3341019059555aad059b064f8e3d91a10bfed3b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd39462b_96b0750c",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-16T07:28:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22a0ba92_7f488f4f",
       "revId": "3341019059555aad059b064f8e3d91a10bfed3b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
