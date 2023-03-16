@@ -144,9 +144,8 @@ public class DefinitionGenerator {
 
 
     public ObjectNode convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
-                                          final ObjectNode definitions, final DefinitionNames definitionNames,
-                                          final OAversion oaversion, final boolean isForSingleModule)
-            throws IOException {
+            final ObjectNode definitions, final DefinitionNames definitionNames,  final OAversion oaversion,
+            final boolean isForSingleModule) throws IOException {
         topLevelModule = module;
 
         processIdentities(module, definitions, definitionNames, schemaContext);
@@ -161,8 +160,7 @@ public class DefinitionGenerator {
     }
 
     public ObjectNode convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
-                                          final DefinitionNames definitionNames, final OAversion oaversion,
-                                          final boolean isForSingleModule)
+            final DefinitionNames definitionNames, final OAversion oaversion, final boolean isForSingleModule)
             throws IOException {
         final ObjectNode definitions = JsonNodeFactory.instance.objectNode();
         if (isForSingleModule) {
@@ -172,7 +170,7 @@ public class DefinitionGenerator {
     }
 
     private void processModule(final Module module, final ObjectNode definitions, final DefinitionNames definitionNames,
-                               final EffectiveModelContext schemaContext, final OAversion oaversion) {
+            final EffectiveModelContext schemaContext, final OAversion oaversion) {
         final ObjectNode definition = JsonNodeFactory.instance.objectNode();
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
@@ -230,8 +228,8 @@ public class DefinitionGenerator {
     }
 
     private void processContainersAndLists(final Module module, final ObjectNode definitions,
-            final DefinitionNames definitionNames, final EffectiveModelContext schemaContext, final OAversion oaversion)
-                throws IOException {
+            final DefinitionNames definitionNames, final EffectiveModelContext schemaContext,
+            final OAversion oaversion)  throws IOException {
         final String moduleName = module.getName();
         final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
         for (final DataSchemaNode childNode : module.getChildNodes()) {
@@ -251,9 +249,8 @@ public class DefinitionGenerator {
     }
 
     private void processActionNodeContainer(final DataSchemaNode childNode, final String moduleName,
-                                            final ObjectNode definitions, final DefinitionNames definitionNames,
-                                            final SchemaInferenceStack stack, final OAversion oaversion)
-            throws IOException {
+            final ObjectNode definitions, final DefinitionNames definitionNames, final SchemaInferenceStack stack,
+            final OAversion oaversion) throws IOException {
         for (final ActionDefinition actionDef : ((ActionNodeContainer) childNode).getActions()) {
             stack.enterSchemaTree(actionDef.getQName());
             processOperations(actionDef, moduleName, definitions, definitionNames, stack, oaversion);
@@ -262,7 +259,7 @@ public class DefinitionGenerator {
     }
 
     private void processRPCs(final Module module, final ObjectNode definitions, final DefinitionNames definitionNames,
-                             final EffectiveModelContext schemaContext, final OAversion oaversion) throws IOException {
+            final EffectiveModelContext schemaContext, final OAversion oaversion) throws IOException {
         final String moduleName = module.getName();
         final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
         for (final RpcDefinition rpcDefinition : module.getRpcs()) {
@@ -274,8 +271,7 @@ public class DefinitionGenerator {
 
     private void processOperations(final OperationDefinition operationDef, final String parentName,
             final ObjectNode definitions, final DefinitionNames definitionNames,
-            final SchemaInferenceStack stack, final OAversion oaversion)
-                throws IOException {
+            final SchemaInferenceStack stack, final OAversion oaversion) throws IOException {
         final String operationName = operationDef.getQName().getLocalName();
         processOperationInputOutput(operationDef.getInput(), operationName, parentName, true, definitions,
                 definitionNames, stack, oaversion);
@@ -284,9 +280,8 @@ public class DefinitionGenerator {
     }
 
     private void processOperationInputOutput(final ContainerLike container, final String operationName,
-                                             final String parentName, final boolean isInput,
-                                             final ObjectNode definitions, final DefinitionNames definitionNames,
-                                             final SchemaInferenceStack stack, final OAversion oaversion)
+            final String parentName, final boolean isInput, final ObjectNode definitions,
+            final DefinitionNames definitionNames, final SchemaInferenceStack stack, final OAversion oaversion)
             throws IOException {
         stack.enterSchemaTree(container.getQName());
         if (!container.getChildNodes().isEmpty()) {
@@ -354,7 +349,7 @@ public class DefinitionGenerator {
      * @param definitionNames Store for definition names
      */
     private static void processIdentities(final Module module, final ObjectNode definitions,
-                                          final DefinitionNames definitionNames, final EffectiveModelContext context) {
+            final DefinitionNames definitionNames, final EffectiveModelContext context) {
         final String moduleName = module.getName();
         final Collection<? extends IdentitySchemaNode> idNodes = module.getIdentities();
         LOG.debug("Processing Identities for module {} . Found {} identity statements", moduleName, idNodes.size());
@@ -369,7 +364,7 @@ public class DefinitionGenerator {
     }
 
     private static void populateEnumWithDerived(final Collection<? extends IdentitySchemaNode> derivedIds,
-                                                final ArrayNode enumPayload, final EffectiveModelContext context) {
+            final ArrayNode enumPayload, final EffectiveModelContext context) {
         for (final IdentitySchemaNode derivedId : derivedIds) {
             enumPayload.add(derivedId.getQName().getLocalName());
             populateEnumWithDerived(context.getDerivedIdentities(derivedId), enumPayload, context);
@@ -377,9 +372,8 @@ public class DefinitionGenerator {
     }
 
     private ObjectNode processDataNodeContainer(final DataNodeContainer dataNode, final String parentName,
-                                                final ObjectNode definitions, final DefinitionNames definitionNames,
-                                                final boolean isConfig, final SchemaInferenceStack stack,
-                                                final OAversion oaversion) throws IOException {
+            final ObjectNode definitions, final DefinitionNames definitionNames, final boolean isConfig,
+            final SchemaInferenceStack stack, final OAversion oaversion) throws IOException {
         if (dataNode instanceof ListSchemaNode || dataNode instanceof ContainerSchemaNode) {
             final Collection<? extends DataSchemaNode> containerChildren = dataNode.getChildNodes();
             final SchemaNode schemaNode = (SchemaNode) dataNode;
@@ -473,10 +467,9 @@ public class DefinitionGenerator {
     /**
      * Processes the nodes.
      */
-    private ObjectNode processChildren(
-            final ObjectNode parentNode, final Collection<? extends DataSchemaNode> nodes, final String parentName,
-            final ObjectNode definitions, final DefinitionNames definitionNames, final boolean isConfig,
-            final SchemaInferenceStack stack, final OAversion oaversion) throws IOException {
+    private ObjectNode processChildren(final ObjectNode parentNode, final Collection<? extends DataSchemaNode> nodes,
+            final String parentName, final ObjectNode definitions, final DefinitionNames definitionNames,
+            final boolean isConfig, final SchemaInferenceStack stack, final OAversion oaversion) throws IOException {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         for (final DataSchemaNode node : nodes) {
@@ -490,11 +483,9 @@ public class DefinitionGenerator {
         return properties;
     }
 
-    private void processChildNode(
-            final DataSchemaNode node, final String parentName, final ObjectNode definitions,
-            final DefinitionNames definitionNames, final boolean isConfig,
-            final SchemaInferenceStack stack, final ObjectNode properties, final OAversion oaversion)
-            throws IOException {
+    private void processChildNode(final DataSchemaNode node, final String parentName, final ObjectNode definitions,
+            final DefinitionNames definitionNames, final boolean isConfig, final SchemaInferenceStack stack,
+            final ObjectNode properties, final OAversion oaversion) throws IOException {
 
         stack.enterSchemaTree(node.getQName());
 
@@ -549,8 +540,7 @@ public class DefinitionGenerator {
     }
 
     private ObjectNode processLeafListNode(final LeafListSchemaNode listNode, final SchemaInferenceStack stack,
-                                           final ObjectNode definitions, final DefinitionNames definitionNames,
-                                           final OAversion oaversion) {
+            final ObjectNode definitions, final DefinitionNames definitionNames, final OAversion oaversion) {
         final ObjectNode props = JsonNodeFactory.instance.objectNode();
         props.put(TYPE_KEY, ARRAY_TYPE);
 
@@ -587,9 +577,8 @@ public class DefinitionGenerator {
     }
 
     private ObjectNode processLeafNode(final LeafSchemaNode leafNode, final String jsonLeafName,
-                                       final ObjectNode properties, final ArrayNode required,
-                                       final SchemaInferenceStack stack, final ObjectNode definitions,
-                                       final DefinitionNames definitionNames, final OAversion oaversion) {
+            final ObjectNode properties, final ArrayNode required, final SchemaInferenceStack stack,
+            final ObjectNode definitions, final DefinitionNames definitionNames, final OAversion oaversion) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -610,7 +599,7 @@ public class DefinitionGenerator {
     }
 
     private static ObjectNode processAnydataNode(final AnydataSchemaNode leafNode, final String name,
-                                                 final ObjectNode properties, final ArrayNode required) {
+            final ObjectNode properties, final ArrayNode required) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -627,7 +616,7 @@ public class DefinitionGenerator {
     }
 
     private static ObjectNode processAnyXMLNode(final AnyxmlSchemaNode leafNode, final String name,
-                                                final ObjectNode properties, final ArrayNode required) {
+            final ObjectNode properties, final ArrayNode required) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -644,9 +633,8 @@ public class DefinitionGenerator {
     }
 
     private String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
-                                  final ObjectNode property, final SchemaInferenceStack stack,
-                                  final ObjectNode definitions, final DefinitionNames definitionNames,
-                                  final OAversion oaversion) {
+            final ObjectNode property, final SchemaInferenceStack stack, final ObjectNode definitions,
+            final DefinitionNames definitionNames, final OAversion oaversion) {
         final String jsonType;
         if (leafTypeDef instanceof BinaryTypeDefinition) {
             jsonType = processBinaryType(property);
@@ -717,7 +705,7 @@ public class DefinitionGenerator {
     }
 
     private static String processEnumType(final EnumTypeDefinition enumLeafType,
-                                          final ObjectNode property) {
+            final ObjectNode property) {
         final List<EnumPair> enumPairs = enumLeafType.getValues();
         final ArrayNode enumNames = new ArrayNode(JsonNodeFactory.instance);
         for (final EnumPair enumPair : enumPairs) {
@@ -730,8 +718,8 @@ public class DefinitionGenerator {
     }
 
     private String processIdentityRefType(final IdentityrefTypeDefinition leafTypeDef, final ObjectNode property,
-                                          final ObjectNode definitions, final DefinitionNames definitionNames,
-                                          final OAversion oaversion, final EffectiveModelContext schemaContext) {
+            final ObjectNode definitions, final DefinitionNames definitionNames, final OAversion oaversion,
+            final EffectiveModelContext schemaContext) {
         final String definitionName;
         if (isImported(leafTypeDef)) {
             definitionName = addImportedIdentity(leafTypeDef, definitions, definitionNames, schemaContext);
@@ -744,8 +732,7 @@ public class DefinitionGenerator {
     }
 
     private static String addImportedIdentity(final IdentityrefTypeDefinition leafTypeDef,
-                                              final ObjectNode definitions, final DefinitionNames definitionNames,
-                                              final EffectiveModelContext context) {
+            final ObjectNode definitions, final DefinitionNames definitionNames, final EffectiveModelContext context) {
         final IdentitySchemaNode idNode = leafTypeDef.getIdentities().iterator().next();
         final String identityName = idNode.getQName().getLocalName();
         if (!definitionNames.isListedNode(idNode)) {
@@ -782,8 +769,7 @@ public class DefinitionGenerator {
         return !leafTypeDef.getQName().getModule().equals(topLevelModule.getQNameModule());
     }
 
-    private static String processBitsType(final BitsTypeDefinition bitsType,
-                                          final ObjectNode property) {
+    private static String processBitsType(final BitsTypeDefinition bitsType, final ObjectNode property) {
         property.put(MIN_ITEMS, 0);
         property.put(UNIQUE_ITEMS_KEY, true);
         final ArrayNode enumNames = new ArrayNode(JsonNodeFactory.instance);
@@ -797,7 +783,7 @@ public class DefinitionGenerator {
     }
 
     private static String processStringType(final TypeDefinition<?> stringType, final ObjectNode property,
-                                            final String nodeName) {
+            final String nodeName) {
         StringTypeDefinition type = (StringTypeDefinition) stringType;
         Optional<LengthConstraint> lengthConstraints = ((StringTypeDefinition) stringType).getLengthConstraint();
         while (lengthConstraints.isEmpty() && type.getBaseType() != null) {
@@ -874,7 +860,7 @@ public class DefinitionGenerator {
     }
 
     private static String processInstanceIdentifierType(final DataSchemaNode node, final ObjectNode property,
-                                                        final EffectiveModelContext schemaContext) {
+            final EffectiveModelContext schemaContext) {
         // create example instance-identifier to the first container of node's module if exists or leave it empty
         final var module = schemaContext.findModule(node.getQName().getModule());
         if (module.isPresent()) {
