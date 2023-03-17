@@ -16,6 +16,24 @@
       "message": "Formatting should be in previous commit",
       "revId": "629f8f241e824dd0aeba612acb933aba16fee1b2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "947f7cf9_1211a859",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-17T09:07:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07b1d521_438c3a04",
+      "revId": "629f8f241e824dd0aeba612acb933aba16fee1b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
