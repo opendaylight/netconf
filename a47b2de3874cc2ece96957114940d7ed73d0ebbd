@@ -22,6 +22,30 @@
       },
       "revId": "a47b2de3874cc2ece96957114940d7ed73d0ebbd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13f54b06_4662ebf8",
+        "filename": "plugins/sal-netconf-connector/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-03-17T14:48:26Z",
+      "side": 1,
+      "message": "Without it, we cannot use javax.ws.rs.core.MediaType;\n\n[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:compile (default-compile) on project sal-netconf-connector: Compilation failure\n[ERROR] /home/tobiaspobocik/projects/netconf/plugins/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/LibraryModulesSchemas.java:[40,24] package javax.ws.rs.core does not exist",
+      "parentUuid": "7f5a6d5c_9471a07b",
+      "range": {
+        "startLine": 138,
+        "startChar": 4,
+        "endLine": 141,
+        "endChar": 17
+      },
+      "revId": "a47b2de3874cc2ece96957114940d7ed73d0ebbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
