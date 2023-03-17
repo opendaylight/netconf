@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "32e256e1_d30d6235",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-17T09:07:20Z",
+      "side": 1,
+      "message": "this will exceed the 120 character limit",
+      "parentUuid": "672d2990_ceaf3ef0",
+      "revId": "0aad3d6942c8c318bb2c35eb12dd365ae6acf9e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b29b4409_bc12d27c",
         "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
         "patchSetId": 2
@@ -48,6 +66,24 @@
       "writtenOn": "2023-03-16T15:13:36Z",
       "side": 1,
       "message": "Exception could be moved to previous line",
+      "revId": "0aad3d6942c8c318bb2c35eb12dd365ae6acf9e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b76583de_d063a535",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-17T09:07:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b29b4409_bc12d27c",
       "revId": "0aad3d6942c8c318bb2c35eb12dd365ae6acf9e6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -65,6 +101,24 @@
       "writtenOn": "2023-03-16T15:13:36Z",
       "side": 1,
       "message": "```\n    private void processChildNode(final DataSchemaNode node, final String parentName, final ObjectNode definitions,\n            final DefinitionNames definitionNames, final boolean isConfig, final SchemaInferenceStack stack,\n            final ObjectNode properties, final OAversion oaversion) throws IOException {\n```",
+      "revId": "0aad3d6942c8c318bb2c35eb12dd365ae6acf9e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a66b1a44_7d0ff6f3",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-17T09:07:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fef03e5c_5ba5f797",
       "revId": "0aad3d6942c8c318bb2c35eb12dd365ae6acf9e6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
