@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f5a6d5c_9471a07b",
+        "filename": "plugins/sal-netconf-connector/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-17T12:01:22Z",
+      "side": 1,
+      "message": "Why do we introduce this dependency?!",
+      "range": {
+        "startLine": 138,
+        "startChar": 4,
+        "endLine": 141,
+        "endChar": 17
+      },
+      "revId": "a47b2de3874cc2ece96957114940d7ed73d0ebbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
