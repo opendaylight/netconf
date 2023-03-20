@@ -110,7 +110,7 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
         final Map<String, Path> paths = mountPointApi.getPaths();
         assertNotNull(paths);
 
-        assertEquals("Unexpected api list size", 26, paths.size());
+        assertEquals("Unexpected api list size", 33, paths.size());
 
         final List<JsonNode> getOperations = new ArrayList<>();
         final List<JsonNode> postOperations = new ArrayList<>();
@@ -126,10 +126,10 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
             Optional.ofNullable(path.getValue().getDelete()).ifPresent(deleteOperations::add);
         }
 
-        assertEquals("Unexpected GET paths size", 18, getOperations.size());
-        assertEquals("Unexpected POST paths size", 24, postOperations.size());
-        assertEquals("Unexpected PUT paths size", 16, putOperations.size());
-        assertEquals("Unexpected PATCH paths size", 16, patchOperations.size());
-        assertEquals("Unexpected DELETE paths size", 16, deleteOperations.size());
+        assertEquals("Unexpected GET paths size", 25, getOperations.size());
+        assertEquals("Unexpected POST paths size", 31, postOperations.size());
+        assertEquals("Unexpected PUT paths size", 23, putOperations.size());
+        assertEquals("Unexpected PATCH paths size", 23, patchOperations.size());
+        assertEquals("Unexpected DELETE paths size", 23, deleteOperations.size());
     }
 }
