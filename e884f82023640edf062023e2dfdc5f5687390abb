@@ -16,6 +16,23 @@
       "message": "Align this with previous line, please.",
       "revId": "e884f82023640edf062023e2dfdc5f5687390abb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6e5e2c1_188b905b",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-20T10:14:06Z",
+      "side": 1,
+      "message": "This is \"ugly\" in browser.",
+      "revId": "e884f82023640edf062023e2dfdc5f5687390abb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
