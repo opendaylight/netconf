@@ -1,0 +1,93 @@
+module mandatory-test {
+  namespace "http://example.com/test";
+  prefix "tst";
+
+  container root-container {
+    leaf optional-root-leaf {
+      type string;
+    }
+    leaf mandatory-root-leaf {
+      type string;
+      mandatory true;
+    }
+    container optional-presence-container {
+      presence true;
+      leaf presence-leaf {
+        type string;
+      }
+    }
+    container mandatory-container {
+      leaf mandatory-leaf {
+        mandatory true;
+        type string;
+      }
+      leaf-list leaf-list-with-min-elements {
+        min-elements 2;
+        type string;
+      }
+    }
+    choice choice-field {
+      mandatory true;
+      case first-case {
+        leaf optional-first-choice{
+          type string;
+        }
+        leaf mandatory-first-choice {
+          type string;
+          mandatory true;
+        }
+      }
+      case second-case {
+        leaf mandatory-second-choice {
+          type string;
+          mandatory true;
+        }
+        leaf-list optional-second-choice- {
+          type string;
+        }
+      }
+      default first-case;
+    }
+    list optional-list {
+      key id;
+      leaf id {
+        type uint32;
+      }
+      leaf optional-list-field {
+        type string;
+      }
+    }
+    list mandatory-list {
+      min-elements 2;
+      key id;
+      leaf id {
+        type uint32;
+      }
+      leaf mandatory-list-field {
+        type string;
+        mandatory true;
+      }
+    }
+  }
+
+  list root-optional-list {
+    key id;
+    leaf id {
+      type uint32;
+    }
+    leaf root-optional-list-field {
+      type string;
+    }
+  }
+
+  list root-mandatory-list {
+    min-elements 2;
+    key id;
+    leaf id {
+      type uint32;
+    }
+    leaf root-mandatory-list-field {
+      type string;
+    }
+  }
+}
