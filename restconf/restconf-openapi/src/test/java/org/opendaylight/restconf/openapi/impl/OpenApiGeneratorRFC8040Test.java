@@ -35,6 +35,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public final class OpenApiGeneratorRFC8040Test {
     private static final String TOASTER_2 = "toaster2";
     private static final String REVISION_DATE = "2009-11-20";
+    private static final String MANDATORY_TEST = "mandatory-test";
 
     private static EffectiveModelContext context;
     private static DOMSchemaService schemaService;
@@ -185,6 +186,31 @@ public final class OpenApiGeneratorRFC8040Test {
         final Schema secondContainer = schemas.get("choice-test_second-container");
         assertTrue(secondContainer.properties().has("leaf-first-case"));
         assertFalse(secondContainer.properties().has("leaf-second-case"));
+    }
+
+    @Test
+    public void testMandatory() {
+        final var module = context.findModule(MANDATORY_TEST).orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        assertNotNull(doc);
+        final var schemas = doc.components().schemas();
+        //TODO: missing mandatory-container, mandatory-list
+        final var reqRootContainerElements = "[\"mandatory-root-leaf\",\"mandatory-first-choice\"]";
+        verifyRequiredField(schemas.get("mandatory-test_config_root-container"), reqRootContainerElements);
+        verifyRequiredField(schemas.get("mandatory-test_root-container"), reqRootContainerElements);
+
+        //TODO: missing leaf-list-with-min-elements
+        final var reqMandatoryContainerElements = "[\"mandatory-leaf\"]";
+        verifyRequiredField(schemas.get("mandatory-test_root-container_config_mandatory-container"),
+            reqMandatoryContainerElements);
+        verifyRequiredField(schemas.get("mandatory-test_root-container_mandatory-container"),
+            reqMandatoryContainerElements);
+
+        final var reqMandatoryListElements = "[\"mandatory-list-field\"]";
+        verifyRequiredField(schemas.get("mandatory-test_root-container_config_mandatory-list"),
+                reqMandatoryListElements);
+        verifyRequiredField(schemas.get("mandatory-test_root-container_mandatory-list"), reqMandatoryListElements);
+        //TODO: missing required field inside "mandatory-test_module" with ["root-container","root-mandatory-list"]
     }
 
     /**
@@ -375,5 +401,13 @@ public final class OpenApiGeneratorRFC8040Test {
         final var postXmlRef = postContent.get("application/xml").get("schema").get("$ref");
         assertNotNull(postXmlRef);
         assertEquals(expectedXmlRef, postXmlRef.textValue());
+    }
+
+    private static void verifyRequiredField(final Schema rootContainer, final String expected) {
+        assertNotNull(rootContainer);
+        final var requiredNode = rootContainer.required();
+        assertNotNull(requiredNode);
+        assertTrue(requiredNode.isArray());
+        assertEquals(expected, requiredNode.toString());
     }
 }
