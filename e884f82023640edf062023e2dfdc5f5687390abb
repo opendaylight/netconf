@@ -33,6 +33,24 @@
       "message": "This is \"ugly\" in browser.",
       "revId": "e884f82023640edf062023e2dfdc5f5687390abb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1310f0c_ffcde76e",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-20T10:16:06Z",
+      "side": 1,
+      "message": "For example see \"original\" formatting: https://docs.opendaylight.org/projects/controller/en/v6.0.7/dev-guide.html",
+      "parentUuid": "d6e5e2c1_188b905b",
+      "revId": "e884f82023640edf062023e2dfdc5f5687390abb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
