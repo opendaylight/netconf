@@ -21,9 +21,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.github.curiousoddman.rgxgen.RgxGen;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
-import com.mifmif.common.regex.Generex;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -819,8 +819,8 @@ public class DefinitionGenerator {
             regex = AUTOMATON_SPECIAL_CHARACTERS.matcher(regex).replaceAll("\\\\$0");
             String defaultValue = "";
             try {
-                final Generex generex = new Generex(regex);
-                defaultValue = generex.random();
+                final RgxGen rgxGen = new RgxGen(regex);
+                defaultValue = rgxGen.generate();
             } catch (IllegalArgumentException ex) {
                 LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
             }

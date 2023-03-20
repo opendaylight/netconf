@@ -20,20 +20,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.github.mifmif</groupId>
-      <artifactId>generex</artifactId>
-      <version>1.0.2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>dk.brics.automaton</groupId>
-          <artifactId>automaton</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>dk.brics</groupId>
-      <artifactId>automaton</artifactId>
-      <version>1.12-3</version>
+      <groupId>com.github.curious-odd-man</groupId>
+      <artifactId>rgxgen</artifactId>
+      <version>1.4</version>
     </dependency>
 
     <dependency>
