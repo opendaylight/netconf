@@ -26,6 +26,7 @@ import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
     private static final String NAME = "toaster2";
+    private static final String MANDATORY_TEST = "mandatory-test";
     private static final String REVISION_DATE = "2009-11-20";
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
@@ -174,6 +175,31 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         assertFalse(secondContainer.getProperties().has("leaf-second-case"));
     }
 
+    @Test
+    public void testMandatory() {
+        final var module = CONTEXT.findModule(MANDATORY_TEST).orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        assertNotNull(doc);
+        final var definitions = doc.getComponents().getSchemas();
+        //TODO: missing mandatory-container, mandatory-list
+        final var reqRootContainer = "[\"mandatory-root-leaf\",\"mandatory-first-choice\"]";
+        verifyRequiredField(definitions.get("mandatory-test_config_root-container"), reqRootContainer);
+        verifyRequiredField(definitions.get("mandatory-test_root-container"), reqRootContainer);
+
+        //TODO: missing leaf-list-with-min-elemnets
+        final var reqMandatoryContainer = "[\"mandatory-leaf\"]";
+        verifyRequiredField(definitions.get("mandatory-test_root-container_config_mandatory-container"),
+                reqMandatoryContainer);
+        verifyRequiredField(definitions.get("mandatory-test_root-container_mandatory-container"),
+                reqMandatoryContainer);
+
+        final var reqMandatoryList = "[\"mandatory-list-field\"]";
+        verifyRequiredField(definitions.get("mandatory-test_root-container_config_mandatory-list"), reqMandatoryList);
+        verifyRequiredField(definitions.get("mandatory-test_root-container_mandatory-list"), reqMandatoryList);
+
+        //TODO: missing required field inside "mandatory-test_module" with ["root-container","root-mandatory-list"]
+    }
+
     /**
      * Test that checks for correct amount of parameters in requests.
      */
@@ -249,5 +275,13 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
         assertTrue(doc.getPaths().containsKey(pathToList4));
         assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList5));
+    }
+
+    private static void verifyRequiredField(final Schema rootContainer, final String expected) {
+        assertNotNull(rootContainer);
+        final var requiredNode = rootContainer.getRequired();
+        assertNotNull(requiredNode);
+        assertTrue(requiredNode.isArray());
+        assertEquals(expected, requiredNode.toString());
     }
 }
