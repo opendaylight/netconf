@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -22,6 +23,7 @@ import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String NAME = "toaster2";
+    private static final String TEST = "test";
     private static final String REVISION_DATE = "2009-11-20";
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
@@ -148,5 +150,39 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final JsonNode properties = input.get("properties");
         assertTrue(properties.has("toasterDoneness"));
         assertTrue(properties.has("toasterToastType"));
+    }
+
+    @Test
+    public void testMandatory() {
+        final var module = CONTEXT.findModule(TEST).orElseThrow();
+        final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+                ApiDocServiceImpl.OAversion.V2_0);
+        assertNotNull(doc);
+        final var definitions = doc.getDefinitions();
+        //TODO: missing mandatory-container, mandatory-list
+        final var reqRootContainer = "[\"mandatory-root-leaf\",\"mandatory-first-choice\",\"mandatory-second-choice\"]";
+        verifyRequiredField(definitions.get("test_config_root-container"), reqRootContainer);
+        verifyRequiredField(definitions.get("test_root-container"), reqRootContainer);
+
+        //TODO: missing leaf-list-with-min-elemnets
+        final var reqMandatoryContainer = "[\"mandatory-leaf\"]";
+        verifyRequiredField(definitions.get("test_root-container_config_mandatory-container"), reqMandatoryContainer);
+        verifyRequiredField(definitions.get("test_root-container_mandatory-container"), reqMandatoryContainer);
+
+        final var reqMandatoryList = "[\"mandatory-list-field\"]";
+        verifyRequiredField(definitions.get("test_root-container_config_mandatory-list"), reqMandatoryList);
+        verifyRequiredField(definitions.get("test_root-container_mandatory-list"), reqMandatoryList);
+
+        //TODO: missing:
+//        final var testModuleMandatory = "[\"root-container\", \"root-mandatory-list\"]";
+//        verifyRequiredField(definitions.get("mandatory-test-module"), testModuleMandatory);
+    }
+
+    public void verifyRequiredField(final JsonNode rootContainer, final String expected) {
+        assertNotNull(rootContainer);
+        final var requiredNode = rootContainer.get("required");
+        assertNotNull(requiredNode);
+        assertTrue(requiredNode.isArray());
+        assertEquals(expected, requiredNode.toString());
     }
 }
