@@ -74,12 +74,6 @@
         showAlternativeSchemaExample: true,
         onComplete: function(swaggerApi, swaggerUi){
 	      var wrappers = document.getElementsByClassName('wrapper');
-	      for(var i = 0; i < wrappers.length; i++) {
-            if (wrappers[i].innerText === "Schemas") {
-              wrappers[i].remove();
-              break;
-            }
-          }
           var topbar = document.getElementsByClassName('topbar-wrapper');
           var node2 = document.createElement("H2");
           var node = document.createElement("IMG");
