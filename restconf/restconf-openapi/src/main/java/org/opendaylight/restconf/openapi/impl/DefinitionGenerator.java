@@ -420,7 +420,7 @@ public class DefinitionGenerator {
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         for (final DataSchemaNode node : nodes) {
             if (!isConfig || node.isConfiguration()) {
-                processChildNode(node, parentName, definitions, definitionNames, isConfig, stack, properties);
+                processChildNode(node, parentName, definitions, definitionNames, isConfig, stack, properties, required);
             }
         }
         parentNodeBuilder.properties(properties);
@@ -430,7 +430,8 @@ public class DefinitionGenerator {
 
     private void processChildNode(final DataSchemaNode node, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames, final boolean isConfig,
-            final SchemaInferenceStack stack, final ObjectNode properties) throws IOException {
+            final SchemaInferenceStack stack, final ObjectNode properties, final ArrayNode required)
+            throws IOException {
 
         stack.enterSchemaTree(node.getQName());
 
@@ -441,14 +442,13 @@ public class DefinitionGenerator {
         final String name = node.getQName().getLocalName();
 
         if (node instanceof LeafSchemaNode leaf) {
-            processLeafNode(leaf, name, properties, JsonNodeFactory.instance.arrayNode(), stack, definitions,
-                    definitionNames);
+            processLeafNode(leaf, name, properties, required, stack, definitions, definitionNames);
 
         } else if (node instanceof AnyxmlSchemaNode anyxml) {
-            processAnyXMLNode(anyxml, name, properties, JsonNodeFactory.instance.arrayNode());
+            processAnyXMLNode(anyxml, name, properties, required);
 
         } else if (node instanceof AnydataSchemaNode anydata) {
-            processAnydataNode(anydata, name, properties, JsonNodeFactory.instance.arrayNode());
+            processAnydataNode(anydata, name, properties, required);
 
         } else {
 
@@ -470,7 +470,7 @@ public class DefinitionGenerator {
                     stack.enterSchemaTree(caseSchemaNode.getQName());
                     for (final DataSchemaNode childNode : caseSchemaNode.getChildNodes()) {
                         processChildNode(childNode, parentName, definitions, definitionNames, isConfig, stack,
-                                properties);
+                                properties, required);
                     }
                     stack.exit();
                 }
