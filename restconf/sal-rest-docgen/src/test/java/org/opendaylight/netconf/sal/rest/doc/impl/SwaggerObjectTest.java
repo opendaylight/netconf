@@ -7,12 +7,14 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import org.junit.Test;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public final class SwaggerObjectTest extends AbstractApiDocTest {
     @Test
@@ -40,5 +42,21 @@ public final class SwaggerObjectTest extends AbstractApiDocTest {
         final ObjectNode jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
             ApiDocServiceImpl.OAversion.V2_0, true);
         assertNotNull(jsonObject);
+    }
+
+    @Test
+    public void testStringFromRegex() throws IOException {
+        final var module = CONTEXT.findModule("strings-from-regex_test").orElseThrow();
+        final var generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
+                ApiDocServiceImpl.OAversion.V2_0, true);
+        assertNotNull(jsonObject);
+
+        var properties = jsonObject.get("strings-from-regex_test_test").get("properties");
+        for (var property : properties) {
+            if (property.get("default").asText().isEmpty()) {
+                assertFalse(property.get("default").asText().isEmpty());
+            }
+        }
     }
 }
