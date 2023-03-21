@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -38,5 +39,18 @@ public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
         final DefinitionGenerator generator = new DefinitionGenerator();
         final ObjectNode jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(), true);
         assertNotNull(jsonObject);
+    }
+
+    @Test
+    public void testStringFromRegex() throws IOException {
+        final var module = CONTEXT.findModule("strings-from-regex-test").orElseThrow();
+        final var generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(), true);
+        assertNotNull(jsonObject);
+
+        var properties = jsonObject.get("strings-from-regex-test_test").get("properties");
+        for (var property : properties) {
+            assertFalse(property.get("default").asText().isEmpty());
+        }
     }
 }
