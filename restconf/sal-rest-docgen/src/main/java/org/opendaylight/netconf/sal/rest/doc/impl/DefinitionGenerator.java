@@ -23,14 +23,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
-import com.mifmif.common.regex.Generex;
+import dk.brics.automaton.RegExp;
+import dk.brics.automaton.State;
+import dk.brics.automaton.Transition;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -126,8 +132,21 @@ public class DefinitionGenerator {
     // Special characters used in automaton inside Generex.
     // See https://www.brics.dk/automaton/doc/dk/brics/automaton/RegExp.html
     private static final Pattern AUTOMATON_SPECIAL_CHARACTERS = Pattern.compile("[@&\"<>#~]");
+    private static final Random RANDOM = new Random();
+    private static final Map<String, String> PREDEFINED_CHARACTER_CLASSES;
 
     private Module topLevelModule;
+
+    static {
+        Map<String, String> characterClasses = new HashMap<>();
+        characterClasses.put("\\\\d", "[0-9]");
+        characterClasses.put("\\\\D", "[^0-9]");
+        characterClasses.put("\\\\s", "[ \t\n\f\r]");
+        characterClasses.put("\\\\S", "[^ \t\n\f\r]");
+        characterClasses.put("\\\\w", "[a-zA-Z_0-9]");
+        characterClasses.put("\\\\W", "[^a-zA-Z_0-9]");
+        PREDEFINED_CHARACTER_CLASSES = Collections.unmodifiableMap(characterClasses);
+    }
 
     public DefinitionGenerator() {
     }
@@ -819,8 +838,8 @@ public class DefinitionGenerator {
             regex = AUTOMATON_SPECIAL_CHARACTERS.matcher(regex).replaceAll("\\\\$0");
             String defaultValue = "";
             try {
-                final Generex generex = new Generex(regex);
-                defaultValue = generex.random();
+                final RegExp regExp = createRegExp(regex);
+                defaultValue = getRandomString(regExp);
             } catch (IllegalArgumentException ex) {
                 LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
             }
@@ -975,6 +994,55 @@ public class DefinitionGenerator {
 
     private static void setDefaultValue(final ObjectNode property, final Boolean value) {
         property.put(DEFAULT_KEY, value);
+    }
+
+    private static RegExp createRegExp(String regex) {
+        var finalRegex = regex;
+        for (var charClass : PREDEFINED_CHARACTER_CLASSES.entrySet()) {
+            finalRegex = finalRegex.replaceAll(charClass.getKey(), charClass.getValue());
+        }
+        return new RegExp(finalRegex);
+    }
+
+    private static String getRandomString(RegExp regExp) {
+        return prepareRandom("", regExp.toAutomaton().getInitialState(), 1, Integer.MAX_VALUE);
+    }
+
+    private static String prepareRandom(String strMatch, State state, int minLength, int maxLength) {
+        final List<Transition> transitions = state.getSortedTransitions(false);
+        final Set<Integer> selectedTransitions = new HashSet<>();
+        String result = strMatch;
+        while (transitions.size() > selectedTransitions.size()) {
+            if (state.isAccept()) {
+                if (strMatch.length() == maxLength) {
+                    return strMatch;
+                }
+                if (RANDOM.nextInt() > 0.3 * Integer.MAX_VALUE && strMatch.length() >= minLength) {
+                    return strMatch;
+                }
+            }
+            if (transitions.size() == 0) {
+                return strMatch;
+            }
+            final int nextInt = RANDOM.nextInt(transitions.size());
+            if (selectedTransitions.contains(nextInt)) {
+                continue;
+            }
+            selectedTransitions.add(nextInt);
+            final Transition randomTransition = transitions.get(nextInt);
+            final int diff = randomTransition.getMax() - randomTransition.getMin() + 1;
+            int randomOffset = diff;
+            if (diff > 0) {
+                randomOffset = RANDOM.nextInt(diff);
+            }
+            final char randomChar = (char) (randomOffset + randomTransition.getMin());
+            result = prepareRandom(strMatch + randomChar, randomTransition.getDest(), minLength, maxLength);
+            final int resultLength = result.length();
+            if (minLength <= resultLength && resultLength <= maxLength) {
+                break;
+            }
+        }
+        return result;
     }
 
 }
