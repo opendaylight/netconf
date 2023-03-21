@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
-import com.mifmif.common.regex.Generex;
+import dk.brics.automaton.RegExp;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -122,9 +122,14 @@ public class DefinitionGenerator {
     private static final String INT32_FORMAT = "int32";
     private static final String INT64_FORMAT = "int64";
     private static final String BOOLEAN_TYPE = "boolean";
-    // Special characters used in automaton inside Generex.
+    // Special characters used in Automaton.
     // See https://www.brics.dk/automaton/doc/dk/brics/automaton/RegExp.html
     private static final Pattern AUTOMATON_SPECIAL_CHARACTERS = Pattern.compile("[@&\"<>#~]");
+    // Adaptation from YANG regex to Automaton regex
+    // See https://github.com/mifmif/Generex/blob/master/src/main/java/com/mifmif/common/regex/Generex.java
+    private static final Map<String, String> PREDEFINED_CHARACTER_CLASSES = Map.of("\\\\d", "[0-9]",
+            "\\\\D", "[^0-9]", "\\\\s", "[ \t\n\f\r]", "\\\\S", "[^ \t\n\f\r]",
+            "\\\\w", "[a-zA-Z_0-9]", "\\\\W", "[^a-zA-Z_0-9]");
 
     private Module topLevelModule;
 
@@ -799,13 +804,15 @@ public class DefinitionGenerator {
         if (type.getPatternConstraints().iterator().hasNext()) {
             final PatternConstraint pattern = type.getPatternConstraints().iterator().next();
             String regex = pattern.getJavaPatternString();
-            regex = regex.substring(1, regex.length() - 1);
-            // Escape special characters to prevent issues inside Generex.
+            // Escape special characters to prevent issues inside Automaton.
             regex = AUTOMATON_SPECIAL_CHARACTERS.matcher(regex).replaceAll("\\\\$0");
+            for (final var charClass : PREDEFINED_CHARACTER_CLASSES.entrySet()) {
+                regex = regex.replaceAll(charClass.getKey(), charClass.getValue());
+            }
             String defaultValue = "";
             try {
-                final Generex generex = new Generex(regex);
-                defaultValue = generex.random();
+                final RegExp regExp = new RegExp(regex);
+                defaultValue = regExp.toAutomaton().getShortestExample(true);
             } catch (IllegalArgumentException ex) {
                 LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
             }
