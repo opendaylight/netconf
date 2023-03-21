@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96081f27_a4e2d98d",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-21T13:24:20Z",
+      "side": 1,
+      "message": "`into to the` -\u003e `to the`",
+      "revId": "2df143bf8351e9ba35d348d4aefe630ed607308f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1131284_acd2dac2",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-21T13:24:20Z",
+      "side": 1,
+      "message": "Please remove this empty line.",
+      "revId": "2df143bf8351e9ba35d348d4aefe630ed607308f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8725b58c_7bba2523",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-21T13:24:20Z",
+      "side": 1,
+      "message": "Please use ``test@2014-10-17.yang`` because now its a mailto link.",
+      "revId": "2df143bf8351e9ba35d348d4aefe630ed607308f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c256fbf5_9c771ded",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-21T13:24:20Z",
+      "side": 1,
+      "message": "`nonconfig` 😊",
+      "revId": "2df143bf8351e9ba35d348d4aefe630ed607308f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e056166_b01e0877",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-21T13:24:20Z",
+      "side": 1,
+      "message": "This example is \"ugly\" formatted. Please fix it.",
+      "revId": "2df143bf8351e9ba35d348d4aefe630ed607308f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c8461d9_15188720",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-21T13:24:20Z",
+      "side": 1,
+      "message": "See this in browser and you wil not be satisifed:\n---\nPOST\n\nWith body\n---\n\n---\npayload\n---",
+      "revId": "2df143bf8351e9ba35d348d4aefe630ed607308f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
