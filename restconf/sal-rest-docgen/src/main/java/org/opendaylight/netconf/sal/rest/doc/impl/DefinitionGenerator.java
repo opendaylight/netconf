@@ -23,14 +23,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
-import com.mifmif.common.regex.Generex;
+import dk.brics.automaton.RegExp;
+import dk.brics.automaton.State;
+import dk.brics.automaton.Transition;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -819,8 +823,8 @@ public class DefinitionGenerator {
             regex = AUTOMATON_SPECIAL_CHARACTERS.matcher(regex).replaceAll("\\\\$0");
             String defaultValue = "";
             try {
-                final Generex generex = new Generex(regex);
-                defaultValue = generex.random();
+                final RegExp regExp = new RegExp(regex);
+                defaultValue = getRandomString(regExp);
             } catch (IllegalArgumentException ex) {
                 LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
             }
@@ -975,6 +979,48 @@ public class DefinitionGenerator {
 
     private static void setDefaultValue(final ObjectNode property, final Boolean value) {
         property.put(DEFAULT_KEY, value);
+    }
+
+    private static String getRandomString(RegExp regExp) {
+        return prepareRandom("", regExp.toAutomaton().getInitialState(), 1, Integer.MAX_VALUE);
+    }
+
+    private static String prepareRandom(String strMatch, State state, int minLength, int maxLength) {
+        Random random = new Random();
+        List<Transition> transitions = state.getSortedTransitions(false);
+        Set<Integer> selectedTransitions = new HashSet<Integer>();
+        String result = strMatch;
+        while (transitions.size() > selectedTransitions.size()) {
+            if (state.isAccept()) {
+                if (strMatch.length() == maxLength) {
+                    return strMatch;
+                }
+                if (random.nextInt() > 0.3 * Integer.MAX_VALUE && strMatch.length() >= minLength) {
+                    return strMatch;
+                }
+            }
+            if (transitions.size() == 0) {
+                return strMatch;
+            }
+            int nextInt = random.nextInt(transitions.size());
+            if (selectedTransitions.contains(nextInt)) {
+                continue;
+            }
+            selectedTransitions.add(nextInt);
+            Transition randomTransition = transitions.get(nextInt);
+            int diff = randomTransition.getMax() - randomTransition.getMin() + 1;
+            int randomOffset = diff;
+            if (diff > 0) {
+                randomOffset = (int) (random.nextInt(diff));
+            }
+            char randomChar = (char) (randomOffset + randomTransition.getMin());
+            result = prepareRandom(strMatch + randomChar, randomTransition.getDest(), minLength, maxLength);
+            int resultLength = result.length();
+            if (minLength <= resultLength && resultLength <= maxLength) {
+                break;
+            }
+        }
+        return result;
     }
 
 }
