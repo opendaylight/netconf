@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
@@ -37,5 +38,18 @@ public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
         final DefinitionGenerator generator = new DefinitionGenerator();
         final var schemas = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(), true);
         assertNotNull(schemas);
+    }
+
+    @Test
+    public void testStringFromRegex() throws IOException {
+        final var module = CONTEXT.findModule("strings-from-regex-test").orElseThrow();
+        final var generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(), true);
+        assertNotNull(jsonObject);
+
+        var properties = jsonObject.get("strings-from-regex-test_test").getProperties();
+        for (var property : properties) {
+            assertFalse(property.get("default").asText().isEmpty());
+        }
     }
 }
