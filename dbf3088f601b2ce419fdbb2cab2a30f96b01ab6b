@@ -33,6 +33,24 @@
       "message": "This is suspicious because node can:\n1. become to leader\n2. become to be follower\n3. become to be leader again",
       "revId": "dbf3088f601b2ce419fdbb2cab2a30f96b01ab6b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28a41381_f1a794e7",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologySingletonImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-03-21T13:25:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c4e5b58_97bdc3a9",
+      "revId": "dbf3088f601b2ce419fdbb2cab2a30f96b01ab6b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
