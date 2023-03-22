@@ -44,6 +44,7 @@ import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ElementCountConstraint;
+import org.opendaylight.yangtools.yang.model.api.ElementCountConstraintAware;
 import org.opendaylight.yangtools.yang.model.api.IdentitySchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -179,6 +180,9 @@ public class DefinitionGenerator {
             final String localName = node.getQName().getLocalName();
             if (node.isConfiguration()) {
                 if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
+                    if (isSchemaNodeMandatory(node)) {
+                        required.add(localName);
+                    }
                     for (final DataSchemaNode childNode : ((DataNodeContainer) node).getChildNodes()) {
                         final ObjectNode childNodeProperties = JsonNodeFactory.instance.objectNode();
 
@@ -222,6 +226,28 @@ public class DefinitionGenerator {
         setRequiredIfNotEmpty(definitionBuilder, required);
 
         definitions.put(definitionName, definitionBuilder.build());
+    }
+
+    private static boolean isSchemaNodeMandatory(final DataSchemaNode node) {
+        //    https://www.rfc-editor.org/rfc/rfc7950#page-14
+        //    mandatory node: A mandatory node is one of:
+        if (node instanceof ContainerSchemaNode containerNode) {
+            //  A container node without a "presence" statement and that has at least one mandatory node as a child.
+            if (containerNode.isPresenceContainer()) {
+                return false;
+            }
+            for (final DataSchemaNode childNode : containerNode.getChildNodes()) {
+                if (childNode instanceof MandatoryAware mandatoryAware && mandatoryAware.isMandatory()) {
+                    return true;
+                }
+            }
+        }
+        //  A list or leaf-list node with a "min-elements" statement with a value greater than zero.
+        return node instanceof ElementCountConstraintAware constraintAware
+                && constraintAware.getElementCountConstraint()
+                .map(ElementCountConstraint::getMinElements)
+                .orElse(0)
+                > 0;
     }
 
     private void processContainersAndLists(final Module module, final Map<String, Schema> definitions,
@@ -454,12 +480,18 @@ public class DefinitionGenerator {
 
             final ObjectNode property;
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
+                if (isSchemaNodeMandatory(node)) {
+                    required.add(name);
+                }
                 property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
                         definitionNames, isConfig, stack);
                 if (!isConfig) {
                     processActionNodeContainer(node, parentName, definitions, definitionNames, stack);
                 }
             } else if (node instanceof LeafListSchemaNode leafList) {
+                if (isSchemaNodeMandatory(node)) {
+                    required.add(name);
+                }
                 property = processLeafListNode(leafList, stack, definitions, definitionNames);
 
             } else if (node instanceof ChoiceSchemaNode choice) {
