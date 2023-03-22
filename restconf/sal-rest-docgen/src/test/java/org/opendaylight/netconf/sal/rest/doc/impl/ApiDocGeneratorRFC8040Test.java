@@ -10,11 +10,13 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
@@ -26,6 +28,13 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String REVISION_DATE = "2009-11-20";
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
+    private static final String CONFIG_ROOT_CONTAINER = "mandatory-test_config_root-container";
+    private static final String ROOT_CONTAINER = "mandatory-test_root-container";
+    private static final String CONFIG_MANDATORY_CONTAINER = "mandatory-test_root-container_config_mandatory-container";
+    private static final String MANDATORY_CONTAINER = "mandatory-test_root-container_mandatory-container";
+    private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_config_mandatory-list";
+    private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
+    private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
 
     private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
 
@@ -158,30 +167,66 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 ApiDocServiceImpl.OAversion.V2_0);
         assertNotNull(doc);
         final var definitions = doc.getDefinitions();
-        //TODO: missing mandatory-container, mandatory-list
-        final var reqRootContainer = "[\"mandatory-root-leaf\",\"mandatory-first-choice\",\"mandatory-second-choice\"]";
-        verifyRequiredField(definitions.get("mandatory-test_config_root-container"), reqRootContainer);
-        verifyRequiredField(definitions.get("mandatory-test_root-container"), reqRootContainer);
+        final var containersWithRequired = new ArrayList<String>();
 
-        //TODO: missing leaf-list-with-min-elemnets
-        final var reqMandatoryContainer = "[\"mandatory-leaf\"]";
-        verifyRequiredField(definitions.get("mandatory-test_root-container_config_mandatory-container"),
-                reqMandatoryContainer);
-        verifyRequiredField(definitions.get("mandatory-test_root-container_mandatory-container"),
-                reqMandatoryContainer);
+        final var reqRootContainerArray = new String[]{"mandatory-root-leaf", "mandatory-container",
+            "mandatory-first-choice", "mandatory-second-choice", "mandatory-list"};
+        verifyRequiredField(definitions.get(CONFIG_ROOT_CONTAINER), reqRootContainerArray);
+        containersWithRequired.add(CONFIG_ROOT_CONTAINER);
+        verifyRequiredField(definitions.get(ROOT_CONTAINER), reqRootContainerArray);
+        containersWithRequired.add(ROOT_CONTAINER);
 
-        final var reqMandatoryList = "[\"mandatory-list-field\"]";
-        verifyRequiredField(definitions.get("mandatory-test_root-container_config_mandatory-list"), reqMandatoryList);
-        verifyRequiredField(definitions.get("mandatory-test_root-container_mandatory-list"), reqMandatoryList);
+        final var reqMandatoryContainerArray = new String[]{"mandatory-leaf", "leaf-list-with-min-elemnets"};
+        verifyRequiredField(definitions.get(CONFIG_MANDATORY_CONTAINER), reqMandatoryContainerArray);
+        containersWithRequired.add(CONFIG_MANDATORY_CONTAINER);
+        verifyRequiredField(definitions.get(MANDATORY_CONTAINER), reqMandatoryContainerArray);
+        containersWithRequired.add(MANDATORY_CONTAINER);
 
-        //TODO: missing required field inside "mandatory-test_module" with ["root-container","root-mandatory-list"]
+        final var reqMandatoryListArray = new String[]{"mandatory-list-field"};
+        verifyRequiredField(definitions.get(CONFIG_MANDATORY_LIST), reqMandatoryListArray);
+        containersWithRequired.add(CONFIG_MANDATORY_LIST);
+        verifyRequiredField(definitions.get(MANDATORY_LIST), reqMandatoryListArray);
+        containersWithRequired.add(MANDATORY_LIST);
+
+        final var testModuleMandatoryArray = new String[]{"root-container", "root-mandatory-list"};
+        verifyRequiredField(definitions.get(MANDATORY_TEST_MODULE), testModuleMandatoryArray);
+        containersWithRequired.add(MANDATORY_TEST_MODULE);
+
+        verifyThatOthersNodeDoesNotHaveRequiredField(containersWithRequired, definitions);
     }
 
-    public void verifyRequiredField(final JsonNode rootContainer, final String expected) {
-        assertNotNull(rootContainer);
-        final var requiredNode = rootContainer.get("required");
+    private static void verifyThatOthersNodeDoesNotHaveRequiredField(final ArrayList<String> containersWithRequired,
+            final JsonNode definitions) {
+        final var fields = definitions.fields();
+        while (fields.hasNext()) {
+            final var next = fields.next();
+            final var nodeName = next.getKey();
+            final var jsonNode = next.getValue();
+            if (containersWithRequired.contains(nodeName) || !jsonNode.isContainerNode()) {
+                continue;
+            }
+            assertNull("Json node " + nodeName + "should not have 'required' field in body",
+                    jsonNode.get("required"));
+            verifyThatOthersNodeDoesNotHaveRequiredField(containersWithRequired, jsonNode);
+        }
+    }
+
+    private static void verifyRequiredField(final JsonNode jsonNode, final String[] reqRootContainerArray) {
+        assertNotNull(jsonNode);
+        assertTrue(jsonNode.isContainerNode());
+        final var requiredNode = jsonNode.get("required");
         assertNotNull(requiredNode);
         assertTrue(requiredNode.isArray());
-        assertEquals(expected, requiredNode.toString());
+        assertEquals(reqRootContainerArray.length, requiredNode.size());
+        for (final var expected : reqRootContainerArray) {
+            var isEqual = false;
+            for (var i = 0; i < requiredNode.size(); i++) {
+                if (expected.equals(requiredNode.get(i).textValue())) {
+                    isEqual = true;
+                    break;
+                }
+            }
+            assertTrue(isEqual);
+        }
     }
 }
