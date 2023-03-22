@@ -17,9 +17,12 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -36,6 +39,13 @@ public final class OpenApiGeneratorRFC8040Test {
     private static final String TOASTER_2 = "toaster2";
     private static final String REVISION_DATE = "2009-11-20";
     private static final String MANDATORY_TEST = "mandatory-test";
+    private static final String CONFIG_ROOT_CONTAINER = "mandatory-test_config_root-container";
+    private static final String ROOT_CONTAINER = "mandatory-test_root-container";
+    private static final String CONFIG_MANDATORY_CONTAINER = "mandatory-test_root-container_config_mandatory-container";
+    private static final String MANDATORY_CONTAINER = "mandatory-test_root-container_mandatory-container";
+    private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_config_mandatory-list";
+    private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
+    private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
 
     private static EffectiveModelContext context;
     private static DOMSchemaService schemaService;
@@ -194,23 +204,32 @@ public final class OpenApiGeneratorRFC8040Test {
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
         assertNotNull(doc);
         final var schemas = doc.components().schemas();
-        //TODO: missing mandatory-container, mandatory-list
-        final var reqRootContainerElements = "[\"mandatory-root-leaf\",\"mandatory-first-choice\"]";
-        verifyRequiredField(schemas.get("mandatory-test_config_root-container"), reqRootContainerElements);
-        verifyRequiredField(schemas.get("mandatory-test_root-container"), reqRootContainerElements);
+        final var containersWithRequired = new ArrayList<String>();
 
-        //TODO: missing leaf-list-with-min-elements
-        final var reqMandatoryContainerElements = "[\"mandatory-leaf\"]";
-        verifyRequiredField(schemas.get("mandatory-test_root-container_config_mandatory-container"),
-            reqMandatoryContainerElements);
-        verifyRequiredField(schemas.get("mandatory-test_root-container_mandatory-container"),
-            reqMandatoryContainerElements);
+        final var reqRootContainerElements = Set.of("mandatory-root-leaf", "mandatory-container",
+            "mandatory-first-choice", "mandatory-list");
+        verifyRequiredField(schemas.get(CONFIG_ROOT_CONTAINER), reqRootContainerElements);
+        containersWithRequired.add(CONFIG_ROOT_CONTAINER);
+        verifyRequiredField(schemas.get(ROOT_CONTAINER), reqRootContainerElements);
+        containersWithRequired.add(ROOT_CONTAINER);
 
-        final var reqMandatoryListElements = "[\"mandatory-list-field\"]";
-        verifyRequiredField(schemas.get("mandatory-test_root-container_config_mandatory-list"),
-                reqMandatoryListElements);
-        verifyRequiredField(schemas.get("mandatory-test_root-container_mandatory-list"), reqMandatoryListElements);
-        //TODO: missing required field inside "mandatory-test_module" with ["root-container","root-mandatory-list"]
+        final var reqMandatoryContainerElements = Set.of("mandatory-leaf", "leaf-list-with-min-elements");
+        verifyRequiredField(schemas.get(CONFIG_MANDATORY_CONTAINER), reqMandatoryContainerElements);
+        containersWithRequired.add(CONFIG_MANDATORY_CONTAINER);
+        verifyRequiredField(schemas.get(MANDATORY_CONTAINER), reqMandatoryContainerElements);
+        containersWithRequired.add(MANDATORY_CONTAINER);
+
+        final var reqMandatoryListElements = Set.of("mandatory-list-field");
+        verifyRequiredField(schemas.get(CONFIG_MANDATORY_LIST), reqMandatoryListElements);
+        containersWithRequired.add(CONFIG_MANDATORY_LIST);
+        verifyRequiredField(schemas.get(MANDATORY_LIST), reqMandatoryListElements);
+        containersWithRequired.add(MANDATORY_LIST);
+
+        final var testModuleMandatoryArray = Set.of("root-container", "root-mandatory-list");
+        verifyRequiredField(schemas.get(MANDATORY_TEST_MODULE), testModuleMandatoryArray);
+        containersWithRequired.add(MANDATORY_TEST_MODULE);
+
+        verifyThatOthersNodeDoesNotHaveRequiredField(containersWithRequired, schemas);
     }
 
     /**
@@ -403,11 +422,40 @@ public final class OpenApiGeneratorRFC8040Test {
         assertEquals(expectedXmlRef, postXmlRef.textValue());
     }
 
-    private static void verifyRequiredField(final Schema rootContainer, final String expected) {
+    private static void verifyThatOthersNodeDoesNotHaveRequiredField(final List<String> expected,
+            final Map<String, Schema> definitions) {
+        for (final var value : definitions.values()) {
+            final var properties = value.properties();
+            if (properties != null) {
+                verifyRecursivelyThatPropertyDoesNotHaveRequired(expected, properties);
+            }
+        }
+    }
+
+    private static void verifyRecursivelyThatPropertyDoesNotHaveRequired(final List<String> expected,
+            final JsonNode definitions) {
+        final var fields = definitions.fields();
+        while (fields.hasNext()) {
+            final var next = fields.next();
+            final var nodeName = next.getKey();
+            final var jsonNode = next.getValue();
+            if (expected.contains(nodeName) || !jsonNode.isContainerNode()) {
+                continue;
+            }
+            assertNull("Json node " + nodeName + " should not have 'required' field in body",
+                jsonNode.get("required"));
+            verifyRecursivelyThatPropertyDoesNotHaveRequired(expected, jsonNode);
+        }
+    }
+
+    private static void verifyRequiredField(final Schema rootContainer, final Set<String> expected) {
         assertNotNull(rootContainer);
-        final var requiredNode = rootContainer.required();
-        assertNotNull(requiredNode);
-        assertTrue(requiredNode.isArray());
-        assertEquals(expected, requiredNode.toString());
+        final var required = rootContainer.required();
+        assertNotNull(required);
+        assertTrue(required.isArray());
+        final var actualContainerArray = StreamSupport.stream(required.spliterator(), false)
+            .map(JsonNode::textValue)
+            .collect(Collectors.toSet());
+        assertEquals(expected, actualContainerArray);
     }
 }
