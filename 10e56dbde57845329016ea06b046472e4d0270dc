@@ -16,6 +16,24 @@
       "message": "The media type MUST be \"application/yang-data+xml\" or \"application/yang-data+json\".",
       "revId": "10e56dbde57845329016ea06b046472e4d0270dc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "138ff26a_4d714c93",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-22T11:21:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73ac1fef_0ca3d478",
+      "revId": "10e56dbde57845329016ea06b046472e4d0270dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
