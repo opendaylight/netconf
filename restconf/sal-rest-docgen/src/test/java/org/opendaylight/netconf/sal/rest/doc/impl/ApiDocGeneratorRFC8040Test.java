@@ -173,9 +173,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         verifyRequiredField(definitions.get("mandatory-test_root-container_config_mandatory-list"), reqMandatoryList);
         verifyRequiredField(definitions.get("mandatory-test_root-container_mandatory-list"), reqMandatoryList);
 
-        //TODO: missing:
-//        final var testModuleMandatory = "[\"root-container\",\"root-mandatory-list\"]";
-//        verifyRequiredField(definitions.get("mandatory-test_module"), testModuleMandatory);
+        final var testModuleMandatory = "[\"root-container\",\"root-mandatory-list\"]";
+        verifyRequiredField(definitions.get("mandatory-test_module"), testModuleMandatory);
     }
 
     public void verifyRequiredField(final JsonNode rootContainer, final String expected) {

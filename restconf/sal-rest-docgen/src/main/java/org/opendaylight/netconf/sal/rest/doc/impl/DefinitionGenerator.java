@@ -184,6 +184,9 @@ public class DefinitionGenerator {
             final String localName = node.getQName().getLocalName();
             if (node.isConfiguration()) {
                 if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
+                   if (isSchemaNodeMandatory(node)) {
+                       required.add(localName);
+                   }
                     for (final DataSchemaNode childNode : ((DataNodeContainer) node).getChildNodes()) {
                         final ObjectNode childNodeProperties = JsonNodeFactory.instance.objectNode();
 
@@ -191,8 +194,7 @@ public class DefinitionGenerator {
                                 + moduleName + CONFIG
                                 + "_" + localName
                                 + definitionNames.getDiscriminator(node);
-
-                        if (node instanceof ListSchemaNode) {
+                        if (node instanceof ListSchemaNode listSchemaNode) {
                             childNodeProperties.put(TYPE_KEY, ARRAY_TYPE);
                             final ObjectNode items = JsonNodeFactory.instance.objectNode();
                             items.put(REF_KEY, ref);
@@ -227,6 +229,26 @@ public class DefinitionGenerator {
         setRequiredIfNotEmpty(definition, required);
 
         definitions.set(definitionName, definition);
+    }
+
+    private boolean isSchemaNodeMandatory(DataSchemaNode node) {
+        //    https://www.rfc-editor.org/rfc/rfc7950#page-14
+        //    mandatory node: A mandatory node is one of:
+        if (node instanceof ContainerSchemaNode containerNode) {
+            //  A container node without a "presence" statement and that has at least one mandatory node as a child.
+            if (containerNode.isPresenceContainer()) {
+                return false;
+            }
+            for (DataSchemaNode childNode : containerNode.getChildNodes()) {
+                if (childNode instanceof MandatoryAware mandatoryAware && mandatoryAware.isMandatory()) {
+                    return true;
+                }
+            }
+        }
+        //  A list or leaf-list node with a "min-elements" statement with a value greater than zero.
+        return node instanceof ListSchemaNode listSchemaNode
+                && listSchemaNode.getElementCountConstraint().isPresent()
+                && listSchemaNode.getElementCountConstraint().get().getMinElements() > 0;
     }
 
     private void processContainersAndLists(final Module module, final ObjectNode definitions,
