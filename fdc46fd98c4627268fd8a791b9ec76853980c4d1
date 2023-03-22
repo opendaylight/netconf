@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "523d99a0_2de8cb25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-22T16:15:18Z",
+      "side": 1,
+      "message": "Comment in the following patch needs to be addressed.",
+      "revId": "fdc46fd98c4627268fd8a791b9ec76853980c4d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
