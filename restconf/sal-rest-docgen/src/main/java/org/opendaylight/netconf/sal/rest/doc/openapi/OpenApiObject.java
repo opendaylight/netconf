@@ -5,17 +5,26 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.rest.doc.swagger;
+package org.opendaylight.netconf.sal.rest.doc.openapi;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 
-public class OpenApiObject implements CommonApiObject {
+public class OpenApiObject {
     private String openapi;
     private Info info;
     private List<Server> servers;
     private ObjectNode paths;
     private Components components;
+    private ObjectNode definitions;
+
+    public ObjectNode getDefinitions() {
+        return definitions;
+    }
+
+    public void setDefinitions(ObjectNode definitions) {
+        this.definitions = definitions;
+    }
 
     public String getOpenapi() {
         return openapi;
