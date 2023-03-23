@@ -26,7 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointOpenApi;
-import org.opendaylight.netconf.sal.rest.doc.openapi.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -72,7 +72,7 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
 
-        final SwaggerObject mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-");
+        final OpenApiObject mountPointApi = swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-");
         assertNotNull("failed to find Datastore API", mountPointApi);
 
         final ObjectNode pathsObject = mountPointApi.getPaths();

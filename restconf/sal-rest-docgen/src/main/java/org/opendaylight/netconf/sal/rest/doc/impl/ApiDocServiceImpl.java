@@ -21,9 +21,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointOpenApi;
-import org.opendaylight.netconf.sal.rest.doc.openapi.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.openapi.MountPointInstance;
-import org.opendaylight.netconf.sal.rest.doc.openapi.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -72,9 +71,9 @@ public final class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getAllModulesDoc(final UriInfo uriInfo) {
         final DefinitionNames definitionNames = new DefinitionNames();
-        final SwaggerObject doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames);
+        final OpenApiObject doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames);
 
-        return Response.ok(BaseYangOpenApiGenerator.convertToOpenApi(doc)).build();
+        return Response.ok(doc).build();
     }
 
     /**
@@ -106,14 +105,14 @@ public final class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getMountDocByModule(final String instanceNum, final String module,
                                                      final String revision, final UriInfo uriInfo) {
-        final CommonApiObject api = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
+        final OpenApiObject api = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
             module, revision);
         return Response.ok(api).build();
     }
 
     @Override
     public synchronized Response getMountDoc(final String instanceNum, final UriInfo uriInfo) {
-        final CommonApiObject api;
+        final OpenApiObject api;
         final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
         final Optional<Integer> pageNum = stringPageNum != null ? Optional.of(Integer.valueOf(stringPageNum))
                 : Optional.empty();
