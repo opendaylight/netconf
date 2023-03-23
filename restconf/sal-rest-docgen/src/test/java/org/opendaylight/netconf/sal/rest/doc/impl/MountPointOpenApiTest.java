@@ -25,12 +25,12 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
-import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointOpenApi;
+import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
-public final class MountPointSwaggerTest extends AbstractApiDocTest {
+public final class MountPointOpenApiTest extends AbstractApiDocTest {
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
@@ -38,7 +38,7 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
             .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
     private static final String INSTANCE_URL = "/nodes/node=123/";
 
-    private MountPointSwagger swagger;
+    private MountPointOpenApi swagger;
 
     @Before
     public void before() {
@@ -51,7 +51,7 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
 
-        swagger = new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service).getMountPointSwagger();
+        swagger = new MountPointOpenApiGeneratorRFC8040(SCHEMA_SERVICE, service).getMountPointOpenApi();
     }
 
     @Test()
@@ -72,7 +72,7 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
 
-        final SwaggerObject mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-");
+        final OpenApiObject mountPointApi = swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-");
         assertNotNull("failed to find Datastore API", mountPointApi);
 
         final ObjectNode pathsObject = mountPointApi.getPaths();
