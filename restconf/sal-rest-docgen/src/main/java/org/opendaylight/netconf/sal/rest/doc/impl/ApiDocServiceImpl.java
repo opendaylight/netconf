@@ -20,10 +20,9 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
-import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
-import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
-import org.opendaylight.netconf.sal.rest.doc.swagger.MountPointInstance;
-import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointOpenApi;
+import org.opendaylight.netconf.sal.rest.doc.openapi.MountPointInstance;
+import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -51,30 +50,30 @@ public final class ApiDocServiceImpl implements ApiDocService {
     // Query parameter
     private static final String PAGE_NUM = "pageNum";
 
-    private final MountPointSwagger mountPointSwaggerRFC8040;
+    private final MountPointOpenApi mountPointOpenApiRFC8040;
     private final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040;
 
     @Inject
     @Activate
     public ApiDocServiceImpl(final @Reference DOMSchemaService schemaService,
                              final @Reference DOMMountPointService mountPointService) {
-        this(new MountPointSwaggerGeneratorRFC8040(schemaService, mountPointService),
+        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService),
             new ApiDocGeneratorRFC8040(schemaService));
     }
 
     @VisibleForTesting
-    ApiDocServiceImpl(final MountPointSwaggerGeneratorRFC8040 mountPointSwaggerGeneratorRFC8040,
+    ApiDocServiceImpl(final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040,
                       final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040) {
-        mountPointSwaggerRFC8040 = requireNonNull(mountPointSwaggerGeneratorRFC8040).getMountPointSwagger();
+        mountPointOpenApiRFC8040 = requireNonNull(mountPointOpenApiGeneratorRFC8040).getMountPointOpenApi();
         this.apiDocGeneratorRFC8040 = requireNonNull(apiDocGeneratorRFC8040);
     }
 
     @Override
     public synchronized Response getAllModulesDoc(final UriInfo uriInfo) {
         final DefinitionNames definitionNames = new DefinitionNames();
-        final SwaggerObject doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames);
+        final OpenApiObject doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames);
 
-        return Response.ok(BaseYangSwaggerGenerator.convertToOpenApi(doc)).build();
+        return Response.ok(doc).build();
     }
 
     /**
@@ -97,7 +96,7 @@ public final class ApiDocServiceImpl implements ApiDocService {
 
     @Override
     public synchronized Response getListOfMounts(final UriInfo uriInfo) {
-        final List<MountPointInstance> entity = mountPointSwaggerRFC8040
+        final List<MountPointInstance> entity = mountPointOpenApiRFC8040
                 .getInstanceIdentifiers().entrySet().stream()
                 .map(MountPointInstance::new).collect(Collectors.toList());
         return Response.ok(entity).build();
@@ -106,18 +105,18 @@ public final class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getMountDocByModule(final String instanceNum, final String module,
                                                      final String revision, final UriInfo uriInfo) {
-        final CommonApiObject api = mountPointSwaggerRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
+        final OpenApiObject api = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
             module, revision);
         return Response.ok(api).build();
     }
 
     @Override
     public synchronized Response getMountDoc(final String instanceNum, final UriInfo uriInfo) {
-        final CommonApiObject api;
+        final OpenApiObject api;
         final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
         final Optional<Integer> pageNum = stringPageNum != null ? Optional.of(Integer.valueOf(stringPageNum))
                 : Optional.empty();
-        api = mountPointSwaggerRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), pageNum);
+        api = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), pageNum);
         return Response.ok(api).build();
     }
 }
