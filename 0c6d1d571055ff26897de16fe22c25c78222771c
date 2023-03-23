@@ -16,6 +16,24 @@
       "message": "The change like this should be done in the previous patch, tx.",
       "revId": "0c6d1d571055ff26897de16fe22c25c78222771c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa9ddb8c_2fdb4658",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-23T13:05:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "945fcca2_9d37e977",
+      "revId": "0c6d1d571055ff26897de16fe22c25c78222771c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
