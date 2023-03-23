@@ -15,7 +15,6 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPostOperation;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPut;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getTypeParentNode;
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -314,6 +313,8 @@ public abstract class BaseYangOpenApiGenerator {
         doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
                 new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         doc.setSecurity(SECURITY);
+        doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
+                new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         return doc;
     }
 

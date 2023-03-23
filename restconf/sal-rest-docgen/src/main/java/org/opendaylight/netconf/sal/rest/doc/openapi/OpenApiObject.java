@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.List;
 import java.util.Map;
 
-public class OpenApiObject {
+public final class OpenApiObject {
     private String openapi;
     private Info info;
     private List<Server> servers;
