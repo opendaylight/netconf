@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9daf5ae_ffd7a276",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-23T13:05:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32e256e1_d30d6235",
+      "revId": "0aad3d6942c8c318bb2c35eb12dd365ae6acf9e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b29b4409_bc12d27c",
