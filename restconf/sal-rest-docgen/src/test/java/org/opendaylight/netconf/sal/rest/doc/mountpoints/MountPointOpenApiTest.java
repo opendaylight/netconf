@@ -13,6 +13,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -74,7 +76,7 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
         openApi.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
 
         final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, "Datastores", "-");
-        assertNotNull("failed to find Datastore API", mountPointApi);
+        assertNotNull("Failed to find Datastore API", mountPointApi);
 
         final Map<String, Path> paths = mountPointApi.getPaths();
         assertNotNull(paths);
@@ -86,11 +88,48 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
         for (final Map.Entry<String, Path> path : paths.entrySet()) {
             actualUrls.add(path.getKey());
             final JsonNode getOperation = path.getValue().getGet();
-            assertNotNull("unexpected operation method on " + path, getOperation);
-            assertNotNull("expected non-null desc on " + path, getOperation.get("description"));
+            assertNotNull("Unexpected operation method on " + path, getOperation);
+            assertNotNull("Expected non-null desc on " + path, getOperation.get("description"));
         }
 
         assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
             "/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
+    }
+
+    /**
+     * Test that creates mount point api with all models from yang folder and checks operation paths for these models.
+     */
+    @Test
+    public void testGetMountPointApi() throws Exception {
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+
+        final Map<String, Path> paths = mountPointApi.getPaths();
+        assertNotNull(paths);
+
+        assertEquals("Unexpected api list size", 26, paths.size());
+
+        final List<JsonNode> getOperations = new ArrayList<>();
+        final List<JsonNode> postOperations = new ArrayList<>();
+        final List<JsonNode> putOperations = new ArrayList<>();
+        final List<JsonNode> patchOperations = new ArrayList<>();
+        final List<JsonNode> deleteOperations = new ArrayList<>();
+
+        for (final Map.Entry<String, Path> path : paths.entrySet()) {
+            Optional.ofNullable(path.getValue().getGet()).ifPresent(getOperations::add);
+            Optional.ofNullable(path.getValue().getPost()).ifPresent(postOperations::add);
+            Optional.ofNullable(path.getValue().getPut()).ifPresent(putOperations::add);
+            Optional.ofNullable(path.getValue().getPatch()).ifPresent(patchOperations::add);
+            Optional.ofNullable(path.getValue().getDelete()).ifPresent(deleteOperations::add);
+        }
+
+        assertEquals("Unexpected GET paths size", 18, getOperations.size());
+        assertEquals("Unexpected POST paths size", 24, postOperations.size());
+        assertEquals("Unexpected PUT paths size", 16, putOperations.size());
+        assertEquals("Unexpected PATCH paths size", 16, patchOperations.size());
+        assertEquals("Unexpected DELETE paths size", 16, deleteOperations.size());
     }
 }
