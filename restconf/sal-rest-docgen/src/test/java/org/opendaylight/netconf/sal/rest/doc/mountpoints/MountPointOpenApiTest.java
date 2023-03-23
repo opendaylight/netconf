@@ -13,8 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -29,6 +27,7 @@ import org.opendaylight.netconf.sal.rest.doc.AbstractApiDocTest;
 import org.opendaylight.netconf.sal.rest.doc.DocGenTestHelper;
 import org.opendaylight.netconf.sal.rest.doc.impl.MountPointOpenApiGeneratorRFC8040;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -77,25 +76,17 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
         final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, "Datastores", "-");
         assertNotNull("failed to find Datastore API", mountPointApi);
 
-        final ObjectNode pathsObject = mountPointApi.getPaths();
-        assertNotNull(pathsObject);
+        final Map<String, Path> paths = mountPointApi.getPaths();
+        assertNotNull(paths);
 
-        assertEquals("Unexpected api list size", 2, pathsObject.size());
+        assertEquals("Unexpected api list size", 2, paths.size());
 
         final Set<String> actualUrls = new TreeSet<>();
 
-        final Iterator<Map.Entry<String, JsonNode>> fields = pathsObject.fields();
-        while (fields.hasNext()) {
-            final Map.Entry<String, JsonNode> field = fields.next();
-            final String path = field.getKey();
-            final JsonNode operations = field.getValue();
-            actualUrls.add(field.getKey());
-            assertEquals("unexpected operations size on " + path, 1, operations.size());
-
-            final JsonNode getOperation = operations.get("get");
-
+        for (final Map.Entry<String, Path> path : paths.entrySet()) {
+            actualUrls.add(path.getKey());
+            final JsonNode getOperation = path.getValue().getGet();
             assertNotNull("unexpected operation method on " + path, getOperation);
-
             assertNotNull("expected non-null desc on " + path, getOperation.get("description"));
         }
 
