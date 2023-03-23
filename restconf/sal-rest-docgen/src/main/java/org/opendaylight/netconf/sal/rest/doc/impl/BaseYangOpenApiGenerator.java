@@ -44,6 +44,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Components;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Info;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.netconf.sal.rest.doc.openapi.SecuritySchemes;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Server;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
@@ -109,7 +110,7 @@ public abstract class BaseYangOpenApiGenerator {
 
         final String title = name + " modules of RESTCONF";
         final OpenApiObject doc = createOpenApiObject(schema, host, BASE_PATH, title);
-        doc.setPaths(JsonNodeFactory.instance.objectNode());
+        doc.setPaths(new HashMap<>());
 
         fillDoc(doc, range, schemaContext, context, deviceName, definitionNames);
 
@@ -230,8 +231,7 @@ public abstract class BaseYangOpenApiGenerator {
         } catch (final IOException e) {
             LOG.error("Exception occurred in DefinitionGenerator", e);
         }
-
-        final ObjectNode paths = JsonNodeFactory.instance.objectNode();
+        final Map<String, Path> paths = new HashMap<>();
         final String moduleName = module.getName();
 
         boolean hasAddRootPostLink = false;
@@ -283,21 +283,21 @@ public abstract class BaseYangOpenApiGenerator {
         if (isForSingleModule) {
             doc.setPaths(paths);
         } else {
-            addFields(doc.getPaths(), paths.fields());
+            doc.getPaths().putAll(paths);
         }
 
         return doc;
     }
 
     private static void addRootPostLink(final Module module, final Optional<String> deviceName,
-            final ArrayNode pathParams, final String resourcePath, final ObjectNode paths) {
+            final ArrayNode pathParams, final String resourcePath, final Map<String, Path> paths) {
         if (containsListOrContainer(module.getChildNodes())) {
-            final ObjectNode post = JsonNodeFactory.instance.objectNode();
             final String moduleName = module.getName();
             final String name = moduleName + MODULE_NAME_SUFFIX;
-            post.set("post", buildPost("", name, "", moduleName, deviceName,
+            final var post = new Path();
+            post.setPost(buildPost("", name, "", moduleName, deviceName,
                     module.getDescription().orElse(""), pathParams));
-            paths.set(resourcePath, post);
+            paths.put(resourcePath, post);
         }
     }
 
@@ -319,7 +319,7 @@ public abstract class BaseYangOpenApiGenerator {
     public abstract String getResourcePath(String resourceType, String context);
 
     private void addPaths(final DataSchemaNode node, final Optional<String> deviceName, final String moduleName,
-            final ObjectNode paths, final ArrayNode parentPathParams, final EffectiveModelContext schemaContext,
+            final Map<String, Path> paths, final ArrayNode parentPathParams, final EffectiveModelContext schemaContext,
             final boolean isConfig, final String parentName, final DefinitionNames definitionNames,
             final String resourcePath) {
         LOG.debug("Adding path: [{}]", resourcePath);
@@ -331,9 +331,8 @@ public abstract class BaseYangOpenApiGenerator {
             childSchemaNodes = dataNodeContainer.getChildNodes();
         }
 
-        final ObjectNode path = JsonNodeFactory.instance.objectNode();
-        path.setAll(operations(node, moduleName, deviceName, pathParams, isConfig, parentName, definitionNames));
-        paths.set(resourcePath, path);
+        paths.put(resourcePath, operations(resourcePath, node, moduleName, deviceName, pathParams, isConfig, parentName,
+                definitionNames));
 
         if (node instanceof ActionNodeContainer) {
             ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
@@ -364,33 +363,33 @@ public abstract class BaseYangOpenApiGenerator {
         return false;
     }
 
-    private static Map<String, ObjectNode> operations(final DataSchemaNode node, final String moduleName,
+    private static Path operations(final String resourcePath, final DataSchemaNode node, final String moduleName,
             final Optional<String> deviceName, final ArrayNode pathParams, final boolean isConfig,
             final String parentName, final DefinitionNames definitionNames) {
-        final Map<String, ObjectNode> operations = new HashMap<>();
-        final String discriminator = definitionNames.getDiscriminator(node);
+        final Path operations = new Path();
 
+        final String discriminator = definitionNames.getDiscriminator(node);
         final String nodeName = node.getQName().getLocalName();
 
         final String defName = parentName + "_" + nodeName + TOP + discriminator;
         final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig);
-        operations.put("get", get);
-
+        operations.setGet(get);
 
         if (isConfig) {
             final ObjectNode put = buildPut(parentName, nodeName, discriminator, moduleName, deviceName,
                     node.getDescription().orElse(""), pathParams);
-            operations.put("put", put);
+            operations.setPut(put);
 
             final ObjectNode patch = buildPatch(parentName, nodeName, moduleName, deviceName,
                     node.getDescription().orElse(""), pathParams);
-            operations.put("patch", patch);
+            operations.setPatch(patch);
 
             final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams);
-            operations.put("delete", delete);
+            operations.setDelete(delete);
 
-            operations.put("post", buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams));
+            final ObjectNode post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
+                    node.getDescription().orElse(""), pathParams);
+            operations.setPost(post);
         }
         return operations;
     }
@@ -475,11 +474,11 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     private static void addOperations(final OperationDefinition operDef, final String moduleName,
-            final Optional<String> deviceName, final ObjectNode paths, final String parentName,
+            final Optional<String> deviceName, final Map<String, Path> paths, final String parentName,
             final DefinitionNames definitionNames, final String resourcePath) {
-        final ObjectNode operations = JsonNodeFactory.instance.objectNode();
-        operations.set("post", buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames));
-        paths.set(resourcePath, operations);
+        final var path = new Path();
+        path.setPost(buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames));
+        paths.put(resourcePath, path);
     }
 
     protected abstract void appendPathKeyValue(StringBuilder builder, Object value);
