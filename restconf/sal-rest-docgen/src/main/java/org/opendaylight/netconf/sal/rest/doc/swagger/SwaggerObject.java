@@ -10,7 +10,7 @@ package org.opendaylight.netconf.sal.rest.doc.swagger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 
-public class SwaggerObject implements CommonApiObject {
+public class SwaggerObject {
     private String swagger;
     private Info info;
     private List<String> schemes;
