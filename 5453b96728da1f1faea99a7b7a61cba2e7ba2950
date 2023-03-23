@@ -16,6 +16,24 @@
       "message": "Try to create new getter method here just for testing purposes.",
       "revId": "5453b96728da1f1faea99a7b7a61cba2e7ba2950",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98b1119d_9d7a9204",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologySingletonImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-03-23T09:09:59Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "627faa01_f5132cae",
+      "revId": "5453b96728da1f1faea99a7b7a61cba2e7ba2950",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
