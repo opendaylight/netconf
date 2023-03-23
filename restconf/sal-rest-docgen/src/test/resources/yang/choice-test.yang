@@ -1,0 +1,36 @@
+module choice-test {
+  namespace "urn:opendaylight:choice-test";
+  prefix "cht";
+
+  container first-container {
+    choice default-choice {
+      default second-case;
+      case first-case {
+        leaf leaf-non-default {
+          type string;
+        }
+      }
+      case second-case {
+        leaf leaf-default {
+          type string;
+          default "default-value";
+        }
+      }
+    }
+  }
+
+  container second-container {
+    choice first-choice {
+      case first-case {
+        leaf leaf-first-case {
+          type string;
+        }
+      }
+      case second-case {
+        leaf leaf-second-case {
+          type string;
+        }
+      }
+    }
+  }
+}
