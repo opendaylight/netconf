@@ -558,9 +558,12 @@ public class DefinitionGenerator {
                 property = processLeafListNode(leafList, stack, definitions, definitionNames, oaversion);
 
             } else if (node instanceof ChoiceSchemaNode choice) {
-                for (final CaseSchemaNode variant : choice.getCases()) {
-                    stack.enterSchemaTree(variant.getQName());
-                    for (final DataSchemaNode childNode : variant.getChildNodes()) {
+                if (!choice.getCases().isEmpty()) {
+                    CaseSchemaNode caseSchemaNode = choice.getDefaultCase()
+                            .orElse(choice.getCases().stream()
+                                    .findFirst().get());
+                    stack.enterSchemaTree(caseSchemaNode.getQName());
+                    for (final DataSchemaNode childNode : caseSchemaNode.getChildNodes()) {
                         processChildNode(childNode, parentName, definitions, definitionNames, isConfig, stack,
                                 properties, oaversion, required);
                     }

@@ -39,6 +39,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_config_mandatory-list";
     private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
     private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
+    private static final String CHOICE_TEST_MODULE = "choice-test";
+    private static final String PROPERTIES = "properties";
 
     private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
 
@@ -274,5 +276,23 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var pathWithoutParameters = "/rests/operations/action-types:multi-container/inner-container/action";
         assertTrue(doc.getPaths().has(pathWithoutParameters));
         assertEquals(List.of(), getPathParameters(doc.getPaths(), pathWithoutParameters));
+    }
+
+    @Test
+    public void testChoice() {
+        final var module = CONTEXT.findModule(CHOICE_TEST_MODULE).orElseThrow();
+        final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+                ApiDocServiceImpl.OAversion.V2_0);
+        assertNotNull(doc);
+
+        final var definitions = doc.getDefinitions();
+        JsonNode firstContainer = definitions.get("choice-test_first-container");
+        assertEquals("default-value",
+                firstContainer.get(PROPERTIES).get("leaf-default").get("default").asText());
+        assertFalse(firstContainer.get(PROPERTIES).has("leaf-non-default"));
+
+        JsonNode secondContainer = definitions.get("choice-test_second-container");
+        assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
+        assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
     }
 }
