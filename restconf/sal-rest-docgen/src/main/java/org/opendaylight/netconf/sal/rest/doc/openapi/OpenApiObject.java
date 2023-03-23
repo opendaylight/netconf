@@ -11,13 +11,22 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 
-public class OpenApiObject implements CommonApiObject {
+public class OpenApiObject {
     private String openapi;
     private Info info;
     private List<Server> servers;
     private ObjectNode paths;
     private Components components;
     private ArrayNode security;
+    private ObjectNode definitions;
+
+    public ObjectNode getDefinitions() {
+        return definitions;
+    }
+
+    public void setDefinitions(ObjectNode definitions) {
+        this.definitions = definitions;
+    }
 
     public String getOpenapi() {
         return openapi;
