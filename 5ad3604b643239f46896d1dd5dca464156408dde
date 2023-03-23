@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d16e7c83_55628818",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 842,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-23T14:18:08Z",
+      "side": 1,
+      "message": "Why we can not use this?\n`regExp.toAutomaton().getShortestExample(true);`",
+      "revId": "5ad3604b643239f46896d1dd5dca464156408dde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdae7f68_44603a62",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 998,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-23T14:18:08Z",
+      "side": 1,
+      "message": "The \u0027final\u0027 keyword is missing in every method parameters.",
+      "revId": "5ad3604b643239f46896d1dd5dca464156408dde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22b25378_119fe9ea",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 1001,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-03-23T14:18:08Z",
+      "side": 1,
+      "message": "Why do we need this? I do not see any test where this will be applied.\n\"regex \u003d\u003d finalRegex\" for every test.",
+      "revId": "5ad3604b643239f46896d1dd5dca464156408dde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
