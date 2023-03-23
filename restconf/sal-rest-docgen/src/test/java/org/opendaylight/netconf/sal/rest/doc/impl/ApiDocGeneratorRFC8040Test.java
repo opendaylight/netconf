@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.swagger.OpenApiObject;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
@@ -34,7 +34,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     @Test
     public void testPaths() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
-        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final OpenApiObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
         assertEquals(List.of("/rests/data",
             "/rests/data/toaster2:toaster",
@@ -63,7 +63,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 "/rests/data/toaster2:lst/lst1={key1},{key2}");
 
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
-        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final OpenApiObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
         for (final String path : configPaths) {
             final JsonNode node = doc.getPaths().get(path);
@@ -80,7 +80,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     @Test
     public void testDefinitions() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
-        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final OpenApiObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
         final ObjectNode definitions = doc.getDefinitions();
         assertNotNull(definitions);
@@ -135,7 +135,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     @Test
     public void testRPC() {
         final var module = CONTEXT.findModule(NAME_2, Revision.of(REVISION_DATE_2)).orElseThrow();
-        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final OpenApiObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
         assertNotNull(doc);
 
         final ObjectNode definitions = doc.getDefinitions();

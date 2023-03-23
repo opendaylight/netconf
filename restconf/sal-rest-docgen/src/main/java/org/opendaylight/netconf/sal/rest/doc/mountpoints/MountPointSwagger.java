@@ -36,8 +36,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
-import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
-import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.swagger.OpenApiObject;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -133,7 +132,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
             .orElse(null);
     }
 
-    public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
+    public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
             final String revision) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
@@ -147,12 +146,12 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
             return generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
         }
-        final SwaggerObject swaggerObject = swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context,
+        final OpenApiObject swaggerObject = swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context,
                 urlPrefix);
-        return BaseYangSwaggerGenerator.convertToOpenApi(swaggerObject);
+        return swaggerObject;
     }
 
-    public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum) {
+    public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -178,9 +177,9 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
             range = Optional.of(Range.closed(start, end));
         }
 
-        final SwaggerObject doc;
+        final OpenApiObject doc;
 
-        final SwaggerObject swaggerObject = swaggerGenerator.getAllModulesDoc(uriInfo, range, context,
+        final OpenApiObject swaggerObject = swaggerGenerator.getAllModulesDoc(uriInfo, range, context,
                 Optional.of(deviceName), urlPrefix, definitionNames);
 
         if (includeDataStore) {
@@ -192,7 +191,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
             doc = swaggerObject;
         }
 
-        return BaseYangSwaggerGenerator.convertToOpenApi(doc);
+        return doc;
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -200,9 +199,9 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private SwaggerObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
+    private OpenApiObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
             final String deviceName) {
-        final SwaggerObject declaration = swaggerGenerator.createSwaggerObject(
+        final OpenApiObject declaration = swaggerGenerator.createOpenApiObject(
                 swaggerGenerator.createSchemaFromUriInfo(uriInfo),
                 swaggerGenerator.createHostFromUriInfo(uriInfo),
                 BASE_PATH,
