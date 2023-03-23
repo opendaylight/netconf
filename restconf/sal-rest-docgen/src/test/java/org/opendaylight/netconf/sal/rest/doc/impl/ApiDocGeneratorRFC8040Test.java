@@ -25,7 +25,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String REVISION_DATE = "2009-11-20";
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
-
+    private static final String CHOICE_TEST_MODULE = "choice-test";
+    private static final String PROPERTIES = "properties";
     private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
 
     /**
@@ -148,5 +149,22 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final JsonNode properties = input.get("properties");
         assertTrue(properties.has("toasterDoneness"));
         assertTrue(properties.has("toasterToastType"));
+    }
+
+    @Test
+    public void testChoice() {
+        final var module = CONTEXT.findModule(CHOICE_TEST_MODULE).orElseThrow();
+        final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+                ApiDocServiceImpl.OAversion.V2_0);
+        assertNotNull(doc);
+
+        final var definitions = doc.getDefinitions();
+        JsonNode firstContainer = definitions.get("choice-test_first-container");
+        assertTrue(firstContainer.get(PROPERTIES).has("leaf-default"));
+        assertFalse(firstContainer.get(PROPERTIES).has("leaf-non-default"));
+
+        JsonNode secondContainer = definitions.get("choice-test_second-container");
+        assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
+        assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
     }
 }
