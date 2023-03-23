@@ -36,8 +36,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
-import org.opendaylight.netconf.sal.rest.doc.openapi.CommonApiObject;
-import org.opendaylight.netconf.sal.rest.doc.openapi.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -133,7 +132,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             .orElse(null);
     }
 
-    public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
+    public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
             final String revision) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
@@ -147,12 +146,12 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
             return generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
         }
-        final SwaggerObject swaggerObject = openApiGenerator.getApiDeclaration(module, revision, uriInfo, context,
+        final OpenApiObject openApiObject = openApiGenerator.getApiDeclaration(module, revision, uriInfo, context,
                 urlPrefix);
-        return BaseYangOpenApiGenerator.convertToOpenApi(swaggerObject);
+        return openApiObject;
     }
 
-    public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum) {
+    public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -178,21 +177,22 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             range = Optional.of(Range.closed(start, end));
         }
 
-        final SwaggerObject doc;
+        // FIXME get rid of this object and thus eliminate need to mutate fields
+        final OpenApiObject doc;
 
-        final SwaggerObject swaggerObject = openApiGenerator.getAllModulesDoc(uriInfo, range, context,
+        final OpenApiObject openApiObject = openApiGenerator.getAllModulesDoc(uriInfo, range, context,
                 Optional.of(deviceName), urlPrefix, definitionNames);
 
         if (includeDataStore) {
             doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
-            addFields(doc.getPaths() ,swaggerObject.getPaths().fields());
-            addFields(doc.getDefinitions() ,swaggerObject.getDefinitions().fields());
-            doc.getInfo().setTitle(swaggerObject.getInfo().getTitle());
+            addFields(doc.getPaths() ,openApiObject.getPaths().fields());
+            addFields(doc.getDefinitions() ,openApiObject.getDefinitions().fields());
+            doc.getInfo().setTitle(openApiObject.getInfo().getTitle());
         } else {
-            doc = swaggerObject;
+            doc = openApiObject;
         }
 
-        return BaseYangOpenApiGenerator.convertToOpenApi(doc);
+        return doc;
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -200,9 +200,9 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private SwaggerObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
+    private OpenApiObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
             final String deviceName) {
-        final SwaggerObject declaration = openApiGenerator.createSwaggerObject(
+        final OpenApiObject declaration = openApiGenerator.createOpenApiObject(
                 openApiGenerator.createSchemaFromUriInfo(uriInfo),
                 openApiGenerator.createHostFromUriInfo(uriInfo),
                 BASE_PATH,
