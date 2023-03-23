@@ -28,7 +28,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,12 +41,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
-import org.opendaylight.netconf.sal.rest.doc.swagger.Components;
-import org.opendaylight.netconf.sal.rest.doc.swagger.Info;
-import org.opendaylight.netconf.sal.rest.doc.swagger.OpenApiObject;
-import org.opendaylight.netconf.sal.rest.doc.swagger.Server;
-import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.Components;
+import org.opendaylight.netconf.sal.rest.doc.openapi.Info;
+import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.Server;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -66,12 +63,11 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BaseYangSwaggerGenerator {
+public abstract class BaseYangOpenApiGenerator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BaseYangSwaggerGenerator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BaseYangOpenApiGenerator.class);
 
     private static final String API_VERSION = "1.0.0";
-    private static final String SWAGGER_VERSION = "2.0";
     private static final String OPEN_API_VERSION = "3.0.3";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -85,7 +81,7 @@ public abstract class BaseYangSwaggerGenerator {
         MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
 
-    protected BaseYangSwaggerGenerator(final Optional<DOMSchemaService> schemaService) {
+    protected BaseYangOpenApiGenerator(final Optional<DOMSchemaService> schemaService) {
         this.schemaService = schemaService.orElse(null);
     }
 
@@ -93,13 +89,13 @@ public abstract class BaseYangSwaggerGenerator {
         return schemaService;
     }
 
-    public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
+    public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
         return getAllModulesDoc(uriInfo, Optional.empty(), schemaContext, Optional.empty(), "", definitionNames);
     }
 
-    public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final Optional<Range<Integer>> range,
+    public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final Optional<Range<Integer>> range,
             final EffectiveModelContext schemaContext, final Optional<String> deviceName, final String context,
             final DefinitionNames definitionNames) {
         final String schema = createSchemaFromUriInfo(uriInfo);
@@ -110,8 +106,9 @@ public abstract class BaseYangSwaggerGenerator {
         }
 
         final String title = name + " modules of RESTCONF";
-        final SwaggerObject doc = createSwaggerObject(schema, host, BASE_PATH, title);
+        final OpenApiObject doc = createOpenApiObject(schema, host, BASE_PATH, title);
         doc.setDefinitions(JsonNodeFactory.instance.objectNode());
+        doc.setComponents(new Components(doc.getDefinitions()));
         doc.setPaths(JsonNodeFactory.instance.objectNode());
 
         fillDoc(doc, range, schemaContext, context, deviceName, definitionNames);
@@ -119,7 +116,7 @@ public abstract class BaseYangSwaggerGenerator {
         return doc;
     }
 
-    public void fillDoc(final SwaggerObject doc, final Optional<Range<Integer>> range,
+    public void fillDoc(final OpenApiObject doc, final Optional<Range<Integer>> range,
             final EffectiveModelContext schemaContext, final String context, final Optional<String> deviceName,
             final DefinitionNames definitionNames) {
         final SortedSet<Module> modules = getSortedModules(schemaContext);
@@ -135,7 +132,7 @@ public abstract class BaseYangSwaggerGenerator {
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
 
-            getSwaggerDocSpec(module, context, deviceName, schemaContext, definitionNames, doc, false);
+            getOpenApiDocSpec(module, context, deviceName, schemaContext, definitionNames, doc, false);
         }
     }
 
@@ -164,14 +161,14 @@ public abstract class BaseYangSwaggerGenerator {
         }
     }
 
-    public CommonApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
+    public OpenApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        final SwaggerObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "");
-        return convertToOpenApi(doc);
+        final OpenApiObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "");
+        return doc;
     }
 
-    public SwaggerObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
+    public OpenApiObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
             final EffectiveModelContext schemaContext, final String context) {
         final Optional<Revision> rev;
 
@@ -188,12 +185,12 @@ public abstract class BaseYangSwaggerGenerator {
         return getApiDeclaration(module, uriInfo, context, schemaContext);
     }
 
-    public SwaggerObject getApiDeclaration(final Module module, final UriInfo uriInfo, final String context,
+    public OpenApiObject getApiDeclaration(final Module module, final UriInfo uriInfo, final String context,
             final EffectiveModelContext schemaContext) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
 
-        return getSwaggerDocSpec(module, schema, host, BASE_PATH, context, schemaContext);
+        return getOpenApiDocSpec(module, schema, host, BASE_PATH, context, schemaContext);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -209,15 +206,15 @@ public abstract class BaseYangSwaggerGenerator {
         return uriInfo.getBaseUri().getScheme();
     }
 
-    public SwaggerObject getSwaggerDocSpec(final Module module, final String schema, final String host,
+    public OpenApiObject getOpenApiDocSpec(final Module module, final String schema, final String host,
             final String basePath, final String context, final EffectiveModelContext schemaContext) {
-        final SwaggerObject doc = createSwaggerObject(schema, host, basePath, module.getName());
+        final OpenApiObject doc = createOpenApiObject(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getSwaggerDocSpec(module, context, Optional.empty(), schemaContext, definitionNames, doc, true);
+        return getOpenApiDocSpec(module, context, Optional.empty(), schemaContext, definitionNames, doc, true);
     }
 
-    public SwaggerObject getSwaggerDocSpec(final Module module, final String context, final Optional<String> deviceName,
-            final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final SwaggerObject doc,
+    public OpenApiObject getOpenApiDocSpec(final Module module, final String context, final Optional<String> deviceName,
+            final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
         final ObjectNode definitions;
 
@@ -229,6 +226,7 @@ public abstract class BaseYangSwaggerGenerator {
                 definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, false);
                 addFields(doc.getDefinitions(), definitions.fields());
             }
+            doc.setComponents(new Components(doc.getDefinitions()));
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
             }
@@ -312,32 +310,19 @@ public abstract class BaseYangSwaggerGenerator {
         }
     }
 
-    public SwaggerObject createSwaggerObject(final String schema, final String host, final String basePath,
-            final String title) {
-        final SwaggerObject doc = new SwaggerObject();
-        doc.setSwagger(SWAGGER_VERSION);
+
+
+    public OpenApiObject createOpenApiObject(final String schema, final String host, final String basePath,
+                                             final String title) {
+        final OpenApiObject doc = new OpenApiObject();
+        doc.setOpenapi(OPEN_API_VERSION);
         final Info info = new Info();
         info.setTitle(title);
         info.setVersion(API_VERSION);
         doc.setInfo(info);
-        doc.setSchemes(ImmutableList.of(schema));
-        doc.setHost(host);
-        doc.setBasePath(basePath);
-        doc.setProduces(Arrays.asList("application/xml", "application/json"));
+        doc.setServers(convertToServers(ImmutableList.of(schema), host, basePath));
         return doc;
     }
-
-    public static OpenApiObject convertToOpenApi(final SwaggerObject swaggerObject) {
-        final OpenApiObject doc = new OpenApiObject();
-        doc.setOpenapi(OPEN_API_VERSION);
-        doc.setInfo(swaggerObject.getInfo());
-        doc.setServers(convertToServers(swaggerObject.getSchemes(), swaggerObject.getHost(),
-                swaggerObject.getBasePath()));
-        doc.setPaths(swaggerObject.getPaths());
-        doc.setComponents(new Components(swaggerObject.getDefinitions()));
-        return doc;
-    }
-
 
     private static List<Server> convertToServers(final List<String> schemes, final String host, final String basePath) {
         return ImmutableList.of(new Server(schemes.get(0) + "://" + host + basePath));
