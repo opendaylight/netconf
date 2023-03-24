@@ -22,6 +22,30 @@
       },
       "revId": "ce1723e44b10bb849878e79f08d14beb2bef4ff9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1df753e0_c082d751",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/config/KeyPairInfo.java",
+        "patchSetId": 55
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-24T16:21:20Z",
+      "side": 1,
+      "message": "code refactored, extra artifacts removed",
+      "parentUuid": "31ce1298_b6cdb49f",
+      "range": {
+        "startLine": 20,
+        "startChar": 7,
+        "endLine": 20,
+        "endChar": 18
+      },
+      "revId": "ce1723e44b10bb849878e79f08d14beb2bef4ff9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
