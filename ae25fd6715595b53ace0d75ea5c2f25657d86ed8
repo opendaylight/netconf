@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "47480267_351d4d7b",
+        "filename": "transport/transport-tls/pom.xml",
+        "patchSetId": 57
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-27T08:24:09Z",
+      "side": 1,
+      "message": "why do we need the TLS implementation?",
+      "range": {
+        "startLine": 64,
+        "startChar": 24,
+        "endLine": 64,
+        "endChar": 29
+      },
+      "revId": "ae25fd6715595b53ace0d75ea5c2f25657d86ed8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ff7df7a3_c3f79763",
         "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/config/ConfigUtils.java",
         "patchSetId": 57
