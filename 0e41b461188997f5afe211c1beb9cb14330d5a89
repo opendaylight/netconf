@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3231f9af_1982f3b0",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/client/SshServerKeyVerifier.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-27T08:28:01Z",
+      "side": 1,
+      "message": "same thing: use a single package with package-private classes",
+      "range": {
+        "startLine": 8,
+        "startChar": 47,
+        "endLine": 8,
+        "endChar": 53
+      },
+      "revId": "0e41b461188997f5afe211c1beb9cb14330d5a89",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9de50a1_0cbbcfc9",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/client/SshServerKeyVerifier.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-27T08:28:01Z",
+      "side": 1,
+      "message": "final",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 6
+      },
+      "revId": "0e41b461188997f5afe211c1beb9cb14330d5a89",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f39bfc0_1d5f26bf",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/client/SshServerKeyVerifier.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-27T08:28:01Z",
+      "side": 1,
+      "message": "we always use static imports for these",
+      "range": {
+        "startLine": 24,
+        "startChar": 8,
+        "endLine": 24,
+        "endChar": 30
+      },
+      "revId": "0e41b461188997f5afe211c1beb9cb14330d5a89",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
