@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildDelete;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildGet;
@@ -353,8 +354,8 @@ public abstract class BaseYangOpenApiGenerator {
         final String discriminator = definitionNames.getDiscriminator(node);
         final String nodeName = node.getQName().getLocalName();
 
-        final String defName = parentName + "_" + nodeName + TOP + discriminator;
-        final Operation get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig);
+        final String defName = parentName + CONFIG + "_" + nodeName + TOP + discriminator;
+        final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig);
         operationsBuilder.get(get);
 
         if (isConfig) {
