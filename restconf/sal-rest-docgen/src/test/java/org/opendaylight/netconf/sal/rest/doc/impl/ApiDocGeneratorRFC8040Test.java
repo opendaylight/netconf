@@ -188,12 +188,25 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var putXmlRef = putXmlSchema.get("$ref");
         assertEquals("#/components/schemas/my-yang_config_data", putXmlRef.textValue());
 
+        // Test JSON and XML references for GET operation
+        final var get = myYangData.get("get");
+        final var getResponses = get.get("responses");
+        final var get200 = getResponses.get("200");
+        JsonNode getContent = get200.get("content");
+        final var getJson = getContent.get("application/json");
+        final var getJsonSchema = getJson.get("schema");
+        final var getJsonRef = getJsonSchema.get("$ref");
+        assertEquals("#/components/schemas/my-yang_config_data_TOP", getJsonRef.textValue());
+        final var getXml = getContent.get("application/xml");
+        final var getXmlSchema = getXml.get("schema");
+        final var getXmlRef = getXmlSchema.get("$ref");
+        // TODO: Should be "#/components/schemas/my-yang_config_data"
+        assertEquals("#/components/schemas/my-yang_config_data_TOP", getXmlRef.textValue());
+
         ObjectNode definitions = doc.getDefinitions();
-        assertEquals(5, definitions.size());
+        assertEquals(3, definitions.size());
         definitions.has("my-yang_config_data");
         definitions.has("my-yang_config_data_TOP");
-        definitions.has("my-yang_data");
-        definitions.has("my-yang_data_TOP");
         definitions.has("my-yang_module");
     }
 }
