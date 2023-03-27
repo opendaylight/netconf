@@ -11,12 +11,9 @@ import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.MO
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.COMPONENTS_PREFIX;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.NAME_KEY;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.POST_SUFFIX;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.XML_KEY;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.XML_SUFFIX;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -28,13 +25,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -386,8 +380,6 @@ public class DefinitionGenerator {
                             definitionNames, isConfig, stack);
 
             final String nodeName = parentName + (isConfig ? CONFIG : "") + "_" + localName;
-            final String postNodeName = parentName + CONFIG + "_" + localName + POST_SUFFIX;
-            final String postXmlNodeName = postNodeName + XML_SUFFIX;
             final String parentNameConfigLocalName = parentName + CONFIG + "_" + localName;
 
             final String description = schemaNode.getDescription().orElse("");
@@ -397,22 +389,10 @@ public class DefinitionGenerator {
                 final List<String> names = List.of(parentNameConfigLocalName,
                         parentNameConfigLocalName + TOP,
                         nameAsParent,
-                        nameAsParent + TOP,
-                        postNodeName,
-                        postXmlNodeName);
+                        nameAsParent + TOP);
                 discriminator = definitionNames.pickDiscriminator(schemaNode, names);
             } else {
                 discriminator = definitionNames.getDiscriminator(schemaNode);
-            }
-
-            if (isConfig) {
-                final Schema postSchema = createPostJsonSchema(schemaNode, properties, postNodeName, description);
-                String truePostNodeName = postNodeName + discriminator;
-                definitions.put(truePostNodeName, postSchema);
-
-                final Schema postXmlSchema = new Schema();
-                postXmlSchema.setRef(COMPONENTS_PREFIX + truePostNodeName);
-                definitions.put(postXmlNodeName + discriminator, postXmlSchema);
             }
 
             childSchema.setType(OBJECT_TYPE);
@@ -427,42 +407,6 @@ public class DefinitionGenerator {
             return processTopData(nodeName, discriminator, definitions, schemaNode);
         }
         return null;
-    }
-
-    private static Schema createPostJsonSchema(final SchemaNode dataNode, final ObjectNode properties,
-            final String postNodeName, final String description) {
-        final Schema postSchema = new Schema();
-        final ObjectNode postItemProperties;
-        if (dataNode instanceof ListSchemaNode) {
-            postItemProperties = createListItemProperties(properties, (ListSchemaNode) dataNode);
-        } else {
-            postItemProperties = properties.deepCopy();
-        }
-        postSchema.setType(OBJECT_TYPE);
-        postSchema.setProperties(postItemProperties);
-        postSchema.setTitle(postNodeName);
-        postSchema.setDescription(description);
-        postSchema.setXml(buildXmlParameter(dataNode));
-        return postSchema;
-    }
-
-    private static ObjectNode createListItemProperties(final ObjectNode properties, final ListSchemaNode listNode) {
-        final ObjectNode postListItemProperties = JsonNodeFactory.instance.objectNode();
-        final List<QName> keyDefinition = listNode.getKeyDefinition();
-        final Set<String> keys = listNode.getChildNodes().stream()
-                .filter(node -> keyDefinition.contains(node.getQName()))
-                .map(node -> node.getQName().getLocalName())
-                .collect(Collectors.toSet());
-
-        Iterator<Map.Entry<String, JsonNode>> it = properties.fields();
-        while (it.hasNext()) {
-            Map.Entry<String, JsonNode> property = it.next();
-            if (!keys.contains(property.getKey())) {
-                postListItemProperties.set(property.getKey(), property.getValue());
-            }
-        }
-
-        return postListItemProperties;
     }
 
     /**
