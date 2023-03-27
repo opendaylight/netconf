@@ -166,17 +166,15 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 "#/components/schemas/my-yang_config_data");
         verifyPutRef(myYangData, "#/components/schemas/my-yang_config_data_TOP",
                 "#/components/schemas/my-yang_config_data");
-        // TODO: The XML should point to the "my-yang_data" element instead of the "TOP" element.
-        verifyGetRef(myYangData, "#/components/schemas/my-yang_data_TOP",
-                "#/components/schemas/my-yang_data_TOP");
+        // TODO: The XML should point to the "my-yang_config_data" element instead of the "TOP" element.
+        verifyGetRef(myYangData, "#/components/schemas/my-yang_config_data_TOP",
+                "#/components/schemas/my-yang_config_data_TOP");
 
         // Test `components/schemas` objects
         final var definitions = doc.getDefinitions();
-        assertEquals(5, definitions.size());
+        assertEquals(3, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
         assertTrue(definitions.has("my-yang_config_data_TOP"));
-        assertTrue(definitions.has("my-yang_data"));
-        assertTrue(definitions.has("my-yang_data_TOP"));
         assertTrue(definitions.has("my-yang_module"));
     }
 
@@ -191,16 +189,16 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 "#/components/schemas/toaster2_config_toaster");
         verifyPutRef(toaster, "#/components/schemas/toaster2_config_toaster_TOP",
                 "#/components/schemas/toaster2_config_toaster");
-        verifyGetRef(toaster, "#/components/schemas/toaster2_toaster_TOP",
-                "#/components/schemas/toaster2_toaster_TOP");
+        verifyGetRef(toaster, "#/components/schemas/toaster2_config_toaster_TOP",
+                "#/components/schemas/toaster2_config_toaster_TOP");
 
         final var toasterSlot = doc.getPaths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
         verifyPostRef(toasterSlot, "#/components/schemas/toaster2_toaster_config_toasterSlot",
                 "#/components/schemas/toaster2_toaster_config_toasterSlot");
         verifyPutRef(toasterSlot, "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
                 "#/components/schemas/toaster2_toaster_config_toasterSlot");
-        verifyGetRef(toasterSlot, "#/components/schemas/toaster2_toaster_toasterSlot_TOP",
-                "#/components/schemas/toaster2_toaster_toasterSlot_TOP");
+        verifyGetRef(toasterSlot, "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
+                "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP");
 
         final var slotInfo = doc.getPaths().get(
                 "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
@@ -208,24 +206,24 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
         verifyPutRef(slotInfo, "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
-        verifyGetRef(slotInfo, "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo_TOP",
-                "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo_TOP");
+        verifyGetRef(slotInfo, "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
+                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP");
 
         final var lst = doc.getPaths().get("/rests/data/toaster2:lst");
         verifyPostRef(lst, "#/components/schemas/toaster2_config_lst",
                 "#/components/schemas/toaster2_config_lst");
         verifyPutRef(lst, "#/components/schemas/toaster2_config_lst_TOP",
                 "#/components/schemas/toaster2_config_lst");
-        verifyGetRef(lst, "#/components/schemas/toaster2_lst_TOP",
-                "#/components/schemas/toaster2_lst_TOP");
+        verifyGetRef(lst, "#/components/schemas/toaster2_config_lst_TOP",
+                "#/components/schemas/toaster2_config_lst_TOP");
 
         final var lst1 = doc.getPaths().get("/rests/data/toaster2:lst/lst1={key1},{key2}");
         verifyPostRef(lst1, "#/components/schemas/toaster2_lst_config_lst1",
                 "#/components/schemas/toaster2_lst_config_lst1");
         verifyPutRef(lst1, "#/components/schemas/toaster2_lst_config_lst1_TOP",
                 "#/components/schemas/toaster2_lst_config_lst1");
-        verifyGetRef(lst1, "#/components/schemas/toaster2_lst_lst1_TOP",
-                "#/components/schemas/toaster2_lst_lst1_TOP");
+        verifyGetRef(lst1, "#/components/schemas/toaster2_lst_config_lst1_TOP",
+                "#/components/schemas/toaster2_lst_config_lst1_TOP");
 
         final var makeToast = doc.getPaths().get("/rests/operations/toaster2:make-toast");
         // TODO: The RPC only contains a `POST` example, so the `GET` request is missing here.
@@ -247,7 +245,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getDefinitions();
-        assertEquals(44, definitions.size());
+        assertEquals(28, definitions.size());
     }
 
     /**

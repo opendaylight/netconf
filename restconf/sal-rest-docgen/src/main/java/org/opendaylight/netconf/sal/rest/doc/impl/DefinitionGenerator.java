@@ -231,12 +231,8 @@ public class DefinitionGenerator {
             stack.enterSchemaTree(childNode.getQName());
             // For every container and list in the module
             if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
-                if (childNode.isConfiguration()) {
-                    processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitions, definitionNames,
-                            true, stack, oaversion);
-                }
                 processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitions, definitionNames,
-                        false, stack, oaversion);
+                        true, stack, oaversion);
                 processActionNodeContainer(childNode, moduleName, definitions, definitionNames, stack, oaversion);
             }
             stack.exit();
