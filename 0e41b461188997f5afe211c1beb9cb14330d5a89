@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4dfc96e_2693bff5",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/client/SshServerKeyVerifier.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-27T12:15:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3231f9af_1982f3b0",
+      "range": {
+        "startLine": 8,
+        "startChar": 47,
+        "endLine": 8,
+        "endChar": 53
+      },
+      "revId": "0e41b461188997f5afe211c1beb9cb14330d5a89",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9de50a1_0cbbcfc9",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27ca7194_700e1c7d",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/client/SshServerKeyVerifier.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-27T12:15:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9de50a1_0cbbcfc9",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 6
+      },
+      "revId": "0e41b461188997f5afe211c1beb9cb14330d5a89",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f39bfc0_1d5f26bf",
@@ -60,6 +108,30 @@
       "writtenOn": "2023-03-27T08:28:01Z",
       "side": 1,
       "message": "we always use static imports for these",
+      "range": {
+        "startLine": 24,
+        "startChar": 8,
+        "endLine": 24,
+        "endChar": 30
+      },
+      "revId": "0e41b461188997f5afe211c1beb9cb14330d5a89",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2639bb9d_168a11d1",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/client/SshServerKeyVerifier.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-27T12:15:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f39bfc0_1d5f26bf",
       "range": {
         "startLine": 24,
         "startChar": 8,
