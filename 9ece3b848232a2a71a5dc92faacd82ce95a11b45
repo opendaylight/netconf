@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b0eaba1_65bc1448",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 58
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-03-27T12:31:31Z",
+      "side": 1,
+      "message": "Consider the changes, other than that looks alright",
+      "revId": "9ece3b848232a2a71a5dc92faacd82ce95a11b45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d24dec1_70ba5939",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TlsClientServerTest.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-03-27T12:31:31Z",
+      "side": 1,
+      "message": "why not importing it once and then using without the mouthfull prefix?\nSimilarly in other places, wont mark them all",
+      "revId": "9ece3b848232a2a71a5dc92faacd82ce95a11b45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
