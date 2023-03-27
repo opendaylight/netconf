@@ -10,10 +10,8 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.NAME_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.POST_SUFFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_SUFFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getAppropriateModelPrefix;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -27,15 +25,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
-import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionObject.DataType;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -390,8 +383,6 @@ public class DefinitionGenerator {
                             definitionNames, isConfig, stack, oaversion, childSchemaObj);
 
             final String nodeName = parentName + (isConfig ? CONFIG : "") + "_" + localName;
-            final String postNodeName = parentName + CONFIG + "_" + localName + POST_SUFFIX;
-            final String postXmlNodeName = postNodeName + XML_SUFFIX;
             final String parentNameConfigLocalName = parentName + CONFIG + "_" + localName;
 
             final String description = schemaNode.getDescription().orElse("");
@@ -401,24 +392,12 @@ public class DefinitionGenerator {
                 final List<String> names = List.of(parentNameConfigLocalName,
                         parentNameConfigLocalName + TOP,
                         nameAsParent,
-                        nameAsParent + TOP,
-                        postNodeName,
-                        postXmlNodeName);
+                        nameAsParent + TOP);
                 discriminator = definitionNames.pickDiscriminator(schemaNode, names);
             } else {
                 discriminator = definitionNames.getDiscriminator(schemaNode);
             }
 
-            if (isConfig) {
-                final DefinitionObject postSchemaObj = createPostJsonSchema(schemaNode, postNodeName, description,
-                        propertiesObj);
-                String truePostNodeName = postNodeName + discriminator;
-                root.addData(truePostNodeName, postSchemaObj);
-
-                final DefinitionObject postXmlObj = new DefinitionObject(root);
-                postXmlObj.addData(REF_KEY, getAppropriateModelPrefix(oaversion) + truePostNodeName);
-                root.addData(postXmlNodeName + discriminator, postXmlObj);
-            }
             childSchemaObj.addData(TYPE_KEY, OBJECT_TYPE);
             childSchemaObj.addData(PROPERTIES_KEY, propertiesObj);
             childSchemaObj.addData(TITLE_KEY, nodeName);
@@ -431,43 +410,6 @@ public class DefinitionGenerator {
             return processTopData(nodeName, discriminator, schemaNode, oaversion, root);
         }
         return null;
-    }
-
-    private static DefinitionObject createPostJsonSchema(final SchemaNode dataNode, final String postNodeName,
-            final String description, final DefinitionObject propertiesObj) {
-        final DefinitionObject postSchemaObj = new DefinitionObject(propertiesObj.getRoot());
-        final DefinitionObject postItemPropObj;
-        if (dataNode instanceof ListSchemaNode) {
-            postItemPropObj = createListItemProperties(propertiesObj, postSchemaObj, (ListSchemaNode) dataNode);
-        } else {
-            postItemPropObj = propertiesObj.createCopy(postSchemaObj);
-        }
-        postSchemaObj.addData(TYPE_KEY, OBJECT_TYPE);
-        postSchemaObj.addData(PROPERTIES_KEY, postItemPropObj);
-        postSchemaObj.addData(TITLE_KEY, postNodeName);
-        postSchemaObj.addData(DESCRIPTION_KEY, description);
-        postSchemaObj.addData(XML_KEY, buildXmlParameter(dataNode, postSchemaObj));
-
-        return postSchemaObj;
-    }
-
-    private static DefinitionObject createListItemProperties(final DefinitionObject defObj,
-            final DefinitionObject parent, final ListSchemaNode listNode) {
-        final DefinitionObject postItemPropertyObj = new DefinitionObject(parent);
-        final List<QName> keyDefinition = listNode.getKeyDefinition();
-        final Set<String> keys = listNode.getChildNodes().stream()
-                .filter(node -> keyDefinition.contains(node.getQName()))
-                .map(node -> node.getQName().getLocalName())
-                .collect(Collectors.toSet());
-
-        final HashMap<String, DataType<?>> data = defObj.getData();
-        for (Entry<String, DataType<?>> stringDataTypeEntry : data.entrySet()) {
-            if (!keys.contains(stringDataTypeEntry.getKey())) {
-                postItemPropertyObj.addData(stringDataTypeEntry.getKey(), stringDataTypeEntry.getValue());
-            }
-        }
-
-        return postItemPropertyObj;
     }
 
     /**
