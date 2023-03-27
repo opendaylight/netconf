@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe1b1479_d10b21bd",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 842,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-27T07:45:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d16e7c83_55628818",
+      "revId": "5ad3604b643239f46896d1dd5dca464156408dde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdae7f68_44603a62",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3c78a0e_b40be592",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 998,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-27T07:45:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cdae7f68_44603a62",
+      "revId": "5ad3604b643239f46896d1dd5dca464156408dde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "22b25378_119fe9ea",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-03-23T14:18:08Z",
       "side": 1,
       "message": "Why do we need this? I do not see any test where this will be applied.\n\"regex \u003d\u003d finalRegex\" for every test.",
+      "revId": "5ad3604b643239f46896d1dd5dca464156408dde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7eb8b75_7a8086fa",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 1001,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-27T07:45:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22b25378_119fe9ea",
       "revId": "5ad3604b643239f46896d1dd5dca464156408dde",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

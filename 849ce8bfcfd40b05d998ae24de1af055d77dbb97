@@ -16,6 +16,24 @@
       "message": "Try to use `private static final PREDEFINED_CHARACTER_CLASSES \u003d Map.of`",
       "revId": "849ce8bfcfd40b05d998ae24de1af055d77dbb97",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06cd31f2_d3afd4a9",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-03-27T07:45:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1adea0ca_2c6226a1",
+      "revId": "849ce8bfcfd40b05d998ae24de1af055d77dbb97",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
