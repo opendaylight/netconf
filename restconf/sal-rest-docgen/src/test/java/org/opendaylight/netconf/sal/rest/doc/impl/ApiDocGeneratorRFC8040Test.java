@@ -181,8 +181,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertEquals(List.of("/rests/data", "/rests/data/my-yang:data"),
                 ImmutableList.copyOf(doc.getPaths().fieldNames()));
         final var myYangData = doc.getPaths().get("/rests/data/my-yang:data");
-        verifyRequestRef(myYangData.get("post"), "#/components/schemas/my-yang_config_data_post",
-                "#/components/schemas/my-yang_config_data_post_xml");
+        verifyRequestRef(myYangData.get("post"), "#/components/schemas/my-yang_config_data",
+                "#/components/schemas/my-yang_config_data");
         verifyRequestRef(myYangData.get("put"), "#/components/schemas/my-yang_config_data_TOP",
                 "#/components/schemas/my-yang_config_data");
         // TODO: The XML should point to the "my-yang_data" element instead of the "TOP" element.
@@ -191,10 +191,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(7, definitions.size());
+        assertEquals(5, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
-        assertTrue(definitions.has("my-yang_config_data_post"));
-        assertTrue(definitions.has("my-yang_config_data_post_xml"));
         assertTrue(definitions.has("my-yang_config_data_TOP"));
         assertTrue(definitions.has("my-yang_data"));
         assertTrue(definitions.has("my-yang_data_TOP"));
@@ -207,16 +205,16 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
         final var toaster = doc.getPaths().get("/rests/data/toaster2:toaster");
-        verifyRequestRef(toaster.get("post"), "#/components/schemas/toaster2_config_toaster_post",
-                "#/components/schemas/toaster2_config_toaster_post_xml");
+        verifyRequestRef(toaster.get("post"), "#/components/schemas/toaster2_config_toaster",
+                "#/components/schemas/toaster2_config_toaster");
         verifyRequestRef(toaster.get("put"), "#/components/schemas/toaster2_config_toaster_TOP",
                 "#/components/schemas/toaster2_config_toaster");
         verifyRequestRef(toaster.get("get"), "#/components/schemas/toaster2_toaster_TOP",
                 "#/components/schemas/toaster2_toaster_TOP");
 
         final var toasterSlot = doc.getPaths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
-        verifyRequestRef(toasterSlot.get("post"), "#/components/schemas/toaster2_toaster_config_toasterSlot_post",
-                "#/components/schemas/toaster2_toaster_config_toasterSlot_post_xml");
+        verifyRequestRef(toasterSlot.get("post"), "#/components/schemas/toaster2_toaster_config_toasterSlot",
+                "#/components/schemas/toaster2_toaster_config_toasterSlot");
         verifyRequestRef(toasterSlot.get("put"), "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
                 "#/components/schemas/toaster2_toaster_config_toasterSlot");
         verifyRequestRef(toasterSlot.get("get"), "#/components/schemas/toaster2_toaster_toasterSlot_TOP",
@@ -224,24 +222,24 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         final var slotInfo = doc.getPaths().get(
                 "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
-        verifyRequestRef(slotInfo.get("post"), "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_post",
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_post_xml");
+        verifyRequestRef(slotInfo.get("post"), "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo",
+                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
         verifyRequestRef(slotInfo.get("put"), "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
         verifyRequestRef(slotInfo.get("get"), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo_TOP",
                 "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo_TOP");
 
         final var lst = doc.getPaths().get("/rests/data/toaster2:lst");
-        verifyRequestRef(lst.get("post"), "#/components/schemas/toaster2_config_lst_post",
-                "#/components/schemas/toaster2_config_lst_post_xml");
+        verifyRequestRef(lst.get("post"), "#/components/schemas/toaster2_config_lst",
+                "#/components/schemas/toaster2_config_lst");
         verifyRequestRef(lst.get("put"), "#/components/schemas/toaster2_config_lst_TOP",
                 "#/components/schemas/toaster2_config_lst");
         verifyRequestRef(lst.get("get"), "#/components/schemas/toaster2_lst_TOP",
                 "#/components/schemas/toaster2_lst_TOP");
 
         final var lst1 = doc.getPaths().get("/rests/data/toaster2:lst/lst1={key1},{key2}");
-        verifyRequestRef(lst1.get("post"), "#/components/schemas/toaster2_lst_config_lst1_post",
-                "#/components/schemas/toaster2_lst_config_lst1_post_xml");
+        verifyRequestRef(lst1.get("post"), "#/components/schemas/toaster2_lst_config_lst1",
+                "#/components/schemas/toaster2_lst_config_lst1");
         verifyRequestRef(lst1.get("put"), "#/components/schemas/toaster2_lst_config_lst1_TOP",
                 "#/components/schemas/toaster2_lst_config_lst1");
         verifyRequestRef(lst1.get("get"), "#/components/schemas/toaster2_lst_lst1_TOP",
@@ -267,7 +265,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(60, definitions.size());
+        assertEquals(44, definitions.size());
     }
 
     /**
