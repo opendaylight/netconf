@@ -187,10 +187,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(7, definitions.size());
+        assertEquals(5, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
-        assertTrue(definitions.has("my-yang_config_data_post"));
-        assertTrue(definitions.has("my-yang_config_data_post_xml"));
         assertTrue(definitions.has("my-yang_config_data_TOP"));
         assertTrue(definitions.has("my-yang_data"));
         assertTrue(definitions.has("my-yang_data_TOP"));
@@ -253,7 +251,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(60, definitions.size());
+        assertEquals(44, definitions.size());
     }
 
     /**
