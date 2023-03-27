@@ -92,13 +92,13 @@ public final class OperationBuilder {
 
     public static Operation buildGet(final DataSchemaNode node, final String moduleName,
             final @Nullable String deviceName, final List<Parameter> pathParams, final String defName,
-            final String defNameTop, final boolean isConfig) {
+            final String defNameTop) {
         final String description = node.getDescription().orElse("");
         final String summary = buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName());
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        addQueryParameters(parameters, isConfig);
+        addQueryParameters(parameters);
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
@@ -117,18 +117,15 @@ public final class OperationBuilder {
             .build();
     }
 
-    private static void addQueryParameters(final List<Parameter> parameters, final boolean isConfig) {
+    private static void addQueryParameters(final List<Parameter> parameters) {
         final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
         cases.add(NONCONFIG_QUERY_PARAM);
-        if (isConfig) {
-            cases.add(CONFIG_QUERY_PARAM);
-        }
+        cases.add(CONFIG_QUERY_PARAM);
 
         final Parameter.Builder contentParamBuilder = new Parameter.Builder()
             .in(QUERY)
             .name(CONTENT)
-            .schema(new Schema.Builder().type(STRING).schemaEnum(cases).build())
-            .required(!isConfig);
+            .schema(new Schema.Builder().type(STRING).schemaEnum(cases).build());
         parameters.add(contentParamBuilder.build());
     }
 
