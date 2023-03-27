@@ -62,7 +62,7 @@ public final class DefinitionGeneratorTest {
         final var jsonObject = generator.convertToSchemas(module, context, new DefinitionNames(), true);
         assertNotNull(jsonObject);
 
-        var properties = jsonObject.get("strings-from-regex_test").properties();
+        var properties = jsonObject.get("strings-from-regex_config_test").properties();
         assertEquals("00:00:00:00:00:00", properties.get("mac-address").get("default").asText());
         assertEquals("0000-00-00T00:00:00Z", properties.get("login-date-time").get("default").asText());
         assertEquals("0.0.0.0", properties.get("ipv4-address").get("default").asText());
