@@ -44,7 +44,6 @@ public final class OperationBuilder {
     public static final String INPUT_KEY = "input";
     public static final String NAME_KEY = "name";
     public static final String PARAMETERS_KEY = "parameters";
-    public static final String POST_SUFFIX = "_post";
     public static final String PROPERTIES_KEY = "properties";
     public static final String REF_KEY = "$ref";
     public static final String REQUEST_BODY_KEY = "requestBody";
@@ -55,7 +54,7 @@ public final class OperationBuilder {
     public static final String TAGS_KEY = "tags";
     public static final String TOP = "_TOP";
     public static final String XML_KEY = "xml";
-    public static final String XML_SUFFIX = "_xml";
+    private static final String CONTENT = "content";
     private static final ArrayNode CONSUMES_PUT_POST;
     private static final String ENUM_KEY = "enum";
     private static final List<String> MIME_TYPES = ImmutableList.of(MediaType.APPLICATION_XML,
@@ -85,16 +84,16 @@ public final class OperationBuilder {
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
-        final String cleanDefName = parentName + CONFIG + "_" + nodeName + POST_SUFFIX;
+        final String cleanDefName = parentName + CONFIG + "_" + nodeName;
         final String defName = cleanDefName + discriminator;
-        final String xmlDefName = cleanDefName + XML_SUFFIX + discriminator;
+        final String xmlDefName = cleanDefName + discriminator;
         ref.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
         final DataSchemaNode childNode = getListOrContainerChildNode(Optional.ofNullable(node));
         if (childNode != null && childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
             final String cleanChildDefName = parentName + "_" + nodeName + CONFIG + "_" + childNodeName;
             final String childDefName = cleanChildDefName + discriminator;
-            final String childXmlDefName = cleanChildDefName + XML_SUFFIX + discriminator;
+            final String childXmlDefName = cleanChildDefName + discriminator;
             insertPostRequestBodyParameter(childNode, parameters, value, childDefName, childXmlDefName, childNodeName,
                 oaversion);
         } else {
