@@ -33,6 +33,24 @@
       "message": "why not importing it once and then using without the mouthfull prefix?\nSimilarly in other places, wont mark them all",
       "revId": "9ece3b848232a2a71a5dc92faacd82ce95a11b45",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c33bcb2_694a3a62",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TlsClientServerTest.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-27T13:11:33Z",
+      "side": 1,
+      "message": "these are different classes from 4 different packages having same name CertificateBuilder",
+      "parentUuid": "3d24dec1_70ba5939",
+      "revId": "9ece3b848232a2a71a5dc92faacd82ce95a11b45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
