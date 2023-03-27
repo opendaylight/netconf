@@ -227,12 +227,8 @@ public class DefinitionGenerator {
             stack.enterSchemaTree(childNode.getQName());
             // For every container and list in the module
             if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
-                if (childNode.isConfiguration()) {
-                    processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitions, definitionNames,
-                            true, stack);
-                }
                 processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitions, definitionNames,
-                        false, stack);
+                        stack);
                 processActionNodeContainer(childNode, moduleName, definitions, definitionNames, stack);
             }
             stack.exit();
@@ -278,8 +274,7 @@ public class DefinitionGenerator {
         if (!container.getChildNodes().isEmpty()) {
             final String filename = parentName + "_" + operationName + (isInput ? INPUT_SUFFIX : OUTPUT_SUFFIX);
             final ObjectNode childSchema = JsonNodeFactory.instance.objectNode();
-            processChildren(childSchema, container.getChildNodes(), parentName, definitions, definitionNames,
-                    false, stack);
+            processChildren(childSchema, container.getChildNodes(), parentName, definitions, definitionNames, stack);
 
             childSchema.put(TYPE_KEY, OBJECT_TYPE);
             final ObjectNode xml = JsonNodeFactory.instance.objectNode();
@@ -363,8 +358,8 @@ public class DefinitionGenerator {
     }
 
     private ObjectNode processDataNodeContainer(final DataNodeContainer dataNode, final String parentName,
-            final ObjectNode definitions, final DefinitionNames definitionNames, final boolean isConfig,
-            final SchemaInferenceStack stack) throws IOException {
+            final ObjectNode definitions, final DefinitionNames definitionNames, final SchemaInferenceStack stack)
+            throws IOException {
         if (dataNode instanceof ListSchemaNode || dataNode instanceof ContainerSchemaNode) {
             final Collection<? extends DataSchemaNode> containerChildren = dataNode.getChildNodes();
             final SchemaNode schemaNode = (SchemaNode) dataNode;
@@ -373,9 +368,9 @@ public class DefinitionGenerator {
             final String nameAsParent = parentName + "_" + localName;
             final ObjectNode properties =
                     processChildren(childSchema, containerChildren, parentName + "_" + localName, definitions,
-                            definitionNames, isConfig, stack);
+                            definitionNames, stack);
 
-            final String nodeName = parentName + (isConfig ? CONFIG : "") + "_" + localName;
+            final String nodeName = parentName + CONFIG + "_" + localName;
             final String parentNameConfigLocalName = parentName + CONFIG + "_" + localName;
 
             final String description = schemaNode.getDescription().orElse("");
@@ -410,13 +405,11 @@ public class DefinitionGenerator {
      */
     private ObjectNode processChildren(final ObjectNode parentNode, final Collection<? extends DataSchemaNode> nodes,
             final String parentName, final ObjectNode definitions, final DefinitionNames definitionNames,
-            final boolean isConfig, final SchemaInferenceStack stack) throws IOException {
+            final SchemaInferenceStack stack) throws IOException {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         for (final DataSchemaNode node : nodes) {
-            if (!isConfig || node.isConfiguration()) {
-                processChildNode(node, parentName, definitions, definitionNames, isConfig, stack, properties);
-            }
+            processChildNode(node, parentName, definitions, definitionNames,stack, properties);
         }
         parentNode.set(PROPERTIES_KEY, properties);
         setRequiredIfNotEmpty(parentNode, required);
@@ -424,8 +417,8 @@ public class DefinitionGenerator {
     }
 
     private void processChildNode(final DataSchemaNode node, final String parentName, final ObjectNode definitions,
-            final DefinitionNames definitionNames, final boolean isConfig, final SchemaInferenceStack stack,
-            final ObjectNode properties) throws IOException {
+            final DefinitionNames definitionNames, final SchemaInferenceStack stack, final ObjectNode properties)
+            throws IOException {
 
         stack.enterSchemaTree(node.getQName());
 
@@ -449,11 +442,8 @@ public class DefinitionGenerator {
 
             final ObjectNode property;
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
-                        definitionNames, isConfig, stack);
-                if (!isConfig) {
-                    processActionNodeContainer(node, parentName, definitions, definitionNames, stack);
-                }
+                property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions, definitionNames,
+                        stack);
             } else if (node instanceof LeafListSchemaNode leafList) {
                 property = processLeafListNode(leafList, stack, definitions, definitionNames);
 
@@ -464,7 +454,7 @@ public class DefinitionGenerator {
                                     .findFirst().orElseThrow());
                     stack.enterSchemaTree(caseSchemaNode.getQName());
                     for (final DataSchemaNode childNode : caseSchemaNode.getChildNodes()) {
-                        processChildNode(childNode, parentName, definitions, definitionNames, isConfig, stack,
+                        processChildNode(childNode, parentName, definitions, definitionNames, stack,
                                 properties);
                     }
                     stack.exit();

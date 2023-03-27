@@ -164,12 +164,12 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertNotNull(doc);
 
         final var schemas = doc.getComponents().getSchemas();
-        JsonNode firstContainer = schemas.get("choice-test_first-container");
+        JsonNode firstContainer = schemas.get("choice-test_config_first-container");
         assertEquals("default-value",
                 firstContainer.get(PROPERTIES).get("leaf-default").get("default").asText());
         assertFalse(firstContainer.get(PROPERTIES).has("leaf-non-default"));
 
-        JsonNode secondContainer = schemas.get("choice-test_second-container");
+        JsonNode secondContainer = schemas.get("choice-test_config_second-container");
         assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
     }
@@ -187,11 +187,9 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(5, definitions.size());
+        assertEquals(3, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
         assertTrue(definitions.has("my-yang_config_data_TOP"));
-        assertTrue(definitions.has("my-yang_data"));
-        assertTrue(definitions.has("my-yang_data_TOP"));
         assertTrue(definitions.has("my-yang_module"));
     }
 
@@ -251,7 +249,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(44, definitions.size());
+        assertEquals(28, definitions.size());
     }
 
     /**
