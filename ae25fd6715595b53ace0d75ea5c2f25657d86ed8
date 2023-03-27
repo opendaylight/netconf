@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff7df7a3_c3f79763",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/config/ConfigUtils.java",
+        "patchSetId": 57
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-27T08:22:45Z",
+      "side": 1,
+      "message": "let\u0027s keep this as a package-private thing instead of a separate package.",
+      "range": {
+        "startLine": 8,
+        "startChar": 47,
+        "endLine": 8,
+        "endChar": 53
+      },
+      "revId": "ae25fd6715595b53ace0d75ea5c2f25657d86ed8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
