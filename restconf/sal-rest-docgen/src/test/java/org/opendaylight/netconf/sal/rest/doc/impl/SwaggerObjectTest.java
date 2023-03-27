@@ -7,8 +7,11 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import org.junit.Test;
@@ -36,9 +39,16 @@ public final class SwaggerObjectTest extends AbstractApiDocTest {
     @Test
     public void testStringTypes() throws IOException {
         final var module = CONTEXT.findModule("string-types").orElseThrow();
-        final DefinitionGenerator generator = new DefinitionGenerator();
-        final ObjectNode jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
+        final var generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
             ApiDocServiceImpl.OAversion.V2_0, true);
         assertNotNull(jsonObject);
+
+        var properties = jsonObject.get("string-types_config_test").get("properties");
+        for (var property : properties) {
+            if (property.get("default").asText().isEmpty()) {
+                assertFalse(property.get("default").asText().isEmpty());
+            }
+        }
     }
 }
