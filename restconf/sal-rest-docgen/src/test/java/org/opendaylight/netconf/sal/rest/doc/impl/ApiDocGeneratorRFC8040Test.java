@@ -17,11 +17,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.junit.Test;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String NAME = "toaster2";
+    private static final String MY_YANG = "my-yang";
+    private static final String MY_YANG_REVISION = "2022-10-06";
     private static final String REVISION_DATE = "2009-11-20";
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
@@ -148,5 +151,49 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final JsonNode properties = input.get("properties");
         assertTrue(properties.has("toasterDoneness"));
         assertTrue(properties.has("toasterToastType"));
+    }
+
+    @Test
+    public void testSwaggerObjectsObjects() {
+        final var module = CONTEXT.findModule(MY_YANG, Revision.of(MY_YANG_REVISION)).orElseThrow();
+        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+                OAversion.V3_0);
+        assertEquals(List.of("/rests/data", "/rests/data/my-yang:data"),
+                ImmutableList.copyOf(doc.getPaths().fieldNames()));
+        final var myYangData = doc.getPaths().get("/rests/data/my-yang:data");
+
+        // Test JSON and XML references for POST operation
+        final var post = myYangData.get("post");
+        final var postRequestBody = post.get("requestBody");
+        final var postContent = postRequestBody.get("content");
+        final var postJson = postContent.get("application/json");
+        final var postJsonSchema = postJson.get("schema");
+        final var postJsonRef = postJsonSchema.get("$ref");
+        assertEquals("#/components/schemas/my-yang_config_data", postJsonRef.textValue());
+        final var postXml = postContent.get("application/xml");
+        final var postXmlSchema = postXml.get("schema");
+        final var postXmlRef = postXmlSchema.get("$ref");
+        assertEquals("#/components/schemas/my-yang_config_data", postXmlRef.textValue());
+
+        // Test JSON and XML references for PUT operation
+        final var put = myYangData.get("put");
+        final var putRequestBody = put.get("requestBody");
+        final var putContent = putRequestBody.get("content");
+        final var putJson = putContent.get("application/json");
+        final var putJsonSchema = putJson.get("schema");
+        final var putJsonRef = putJsonSchema.get("$ref");
+        assertEquals("#/components/schemas/my-yang_config_data_TOP", putJsonRef.textValue());
+        final var putXml = putContent.get("application/xml");
+        final var putXmlSchema = putXml.get("schema");
+        final var putXmlRef = putXmlSchema.get("$ref");
+        assertEquals("#/components/schemas/my-yang_config_data", putXmlRef.textValue());
+
+        ObjectNode definitions = doc.getDefinitions();
+        assertEquals(5, definitions.size());
+        definitions.has("my-yang_config_data");
+        definitions.has("my-yang_config_data_TOP");
+        definitions.has("my-yang_data");
+        definitions.has("my-yang_data_TOP");
+        definitions.has("my-yang_module");
     }
 }
