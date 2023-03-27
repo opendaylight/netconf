@@ -176,12 +176,12 @@ public final class OpenApiGeneratorRFC8040Test {
         assertNotNull(doc);
 
         final var schemas = doc.getComponents().getSchemas();
-        final Schema firstContainer = schemas.get("choice-test_first-container");
+        final Schema firstContainer = schemas.get("choice-test_config_first-container");
         assertEquals("default-value",
                 firstContainer.getProperties().get("leaf-default").get("default").asText());
         assertFalse(firstContainer.getProperties().has("leaf-non-default"));
 
-        final Schema secondContainer = schemas.get("choice-test_second-container");
+        final Schema secondContainer = schemas.get("choice-test_config_second-container");
         assertTrue(secondContainer.getProperties().has("leaf-first-case"));
         assertFalse(secondContainer.getProperties().has("leaf-second-case"));
     }
@@ -274,16 +274,14 @@ public final class OpenApiGeneratorRFC8040Test {
                 "#/components/schemas/my-yang_config_data");
         verifyRequestRef(JsonNodeMyYangData.getPut(), "#/components/schemas/my-yang_config_data_TOP",
                 "#/components/schemas/my-yang_config_data");
-        verifyRequestRef(JsonNodeMyYangData.getGet(), "#/components/schemas/my-yang_data_TOP",
-                "#/components/schemas/my-yang_data_TOP");
+        verifyRequestRef(JsonNodeMyYangData.getGet(), "#/components/schemas/my-yang_config_data_TOP",
+                "#/components/schemas/my-yang_config_data_TOP");
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(5, definitions.size());
+        assertEquals(3, definitions.size());
         assertTrue(definitions.containsKey("my-yang_config_data"));
         assertTrue(definitions.containsKey("my-yang_config_data_TOP"));
-        assertTrue(definitions.containsKey("my-yang_data"));
-        assertTrue(definitions.containsKey("my-yang_data_TOP"));
         assertTrue(definitions.containsKey("my-yang_module"));
     }
 
@@ -297,16 +295,16 @@ public final class OpenApiGeneratorRFC8040Test {
                 "#/components/schemas/toaster2_config_toaster");
         verifyRequestRef(jsonNodeToaster.getPut(), "#/components/schemas/toaster2_config_toaster_TOP",
                 "#/components/schemas/toaster2_config_toaster");
-        verifyRequestRef(jsonNodeToaster.getGet(), "#/components/schemas/toaster2_toaster_TOP",
-                "#/components/schemas/toaster2_toaster_TOP");
+        verifyRequestRef(jsonNodeToaster.getGet(), "#/components/schemas/toaster2_config_toaster_TOP",
+                "#/components/schemas/toaster2_config_toaster_TOP");
 
         final var jsonNodeToasterSlot = doc.getPaths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
         verifyRequestRef(jsonNodeToasterSlot.getPost(), "#/components/schemas/toaster2_toaster_config_toasterSlot",
                 "#/components/schemas/toaster2_toaster_config_toasterSlot");
         verifyRequestRef(jsonNodeToasterSlot.getPut(), "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
                 "#/components/schemas/toaster2_toaster_config_toasterSlot");
-        verifyRequestRef(jsonNodeToasterSlot.getGet(), "#/components/schemas/toaster2_toaster_toasterSlot_TOP",
-                "#/components/schemas/toaster2_toaster_toasterSlot_TOP");
+        verifyRequestRef(jsonNodeToasterSlot.getGet(), "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
+                "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP");
 
         final var jsonNodeSlotInfo = doc.getPaths().get(
                 "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
@@ -316,24 +314,25 @@ public final class OpenApiGeneratorRFC8040Test {
         verifyRequestRef(jsonNodeSlotInfo.getPut(),
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
-        verifyRequestRef(jsonNodeSlotInfo.getGet(), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo_TOP",
-                "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo_TOP");
+        verifyRequestRef(jsonNodeSlotInfo.getGet(),
+                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
+                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP");
 
         final var jsonNodeLst = doc.getPaths().get("/rests/data/toaster2:lst");
         verifyRequestRef(jsonNodeLst.getPost(), "#/components/schemas/toaster2_config_lst",
                 "#/components/schemas/toaster2_config_lst");
         verifyRequestRef(jsonNodeLst.getPut(), "#/components/schemas/toaster2_config_lst_TOP",
                 "#/components/schemas/toaster2_config_lst");
-        verifyRequestRef(jsonNodeLst.getGet(), "#/components/schemas/toaster2_lst_TOP",
-                "#/components/schemas/toaster2_lst_TOP");
+        verifyRequestRef(jsonNodeLst.getGet(), "#/components/schemas/toaster2_config_lst_TOP",
+                "#/components/schemas/toaster2_config_lst_TOP");
 
         final var jsonNodeLst1 = doc.getPaths().get("/rests/data/toaster2:lst/lst1={key1},{key2}");
         verifyRequestRef(jsonNodeLst1.getPost(), "#/components/schemas/toaster2_lst_config_lst1",
                 "#/components/schemas/toaster2_lst_config_lst1");
         verifyRequestRef(jsonNodeLst1.getPut(), "#/components/schemas/toaster2_lst_config_lst1_TOP",
                 "#/components/schemas/toaster2_lst_config_lst1");
-        verifyRequestRef(jsonNodeLst1.getGet(), "#/components/schemas/toaster2_lst_lst1_TOP",
-                "#/components/schemas/toaster2_lst_lst1_TOP");
+        verifyRequestRef(jsonNodeLst1.getGet(), "#/components/schemas/toaster2_lst_config_lst1_TOP",
+                "#/components/schemas/toaster2_lst_config_lst1_TOP");
 
         final var jsonNodeMakeToast = doc.getPaths().get("/rests/operations/toaster2:make-toast");
         assertNull(jsonNodeMakeToast.getGet());
@@ -353,7 +352,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(44, definitions.size());
+        assertEquals(28, definitions.size());
     }
 
     /**
