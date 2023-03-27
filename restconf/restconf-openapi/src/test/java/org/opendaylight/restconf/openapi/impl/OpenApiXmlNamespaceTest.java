@@ -126,21 +126,21 @@ public class OpenApiXmlNamespaceTest {
 
     @Test
     public void testAugmentedListInContainer() {
-        final var simpleList1 = schemas.get("module_root_simple-root_list-1");
+        final var simpleList1 = schemas.get("module_root_simple-root_config_list-1");
         assertEquals(TEST_AUGMENTATION_NAMESPACE, simpleList1.xml().path("namespace").asText());
         assertTrue(simpleList1.properties().path("leaf-x").path("xml").isMissingNode());
     }
 
     @Test
     public void testAugmentedContainerInContainer() {
-        final var simpleAbc = schemas.get("module_root_simple-root_abc");
+        final var simpleAbc = schemas.get("module_root_simple-root_config_abc");
         assertEquals(TEST_AUGMENTATION_NAMESPACE, simpleAbc.xml().path("namespace").asText());
         assertTrue(simpleAbc.properties().path("leaf-abc").path("xml").isMissingNode());
     }
 
     @Test
     public void testAugmentedLeafInContainer() {
-        final var simple = schemas.get("module_root_simple-root");
+        final var simple = schemas.get("module_root_config_simple-root");
         assertEquals(TEST_MODULE_NAMESPACE, simple.xml().path("namespace").asText());
         assertEquals(TEST_AUGMENTATION_NAMESPACE, simple.properties().path("leaf-y").path("xml")
             .path("namespace").asText());
@@ -149,21 +149,21 @@ public class OpenApiXmlNamespaceTest {
 
     @Test
     public void testAugmentedListInList() {
-        final var topList1 = schemas.get("module_root_top-list_list-1");
+        final var topList1 = schemas.get("module_root_top-list_config_list-1");
         assertEquals(TEST_AUGMENTATION_NAMESPACE, topList1.xml().path("namespace").asText());
         assertTrue(topList1.properties().path("leaf-x").path("xml").isMissingNode());
     }
 
     @Test
     public void testAugmentedContainerInList() {
-        final var topAbc = schemas.get("module_root_top-list_abc");
+        final var topAbc = schemas.get("module_root_top-list_config_abc");
         assertEquals(TEST_AUGMENTATION_NAMESPACE, topAbc.xml().path("namespace").asText());
         assertTrue(topAbc.properties().path("leaf-abc").path("xml").isMissingNode());
     }
 
     @Test
     public void testAugmentedLeafInList() {
-        final var top = schemas.get("module_root_top-list");
+        final var top = schemas.get("module_root_config_top-list");
         assertEquals(TEST_MODULE_NAMESPACE, top.xml().path("namespace").asText());
         assertEquals(TEST_AUGMENTATION_NAMESPACE, top.properties().path("leaf-y").path("xml")
             .path("namespace").asText());
