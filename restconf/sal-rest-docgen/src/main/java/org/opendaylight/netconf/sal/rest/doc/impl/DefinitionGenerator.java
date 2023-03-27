@@ -218,15 +218,9 @@ public class DefinitionGenerator {
             stack.enterSchemaTree(childNode.getQName());
             // For every container and list in the module
             if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
-                if (childNode.isConfiguration()) {
-                    final DefinitionObject definitionObject = new DefinitionObject();
-                    processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitionNames,
-                            true, stack, oaversion, definitionObject);
-                    definitionObject.writeDataToJsonGenerator(gen);
-                }
                 DefinitionObject definitionObject = new DefinitionObject();
-                processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitionNames,
-                        false, stack, oaversion, definitionObject);
+                processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitionNames, stack, oaversion,
+                        definitionObject);
                 definitionObject.writeDataToJsonGenerator(gen);
 
                 definitionObject = new DefinitionObject();
@@ -279,8 +273,7 @@ public class DefinitionGenerator {
             final String filename = parentName + "_" + operationName + (isInput ? INPUT_SUFFIX : OUTPUT_SUFFIX);
             final DefinitionObject root = defObj.getRoot();
             final DefinitionObject childSchemaObj = new DefinitionObject(root);
-            processChildren(container.getChildNodes(), parentName, definitionNames,
-                    false, stack, oaversion, childSchemaObj);
+            processChildren(container.getChildNodes(), parentName, definitionNames, stack, oaversion, childSchemaObj);
 
             childSchemaObj.addData(TYPE_KEY, OBJECT_TYPE);
             final DefinitionObject xmlObj = new DefinitionObject(childSchemaObj);
@@ -369,7 +362,7 @@ public class DefinitionGenerator {
     }
 
     private DefinitionObject processDataNodeContainer(final DataNodeContainer dataNode, final String parentName,
-            final DefinitionNames definitionNames, final boolean isConfig, final SchemaInferenceStack stack,
+            final DefinitionNames definitionNames, final SchemaInferenceStack stack,
             final OAversion oaversion, final DefinitionObject defObj) throws IOException {
         if (dataNode instanceof ListSchemaNode || dataNode instanceof ContainerSchemaNode) {
             final Collection<? extends DataSchemaNode> containerChildren = dataNode.getChildNodes();
@@ -378,11 +371,10 @@ public class DefinitionGenerator {
             final DefinitionObject root = defObj.getRoot();
             final DefinitionObject childSchemaObj = new DefinitionObject(root);
             final String nameAsParent = parentName + "_" + localName;
-            final DefinitionObject propertiesObj =
-                    processChildren(containerChildren, parentName + "_" + localName,
-                            definitionNames, isConfig, stack, oaversion, childSchemaObj);
+            final DefinitionObject propertiesObj = processChildren(containerChildren, parentName + "_" + localName,
+                    definitionNames, stack, oaversion, childSchemaObj);
 
-            final String nodeName = parentName + (isConfig ? CONFIG : "") + "_" + localName;
+            final String nodeName = parentName + CONFIG + "_" + localName;
             final String parentNameConfigLocalName = parentName + CONFIG + "_" + localName;
 
             final String description = schemaNode.getDescription().orElse("");
@@ -416,21 +408,18 @@ public class DefinitionGenerator {
      * Processes the nodes.
      */
     private DefinitionObject processChildren(final Collection<? extends DataSchemaNode> nodes, final String parentName,
-            final DefinitionNames definitionNames, final boolean isConfig, final SchemaInferenceStack stack,
+            final DefinitionNames definitionNames, final SchemaInferenceStack stack,
             final OAversion oaversion, final DefinitionObject defObj) throws IOException {
         final DefinitionObject propertiesObj = new DefinitionObject(defObj);
         for (final DataSchemaNode node : nodes) {
-            if (!isConfig || node.isConfiguration()) {
-                processChildNode(node, parentName, definitionNames, isConfig, stack,
-                        oaversion, propertiesObj);
-            }
+            processChildNode(node, parentName, definitionNames, stack, oaversion, propertiesObj);
         }
         defObj.addData(PROPERTIES_KEY, propertiesObj);
         return propertiesObj;
     }
 
     private void processChildNode(final DataSchemaNode node, final String parentName,
-            final DefinitionNames definitionNames, final boolean isConfig, final SchemaInferenceStack stack,
+            final DefinitionNames definitionNames, final SchemaInferenceStack stack,
             final OAversion oaversion, final DefinitionObject defObj) throws IOException {
         stack.enterSchemaTree(node.getQName());
 
@@ -452,10 +441,7 @@ public class DefinitionGenerator {
             final DefinitionObject propertyObj;
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                 propertyObj = processDataNodeContainer((DataNodeContainer) node, parentName,
-                        definitionNames, isConfig, stack, oaversion, defObj);
-                if (!isConfig) {
-                    processActionNodeContainer(node, parentName, definitionNames, stack, oaversion, defObj);
-                }
+                        definitionNames, stack, oaversion, defObj);
             } else if (node instanceof LeafListSchemaNode leafList) {
                 propertyObj = processLeafListNode(leafList, stack, definitionNames, oaversion, defObj);
 
@@ -463,7 +449,7 @@ public class DefinitionGenerator {
                 for (final CaseSchemaNode variant : choice.getCases()) {
                     stack.enterSchemaTree(variant.getQName());
                     for (final DataSchemaNode childNode : variant.getChildNodes()) {
-                        processChildNode(childNode, parentName, definitionNames, isConfig, stack, oaversion, defObj);
+                        processChildNode(childNode, parentName, definitionNames, stack, oaversion, defObj);
                     }
                     stack.exit();
                 }
