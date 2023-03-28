@@ -29,7 +29,7 @@ public class LibraryModulesSchemasTest {
         LibraryModulesSchemas libraryModuleSchemas =
                 LibraryModulesSchemas.create(getClass().getResource("/yang-library.json").toString());
 
-        verifySchemas(libraryModulesSchemas);
+        verifySchemas(libraryModuleSchemas);
     }
 
     private static void verifySchemas(final LibraryModulesSchemas libraryModulesSchemas) throws MalformedURLException {
