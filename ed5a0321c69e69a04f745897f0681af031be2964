@@ -22,6 +22,144 @@
       },
       "revId": "ed5a0321c69e69a04f745897f0681af031be2964",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00bdecad_67b800c7",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/KeyUtils.java",
+        "patchSetId": 59
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-28T09:46:16Z",
+      "side": 1,
+      "message": "no need for this intermediate constant",
+      "range": {
+        "startLine": 38,
+        "startChar": 25,
+        "endLine": 38,
+        "endChar": 34
+      },
+      "revId": "ed5a0321c69e69a04f745897f0681af031be2964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5812334b_b2faab9d",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/KeyUtils.java",
+        "patchSetId": 59
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-28T09:46:16Z",
+      "side": 1,
+      "message": "there should be exactly one place where we do this",
+      "range": {
+        "startLine": 41,
+        "startChar": 8,
+        "endLine": 41,
+        "endChar": 57
+      },
+      "revId": "ed5a0321c69e69a04f745897f0681af031be2964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84b3f6d0_8161f6a1",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TestUtils.java",
+        "patchSetId": 59
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-28T09:46:16Z",
+      "side": 1,
+      "message": "toMap() is a very generic name, prefer explicit Collectors.toMap()",
+      "range": {
+        "startLine": 10,
+        "startChar": 31,
+        "endLine": 10,
+        "endChar": 47
+      },
+      "revId": "ed5a0321c69e69a04f745897f0681af031be2964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db6c5454_2e2520c3",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TestUtils.java",
+        "patchSetId": 59
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-28T09:46:16Z",
+      "side": 1,
+      "message": "is this really \u0027Utils\u0027 or is this abstract base class for tests?",
+      "range": {
+        "startLine": 50,
+        "startChar": 19,
+        "endLine": 50,
+        "endChar": 28
+      },
+      "revId": "ed5a0321c69e69a04f745897f0681af031be2964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7588cde4_17c4f1da",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TestUtils.java",
+        "patchSetId": 59
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-28T09:46:16Z",
+      "side": 1,
+      "message": "right: simplify down to \u0027throws Exception\u0027",
+      "range": {
+        "startLine": 134,
+        "startChar": 18,
+        "endLine": 134,
+        "endChar": 66
+      },
+      "revId": "ed5a0321c69e69a04f745897f0681af031be2964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2d9edbc_5ed617e7",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TestUtils.java",
+        "patchSetId": 59
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-28T09:46:16Z",
+      "side": 1,
+      "message": "there is only a single caller -- inline as a final boolean",
+      "range": {
+        "startLine": 154,
+        "startChar": 15,
+        "endLine": 154,
+        "endChar": 39
+      },
+      "revId": "ed5a0321c69e69a04f745897f0681af031be2964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
