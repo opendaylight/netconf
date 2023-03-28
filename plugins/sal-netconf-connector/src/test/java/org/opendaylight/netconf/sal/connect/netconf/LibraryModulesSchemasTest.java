@@ -7,14 +7,10 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Map;
 import org.junit.Test;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -37,21 +33,15 @@ public class LibraryModulesSchemasTest {
     }
 
     private static void verifySchemas(final LibraryModulesSchemas libraryModulesSchemas) throws MalformedURLException {
-        final Map<SourceIdentifier, URL> resolvedModulesSchema = libraryModulesSchemas.getAvailableModels();
-        assertThat(resolvedModulesSchema.size(), is(3));
+        assertEquals(Map.of(
+            new SourceIdentifier("module-with-revision", "2014-04-08"),
+            new URL("http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08"),
+            new SourceIdentifier("another-module-with-revision", "2013-10-21"),
+            new URL("http://localhost:8181/yanglib/schemas/another-module-with-revision/2013-10-21"),
+            new SourceIdentifier("module-without-revision"),
+            new URL("http://localhost:8181/yanglib/schemas/module-without-revision/")),
 
-        assertTrue(resolvedModulesSchema.containsKey(new SourceIdentifier("module-with-revision", "2014-04-08")));
-        assertThat(resolvedModulesSchema.get(new SourceIdentifier("module-with-revision", "2014-04-08")),
-                is(new URL("http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08")));
-
-        assertTrue(resolvedModulesSchema.containsKey(
-                new SourceIdentifier("another-module-with-revision", "2013-10-21")));
-        assertThat(resolvedModulesSchema.get(new SourceIdentifier("another-module-with-revision", "2013-10-21")),
-                is(new URL("http://localhost:8181/yanglib/schemas/another-module-with-revision/2013-10-21")));
-
-        assertTrue(resolvedModulesSchema.containsKey(new SourceIdentifier("module-without-revision")));
-        assertThat(resolvedModulesSchema.get(new SourceIdentifier("module-without-revision")),
-                is(new URL("http://localhost:8181/yanglib/schemas/module-without-revision/")));
+            libraryModulesSchemas.getAvailableModels());
     }
 
     @Test
@@ -59,21 +49,15 @@ public class LibraryModulesSchemasTest {
         LibraryModulesSchemas libraryModulesSchemas =
                 LibraryModulesSchemas.create(getClass().getResource("/yang-library-fail.xml").toString());
 
-        final Map<SourceIdentifier, URL> resolvedModulesSchema = libraryModulesSchemas.getAvailableModels();
-        assertThat(resolvedModulesSchema.size(), is(1));
-
-        assertFalse(resolvedModulesSchema.containsKey(new SourceIdentifier("module-with-bad-url")));
-        //See BUG 8071 https://bugs.opendaylight.org/show_bug.cgi?id=8071
-        //assertFalse(resolvedModulesSchema.containsKey(
-        //        RevisionSourceIdentifier.create("module-with-bad-revision", "bad-revision")));
-        assertTrue(resolvedModulesSchema.containsKey(new SourceIdentifier("good-ol-module")));
+        assertEquals(Map.of(new SourceIdentifier("good-ol-module"), new URL("http://www.example.com")),
+            libraryModulesSchemas.getAvailableModels());
     }
 
     @Test
     public void testCreateFromInvalidAll() throws Exception {
         // test bad yang lib url
         LibraryModulesSchemas libraryModulesSchemas = LibraryModulesSchemas.create("ObviouslyBadUrl");
-        assertThat(libraryModulesSchemas.getAvailableModels(), is(Collections.emptyMap()));
+        assertEquals(Map.of(), libraryModulesSchemas.getAvailableModels());
 
         // TODO test also fail on json and xml parsing. But can we fail not on runtime exceptions?
     }
