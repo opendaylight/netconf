@@ -306,8 +306,11 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             final Element rootElement = doc.createElementNS(LIBRARY_NAMESPACE, ModulesState.QNAME.getLocalName());
             doc.appendChild(rootElement);
 
-            for (int i = 0; i < read.getElementsByTagName("revision").getLength(); i++) {
-                final String revision = read.getElementsByTagName("revision").item(i).getTextContent();
+            // FIXME: also namespace?!
+            final var revisions = read.getElementsByTagName("revision");
+
+            for (int i = 0, length = revisions.getLength(); i < length; i++) {
+                final String revision = revisions.item(i).getTextContent();
                 if (DATE_PATTERN.matcher(revision).find() || revision.isEmpty()) {
                     final Node module = doc.importNode(read.getElementsByTagName("module").item(i), true);
                     rootElement.appendChild(module);
