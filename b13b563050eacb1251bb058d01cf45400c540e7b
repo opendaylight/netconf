@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cbc4595_5abdd769",
+        "filename": "plugins/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/LibraryModulesSchemas.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-28T10:48:45Z",
+      "side": 0,
+      "message": "Is there any problem to use:\n```\n            final Element rootElement \u003d doc.createElementNS(ModulesState.QNAME.getNamespace().toString(),\n                ModulesState.QNAME.getLocalName());\n```",
+      "revId": "b13b563050eacb1251bb058d01cf45400c540e7b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
