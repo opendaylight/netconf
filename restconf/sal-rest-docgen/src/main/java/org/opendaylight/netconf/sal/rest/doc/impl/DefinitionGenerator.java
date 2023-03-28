@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.NAME_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getAppropriateModelPrefix;
 
@@ -280,24 +279,17 @@ public class DefinitionGenerator {
             xmlObj.addData(NAME_KEY, isInput ? INPUT : OUTPUT);
             childSchemaObj.addData(XML_KEY, xmlObj);
             childSchemaObj.addData(TITLE_KEY, filename);
-            final String discriminator =
-                    definitionNames.pickDiscriminator(container, List.of(filename, filename + TOP));
+            final String discriminator = definitionNames.pickDiscriminator(container, List.of(filename, filename));
             root.addData(filename + discriminator, childSchemaObj);
-
-            processTopData(filename, discriminator, container, oaversion , root);
         }
         stack.exit();
     }
 
-    private static DefinitionObject processTopData(final String filename, final String discriminator,
+    private static DefinitionObject processInnerData(final String filename, final String discriminator,
             final SchemaNode schemaNode, final OAversion oaversion, final DefinitionObject defObj) {
-        final DefinitionObject finalChildObj = new DefinitionObject(defObj);
-        final DefinitionObject propertiesObj = new DefinitionObject(finalChildObj);
-        final DefinitionObject dataNodePropObj = new DefinitionObject(propertiesObj);
-
+        final DefinitionObject dataNodePropObj = new DefinitionObject(defObj);
         final String name = filename + discriminator;
         final String ref = getAppropriateModelPrefix(oaversion) + name;
-        final String topName = filename + TOP;
 
         if (schemaNode instanceof ListSchemaNode) {
             dataNodePropObj.addData(TYPE_KEY, ARRAY_TYPE);
@@ -312,18 +304,6 @@ public class DefinitionGenerator {
               */
             dataNodePropObj.addData(REF_KEY, ref);
         }
-        /*
-            Add module name prefix to property name, when needed, when ServiceNow can process colons,
-            use RestDocGenUtil#resolveNodesName for creating property name
-         */
-        propertiesObj.addData(schemaNode.getQName().getLocalName(), dataNodePropObj);
-
-        finalChildObj.addData(TYPE_KEY, OBJECT_TYPE);
-        finalChildObj.addData(PROPERTIES_KEY, propertiesObj);
-        finalChildObj.addData(TITLE_KEY, topName);
-
-        defObj.addData(topName + discriminator, finalChildObj);
-
         return dataNodePropObj;
     }
 
@@ -381,10 +361,7 @@ public class DefinitionGenerator {
             final String discriminator;
 
             if (!definitionNames.isListedNode(schemaNode)) {
-                final List<String> names = List.of(parentNameConfigLocalName,
-                        parentNameConfigLocalName + TOP,
-                        nameAsParent,
-                        nameAsParent + TOP);
+                final List<String> names = List.of(parentNameConfigLocalName, nameAsParent);
                 discriminator = definitionNames.pickDiscriminator(schemaNode, names);
             } else {
                 discriminator = definitionNames.getDiscriminator(schemaNode);
@@ -399,7 +376,7 @@ public class DefinitionGenerator {
             childSchemaObj.addData(XML_KEY, buildXmlParameter(schemaNode, childSchemaObj));
             root.addData(defName, childSchemaObj);
 
-            return processTopData(nodeName, discriminator, schemaNode, oaversion, root);
+            return processInnerData(nodeName, discriminator, schemaNode, oaversion, defObj);
         }
         return null;
     }
