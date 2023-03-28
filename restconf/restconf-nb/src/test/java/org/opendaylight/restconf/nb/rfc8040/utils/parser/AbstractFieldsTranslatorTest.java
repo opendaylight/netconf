@@ -37,9 +37,12 @@ public abstract class AbstractFieldsTranslatorTest<T> {
         XMLNamespace.of("tests:test-services"), Revision.of("2019-03-25"));
     private static final QNameModule Q_NAME_MODULE_AUGMENTED_JUKEBOX = QNameModule.create(
         XMLNamespace.of("http://example.com/ns/augmented-jukebox"), Revision.of("2016-05-05"));
+    private static final QNameModule Q_NAME_MODULE_FOO = QNameModule.create(
+        XMLNamespace.of("urn:foo"), Revision.of("2023-03-27"));
 
     private InstanceIdentifierContext identifierJukebox;
     private InstanceIdentifierContext identifierTestServices;
+    private InstanceIdentifierContext identifierFoo;
 
     // FIXME: remove all this mocking -- just parse the underlying model and be done with it
 
@@ -95,6 +98,30 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     // leaf-list protocols
     protected static final QName PROTOCOLS_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "protocols");
 
+    // container foo
+    protected static final QName FOO_Q_NAME = QName.create(Q_NAME_MODULE_FOO, "foo");
+
+    // container bar
+    protected static final QName BAR_Q_NAME = QName.create(Q_NAME_MODULE_FOO, "bar");
+
+    // container baz
+    protected static final QName BAZ_Q_NAME = QName.create(Q_NAME_MODULE_FOO, "baz");
+
+    // leaf alpha
+    protected static final QName ALPHA_Q_NAME = QName.create(Q_NAME_MODULE_FOO, "alpha");
+
+    // container beta
+    protected static final QName BETA_Q_NAME = QName.create(Q_NAME_MODULE_FOO, "beta");
+
+    // container foo
+    protected static final QName GAMMA_Q_NAME = QName.create(Q_NAME_MODULE_FOO, "gamma");
+
+    // container foo
+    protected static final QName DELTA_Q_NAME = QName.create(Q_NAME_MODULE_FOO, "delta");
+
+    // container foo
+    protected static final QName EPSILON_Q_NAME = QName.create(Q_NAME_MODULE_FOO, "epsilon");
+
     @Before
     public void setUp() throws Exception {
         final EffectiveModelContext schemaContextJukebox =
@@ -106,6 +133,11 @@ public abstract class AbstractFieldsTranslatorTest<T> {
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/test-services"));
         identifierTestServices = InstanceIdentifierContext.ofStack(
             SchemaInferenceStack.ofDataTreePath(schemaContextTestServices, TEST_DATA_Q_NAME));
+
+        final EffectiveModelContext schemaContextFoo =
+            YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/same-qname-nodes"));
+        identifierFoo = InstanceIdentifierContext.ofStack(
+            SchemaInferenceStack.ofDataTreePath(schemaContextFoo, FOO_Q_NAME));
     }
 
     protected abstract List<T> translateFields(InstanceIdentifierContext context, FieldsParam fields);
@@ -267,6 +299,26 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     protected abstract void assertKeyedList(List<T> result);
 
     protected abstract void assertLeafList(@NonNull List<T> result);
+
+    @Test
+    public void testDuplicateNodes1() {
+        final var result = translateFields(identifierFoo,
+            assertFields("bar(alpha;beta/gamma);baz(alpha;beta/gamma)"));
+        assertNotNull(result);
+        assertDuplicateNodes1(result);
+    }
+
+    protected abstract void assertDuplicateNodes1(List<T> result);
+
+    @Test
+    public void testDuplicateNodes2() {
+        final var result = translateFields(identifierFoo,
+            assertFields("bar(alpha;beta/delta);baz(alpha;beta/epsilon)"));
+        assertNotNull(result);
+        assertDuplicateNodes2(result);
+    }
+
+    protected abstract void assertDuplicateNodes2(List<T> result);
 
     /**
      * Test parse fields parameter when not existing child node selected.
