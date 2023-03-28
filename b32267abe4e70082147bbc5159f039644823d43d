@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6138fe60_067b9189",
+        "filename": "plugins/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/LibraryModulesSchemasTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-28T10:57:09Z",
+      "side": 1,
+      "message": "IIRC `assertTrue(libraryModulesSchemas.getAvailableModels().isEmpty)`",
+      "revId": "b32267abe4e70082147bbc5159f039644823d43d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
