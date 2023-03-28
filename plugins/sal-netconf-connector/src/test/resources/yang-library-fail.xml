@@ -7,13 +7,11 @@
             badurl
         </schema>
     </module>
-    <!-- See BUG 8071 https://bugs.opendaylight.org/show_bug.cgi?id=8071
     <module>
         <name>module-bad-revision</name>
         <revision>bad-revision</revision>
         <namespace>bbb</namespace>
     </module>
-    -->
     <module>
         <name>good-ol-module</name>
         <revision></revision>
