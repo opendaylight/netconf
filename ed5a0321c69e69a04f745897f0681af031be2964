@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78f88133_ad785c3d",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/ConfigUtils.java",
+        "patchSetId": 59
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-28T09:33:46Z",
+      "side": 1,
+      "message": "this is an anti-pattern, please never do this: isn\u0027t \n\n    final var localDef \u003d local.getLocalDefinition();\n    if (localDef \u003d\u003d null) {\n        throw new UnsupportedConfigurationException(\"Missing local definition in \" + local);\n    }\n\nmuch more obvious?",
+      "range": {
+        "startLine": 144,
+        "startChar": 29,
+        "endLine": 145,
+        "endChar": 28
+      },
+      "revId": "ed5a0321c69e69a04f745897f0681af031be2964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
