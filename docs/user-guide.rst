@@ -16,7 +16,7 @@ Overview
 
 NETCONF is an XML-based protocol used for configuration and monitoring
 devices in the network. The base NETCONF protocol is described in
-`RFC-6241 <http://tools.ietf.org/html/rfc6241>`__.
+`RFC-6241 <https://www.rfc-editor.org/rfc/rfc6241>`__.
 
 **NETCONF in OpenDaylight:.**
 
@@ -35,13 +35,13 @@ mounted devices.
 
 In terms of RFCs, the connector supports:
 
--  `RFC-6241 <http://tools.ietf.org/html/rfc6241>`__
+-  `RFC-6241 <https://www.rfc-editor.org/rfc/rfc6241>`__
 
--  `RFC-5277 <https://tools.ietf.org/html/rfc5277>`__
+-  `RFC-5277 <https://www.rfc-editor.org/rfc/rfc5277>`__
 
--  `RFC-6022 <https://tools.ietf.org/html/rfc6022>`__
+-  `RFC-6022 <https://www.rfc-editor.org/rfc/rfc6022>`__
 
--  `RFC-7895 <https://tools.ietf.org/html/rfc7895>`__
+-  `RFC-7895 <https://www.rfc-editor.org/rfc/rfc7895>`__
 
 **Netconf-connector is fully model-driven (utilizing the YANG modeling
 language) so in addition to the above RFCs, it supports any
@@ -65,7 +65,7 @@ focuses on RESTCONF.
 
     Since 2022.09 Chlorine there is only one RESTCONF endpoint:
 
-    - | ``http://localhost:8181/rests`` is related to `RFC-8040 <https://tools.ietf.org/html/rfc8040>`__,
+    - | ``http://localhost:8181/rests`` is related to `RFC-8040 <https://www.rfc-editor.org/rfc/rfc8040>`__,
       | can be activated by installing ``odl-restconf-nb``
        Karaf feature.
 
@@ -196,7 +196,7 @@ to be done with a PUT request because the node already exists. A POST
 request will fail for that reason.
 
 Additionally, a PATCH request can be used to modify an existing
-configuration. Currently, only yang-patch (`RFC-8072 <https://tools.ietf.org/html/rfc8072>`__)
+configuration. Currently, only yang-patch (`RFC-8072 <https://www.rfc-editor.org/rfc/rfc8072>`__)
 is supported. The URL would be the same as the above PUT examples.
 Using JSON for the body, the headers needed for the request would
 be:
@@ -675,11 +675,11 @@ previous step.
 
 The subscription call may be modified with the following query parameters defined in the RESTCONF RFC:
 
--  `filter <https://tools.ietf.org/html/draft-ietf-netconf-restconf-05#section-4.8.6>`__
+-  `filter <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.4>`__
 
--  `start-time <https://tools.ietf.org/html/draft-ietf-netconf-restconf-05#section-4.8.7>`__
+-  `start-time <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.7>`__
 
--  `end-time <https://tools.ietf.org/html/draft-ietf-netconf-restconf-05#section-4.8.8>`__
+-  `end-time <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.8>`__
 
 In addition, the following ODL extension query parameter is supported:
 
@@ -925,7 +925,7 @@ RESTCONF.
 
     for more information about WebSockets in JavaScript visit `Writing
     WebSocket client
-    applications <https://developer.mozilla.org/en-US/docs/WebSockets/Writing_WebSocket_client_applications>`__
+    applications <https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications>`__
 
 Netconf-connector + Netopeer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -942,7 +942,7 @@ used in this guide. To install Docker and start the `netopeer
 image <https://hub.docker.com/r/sysrepo/sysrepo-netopeer2>`__ perform
 following steps:
 
-1. Install docker http://docs.docker.com/linux/step_one/
+1. Install docker https://docs.docker.com/get-started/
 
 2. Start the netopeer image:
 
@@ -1016,7 +1016,7 @@ OpenDaylight provides 2 types of NETCONF servers:
     Since Nitrogen release, there is performance regression in NETCONF
     servers accepting SSH connections. While opening a connection takes
     less than 10 seconds on Carbon, on Nitrogen time can increase up to
-    60 seconds. Please see https://bugs.opendaylight.org/show_bug.cgi?id=9020
+    60 seconds. Please see https://jira.opendaylight.org/browse/ODLPARENT-112
 
 NETCONF server for config-subsystem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1027,16 +1027,16 @@ NETCONF manner.
 
 In terms of RFCs, these are supported:
 
--  `RFC-6241 <http://tools.ietf.org/html/rfc6241>`__
+-  `RFC-6241 <https://www.rfc-editor.org/rfc/rfc6241>`__
 
--  `RFC-5277 <https://tools.ietf.org/html/rfc5277>`__
+-  `RFC-5277 <https://www.rfc-editor.org/rfc/rfc5277>`__
 
--  `RFC-6470 <https://tools.ietf.org/html/rfc6470>`__
+-  `RFC-6470 <https://www.rfc-editor.org/rfc/rfc6470>`__
 
    -  (partially, only the schema-change notification is available in
       Boron release)
 
--  `RFC-6022 <https://tools.ietf.org/html/rfc6022>`__
+-  `RFC-6022 <https://www.rfc-editor.org/rfc/rfc6022>`__
 
 For regular users it is recommended to use RESTCONF + the
 controller-config loopback mountpoint instead of using pure NETCONF. How
@@ -1053,11 +1053,11 @@ and rpcs that are supported by MD-SAL.
 
 In terms of RFCs, these are supported:
 
--  `RFC-6241 <http://tools.ietf.org/html/rfc6241>`__
+-  `RFC-6241 <https://www.rfc-editor.org/rfc/rfc6241>`__
 
--  `RFC-6022 <https://tools.ietf.org/html/rfc6022>`__
+-  `RFC-6022 <https://www.rfc-editor.org/rfc/rfc6022>`__
 
--  `RFC-7895 <https://tools.ietf.org/html/rfc7895>`__
+-  `RFC-7895 <https://www.rfc-editor.org/rfc/rfc7895>`__
 
 Notifications over NETCONF are not supported in the Boron release.
 
@@ -1234,7 +1234,7 @@ Global Configuration
 
 .. important::
   The global configuration is not a part of the `RFC 8071
-  <https://tools.ietf.org/html/rfc8071>`__ and, therefore, subject to change.
+  <https://www.rfc-editor.org/rfc/rfc8071>`__ and, therefore, subject to change.
 
 Configuring global credentials
 ''''''''''''''''''''''''''''''
@@ -1380,7 +1380,7 @@ in such case values from global credentials will be used.
 Deprecated configuration models for devices accessed with SSH protocol
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-With `RFC 8071 <https://tools.ietf.org/html/rfc8071>`__ alignment and adding
+With `RFC 8071 <https://www.rfc-editor.org/rfc/rfc8071>`__ alignment and adding
 support for TLS transport following configuration models has been marked
 deprecated.
 
@@ -1613,7 +1613,7 @@ Next advantages:
 
 .. note::
 
-  More information about fields query parameter: `RFC 8071 <https://tools.ietf.org/html/rfc8040#section-4.8.3>`__
+  More information about fields query parameter: `RFC 8071 <https://www.rfc-editor.org/rfc/rfc8040#section-4.8.3>`__
 
 Preparation of data
 ~~~~~~~~~~~~~~~~~~~
