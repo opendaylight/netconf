@@ -540,8 +540,7 @@ public abstract class BaseYangSwaggerGenerator {
         }
         for (final PathArgument arg : key.getPathArguments()) {
             final String name = arg.getNodeType().getLocalName();
-            if (arg instanceof NodeIdentifierWithPredicates) {
-                final NodeIdentifierWithPredicates nodeId = (NodeIdentifierWithPredicates) arg;
+            if (arg instanceof NodeIdentifierWithPredicates nodeId) {
                 for (final Entry<QName, Object> entry : nodeId.entrySet()) {
                     appendPathKeyValue(builder, entry.getValue());
                 }
