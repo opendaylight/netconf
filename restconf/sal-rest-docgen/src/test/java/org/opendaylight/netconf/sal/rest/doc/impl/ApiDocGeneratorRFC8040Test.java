@@ -92,25 +92,13 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final ObjectNode schemas = doc.getComponents().getSchemas();
         assertNotNull(schemas);
 
-        final JsonNode configLstTop = schemas.get("toaster2_config_lst_TOP");
-        assertNotNull(configLstTop);
-        DocGenTestHelper.containsReferences(configLstTop, "lst", "#/components/schemas/toaster2_config_lst");
-
         final JsonNode configLst = schemas.get("toaster2_config_lst");
         assertNotNull(configLst);
         DocGenTestHelper.containsReferences(configLst, "lst1", "#/components/schemas/toaster2_lst_config_lst1");
         DocGenTestHelper.containsReferences(configLst, "cont1", "#/components/schemas/toaster2_lst_config_cont1");
 
-        final JsonNode configLst1Top = schemas.get("toaster2_lst_config_lst1_TOP");
-        assertNotNull(configLst1Top);
-        DocGenTestHelper.containsReferences(configLst1Top, "lst1", "#/components/schemas/toaster2_lst_config_lst1");
-
         final JsonNode configLst1 = schemas.get("toaster2_lst_config_lst1");
         assertNotNull(configLst1);
-
-        final JsonNode configCont1Top = schemas.get("toaster2_lst_config_cont1_TOP");
-        assertNotNull(configCont1Top);
-        DocGenTestHelper.containsReferences(configCont1Top, "cont1", "#/components/schemas/toaster2_lst_config_cont1");
 
         final JsonNode configCont1 = schemas.get("toaster2_lst_config_cont1");
         assertNotNull(configCont1);
@@ -119,18 +107,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         DocGenTestHelper.containsReferences(configCont1, "lst11",
                 "#/components/schemas/toaster2_lst_cont1_config_lst11");
 
-        final JsonNode configCont11Top = schemas.get("toaster2_lst_cont1_config_cont11_TOP");
-        assertNotNull(configCont11Top);
-        DocGenTestHelper.containsReferences(configCont11Top,
-                "cont11", "#/components/schemas/toaster2_lst_cont1_config_cont11");
-
         final JsonNode configCont11 = schemas.get("toaster2_lst_cont1_config_cont11");
         assertNotNull(configCont11);
-
-        final JsonNode configLst11Top = schemas.get("toaster2_lst_cont1_config_lst11_TOP");
-        assertNotNull(configLst11Top);
-        DocGenTestHelper.containsReferences(configLst11Top, "lst11",
-                "#/components/schemas/toaster2_lst_cont1_config_lst11");
 
         final JsonNode configLst11 = schemas.get("toaster2_lst_cont1_config_lst11");
         assertNotNull(configLst11);
@@ -146,10 +124,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertNotNull(doc);
 
         final ObjectNode schemas = doc.getComponents().getSchemas();
-        final JsonNode inputTop = schemas.get("toaster_make-toast_input_TOP");
+        final JsonNode inputTop = schemas.get("toaster_make-toast_input");
         assertNotNull(inputTop);
-        final String testString = "{\"input\":{\"$ref\":\"#/components/schemas/toaster_make-toast_input\"}}";
-        assertEquals(testString, inputTop.get("properties").toString());
         final JsonNode input = schemas.get("toaster_make-toast_input");
         final JsonNode properties = input.get("properties");
         assertTrue(properties.has("toasterDoneness"));
@@ -179,20 +155,16 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
         assertEquals(List.of("/rests/data", "/rests/data/my-yang:data"),
                 ImmutableList.copyOf(doc.getPaths().fieldNames()));
-        final var myYangData = doc.getPaths().get("/rests/data/my-yang:data");
-        verifyRequestRef(myYangData.get("post"), "#/components/schemas/my-yang_config_data",
-                "#/components/schemas/my-yang_config_data");
-        verifyRequestRef(myYangData.get("put"), "#/components/schemas/my-yang_config_data_TOP",
-                "#/components/schemas/my-yang_config_data");
-        // TODO: The XML should point to the "my-yang_config_data" element instead of the "TOP" element.
-        verifyRequestRef(myYangData.get("get"), "#/components/schemas/my-yang_config_data_TOP",
-                "#/components/schemas/my-yang_config_data_TOP");
+        final var jsonNodeMyYangData = doc.getPaths().get("/rests/data/my-yang:data");
+        final var myYangData = "#/components/schemas/my-yang_config_data";
+        verifyRequestRef(jsonNodeMyYangData.get("post"), myYangData, myYangData);
+        verifyRequestRef(jsonNodeMyYangData.get("put"), myYangData, myYangData);
+        verifyRequestRef(jsonNodeMyYangData.get("get"), myYangData, myYangData);
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(3, definitions.size());
+        assertEquals(2, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
-        assertTrue(definitions.has("my-yang_config_data_TOP"));
         assertTrue(definitions.has("my-yang_module"));
     }
 
@@ -201,58 +173,48 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
-        final var toaster = doc.getPaths().get("/rests/data/toaster2:toaster");
-        verifyRequestRef(toaster.get("post"), "#/components/schemas/toaster2_config_toaster",
-                "#/components/schemas/toaster2_config_toaster");
-        verifyRequestRef(toaster.get("put"), "#/components/schemas/toaster2_config_toaster_TOP",
-                "#/components/schemas/toaster2_config_toaster");
-        verifyRequestRef(toaster.get("get"), "#/components/schemas/toaster2_config_toaster_TOP",
-                "#/components/schemas/toaster2_config_toaster_TOP");
+        final var jsonNodeToaster = doc.getPaths().get("/rests/data/toaster2:toaster");
+        final var toaster2 = "#/components/schemas/toaster2_config_toaster";
+        verifyRequestRef(jsonNodeToaster.get("post"), toaster2, toaster2);
+        verifyRequestRef(jsonNodeToaster.get("put"), toaster2, toaster2);
+        verifyRequestRef(jsonNodeToaster.get("get"), toaster2, toaster2);
 
-        final var toasterSlot = doc.getPaths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
-        verifyRequestRef(toasterSlot.get("post"), "#/components/schemas/toaster2_toaster_config_toasterSlot",
-                "#/components/schemas/toaster2_toaster_config_toasterSlot");
-        verifyRequestRef(toasterSlot.get("put"), "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
-                "#/components/schemas/toaster2_toaster_config_toasterSlot");
-        verifyRequestRef(toasterSlot.get("get"), "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
-                "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP");
+        final var jsonNodeToasterSlot = doc.getPaths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
+        final var toasterSlot2 = "#/components/schemas/toaster2_toaster_config_toasterSlot";
+        verifyRequestRef(jsonNodeToasterSlot.get("post"), toasterSlot2, toasterSlot2);
+        verifyRequestRef(jsonNodeToasterSlot.get("put"), toasterSlot2, toasterSlot2);
+        verifyRequestRef(jsonNodeToasterSlot.get("get"), toasterSlot2, toasterSlot2);
 
-        final var slotInfo = doc.getPaths().get(
+        final var jsonNodeSlotInfo = doc.getPaths().get(
                 "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
-        verifyRequestRef(slotInfo.get("post"), "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo",
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
-        verifyRequestRef(slotInfo.get("put"), "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
-        verifyRequestRef(slotInfo.get("get"), "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP");
+        final var slotInfo = "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo";
+        verifyRequestRef(jsonNodeSlotInfo.get("post"), slotInfo, slotInfo);
+        verifyRequestRef(jsonNodeSlotInfo.get("put"), slotInfo, slotInfo);
+        verifyRequestRef(jsonNodeSlotInfo.get("get"), slotInfo, slotInfo);
 
-        final var lst = doc.getPaths().get("/rests/data/toaster2:lst");
-        verifyRequestRef(lst.get("post"), "#/components/schemas/toaster2_config_lst",
-                "#/components/schemas/toaster2_config_lst");
-        verifyRequestRef(lst.get("put"), "#/components/schemas/toaster2_config_lst_TOP",
-                "#/components/schemas/toaster2_config_lst");
-        verifyRequestRef(lst.get("get"), "#/components/schemas/toaster2_config_lst_TOP",
-                "#/components/schemas/toaster2_config_lst_TOP");
+        final var jsonNodeLst = doc.getPaths().get("/rests/data/toaster2:lst");
+        final var lst = "#/components/schemas/toaster2_config_lst";
+        verifyRequestRef(jsonNodeLst.get("post"), lst, lst);
+        verifyRequestRef(jsonNodeLst.get("put"), lst, lst);
+        verifyRequestRef(jsonNodeLst.get("get"), lst, lst);
 
-        final var lst1 = doc.getPaths().get("/rests/data/toaster2:lst/lst1={key1},{key2}");
-        verifyRequestRef(lst1.get("post"), "#/components/schemas/toaster2_lst_config_lst1",
-                "#/components/schemas/toaster2_lst_config_lst1");
-        verifyRequestRef(lst1.get("put"), "#/components/schemas/toaster2_lst_config_lst1_TOP",
-                "#/components/schemas/toaster2_lst_config_lst1");
-        verifyRequestRef(lst1.get("get"), "#/components/schemas/toaster2_lst_config_lst1_TOP",
-                "#/components/schemas/toaster2_lst_config_lst1_TOP");
+        final var jsonNodeLst1 = doc.getPaths().get("/rests/data/toaster2:lst/lst1={key1},{key2}");
+        final var lst1 = "#/components/schemas/toaster2_lst_config_lst1";
+        verifyRequestRef(jsonNodeLst1.get("post"), lst1, lst1);
+        verifyRequestRef(jsonNodeLst1.get("put"), lst1, lst1);
+        verifyRequestRef(jsonNodeLst1.get("get"), lst1, lst1);
 
-        final var makeToast = doc.getPaths().get("/rests/operations/toaster2:make-toast");
+        final var jsonNodeMakeToast = doc.getPaths().get("/rests/operations/toaster2:make-toast");
         // TODO: The RPC only contains a `POST` example, so the `GET` request is missing here.
-        assertNull(makeToast.get("get"));
-        verifyRequestRef(makeToast.get("post"), "#/components/schemas/toaster2_make-toast_input_TOP",
-                "#/components/schemas/toaster2_make-toast_input");
+        assertNull(jsonNodeMakeToast.get("get"));
+        final var makeToast = "#/components/schemas/toaster2_make-toast_input";
+        verifyRequestRef(jsonNodeMakeToast.get("post"), makeToast, makeToast);
 
-        final var cancelToast = doc.getPaths().get("/rests/operations/toaster2:cancel-toast");
-        assertNull(cancelToast.get("get"));
+        final var jsonNodeCancelToast = doc.getPaths().get("/rests/operations/toaster2:cancel-toast");
+        assertNull(jsonNodeCancelToast.get("get"));
         // TODO: For some reason, this RPC does not contain a reference but instead contains a specific object.
         //       It should be replaced with a reference.
-        final var postContent = cancelToast.get("post").get("requestBody").get("content");
+        final var postContent = jsonNodeCancelToast.get("post").get("requestBody").get("content");
         final var jsonSchema = postContent.get("application/json").get("schema");
         assertNull(jsonSchema.get("$ref"));
         assertEquals(2, jsonSchema.size());
@@ -262,7 +224,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(28, definitions.size());
+        assertEquals(18, definitions.size());
     }
 
     /**
