@@ -34,6 +34,24 @@
       "parentUuid": "6138fe60_067b9189",
       "revId": "b32267abe4e70082147bbc5159f039644823d43d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "716bdc04_5177b605",
+        "filename": "plugins/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/LibraryModulesSchemasTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-03-28T13:42:49Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6da8ebaa_687047f5",
+      "revId": "b32267abe4e70082147bbc5159f039644823d43d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
