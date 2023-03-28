@@ -93,25 +93,13 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final ObjectNode schemas = doc.getComponents().getSchemas();
         assertNotNull(schemas);
 
-        final JsonNode configLstTop = schemas.get("toaster2_config_lst_TOP");
-        assertNotNull(configLstTop);
-        DocGenTestHelper.containsReferences(configLstTop, "lst", "#/components/schemas/toaster2_config_lst");
-
         final JsonNode configLst = schemas.get("toaster2_config_lst");
         assertNotNull(configLst);
         DocGenTestHelper.containsReferences(configLst, "lst1", "#/components/schemas/toaster2_lst_config_lst1");
         DocGenTestHelper.containsReferences(configLst, "cont1", "#/components/schemas/toaster2_lst_config_cont1");
 
-        final JsonNode configLst1Top = schemas.get("toaster2_lst_config_lst1_TOP");
-        assertNotNull(configLst1Top);
-        DocGenTestHelper.containsReferences(configLst1Top, "lst1", "#/components/schemas/toaster2_lst_config_lst1");
-
         final JsonNode configLst1 = schemas.get("toaster2_lst_config_lst1");
         assertNotNull(configLst1);
-
-        final JsonNode configCont1Top = schemas.get("toaster2_lst_config_cont1_TOP");
-        assertNotNull(configCont1Top);
-        DocGenTestHelper.containsReferences(configCont1Top, "cont1", "#/components/schemas/toaster2_lst_config_cont1");
 
         final JsonNode configCont1 = schemas.get("toaster2_lst_config_cont1");
         assertNotNull(configCont1);
@@ -120,18 +108,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         DocGenTestHelper.containsReferences(configCont1, "lst11",
                 "#/components/schemas/toaster2_lst_cont1_config_lst11");
 
-        final JsonNode configCont11Top = schemas.get("toaster2_lst_cont1_config_cont11_TOP");
-        assertNotNull(configCont11Top);
-        DocGenTestHelper.containsReferences(configCont11Top,
-                "cont11", "#/components/schemas/toaster2_lst_cont1_config_cont11");
-
         final JsonNode configCont11 = schemas.get("toaster2_lst_cont1_config_cont11");
         assertNotNull(configCont11);
-
-        final JsonNode configLst11Top = schemas.get("toaster2_lst_cont1_config_lst11_TOP");
-        assertNotNull(configLst11Top);
-        DocGenTestHelper.containsReferences(configLst11Top, "lst11",
-                "#/components/schemas/toaster2_lst_cont1_config_lst11");
 
         final JsonNode configLst11 = schemas.get("toaster2_lst_cont1_config_lst11");
         assertNotNull(configLst11);
@@ -147,10 +125,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertNotNull(doc);
 
         final ObjectNode schemas = doc.getComponents().getSchemas();
-        final JsonNode inputTop = schemas.get("toaster_make-toast_input_TOP");
+        final JsonNode inputTop = schemas.get("toaster_make-toast_input");
         assertNotNull(inputTop);
-        final String testString = "{\"input\":{\"$ref\":\"#/components/schemas/toaster_make-toast_input\"}}";
-        assertEquals(testString, inputTop.get("properties").toString());
         final JsonNode input = schemas.get("toaster_make-toast_input");
         final JsonNode properties = input.get("properties");
         assertTrue(properties.has("toasterDoneness"));
@@ -187,9 +163,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(3, definitions.size());
+        assertEquals(2, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
-        assertTrue(definitions.has("my-yang_config_data_TOP"));
         assertTrue(definitions.has("my-yang_module"));
     }
 
@@ -249,7 +224,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(28, definitions.size());
+        assertEquals(18, definitions.size());
     }
 
     /**
