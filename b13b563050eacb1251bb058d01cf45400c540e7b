@@ -16,6 +16,24 @@
       "message": "Is there any problem to use:\n```\n            final Element rootElement \u003d doc.createElementNS(ModulesState.QNAME.getNamespace().toString(),\n                ModulesState.QNAME.getLocalName());\n```",
       "revId": "b13b563050eacb1251bb058d01cf45400c540e7b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e796e1a_380a1bd7",
+        "filename": "plugins/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/LibraryModulesSchemas.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-28T12:12:17Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "4cbc4595_5abdd769",
+      "revId": "b13b563050eacb1251bb058d01cf45400c540e7b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
