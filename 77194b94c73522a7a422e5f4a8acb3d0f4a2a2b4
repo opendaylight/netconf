@@ -22,6 +22,30 @@
       },
       "revId": "77194b94c73522a7a422e5f4a8acb3d0f4a2a2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64ff2fa5_f569b1e7",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TestUtils.java",
+        "patchSetId": 60
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-28T14:26:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3de53b0b_d90bbda1",
+      "range": {
+        "startLine": 121,
+        "startChar": 68,
+        "endLine": 121,
+        "endChar": 78
+      },
+      "revId": "77194b94c73522a7a422e5f4a8acb3d0f4a2a2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
