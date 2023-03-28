@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<modules xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+<modules-state xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
     <module>
         <name>module-with-revision</name>
         <revision>2014-04-08</revision>
@@ -32,4 +32,4 @@
             http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08
         </schema>
     </module>
-</modules>
+</modules-state>
