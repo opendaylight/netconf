@@ -27,7 +27,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
@@ -354,7 +353,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
                 : QName.create(XMLNamespace.of(moduleNameSpace), moduleName);
 
         try {
-            return new SimpleImmutableEntry<>(moduleQName, new URL(schemaUriAsString.orElseThrow()));
+            return Map.entry(moduleQName, new URL(schemaUriAsString.orElseThrow()));
         } catch (final MalformedURLException e) {
             LOG.warn("Skipping library schema for {}. URL {} representing yang schema resource is not valid",
                     moduleNode, schemaUriAsString.orElseThrow());
