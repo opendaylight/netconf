@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64ecc5cc_9b5860b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 46
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-03-28T10:58:26Z",
+      "side": 1,
+      "message": "There are few FIXME comments without proper explanation and TODO comments that may be fixed - please review and deal with them OR give them meaningful message.\n\nAlso there is few lines of commented code - pls delete all lines we don\u0027t need.",
+      "revId": "f06ff032fe5612939c197f318597fcc67113c3ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69059a3f_24057e25",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportUtils.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-03-28T10:58:26Z",
+      "side": 1,
+      "message": "Remove it?",
+      "range": {
+        "startLine": 118,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 48
+      },
+      "revId": "f06ff032fe5612939c197f318597fcc67113c3ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72ca3005_c15b2248",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportUtils.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-03-28T10:58:26Z",
+      "side": 1,
+      "message": "Remove it?",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 40
+      },
+      "revId": "f06ff032fe5612939c197f318597fcc67113c3ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb6b99b2_25701dbd",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportUtils.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-03-28T10:58:26Z",
+      "side": 1,
+      "message": "What about this FIXME?",
+      "range": {
+        "startLine": 133,
+        "startChar": 19,
+        "endLine": 133,
+        "endChar": 24
+      },
+      "revId": "f06ff032fe5612939c197f318597fcc67113c3ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbd15889_5a845033",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportUtils.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-03-28T10:58:26Z",
+      "side": 1,
+      "message": "What about these? Pls either remove it or write more meaningful message if it is for fixing later.",
+      "range": {
+        "startLine": 152,
+        "startChar": 23,
+        "endLine": 156,
+        "endChar": 28
+      },
+      "revId": "f06ff032fe5612939c197f318597fcc67113c3ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d62a2bd_a2cbe51a",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportUtils.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-03-28T10:58:26Z",
+      "side": 1,
+      "message": "Remove it and other commented code",
+      "range": {
+        "startLine": 176,
+        "startChar": 22,
+        "endLine": 182,
+        "endChar": 44
+      },
+      "revId": "f06ff032fe5612939c197f318597fcc67113c3ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
