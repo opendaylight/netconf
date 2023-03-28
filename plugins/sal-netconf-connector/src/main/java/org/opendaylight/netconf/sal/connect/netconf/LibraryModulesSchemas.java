@@ -302,8 +302,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
             final Document read = docBuilder.parse(in);
             final Document doc = docBuilder.newDocument();
-            final Element rootElement = doc.createElementNS("urn:ietf:params:xml:ns:yang:ietf-yang-library",
-                    "modules");
+            final Element rootElement = doc.createElementNS(ModulesState.QNAME.getNamespace().toString(),
+                ModulesState.QNAME.getLocalName());
             doc.appendChild(rootElement);
 
             for (int i = 0; i < read.getElementsByTagName("revision").getLength(); i++) {
