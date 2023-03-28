@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,6 +26,8 @@ import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String NAME = "toaster2";
+    private static final String MY_YANG = "my-yang";
+    private static final String MY_YANG_REVISION = "2022-10-06";
     private static final String REVISION_DATE = "2009-11-20";
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
@@ -169,5 +172,106 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         JsonNode secondContainer = schemas.get("choice-test_second-container");
         assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
+    }
+
+    @Test
+    public void testSimpleSwaggerObjects() {
+        final var module = CONTEXT.findModule(MY_YANG, Revision.of(MY_YANG_REVISION)).orElseThrow();
+        final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        assertEquals(Set.of("/rests/data", "/rests/data/my-yang:data"), doc.getPaths().keySet());
+        final var jsonNodeMyYangData = doc.getPaths().get("/rests/data/my-yang:data");
+        final var myYangData = "#/components/schemas/my-yang_config_data";
+        verifyRequestRef(jsonNodeMyYangData.getPost(), myYangData, myYangData);
+        verifyRequestRef(jsonNodeMyYangData.getPut(), myYangData, myYangData);
+        verifyRequestRef(jsonNodeMyYangData.getGet(), myYangData, myYangData);
+
+        // Test `components/schemas` objects
+        final var definitions = doc.getComponents().getSchemas();
+        assertEquals(7, definitions.size());
+        assertTrue(definitions.has("my-yang_config_data"));
+        assertTrue(definitions.has("my-yang_config_data_post"));
+        assertTrue(definitions.has("my-yang_config_data_post_xml"));
+        assertTrue(definitions.has("my-yang_config_data_TOP"));
+        assertTrue(definitions.has("my-yang_data"));
+        assertTrue(definitions.has("my-yang_data_TOP"));
+        assertTrue(definitions.has("my-yang_module"));
+    }
+
+    @Test
+    public void testToaster2SwaggerObjects() {
+        final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+
+        final var jsonNodeToaster = doc.getPaths().get("/rests/data/toaster2:toaster");
+        final var toaster2 = "#/components/schemas/toaster2_config_toaster";
+        verifyRequestRef(jsonNodeToaster.getPost(), toaster2, toaster2);
+        verifyRequestRef(jsonNodeToaster.getPut(), toaster2, toaster2);
+        verifyRequestRef(jsonNodeToaster.getGet(), toaster2, toaster2);
+
+        final var jsonNodeToasterSlot = doc.getPaths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
+        final var toasterSlot2 = "#/components/schemas/toaster2_toaster_config_toasterSlot";
+        verifyRequestRef(jsonNodeToasterSlot.getPost(), toasterSlot2, toasterSlot2);
+        verifyRequestRef(jsonNodeToasterSlot.getPut(), toasterSlot2, toasterSlot2);
+        verifyRequestRef(jsonNodeToasterSlot.getGet(), toasterSlot2, toasterSlot2);
+
+        final var jsonNodeSlotInfo = doc.getPaths().get(
+                "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
+        final var slotInfo = "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo";
+        verifyRequestRef(jsonNodeSlotInfo.getPost(), slotInfo, slotInfo);
+        verifyRequestRef(jsonNodeSlotInfo.getPut(), slotInfo, slotInfo);
+        verifyRequestRef(jsonNodeSlotInfo.getGet(), slotInfo, slotInfo);
+
+        final var jsonNodeLst = doc.getPaths().get("/rests/data/toaster2:lst");
+        final var lst = "#/components/schemas/toaster2_config_lst";
+        verifyRequestRef(jsonNodeLst.getPost(), lst, lst);
+        verifyRequestRef(jsonNodeLst.getPut(), lst, lst);
+        verifyRequestRef(jsonNodeLst.getGet(), lst, lst);
+
+        final var jsonNodeLst1 = doc.getPaths().get("/rests/data/toaster2:lst/lst1={key1},{key2}");
+        final var lst1 = "#/components/schemas/toaster2_lst_config_lst1";
+        verifyRequestRef(jsonNodeLst1.getPost(), lst1, lst1);
+        verifyRequestRef(jsonNodeLst1.getPut(), lst1, lst1);
+        verifyRequestRef(jsonNodeLst1.getGet(), lst1, lst1);
+
+        final var jsonNodeMakeToast = doc.getPaths().get("/rests/operations/toaster2:make-toast");
+        // TODO: The RPC only contains a `POST` example, so the `GET` request is missing here.
+        assertNull(jsonNodeMakeToast.getGet());
+        final var makeToast = "#/components/schemas/toaster2_make-toast_input";
+        verifyRequestRef(jsonNodeMakeToast.getPost(), makeToast, makeToast);
+
+        final var jsonNodeCancelToast = doc.getPaths().get("/rests/operations/toaster2:cancel-toast");
+        assertNull(jsonNodeCancelToast.getGet());
+        // TODO: For some reason, this RPC does not contain a reference but instead contains a specific object.
+        //       It should be replaced with a reference.
+        final var postContent = jsonNodeCancelToast.getPost().get("requestBody").get("content");
+        final var jsonSchema = postContent.get("application/json").get("schema");
+        assertNull(jsonSchema.get("$ref"));
+        assertEquals(2, jsonSchema.size());
+        final var xmlSchema = postContent.get("application/xml").get("schema");
+        assertNull(xmlSchema.get("$ref"));
+        assertEquals(2, xmlSchema.size());
+
+        // Test `components/schemas` objects
+        final var definitions = doc.getComponents().getSchemas();
+        assertEquals(60, definitions.size());
+    }
+
+    /**
+     *  Test JSON and XML references for request operation.
+     */
+    public void verifyRequestRef(final JsonNode path, final String expectedJsonRef, final String expectedXmlRef) {
+        final JsonNode postContent;
+        if (path.get("requestBody") != null) {
+            postContent = path.get("requestBody").get("content");
+        } else {
+            postContent = path.get("responses").get("200").get("content");
+        }
+        assertNotNull(postContent);
+        final var postJsonRef = postContent.get("application/json").get("schema").get("$ref");
+        assertNotNull(postJsonRef);
+        assertEquals(expectedJsonRef, postJsonRef.textValue());
+        final var postXmlRef = postContent.get("application/xml").get("schema").get("$ref");
+        assertNotNull(postXmlRef);
+        assertEquals(expectedXmlRef, postXmlRef.textValue());
     }
 }
