@@ -11,7 +11,6 @@ import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.MO
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.COMPONENTS_PREFIX;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.NAME_KEY;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.XML_KEY;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -285,21 +284,17 @@ public class DefinitionGenerator {
             xml.put(NAME_KEY, isInput ? INPUT : OUTPUT);
             childSchema.setXml(xml);
             childSchema.setTitle(filename);
-            final String discriminator =
-                    definitionNames.pickDiscriminator(container, List.of(filename, filename + TOP));
+            final String discriminator = definitionNames.pickDiscriminator(container, List.of(filename));
             definitions.put(filename + discriminator, childSchema);
-
-            processTopData(filename, discriminator, definitions, container);
         }
         stack.exit();
     }
 
-    private static ObjectNode processTopData(final String filename, final String discriminator,
-            final Map<String, Schema> definitions, final SchemaNode schemaNode) {
+    private static ObjectNode processInnerData(final String filename, final String discriminator,
+            final SchemaNode schemaNode) {
         final ObjectNode dataNodeProperties = JsonNodeFactory.instance.objectNode();
         final String name = filename + discriminator;
         final String ref = COMPONENTS_PREFIX + name;
-        final String topName = filename + TOP;
 
         if (schemaNode instanceof ListSchemaNode) {
             dataNodeProperties.put(TYPE_KEY, ARRAY_TYPE);
@@ -314,21 +309,6 @@ public class DefinitionGenerator {
               */
             dataNodeProperties.put(REF_KEY, ref);
         }
-
-        final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-        /*
-            Add module name prefix to property name, when needed, when ServiceNow can process colons,
-            use RestDocGenUtil#resolveNodesName for creating property name
-         */
-        properties.set(schemaNode.getQName().getLocalName(), dataNodeProperties);
-        final Schema finalChildSchema = new Schema();
-        finalChildSchema.setType(OBJECT_TYPE);
-        finalChildSchema.setProperties(properties);
-        finalChildSchema.setTitle(topName);
-
-
-        definitions.put(topName + discriminator, finalChildSchema);
-
         return dataNodeProperties;
     }
 
@@ -381,10 +361,7 @@ public class DefinitionGenerator {
             final String discriminator;
 
             if (!definitionNames.isListedNode(schemaNode)) {
-                final List<String> names = List.of(parentNameConfigLocalName,
-                        parentNameConfigLocalName + TOP,
-                        nameAsParent,
-                        nameAsParent + TOP);
+                final List<String> names = List.of(parentNameConfigLocalName, nameAsParent);
                 discriminator = definitionNames.pickDiscriminator(schemaNode, names);
             } else {
                 discriminator = definitionNames.getDiscriminator(schemaNode);
@@ -399,7 +376,7 @@ public class DefinitionGenerator {
             childSchema.setXml(buildXmlParameter(schemaNode));
             definitions.put(defName, childSchema);
 
-            return processTopData(nodeName, discriminator, definitions, schemaNode);
+            return processInnerData(nodeName, discriminator, schemaNode);
         }
         return null;
     }
