@@ -91,6 +91,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
     private static final EffectiveModelContext LIBRARY_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(
         YangLibrary.class);
+    private static final String LIBRARY_NAMESPACE = ModulesState.QNAME.getNamespace().toString();
     private static final Inference MODULES_STATE_INFERENCE =
         SchemaInferenceStack.ofDataTreePath(LIBRARY_CONTEXT, ModulesState.QNAME).toInference();
 
@@ -302,8 +303,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
             final Document read = docBuilder.parse(in);
             final Document doc = docBuilder.newDocument();
-            final Element rootElement = doc.createElementNS("urn:ietf:params:xml:ns:yang:ietf-yang-library",
-                    "modules");
+            final Element rootElement = doc.createElementNS(LIBRARY_NAMESPACE, ModulesState.QNAME.getLocalName());
             doc.appendChild(rootElement);
 
             for (int i = 0; i < read.getElementsByTagName("revision").getLength(); i++) {
