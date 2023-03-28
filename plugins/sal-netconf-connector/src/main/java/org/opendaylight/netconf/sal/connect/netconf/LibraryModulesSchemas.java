@@ -185,7 +185,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         final Optional<DataContainerChild> modulesStateNode =
                 findModulesStateNode(moduleListNodeResult.value());
         if (modulesStateNode.isPresent()) {
-            final DataContainerChild node = modulesStateNode.get();
+            final DataContainerChild node = modulesStateNode.orElseThrow();
             checkState(node instanceof ContainerNode, "Expecting container containing schemas, but was %s", node);
             return create((ContainerNode) node);
         }
@@ -197,7 +197,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
         final Optional<DataContainerChild> moduleListNode = modulesStateNode.findChildByArg(MODULE_NID);
         checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", MODULE_NID, modulesStateNode);
-        final DataContainerChild node = moduleListNode.get();
+        final DataContainerChild node = moduleListNode.orElseThrow();
         checkState(node instanceof MapNode, "Unexpected structure for container: %s in : %s. Expecting a list",
             MODULE_NID, modulesStateNode);
 
@@ -243,7 +243,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return Optional.empty();
         }
 
-        return ((DataContainerNode) dataNode.get()).findChildByArg(MODULES_STATE_NID);
+        return ((DataContainerNode) dataNode.orElseThrow()).findChildByArg(MODULES_STATE_NID);
     }
 
     private static LibraryModulesSchemas createFromURLConnection(final URLConnection connection) {
@@ -270,7 +270,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return new LibraryModulesSchemas(ImmutableMap.of());
         }
 
-        final NormalizedNode modulesStateNode = optionalModulesStateNode.get();
+        final NormalizedNode modulesStateNode = optionalModulesStateNode.orElseThrow();
         checkState(modulesStateNode instanceof ContainerNode, "Expecting container containing module list, but was %s",
             modulesStateNode);
         final ContainerNode modulesState = (ContainerNode) modulesStateNode;
@@ -334,11 +334,12 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         final QName moduleNodeId = moduleNode.getIdentifier().getNodeType();
         checkArgument(moduleNodeId.equals(Module.QNAME), "Wrong QName %s", moduleNodeId);
 
-        final String moduleName = getSingleChildNodeValue(moduleNode, NAME_NID).get();
+        final String moduleName = getSingleChildNodeValue(moduleNode, NAME_NID).orElseThrow();
         final Optional<String> revision = getSingleChildNodeValue(moduleNode, REVISION_NID);
         if (revision.isPresent()) {
-            if (!Revision.STRING_FORMAT_PATTERN.matcher(revision.get()).matches()) {
-                LOG.warn("Skipping library schema for {}. Revision {} is in wrong format.", moduleNode, revision.get());
+            final var rev = revision.orElseThrow();
+            if (!Revision.STRING_FORMAT_PATTERN.matcher(rev).matches()) {
+                LOG.warn("Skipping library schema for {}. Revision {} is in wrong format.", moduleNode, rev);
                 return null;
             }
         }
@@ -346,17 +347,17 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         // FIXME leaf schema with url that represents the yang schema resource for this module is not mandatory
         // don't fail if schema node is not present, just skip the entry or add some default URL
         final Optional<String> schemaUriAsString = getSingleChildNodeValue(moduleNode, SCHEMA_NID);
-        final String moduleNameSpace = getSingleChildNodeValue(moduleNode, NAMESPACE_NID).get();
+        final String moduleNameSpace = getSingleChildNodeValue(moduleNode, NAMESPACE_NID).orElseThrow();
 
         final QName moduleQName = revision.isPresent()
-                ? QName.create(moduleNameSpace, revision.get(), moduleName)
+                ? QName.create(moduleNameSpace, revision.orElseThrow(), moduleName)
                 : QName.create(XMLNamespace.of(moduleNameSpace), moduleName);
 
         try {
-            return new SimpleImmutableEntry<>(moduleQName, new URL(schemaUriAsString.get()));
+            return new SimpleImmutableEntry<>(moduleQName, new URL(schemaUriAsString.orElseThrow()));
         } catch (final MalformedURLException e) {
             LOG.warn("Skipping library schema for {}. URL {} representing yang schema resource is not valid",
-                    moduleNode, schemaUriAsString.get());
+                    moduleNode, schemaUriAsString.orElseThrow());
             return null;
         }
     }
@@ -365,7 +366,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
                                                             final NodeIdentifier childNodeId) {
         final Optional<DataContainerChild> node = schemaNode.findChildByArg(childNodeId);
         checkArgument(node.isPresent(), "Child node %s not present", childNodeId.getNodeType());
-        return getValueOfSimpleNode(node.get());
+        return getValueOfSimpleNode(node.orElseThrow());
     }
 
     private static Optional<String> getValueOfSimpleNode(final NormalizedNode node) {
