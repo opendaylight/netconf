@@ -131,4 +131,20 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
         assertEquals(1, result.size());
         assertEquals(Set.of(PROTOCOLS_Q_NAME), result.get(0));
     }
+
+    @Override
+    protected void assertDuplicateNodes1(final List<Set<QName>> result) {
+        assertEquals(3, result.size());
+        assertEquals(Set.of(BAR_Q_NAME, BAZ_Q_NAME), result.get(0));
+        assertEquals(Set.of(ALPHA_Q_NAME, BETA_Q_NAME), result.get(1));
+        assertEquals(Set.of(GAMMA_Q_NAME), result.get(2));
+    }
+
+    @Override
+    protected void assertDuplicateNodes2(final List<Set<QName>> result) {
+        assertEquals(3, result.size());
+        assertEquals(Set.of(BAR_Q_NAME, BAZ_Q_NAME), result.get(0));
+        assertEquals(Set.of(ALPHA_Q_NAME, BETA_Q_NAME), result.get(1));
+        assertEquals(Set.of(DELTA_Q_NAME, EPSILON_Q_NAME), result.get(2));
+    }
 }

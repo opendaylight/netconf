@@ -1,0 +1,39 @@
+module foo {
+  namespace "urn:foo";
+  prefix "foo";
+  revision "2023-03-27" {
+    description
+      "Initial revision.";
+  }
+
+  container foo {
+    container bar {
+      leaf alpha {
+        type string;
+      }
+      container beta {
+        leaf gamma {
+          type string;
+        }
+        leaf delta {
+          type string;
+        }
+      }
+    }
+
+    list baz {
+      key alpha;
+      leaf alpha {
+        type string;
+      }
+      container beta {
+        leaf gamma {
+          type string;
+        }
+        leaf epsilon {
+          type string;
+        }
+      }
+    }
+  }
+}
