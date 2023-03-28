@@ -51,7 +51,6 @@ public final class OperationBuilder {
     public static final String SUMMARY_KEY = "summary";
     public static final String SUMMARY_SEPARATOR = " - ";
     public static final String TAGS_KEY = "tags";
-    public static final String TOP = "_TOP";
     public static final String XML_KEY = "xml";
     private static final String CONTENT = "content";
     private static final ArrayNode CONSUMES_PUT_POST;
@@ -152,7 +151,7 @@ public final class OperationBuilder {
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
-        final String defName = parentName + CONFIG + "_" + nodeName + TOP;
+        final String defName = parentName + CONFIG + "_" + nodeName;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
         insertRequestBodyParameter(parameters, value, defName, xmlDefName, nodeName + CONFIG, oaversion);
         value.set(PARAMETERS_KEY, parameters);
@@ -200,7 +199,7 @@ public final class OperationBuilder {
             final String discriminator = definitionNames.getDiscriminator(input);
             final String clearDefName = parentName + "_" + operName + INPUT_SUFFIX;
             final String defName = clearDefName + discriminator;
-            final String defTopName = clearDefName + TOP + discriminator;
+            final String defTopName = clearDefName + discriminator;
             insertRequestBodyParameter(parameters, postOperation, defTopName, defName, inputName, oaversion);
         } else {
             final ObjectNode payload = JsonNodeFactory.instance.objectNode();
@@ -244,7 +243,7 @@ public final class OperationBuilder {
 
         if (!output.getChildNodes().isEmpty()) {
             final ObjectNode schema = JsonNodeFactory.instance.objectNode();
-            final String defName = parentName + "_" + operName + OUTPUT_SUFFIX + TOP
+            final String defName = parentName + "_" + operName + OUTPUT_SUFFIX
                     + definitionNames.getDiscriminator(output);
             schema.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
             responses.set(String.valueOf(Response.Status.OK.getStatusCode()), buildResponse(description,

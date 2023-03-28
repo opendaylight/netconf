@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.NAME_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getAppropriateModelPrefix;
 
@@ -284,21 +283,17 @@ public class DefinitionGenerator {
             xml.put(NAME_KEY, isInput ? INPUT : OUTPUT);
             childSchema.set(XML_KEY, xml);
             childSchema.put(TITLE_KEY, filename);
-            final String discriminator =
-                    definitionNames.pickDiscriminator(container, List.of(filename, filename + TOP));
+            final String discriminator = definitionNames.pickDiscriminator(container, List.of(filename));
             definitions.set(filename + discriminator, childSchema);
-
-            processTopData(filename, discriminator, definitions, container, oaversion);
         }
         stack.exit();
     }
 
-    private static ObjectNode processTopData(final String filename, final String discriminator,
-            final ObjectNode definitions, final SchemaNode schemaNode, final OAversion oaversion) {
+    private static ObjectNode processInnerData(final String filename, final String discriminator,
+            final SchemaNode schemaNode, final OAversion oaversion) {
         final ObjectNode dataNodeProperties = JsonNodeFactory.instance.objectNode();
         final String name = filename + discriminator;
         final String ref = getAppropriateModelPrefix(oaversion) + name;
-        final String topName = filename + TOP;
 
         if (schemaNode instanceof ListSchemaNode) {
             dataNodeProperties.put(TYPE_KEY, ARRAY_TYPE);
@@ -313,21 +308,6 @@ public class DefinitionGenerator {
               */
             dataNodeProperties.put(REF_KEY, ref);
         }
-
-        final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-        /*
-            Add module name prefix to property name, when needed, when ServiceNow can process colons,
-            use RestDocGenUtil#resolveNodesName for creating property name
-         */
-        properties.set(schemaNode.getQName().getLocalName(), dataNodeProperties);
-        final ObjectNode finalChildSchema = JsonNodeFactory.instance.objectNode();
-        finalChildSchema.put(TYPE_KEY, OBJECT_TYPE);
-        finalChildSchema.set(PROPERTIES_KEY, properties);
-        finalChildSchema.put(TITLE_KEY, topName);
-
-
-        definitions.set(topName + discriminator, finalChildSchema);
-
         return dataNodeProperties;
     }
 
@@ -380,10 +360,7 @@ public class DefinitionGenerator {
             final String discriminator;
 
             if (!definitionNames.isListedNode(schemaNode)) {
-                final List<String> names = List.of(parentNameConfigLocalName,
-                        parentNameConfigLocalName + TOP,
-                        nameAsParent,
-                        nameAsParent + TOP);
+                final List<String> names = List.of(parentNameConfigLocalName, nameAsParent);
                 discriminator = definitionNames.pickDiscriminator(schemaNode, names);
             } else {
                 discriminator = definitionNames.getDiscriminator(schemaNode);
@@ -398,7 +375,7 @@ public class DefinitionGenerator {
             childSchema.set(XML_KEY, buildXmlParameter(schemaNode));
             definitions.set(defName, childSchema);
 
-            return processTopData(nodeName, discriminator, definitions, schemaNode, oaversion);
+            return processInnerData(nodeName, discriminator, schemaNode, oaversion);
         }
         return null;
     }
@@ -445,8 +422,8 @@ public class DefinitionGenerator {
 
             final ObjectNode property;
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
-                        definitionNames, stack, oaversion);
+                property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions, definitionNames,
+                        stack, oaversion);
             } else if (node instanceof LeafListSchemaNode leafList) {
                 property = processLeafListNode(leafList, stack, definitions, definitionNames, oaversion);
 
