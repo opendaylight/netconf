@@ -1,4 +1,4 @@
-<modules xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+<modules-state xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
     <module>
         <name>module-with-bad-url</name>
         <revision></revision>
@@ -20,4 +20,4 @@
         <schema>http://www.example.com</schema>
         <namespace>bbbds</namespace>
     </module>
-</modules>
+</modules-state>
