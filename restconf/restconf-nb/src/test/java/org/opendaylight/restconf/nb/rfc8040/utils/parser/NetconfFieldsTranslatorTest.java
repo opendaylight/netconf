@@ -13,6 +13,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.api.query.FieldsParam;
@@ -193,6 +195,34 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
     protected void assertLeafList(final List<YangInstanceIdentifier> parsedFields) {
         assertEquals(1, parsedFields.size());
         assertEquals(List.of(new NodeIdentifier(PROTOCOLS_Q_NAME)), parsedFields.get(0).getPathArguments());
+    }
+
+    @Override
+    protected void assertDuplicateNodes1(final List<YangInstanceIdentifier> parsedFields) {
+        assertEquals(4, parsedFields.size());
+        assertEquals(
+            Set.of(List.of(NodeIdentifier.create(BAR_Q_NAME), NodeIdentifier.create(ALPHA_Q_NAME)),
+                List.of(NodeIdentifier.create(BAR_Q_NAME), NodeIdentifier.create(BETA_Q_NAME),
+                    NodeIdentifier.create(GAMMA_Q_NAME)),
+                List.of(NodeIdentifier.create(BAZ_Q_NAME), NodeIdentifierWithPredicates.of(BAZ_Q_NAME),
+                    NodeIdentifier.create(ALPHA_Q_NAME)),
+                List.of(NodeIdentifier.create(BAZ_Q_NAME), NodeIdentifierWithPredicates.of(BAZ_Q_NAME),
+                    NodeIdentifier.create(BETA_Q_NAME), NodeIdentifier.create(GAMMA_Q_NAME))),
+            parsedFields.stream().map(YangInstanceIdentifier::getPathArguments).collect(Collectors.toSet()));
+    }
+
+    @Override
+    protected void assertDuplicateNodes2(final List<YangInstanceIdentifier> parsedFields) {
+        assertEquals(4, parsedFields.size());
+        assertEquals(
+            Set.of(List.of(NodeIdentifier.create(BAR_Q_NAME), NodeIdentifier.create(ALPHA_Q_NAME)),
+                List.of(NodeIdentifier.create(BAR_Q_NAME), NodeIdentifier.create(BETA_Q_NAME),
+                    NodeIdentifier.create(DELTA_Q_NAME)),
+                List.of(NodeIdentifier.create(BAZ_Q_NAME), NodeIdentifierWithPredicates.of(BAZ_Q_NAME),
+                    NodeIdentifier.create(ALPHA_Q_NAME)),
+                List.of(NodeIdentifier.create(BAZ_Q_NAME), NodeIdentifierWithPredicates.of(BAZ_Q_NAME),
+                    NodeIdentifier.create(BETA_Q_NAME), NodeIdentifier.create(EPSILON_Q_NAME))),
+            parsedFields.stream().map(YangInstanceIdentifier::getPathArguments).collect(Collectors.toSet()));
     }
 
     private static YangInstanceIdentifier assertPath(final List<YangInstanceIdentifier> paths, final QName lastArg) {
