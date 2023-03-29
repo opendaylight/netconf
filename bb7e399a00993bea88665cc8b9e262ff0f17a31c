@@ -16,6 +16,23 @@
       "message": "provided description on why the lines are commented out",
       "revId": "bb7e399a00993bea88665cc8b9e262ff0f17a31c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f88b1b36_cf5a1b00",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 47
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-03-29T11:00:19Z",
+      "side": 1,
+      "message": "recheck\n",
+      "revId": "bb7e399a00993bea88665cc8b9e262ff0f17a31c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
