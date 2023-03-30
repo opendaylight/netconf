@@ -11,13 +11,11 @@
         var sentState = oauth2.state;
         var redirectUrl = oauth2.redirectUrl;
         var isValid, qp, arr;
-
         if (/code|token|error/.test(window.location.hash)) {
             qp = window.location.hash.substring(1);
         } else {
             qp = location.search.substring(1);
         }
-
         arr = qp.split("&")
         arr.forEach(function (v,i,_arr) { _arr[i] = '"' + v.replace('=', '":"') + '"';})
         qp = qp ? JSON.parse('{' + arr.join() + '}',
@@ -25,9 +23,7 @@
                     return key === "" ? value : decodeURIComponent(value)
                 }
         ) : {}
-
         isValid = qp.state === sentState
-
         if ((
           oauth2.auth.schema.get("flow") === "accessCode"||
           oauth2.auth.schema.get("flow") === "authorizationCode"
@@ -40,7 +36,6 @@
                     message: "Authorization may be unsafe, passed state was changed in server Passed state wasn't returned from auth server"
                 });
             }
-
             if (qp.code) {
                 delete oauth2.state;
                 oauth2.auth.code = qp.code;
@@ -52,7 +47,6 @@
                         (qp.error_description ? qp.error_description+ ". " : "no accessCode received from the server. ") +
                         (qp.error_uri ? "More info: "+qp.error_uri : "");
                 }
-
                 oauth2.errCb({
                     authId: oauth2.auth.name,
                     source: "auth",
