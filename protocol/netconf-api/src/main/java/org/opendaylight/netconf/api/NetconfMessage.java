@@ -8,6 +8,9 @@
 
 package org.opendaylight.netconf.api;
 
+import static org.opendaylight.netconf.api.xml.XmlUtil.PRETTY_PRINT_XSL;
+
+import java.io.StringReader;
 import java.io.StringWriter;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -17,6 +20,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 
 /**
@@ -29,7 +33,8 @@ public class NetconfMessage {
     static {
         final Transformer t;
         try {
-            t = TransformerFactory.newInstance().newTransformer();
+            StreamSource streamSource = new StreamSource(new StringReader(PRETTY_PRINT_XSL));
+            t = TransformerFactory.newInstance().newTransformer(streamSource);
         } catch (TransformerConfigurationException | TransformerFactoryConfigurationError e) {
             throw new ExceptionInInitializerError(e);
         }
