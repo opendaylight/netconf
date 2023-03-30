@@ -74,4 +74,22 @@ public class XmlUtilTest {
               </capabilities>
               </hello>]]>]]>"""));
     }
+
+    @Test
+    public void testEmptyLines() throws Exception {
+        // Adapted from https://bugs.openjdk.org/secure/attachment/93338/XmlBugExample.java
+        final var input = """
+            <users>
+                <!-- pre-existing entry BEGIN -->
+                <user>
+                    <!-- a user -->
+                    <name>A name</name>
+                    <email>An email</email>
+                </user>
+                <!-- pre-existing entry END -->
+            </users>
+            """;
+
+        assertEquals(input, XmlUtil.toString(XMLUnit.buildControlDocument(input)));
+    }
 }
