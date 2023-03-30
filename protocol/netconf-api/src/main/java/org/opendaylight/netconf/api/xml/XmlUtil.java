@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -43,6 +44,16 @@ import org.xml.sax.SAXException;
 
 public final class XmlUtil {
 
+    public static final String PRETTY_PRINT_XSL =
+        "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">"
+            + "    <xsl:strip-space elements=\"*\"/>"
+            + "    <xsl:output method=\"xml\" encoding=\"UTF-8\"/>"
+            + "    <xsl:template match=\"@*|node()\">"
+            + "        <xsl:copy>"
+            + "            <xsl:apply-templates select=\"@*|node()\"/>"
+            + "        </xsl:copy>"
+            + "    </xsl:template>"
+            + "</xsl:stylesheet>";
     private static final DocumentBuilderFactory BUILDER_FACTORY;
     private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
     private static final SchemaFactory SCHEMA_FACTORY = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -179,7 +190,8 @@ public final class XmlUtil {
 
     public static String toString(final Element xml, final boolean addXmlDeclaration) {
         try {
-            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            StreamSource streamSource = new StreamSource(new StringReader(PRETTY_PRINT_XSL));
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer(streamSource);
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, addXmlDeclaration ? "no" : "yes");
 
