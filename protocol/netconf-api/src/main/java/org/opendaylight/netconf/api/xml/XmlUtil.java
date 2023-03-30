@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -25,7 +26,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -42,10 +45,35 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public final class XmlUtil {
+    /**
+     * A pre-compiled XSL template to deal with Java XML transform creating empty lines when indenting is enabled, as
+     * detailed in <a href="https://bugs.openjdk.org/browse/JDK-8262285">JDK-8262285</a>.
+     */
+    public static final Templates PRETTY_PRINT_TEMPLATE;
 
-    private static final DocumentBuilderFactory BUILDER_FACTORY;
-    private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
+    static {
+        try {
+            // See https://stackoverflow.com/a/58510553 for details
+            PRETTY_PRINT_TEMPLATE = TransformerFactory.newInstance().newTemplates(new StreamSource(new StringReader(
+                """
+                <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                    <xsl:strip-space elements="*"/>
+                    <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+
+                    <xsl:template match="@*|node()">
+                        <xsl:copy>
+                            <xsl:apply-templates select="@*|node()"/>
+                        </xsl:copy>
+                    </xsl:template>
+                </xsl:stylesheet>
+                """)));
+        } catch (TransformerConfigurationException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
     private static final SchemaFactory SCHEMA_FACTORY = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    private static final DocumentBuilderFactory BUILDER_FACTORY;
 
     static {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -181,7 +209,7 @@ public final class XmlUtil {
         final StringWriter writer = new StringWriter();
 
         try {
-            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = PRETTY_PRINT_TEMPLATE.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, addXmlDeclaration ? "no" : "yes");
             transformer.transform(new DOMSource(xml), new StreamResult(writer));
