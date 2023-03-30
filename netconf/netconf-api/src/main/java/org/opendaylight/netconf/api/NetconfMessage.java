@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api;
 
 import java.io.StringWriter;
@@ -13,10 +12,9 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Document;
 
 /**
@@ -29,11 +27,10 @@ public class NetconfMessage {
     static {
         final Transformer t;
         try {
-            t = TransformerFactory.newInstance().newTransformer();
-        } catch (TransformerConfigurationException | TransformerFactoryConfigurationError e) {
+            t = XmlUtil.newIndentingTransformer();
+        } catch (TransformerConfigurationException e) {
             throw new ExceptionInInitializerError(e);
         }
-        t.setOutputProperty(OutputKeys.INDENT, "yes");
         t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
         TRANSFORMER = t;
@@ -43,7 +40,7 @@ public class NetconfMessage {
 
     public NetconfMessage() {
         // Required for FailedNetconfMessage
-        this.doc = null;
+        doc = null;
     }
 
     public NetconfMessage(final Document doc) {
@@ -51,7 +48,7 @@ public class NetconfMessage {
     }
 
     public Document getDocument() {
-        return this.doc;
+        return doc;
     }
 
     @Override
