@@ -7,16 +7,21 @@
  */
 package org.opendaylight.netconf.api.xml;
 
+import static java.util.Objects.requireNonNull;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
+import com.google.common.io.ByteSource;
+import com.google.common.io.Resources;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Optional;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -179,7 +184,7 @@ public final class XmlUtil {
 
     public static String toString(final Element xml, final boolean addXmlDeclaration) {
         try {
-            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer(prettyPrintStreamSource());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, addXmlDeclaration ? "no" : "yes");
 
@@ -190,6 +195,16 @@ public final class XmlUtil {
             return result.getWriter().toString();
         } catch (TransformerFactoryConfigurationError | TransformerException e) {
             throw new IllegalStateException("Unable to serialize xml element " + xml, e);
+        }
+    }
+
+    public static StreamSource prettyPrintStreamSource() {
+        final ByteSource source = Resources.asByteSource(
+            requireNonNull(XmlUtil.class.getResource("/pretty-print.xsl")));
+        try (InputStream inputStream = source.openStream()) {
+            return new StreamSource(inputStream);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to create pretty print template", e);
         }
     }
 
