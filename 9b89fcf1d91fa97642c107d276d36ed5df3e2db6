@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a6b680f_1b660fa8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-03-31T15:31:48Z",
+      "side": 1,
+      "message": "Waiting for netconf-6.0.x",
+      "revId": "9b89fcf1d91fa97642c107d276d36ed5df3e2db6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
