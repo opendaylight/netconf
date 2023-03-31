@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69ea0767_839ad609",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/xml/XmlUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-03-31T13:37:07Z",
+      "side": 1,
+      "message": "this should be pre-compiled into a javax.xml.transform.Templates\n\nalso should be documented",
+      "range": {
+        "startLine": 47,
+        "startChar": 24,
+        "endLine": 47,
+        "endChar": 47
+      },
+      "revId": "b66ccfe301eff52ebed3031c9e8130efb7aff4b5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
