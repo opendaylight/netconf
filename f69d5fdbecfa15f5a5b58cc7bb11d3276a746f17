@@ -16,6 +16,24 @@
       "message": "Please describe what is the issue here:\nThis needs a JIRA ticket where there is described the current behaviour and behaviour after the patch is merged. And why this change is needed.",
       "revId": "f69d5fdbecfa15f5a5b58cc7bb11d3276a746f17",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0681427f_22ddd561",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8407
+      },
+      "writtenOn": "2023-03-31T12:50:27Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "e5892d6b_73812e33",
+      "revId": "f69d5fdbecfa15f5a5b58cc7bb11d3276a746f17",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
