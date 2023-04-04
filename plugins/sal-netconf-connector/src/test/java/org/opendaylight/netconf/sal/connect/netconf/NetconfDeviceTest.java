@@ -260,7 +260,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDeviceCommunicator listener = getListener();
         final EffectiveModelContextFactory schemaContextProviderFactory = mock(EffectiveModelContextFactory.class);
         final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
-        doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(any(Collection.class));
+        doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(anyCollection());
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO =
                 new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
                         schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
@@ -310,7 +310,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        verify(schemaContextProviderFactory, timeout(5000)).createEffectiveModelContext(any(Collection.class));
+        verify(schemaContextProviderFactory, timeout(5000)).createEffectiveModelContext(anyCollection());
         verify(facade, timeout(5000)).onDeviceConnected(
                 any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
 
@@ -319,7 +319,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        verify(schemaContextProviderFactory, timeout(5000).times(2)).createEffectiveModelContext(any(Collection.class));
+        verify(schemaContextProviderFactory, timeout(5000).times(2)).createEffectiveModelContext(anyCollection());
         verify(facade, timeout(5000).times(2)).onDeviceConnected(
                 any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
     }
@@ -330,7 +330,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDeviceCommunicator listener = getListener();
         final EffectiveModelContextFactory schemaContextProviderFactory = mock(EffectiveModelContextFactory.class);
         final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
-        doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(any(Collection.class));
+        doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(anyCollection());
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
                 = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
                 schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
@@ -517,7 +517,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     private static EffectiveModelContextFactory getSchemaFactory() throws Exception {
         final EffectiveModelContextFactory schemaFactory = mockClass(EffectiveModelContextFactory.class);
         doReturn(Futures.immediateFuture(SCHEMA_CONTEXT))
-                .when(schemaFactory).createEffectiveModelContext(any(Collection.class));
+                .when(schemaFactory).createEffectiveModelContext(anyCollection());
         return schemaFactory;
     }
 
