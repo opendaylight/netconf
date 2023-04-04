@@ -35,7 +35,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.EffectiveOperation;
-import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -562,9 +561,9 @@ public final class NetconfMessageTransformUtil {
         }
     }
 
-    public static RpcResult<NetconfMessage> toRpcResult(final FailedNetconfMessage message) {
+    public static RpcResult<NetconfMessage> toRpcResult(final Exception failure) {
         return RpcResultBuilder.<NetconfMessage>failed()
-                .withRpcError(toRpcError(new NetconfDocumentedException(message.getException().getMessage(),
+                .withRpcError(toRpcError(new NetconfDocumentedException(failure.getMessage(),
                     ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR)))
                 .build();
     }

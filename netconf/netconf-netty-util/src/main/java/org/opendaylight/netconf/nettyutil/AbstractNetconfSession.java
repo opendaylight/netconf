@@ -65,6 +65,11 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
         sessionListener.onMessage(thisInstance(), netconfMessage);
     }
 
+    protected void handleError(final Exception failure) {
+        LOG.debug("handling incoming error");
+        sessionListener.onError(thisInstance(), failure);
+    }
+
     @Override
     public ChannelFuture sendMessage(final NetconfMessage netconfMessage) {
         // From: https://github.com/netty/netty/issues/3887
@@ -91,14 +96,14 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     protected void endOfInput() {
         LOG.debug("Session {} end of input detected while session was in state {}", this, up ? "up" : "initialized");
         if (up) {
-            this.sessionListener.onSessionDown(thisInstance(), new EOFException("End of input"));
+            sessionListener.onSessionDown(thisInstance(), new EOFException("End of input"));
         }
     }
 
     protected void sessionUp() {
         LOG.debug("Session {} up", this);
         sessionListener.onSessionUp(thisInstance());
-        this.up = true;
+        up = true;
     }
 
     @Override
@@ -119,7 +124,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     }
 
     protected final void replaceMessageEncoderAfterNextMessage(final ChannelHandler handler) {
-        this.delayedEncoder = handler;
+        delayedEncoder = handler;
     }
 
     protected final void replaceChannelHandler(final String handlerName, final ChannelHandler handler) {
@@ -183,7 +188,13 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     @Override
     protected final void channelRead0(final ChannelHandlerContext ctx, final Object msg) {
         LOG.debug("Message was received: {}", msg);
-        handleMessage((NetconfMessage) msg);
+        if (msg instanceof NetconfMessage message) {
+            handleMessage(message);
+        } else if (msg instanceof Exception failure) {
+            handleError(failure);
+        } else {
+            LOG.warn("Ignoring unexpected message {}", msg);
+        }
     }
 
     @Override

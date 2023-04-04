@@ -41,7 +41,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
                                         final NetconfMonitoringService monitoringService,
                                         final AutoCloseable onSessionDownCloseable) {
         this.operationRouter = operationRouter;
-        this.monitoringSessionListener = monitoringService.getSessionListener();
+        monitoringSessionListener = monitoringService.getSessionListener();
         this.onSessionDownCloseable = onSessionDownCloseable;
     }
 
@@ -87,8 +87,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
 
             Preconditions.checkState(operationRouter != null, "Cannot handle message, session up was not yet received");
             // there is no validation since the document may contain yang schemas
-            final NetconfMessage message = processDocument(netconfMessage,
-                    session);
+            final NetconfMessage message = processDocument(netconfMessage, session);
             LOG.debug("Responding with message {}", message);
             session.sendMessage(message);
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcSuccess(session));
@@ -106,6 +105,13 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             monitoringSessionListener.onSessionEvent(SessionEvent.outRpcError(session));
             SendErrorExceptionUtil.sendErrorMessage(session, e, netconfMessage);
         }
+    }
+
+    @Override
+    public void onError(final NetconfServerSession session, final Exception failure) {
+        session.onIncommingRpcFail();
+        monitoringSessionListener.onSessionEvent(SessionEvent.inRpcFail(session));
+        throw new IllegalStateException("Unable to process incoming message", failure);
     }
 
     public void onNotification(final NetconfServerSession session, final NetconfNotification notification) {

@@ -15,7 +15,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import java.io.IOException;
 import java.util.List;
-import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.slf4j.Logger;
@@ -70,16 +69,12 @@ public final class NetconfXMLToMessageDecoder extends ByteToMessageDecoder {
             }
         }
         if (in.isReadable()) {
-            NetconfMessage msg;
-
             try {
-                msg = new NetconfMessage(XmlUtil.readXmlToDocument(new ByteBufInputStream(in)));
-            } catch (SAXParseException exception) {
-                LOG.error("Failed to parse received message", exception);
-                msg = new FailedNetconfMessage(exception);
+                out.add(new NetconfMessage(XmlUtil.readXmlToDocument(new ByteBufInputStream(in))));
+            } catch (SAXParseException e) {
+                LOG.error("Failed to parse received message", e);
+                out.add(e);
             }
-
-            out.add(msg);
         } else {
             LOG.debug("No more content in incoming buffer.");
         }

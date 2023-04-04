@@ -166,9 +166,9 @@ public class AbstractNetconfSessionNegotiatorTest {
         xmlToHello.decode(null, helloBuf, out);
         xmlToHello.decode(null, msgBuf, out);
         final TestingNetconfSession session = mock(TestingNetconfSession.class);
-        doNothing().when(session).handleMessage(any());
+        doNothing().when(session).handleError(any());
         negotiator.replaceHelloMessageInboundHandler(session);
-        verify(session, times(1)).handleMessage(any());
+        verify(session, times(1)).handleError(any());
     }
 
     @Test
