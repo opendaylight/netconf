@@ -178,19 +178,18 @@ public final class XmlUtil {
     }
 
     public static String toString(final Element xml, final boolean addXmlDeclaration) {
+        final StringWriter writer = new StringWriter();
+
         try {
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, addXmlDeclaration ? "no" : "yes");
-
-            StreamResult result = new StreamResult(new StringWriter());
-            DOMSource source = new DOMSource(xml);
-            transformer.transform(source, result);
-
-            return result.getWriter().toString();
+            transformer.transform(new DOMSource(xml), new StreamResult(writer));
         } catch (TransformerFactoryConfigurationError | TransformerException e) {
             throw new IllegalStateException("Unable to serialize xml element " + xml, e);
         }
+
+        return writer.toString();
     }
 
     public static String toString(final Document doc, final boolean addXmlDeclaration) {
