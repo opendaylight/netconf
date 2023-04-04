@@ -212,7 +212,7 @@ public final class XmlUtil {
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, addXmlDeclaration ? "no" : "yes");
             transformer.transform(new DOMSource(xml), new StreamResult(writer));
         } catch (TransformerException e) {
-            throw new IllegalStateException("Unable to serialize xml element " + xml, e);
+            throw new IllegalStateException("Unable to serialize XML element", e);
         }
 
         return writer.toString();

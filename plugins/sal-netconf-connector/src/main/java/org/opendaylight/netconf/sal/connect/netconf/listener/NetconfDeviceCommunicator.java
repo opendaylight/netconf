@@ -286,8 +286,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                 }
             } else {
                 request = null;
-                LOG.warn("{}: Ignoring unsolicited message {}", id,
-                        msgToS(message));
+                LOG.warn("{}: Ignoring unsolicited message {}", id, message);
             }
         } finally {
             sessionLock.unlock();
@@ -305,16 +304,13 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         }
 
         LOG.debug("{}: Message received {}", id, message);
-
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("{}: Matched request: {} to response: {}", id, msgToS(request.request), msgToS(message));
-        }
+        LOG.trace("{}: Matched request: {} to response: {}", id, request.request, message);
 
         try {
             NetconfMessageTransformUtil.checkValidReply(request.request, message);
         } catch (final NetconfDocumentedException e) {
             LOG.warn("{}: Invalid request-reply match, reply message contains different message-id, "
-                + "request: {}, response: {}", id, msgToS(request.request), msgToS(message), e);
+                + "request: {}, response: {}", id, request.request, message, e);
 
             request.future.set(RpcResultBuilder.<NetconfMessage>failed()
                 .withRpcError(NetconfMessageTransformUtil.toRpcError(e))
@@ -328,8 +324,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         try {
             NetconfMessageTransformUtil.checkSuccessReply(message);
         } catch (final NetconfDocumentedException e) {
-            LOG.warn("{}: Error reply from remote device, request: {}, response: {}",
-                id, msgToS(request.request), msgToS(message), e);
+            LOG.warn("{}: Error reply from remote device, request: {}, response: {}", id, request.request, message, e);
 
             request.future.set(RpcResultBuilder.<NetconfMessage>failed()
                 .withRpcError(NetconfMessageTransformUtil.toRpcError(e))
@@ -338,10 +333,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         }
 
         request.future.set(RpcResultBuilder.success(message).build());
-    }
-
-    private static String msgToS(final NetconfMessage msg) {
-        return XmlUtil.toString(msg.getDocument());
     }
 
     @Override
@@ -364,9 +355,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message,
                                                                             final QName rpc) {
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("{}: Sending message {}", id, msgToS(message));
-        }
+        LOG.trace("{}: Sending message {}", id, message);
 
         if (currentSession == null) {
             LOG.warn("{}: Session is disconnected, failing RPC request {}",
@@ -399,10 +388,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     private void processNotification(final NetconfMessage notification) {
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("{}: Notification received: {}", id, notification);
-        }
-
+        LOG.trace("{}: Notification received: {}", id, notification);
         remoteDevice.onNotification(notification);
     }
 
