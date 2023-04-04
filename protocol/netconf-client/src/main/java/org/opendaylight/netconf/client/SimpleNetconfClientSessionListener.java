@@ -27,7 +27,7 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
         private final NetconfMessage request;
 
         RequestEntry(final Promise<NetconfMessage> future, final NetconfMessage request) {
-            this.promise = requireNonNull(future);
+            promise = requireNonNull(future);
             this.request = requireNonNull(request);
         }
     }
@@ -69,7 +69,7 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
             e.promise.setFailure(cause);
         }
 
-        this.clientSession = null;
+        clientSession = null;
     }
 
     @Override
@@ -98,6 +98,19 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
             dispatchRequest();
         } else {
             LOG.info("Ignoring unsolicited message {}", message);
+        }
+    }
+
+    @Override
+    public synchronized void onError(final NetconfClientSession session, final Exception failure) {
+        LOG.debug("New error arrived: {}", failure.toString());
+
+        final RequestEntry e = requests.poll();
+        if (e != null) {
+            e.promise.setFailure(failure);
+            dispatchRequest();
+        } else {
+            LOG.info("Ignoring unsolicited error {}", failure.toString());
         }
     }
 

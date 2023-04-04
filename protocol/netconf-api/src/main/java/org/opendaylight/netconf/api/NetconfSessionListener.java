@@ -42,4 +42,11 @@ public interface NetconfSessionListener<S extends NetconfSession> {
      * @param message Protocol message
      */
     void onMessage(S session, NetconfMessage message);
+
+    /**
+     * Fired when a protocol message cannot be decoded.
+     *
+     * @param failure Decoding failure
+     */
+    void onError(S session, Exception failure);
 }
