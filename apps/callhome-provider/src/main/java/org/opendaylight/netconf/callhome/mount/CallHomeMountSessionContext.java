@@ -145,6 +145,11 @@ class CallHomeMountSessionContext {
             public void onMessage(final NetconfClientSession session, final NetconfMessage message) {
                 delegate.onMessage(session, message);
             }
+
+            @Override
+            public void onError(final NetconfClientSession session, final Exception failure) {
+                delegate.onError(session, failure);
+            }
         };
     }
 

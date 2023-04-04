@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import org.junit.Test;
-import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.xml.sax.SAXParseException;
 
 public class NetconfXMLToMessageDecoderTest {
@@ -63,9 +62,7 @@ public class NetconfXMLToMessageDecoderTest {
         final ArrayList<Object> out = new ArrayList<>();
         new NetconfXMLToMessageDecoder().decode(null, Unpooled.wrappedBuffer("\r\n?xml version>".getBytes()), out);
         assertEquals(1, out.size());
-        assertTrue(FailedNetconfMessage.class.isInstance(out.get(0)));
-        assertTrue(((FailedNetconfMessage) out.get(0))
-                .getException().getClass().isAssignableFrom(SAXParseException.class));
+        assertTrue((out.get(0) instanceof SAXParseException));
     }
 
     @Test
