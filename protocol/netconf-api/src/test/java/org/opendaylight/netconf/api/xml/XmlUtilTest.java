@@ -7,9 +7,12 @@
  */
 package org.opendaylight.netconf.api.xml;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
@@ -21,12 +24,12 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXParseException;
 
 public class XmlUtilTest {
-
-    private final String xml = "<top xmlns=\"namespace\">\n" + "<innerText>value</innerText>\n"
-        + "<innerPrefixedText xmlns:pref=\"prefixNamespace\">prefix:value</innerPrefixedText>\n"
-        + "<innerPrefixedText xmlns=\"randomNamespace\" xmlns:pref=\"prefixNamespace\">prefix:value"
-            + "</innerPrefixedText>\n"
-        + "</top>";
+    private static final String XML_SNIPPET = """
+        <top xmlns="namespace">
+            <innerText>value</innerText>
+            <innerPrefixedText xmlns:pref="prefixNamespace">prefix:value</innerPrefixedText>
+            <innerPrefixedText xmlns="randomNamespace" xmlns:pref="prefixNamespace">prefix:value</innerPrefixedText>
+        </top>""";
 
     @Test
     public void testCreateElement() throws Exception {
@@ -45,29 +48,30 @@ public class XmlUtilTest {
         XMLUnit.setIgnoreAttributeOrder(true);
         XMLUnit.setIgnoreWhitespace(true);
 
-        final Diff diff = XMLUnit.compareXML(XMLUnit.buildControlDocument(xml), document);
+        final Diff diff = XMLUnit.compareXML(XMLUnit.buildControlDocument(XML_SNIPPET), document);
         assertTrue(diff.toString(), diff.similar());
     }
 
     @Test
     public void testLoadSchema() throws Exception {
-        XmlUtil.loadSchema();
-        try {
-            XmlUtil.loadSchema(new ByteArrayInputStream(xml.getBytes()));
-            fail("Input stream does not contain xsd");
-        } catch (final IllegalStateException e) {
-            assertTrue(e.getCause() instanceof SAXParseException);
+        assertNotNull(XmlUtil.loadSchema());
+
+        try (var input = new ByteArrayInputStream(XML_SNIPPET.getBytes())) {
+            final var cause = assertThrows(IllegalStateException.class, () -> XmlUtil.loadSchema(input)).getCause();
+            assertThat(cause, instanceOf(SAXParseException.class));
         }
-
     }
 
-    @Test(expected = SAXParseException.class)
-    public void testXXEFlaw() throws Exception {
-        XmlUtil.readXmlToDocument(
-                "<!DOCTYPE foo [  \n" + "<!ELEMENT foo ANY >\n" + "<!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]>\n"
-                        + "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" + "  <capabilities>\n"
-                        + "    <capability>urn:ietf:params:netconf:base:1.0 &xxe;</capability>\n"
-                        + "  </capabilities>\n" + "  </hello>]]>]]>");
+    @Test
+    public void testXXEFlaw() {
+        assertThrows(SAXParseException.class, () -> XmlUtil.readXmlToDocument("""
+            <!DOCTYPE foo [\s\s
+            <!ELEMENT foo ANY >
+            <!ENTITY xxe SYSTEM "file:///etc/passwd" >]>
+            <hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <capabilities>
+                <capability>urn:ietf:params:netconf:base:1.0 &xxe;</capability>
+              </capabilities>
+              </hello>]]>]]>"""));
     }
-
 }
