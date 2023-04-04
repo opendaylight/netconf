@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "976c7def_035ccdf7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-04T12:17:54Z",
+      "side": 1,
+      "message": "This needs to be adapted to show ODL swagger API Urls by default instead of petstore.",
+      "revId": "78ccd2a04b0a3151edcc95d43a09542184dae430",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
