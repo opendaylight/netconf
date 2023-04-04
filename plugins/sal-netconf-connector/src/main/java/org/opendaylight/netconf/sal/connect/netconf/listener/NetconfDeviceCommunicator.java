@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
@@ -271,8 +270,18 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         }
     }
 
-    private void processMessage(final NetconfMessage message) {
-        Request request = null;
+    @Override
+    public void onError(final NetconfClientSession session, final Exception failure) {
+        final Request request = pollRequest();
+        if (request != null) {
+            request.future.set(NetconfMessageTransformUtil.toRpcResult(failure));
+        } else {
+            LOG.warn("{}: Ignoring unsolicited failure {}", id, failure);
+        }
+    }
+
+    private @Nullable Request pollRequest() {
+        Request request;
         sessionLock.lock();
 
         try {
@@ -286,21 +295,18 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                 }
             } else {
                 request = null;
-                LOG.warn("{}: Ignoring unsolicited message {}", id,
-                        msgToS(message));
             }
         } finally {
             sessionLock.unlock();
         }
+        return request;
+    }
 
+    private void processMessage(final NetconfMessage message) {
+        final Request request = pollRequest();
         if (request == null) {
             // No matching request, bail out
-            return;
-        }
-
-
-        if (message instanceof FailedNetconfMessage) {
-            request.future.set(NetconfMessageTransformUtil.toRpcResult((FailedNetconfMessage) message));
+            LOG.warn("{}: Ignoring unsolicited message {}", id, msgToS(message));
             return;
         }
 
