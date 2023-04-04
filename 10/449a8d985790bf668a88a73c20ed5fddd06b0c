@@ -1,0 +1,8 @@
+Code-Review+1: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Code-Review+2: Robert Varga <nite@hq.sk>
+Verified+1: Robert Varga <nite@hq.sk>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Tue, 04 Apr 2023 10:25:27 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/104960
+Project: netconf
+Branch: refs/heads/master
