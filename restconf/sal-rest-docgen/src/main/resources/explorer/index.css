@@ -14,3 +14,7 @@ body {
     margin: 0;
     background: #fafafa;
 }
+
+topbar-wrapper img {
+    content:url('logo_small.png');
+}
