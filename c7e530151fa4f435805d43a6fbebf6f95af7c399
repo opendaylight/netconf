@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "379496f7_d9adc339",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-04T12:57:32Z",
+      "side": 1,
+      "message": "1. Still contains references to petstore\n2. Validation is missing (bottom of the page)",
+      "revId": "c7e530151fa4f435805d43a6fbebf6f95af7c399",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
