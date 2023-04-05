@@ -17,6 +17,8 @@ public class OpenApiObject implements CommonApiObject {
     private ObjectNode paths;
     private Components components;
 
+    private Security security;
+
     public String getOpenapi() {
         return openapi;
     }
@@ -55,5 +57,13 @@ public class OpenApiObject implements CommonApiObject {
 
     public void setComponents(Components components) {
         this.components = components;
+    }
+
+    public Security getSecurity() {
+        return security;
+    }
+
+    public void setSecurity(Security basicAuth) {
+        this.security = basicAuth;
     }
 }
