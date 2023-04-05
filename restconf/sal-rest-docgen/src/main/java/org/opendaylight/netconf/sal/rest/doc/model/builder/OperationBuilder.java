@@ -66,12 +66,19 @@ public final class OperationBuilder {
     private static final String STRING = "string";
     private static final String TYPE_KEY = "type";
     private static final String QUERY = "query";
+    private static final String SECURITY_KEY = "security";
+    private static final ArrayNode SECURITY;
 
     static {
         CONSUMES_PUT_POST = JsonNodeFactory.instance.arrayNode();
         for (final String mimeType : MIME_TYPES) {
             CONSUMES_PUT_POST.add(mimeType);
         }
+
+        SECURITY = JsonNodeFactory.instance.arrayNode();
+        final var basicAuth = JsonNodeFactory.instance.objectNode();
+        basicAuth.set("basicAuth", JsonNodeFactory.instance.arrayNode());
+        SECURITY.add(basicAuth);
     }
 
     private OperationBuilder() {
@@ -85,6 +92,7 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.set(SECURITY_KEY, SECURITY);
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + CONFIG + "_" + nodeName + POST_SUFFIX;
@@ -111,6 +119,7 @@ public final class OperationBuilder {
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName()));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.set(SECURITY_KEY, SECURITY);
         final ArrayNode parameters = JsonUtil.copy(pathParams);
 
         addQueryParameters(parameters, isConfig, oaversion);
@@ -154,6 +163,7 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.set(SECURITY_KEY, SECURITY);
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
@@ -178,6 +188,7 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.set(SECURITY_KEY, SECURITY);
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
@@ -201,6 +212,7 @@ public final class OperationBuilder {
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
                 node.getQName().getLocalName()));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.set(SECURITY_KEY, SECURITY);
         value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         value.set(PARAMETERS_KEY, parameters);
@@ -256,6 +268,7 @@ public final class OperationBuilder {
                 payload.set(CONTENT_KEY, content);
                 payload.put(DESCRIPTION_KEY, inputName);
                 postOperation.set(REQUEST_BODY_KEY, payload);
+                postOperation.set(SECURITY_KEY, SECURITY);
             } else {
                 payload.put(IN_KEY, BODY);
                 payload.put(NAME_KEY, inputName);
