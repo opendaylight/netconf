@@ -48,6 +48,7 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Components;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Info;
 import org.opendaylight.netconf.sal.rest.doc.swagger.OpenApiObject;
+import org.opendaylight.netconf.sal.rest.doc.swagger.Security;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Server;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
@@ -354,7 +355,6 @@ public abstract class BaseYangSwaggerGenerator {
         doc.setComponents(new Components(swaggerObject.getDefinitions()));
         return doc;
     }
-
 
     private static List<Server> convertToServers(final List<String> schemes, final String host, final String basePath) {
         return ImmutableList.of(new Server(schemes.get(0) + "://" + host + basePath));
