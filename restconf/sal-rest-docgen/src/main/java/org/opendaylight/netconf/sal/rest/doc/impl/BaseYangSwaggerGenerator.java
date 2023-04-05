@@ -48,6 +48,7 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Components;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Info;
 import org.opendaylight.netconf.sal.rest.doc.swagger.OpenApiObject;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SecuritySchemes;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Server;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
@@ -83,6 +84,12 @@ public abstract class BaseYangSwaggerGenerator {
 
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
+
+    private static final ObjectNode BASIC_AUTH = JsonNodeFactory.instance.objectNode()
+            .put("type", "http")
+            .put("scheme", "basic");
+    private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
+            .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
     static {
         MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
@@ -351,10 +358,10 @@ public abstract class BaseYangSwaggerGenerator {
         doc.setServers(convertToServers(swaggerObject.getSchemes(), swaggerObject.getHost(),
                 swaggerObject.getBasePath()));
         doc.setPaths(swaggerObject.getPaths());
-        doc.setComponents(new Components(swaggerObject.getDefinitions()));
+        doc.setComponents(new Components(swaggerObject.getDefinitions(), new SecuritySchemes(BASIC_AUTH)));
+        doc.setSecurity(SECURITY);
         return doc;
     }
-
 
     private static List<Server> convertToServers(final List<String> schemes, final String host, final String basePath) {
         return ImmutableList.of(new Server(schemes.get(0) + "://" + host + basePath));

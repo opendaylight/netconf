@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.swagger;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class OpenApiObject implements CommonApiObject {
     private List<Server> servers;
     private ObjectNode paths;
     private Components components;
+    private ArrayNode security;
 
     public String getOpenapi() {
         return openapi;
@@ -55,5 +57,13 @@ public class OpenApiObject implements CommonApiObject {
 
     public void setComponents(Components components) {
         this.components = components;
+    }
+
+    public ArrayNode getSecurity() {
+        return security;
+    }
+
+    public void setSecurity(ArrayNode security) {
+        this.security = security;
     }
 }

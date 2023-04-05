@@ -11,13 +11,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Components {
     private ObjectNode schemas;
+    private SecuritySchemes securitySchemes;
 
-    public Components() {
-
-    }
-
-    public Components(ObjectNode schemas) {
+    public Components(ObjectNode schemas, SecuritySchemes securitySchemes) {
         this.schemas = schemas;
+        this.securitySchemes = securitySchemes;
     }
 
     public ObjectNode getSchemas() {
@@ -26,5 +24,13 @@ public class Components {
 
     public void setSchemas(ObjectNode schemas) {
         this.schemas = schemas;
+    }
+
+    public SecuritySchemes getSecuritySchemes() {
+        return securitySchemes;
+    }
+
+    public void setSecuritySchemes(SecuritySchemes securitySchemes) {
+        this.securitySchemes = securitySchemes;
     }
 }
