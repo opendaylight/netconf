@@ -24,6 +24,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
+import org.opendaylight.netconf.sal.rest.doc.swagger.Security;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SecuritySchemes;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
@@ -66,12 +68,17 @@ public final class OperationBuilder {
     private static final String STRING = "string";
     private static final String TYPE_KEY = "type";
     private static final String QUERY = "query";
+    private static final String SECURITY_KEY = "security";
+    private static final ArrayNode BASIC_AUTH;
 
     static {
         CONSUMES_PUT_POST = JsonNodeFactory.instance.arrayNode();
         for (final String mimeType : MIME_TYPES) {
             CONSUMES_PUT_POST.add(mimeType);
         }
+
+        BASIC_AUTH = new Security().getBasicAuth();
+        BASIC_AUTH.add(new SecuritySchemes().getBasicAuth());
     }
 
     private OperationBuilder() {
@@ -85,6 +92,7 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.set(SECURITY_KEY, BASIC_AUTH);
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + CONFIG + "_" + nodeName + POST_SUFFIX;
@@ -111,6 +119,7 @@ public final class OperationBuilder {
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName()));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.set(SECURITY_KEY, BASIC_AUTH);
         final ArrayNode parameters = JsonUtil.copy(pathParams);
 
         addQueryParameters(parameters, isConfig, oaversion);
@@ -154,6 +163,7 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.set(SECURITY_KEY, BASIC_AUTH);
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
@@ -178,6 +188,7 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.set(SECURITY_KEY, BASIC_AUTH);
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
@@ -201,6 +212,7 @@ public final class OperationBuilder {
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
                 node.getQName().getLocalName()));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.set(SECURITY_KEY, BASIC_AUTH);
         value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         value.set(PARAMETERS_KEY, parameters);

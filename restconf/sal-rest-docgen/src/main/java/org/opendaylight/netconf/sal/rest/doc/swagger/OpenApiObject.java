@@ -56,4 +56,5 @@ public class OpenApiObject implements CommonApiObject {
     public void setComponents(Components components) {
         this.components = components;
     }
+
 }

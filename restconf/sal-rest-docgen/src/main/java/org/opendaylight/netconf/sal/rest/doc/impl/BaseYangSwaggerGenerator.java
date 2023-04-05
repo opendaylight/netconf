@@ -355,7 +355,6 @@ public abstract class BaseYangSwaggerGenerator {
         return doc;
     }
 
-
     private static List<Server> convertToServers(final List<String> schemes, final String host, final String basePath) {
         return ImmutableList.of(new Server(schemes.get(0) + "://" + host + basePath));
     }
