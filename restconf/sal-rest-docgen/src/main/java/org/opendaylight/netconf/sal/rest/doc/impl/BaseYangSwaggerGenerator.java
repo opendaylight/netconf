@@ -352,9 +352,13 @@ public abstract class BaseYangSwaggerGenerator {
                 swaggerObject.getBasePath()));
         doc.setPaths(swaggerObject.getPaths());
         doc.setComponents(new Components(swaggerObject.getDefinitions()));
+        final var security  = JsonNodeFactory.instance.arrayNode();
+        final var basicAuth = JsonNodeFactory.instance.objectNode();
+        basicAuth.set("basicAuth", JsonNodeFactory.instance.arrayNode());
+        security.add(basicAuth);
+        doc.setSecurity(security);
         return doc;
     }
-
 
     private static List<Server> convertToServers(final List<String> schemes, final String host, final String basePath) {
         return ImmutableList.of(new Server(schemes.get(0) + "://" + host + basePath));
