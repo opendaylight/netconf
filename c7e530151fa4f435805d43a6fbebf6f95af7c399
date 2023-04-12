@@ -16,6 +16,24 @@
       "message": "1. Still contains references to petstore\n2. Validation is missing (bottom of the page)",
       "revId": "c7e530151fa4f435805d43a6fbebf6f95af7c399",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c16df0d4_bf818b76",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-04-12T09:11:12Z",
+      "side": 1,
+      "message": "1. Done\n2. Validation is working but you can\u0027t see this label for our models because they are not valid.",
+      "parentUuid": "379496f7_d9adc339",
+      "revId": "c7e530151fa4f435805d43a6fbebf6f95af7c399",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
