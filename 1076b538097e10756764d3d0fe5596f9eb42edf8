@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44891cca_8a783e06",
+        "filename": "restconf/sal-rest-docgen/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-04-12T12:16:04Z",
+      "side": 1,
+      "message": "What about this?",
+      "range": {
+        "startLine": 128,
+        "startChar": 30,
+        "endLine": 128,
+        "endChar": 37
+      },
+      "revId": "1076b538097e10756764d3d0fe5596f9eb42edf8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
