@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa2dccc2_832ee54c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-12T11:23:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5014908e_2019b28c",
+      "range": {
+        "startLine": 11,
+        "startChar": 30,
+        "endLine": 11,
+        "endChar": 62
+      },
+      "revId": "3c24918f5a6a16f3912856f8342dc656b85cc8c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5645e18d_0b40e4db",
@@ -37,6 +61,24 @@
       "writtenOn": "2023-04-12T09:44:02Z",
       "side": 1,
       "message": "mixing \u0027-\u0027 and \u0027_\u0027 looks weird.. Can you stick with just one?",
+      "revId": "3c24918f5a6a16f3912856f8342dc656b85cc8c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d3fc48d_b884983f",
+        "filename": "restconf/sal-rest-docgen/src/test/resources/yang/strings-from-regex_test.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-12T11:23:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5645e18d_0b40e4db",
       "revId": "3c24918f5a6a16f3912856f8342dc656b85cc8c0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
