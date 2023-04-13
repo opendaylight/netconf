@@ -186,8 +186,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         if (includeDataStore) {
             doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
             addFields(doc.getPaths() ,openApiObject.getPaths().fields());
-            addFields(doc.getDefinitions() ,openApiObject.getDefinitions().fields());
             doc.getInfo().setTitle(openApiObject.getInfo().getTitle());
+            addFields(doc.getComponents().getSchemas(), openApiObject.getComponents().getSchemas().fields());
         } else {
             doc = openApiObject;
         }
@@ -215,8 +215,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 context, deviceName, pathsObject);
 
         declaration.setPaths(pathsObject);
-        declaration.setDefinitions(JsonNodeFactory.instance.objectNode());
-        declaration.setComponents(new Components(declaration.getDefinitions(),
+        declaration.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
                 new SecuritySchemes(BaseYangOpenApiGenerator.OPEN_API_BASIC_AUTH)));
 
         return declaration;
