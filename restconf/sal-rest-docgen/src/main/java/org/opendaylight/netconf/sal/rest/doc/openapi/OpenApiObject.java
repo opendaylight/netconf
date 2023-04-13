@@ -10,21 +10,14 @@ package org.opendaylight.netconf.sal.rest.doc.openapi;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 
-public class OpenApiObject {
+public final class OpenApiObject {
     private String openapi;
     private Info info;
+    private ObjectNode externalDocs;
     private List<Server> servers;
+    private ObjectNode tags;
     private ObjectNode paths;
     private Components components;
-    private ObjectNode definitions;
-
-    public ObjectNode getDefinitions() {
-        return definitions;
-    }
-
-    public void setDefinitions(ObjectNode definitions) {
-        this.definitions = definitions;
-    }
 
     public String getOpenapi() {
         return openapi;
@@ -42,12 +35,28 @@ public class OpenApiObject {
         this.info = info;
     }
 
+    public ObjectNode getExternalDocs() {
+        return externalDocs;
+    }
+
+    public void setExternalDocs(ObjectNode externalDocs) {
+        this.externalDocs = externalDocs;
+    }
+
     public List<Server> getServers() {
         return servers;
     }
 
     public void setServers(List<Server> servers) {
         this.servers = servers;
+    }
+
+    public ObjectNode getTags() {
+        return tags;
+    }
+
+    public void setTags(ObjectNode tags) {
+        this.tags = tags;
     }
 
     public ObjectNode getPaths() {
