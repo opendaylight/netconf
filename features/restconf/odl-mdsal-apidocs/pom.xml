@@ -23,7 +23,7 @@
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>odl-jackson-2.13</artifactId>
+            <artifactId>odl-jackson-2</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
