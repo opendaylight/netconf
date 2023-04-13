@@ -14,4 +14,6 @@ from docs_conf.conf import *
 
 linkcheck_ignore = [
     'http://localhost',
+    'https?://tools.ietf.org',
+    'https?://www.rfc-editor.org',
 ]
