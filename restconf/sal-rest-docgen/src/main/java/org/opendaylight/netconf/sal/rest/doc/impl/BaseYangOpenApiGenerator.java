@@ -7,17 +7,6 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildDelete;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildGet;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPatch;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPost;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPostOperation;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPut;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getTypeParentNode;
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
-import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -27,22 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
-import java.io.IOException;
-import java.time.format.DateTimeParseException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.openapi.Components;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Info;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Server;
@@ -52,17 +26,19 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.UriInfo;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.*;
+import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
+import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
 
 public abstract class BaseYangOpenApiGenerator {
 
@@ -72,7 +48,6 @@ public abstract class BaseYangOpenApiGenerator {
     private static final String OPEN_API_VERSION = "3.0.3";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
     private final DOMSchemaService schemaService;
 
     public static final String BASE_PATH = "/";
@@ -108,8 +83,6 @@ public abstract class BaseYangOpenApiGenerator {
 
         final String title = name + " modules of RESTCONF";
         final OpenApiObject doc = createOpenApiObject(schema, host, BASE_PATH, title);
-        doc.setDefinitions(JsonNodeFactory.instance.objectNode());
-        doc.setComponents(new Components(doc.getDefinitions()));
         doc.setPaths(JsonNodeFactory.instance.objectNode());
 
         fillDoc(doc, range, schemaContext, context, deviceName, definitionNames);
@@ -217,24 +190,6 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getOpenApiDocSpec(final Module module, final String context, final Optional<String> deviceName,
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
-        final ObjectNode definitions;
-
-        try {
-            if (isForSingleModule) {
-                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, true);
-                doc.setDefinitions(definitions);
-            } else {
-                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, false);
-                addFields(doc.getDefinitions(), definitions.fields());
-            }
-            doc.setComponents(new Components(doc.getDefinitions()));
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
-            }
-        } catch (final IOException e) {
-            LOG.error("Exception occured in DefinitionGenerator", e);
-        }
-
         final ObjectNode paths = JsonNodeFactory.instance.objectNode();
         final String moduleName = module.getName();
 

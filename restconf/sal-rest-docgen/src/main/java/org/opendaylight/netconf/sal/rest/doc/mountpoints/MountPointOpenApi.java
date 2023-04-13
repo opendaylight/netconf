@@ -7,36 +7,14 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.mountpoints;
 
-import static com.google.common.base.Preconditions.checkState;
-import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.DEFAULT_PAGESIZE;
-import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator.BASE_PATH;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.DESCRIPTION_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.RESPONSES_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TAGS_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildTagsValue;
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
-
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Range;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicLong;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
-import org.opendaylight.netconf.sal.rest.doc.openapi.Components;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -46,6 +24,23 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.DEFAULT_PAGESIZE;
+import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator.BASE_PATH;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.*;
+import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 
 public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
@@ -186,7 +181,6 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         if (includeDataStore) {
             doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
             addFields(doc.getPaths() ,openApiObject.getPaths().fields());
-            addFields(doc.getDefinitions() ,openApiObject.getDefinitions().fields());
             doc.getInfo().setTitle(openApiObject.getInfo().getTitle());
         } else {
             doc = openApiObject;
@@ -217,8 +211,6 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 context, deviceName, pathsObject);
 
         declaration.setPaths(pathsObject);
-        declaration.setDefinitions(JsonNodeFactory.instance.objectNode());
-        declaration.setComponents(new Components(declaration.getDefinitions()));
 
         return declaration;
     }
