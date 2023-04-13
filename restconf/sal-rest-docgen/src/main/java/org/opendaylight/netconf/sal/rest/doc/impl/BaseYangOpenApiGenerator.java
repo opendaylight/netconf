@@ -110,7 +110,6 @@ public abstract class BaseYangOpenApiGenerator {
 
         final String title = name + " modules of RESTCONF";
         final OpenApiObject doc = createOpenApiObject(schema, host, BASE_PATH, title);
-        doc.setDefinitions(JsonNodeFactory.instance.objectNode());
         doc.setPaths(JsonNodeFactory.instance.objectNode());
 
         fillDoc(doc, range, schemaContext, context, deviceName, definitionNames);
@@ -218,21 +217,19 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getOpenApiDocSpec(final Module module, final String context, final Optional<String> deviceName,
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
-        final ObjectNode definitions;
-
         try {
+            final ObjectNode schema;
             if (isForSingleModule) {
-                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, true);
-                doc.setDefinitions(definitions);
+                schema = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, true);
             } else {
-                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, false);
-                addFields(doc.getDefinitions(), definitions.fields());
+                schema = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, false);
             }
+            addFields(doc.getComponents().getSchemas(), schema.fields());
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
             }
         } catch (final IOException e) {
-            LOG.error("Exception occured in DefinitionGenerator", e);
+            LOG.error("Exception occurred in DefinitionGenerator", e);
         }
 
         final ObjectNode paths = JsonNodeFactory.instance.objectNode();
@@ -314,7 +311,8 @@ public abstract class BaseYangOpenApiGenerator {
         info.setVersion(API_VERSION);
         doc.setInfo(info);
         doc.setServers(convertToServers(ImmutableList.of(schema), host, basePath));
-        doc.setComponents(new Components(doc.getDefinitions(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
+        doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
+                new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         doc.setSecurity(SECURITY);
         return doc;
     }
