@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f014a9f0_53e98b3e",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-13T16:49:28Z",
+      "side": 1,
+      "message": "This looks like adaptation from YANG regex to Automaton regex - and that needs a comment here.\n\nAre we sure that this map is complete?",
+      "revId": "ee09086b9df7c6f234a49afe3c70d8d8e04ff24d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f001535_89615fe0",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/SwaggerObjectTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-13T16:49:28Z",
+      "side": 1,
+      "message": "What is the meaning of this test?",
+      "revId": "ee09086b9df7c6f234a49afe3c70d8d8e04ff24d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
