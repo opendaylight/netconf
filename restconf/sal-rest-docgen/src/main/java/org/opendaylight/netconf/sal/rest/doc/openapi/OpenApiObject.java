@@ -18,15 +18,6 @@ public class OpenApiObject {
     private ObjectNode paths;
     private Components components;
     private ArrayNode security;
-    private ObjectNode definitions;
-
-    public ObjectNode getDefinitions() {
-        return definitions;
-    }
-
-    public void setDefinitions(ObjectNode definitions) {
-        this.definitions = definitions;
-    }
 
     public String getOpenapi() {
         return openapi;
