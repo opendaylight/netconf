@@ -36,7 +36,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
-import org.opendaylight.netconf.sal.rest.doc.openapi.Components;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -186,7 +185,6 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         if (includeDataStore) {
             doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
             addFields(doc.getPaths() ,openApiObject.getPaths().fields());
-            addFields(doc.getDefinitions() ,openApiObject.getDefinitions().fields());
             doc.getInfo().setTitle(openApiObject.getInfo().getTitle());
         } else {
             doc = openApiObject;
@@ -217,8 +215,6 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 context, deviceName, pathsObject);
 
         declaration.setPaths(pathsObject);
-        declaration.setDefinitions(JsonNodeFactory.instance.objectNode());
-        declaration.setComponents(new Components(declaration.getDefinitions()));
 
         return declaration;
     }
