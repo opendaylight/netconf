@@ -14,4 +14,7 @@ from docs_conf.conf import *
 
 linkcheck_ignore = [
     'http://localhost',
+# IETF URLs disabled due to https://jira.linuxfoundation.org/plugins/servlet/desk/portal/2/IT-25351
+    'https?://tools.ietf.org',
+    'https?://www.rfc-editor.org',
 ]
