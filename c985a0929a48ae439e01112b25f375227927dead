@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af4ef46a_9447432d",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-14T08:13:02Z",
+      "side": 0,
+      "message": "But still we need components.",
+      "revId": "c985a0929a48ae439e01112b25f375227927dead",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9f53faa_1d6cbd23",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-14T08:13:02Z",
+      "side": 0,
+      "message": "But still we need components.",
+      "revId": "c985a0929a48ae439e01112b25f375227927dead",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "794a07a2_67dca6d5",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-14T08:13:02Z",
+      "side": 0,
+      "message": "We need components.",
+      "revId": "c985a0929a48ae439e01112b25f375227927dead",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e916bf47_1cc77b2e",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-14T08:13:02Z",
+      "side": 0,
+      "message": "This will be `doc.getComponents`.",
+      "revId": "c985a0929a48ae439e01112b25f375227927dead",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f188bd2_ec28e295",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-14T08:13:02Z",
+      "side": 0,
+      "message": "This will be `doc.getComponents`.",
+      "revId": "c985a0929a48ae439e01112b25f375227927dead",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
