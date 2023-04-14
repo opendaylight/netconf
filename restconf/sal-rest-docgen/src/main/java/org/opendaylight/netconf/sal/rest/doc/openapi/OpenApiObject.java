@@ -10,12 +10,13 @@ package org.opendaylight.netconf.sal.rest.doc.openapi;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
+import java.util.Map;
 
 public class OpenApiObject {
     private String openapi;
     private Info info;
     private List<Server> servers;
-    private ObjectNode paths;
+    private Map<String, Path> paths;
     private Components components;
     private ArrayNode security;
     private ObjectNode definitions;
@@ -52,11 +53,11 @@ public class OpenApiObject {
         this.servers = servers;
     }
 
-    public ObjectNode getPaths() {
+    public Map<String, Path> getPaths() {
         return paths;
     }
 
-    public void setPaths(ObjectNode paths) {
+    public void setPaths(Map<String, Path> paths) {
         this.paths = paths;
     }
 

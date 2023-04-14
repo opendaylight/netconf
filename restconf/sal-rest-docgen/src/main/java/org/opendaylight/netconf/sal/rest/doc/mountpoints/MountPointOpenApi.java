@@ -38,6 +38,7 @@ import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Components;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.netconf.sal.rest.doc.openapi.SecuritySchemes;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -189,8 +190,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
         if (includeDataStore) {
             doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
-            addFields(doc.getPaths() ,openApiObject.getPaths().fields());
-            addFields(doc.getDefinitions() ,openApiObject.getDefinitions().fields());
+            doc.getPaths().putAll(openApiObject.getPaths());
+            addFields(doc.getDefinitions(), openApiObject.getDefinitions().fields());
             doc.getInfo().setTitle(openApiObject.getInfo().getTitle());
         } else {
             doc = openApiObject;
@@ -212,15 +213,17 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 BASE_PATH,
                 context);
 
-        final ObjectNode pathsObject = JsonNodeFactory.instance.objectNode();
-        createGetPathItem("config", "Queries the config (startup) datastore on the mounted hosted.",
-                context, deviceName, pathsObject);
-        createGetPathItem("operational", "Queries the operational (running) datastore on the mounted hosted.",
-                context, deviceName, pathsObject);
-        createGetPathItem("operations", "Queries the available operations (RPC calls) on the mounted hosted.",
-                context, deviceName, pathsObject);
+        final var config = new Path();
+        config.setGet(createGetPathItem("config",
+                "Queries the config (startup) datastore on the mounted hosted.", deviceName));
 
-        declaration.setPaths(pathsObject);
+        final var operations = new Path();
+        operations.setGet(createGetPathItem("operations",
+                "Queries the available operations (RPC calls) on the mounted hosted.", deviceName));
+
+        final var paths = Map.of(openApiGenerator.getResourcePath("config", context), config,
+                openApiGenerator.getResourcePath("operations", context), operations);
+        declaration.setPaths(paths);
         declaration.setDefinitions(JsonNodeFactory.instance.objectNode());
         declaration.setComponents(new Components(declaration.getDefinitions(),
                 new SecuritySchemes(OPEN_API_BASIC_AUTH)));
@@ -228,11 +231,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         return declaration;
     }
 
-    private void createGetPathItem(final String resourceType, final String description, final String context,
-            final String deviceName, final ObjectNode pathsObject) {
-        final ObjectNode pathItem = JsonNodeFactory.instance.objectNode();
+    private ObjectNode createGetPathItem(final String resourceType, final String description, final String deviceName) {
         final ObjectNode operationObject = JsonNodeFactory.instance.objectNode();
-        pathItem.set("get", operationObject);
         operationObject.put(DESCRIPTION_KEY, description);
         operationObject.put(SUMMARY_KEY, HttpMethod.GET + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR
                 + openApiGenerator.getResourcePathPart(resourceType));
@@ -242,7 +242,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()), okResponse);
         operationObject.set(RESPONSES_KEY, responses);
-        pathsObject.set(openApiGenerator.getResourcePath(resourceType, context), pathItem);
+        return operationObject;
     }
 
     @Override
