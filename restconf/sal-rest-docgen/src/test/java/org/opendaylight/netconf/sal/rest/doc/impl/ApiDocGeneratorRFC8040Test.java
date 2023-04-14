@@ -8,16 +8,16 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
@@ -36,7 +36,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
-        assertEquals(List.of("/rests/data",
+        assertEquals(Set.of("/rests/data",
             "/rests/data/toaster2:toaster",
             "/rests/data/toaster2:toaster/toasterSlot={slotId}",
             "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo",
@@ -48,7 +48,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
             "/rests/operations/toaster2:make-toast",
             "/rests/operations/toaster2:cancel-toast",
             "/rests/operations/toaster2:restock-toaster"),
-            ImmutableList.copyOf(doc.getPaths().fieldNames()));
+            doc.getPaths().keySet());
     }
 
     /**
@@ -66,12 +66,12 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
         for (final String path : configPaths) {
-            final JsonNode node = doc.getPaths().get(path);
-            assertFalse(node.path("get").isMissingNode());
-            assertFalse(node.path("put").isMissingNode());
-            assertFalse(node.path("delete").isMissingNode());
-            assertFalse(node.path("post").isMissingNode());
-            assertFalse(node.path("patch").isMissingNode());
+            final Path node = doc.getPaths().get(path);
+            assertNotNull(node.getGet());
+            assertNotNull(node.getPut());
+            assertNotNull(node.getDelete());
+            assertNotNull(node.getPost());
+            assertNotNull(node.getPatch());
         }
     }
 
