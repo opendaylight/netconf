@@ -102,10 +102,6 @@ public abstract class BaseYangSwaggerGenerator {
         this.schemaService = schemaService.orElse(null);
     }
 
-    public DOMSchemaService getSchemaService() {
-        return schemaService;
-    }
-
     public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames,
             final OAversion oaversion) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
@@ -371,8 +367,6 @@ public abstract class BaseYangSwaggerGenerator {
     private static List<Server> convertToServers(final List<String> schemes, final String host, final String basePath) {
         return ImmutableList.of(new Server(schemes.get(0) + "://" + host + basePath));
     }
-
-    protected abstract String getPathVersion();
 
     public abstract String getResourcePath(String resourceType, String context);
 
