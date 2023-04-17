@@ -30,11 +30,6 @@ public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGen
     }
 
     @Override
-    protected String getPathVersion() {
-        return "rfc8040";
-    }
-
-    @Override
     public String getResourcePath(final String resourceType, final String context) {
         if (isData(resourceType)) {
             return "/" + basePath + "/data" + context;
