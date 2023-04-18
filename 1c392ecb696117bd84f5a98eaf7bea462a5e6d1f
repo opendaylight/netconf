@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccff0299_7159c2b4",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-18T10:41:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ecdd285_63ad23ee",
+      "revId": "1c392ecb696117bd84f5a98eaf7bea462a5e6d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c82dad0_c5114ece",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8d64501_8dd0fbce",
+        "filename": "restconf/sal-rest-docgen/src/test/resources/yang/choice-test.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-18T10:41:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c82dad0_c5114ece",
+      "revId": "1c392ecb696117bd84f5a98eaf7bea462a5e6d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94eae67d_e634b3c1",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-04-13T09:55:10Z",
       "side": 1,
       "message": "Wrong formatting.",
+      "revId": "1c392ecb696117bd84f5a98eaf7bea462a5e6d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca1a1ca6_8fc36326",
+        "filename": "restconf/sal-rest-docgen/src/test/resources/yang/choice-test.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-18T10:41:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94eae67d_e634b3c1",
       "revId": "1c392ecb696117bd84f5a98eaf7bea462a5e6d1f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
