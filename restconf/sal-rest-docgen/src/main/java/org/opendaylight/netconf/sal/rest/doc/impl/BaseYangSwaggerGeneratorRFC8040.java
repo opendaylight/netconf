@@ -51,7 +51,7 @@ public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGen
     }
 
     private static boolean isData(final String dataStore) {
-        return "config".contains(dataStore) || "operational".contains(dataStore);
+        return "config".contains(dataStore);
     }
 
     @Override

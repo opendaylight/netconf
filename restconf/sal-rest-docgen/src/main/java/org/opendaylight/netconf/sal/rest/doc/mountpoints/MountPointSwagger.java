@@ -213,8 +213,6 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         final ObjectNode pathsObject = JsonNodeFactory.instance.objectNode();
         createGetPathItem("config", "Queries the config (startup) datastore on the mounted hosted.",
                 context, deviceName, pathsObject);
-        createGetPathItem("operational", "Queries the operational (running) datastore on the mounted hosted.",
-                context, deviceName, pathsObject);
         createGetPathItem("operations", "Queries the available operations (RPC calls) on the mounted hosted.",
                 context, deviceName, pathsObject);
 

@@ -281,14 +281,6 @@ public abstract class BaseYangSwaggerGenerator {
                     addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, true, module.getName(),
                         definitionNames, oaversion, resolvedPath);
                 }
-                pathParams = JsonNodeFactory.instance.arrayNode();
-                resourcePath = getResourcePath("operational", context);
-
-                if (!node.isConfiguration()) {
-                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
-                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, false, moduleName,
-                        definitionNames, oaversion, resolvedPath);
-                }
             }
         }
 
