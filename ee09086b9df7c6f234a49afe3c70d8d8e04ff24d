@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3895085e_870dbd34",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-18T15:03:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f014a9f0_53e98b3e",
+      "revId": "ee09086b9df7c6f234a49afe3c70d8d8e04ff24d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8f001535_89615fe0",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-04-13T16:49:28Z",
       "side": 1,
       "message": "What is the meaning of this test?",
+      "revId": "ee09086b9df7c6f234a49afe3c70d8d8e04ff24d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a9057b1_7f1e8f58",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/SwaggerObjectTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-18T15:03:01Z",
+      "side": 1,
+      "message": "We check if each property has generated a default value by an Automaton.",
+      "parentUuid": "8f001535_89615fe0",
       "revId": "ee09086b9df7c6f234a49afe3c70d8d8e04ff24d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
