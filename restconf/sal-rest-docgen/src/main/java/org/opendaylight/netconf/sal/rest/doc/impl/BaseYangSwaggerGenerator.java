@@ -48,6 +48,7 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Components;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Info;
 import org.opendaylight.netconf.sal.rest.doc.swagger.OpenApiObject;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SecurityDefinitions;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SecuritySchemes;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Server;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
@@ -85,10 +86,12 @@ public abstract class BaseYangSwaggerGenerator {
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
 
+    private static final ObjectNode SWAGGER_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
+            .put("type", "basic");
     private static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
             .put("type", "http")
             .put("scheme", "basic");
-    private static final ArrayNode OPEN_API_SECURITY = JsonNodeFactory.instance.arrayNode()
+    private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
             .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
     static {
@@ -341,6 +344,8 @@ public abstract class BaseYangSwaggerGenerator {
         doc.setHost(host);
         doc.setBasePath(basePath);
         doc.setProduces(PRODUCES);
+        doc.setSecurityDefinitions(new SecurityDefinitions(SWAGGER_BASIC_AUTH));
+        doc.setSecurity(SECURITY);
         return doc;
     }
 
@@ -359,7 +364,7 @@ public abstract class BaseYangSwaggerGenerator {
                 swaggerObject.getBasePath()));
         doc.setPaths(swaggerObject.getPaths());
         doc.setComponents(new Components(swaggerObject.getDefinitions(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
-        doc.setSecurity(OPEN_API_SECURITY);
+        doc.setSecurity(swaggerObject.getSecurity());
         return doc;
     }
 
