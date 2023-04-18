@@ -211,9 +211,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
                 context);
 
         final ObjectNode pathsObject = JsonNodeFactory.instance.objectNode();
-        createGetPathItem("config", "Queries the config (startup) datastore on the mounted hosted.",
-                context, deviceName, pathsObject);
-        createGetPathItem("operational", "Queries the operational (running) datastore on the mounted hosted.",
+        createGetPathItem("data", "Queries the config (startup) datastore on the mounted hosted.",
                 context, deviceName, pathsObject);
         createGetPathItem("operations", "Queries the available operations (RPC calls) on the mounted hosted.",
                 context, deviceName, pathsObject);
@@ -231,7 +229,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         pathItem.set("get", operationObject);
         operationObject.put(DESCRIPTION_KEY, description);
         operationObject.put(SUMMARY_KEY, HttpMethod.GET + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR
-                + swaggerGenerator.getResourcePathPart(resourceType));
+                + resourceType);
         operationObject.set(TAGS_KEY, buildTagsValue(Optional.of(deviceName), "GET root"));
         final ObjectNode okResponse = JsonNodeFactory.instance.objectNode();
         okResponse.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
