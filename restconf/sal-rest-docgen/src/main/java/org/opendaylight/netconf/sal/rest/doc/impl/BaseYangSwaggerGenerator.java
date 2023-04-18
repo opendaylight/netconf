@@ -326,13 +326,10 @@ public abstract class BaseYangSwaggerGenerator {
                 LOG.debug("Is Configuration node [{}] [{}]", node.isConfiguration(), node.getQName().getLocalName());
 
                 final String localName = module.getName() + ":" + node.getQName().getLocalName();
-                ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
-                String resourcePath;
+                final String resourcePath  = getResourcePath("data", context);
 
-                if (node.isConfiguration()) { // This node's config statement is
-                    // true.
-                    resourcePath = getResourcePath("config", context);
-
+                final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
+                if (node.isConfiguration()) {
                     /*
                      * When there are two or more top container or list nodes
                      * whose config statement is true in module, make sure that
@@ -348,11 +345,8 @@ public abstract class BaseYangSwaggerGenerator {
                     final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
                     addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, true, module.getName(),
                         definitionNames, oaversion, resolvedPath);
-                }
-                pathParams = JsonNodeFactory.instance.arrayNode();
-                resourcePath = getResourcePath("operational", context);
 
-                if (!node.isConfiguration()) {
+                } else  {
                     final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
                     addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, false, moduleName,
                         definitionNames, oaversion, resolvedPath);
@@ -432,8 +426,6 @@ public abstract class BaseYangSwaggerGenerator {
     protected abstract String getPathVersion();
 
     public abstract String getResourcePath(String resourceType, String context);
-
-    public abstract String getResourcePathPart(String resourceType);
 
     private static String generateCacheKey(final String module, final String revision) {
         return module + "(" + revision + ")";
