@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.swagger;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 
@@ -19,6 +20,8 @@ public class SwaggerObject implements CommonApiObject {
     private List<String> produces;
     private ObjectNode paths;
     private ObjectNode definitions;
+    private SecurityDefinitions securityDefinitions;
+    private ArrayNode security;
 
     public ObjectNode getDefinitions() {
         return definitions;
@@ -82,5 +85,21 @@ public class SwaggerObject implements CommonApiObject {
 
     public void setSwagger(String swagger) {
         this.swagger = swagger;
+    }
+
+    public SecurityDefinitions getSecurityDefinitions() {
+        return securityDefinitions;
+    }
+
+    public void setSecurityDefinitions(SecurityDefinitions securityDefinitions) {
+        this.securityDefinitions = securityDefinitions;
+    }
+
+    public ArrayNode getSecurity() {
+        return security;
+    }
+
+    public void setSecurity(ArrayNode security) {
+        this.security = security;
     }
 }
