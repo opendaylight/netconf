@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f20f0857_bd6717a2",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-19T13:17:36Z",
+      "side": 1,
+      "message": "We adding schemas because #addFields accept ObjectNode values.",
+      "parentUuid": "d6fe4fdb_474888db",
+      "revId": "e6ffffd134b00cc39a4ff54803060053911ef3fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d14c1d09_44a28bcb",
         "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
         "patchSetId": 5
@@ -48,6 +66,24 @@
       "writtenOn": "2023-04-19T12:20:03Z",
       "side": 1,
       "message": "Have you tried to run swagger UI? I am unsure if we deal with this correctly.",
+      "revId": "e6ffffd134b00cc39a4ff54803060053911ef3fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a647a973_ad362391",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-19T13:17:36Z",
+      "side": 1,
+      "message": "Yes, it works properly.",
+      "parentUuid": "d14c1d09_44a28bcb",
       "revId": "e6ffffd134b00cc39a4ff54803060053911ef3fa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
