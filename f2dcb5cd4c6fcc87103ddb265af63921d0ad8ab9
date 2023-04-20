@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "3497b103_637f9899",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-20T12:37:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d96b03f3_3b8c987b",
+      "revId": "f2dcb5cd4c6fcc87103ddb265af63921d0ad8ab9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "54490380_30eb203e",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -31,6 +49,40 @@
       "writtenOn": "2023-04-19T10:44:35Z",
       "side": 1,
       "message": "recheck",
+      "revId": "f2dcb5cd4c6fcc87103ddb265af63921d0ad8ab9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f798bea_edd09522",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-20T12:37:48Z",
+      "side": 1,
+      "message": "Replace `config` with `data`.",
+      "revId": "f2dcb5cd4c6fcc87103ddb265af63921d0ad8ab9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61babd91_6325f7c7",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGeneratorRFC8040.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-20T12:37:48Z",
+      "side": 1,
+      "message": "This method can be removed, too. We can use \"data\" or \"operations\" directly.",
       "revId": "f2dcb5cd4c6fcc87103ddb265af63921d0ad8ab9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

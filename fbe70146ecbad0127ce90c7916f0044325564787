@@ -16,6 +16,24 @@
       "message": "Now, I am unsure what to do with this method.",
       "revId": "fbe70146ecbad0127ce90c7916f0044325564787",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14077d54_17389faf",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGeneratorRFC8040.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-20T12:37:48Z",
+      "side": 0,
+      "message": "We can remove this method. We can use \"data\" or \"operations\" directly in getResourcePath.",
+      "parentUuid": "6a86dd3c_3f056b0d",
+      "revId": "fbe70146ecbad0127ce90c7916f0044325564787",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
