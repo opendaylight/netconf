@@ -113,13 +113,9 @@ public final class CopyConfig extends AbstractEdit {
     }
 
     private static XmlElement getSourceElement(final XmlElement parent) throws DocumentedException {
-        final Optional<XmlElement> sourceElement = parent.getOnlyChildElementOptionally(SOURCE_KEY);
-        if (sourceElement.isEmpty()) {
-            throw new DocumentedException("<source> element is missing",
-                ErrorType.PROTOCOL, ErrorTag.MISSING_ELEMENT, ErrorSeverity.ERROR);
-        }
-
-        return sourceElement.get();
+        return parent.getOnlyChildElementOptionally(SOURCE_KEY)
+            .orElseThrow(() ->  new DocumentedException("<source> element is missing",
+                ErrorType.PROTOCOL, ErrorTag.MISSING_ELEMENT, ErrorSeverity.ERROR));
     }
 
     private void copyToUrl(final XmlElement urlElement, final XmlElement operationElement) throws DocumentedException {
@@ -161,7 +157,7 @@ public final class CopyConfig extends AbstractEdit {
             if (sourceDatastore == Datastore.running) {
                 transactionProvider.abortRunningTransaction(rwTx);
             }
-            return (ContainerNode) normalizedNodeOptional.get();
+            return (ContainerNode) normalizedNodeOptional.orElseThrow();
         } catch (InterruptedException | ExecutionException e) {
             throw new IllegalStateException("Unable to read data " + dataRoot, e);
         }

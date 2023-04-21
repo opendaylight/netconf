@@ -82,7 +82,7 @@ public final class NetconfMessageUtil {
             capabilitiesElement = responseElement.getOnlyChildElementOptionally(XmlNetconfConstants.CAPABILITIES);
         }
 
-        List<XmlElement> caps = capabilitiesElement.get().getChildElements(XmlNetconfConstants.CAPABILITY);
+        List<XmlElement> caps = capabilitiesElement.orElseThrow().getChildElements(XmlNetconfConstants.CAPABILITY);
         return Collections2.transform(caps, input -> {
             // Trim possible leading/tailing whitespace
             try {

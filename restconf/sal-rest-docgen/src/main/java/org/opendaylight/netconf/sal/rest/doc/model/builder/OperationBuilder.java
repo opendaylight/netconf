@@ -301,7 +301,7 @@ public final class OperationBuilder {
         final ObjectNode response = JsonNodeFactory.instance.objectNode();
 
         if (schema.isPresent()) {
-            final ObjectNode schemaValue = schema.get();
+            final ObjectNode schemaValue = schema.orElseThrow();
             final ObjectNode content = JsonNodeFactory.instance.objectNode();
             final ObjectNode body = JsonNodeFactory.instance.objectNode();
             for (final String mimeType : MIME_TYPES) {

@@ -92,7 +92,7 @@ public final class NetconfConsoleUtils {
         }
 
         if (optionalData.isPresent()) {
-            return optionalData.get();
+            return optionalData.orElseThrow();
         }
 
         if (LOG.isDebugEnabled()) {

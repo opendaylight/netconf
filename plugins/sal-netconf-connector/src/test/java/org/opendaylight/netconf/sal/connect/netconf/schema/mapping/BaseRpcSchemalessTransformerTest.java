@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
-import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -118,9 +117,8 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         assertNotNull(result.value());
         final ContainerNode rpcReply = result.value();
         assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getIdentifier().getNodeType());
-        final Optional<?> dataOpt = rpcReply.findChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID);
-        assertTrue(dataOpt.isPresent());
-        final DOMSourceAnyxmlNode data = (DOMSourceAnyxmlNode) dataOpt.get();
+        final DOMSourceAnyxmlNode data =
+            (DOMSourceAnyxmlNode) rpcReply.getChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID);
         final Diff diff = XMLUnit.compareXML(dataElement.getOwnerDocument(), (Document) data.body().getNode());
         assertTrue(diff.toString(), diff.similar());
     }

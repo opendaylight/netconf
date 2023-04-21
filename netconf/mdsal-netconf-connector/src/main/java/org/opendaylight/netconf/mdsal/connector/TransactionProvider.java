@@ -41,7 +41,7 @@ public class TransactionProvider implements AutoCloseable {
     public TransactionProvider(final DOMDataBroker dataBroker, final String netconfSessionIdForReporting) {
         this.dataBroker = dataBroker;
         this.netconfSessionIdForReporting = netconfSessionIdForReporting;
-        this.transactionValidator = dataBroker.getExtensions().getInstance(DOMDataTransactionValidator.class);
+        transactionValidator = dataBroker.getExtensions().getInstance(DOMDataTransactionValidator.class);
     }
 
     @Override
@@ -58,8 +58,10 @@ public class TransactionProvider implements AutoCloseable {
     }
 
     public synchronized DOMDataTreeReadWriteTransaction getOrCreateTransaction() {
-        if (getCandidateTransaction().isPresent()) {
-            return getCandidateTransaction().get();
+        // FIXME: getCandidateTransaction() should be final in which case we will just talk to the field
+        final var currentTransaction = getCandidateTransaction();
+        if (currentTransaction.isPresent()) {
+            return currentTransaction.orElseThrow();
         }
 
         candidateTransaction = dataBroker.newReadWriteTransaction();

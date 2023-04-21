@@ -343,9 +343,9 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         NormalizedNodeResult nodeResult =
                 NetconfUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.body());
         ContainerNode result = (ContainerNode) nodeResult.getResult();
-        final ContainerNode state = (ContainerNode) result.findChildByArg(toId(NetconfState.QNAME)).get();
-        final ContainerNode schemas = (ContainerNode) state.findChildByArg(toId(Schemas.QNAME)).get();
-        final MapNode schemaParent = (MapNode) schemas.findChildByArg(toId(Schema.QNAME)).get();
+        final ContainerNode state = (ContainerNode) result.getChildByArg(toId(NetconfState.QNAME));
+        final ContainerNode schemas = (ContainerNode) state.getChildByArg(toId(Schemas.QNAME));
+        final MapNode schemaParent = (MapNode) schemas.getChildByArg(toId(Schema.QNAME));
         assertEquals(1, Iterables.size(schemaParent.body()));
 
         assertEquals(schemaNode, schemaParent.body().iterator().next());
@@ -844,7 +844,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "</rpc-reply>"));
         DOMActionResult actionResult = actionNetconfMessageTransformer.toActionResult(RESET_SERVER_PATH, message);
         assertNotNull(actionResult);
-        ContainerNode containerNode = actionResult.getOutput().get();
+        ContainerNode containerNode = actionResult.getOutput().orElseThrow();
         assertNotNull(containerNode);
         assertEquals("now", containerNode.body().iterator().next().body());
     }

@@ -88,7 +88,7 @@ public final class ParserIdentifier {
         final Iterator<String> pathsIt = MP_SPLITTER.split(identifier).iterator();
         final String mountPointId = pathsIt.next();
         final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContext);
-        final DOMMountPoint mountPoint = mountPointService.get().getMountPoint(mountPath)
+        final DOMMountPoint mountPoint = mountPointService.orElseThrow().getMountPoint(mountPath)
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
                     ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
 

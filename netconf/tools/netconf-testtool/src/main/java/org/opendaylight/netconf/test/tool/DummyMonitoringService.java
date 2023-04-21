@@ -46,12 +46,12 @@ public class DummyMonitoringService implements NetconfMonitoringService {
         capability -> new Uri(capability.getCapabilityUri());
 
     private static final Function<Capability, Schema> CAPABILITY_SCHEMA_FUNCTION = capability -> new SchemaBuilder()
-            .setIdentifier(capability.getModuleName().get())
-            .setNamespace(new Uri(capability.getModuleNamespace().get()))
+            .setIdentifier(capability.getModuleName().orElseThrow())
+            .setNamespace(new Uri(capability.getModuleNamespace().orElseThrow()))
             .setFormat(Yang.VALUE)
             .setVersion(capability.getRevision().orElse(""))
             .setLocation(Set.of(new Location(Enumeration.NETCONF)))
-            .withKey(new SchemaKey(Yang.VALUE, capability.getModuleName().get(),
+            .withKey(new SchemaKey(Yang.VALUE, capability.getModuleName().orElseThrow(),
                 capability.getRevision().orElse("")))
             .build();
 
@@ -67,10 +67,10 @@ public class DummyMonitoringService implements NetconfMonitoringService {
         Set<Capability> moduleCapabilities = new HashSet<>();
         capabilityMultiMap = ArrayListMultimap.create();
         for (Capability cap : capabilities) {
-            if (cap.getModuleName().isPresent()) {
-                capabilityMultiMap.put(cap.getModuleName().get(), cap);
+            cap.getModuleName().ifPresent(moduleName -> {
+                capabilityMultiMap.put(moduleName, cap);
                 moduleCapabilities.add(cap);
-            }
+            });
         }
 
         schemas = new SchemasBuilder()
@@ -114,7 +114,7 @@ public class DummyMonitoringService implements NetconfMonitoringService {
         final List<Capability> capabilityList = capabilityMultiMap.get(moduleName);
         if (revision.isPresent()) {
             for (Capability capability : capabilityList) {
-                if (capability.getRevision().orElseThrow().equals(revision.get())) {
+                if (capability.getRevision().orElseThrow().equals(revision.orElseThrow())) {
                     return capability.getCapabilitySchema().orElseThrow();
                 }
             }

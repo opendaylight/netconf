@@ -212,9 +212,7 @@ public class ProxyReadWriteTransactionTest {
         assertEquals(PATH, readRequest.getPath());
 
         masterActor.reply(new NormalizedNodeMessage(PATH, node));
-        final Optional<NormalizedNode> result = read.get(5, TimeUnit.SECONDS);
-        assertTrue(result.isPresent());
-        assertEquals(node, result.get());
+        assertEquals(Optional.of(node), read.get(5, TimeUnit.SECONDS));
     }
 
     @Test

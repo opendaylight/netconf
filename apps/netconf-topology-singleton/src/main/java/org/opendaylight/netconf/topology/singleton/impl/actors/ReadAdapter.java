@@ -31,15 +31,13 @@ class ReadAdapter {
 
     @SuppressWarnings("checkstyle:IllegalThrows")
     public void handle(final Object message, final ActorRef sender, final ActorRef self) {
-        if (message instanceof ReadRequest) {
+        if (message instanceof ReadRequest readRequest) {
 
-            final ReadRequest readRequest = (ReadRequest) message;
             final YangInstanceIdentifier path = readRequest.getPath();
             final LogicalDatastoreType store = readRequest.getStore();
             read(path, store, sender, self);
 
-        } else if (message instanceof ExistsRequest) {
-            final ExistsRequest readRequest = (ExistsRequest) message;
+        } else if (message instanceof ExistsRequest readRequest) {
             final YangInstanceIdentifier path = readRequest.getPath();
             final LogicalDatastoreType store = readRequest.getStore();
             exists(path, store, sender, self);
@@ -55,7 +53,7 @@ class ReadAdapter {
                     sender.tell(new EmptyReadResponse(), self);
                     return;
                 }
-                sender.tell(new NormalizedNodeMessage(path, result.get()), self);
+                sender.tell(new NormalizedNodeMessage(path, result.orElseThrow()), self);
             }
 
             @Override

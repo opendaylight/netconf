@@ -112,7 +112,7 @@ public class WriteRunningTx extends AbstractWriteTx {
                                                          final boolean rollbackSupport) {
             final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit running", id);
             if (defaultOperation.isPresent()) {
-                return netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(),
+                return netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.orElseThrow(),
                     rollbackSupport);
             } else {
                 return netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport);

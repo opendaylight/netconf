@@ -54,7 +54,7 @@ public final class NetconfHelloMessageToXMLEncoder extends NetconfMessageToXMLEn
 
         // If additional header present, serialize it along with netconf hello message
         if (headerOptional.isPresent()) {
-            out.writeBytes(headerOptional.get().toFormattedString().getBytes(StandardCharsets.UTF_8));
+            out.writeBytes(headerOptional.orElseThrow().toFormattedString().getBytes(StandardCharsets.UTF_8));
         }
 
         super.encode(ctx, msg, out);

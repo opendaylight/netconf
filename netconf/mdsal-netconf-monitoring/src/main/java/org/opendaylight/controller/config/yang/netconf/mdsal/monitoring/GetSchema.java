@@ -93,7 +93,7 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
             final Optional<XmlElement> versionElement = getSchemaElement
                     .getOnlyChildElementWithSameNamespaceOptionally(VERSION);
             if (versionElement.isPresent()) {
-                version = Optional.of(versionElement.get().getTextContent());
+                version = Optional.of(versionElement.orElseThrow().getTextContent());
             } else {
                 version = Optional.empty();
             }

@@ -57,16 +57,14 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
     static XmlElement getConfigElement(final XmlElement parent) throws DocumentedException {
         final Optional<XmlElement> configElement = parent.getOnlyChildElementOptionally(CONFIG_KEY);
         if (configElement.isPresent()) {
-            return configElement.get();
+            return configElement.orElseThrow();
         }
 
-        final Optional<XmlElement> urlElement = parent.getOnlyChildElementOptionally(URL_KEY);
-        if (urlElement.isEmpty()) {
-            throw new DocumentedException("Invalid RPC, neither <config> not <url> element is present",
-                ErrorType.PROTOCOL, ErrorTag.MISSING_ELEMENT, ErrorSeverity.ERROR);
-        }
+        final XmlElement urlElement = parent.getOnlyChildElementOptionally(URL_KEY)
+            .orElseThrow(() -> new DocumentedException("Invalid RPC, neither <config> not <url> element is present",
+                ErrorType.PROTOCOL, ErrorTag.MISSING_ELEMENT, ErrorSeverity.ERROR));
 
-        final Document document = getDocumentFromUrl(urlElement.get().getTextContent());
+        final Document document = getDocumentFromUrl(urlElement.getTextContent());
         return XmlElement.fromDomElementWithExpected(document.getDocumentElement(), CONFIG_KEY,
             XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
     }

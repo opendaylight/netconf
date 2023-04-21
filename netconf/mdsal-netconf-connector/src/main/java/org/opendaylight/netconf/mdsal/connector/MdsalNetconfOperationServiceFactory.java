@@ -100,15 +100,9 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
         // capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
 
         for (final Module module : currentContext.getModules()) {
-            Optional<YangModuleCapability> cap = moduleToCapability(module, rootSchemaSourceProviderDependency);
-            if (cap.isPresent()) {
-                capabilities.add(cap.get());
-            }
+            moduleToCapability(module, rootSchemaSourceProviderDependency).ifPresent(capabilities::add);
             for (final Submodule submodule : module.getSubmodules()) {
-                cap = moduleToCapability(submodule, rootSchemaSourceProviderDependency);
-                if (cap.isPresent()) {
-                    capabilities.add(cap.get());
-                }
+                moduleToCapability(submodule, rootSchemaSourceProviderDependency).ifPresent(capabilities::add);
             }
         }
 

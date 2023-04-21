@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
  * </ol>
  */
 public class WriteCandidateTx extends AbstractWriteTx {
-
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateTx.class);
 
     public WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport) {
@@ -107,9 +106,9 @@ public class WriteCandidateTx extends AbstractWriteTx {
     @Override
     public synchronized ListenableFuture<RpcResult<Void>> performCommit() {
         resultsFutures.add(netOps.commit(new NetconfRpcFutureCallback("Commit", id)));
-        final ListenableFuture<RpcResult<Void>> txResult = resultsToTxStatus();
+        final var txResult = resultsToTxStatus();
 
-        Futures.addCallback(txResult, new FutureCallback<RpcResult<Void>>() {
+        Futures.addCallback(txResult, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
                 cleanupOnSuccess();
@@ -139,7 +138,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
         if (defaultOperation.isPresent()) {
             resultsFutures.add(netOps.editConfigCandidate(
-                    editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport));
+                    editConfigCallback, editStructure, defaultOperation.orElseThrow(), rollbackSupport));
         } else {
             resultsFutures.add(netOps.editConfigCandidate(editConfigCallback, editStructure, rollbackSupport));
         }
