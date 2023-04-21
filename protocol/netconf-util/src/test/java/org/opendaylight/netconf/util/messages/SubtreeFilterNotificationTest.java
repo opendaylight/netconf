@@ -61,7 +61,7 @@ public class SubtreeFilterNotificationTest {
         Optional<Document> actualPostFilterDocumentOpt =
                 SubtreeFilter.applySubtreeNotificationFilter(filter, preFilterDocument);
         if (actualPostFilterDocumentOpt.isPresent()) {
-            Document actualPostFilterDocument = actualPostFilterDocumentOpt.get();
+            Document actualPostFilterDocument = actualPostFilterDocumentOpt.orElseThrow();
             LOG.info("Actual document: {}", XmlUtil.toString(actualPostFilterDocument));
             Diff diff = XMLUnit.compareXML(postFilterDocument, actualPostFilterDocument);
             assertTrue(diff.toString(), diff.similar());

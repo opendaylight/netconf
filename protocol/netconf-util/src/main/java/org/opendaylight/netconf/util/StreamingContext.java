@@ -59,7 +59,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
                 "Supplied QName %s is not valid according to schema %s, potential children nodes: %s", child, schema,
                 schema.getChildNodes());
 
-        final DataSchemaNode result = potential.get();
+        final DataSchemaNode result = potential.orElseThrow();
         // We try to look up if this node was added by augmentation
         if (schema instanceof DataSchemaNode && result.isAugmenting()) {
             for (final AugmentationSchemaNode aug : ((AugmentationTarget)schema).getAvailableAugmentations()) {

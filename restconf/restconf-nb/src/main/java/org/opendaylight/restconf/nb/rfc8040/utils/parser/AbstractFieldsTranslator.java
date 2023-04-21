@@ -133,7 +133,7 @@ public abstract class AbstractFieldsTranslator<T> {
                 .filter(qNameSet -> qNameSet.equals(currentLevel))
                 .findAny();
         if (existingLevel.isPresent()) {
-            final int index = parsedIdentifiers.indexOf(existingLevel.get());
+            final int index = parsedIdentifiers.indexOf(existingLevel.orElseThrow());
             if (index == parsedIdentifiers.size() - 1) {
                 final Set<T> nextLevel = new HashSet<>();
                 parsedIdentifiers.add(nextLevel);

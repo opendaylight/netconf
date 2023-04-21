@@ -31,9 +31,9 @@ public class SimulatedGetConfig extends AbstractLastNetconfOperation {
         super(netconfSessionIdForReporting);
 
         if (initialConfigXMLFile.isPresent()) {
-            LOG.info("File is present: {}", initialConfigXMLFile.get()
-                    .getName());
-            this.storage = loadInitialConfigXMLFile(initialConfigXMLFile.get());
+            final var file = initialConfigXMLFile.orElseThrow();
+            LOG.info("File is present: {}", file.getName());
+            this.storage = loadInitialConfigXMLFile(file);
         } else {
             this.storage = storage;
         }

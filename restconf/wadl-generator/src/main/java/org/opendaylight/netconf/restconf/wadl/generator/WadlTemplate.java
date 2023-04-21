@@ -173,7 +173,7 @@ final class WadlTemplate {
             builder.append(imprt.getPrefix());
             builder.append("=\"");
             builder.append(context.findModule(imprt.getModuleName().getLocalName(),
-                imprt.getRevision()).get().getNamespace());
+                imprt.getRevision()).orElseThrow().getNamespace());
             builder.append("\"");
             builder.newLineIfNotEmpty();
         }

@@ -55,7 +55,7 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
         // if we have keypair set the identity, otherwise retry the retrieval from the adapter
         // if successful set the identity.
         if (keyPair.isPresent() || tryToSetKeyPair()) {
-            session.addPublicKeyIdentity(keyPair.get());
+            session.addPublicKeyIdentity(keyPair.orElseThrow());
         }
         return session.auth();
     }
@@ -65,15 +65,13 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
         final Optional<KeyCredential> keypairOptional = keystoreAdapter.getKeypairFromId(pairId);
 
         if (keypairOptional.isPresent()) {
-            final KeyCredential dsKeypair = keypairOptional.get();
+            final KeyCredential dsKeypair = keypairOptional.orElseThrow();
             final String passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
 
             try {
-                this.keyPair = Optional.of(
-                        new PKIUtil().decodePrivateKey(
-                                new StringReader(encryptionService.decrypt(
-                                        dsKeypair.getPrivateKey()).replaceAll("\\\\n", "\n")),
-                                encryptionService.decrypt(passPhrase)));
+                keyPair = Optional.of(new PKIUtil().decodePrivateKey(
+                    new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey()).replace("\\n", "\n")),
+                    encryptionService.decrypt(passPhrase)));
             } catch (IOException exception) {
                 LOG.warn("Unable to decode private key, id={}", pairId, exception);
                 return false;

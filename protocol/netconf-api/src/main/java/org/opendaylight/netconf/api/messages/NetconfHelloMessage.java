@@ -98,6 +98,6 @@ public final class NetconfHelloMessage extends NetconfMessage {
         final Optional<String> optNamespace = element.getNamespaceOptionally();
         // accept even if hello has no namespace
         return optNamespace.isEmpty()
-                || XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0.equals(optNamespace.get());
+                || XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0.equals(optNamespace.orElseThrow());
     }
 }

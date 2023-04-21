@@ -508,7 +508,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 Optional<Node> node = readTx.read(LogicalDatastoreType.OPERATIONAL,
                         NODE_INSTANCE_ID).get(5, TimeUnit.SECONDS);
                 assertTrue(node.isPresent());
-                final NetconfNode netconfNode = node.get().augmentation(NetconfNode.class);
+                final NetconfNode netconfNode = node.orElseThrow().augmentation(NetconfNode.class);
                 return netconfNode.getConnectionStatus() != ConnectionStatus.Connected;
             }
         });
@@ -667,13 +667,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private static void verifyDataInStore(final DOMDataTreeReadOperations readTx, final YangInstanceIdentifier path,
             final NormalizedNode expNode) throws InterruptedException, ExecutionException, TimeoutException {
-        final Optional<NormalizedNode> read = readTx.read(LogicalDatastoreType.CONFIGURATION, path)
-                .get(5, TimeUnit.SECONDS);
-        assertTrue(read.isPresent());
-        assertEquals(expNode, read.get());
-
-        final Boolean exists = readTx.exists(LogicalDatastoreType.CONFIGURATION, path).get(5, TimeUnit.SECONDS);
-        assertTrue(exists);
+        assertEquals(Optional.of(expNode), readTx.read(LogicalDatastoreType.CONFIGURATION, path)
+            .get(5, TimeUnit.SECONDS));
+        assertTrue(readTx.exists(LogicalDatastoreType.CONFIGURATION, path).get(5, TimeUnit.SECONDS));
     }
 
     private static void verifyTopologyNodesCreated(final DataBroker dataBroker) {
@@ -733,7 +729,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     private RpcDefinition findRpcDefinition(final String rpc) {
-        Module topModule = deviceSchemaContext.findModule(TOP_MODULE_NAME, topModuleInfo.getName().getRevision()).get();
+        Module topModule = deviceSchemaContext.findModule(TOP_MODULE_NAME, topModuleInfo.getName().getRevision())
+            .orElseThrow();
         RpcDefinition rpcDefinition = null;
         for (RpcDefinition def: topModule.getRpcs()) {
             if (def.getQName().getLocalName().equals(rpc)) {

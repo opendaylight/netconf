@@ -68,7 +68,7 @@ public class SchemalessMessageTransformerTest {
         final QName qName =
                 QName.create("org:opendaylight:notification:test:ns:yang:user-notification", "user-visited-page");
         final DOMSourceAnyxmlNode dataContainerChild = (DOMSourceAnyxmlNode) domNotification.getBody()
-                .findChildByArg(new NodeIdentifier(qName)).get();
+                .getChildByArg(new NodeIdentifier(qName));
         final Diff diff = XMLUnit.compareXML(payload, dataContainerChild.body().getNode().getOwnerDocument());
         assertTrue(diff.toString(), diff.similar());
 

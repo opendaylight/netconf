@@ -126,15 +126,16 @@ abstract class AbstractGet extends AbstractSingletonNetconfOperation {
      */
     final Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement)
             throws DocumentedException {
-        final Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
-        if (filterElement.isPresent()) {
-            if (filterElement.get().getChildElements().size() == 0) {
-                return Optional.empty();
-            }
-            return Optional.of(getInstanceIdentifierFromFilter(filterElement.get()));
+        final var optFilterElement = operationElement.getOnlyChildElementOptionally(FILTER);
+        if (optFilterElement.isEmpty()) {
+            return Optional.of(YangInstanceIdentifier.empty());
         }
 
-        return Optional.of(YangInstanceIdentifier.empty());
+        final var filterElement = optFilterElement.orElseThrow();
+        if (filterElement.getChildElements().size() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(getInstanceIdentifierFromFilter(filterElement));
     }
 
     @VisibleForTesting
@@ -178,10 +179,9 @@ abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
         private static Optional<Datastore> parseSource(final XmlElement xml) throws DocumentedException {
             final Optional<XmlElement> sourceElement = xml.getOnlyChildElementOptionally(XmlNetconfConstants.SOURCE_KEY,
-                    XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
-            return sourceElement.isPresent()
-                    ? Optional.of(Datastore.valueOf(sourceElement.get().getOnlyChildElement().getName()))
-                    : Optional.empty();
+                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+            return sourceElement.isEmpty() ? Optional.empty()
+                : Optional.of(Datastore.valueOf(sourceElement.orElseThrow().getOnlyChildElement().getName()));
         }
 
         private static void validateInputRpc(final XmlElement xml, final String operationName) throws

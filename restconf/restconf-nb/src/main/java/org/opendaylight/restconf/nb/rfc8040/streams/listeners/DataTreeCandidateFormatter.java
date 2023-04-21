@@ -68,7 +68,7 @@ abstract class DataTreeCandidateFormatter extends EventFormatter<Collection<Data
             throws IOException {
         if (candidate.getRootNode().getDataAfter().isPresent()) {
             try (NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(writer)) {
-                nodeWriter.write(candidate.getRootNode().getDataAfter().get());
+                nodeWriter.write(candidate.getRootNode().getDataAfter().orElseThrow());
             }
         }
     }

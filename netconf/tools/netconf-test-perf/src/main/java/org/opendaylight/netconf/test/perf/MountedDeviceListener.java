@@ -14,7 +14,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.PreDestroy;
@@ -82,11 +81,12 @@ public final class MountedDeviceListener implements DOMMountPointListener {
 
     @Override
     public void onMountPointCreated(final YangInstanceIdentifier path) {
-        final Optional<String> optNodeId = TestUtils.getNodeId(path);
-        if (optNodeId.isPresent() && optNodeId.get().startsWith(TEST_NODE_PREFIX)) {
-            LOG.info("Test node mounted: {}", optNodeId.get());
-            trackNotificationsPerformance(path);
-        }
+        TestUtils.getNodeId(path).ifPresent(nodeId -> {
+            if (nodeId.startsWith(TEST_NODE_PREFIX)) {
+                LOG.info("Test node mounted: {}", nodeId);
+                trackNotificationsPerformance(path);
+            }
+        });
     }
 
     @Override
@@ -99,7 +99,7 @@ public final class MountedDeviceListener implements DOMMountPointListener {
 
     private void trackNotificationsPerformance(final YangInstanceIdentifier path) {
         // 1. get nodeId from the path
-        final String nodeId = TestUtils.getNodeId(path).get();
+        final String nodeId = TestUtils.getNodeId(path).orElseThrow();
 
         // 2. extract needed services from the mount point
         final DOMMountPoint mountPoint = mountPointService.getMountPoint(path)

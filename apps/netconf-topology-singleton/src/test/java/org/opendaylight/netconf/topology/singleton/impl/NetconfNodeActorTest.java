@@ -582,7 +582,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         result = slaveDomActionService.invokeAction(schemaPath, domDataTreeIdentifier, outputNode)
             .get(2, TimeUnit.SECONDS);
 
-        assertEquals(outputNode, result.getOutput().get());
+        assertEquals(Optional.of(outputNode), result.getOutput());
         assertTrue(result.getErrors().isEmpty());
 
         // Action failure.
