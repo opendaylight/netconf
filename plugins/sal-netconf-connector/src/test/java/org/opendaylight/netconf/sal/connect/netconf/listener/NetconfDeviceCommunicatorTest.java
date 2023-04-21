@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.withSettings;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
 
 import com.google.common.base.CharMatcher;
@@ -49,6 +51,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockMakers;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
@@ -94,8 +97,12 @@ public class NetconfDeviceCommunicatorTest {
     public void setUp() throws Exception {
         communicator = new NetconfDeviceCommunicator(
                 new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, 10);
-        spySession = spy(new NetconfClientSession(mock(NetconfClientSessionListener.class), mock(Channel.class),
-                SESSION_ID.toJava(), Set.of()));
+        // FIXME: spy() except we override the MockMaker in use
+        spySession = mock(NetconfClientSession.class, withSettings()
+            .spiedInstance(new NetconfClientSession(mock(NetconfClientSessionListener.class), mock(Channel.class),
+                SESSION_ID.toJava(), Set.of()))
+            .defaultAnswer(CALLS_REAL_METHODS)
+            .mockMaker(MockMakers.SUBCLASS));
     }
 
     void setupSession() {
