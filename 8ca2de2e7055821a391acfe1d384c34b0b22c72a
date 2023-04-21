@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54b468df_74670269",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-04-21T09:39:11Z",
+      "side": 1,
+      "message": "any particular reason why this is not Map.of()?",
+      "range": {
+        "startLine": 116,
+        "startChar": 21,
+        "endLine": 116,
+        "endChar": 36
+      },
+      "revId": "8ca2de2e7055821a391acfe1d384c34b0b22c72a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
