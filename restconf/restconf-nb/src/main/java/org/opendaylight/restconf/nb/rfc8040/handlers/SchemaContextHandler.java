@@ -303,7 +303,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
             final QName lastComponent = ids.get(ids.size() - 1);
 
             deviations.withChild(newCommonLeafsMapEntryBuilder(Deviation.QNAME,
-                context.findModule(lastComponent.getModule()).get())
+                context.findModule(lastComponent.getModule()).orElseThrow())
                 .build());
         }
         mapEntryBuilder.withChild(deviations.build());

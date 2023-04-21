@@ -117,9 +117,7 @@ public class ProxyNetconfServiceTest {
         assertEquals(PATH, getRequest.getPath());
 
         masterActor.reply(new NormalizedNodeMessage(PATH, node));
-        final Optional<NormalizedNode> result = get.get(5, TimeUnit.SECONDS);
-        assertTrue(result.isPresent());
-        assertEquals(node, result.get());
+        assertEquals(Optional.of(node), get.get(5, TimeUnit.SECONDS));
     }
 
     @Test
@@ -159,9 +157,7 @@ public class ProxyNetconfServiceTest {
         assertEquals(PATH, getRequest.getPath());
 
         masterActor.reply(new NormalizedNodeMessage(PATH, node));
-        final Optional<NormalizedNode> result = getConfig.get(5, TimeUnit.SECONDS);
-        assertTrue(result.isPresent());
-        assertEquals(node, result.get());
+        assertEquals(Optional.of(node), getConfig.get(5, TimeUnit.SECONDS));
     }
 
     @Test

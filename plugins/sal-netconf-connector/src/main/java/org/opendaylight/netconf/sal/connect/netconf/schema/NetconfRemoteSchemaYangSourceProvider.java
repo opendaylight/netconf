@@ -34,7 +34,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -70,13 +69,11 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
 
     public static @NonNull ContainerNode createGetSchemaRequest(final String moduleName,
             final Optional<String> revision) {
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder = Builders.containerBuilder()
-                .withNodeIdentifier(GET_SCHEMA_PATHARG)
-                .withChild(ImmutableNodes.leafNode(IDENTIFIER_PATHARG, moduleName))
-                .withChild(FORMAT_LEAF);
-        if (revision.isPresent()) {
-            builder.withChild(ImmutableNodes.leafNode(VERSION_PATHARG, revision.get()));
-        }
+        final var builder = Builders.containerBuilder()
+            .withNodeIdentifier(GET_SCHEMA_PATHARG)
+            .withChild(ImmutableNodes.leafNode(IDENTIFIER_PATHARG, moduleName))
+            .withChild(FORMAT_LEAF);
+        revision.ifPresent(rev -> builder.withChild(ImmutableNodes.leafNode(VERSION_PATHARG, rev)));
         return builder.build();
     }
 
@@ -86,11 +83,11 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         }
 
         final Optional<DataContainerChild> child = ((ContainerNode) result).findChildByArg(NETCONF_DATA_PATHARG);
-        checkState(child.isPresent() && child.get() instanceof DOMSourceAnyxmlNode,
+        checkState(child.isPresent() && child.orElseThrow() instanceof DOMSourceAnyxmlNode,
                 "%s Unexpected response to get-schema, expected response with one child %s, but was %s", id,
                 NETCONF_DATA, result);
 
-        final DOMSource wrappedNode = ((DOMSourceAnyxmlNode) child.get()).body();
+        final DOMSource wrappedNode = ((DOMSourceAnyxmlNode) child.orElseThrow()).body();
         final Element dataNode = (Element) requireNonNull(wrappedNode.getNode());
 
         return Optional.of(dataNode.getTextContent().trim());
@@ -107,13 +104,13 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
             rpc.invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, getSchemaRequest), input -> {
                 // Transform composite node to string schema representation and then to ASTSchemaSource.
                 if (input.errors().isEmpty()) {
-                    final Optional<String> schemaString = getSchemaFromRpc(id, input.value());
-                    checkState(schemaString.isPresent(),
-                        "%s: Unexpected response to get-schema, schema not present in message for: %s", id,
-                        sourceIdentifier);
+                    final String schemaString = getSchemaFromRpc(id, input.value())
+                        .orElseThrow(() -> new IllegalStateException(
+                            id + ": Unexpected response to get-schema, schema not present in message for: "
+                                + sourceIdentifier));
                     LOG.debug("{}: YANG Schema successfully retrieved for {}:{}", id, moduleName, revision);
                     return new NetconfYangTextSchemaSource(id, sourceIdentifier, moduleName,
-                        schemaString.get().getBytes(StandardCharsets.UTF_8));
+                        schemaString.getBytes(StandardCharsets.UTF_8));
                 }
 
                 LOG.warn("{}: YANG schema was not successfully retrieved for {}. Errors: {}", id, sourceIdentifier,

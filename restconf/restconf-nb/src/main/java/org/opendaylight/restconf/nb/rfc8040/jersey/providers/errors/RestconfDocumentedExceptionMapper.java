@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.$YangModuleInfoImpl.qnameOf;
 
@@ -294,9 +293,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     }
 
     private static MediaType chooseAndCheckMediaType(final List<MediaType> options) {
-        final Optional<MediaType> mediaTypeOpt = chooseMediaType(options);
-        checkState(mediaTypeOpt.isPresent());
-        return mediaTypeOpt.get();
+        return chooseMediaType(options).orElseThrow(IllegalStateException::new);
     }
 
     /**

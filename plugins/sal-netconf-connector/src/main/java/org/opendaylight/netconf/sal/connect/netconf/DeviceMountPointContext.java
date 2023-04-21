@@ -73,7 +73,7 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
         }
 
         final EffectiveModelContext schemaContext = emptyContext.getEffectiveModelContext();
-        final DataContainerChild mountPoint = optMountPoint.get();
+        final DataContainerChild mountPoint = optMountPoint.orElseThrow();
         checkArgument(mountPoint instanceof MapNode, "mount-point list %s is not a MapNode", mountPoint);
 
         final Map<MountPointIdentifier, NetconfMountPointContextFactory> mountPoints = new HashMap<>();

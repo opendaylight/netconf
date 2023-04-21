@@ -518,7 +518,7 @@ public class DefinitionGenerator {
                 if (!choice.getCases().isEmpty()) {
                     CaseSchemaNode caseSchemaNode = choice.getDefaultCase()
                             .orElse(choice.getCases().stream()
-                                    .findFirst().get());
+                                    .findFirst().orElseThrow());
                     stack.enterSchemaTree(caseSchemaNode.getQName());
                     for (final DataSchemaNode childNode : caseSchemaNode.getChildNodes()) {
                         processChildNode(childNode, parentName, definitions, definitionNames, isConfig, stack,
@@ -558,7 +558,7 @@ public class DefinitionGenerator {
 
     private static void processElementCount(final Optional<ElementCountConstraint> constraint, final ObjectNode props) {
         if (constraint.isPresent()) {
-            final ElementCountConstraint constr = constraint.get();
+            final ElementCountConstraint constr = constraint.orElseThrow();
             final Integer minElements = constr.getMinElements();
             if (minElements != null) {
                 props.put(MIN_ITEMS, minElements);
@@ -673,7 +673,7 @@ public class DefinitionGenerator {
         if (!(leafTypeDef instanceof IdentityrefTypeDefinition)) {
             putIfNonNull(property, TYPE_KEY, jsonType);
             if (leafTypeDef.getDefaultValue().isPresent()) {
-                final Object defaultValue = leafTypeDef.getDefaultValue().get();
+                final Object defaultValue = leafTypeDef.getDefaultValue().orElseThrow();
                 if (defaultValue instanceof String stringDefaultValue) {
                     if (leafTypeDef instanceof BooleanTypeDefinition) {
                         setDefaultValue(property, Boolean.valueOf(stringDefaultValue));
@@ -791,7 +791,7 @@ public class DefinitionGenerator {
         }
 
         if (lengthConstraints.isPresent()) {
-            final Range<Integer> range = lengthConstraints.get().getAllowedRanges().span();
+            final Range<Integer> range = lengthConstraints.orElseThrow().getAllowedRanges().span();
             putIfNonNull(property, MIN_LENGTH_KEY, range.lowerEndpoint());
             putIfNonNull(property, MAX_LENGTH_KEY, range.upperEndpoint());
         }
@@ -852,7 +852,7 @@ public class DefinitionGenerator {
     private static boolean isHexadecimalOrOctal(final RangeRestrictedTypeDefinition<?, ?> typeDef) {
         final Optional<?> optDefaultValue = typeDef.getDefaultValue();
         if (optDefaultValue.isPresent()) {
-            final String defaultValue = (String) optDefaultValue.get();
+            final String defaultValue = (String) optDefaultValue.orElseThrow();
             return defaultValue.startsWith("0") || defaultValue.startsWith("-0");
         }
         return false;
@@ -863,10 +863,10 @@ public class DefinitionGenerator {
         // create example instance-identifier to the first container of node's module if exists or leave it empty
         final var module = schemaContext.findModule(node.getQName().getModule());
         if (module.isPresent()) {
-            final var container = module.get().getChildNodes().stream()
+            final var container = module.orElseThrow().getChildNodes().stream()
                     .filter(n -> n instanceof ContainerSchemaNode)
                     .findFirst();
-            container.ifPresent(c -> setDefaultValue(property, String.format("/%s:%s", module.get().getPrefix(),
+            container.ifPresent(c -> setDefaultValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
                     c.getQName().getLocalName())));
         }
 

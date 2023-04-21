@@ -141,7 +141,7 @@ public final class XmlUtil {
             return document.createElement(qname);
         }
 
-        final String uri = namespaceURI.get();
+        final String uri = namespaceURI.orElseThrow();
         final Element element = document.createElementNS(uri, qname);
         String name = XMLNS_ATTRIBUTE;
         if (element.getPrefix() != null) {

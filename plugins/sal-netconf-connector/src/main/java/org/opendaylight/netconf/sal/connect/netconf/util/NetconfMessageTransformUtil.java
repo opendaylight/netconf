@@ -365,11 +365,11 @@ public final class NetconfMessageTransformUtil {
             final EffectiveModelContext ctx, final YangInstanceIdentifier dataPath,
             final Optional<EffectiveOperation> operation, final Optional<NormalizedNode> lastChildOverride) {
         if (dataPath.isEmpty()) {
-            Preconditions.checkArgument(lastChildOverride.isPresent(),
-                    "Data has to be present when creating structure for top level element");
-            Preconditions.checkArgument(lastChildOverride.get() instanceof DataContainerChild,
-                    "Data has to be either container or a list node when creating structure for top level element, "
-                            + "but was: %s", lastChildOverride.get());
+            final var override = lastChildOverride.orElseThrow(() -> new IllegalArgumentException(
+                "Data has to be present when creating structure for top level element"));
+            Preconditions.checkArgument(override instanceof DataContainerChild,
+                "Data has to be either container or a list node when creating structure for top level element, "
+                    + "but was: %s", override);
         }
 
         final var element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
@@ -385,7 +385,7 @@ public final class NetconfMessageTransformUtil {
                 try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(result)) {
                     try (var iidWriter = YangInstanceIdentifierWriter.open(streamWriter, ctx, parentPath);
                          var nnWriter = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
-                        nnWriter.write(lastChildOverride.get());
+                        nnWriter.write(lastChildOverride.orElseThrow());
                     }
                 }
                 NetconfUtil.writeNormalizedNode(result.getResult(), metadata, new DOMResult(element), ctx, null);

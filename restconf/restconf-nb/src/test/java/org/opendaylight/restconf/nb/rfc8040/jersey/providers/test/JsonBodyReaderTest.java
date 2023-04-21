@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -109,11 +108,11 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
     @Test
     public void moduleSubContainerDataPostActionTest() throws Exception {
-        final Optional<DataSchemaNode> dataSchemaNode = schemaContext
-            .findDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final QName cont1QName = QName.create(dataSchemaNode.get().getQName(), "cont1");
-        final QName actionQName = QName.create(dataSchemaNode.get().getQName(), "reset");
-        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.get().getQName())
+        final DataSchemaNode dataSchemaNode = schemaContext
+            .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
+        final QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
+        final QName actionQName = QName.create(dataSchemaNode.getQName(), "reset");
+        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
             .node(cont1QName).node(actionQName);
         final String uri = "instance-identifier-module:cont/cont1/reset";
         mockBodyReader(uri, jsonBodyReader, true);

@@ -72,6 +72,7 @@ public final class NotificationsTransformUtil {
             throw new IllegalStateException("Unable to serialize " + notification, e);
         }
         final Document node = (Document) result.getNode();
-        return eventTime.isPresent() ? new NetconfNotification(node, eventTime.get()) : new NetconfNotification(node);
+        return eventTime.isPresent() ? new NetconfNotification(node, eventTime.orElseThrow())
+            : new NetconfNotification(node);
     }
 }

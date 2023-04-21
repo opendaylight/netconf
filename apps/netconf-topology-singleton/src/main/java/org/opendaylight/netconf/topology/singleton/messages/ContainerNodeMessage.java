@@ -49,7 +49,7 @@ public class ContainerNodeMessage implements Externalizable {
 
     @Override
     public void readExternal(final ObjectInput in) throws IOException {
-        node = (ContainerNode) SerializationUtils.readNormalizedNode(in).get();
+        node = (ContainerNode) SerializationUtils.readNormalizedNode(in).orElseThrow();
     }
 
     @Override

@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.restconf.api.query.DepthParam;
@@ -28,6 +27,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
@@ -267,8 +267,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
 
     private boolean wasProcessedAsCompositeNode(final NormalizedNode node) throws IOException {
         boolean processedAsCompositeNode = false;
-        if (node instanceof ContainerNode) {
-            final ContainerNode n = (ContainerNode) node;
+        if (node instanceof ContainerNode n) {
             if (!n.getIdentifier().getNodeType().withoutRevision().equals(ROOT_DATA_QNAME)) {
                 writer.startContainerNode(n.getIdentifier(), childSizeHint(n.body()));
                 currentDepth++;
@@ -287,30 +286,24 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             }
         } else if (node instanceof MapEntryNode) {
             processedAsCompositeNode = writeMapEntryNode((MapEntryNode) node);
-        } else if (node instanceof UnkeyedListEntryNode) {
-            final UnkeyedListEntryNode n = (UnkeyedListEntryNode) node;
+        } else if (node instanceof UnkeyedListEntryNode n) {
             writer.startUnkeyedListItem(n.getIdentifier(), childSizeHint(n.body()));
             currentDepth++;
             processedAsCompositeNode = writeChildren(n.body(), false);
             currentDepth--;
-        } else if (node instanceof ChoiceNode) {
-            final ChoiceNode n = (ChoiceNode) node;
+        } else if (node instanceof ChoiceNode n) {
             writer.startChoiceNode(n.getIdentifier(), childSizeHint(n.body()));
             processedAsCompositeNode = writeChildren(n.body(), true);
-        } else if (node instanceof AugmentationNode) {
-            final AugmentationNode n = (AugmentationNode) node;
+        } else if (node instanceof AugmentationNode n) {
             writer.startAugmentationNode(n.getIdentifier());
             processedAsCompositeNode = writeChildren(n.body(), true);
-        } else if (node instanceof UnkeyedListNode) {
-            final UnkeyedListNode n = (UnkeyedListNode) node;
+        } else if (node instanceof UnkeyedListNode n) {
             writer.startUnkeyedList(n.getIdentifier(), childSizeHint(n.body()));
             processedAsCompositeNode = writeChildren(n.body(), false);
-        } else if (node instanceof UserMapNode) {
-            final UserMapNode n = (UserMapNode) node;
+        } else if (node instanceof UserMapNode n) {
             writer.startOrderedMapNode(n.getIdentifier(), childSizeHint(n.body()));
             processedAsCompositeNode = writeChildren(n.body(), true);
-        } else if (node instanceof MapNode) {
-            final MapNode n = (MapNode) node;
+        } else if (node instanceof MapNode n) {
             writer.startMapNode(n.getIdentifier(), childSizeHint(n.body()));
             processedAsCompositeNode = writeChildren(n.body(), true);
         } else if (node instanceof LeafSetNode) {
@@ -345,10 +338,10 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             // Write out all the key children
             currentDepth++;
             for (final QName qname : qnames) {
-                final Optional<? extends NormalizedNode> child = node.findChildByArg(new NodeIdentifier(qname));
-                if (child.isPresent()) {
-                    if (selectedByParameters(child.get(), false)) {
-                        write(child.get());
+                final DataContainerChild child = node.childByArg(new NodeIdentifier(qname));
+                if (child != null) {
+                    if (selectedByParameters(child, false)) {
+                        write(child);
                     }
                 } else {
                     LOG.info("No child for key element {} found", qname);
