@@ -91,12 +91,12 @@ public class XmlElementTest {
         assertThrows(MissingNameSpaceException.class, () -> noNamespaceElement.getNamespace());
 
         final XmlElement inner = xmlElement.getOnlyChildElement("inner");
-        final XmlElement deepInner = inner.getOnlyChildElementWithSameNamespaceOptionally().get();
+        final XmlElement deepInner = inner.getOnlyChildElementWithSameNamespaceOptionally().orElseThrow();
         assertEquals(deepInner, inner.getOnlyChildElementWithSameNamespace());
         assertEquals(Optional.empty(), xmlElement.getOnlyChildElementOptionally("unknown"));
         assertEquals("deepValue", deepInner.getTextContent());
-        assertEquals("deepValue", deepInner.getOnlyTextContentOptionally().get());
-        assertEquals("deepValue", deepInner.getOnlyTextContentOptionally().get());
+        assertEquals("deepValue", deepInner.getOnlyTextContentOptionally().orElseThrow());
+        assertEquals("deepValue", deepInner.getOnlyTextContentOptionally().orElseThrow());
     }
 
     @Test

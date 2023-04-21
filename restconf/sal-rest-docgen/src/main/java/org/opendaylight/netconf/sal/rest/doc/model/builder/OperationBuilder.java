@@ -328,7 +328,7 @@ public final class OperationBuilder {
         final ObjectNode response = JsonNodeFactory.instance.objectNode();
 
         if (schema.isPresent()) {
-            final ObjectNode schemaValue = schema.get();
+            final ObjectNode schemaValue = schema.orElseThrow();
             if (oaversion.equals(OAversion.V3_0)) {
                 final ObjectNode content = JsonNodeFactory.instance.objectNode();
                 final ObjectNode body = JsonNodeFactory.instance.objectNode();

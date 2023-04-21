@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
-import com.google.common.base.Preconditions;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -58,16 +57,17 @@ public class GetConfig extends AbstractGet {
             return document.createElement(XmlNetconfConstants.DATA_KEY);
         }
 
-        final YangInstanceIdentifier dataRoot = dataRootOptional.get();
+        final YangInstanceIdentifier dataRoot = dataRootOptional.orElseThrow();
 
-        // Proper exception should be thrown
-        Preconditions.checkState(getConfigExecution.getDatastore().isPresent(), "Source element missing from request");
+        // FIXME: Proper exception should be thrown
+        final var datastore = getConfigExecution.getDatastore()
+            .orElseThrow(() -> new IllegalStateException("Source element missing from request"));
 
-        final DOMDataTreeReadWriteTransaction rwTx = getTransaction(getConfigExecution.getDatastore().get());
+        final DOMDataTreeReadWriteTransaction rwTx = getTransaction(datastore);
         try {
             final Optional<NormalizedNode> normalizedNodeOptional = rwTx.read(
                     LogicalDatastoreType.CONFIGURATION, dataRoot).get();
-            if (getConfigExecution.getDatastore().get() == Datastore.running) {
+            if (datastore == Datastore.running) {
                 transactionProvider.abortRunningTransaction(rwTx);
             }
 
@@ -75,7 +75,7 @@ public class GetConfig extends AbstractGet {
                 return document.createElement(XmlNetconfConstants.DATA_KEY);
             }
 
-            return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.get());
+            return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.orElseThrow());
         } catch (final InterruptedException | ExecutionException e) {
             LOG.warn("Unable to read data: {}", dataRoot, e);
             throw new IllegalStateException("Unable to read data " + dataRoot, e);

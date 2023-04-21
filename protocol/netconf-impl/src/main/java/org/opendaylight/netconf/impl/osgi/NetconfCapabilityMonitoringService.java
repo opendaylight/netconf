@@ -104,17 +104,18 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
     private void updateCapabilityToSchemaMap(final Set<Capability> added, final Set<Capability> removed) {
         for (final Capability cap : added) {
             if (isValidModuleCapability(cap)) {
-                mappedModulesToRevisionToSchema.computeIfAbsent(cap.getModuleName().get(), k -> new HashMap<>())
-                    .put(cap.getRevision().orElse(""), cap.getCapabilitySchema().get());
+                mappedModulesToRevisionToSchema.computeIfAbsent(cap.getModuleName().orElseThrow(), k -> new HashMap<>())
+                    .put(cap.getRevision().orElse(""), cap.getCapabilitySchema().orElseThrow());
             }
         }
         for (final Capability cap : removed) {
             if (isValidModuleCapability(cap)) {
-                final Map<String, String> revisionMap = mappedModulesToRevisionToSchema.get(cap.getModuleName().get());
+                final Map<String, String> revisionMap =
+                    mappedModulesToRevisionToSchema.get(cap.getModuleName().orElseThrow());
                 if (revisionMap != null) {
-                    revisionMap.remove(cap.getRevision().get());
+                    revisionMap.remove(cap.getRevision().orElseThrow());
                     if (revisionMap.isEmpty()) {
-                        mappedModulesToRevisionToSchema.remove(cap.getModuleName().get());
+                        mappedModulesToRevisionToSchema.remove(cap.getModuleName().orElseThrow());
                     }
                 }
             }

@@ -140,7 +140,7 @@ public class SchemalessRpcStructureTransformerTest {
                 .withValue(new DOMSource(XmlUtil.readXmlToDocument(getConfigData).getDocumentElement()))
                 .build();
         final DOMSourceAnyxmlNode dataStructure = (DOMSourceAnyxmlNode) adapter.selectFromDataStructure(data, path)
-                .get();
+                .orElseThrow();
         final XmlElement s = XmlElement.fromDomDocument((Document) dataStructure.body().getNode());
         final String dataFromReply = XmlUtil.toString(s.getOnlyChildElement().getDomElement());
         final String expectedData = XmlUtil.toString((Element) source.getNode());

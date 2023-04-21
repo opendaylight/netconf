@@ -144,7 +144,7 @@ public class NetconfCommandsImplTest {
 
             assertTrue(storedNode.isPresent());
 
-            NetconfNode storedNetconfNode = storedNode.get().augmentation(NetconfNode.class);
+            NetconfNode storedNetconfNode = storedNode.orElseThrow().augmentation(NetconfNode.class);
             assertEquals(7777, storedNetconfNode.getPort().getValue().longValue());
             assertEquals("10.10.1.1", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
             return true;
@@ -193,7 +193,7 @@ public class NetconfCommandsImplTest {
                     node.key().getNodeId().getValue().equals(NODE_ID)).findFirst();
             assertTrue(storedNode.isPresent());
 
-            NetconfNode storedNetconfNode = storedNode.get().augmentation(NetconfNode.class);
+            NetconfNode storedNetconfNode = storedNode.orElseThrow().augmentation(NetconfNode.class);
             assertEquals("7.7.7.7", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
             return true;
         });

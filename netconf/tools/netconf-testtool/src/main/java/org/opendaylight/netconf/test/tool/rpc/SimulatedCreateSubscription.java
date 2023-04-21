@@ -12,8 +12,6 @@ import com.google.common.collect.Maps;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -48,22 +46,22 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
         final Optional<Notifications> notifs;
 
         if (notificationsFile.isPresent()) {
-            notifs = Optional.of(loadNotifications(notificationsFile.get()));
+            notifs = Optional.of(loadNotifications(notificationsFile.orElseThrow()));
             scheduledExecutorService = Executors.newScheduledThreadPool(1);
         } else {
             notifs = Optional.empty();
         }
 
         if (notifs.isPresent()) {
-            final Collection<Notification> toCopy = notifs.get().getNotificationList();
+            final List<Notification> toCopy = notifs.orElseThrow().getNotificationList();
             final Map<Notification, NetconfMessage> preparedMessages = Maps.newHashMapWithExpectedSize(toCopy.size());
             for (final Notification notification : toCopy) {
                 final NetconfMessage parsedNotification = parseNetconfNotification(notification.getContent());
                 preparedMessages.put(notification, parsedNotification);
             }
-            this.notifications = preparedMessages;
+            notifications = preparedMessages;
         } else {
-            this.notifications = Collections.emptyMap();
+            notifications = Map.of();
         }
     }
 
@@ -122,7 +120,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
 
     @Override
     public void setNetconfSession(final NetconfServerSession newSession) {
-        this.session = newSession;
+        session = newSession;
     }
 
     @XmlRootElement(name = "notifications")

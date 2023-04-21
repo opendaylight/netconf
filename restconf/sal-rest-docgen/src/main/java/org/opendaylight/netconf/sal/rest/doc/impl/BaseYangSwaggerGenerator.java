@@ -117,7 +117,7 @@ public abstract class BaseYangSwaggerGenerator {
         final String host = createHostFromUriInfo(uriInfo);
         String name = "Controller";
         if (deviceName.isPresent()) {
-            name = deviceName.get();
+            name = deviceName.orElseThrow();
         }
 
         final String title = name + " modules of RESTCONF";
@@ -136,7 +136,7 @@ public abstract class BaseYangSwaggerGenerator {
         final SortedSet<Module> modules = getSortedModules(schemaContext);
         final Set<Module> filteredModules;
         if (range.isPresent()) {
-            filteredModules = filterByRange(modules, range.get());
+            filteredModules = filterByRange(modules, range.orElseThrow());
         } else {
             filteredModules = modules;
         }

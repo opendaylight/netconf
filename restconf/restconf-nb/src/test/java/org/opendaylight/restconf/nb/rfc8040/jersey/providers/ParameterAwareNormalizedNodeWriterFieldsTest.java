@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,7 +93,7 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
         mapEntryNodeIdentifier = NodeIdentifierWithPredicates.of(
                 QName.create("namespace", "list-entry"), mapEntryNodeKey, keyLeafNodeValue);
         when(mapEntryNodeData.getIdentifier()).thenReturn(mapEntryNodeIdentifier);
-        when(mapEntryNodeData.findChildByArg(keyLeafNodeIdentifier)).thenReturn(Optional.of(keyLeafNodeData));
+        when(mapEntryNodeData.childByArg(keyLeafNodeIdentifier)).thenReturn(keyLeafNodeData);
 
         when(keyLeafNodeData.body()).thenReturn(keyLeafNodeValue);
         when(keyLeafNodeData.getIdentifier()).thenReturn(keyLeafNodeIdentifier);

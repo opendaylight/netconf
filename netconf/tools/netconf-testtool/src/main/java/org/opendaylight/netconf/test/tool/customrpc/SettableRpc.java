@@ -47,7 +47,7 @@ class SettableRpc implements NetconfOperation {
         final String msgId = requestElement.getAttribute(XmlNetconfConstants.MESSAGE_ID);
         final Optional<Document> response = mapping.getResponse(rpcElement);
         if (response.isPresent()) {
-            final Document document = response.get();
+            final Document document = response.orElseThrow();
             checkForError(document);
             document.getDocumentElement().setAttribute(XmlNetconfConstants.MESSAGE_ID, msgId);
             return document;

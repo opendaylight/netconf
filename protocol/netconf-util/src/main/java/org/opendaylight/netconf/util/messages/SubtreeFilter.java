@@ -46,11 +46,11 @@ public final class SubtreeFilter {
             if (maybeFilter.isEmpty()) {
                 return rpcReply;
             }
-            XmlElement filter = maybeFilter.get();
+            XmlElement filter = maybeFilter.orElseThrow();
             if (isSupported(filter)) {
 
                 // do
-                return filtered(maybeFilter.get(), rpcReply);
+                return filtered(filter, rpcReply);
             }
         }
 

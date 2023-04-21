@@ -17,7 +17,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -203,16 +202,14 @@ public class FilterContentValidator {
         final Map<QName, Object> keys = new HashMap<>();
         final List<QName> keyDefinition = listSchemaNode.getKeyDefinition();
         for (final QName qualifiedName : keyDefinition) {
-            final Optional<XmlElement> childElements =
-                    current.getOnlyChildElementOptionally(qualifiedName.getLocalName());
-            if (childElements.isEmpty()) {
+            final var optChildElements = current.getOnlyChildElementOptionally(qualifiedName.getLocalName());
+            if (optChildElements.isEmpty()) {
                 return Map.of();
             }
-            final Optional<String> keyValue = childElements.get().getOnlyTextContentOptionally();
-            if (keyValue.isPresent()) {
+            optChildElements.orElseThrow().getOnlyTextContentOptionally().ifPresent(keyValue -> {
                 final LeafSchemaNode listKey = (LeafSchemaNode) listSchemaNode.getDataChildByName(qualifiedName);
                 if (listKey instanceof IdentityrefTypeDefinition) {
-                    keys.put(qualifiedName, keyValue.get());
+                    keys.put(qualifiedName, keyValue);
                 } else {
                     final TypeDefinition<? extends TypeDefinition<?>> keyType = listKey.getType();
                     if (keyType instanceof IdentityrefTypeDefinition || keyType instanceof LeafrefTypeDefinition) {
@@ -224,15 +221,14 @@ public class FilterContentValidator {
                                 parentSchemaNode.getQName(), listSchemaNode.getQName(), listKey.getQName()));
                         final TypeAwareCodec<?, NamespaceContext, XMLStreamWriter> typeCodec = xmlCodecFactory
                                 .codecFor(listKey, resolver);
-                        final Object deserializedKeyValue = typeCodec.parseValue(nsContext, keyValue.get());
+                        final Object deserializedKeyValue = typeCodec.parseValue(nsContext, keyValue);
                         keys.put(qualifiedName, deserializedKeyValue);
                     } else {
-                        final Object deserializedKey = TypeDefinitionAwareCodec.from(keyType)
-                                .deserialize(keyValue.get());
+                        final Object deserializedKey = TypeDefinitionAwareCodec.from(keyType).deserialize(keyValue);
                         keys.put(qualifiedName, deserializedKey);
                     }
                 }
-            }
+            });
         }
         return keys;
     }

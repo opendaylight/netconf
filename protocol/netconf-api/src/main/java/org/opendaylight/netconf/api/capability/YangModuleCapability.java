@@ -23,10 +23,10 @@ public final class YangModuleCapability extends BasicCapability {
 
     public YangModuleCapability(final ModuleLike module, final String moduleContent) {
         super(toCapabilityURI(module));
-        this.content = moduleContent;
-        this.moduleName = module.getName();
-        this.moduleNamespace = module.getNamespace().toString();
-        this.revision = module.getRevision().map(Revision::toString).orElse(null);
+        content = moduleContent;
+        moduleName = module.getName();
+        moduleNamespace = module.getNamespace().toString();
+        revision = module.getRevision().map(Revision::toString).orElse(null);
     }
 
     @Override
@@ -37,11 +37,7 @@ public final class YangModuleCapability extends BasicCapability {
     private static String toCapabilityURI(final ModuleLike module) {
         final StringBuilder sb = new StringBuilder();
         sb.append(module.getNamespace()).append("?module=").append(module.getName());
-
-        final java.util.Optional<Revision> rev = module.getRevision();
-        if (rev.isPresent()) {
-            sb.append("&revision=").append(rev.get());
-        }
+        module.getRevision().ifPresent(revision -> sb.append("&revision=").append(revision));
         return sb.toString();
     }
 

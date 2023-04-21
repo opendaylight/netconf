@@ -93,7 +93,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
 
     private static StreamNameType parseStreamIfPresent(final XmlElement operationElement) throws DocumentedException {
         final Optional<XmlElement> stream = operationElement.getOnlyChildElementWithSameNamespaceOptionally("stream");
-        return stream.isPresent() ? new StreamNameType(stream.get().getTextContent())
+        return stream.isPresent() ? new StreamNameType(stream.orElseThrow().getTextContent())
                 : NetconfNotificationManager.BASE_STREAM_NAME;
     }
 
@@ -123,28 +123,29 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
 
     private static class NotificationSubscription implements NetconfNotificationListener {
         private final NetconfSession currentSession;
-        private final Optional<XmlElement> filter;
+        private final XmlElement filter;
 
         NotificationSubscription(final NetconfSession currentSession, final Optional<XmlElement> filter) {
             this.currentSession = currentSession;
-            this.filter = filter;
+            this.filter = filter.orElse(null);
         }
 
         @Override
         public void onNotification(final StreamNameType stream, final NetconfNotification notification) {
-            if (filter.isPresent()) {
-                try {
-                    final Optional<Document> filtered =
-                            SubtreeFilter.applySubtreeNotificationFilter(this.filter.get(), notification.getDocument());
-                    if (filtered.isPresent()) {
-                        final Date eventTime = notification.getEventTime();
-                        currentSession.sendMessage(new NetconfNotification(filtered.get(), eventTime));
-                    }
-                } catch (DocumentedException e) {
-                    LOG.warn("Failed to process notification {}", notification, e);
-                    currentSession.sendMessage(notification);
+            if (filter == null) {
+                currentSession.sendMessage(notification);
+                return;
+            }
+
+            try {
+                final Optional<Document> filtered =
+                        SubtreeFilter.applySubtreeNotificationFilter(filter, notification.getDocument());
+                if (filtered.isPresent()) {
+                    final Date eventTime = notification.getEventTime();
+                    currentSession.sendMessage(new NetconfNotification(filtered.orElseThrow(), eventTime));
                 }
-            } else {
+            } catch (DocumentedException e) {
+                LOG.warn("Failed to process notification {}", notification, e);
                 currentSession.sendMessage(notification);
             }
         }

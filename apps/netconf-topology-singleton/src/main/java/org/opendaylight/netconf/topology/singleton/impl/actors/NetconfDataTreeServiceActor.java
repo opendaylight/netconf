@@ -183,7 +183,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
                     sender.tell(new EmptyReadResponse(), self);
                     return;
                 }
-                sender.tell(new NormalizedNodeMessage(path, result.get()), self);
+                sender.tell(new NormalizedNodeMessage(path, result.orElseThrow()), self);
             }
 
             @Override

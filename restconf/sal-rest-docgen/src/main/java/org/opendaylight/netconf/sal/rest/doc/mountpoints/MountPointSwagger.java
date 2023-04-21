@@ -169,7 +169,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         Optional<Range<Integer>> range = Optional.empty();
 
         if (pageNum.isPresent()) {
-            final int pageNumValue = pageNum.get();
+            final int pageNumValue = pageNum.orElseThrow();
             final int end = DEFAULT_PAGESIZE * pageNumValue - 1;
             int start = end - DEFAULT_PAGESIZE;
             if (pageNumValue == 1) {
