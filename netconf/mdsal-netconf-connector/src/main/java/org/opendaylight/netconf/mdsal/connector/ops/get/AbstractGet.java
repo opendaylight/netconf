@@ -126,15 +126,16 @@ abstract class AbstractGet extends AbstractSingletonNetconfOperation {
      */
     final Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement)
             throws DocumentedException {
-        final Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
-        if (filterElement.isPresent()) {
-            if (filterElement.get().getChildElements().size() == 0) {
-                return Optional.empty();
-            }
-            return Optional.of(getInstanceIdentifierFromFilter(filterElement.get()));
+        final var optFilterElement = operationElement.getOnlyChildElementOptionally(FILTER);
+        if (optFilterElement.isEmpty()) {
+            return Optional.of(YangInstanceIdentifier.empty());
         }
 
-        return Optional.of(YangInstanceIdentifier.empty());
+        final var filterElement = optFilterElement.orElseThrow();
+        if (filterElement.getChildElements().size() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(getInstanceIdentifierFromFilter(filterElement));
     }
 
     @VisibleForTesting

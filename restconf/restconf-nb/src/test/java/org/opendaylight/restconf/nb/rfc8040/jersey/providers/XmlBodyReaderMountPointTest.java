@@ -112,7 +112,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final NormalizedNodePayload pyaload = xmlBodyReader.readFrom(null,null, null, mediaType, null,
             XmlBodyReaderMountPointTest.class.getResourceAsStream("/instanceidentifier/xml/xml_cont_action.xml"));
         checkMountPointNormalizedNodePayload(pyaload);
-        checkExpectValueNormalizeNodeContext(dataSchemaNode.get(), pyaload);
+        checkExpectValueNormalizeNodeContext(dataSchemaNode.orElseThrow(), pyaload);
     }
 
     @Test
@@ -128,13 +128,13 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final Optional<DataContainerChild> contDataNodePotential =
             contNode.findChildByArg(yangCont.getLastPathArgument());
         assertTrue(contDataNodePotential.isPresent());
-        final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.get();
+        final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.orElseThrow();
         final YangInstanceIdentifier yangLeaf = YangInstanceIdentifier.of(
             QName.create(contDataNode.getIdentifier().getNodeType(), "lf"));
         final Optional<DataContainerChild> leafDataNode = contDataNode.findChildByArg(
                 yangLeaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
-        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().body().toString()));
+        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.orElseThrow().body().toString()));
     }
 
     private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,

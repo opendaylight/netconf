@@ -83,9 +83,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTre
             return;
         }
 
-        if (maybeData.isPresent()) {
-            post(maybeData.get());
-        }
+        maybeData.ifPresent(this::post);
     }
 
     /**

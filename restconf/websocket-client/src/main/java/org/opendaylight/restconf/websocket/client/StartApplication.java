@@ -48,22 +48,21 @@ public final class StartApplication {
 
     public static void main(String[] args) {
         BasicConfigurator.configure();
-        final Optional<ApplicationSettings> applicationSettings = ApplicationSettings.parseApplicationSettings(args);
-        if (applicationSettings.isPresent()) {
-            setLoggingLevel(applicationSettings.get().getLoggingLevel());
-            final SslContextFactory sslContextFactory = getSslContextFactory(applicationSettings.get());
+        ApplicationSettings.parseApplicationSettings(args).ifPresent(applicationSettings -> {
+            setLoggingLevel(applicationSettings.getLoggingLevel());
+            final SslContextFactory sslContextFactory = getSslContextFactory(applicationSettings);
             final ThreadFactory threadFactory = new NamingThreadPoolFactory(THREAD_POOL_NAME);
             final ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolWrapper(
-                    applicationSettings.get().getThreadPoolSize(), threadFactory).getExecutor();
-            final List<WebSocketClientHandler> clientHandlers = applicationSettings.get().getStreams().stream()
-                    .map(streamName -> getWebSocketClientHandler(applicationSettings.get(), sslContextFactory,
+                    applicationSettings.getThreadPoolSize(), threadFactory).getExecutor();
+            final List<WebSocketClientHandler> clientHandlers = applicationSettings.getStreams().stream()
+                    .map(streamName -> getWebSocketClientHandler(applicationSettings, sslContextFactory,
                             scheduledExecutorService, streamName))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
-            printHandledStreamsOverview(applicationSettings.get().getStreams(), clientHandlers);
+            printHandledStreamsOverview(applicationSettings.getStreams(), clientHandlers);
             startAndLockOnClientHandlers(scheduledExecutorService, clientHandlers);
-        }
+        });
         System.exit(0);
     }
 

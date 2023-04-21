@@ -58,7 +58,7 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
             final long updateInterval) {
         this.updateInterval = updateInterval;
         if (schedulingThreadPool.isPresent() && updateInterval > 0) {
-            executor = schedulingThreadPool.get().getExecutor();
+            executor = schedulingThreadPool.orElseThrow().getExecutor();
             LOG.info("/netconf-state/sessions will be updated every {} seconds.", updateInterval);
         } else {
             LOG.info("Scheduling thread pool is present = {}, "

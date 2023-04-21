@@ -125,7 +125,7 @@ public class TestingNetconfClient implements Closeable {
                 NetconfClientConfigurationBuilder.DEFAULT_CONNECTION_TIMEOUT_MILLIS));
         if (ssh) {
             b.withProtocol(NetconfClientProtocol.SSH);
-            b.withAuthHandler(maybeAuthHandler.get());
+            b.withAuthHandler(maybeAuthHandler.orElseThrow());
         } else {
             b.withProtocol(NetconfClientProtocol.TCP);
         }

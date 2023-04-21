@@ -49,7 +49,7 @@ public class Get extends AbstractGet {
             return document.createElement(XmlNetconfConstants.DATA_KEY);
         }
 
-        final YangInstanceIdentifier dataRoot = dataRootOptional.get();
+        final YangInstanceIdentifier dataRoot = dataRootOptional.orElseThrow();
 
         final DOMDataTreeReadWriteTransaction rwTx = getTransaction(Datastore.running);
         try {
@@ -61,7 +61,7 @@ public class Get extends AbstractGet {
                 return document.createElement(XmlNetconfConstants.DATA_KEY);
             }
 
-            return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.get());
+            return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.orElseThrow());
         } catch (final InterruptedException | ExecutionException e) {
             LOG.warn("Unable to read data: {}", dataRoot, e);
             throw new IllegalStateException("Unable to read data " + dataRoot, e);

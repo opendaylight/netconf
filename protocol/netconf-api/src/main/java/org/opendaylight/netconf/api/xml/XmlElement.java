@@ -100,7 +100,7 @@ public final class XmlElement {
         if (!namespaces.containsKey(DEFAULT_NAMESPACE_PREFIX)) {
             Optional<String> namespaceOptionally = getNamespaceOptionally();
             if (namespaceOptionally.isPresent()) {
-                namespaces.put(DEFAULT_NAMESPACE_PREFIX, namespaceOptionally.get());
+                namespaces.put(DEFAULT_NAMESPACE_PREFIX, namespaceOptionally.orElseThrow());
             }
         }
 
@@ -257,7 +257,7 @@ public final class XmlElement {
     public Optional<XmlElement> getOnlyChildElementWithSameNamespaceOptionally(final String childName) {
         Optional<String> namespace = getNamespaceOptionally();
         if (namespace.isPresent()) {
-            List<XmlElement> children = getChildElementsWithinNamespace(namespace.get());
+            List<XmlElement> children = getChildElementsWithinNamespace(namespace.orElseThrow());
             children = Lists.newArrayList(Collections2.filter(children,
                 xmlElement -> xmlElement.getName().equals(childName)));
             if (children.size() != 1) {
@@ -270,10 +270,12 @@ public final class XmlElement {
 
     public Optional<XmlElement> getOnlyChildElementWithSameNamespaceOptionally() {
         Optional<XmlElement> child = getOnlyChildElementOptionally();
+        // FIXME: a beautiful example of how NOT to use Optional
         if (child.isPresent()
-                && child.get().getNamespaceOptionally().isPresent()
-                && getNamespaceOptionally().isPresent()
-                && getNamespaceOptionally().get().equals(child.get().getNamespaceOptionally().get())) {
+            && child.orElseThrow().getNamespaceOptionally().isPresent()
+            && getNamespaceOptionally().isPresent()
+            && getNamespaceOptionally().orElseThrow().equals(
+                child.orElseThrow().getNamespaceOptionally().orElseThrow())) {
             return child;
         }
         return Optional.empty();
@@ -367,7 +369,7 @@ public final class XmlElement {
             throw new MissingNameSpaceException(String.format("No namespace defined for %s", this),
                     ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
-        return namespaceURI.get();
+        return namespaceURI.orElseThrow();
     }
 
     @Override

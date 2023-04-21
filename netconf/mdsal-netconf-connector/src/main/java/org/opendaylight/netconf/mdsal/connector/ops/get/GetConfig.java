@@ -58,7 +58,7 @@ public class GetConfig extends AbstractGet {
             return document.createElement(XmlNetconfConstants.DATA_KEY);
         }
 
-        final YangInstanceIdentifier dataRoot = dataRootOptional.get();
+        final YangInstanceIdentifier dataRoot = dataRootOptional.orElseThrow();
 
         // Proper exception should be thrown
         Preconditions.checkState(getConfigExecution.getDatastore().isPresent(), "Source element missing from request");
