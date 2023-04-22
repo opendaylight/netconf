@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +34,11 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 public final class XmlElement {
-
     public static final String DEFAULT_NAMESPACE_PREFIX = "";
 
-    private final Element element;
     private static final Logger LOG = LoggerFactory.getLogger(XmlElement.class);
+
+    private final Element element;
 
     private XmlElement(final Element element) {
         this.element = element;
@@ -364,12 +363,9 @@ public final class XmlElement {
     }
 
     public String getNamespace() throws MissingNameSpaceException {
-        Optional<String> namespaceURI = getNamespaceOptionally();
-        if (namespaceURI.isEmpty()) {
-            throw new MissingNameSpaceException(String.format("No namespace defined for %s", this),
-                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
-        }
-        return namespaceURI.orElseThrow();
+        return getNamespaceOptionally()
+            .orElseThrow(() -> new MissingNameSpaceException("No namespace defined for " + this,
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR));
     }
 
     @Override
@@ -439,22 +435,12 @@ public final class XmlElement {
     }
 
     public void checkUnrecognisedElements(final XmlElement... additionalRecognisedElements) throws DocumentedException {
-        checkUnrecognisedElements(Collections.emptyList(), additionalRecognisedElements);
+        checkUnrecognisedElements(List.of(), additionalRecognisedElements);
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        XmlElement that = (XmlElement) obj;
-
-        return element.isEqualNode(that.element);
-
+        return this == obj || obj instanceof XmlElement other && element.isEqualNode(other.element);
     }
 
     @Override
