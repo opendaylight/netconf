@@ -332,11 +332,6 @@ public final class XmlElement {
         return attribute;
     }
 
-    @Deprecated(since = "5.0.6", forRemoval = true)
-    public Optional<String> getNamespaceAttributeOptionally() {
-        return findNamespaceAttribute();
-    }
-
     public @Nullable String namespace() {
         return namespace(element);
     }
@@ -348,11 +343,6 @@ public final class XmlElement {
 
     public Optional<String> findNamespace() {
         return Optional.ofNullable(namespace());
-    }
-
-    @Deprecated(since = "5.0.6", forRemoval = true)
-    public Optional<String> getNamespaceOptionally() {
-        return findNamespace();
     }
 
     public @NonNull String getNamespace() throws MissingNameSpaceException {
