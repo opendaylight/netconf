@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.api.xml;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -17,7 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import javax.xml.XMLConstants;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -132,6 +139,10 @@ public final class XmlElement {
     }
 
     public String getName() {
+        return getName(element);
+    }
+
+    private static String getName(final Element element) {
         final var localName = element.getLocalName();
         return Strings.isNullOrEmpty(localName) ? element.getTagName() : localName;
     }
@@ -182,7 +193,7 @@ public final class XmlElement {
     }
 
     public List<XmlElement> getChildElements() {
-        return getChildElementsInternal(e -> true);
+        return collectToList(streamChildElements(element));
     }
 
     /**
@@ -192,7 +203,11 @@ public final class XmlElement {
      * @return List of child elements
      */
     public List<XmlElement> getChildElements(final String tagName) {
-        return getChildElementsInternal(e -> e.getLocalName().equals(tagName));
+        return collectToList(streamChildElements(element).filter(e -> e.getLocalName().equals(tagName)));
+    }
+
+    private static List<XmlElement> collectToList(final Stream<@NonNull Element> stream) {
+        return stream.map(XmlElement::new).collect(Collectors.toList());
     }
 
     public List<XmlElement> getChildElementsWithinNamespace(final String childName, final String namespace) {
@@ -435,5 +450,50 @@ public final class XmlElement {
             sb.append(", namespace='").append(namespace).append('\'');
         }
         return sb.append('}').toString();
+    }
+
+    private static Stream<@NonNull Element> streamChildElements(final Element element) {
+        final var nodeList = element.getChildNodes();
+        final var length = nodeList.getLength();
+
+        return length == 0 ? Stream.empty() : StreamSupport.stream(new ElementSpliterator(nodeList, length), false);
+    }
+
+    private static final class ElementSpliterator implements Spliterator<@NonNull Element> {
+        private final NodeList nodeList;
+        private final int length;
+
+        private int index = 0;
+
+        ElementSpliterator(final NodeList nodeList, final int length) {
+            this.nodeList = requireNonNull(nodeList);
+            this.length = length;
+        }
+
+        @Override
+        public boolean tryAdvance(final Consumer<? super Element> action) {
+            while (index < length) {
+                if (nodeList.item(index++) instanceof Element elem) {
+                    action.accept(elem);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public Spliterator<@NonNull Element> trySplit() {
+            return null;
+        }
+
+        @Override
+        public long estimateSize() {
+            return Long.MAX_VALUE;
+        }
+
+        @Override
+        public int characteristics() {
+            return Spliterator.NONNULL;
+        }
     }
 }
