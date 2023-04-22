@@ -7,9 +7,6 @@
  */
 package org.opendaylight.netconf.api.xml;
 
-import static org.hamcrest.CoreMatchers.both;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -110,17 +107,5 @@ public class XmlElementTest {
 
         assertEquals("", namespaceOfTextContent.getKey());
         assertEquals("innerNamespace", namespaceOfTextContent.getValue());
-    }
-
-    @Test
-    public void testUnrecognisedElements() throws Exception {
-        xmlElement.checkUnrecognisedElements(xmlElement.getOnlyChildElement("inner"),
-                xmlElement.getOnlyChildElement("innerPrefixed"), xmlElement.getOnlyChildElement("innerNamespace"));
-
-        final DocumentedException e = assertThrows(DocumentedException.class,
-            () -> xmlElement.checkUnrecognisedElements(xmlElement.getOnlyChildElement("inner")));
-        assertThat(e.getMessage(),
-            // FIXME: this looks very suspect
-            both(containsString("innerNamespace")).and(containsString("innerNamespace")));
     }
 }
