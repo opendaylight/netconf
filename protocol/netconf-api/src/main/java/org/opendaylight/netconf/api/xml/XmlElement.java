@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -27,8 +28,6 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
@@ -70,38 +69,6 @@ public final class XmlElement {
         XmlElement xmlElement = XmlElement.fromDomElementWithExpected(element, expectedName);
         xmlElement.checkNamespace(expectedNamespace);
         return xmlElement;
-    }
-
-    private Map<String, String> extractNamespaces() throws DocumentedException {
-        Map<String, String> namespaces = new HashMap<>();
-        NamedNodeMap attributes = element.getAttributes();
-        for (int i = 0; i < attributes.getLength(); i++) {
-            Node attribute = attributes.item(i);
-            String attribKey = attribute.getNodeName();
-            if (attribKey.startsWith(XMLConstants.XMLNS_ATTRIBUTE)) {
-                String prefix;
-                if (attribKey.equals(XMLConstants.XMLNS_ATTRIBUTE)) {
-                    prefix = DEFAULT_NAMESPACE_PREFIX;
-                } else {
-                    if (!attribKey.startsWith(XMLConstants.XMLNS_ATTRIBUTE + ":")) {
-                        throw new DocumentedException("Attribute doesn't start with :",
-                                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
-                    }
-                    prefix = attribKey.substring(XMLConstants.XMLNS_ATTRIBUTE.length() + 1);
-                }
-                namespaces.put(prefix, attribute.getNodeValue());
-            }
-        }
-
-        // namespace does not have to be defined on this element but inherited
-        if (!namespaces.containsKey(DEFAULT_NAMESPACE_PREFIX)) {
-            final var namespace = namespace();
-            if (namespace != null) {
-                namespaces.put(DEFAULT_NAMESPACE_PREFIX, namespace);
-            }
-        }
-
-        return namespaces;
     }
 
     public void checkName(final String expectedName) throws UnexpectedElementException {
@@ -369,22 +336,49 @@ public final class XmlElement {
      * namespace is returned with empty string as key. If no default namespace
      * is found value will be null.
      */
-    public Map.Entry<String/* prefix */, String/* namespace */> findNamespaceOfTextContent()
+    public Entry<String/* prefix */, String/* namespace */> findNamespaceOfTextContent()
             throws DocumentedException {
-        Map<String, String> namespaces = extractNamespaces();
-        String textContent = getTextContent();
-        int indexOfColon = textContent.indexOf(':');
-        String prefix;
-        if (indexOfColon > -1) {
-            prefix = textContent.substring(0, indexOfColon);
-        } else {
-            prefix = DEFAULT_NAMESPACE_PREFIX;
-        }
-        if (!namespaces.containsKey(prefix)) {
+        final var textContent = getTextContent();
+        final int firstColon = textContent.indexOf(':');
+        final var textPrefix = firstColon == -1 ? DEFAULT_NAMESPACE_PREFIX : textContent.substring(0, firstColon);
+
+        final var namespaces = extractNamespaces();
+        if (!namespaces.containsKey(textPrefix)) {
             throw new IllegalArgumentException("Cannot find namespace for " + XmlUtil.toString(element)
-                + ". Prefix from content is " + prefix + ". Found namespaces " + namespaces);
+                + ". Prefix from content is " + textPrefix + ". Found namespaces " + namespaces);
         }
-        return new SimpleImmutableEntry<>(prefix, namespaces.get(prefix));
+        return new SimpleImmutableEntry<>(textPrefix, namespaces.get(textPrefix));
+    }
+
+    private Map<String, String> extractNamespaces() throws DocumentedException {
+        final var namespaces = new HashMap<String, String>();
+        final var attributes = element.getAttributes();
+        for (int i = 0, length = attributes.getLength(); i < length; i++) {
+            final var attribute = attributes.item(i);
+            final var attribKey = attribute.getNodeName();
+            if (attribKey.startsWith(XMLConstants.XMLNS_ATTRIBUTE)) {
+                final String prefix;
+                if (attribKey.equals(XMLConstants.XMLNS_ATTRIBUTE)) {
+                    prefix = DEFAULT_NAMESPACE_PREFIX;
+                } else if (attribKey.startsWith(XMLConstants.XMLNS_ATTRIBUTE + ":")) {
+                    prefix = attribKey.substring(XMLConstants.XMLNS_ATTRIBUTE.length() + 1);
+                } else {
+                    throw new DocumentedException("Attribute does not start with :",
+                        ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
+                }
+                namespaces.put(prefix, attribute.getNodeValue());
+            }
+        }
+
+        // namespace does not have to be defined on this element but inherited
+        if (!namespaces.containsKey(DEFAULT_NAMESPACE_PREFIX)) {
+            final var namespace = namespace();
+            if (namespace != null) {
+                namespaces.put(DEFAULT_NAMESPACE_PREFIX, namespace);
+            }
+        }
+
+        return namespaces;
     }
 
     public boolean hasNamespace() {
