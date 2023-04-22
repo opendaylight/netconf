@@ -291,12 +291,13 @@ public final class XmlElement {
     }
 
     public String getTextContent() throws DocumentedException {
-        NodeList childNodes = element.getChildNodes();
-        if (childNodes.getLength() == 0) {
+        final var children = element.getChildNodes();
+        final var length = children.getLength();
+        if (length == 0) {
             return DEFAULT_NAMESPACE_PREFIX;
         }
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            if (childNodes.item(i) instanceof Text textChild) {
+        for (int i = 0; i < length; i++) {
+            if (children.item(i) instanceof Text textChild) {
                 return textChild.getTextContent().trim();
             }
         }
@@ -306,10 +307,9 @@ public final class XmlElement {
 
     public Optional<String> getOnlyTextContentOptionally() {
         // only return text content if this node has exactly one Text child node
-        if (element.getChildNodes().getLength() == 1) {
-            if (element.getChildNodes().item(0) instanceof Text textChild) {
-                return Optional.of(textChild.getWholeText());
-            }
+        final var children = element.getChildNodes();
+        if (children.getLength() == 1 && children.item(0) instanceof Text textChild) {
+            return Optional.of(textChild.getWholeText());
         }
         return Optional.empty();
     }
