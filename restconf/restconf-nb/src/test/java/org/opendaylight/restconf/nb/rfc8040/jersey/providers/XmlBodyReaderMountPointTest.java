@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -105,14 +104,14 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     @Test
     public void moduleSubContainerDataPostActionTest() throws Exception {
-        final Optional<DataSchemaNode> dataSchemaNode = schemaContext
-            .findDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
+        final DataSchemaNode dataSchemaNode = schemaContext
+            .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont/cont1/reset";
         mockBodyReader(uri, xmlBodyReader, true);
         final NormalizedNodePayload pyaload = xmlBodyReader.readFrom(null,null, null, mediaType, null,
             XmlBodyReaderMountPointTest.class.getResourceAsStream("/instanceidentifier/xml/xml_cont_action.xml"));
         checkMountPointNormalizedNodePayload(pyaload);
-        checkExpectValueNormalizeNodeContext(dataSchemaNode.orElseThrow(), pyaload);
+        checkExpectValueNormalizeNodeContext(dataSchemaNode, pyaload);
     }
 
     @Test
@@ -125,16 +124,11 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final ContainerNode contNode = (ContainerNode) payload.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(
             QName.create(contNode.getIdentifier().getNodeType(), "cont"));
-        final Optional<DataContainerChild> contDataNodePotential =
-            contNode.findChildByArg(yangCont.getLastPathArgument());
-        assertTrue(contDataNodePotential.isPresent());
-        final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.orElseThrow();
+        final ContainerNode contDataNode = (ContainerNode) contNode.getChildByArg(yangCont.getLastPathArgument());
         final YangInstanceIdentifier yangLeaf = YangInstanceIdentifier.of(
             QName.create(contDataNode.getIdentifier().getNodeType(), "lf"));
-        final Optional<DataContainerChild> leafDataNode = contDataNode.findChildByArg(
-                yangLeaf.getLastPathArgument());
-        assertTrue(leafDataNode.isPresent());
-        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.orElseThrow().body().toString()));
+        final DataContainerChild leafDataNode = contDataNode.getChildByArg(yangLeaf.getLastPathArgument());
+        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.body().toString()));
     }
 
     private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
