@@ -163,16 +163,14 @@ public final class XmlElement {
     }
 
     public Map<String, Attr> getAttributes() {
-
-        Map<String, Attr> mappedAttributes = new HashMap<>();
-
-        NamedNodeMap attributes = element.getAttributes();
-        for (int i = 0; i < attributes.getLength(); i++) {
-            Attr attr = (Attr) attributes.item(i);
-            mappedAttributes.put(attr.getNodeName(), attr);
+        final var attributes = element.getAttributes();
+        final var result = new HashMap<String, Attr>();
+        for (int i = 0, length = attributes.getLength(); i < length; i++) {
+            if (attributes.item(i) instanceof Attr attr) {
+                result.put(attr.getNodeName(), attr);
+            }
         }
-
-        return mappedAttributes;
+        return result;
     }
 
     /**
