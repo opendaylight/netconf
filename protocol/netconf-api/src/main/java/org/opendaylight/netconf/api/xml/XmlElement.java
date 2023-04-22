@@ -387,12 +387,6 @@ public final class XmlElement {
         return new SimpleImmutableEntry<>(prefix, namespaces.get(prefix));
     }
 
-    public List<XmlElement> getChildElementsWithSameNamespace(final String childName) throws MissingNameSpaceException {
-        return getChildElementsWithinNamespace(getNamespace()).stream()
-            .filter(xmlElement -> xmlElement.getName().equals(childName))
-            .collect(Collectors.toList());
-    }
-
     public void checkUnrecognisedElements(final List<XmlElement> recognisedElements,
                                           final XmlElement... additionalRecognisedElements) throws DocumentedException {
         List<XmlElement> childElements = getChildElements();

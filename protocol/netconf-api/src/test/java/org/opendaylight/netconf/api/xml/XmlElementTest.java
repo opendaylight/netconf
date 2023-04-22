@@ -79,8 +79,6 @@ public class XmlElementTest {
         assertTrue(xmlElement.getOnlyChildElementWithSameNamespaceOptionally("inner").isPresent());
         assertEquals(0, xmlElement.getChildElements("unknown").size());
         assertFalse(xmlElement.getOnlyChildElementOptionally("unknown").isPresent());
-        assertEquals(1, xmlElement.getChildElementsWithSameNamespace("inner").size());
-        assertEquals(0, xmlElement.getChildElementsWithSameNamespace("innerNamespace").size());
         assertEquals(1, xmlElement.getChildElementsWithinNamespace("innerNamespace", "innerNamespace").size());
         assertTrue(xmlElement.getOnlyChildElementOptionally("innerNamespace", "innerNamespace").isPresent());
         assertFalse(xmlElement.getOnlyChildElementOptionally("innerNamespace", "unknownNamespace").isPresent());
