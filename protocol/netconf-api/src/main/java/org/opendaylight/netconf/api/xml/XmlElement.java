@@ -8,8 +8,6 @@
 package org.opendaylight.netconf.api.xml;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
@@ -18,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javax.xml.XMLConstants;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -196,8 +195,9 @@ public final class XmlElement {
     }
 
     public List<XmlElement> getChildElementsWithinNamespace(final String childName, final String namespace) {
-        return Lists.newArrayList(Collections2.filter(getChildElementsWithinNamespace(namespace),
-            xmlElement -> xmlElement.getName().equals(childName)));
+        return getChildElementsWithinNamespace(namespace).stream()
+            .filter(xmlElement -> xmlElement.getName().equals(childName))
+            .collect(Collectors.toList());
     }
 
     public List<XmlElement> getChildElementsWithinNamespace(final String namespace) {
@@ -208,29 +208,20 @@ public final class XmlElement {
     }
 
     public Optional<XmlElement> getOnlyChildElementOptionally(final String childName) {
-        List<XmlElement> nameElements = getChildElements(childName);
-        if (nameElements.size() != 1) {
-            return Optional.empty();
-        }
-        return Optional.of(nameElements.get(0));
+        final var children = getChildElements(childName);
+        return children.size() != 1 ? Optional.empty() : Optional.of(children.get(0));
     }
 
     public Optional<XmlElement> getOnlyChildElementOptionally(final String childName, final String namespace) {
-        List<XmlElement> children = getChildElementsWithinNamespace(namespace);
-        children = Lists.newArrayList(Collections2.filter(children,
-            xmlElement -> xmlElement.getName().equals(childName)));
-        if (children.size() != 1) {
-            return Optional.empty();
-        }
-        return Optional.of(children.get(0));
+        final var children = getChildElementsWithinNamespace(namespace).stream()
+            .filter(xmlElement -> xmlElement.getName().equals(childName))
+            .collect(Collectors.toList());
+        return children.size() != 1 ? Optional.empty() : Optional.of(children.get(0));
     }
 
     public Optional<XmlElement> getOnlyChildElementOptionally() {
-        List<XmlElement> children = getChildElements();
-        if (children.size() != 1) {
-            return Optional.empty();
-        }
-        return Optional.of(children.get(0));
+        final var children = getChildElements();
+        return children.size() != 1 ? Optional.empty() : Optional.of(children.get(0));
     }
 
     public XmlElement getOnlyChildElementWithSameNamespace(final String childName) throws  DocumentedException {
@@ -249,13 +240,10 @@ public final class XmlElement {
             return Optional.empty();
         }
 
-        List<XmlElement> children = getChildElementsWithinNamespace(namespace);
-        children = Lists.newArrayList(Collections2.filter(children,
-            xmlElement -> xmlElement.getName().equals(childName)));
-        if (children.size() != 1) {
-            return Optional.empty();
-        }
-        return Optional.of(children.get(0));
+        final var children = getChildElementsWithinNamespace(namespace).stream()
+            .filter(xmlElement -> xmlElement.getName().equals(childName))
+            .collect(Collectors.toList());
+        return children.size() != 1 ? Optional.empty() : Optional.of(children.get(0));
     }
 
     // FIXME: if we do not have a namespace this method always returns Optional.empty(). Why?!
@@ -271,9 +259,9 @@ public final class XmlElement {
     }
 
     public XmlElement getOnlyChildElement(final String childName, final String namespace) throws DocumentedException {
-        List<XmlElement> children = getChildElementsWithinNamespace(namespace);
-        children = Lists.newArrayList(Collections2.filter(children,
-            xmlElement -> xmlElement.getName().equals(childName)));
+        final var children = getChildElementsWithinNamespace(namespace).stream()
+            .filter(xmlElement -> xmlElement.getName().equals(childName))
+            .collect(Collectors.toList());
         if (children.size() != 1) {
             throw new DocumentedException(String.format("One element %s:%s expected in %s but was %s", namespace,
                     childName, toString(), children.size()),
@@ -284,16 +272,16 @@ public final class XmlElement {
     }
 
     public XmlElement getOnlyChildElement(final String childName) throws DocumentedException {
-        List<XmlElement> nameElements = getChildElements(childName);
-        if (nameElements.size() != 1) {
+        final var children = getChildElements(childName);
+        if (children.size() != 1) {
             throw new DocumentedException("One element " + childName + " expected in " + toString(),
                     ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         }
-        return nameElements.get(0);
+        return children.get(0);
     }
 
     public XmlElement getOnlyChildElement() throws DocumentedException {
-        List<XmlElement> children = getChildElements();
+        final var children = getChildElements();
         if (children.size() != 1) {
             throw new DocumentedException(
                     String.format("One element expected in %s but was %s", toString(), children.size()),
@@ -410,8 +398,9 @@ public final class XmlElement {
     }
 
     public List<XmlElement> getChildElementsWithSameNamespace(final String childName) throws MissingNameSpaceException {
-        List<XmlElement> children = getChildElementsWithinNamespace(getNamespace());
-        return Lists.newArrayList(Collections2.filter(children, xmlElement -> xmlElement.getName().equals(childName)));
+        return getChildElementsWithinNamespace(getNamespace()).stream()
+            .filter(xmlElement -> xmlElement.getName().equals(childName))
+            .collect(Collectors.toList());
     }
 
     public void checkUnrecognisedElements(final List<XmlElement> recognisedElements,
