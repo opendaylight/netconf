@@ -33,7 +33,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -77,17 +76,17 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         return builder.build();
     }
 
-    private static Optional<String> getSchemaFromRpc(final RemoteDeviceId id, final NormalizedNode result) {
+    private static Optional<String> getSchemaFromRpc(final RemoteDeviceId id, final ContainerNode result) {
         if (result == null) {
             return Optional.empty();
         }
 
-        final Optional<DataContainerChild> child = ((ContainerNode) result).findChildByArg(NETCONF_DATA_PATHARG);
-        checkState(child.isPresent() && child.orElseThrow() instanceof DOMSourceAnyxmlNode,
+        final DataContainerChild child = result.childByArg(NETCONF_DATA_PATHARG);
+        checkState(child instanceof DOMSourceAnyxmlNode,
                 "%s Unexpected response to get-schema, expected response with one child %s, but was %s", id,
                 NETCONF_DATA, result);
 
-        final DOMSource wrappedNode = ((DOMSourceAnyxmlNode) child.orElseThrow()).body();
+        final DOMSource wrappedNode = ((DOMSourceAnyxmlNode) child).body();
         final Element dataNode = (Element) requireNonNull(wrappedNode.getNode());
 
         return Optional.of(dataNode.getTextContent().trim());
