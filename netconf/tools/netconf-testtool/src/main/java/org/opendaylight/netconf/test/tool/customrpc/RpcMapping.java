@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.bind.JAXB;
@@ -77,7 +78,7 @@ class RpcMapping {
         private final int hashCode;
 
         Request(final XmlElement element) {
-            this.xmlElement = element;
+            xmlElement = element;
             hashCode = XmlUtil.toString(element)
                     .replaceAll("message-id=.*(>| )", "") //message id is variable, remove it
                     .replaceAll("\\s+", "") //remove whitespaces
@@ -93,7 +94,7 @@ class RpcMapping {
                 return false;
             }
             final Request request = (Request) obj;
-            return documentEquals(this.xmlElement, request.xmlElement);
+            return documentEquals(xmlElement, request.xmlElement);
         }
 
         @Override
@@ -102,7 +103,7 @@ class RpcMapping {
         }
 
         private static boolean documentEquals(final XmlElement e1, final XmlElement e2) {
-            if (!e1.getNamespaceOptionally().equals(e2.getNamespaceOptionally())) {
+            if (!Objects.equals(e1.namespace(), e2.namespace())) {
                 return false;
             }
             if (!e1.getName().equals(e2.getName())) {

@@ -95,9 +95,8 @@ public final class NetconfHelloMessage extends NetconfMessage {
             return false;
         }
 
-        final Optional<String> optNamespace = element.getNamespaceOptionally();
+        final var namespace = element.namespace();
         // accept even if hello has no namespace
-        return optNamespace.isEmpty()
-                || XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0.equals(optNamespace.orElseThrow());
+        return namespace == null || XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0.equals(namespace);
     }
 }

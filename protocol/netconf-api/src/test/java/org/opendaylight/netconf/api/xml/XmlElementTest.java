@@ -67,7 +67,7 @@ public class XmlElementTest {
         assertTrue(xmlElement.hasNamespace());
         assertEquals("namespace", xmlElement.getNamespace());
         assertEquals("namespace", xmlElement.getNamespaceAttribute());
-        assertEquals(Optional.of("namespace"), xmlElement.getNamespaceOptionally());
+        assertEquals(Optional.of("namespace"), xmlElement.findNamespace());
 
         assertEquals("value1", xmlElement.getAttribute("attr1", "attrNamespace"));
         assertEquals("value2", xmlElement.getAttribute("attr2"));
