@@ -177,14 +177,13 @@ public final class XmlElement {
      * Non recursive.
      */
     private List<XmlElement> getChildElementsInternal(final ElementFilteringStrategy strat) {
-        NodeList childNodes = element.getChildNodes();
-        final List<XmlElement> result = new ArrayList<>();
-        for (int i = 0; i < childNodes.getLength(); i++) {
+        final var childNodes = element.getChildNodes();
+        final var result = new ArrayList<XmlElement>();
+        for (int i = 0, length = childNodes.getLength(); i < length; i++) {
             if (childNodes.item(i) instanceof Element elem && strat.accept(elem)) {
                 result.add(new XmlElement(elem));
             }
         }
-
         return result;
     }
 
