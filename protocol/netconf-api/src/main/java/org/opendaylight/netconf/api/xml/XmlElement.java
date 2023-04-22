@@ -208,29 +208,16 @@ public final class XmlElement {
     }
 
     public Optional<XmlElement> getOnlyChildElementOptionally(final String childName) {
-        List<XmlElement> nameElements = getChildElements(childName);
-        if (nameElements.size() != 1) {
-            return Optional.empty();
-        }
-        return Optional.of(nameElements.get(0));
+        return findOnlyElement(getChildElements(childName));
     }
 
     public Optional<XmlElement> getOnlyChildElementOptionally(final String childName, final String namespace) {
-        List<XmlElement> children = getChildElementsWithinNamespace(namespace);
-        children = Lists.newArrayList(Collections2.filter(children,
-            xmlElement -> xmlElement.getName().equals(childName)));
-        if (children.size() != 1) {
-            return Optional.empty();
-        }
-        return Optional.of(children.get(0));
+        return findOnlyElement(Lists.newArrayList(Collections2.filter(getChildElementsWithinNamespace(namespace),
+            xmlElement -> xmlElement.getName().equals(childName))));
     }
 
     public Optional<XmlElement> getOnlyChildElementOptionally() {
-        List<XmlElement> children = getChildElements();
-        if (children.size() != 1) {
-            return Optional.empty();
-        }
-        return Optional.of(children.get(0));
+        return findOnlyElement(getChildElements());
     }
 
     public XmlElement getOnlyChildElementWithSameNamespace(final String childName) throws  DocumentedException {
@@ -245,17 +232,9 @@ public final class XmlElement {
 
     public Optional<XmlElement> getOnlyChildElementWithSameNamespaceOptionally(final String childName) {
         final var namespace = namespace();
-        if (namespace == null) {
-            return Optional.empty();
-        }
-
-        List<XmlElement> children = getChildElementsWithinNamespace(namespace);
-        children = Lists.newArrayList(Collections2.filter(children,
-            xmlElement -> xmlElement.getName().equals(childName)));
-        if (children.size() != 1) {
-            return Optional.empty();
-        }
-        return Optional.of(children.get(0));
+        return namespace == null ? Optional.empty()
+            : findOnlyElement(Lists.newArrayList(Collections2.filter(getChildElementsWithinNamespace(namespace),
+                xmlElement -> xmlElement.getName().equals(childName))));
     }
 
     // FIXME: if we do not have a namespace this method always returns Optional.empty(). Why?!
@@ -271,8 +250,7 @@ public final class XmlElement {
     }
 
     public XmlElement getOnlyChildElement(final String childName, final String namespace) throws DocumentedException {
-        List<XmlElement> children = getChildElementsWithinNamespace(namespace);
-        children = Lists.newArrayList(Collections2.filter(children,
+        final var children = Lists.newArrayList(Collections2.filter(getChildElementsWithinNamespace(namespace),
             xmlElement -> xmlElement.getName().equals(childName)));
         if (children.size() != 1) {
             throw new DocumentedException(String.format("One element %s:%s expected in %s but was %s", namespace,
@@ -281,6 +259,10 @@ public final class XmlElement {
         }
 
         return children.get(0);
+    }
+
+    private static Optional<XmlElement> findOnlyElement(final List<XmlElement> elements) {
+        return elements.size() == 1 ? Optional.of(elements.get(0)) : Optional.empty();
     }
 
     public XmlElement getOnlyChildElement(final String childName) throws DocumentedException {
