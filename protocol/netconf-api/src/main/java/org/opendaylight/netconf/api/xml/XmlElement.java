@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import javax.xml.XMLConstants;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -176,11 +177,11 @@ public final class XmlElement {
     /**
      * Non recursive.
      */
-    private List<XmlElement> getChildElementsInternal(final ElementFilteringStrategy strat) {
+    private List<XmlElement> getChildElementsInternal(final Predicate<Element> strat) {
         final var childNodes = element.getChildNodes();
         final var result = new ArrayList<XmlElement>();
         for (int i = 0, length = childNodes.getLength(); i < length; i++) {
-            if (childNodes.item(i) instanceof Element elem && strat.accept(elem)) {
+            if (childNodes.item(i) instanceof Element elem && strat.test(elem)) {
                 result.add(new XmlElement(elem));
             }
         }
@@ -449,9 +450,5 @@ public final class XmlElement {
 
     public boolean hasNamespace() {
         return getNamespaceAttributeOptionally().isPresent() || getNamespaceOptionally().isPresent();
-    }
-
-    private interface ElementFilteringStrategy {
-        boolean accept(Element element);
     }
 }
