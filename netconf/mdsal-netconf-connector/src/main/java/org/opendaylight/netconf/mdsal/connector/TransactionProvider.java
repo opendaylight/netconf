@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.mdsal.connector;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.util.concurrent.FluentFuture;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,19 +22,16 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TransactionProvider implements AutoCloseable {
+public final class TransactionProvider implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(TransactionProvider.class);
 
+    private final List<DOMDataTreeReadWriteTransaction> allOpenReadWriteTransactions = new ArrayList<>();
+    private final DOMDataTransactionValidator transactionValidator;
     private final DOMDataBroker dataBroker;
+    private final String netconfSessionIdForReporting;
 
     private DOMDataTreeReadWriteTransaction candidateTransaction = null;
     private DOMDataTreeReadWriteTransaction runningTransaction = null;
-    private final List<DOMDataTreeReadWriteTransaction> allOpenReadWriteTransactions = new ArrayList<>();
-    private final DOMDataTransactionValidator transactionValidator;
-
-    private final String netconfSessionIdForReporting;
-
-    private static final String NO_TRANSACTION_FOUND_FOR_SESSION = "No candidateTransaction found for session ";
 
     public TransactionProvider(final DOMDataBroker dataBroker, final String netconfSessionIdForReporting) {
         this.dataBroker = dataBroker;
@@ -46,7 +41,7 @@ public class TransactionProvider implements AutoCloseable {
 
     @Override
     public synchronized void close() {
-        for (final DOMDataTreeReadWriteTransaction rwt : allOpenReadWriteTransactions) {
+        for (var rwt : allOpenReadWriteTransactions) {
             rwt.cancel();
         }
 
@@ -58,14 +53,10 @@ public class TransactionProvider implements AutoCloseable {
     }
 
     public synchronized DOMDataTreeReadWriteTransaction getOrCreateTransaction() {
-        // FIXME: getCandidateTransaction() should be final in which case we will just talk to the field
-        final var currentTransaction = getCandidateTransaction();
-        if (currentTransaction.isPresent()) {
-            return currentTransaction.orElseThrow();
+        if (candidateTransaction == null) {
+            candidateTransaction = dataBroker.newReadWriteTransaction();
+            allOpenReadWriteTransactions.add(candidateTransaction);
         }
-
-        candidateTransaction = dataBroker.newReadWriteTransaction();
-        allOpenReadWriteTransactions.add(candidateTransaction);
         return candidateTransaction;
     }
 
@@ -76,7 +67,7 @@ public class TransactionProvider implements AutoCloseable {
                 ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         }
 
-        if (getCandidateTransaction().isEmpty()) {
+        if (candidateTransaction == null) {
             // Validating empty transaction, just return true
             LOG.debug("Validating empty candidate transaction for session {}", netconfSessionIdForReporting);
             return;
@@ -95,7 +86,7 @@ public class TransactionProvider implements AutoCloseable {
     }
 
     public synchronized boolean commitTransaction() throws DocumentedException {
-        if (getCandidateTransaction().isEmpty()) {
+        if (candidateTransaction == null) {
             //making empty commit without prior opened transaction, just return true
             LOG.debug("Making commit without open candidate transaction for session {}", netconfSessionIdForReporting);
             return true;
@@ -120,11 +111,11 @@ public class TransactionProvider implements AutoCloseable {
 
     public synchronized void abortTransaction() {
         LOG.debug("Aborting current candidateTransaction");
-        final Optional<DOMDataTreeReadWriteTransaction> otx = getCandidateTransaction();
-        if (otx.isEmpty()) {
+        if (candidateTransaction == null) {
             LOG.warn("discard-changes triggerd on an empty transaction for session: {}", netconfSessionIdForReporting);
             return;
         }
+
         candidateTransaction.cancel();
         allOpenReadWriteTransactions.remove(candidateTransaction);
         candidateTransaction = null;
@@ -138,7 +129,10 @@ public class TransactionProvider implements AutoCloseable {
 
     public synchronized void abortRunningTransaction(final DOMDataTreeReadWriteTransaction tx) {
         LOG.debug("Aborting current running Transaction");
-        checkState(runningTransaction != null, NO_TRANSACTION_FOUND_FOR_SESSION + netconfSessionIdForReporting);
+        if (runningTransaction == null) {
+            throw new IllegalStateException("No candidateTransaction found for session "
+                + netconfSessionIdForReporting);
+        }
         tx.cancel();
         allOpenReadWriteTransactions.remove(tx);
     }
