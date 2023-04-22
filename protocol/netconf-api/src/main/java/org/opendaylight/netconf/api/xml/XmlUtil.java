@@ -19,13 +19,11 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -34,8 +32,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Document;
@@ -59,7 +55,6 @@ public final class XmlUtil {
         }
     }
 
-    private static final SchemaFactory SCHEMA_FACTORY = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     private static final DocumentBuilderFactory BUILDER_FACTORY;
 
     static {
@@ -220,20 +215,6 @@ public final class XmlUtil {
 
     public static String toString(final Document doc, final boolean addXmlDeclaration) {
         return toString(doc.getDocumentElement(), addXmlDeclaration);
-    }
-
-    public static Schema loadSchema(final InputStream... fromStreams) {
-        Source[] sources = new Source[fromStreams.length];
-        int index = 0;
-        for (InputStream stream : fromStreams) {
-            sources[index++] = new StreamSource(stream);
-        }
-
-        try {
-            return SCHEMA_FACTORY.newSchema(sources);
-        } catch (final SAXException e) {
-            throw new IllegalStateException("Failed to instantiate XML schema", e);
-        }
     }
 
     public static Object evaluateXPath(final XPathExpression expr, final Object rootNode, final QName returnType) {

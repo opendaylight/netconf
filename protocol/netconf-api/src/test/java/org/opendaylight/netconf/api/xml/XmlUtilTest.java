@@ -7,14 +7,10 @@
  */
 package org.opendaylight.netconf.api.xml;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
 import java.util.Optional;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -50,16 +46,6 @@ public class XmlUtilTest {
 
         final Diff diff = XMLUnit.compareXML(XMLUnit.buildControlDocument(XML_SNIPPET), document);
         assertTrue(diff.toString(), diff.similar());
-    }
-
-    @Test
-    public void testLoadSchema() throws Exception {
-        assertNotNull(XmlUtil.loadSchema());
-
-        try (var input = new ByteArrayInputStream(XML_SNIPPET.getBytes())) {
-            final var cause = assertThrows(IllegalStateException.class, () -> XmlUtil.loadSchema(input)).getCause();
-            assertThat(cause, instanceOf(SAXParseException.class));
-        }
     }
 
     @Test
