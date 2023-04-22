@@ -7,9 +7,6 @@
  */
 package org.opendaylight.netconf.api.xml;
 
-import static org.hamcrest.CoreMatchers.both;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -27,10 +24,14 @@ import org.w3c.dom.Element;
 public class XmlElementTest {
 
     private final String elementAsString =
-            "<top xmlns=\"namespace\" xmlns:a=\"attrNamespace\" a:attr1=\"value1\" attr2=\"value2\">"
-            + "<inner>" + "<deepInner>deepValue</deepInner>" + "</inner>"
-            + "<innerNamespace xmlns=\"innerNamespace\">innerNamespaceValue</innerNamespace>"
-            + "<innerPrefixed xmlns:b=\"prefixedValueNamespace\">b:valueWithPrefix</innerPrefixed>" + "</top>";
+            """
+    	<top xmlns="namespace" xmlns:a="attrNamespace" a:attr1="value1" attr2="value2">\
+    	<inner>\
+    	<deepInner>deepValue</deepInner>\
+    	</inner>\
+    	<innerNamespace xmlns="innerNamespace">innerNamespaceValue</innerNamespace>\
+    	<innerPrefixed xmlns:b="prefixedValueNamespace">b:valueWithPrefix</innerPrefixed>\
+    	</top>""";
     private Document document;
     private Element element;
     private XmlElement xmlElement;
@@ -110,17 +111,5 @@ public class XmlElementTest {
 
         assertEquals("", namespaceOfTextContent.getKey());
         assertEquals("innerNamespace", namespaceOfTextContent.getValue());
-    }
-
-    @Test
-    public void testUnrecognisedElements() throws Exception {
-        xmlElement.checkUnrecognisedElements(xmlElement.getOnlyChildElement("inner"),
-                xmlElement.getOnlyChildElement("innerPrefixed"), xmlElement.getOnlyChildElement("innerNamespace"));
-
-        final DocumentedException e = assertThrows(DocumentedException.class,
-            () -> xmlElement.checkUnrecognisedElements(xmlElement.getOnlyChildElement("inner")));
-        assertThat(e.getMessage(),
-            // FIXME: this looks very suspect
-            both(containsString("innerNamespace")).and(containsString("innerNamespace")));
     }
 }

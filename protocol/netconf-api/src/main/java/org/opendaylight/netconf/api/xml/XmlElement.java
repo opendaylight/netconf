@@ -387,23 +387,6 @@ public final class XmlElement {
         return new SimpleImmutableEntry<>(prefix, namespaces.get(prefix));
     }
 
-    public void checkUnrecognisedElements(final List<XmlElement> recognisedElements,
-                                          final XmlElement... additionalRecognisedElements) throws DocumentedException {
-        List<XmlElement> childElements = getChildElements();
-        childElements.removeAll(recognisedElements);
-        for (XmlElement additionalRecognisedElement : additionalRecognisedElements) {
-            childElements.remove(additionalRecognisedElement);
-        }
-        if (!childElements.isEmpty()) {
-            throw new DocumentedException(String.format("Unrecognised elements %s in %s", childElements, this),
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
-        }
-    }
-
-    public void checkUnrecognisedElements(final XmlElement... additionalRecognisedElements) throws DocumentedException {
-        checkUnrecognisedElements(List.of(), additionalRecognisedElements);
-    }
-
     public boolean hasNamespace() {
         return namespaceAttribute() != null || namespace() != null;
     }
