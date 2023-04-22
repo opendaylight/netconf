@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.util.messages;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import javax.xml.XMLConstants;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -179,10 +180,8 @@ public final class SubtreeFilter {
      * If filter node has no children and has text content, it also must match.
      */
     private static MatchingResult matches(final XmlElement src, final XmlElement filter) throws DocumentedException {
-        boolean tagMatch = src.getName().equals(filter.getName())
-                && src.getNamespaceOptionally().equals(filter.getNamespaceOptionally());
         MatchingResult result = null;
-        if (tagMatch) {
+        if (src.getName().equals(filter.getName()) && Objects.equals(src.namespace(), filter.namespace())) {
             // match text content
             Optional<String> maybeText = filter.getOnlyTextContentOptionally();
             if (maybeText.isPresent()) {

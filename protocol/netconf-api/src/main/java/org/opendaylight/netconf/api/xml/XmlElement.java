@@ -20,12 +20,11 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import javax.xml.XMLConstants;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -36,9 +35,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 public final class XmlElement {
-    public static final String DEFAULT_NAMESPACE_PREFIX = "";
-
-    private static final Logger LOG = LoggerFactory.getLogger(XmlElement.class);
+    public static final @NonNull String DEFAULT_NAMESPACE_PREFIX = "";
 
     private final Element element;
 
@@ -99,9 +96,9 @@ public final class XmlElement {
 
         // namespace does not have to be defined on this element but inherited
         if (!namespaces.containsKey(DEFAULT_NAMESPACE_PREFIX)) {
-            Optional<String> namespaceOptionally = getNamespaceOptionally();
-            if (namespaceOptionally.isPresent()) {
-                namespaces.put(DEFAULT_NAMESPACE_PREFIX, namespaceOptionally.orElseThrow());
+            final var namespace = namespace();
+            if (namespace != null) {
+                namespaces.put(DEFAULT_NAMESPACE_PREFIX, namespace);
             }
         }
 
@@ -135,11 +132,8 @@ public final class XmlElement {
     }
 
     public String getName() {
-        final String localName = element.getLocalName();
-        if (!Strings.isNullOrEmpty(localName)) {
-            return localName;
-        }
-        return element.getTagName();
+        final var localName = element.getLocalName();
+        return Strings.isNullOrEmpty(localName) ? element.getTagName() : localName;
     }
 
     public String getAttribute(final String attributeName) {
@@ -208,11 +202,8 @@ public final class XmlElement {
 
     public List<XmlElement> getChildElementsWithinNamespace(final String namespace) {
         return getChildElementsInternal(e -> {
-            try {
-                return XmlElement.fromDomElement(e).getNamespace().equals(namespace);
-            } catch (final MissingNameSpaceException e1) {
-                return false;
-            }
+            final var elementNamespace = namespace(e);
+            return elementNamespace != null && elementNamespace.equals(namespace);
         });
     }
 
@@ -253,28 +244,28 @@ public final class XmlElement {
     }
 
     public Optional<XmlElement> getOnlyChildElementWithSameNamespaceOptionally(final String childName) {
-        Optional<String> namespace = getNamespaceOptionally();
-        if (namespace.isPresent()) {
-            List<XmlElement> children = getChildElementsWithinNamespace(namespace.orElseThrow());
-            children = Lists.newArrayList(Collections2.filter(children,
-                xmlElement -> xmlElement.getName().equals(childName)));
-            if (children.size() != 1) {
-                return Optional.empty();
-            }
-            return Optional.of(children.get(0));
+        final var namespace = namespace();
+        if (namespace == null) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        List<XmlElement> children = getChildElementsWithinNamespace(namespace);
+        children = Lists.newArrayList(Collections2.filter(children,
+            xmlElement -> xmlElement.getName().equals(childName)));
+        if (children.size() != 1) {
+            return Optional.empty();
+        }
+        return Optional.of(children.get(0));
     }
 
+    // FIXME: if we do not have a namespace this method always returns Optional.empty(). Why?!
     public Optional<XmlElement> getOnlyChildElementWithSameNamespaceOptionally() {
-        Optional<XmlElement> child = getOnlyChildElementOptionally();
-        // FIXME: a beautiful example of how NOT to use Optional
-        if (child.isPresent()
-            && child.orElseThrow().getNamespaceOptionally().isPresent()
-            && getNamespaceOptionally().isPresent()
-            && getNamespaceOptionally().orElseThrow().equals(
-                child.orElseThrow().getNamespaceOptionally().orElseThrow())) {
-            return child;
+        final var optChild = getOnlyChildElementOptionally();
+        if (optChild.isPresent()) {
+            final var namespace = namespace();
+            if (namespace != null && namespace.equals(optChild.orElseThrow().namespace())) {
+                return optChild;
+            }
         }
         return Optional.empty();
     }
@@ -335,51 +326,54 @@ public final class XmlElement {
         return Optional.empty();
     }
 
-    public String getNamespaceAttribute() throws MissingNameSpaceException {
-        String attribute = element.getAttribute(XMLConstants.XMLNS_ATTRIBUTE);
-        if (attribute.isEmpty() || attribute.equals(DEFAULT_NAMESPACE_PREFIX)) {
-            throw new MissingNameSpaceException(String.format("Element %s must specify namespace", toString()),
-                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+    public @Nullable String namespaceAttribute() {
+        final var attribute = element.getAttribute(XMLConstants.XMLNS_ATTRIBUTE);
+        return attribute.isEmpty() ? null : attribute;
+    }
+
+    public Optional<String> findNamespaceAttribute() {
+        return Optional.ofNullable(namespaceAttribute());
+    }
+
+    public @NonNull String getNamespaceAttribute() throws MissingNameSpaceException {
+        final var attribute = namespaceAttribute();
+        if (attribute == null) {
+            throw new MissingNameSpaceException("Element " + this + " must specify namespace",
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
         return attribute;
     }
 
+    @Deprecated(since = "5.0.6", forRemoval = true)
     public Optional<String> getNamespaceAttributeOptionally() {
-        String attribute = element.getAttribute(XMLConstants.XMLNS_ATTRIBUTE);
-        if (attribute.isEmpty() || attribute.equals(DEFAULT_NAMESPACE_PREFIX)) {
-            return Optional.empty();
-        }
-        return Optional.of(attribute);
+        return findNamespaceAttribute();
     }
 
+    public @Nullable String namespace() {
+        return namespace(element);
+    }
+
+    private static @Nullable String namespace(final Element element) {
+        final var namespaceURI = element.getNamespaceURI();
+        return namespaceURI == null || namespaceURI.isEmpty() ? null : namespaceURI;
+    }
+
+    public Optional<String> findNamespace() {
+        return Optional.ofNullable(namespace());
+    }
+
+    @Deprecated(since = "5.0.6", forRemoval = true)
     public Optional<String> getNamespaceOptionally() {
-        String namespaceURI = element.getNamespaceURI();
-        if (Strings.isNullOrEmpty(namespaceURI)) {
-            return Optional.empty();
-        } else {
-            return Optional.of(namespaceURI);
-        }
+        return findNamespace();
     }
 
-    public String getNamespace() throws MissingNameSpaceException {
-        return getNamespaceOptionally()
-            .orElseThrow(() -> new MissingNameSpaceException("No namespace defined for " + this,
-                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR));
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("XmlElement{");
-        sb.append("name='").append(getName()).append('\'');
-        if (element.getNamespaceURI() != null) {
-            try {
-                sb.append(", namespace='").append(getNamespace()).append('\'');
-            } catch (final MissingNameSpaceException e) {
-                LOG.trace("Missing namespace for element.");
-            }
+    public @NonNull String getNamespace() throws MissingNameSpaceException {
+        final var namespace = namespace();
+        if (namespace == null) {
+            throw new MissingNameSpaceException("No namespace defined for " + this,
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
-        sb.append('}');
-        return sb.toString();
+        return namespace;
     }
 
     /**
@@ -437,6 +431,10 @@ public final class XmlElement {
         checkUnrecognisedElements(List.of(), additionalRecognisedElements);
     }
 
+    public boolean hasNamespace() {
+        return namespaceAttribute() != null || namespace() != null;
+    }
+
     @Override
     public boolean equals(final Object obj) {
         return this == obj || obj instanceof XmlElement other && element.isEqualNode(other.element);
@@ -447,7 +445,13 @@ public final class XmlElement {
         return element.hashCode();
     }
 
-    public boolean hasNamespace() {
-        return getNamespaceAttributeOptionally().isPresent() || getNamespaceOptionally().isPresent();
+    @Override
+    public String toString() {
+        final var sb = new StringBuilder("XmlElement{").append("name='").append(getName()).append('\'');
+        final var namespace = namespace();
+        if (namespace != null) {
+            sb.append(", namespace='").append(namespace).append('\'');
+        }
+        return sb.append('}').toString();
     }
 }
