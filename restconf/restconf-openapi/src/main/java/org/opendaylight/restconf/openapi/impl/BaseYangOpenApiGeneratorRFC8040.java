@@ -9,7 +9,6 @@ package org.opendaylight.restconf.openapi.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 
 /**
@@ -20,11 +19,11 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 public abstract class BaseYangOpenApiGeneratorRFC8040 extends BaseYangOpenApiGenerator {
     private final String basePath;
 
-    protected BaseYangOpenApiGeneratorRFC8040(final Optional<DOMSchemaService> schemaService) {
+    protected BaseYangOpenApiGeneratorRFC8040(final DOMSchemaService schemaService) {
         this(schemaService, "rests");
     }
 
-    protected BaseYangOpenApiGeneratorRFC8040(final Optional<DOMSchemaService> schemaService, final String basePath) {
+    protected BaseYangOpenApiGeneratorRFC8040(final DOMSchemaService schemaService, final String basePath) {
         super(schemaService);
         this.basePath = requireNonNull(basePath);
     }
