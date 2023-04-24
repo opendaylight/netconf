@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f94cf014_ee9f32fc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-24T13:05:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcc57870_10b3716b",
+      "revId": "bdc4abf0a3f91d76f96af3f8ed02f9bc2125b7e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "233a8ea4_9fe68b13",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-04-24T13:04:56Z",
       "side": 1,
       "message": "No, this should point to relative part of `restconf/sal-rest-docgen/src/main/resources/explorer/logo_small.png`.",
+      "revId": "bdc4abf0a3f91d76f96af3f8ed02f9bc2125b7e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39c1bbc6_983eb8aa",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/explorer/index.css",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-24T13:05:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "233a8ea4_9fe68b13",
       "revId": "bdc4abf0a3f91d76f96af3f8ed02f9bc2125b7e1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
