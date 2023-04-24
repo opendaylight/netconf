@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
-import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -73,12 +72,17 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildPost(final String parentName, final String nodeName, final String discriminator,
-            final String moduleName, final Optional<String> deviceName, final String description,
+            final String moduleName, final String deviceName, final String description,
             final ArrayNode pathParams) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, description);
-        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
-        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.put(SUMMARY_KEY, new SummaryBuilder().setMethod(HttpMethod.PUT)
+                .setModule(moduleName)
+                .setNode(nodeName)
+                .setDevice(deviceName)
+                .buildSummary()
+        );
+        value.set(TAGS_KEY, buildTagsValue(moduleName, deviceName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + CONFIG + "_" + nodeName + POST_SUFFIX;
@@ -90,20 +94,24 @@ public final class OperationBuilder {
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
-                buildResponse(Response.Status.CREATED.getReasonPhrase(), Optional.empty()));
+                buildResponse(Response.Status.CREATED.getReasonPhrase()));
 
         value.set(RESPONSES_KEY, responses);
         return value;
     }
 
     public static ObjectNode buildGet(final DataSchemaNode node, final String moduleName,
-            final Optional<String> deviceName, final ArrayNode pathParams, final String defName,
+            final String deviceName, final ArrayNode pathParams, final String defName,
             final boolean isConfig) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
-        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
-                node.getQName().getLocalName()));
-        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.put(SUMMARY_KEY, new SummaryBuilder().setMethod(HttpMethod.PUT)
+                .setModule(moduleName)
+                .setNode(node.getQName().getLocalName())
+                .setDevice(deviceName)
+                .buildSummary()
+        );
+        value.set(TAGS_KEY, buildTagsValue(moduleName, deviceName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
 
         addQueryParameters(parameters, isConfig);
@@ -114,7 +122,7 @@ public final class OperationBuilder {
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         schema.put(REF_KEY, COMPONENTS_PREFIX + defName);
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
-                buildResponse(Response.Status.OK.getReasonPhrase(), Optional.of(schema)));
+                buildResponse(Response.Status.OK.getReasonPhrase(), schema));
 
         value.set(RESPONSES_KEY, responses);
         return value;
@@ -140,12 +148,17 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildPut(final String parentName, final String nodeName, final String discriminator,
-            final String moduleName, final Optional<String> deviceName, final String description,
+            final String moduleName, final String deviceName, final String description,
             final ArrayNode pathParams) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, description);
-        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName));
-        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.put(SUMMARY_KEY, new SummaryBuilder().setMethod(HttpMethod.PUT)
+                .setModule(moduleName)
+                .setNode(nodeName)
+                .setDevice(deviceName)
+                .buildSummary()
+        );
+        value.set(TAGS_KEY, buildTagsValue(moduleName, deviceName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
@@ -154,20 +167,24 @@ public final class OperationBuilder {
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
-                buildResponse(Response.Status.CREATED.getReasonPhrase(), Optional.empty()));
-        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
-                buildResponse("Updated", Optional.empty()));
+                buildResponse(Response.Status.CREATED.getReasonPhrase()));
+        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Updated"));
 
         value.set(RESPONSES_KEY, responses);
         return value;
     }
 
     public static ObjectNode buildPatch(final String parentName, final String nodeName, final String moduleName,
-            final Optional<String> deviceName, final String description, final ArrayNode pathParams) {
+            final String deviceName, final String description, final ArrayNode pathParams) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, description);
-        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName));
-        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.put(SUMMARY_KEY, new SummaryBuilder().setMethod(HttpMethod.PATCH)
+                .setModule(moduleName)
+                .setNode(nodeName)
+                .setDevice(deviceName)
+                .buildSummary()
+        );
+        value.set(TAGS_KEY, buildTagsValue(moduleName, deviceName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
@@ -176,34 +193,36 @@ public final class OperationBuilder {
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
-                buildResponse(Response.Status.OK.getReasonPhrase(), Optional.empty()));
-        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
-                buildResponse("Updated", Optional.empty()));
+                buildResponse(Response.Status.OK.getReasonPhrase()));
+        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Updated"));
 
         value.set(RESPONSES_KEY, responses);
         return value;
     }
 
     public static ObjectNode buildDelete(final DataSchemaNode node, final String moduleName,
-            final Optional<String> deviceName, final ArrayNode pathParams) {
+            final String deviceName, final ArrayNode pathParams) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
-        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
-                node.getQName().getLocalName()));
-        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.put(SUMMARY_KEY, new SummaryBuilder().setMethod(HttpMethod.DELETE)
+                .setModule(moduleName)
+                .setNode(node.getQName().getLocalName())
+                .setDevice(deviceName)
+                .buildSummary()
+        );
+        value.set(TAGS_KEY, buildTagsValue(moduleName, deviceName));
         value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         value.set(PARAMETERS_KEY, parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
-        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
-                buildResponse("Deleted", Optional.empty()));
+        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Deleted"));
 
         value.set(RESPONSES_KEY, responses);
         return value;
     }
 
     public static ObjectNode buildPostOperation(final OperationDefinition operDef, final String moduleName,
-            final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames) {
+            final String deviceName, final String parentName, final DefinitionNames definitionNames) {
         final ObjectNode postOperation = JsonNodeFactory.instance.objectNode();
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode();
         final String operName = operDef.getQName().getLocalName();
@@ -253,16 +272,19 @@ public final class OperationBuilder {
             final String defName = parentName + "_" + operName + OUTPUT_SUFFIX + TOP
                     + definitionNames.getDiscriminator(output);
             schema.put(REF_KEY, COMPONENTS_PREFIX + defName);
-            responses.set(String.valueOf(Response.Status.OK.getStatusCode()), buildResponse(description,
-                    Optional.of(schema)));
+            responses.set(String.valueOf(Response.Status.OK.getStatusCode()), buildResponse(description, schema));
         } else {
-            responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse(description,
-                    Optional.empty()));
+            responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse(description));
         }
         postOperation.set(RESPONSES_KEY, responses);
         postOperation.put(DESCRIPTION_KEY, operDef.getDescription().orElse(""));
-        postOperation.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, operName));
-        postOperation.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        postOperation.put(SUMMARY_KEY, new SummaryBuilder().setMethod(HttpMethod.POST)
+                .setModule(moduleName)
+                .setNode(operName)
+                .setDevice(deviceName)
+                .buildSummary()
+        );
+        postOperation.set(TAGS_KEY, buildTagsValue(moduleName, deviceName));
         return postOperation;
     }
 
@@ -295,38 +317,90 @@ public final class OperationBuilder {
         return mimeTypeValue;
     }
 
-    public static ObjectNode buildResponse(final String description, final Optional<ObjectNode> schema) {
+    public static ObjectNode buildResponse(final String description) {
         final ObjectNode response = JsonNodeFactory.instance.objectNode();
-
-        if (schema.isPresent()) {
-            final ObjectNode schemaValue = schema.orElseThrow();
-            final ObjectNode content = JsonNodeFactory.instance.objectNode();
-            final ObjectNode body = JsonNodeFactory.instance.objectNode();
-            for (final String mimeType : MIME_TYPES) {
-                content.set(mimeType, body);
-            }
-            body.set(SCHEMA_KEY, schemaValue);
-            response.set(CONTENT_KEY, content);
-        }
         response.put(DESCRIPTION_KEY, description);
         return response;
     }
 
-    private static String buildSummaryValue(final String httpMethod, final String moduleName,
-            final Optional<String> deviceName, final String nodeName) {
-        return httpMethod + SUMMARY_SEPARATOR + deviceName.map(s -> s + SUMMARY_SEPARATOR).orElse("")
-                + moduleName + SUMMARY_SEPARATOR + nodeName;
+    public static ObjectNode buildResponse(final String description, final ObjectNode schema) {
+        final ObjectNode response = JsonNodeFactory.instance.objectNode();
+
+        final ObjectNode content = JsonNodeFactory.instance.objectNode();
+        final ObjectNode body = JsonNodeFactory.instance.objectNode();
+        for (final String mimeType : MIME_TYPES) {
+            content.set(mimeType, body);
+        }
+        body.set(SCHEMA_KEY, schema);
+        response.set(CONTENT_KEY, content);
+        response.put(DESCRIPTION_KEY, description);
+        return response;
     }
 
-    public static ArrayNode buildTagsValue(final Optional<String> deviceName, final String moduleName) {
-        final ArrayNode tagsValue = JsonNodeFactory.instance.arrayNode();
-        tagsValue.add(deviceName.map(s -> "mounted " + s).orElse("controller") + " " + moduleName);
-        return tagsValue;
+    public static ArrayNode buildTagsValue(final String moduleName, final String deviceName) {
+        if (deviceName == null) {
+            return buildTagsValue(moduleName);
+        }
+        return JsonNodeFactory.instance.arrayNode().add("mounted " + deviceName + " " + moduleName);
+    }
+
+    public static ArrayNode buildTagsValue(final String moduleName) {
+        return JsonNodeFactory.instance.arrayNode().add("controller" + " " + moduleName);
     }
 
     public static ObjectNode getTypeParentNode(final ObjectNode parameter) {
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         parameter.set(SCHEMA_KEY, schema);
         return schema;
+    }
+
+    private static class SummaryBuilder {
+
+        // indexes of attributes in the summaryAttributes array
+        private static final int METHOD = 0;
+        private static final int DEVICE = 1;
+        private static final int MODULE = 2;
+        private static final int NODE = 3;
+
+        // array of attributes that compose summary
+        private final String[] summaryAttributes = new String[4];
+
+        SummaryBuilder() {
+        }
+
+        public String buildSummary() {
+            final StringBuilder sb = new StringBuilder();
+
+            // attributes are in desired order, which allows us to conveniently loop through them
+            //  not having to check each attribute individually
+            for (final String attr : summaryAttributes) {
+                if (attr != null && !attr.isEmpty()) {
+                    sb.append(attr).append(SUMMARY_SEPARATOR);
+                }
+            }
+            // '$' matches the end of a string
+            return sb.toString().replaceAll(SUMMARY_SEPARATOR + "$","");
+        }
+
+        public SummaryBuilder setMethod(final String method) {
+            summaryAttributes[METHOD] = method;
+            return this;
+        }
+
+        public SummaryBuilder setDevice(final String device) {
+            summaryAttributes[DEVICE] = device;
+            return this;
+        }
+
+        public SummaryBuilder setModule(final String module) {
+            summaryAttributes[MODULE] = module;
+            return this;
+        }
+
+        public SummaryBuilder setNode(final String node) {
+            summaryAttributes[NODE] = node;
+            return this;
+        }
+
     }
 }
