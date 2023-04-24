@@ -156,7 +156,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
-        final String deviceName  = extractDeviceName(iid);
+        final String deviceName = extractDeviceName(iid);
 
         if (context == null) {
             return null;
@@ -181,7 +181,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         final SwaggerObject doc;
 
         final SwaggerObject swaggerObject = swaggerGenerator.getAllModulesDoc(uriInfo, range, context,
-                Optional.of(deviceName), urlPrefix, definitionNames);
+                deviceName, urlPrefix, definitionNames);
 
         if (includeDataStore) {
             doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
@@ -230,7 +230,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         operationObject.put(DESCRIPTION_KEY, description);
         operationObject.put(SUMMARY_KEY, HttpMethod.GET + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR
                 + swaggerGenerator.getResourcePathPart(resourceType));
-        operationObject.set(TAGS_KEY, buildTagsValue(Optional.of(deviceName), "GET root"));
+        operationObject.set(TAGS_KEY, buildTagsValue(deviceName, "GET root"));
         final ObjectNode okResponse = JsonNodeFactory.instance.objectNode();
         okResponse.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
