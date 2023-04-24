@@ -104,7 +104,7 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         openApi.onMountPointCreated(INSTANCE_ID);
 
-        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, null);
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
         final Map<String, Path> paths = mountPointApi.getPaths();
