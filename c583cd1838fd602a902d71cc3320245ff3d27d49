@@ -16,6 +16,74 @@
       "message": "recheck",
       "revId": "c583cd1838fd602a902d71cc3320245ff3d27d49",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "227ff25d_109abe24",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiGeneratorRFC8040.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-24T08:26:45Z",
+      "side": 1,
+      "message": "Should be:\n```\npublic MountPointOpenApiGeneratorRFC8040(final DOMSchemaService schemaService,\n    final DOMMountPointService mountService) {\n```",
+      "revId": "c583cd1838fd602a902d71cc3320245ff3d27d49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c83ea472_f982ef94",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiGeneratorRFC8040.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-24T08:26:45Z",
+      "side": 1,
+      "message": "The same problem here.",
+      "revId": "c583cd1838fd602a902d71cc3320245ff3d27d49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a90890b9_75903b5d",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-24T08:26:45Z",
+      "side": 1,
+      "message": "IIRC we do not need this here.",
+      "revId": "c583cd1838fd602a902d71cc3320245ff3d27d49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "095d5284_f2f43c1d",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/openapi/Server.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-24T08:26:45Z",
+      "side": 1,
+      "message": "Please change packages in separate commit before this one.",
+      "revId": "c583cd1838fd602a902d71cc3320245ff3d27d49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
