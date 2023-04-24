@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
-import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointOpenApi;
@@ -22,14 +21,14 @@ public class MountPointOpenApiGeneratorRFC8040 extends BaseYangOpenApiGeneratorR
 
     public MountPointOpenApiGeneratorRFC8040(final DOMSchemaService schemaService,
             final DOMMountPointService mountService) {
-        super(Optional.of(schemaService));
+        super(schemaService);
         mountPointOpenApi = new MountPointOpenApi(schemaService, mountService, this);
         mountPointOpenApi.init();
     }
 
     public MountPointOpenApiGeneratorRFC8040(final DOMSchemaService schemaService,
             final DOMMountPointService mountService, final String basePath) {
-        super(Optional.of(schemaService), basePath);
+        super(schemaService, basePath);
         mountPointOpenApi = new MountPointOpenApi(schemaService, mountService, this);
         mountPointOpenApi.init();
     }
