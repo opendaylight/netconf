@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -152,11 +153,11 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         return BaseYangSwaggerGenerator.convertToOpenApi(swaggerObject);
     }
 
-    public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum) {
+    public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, @Nullable final Integer pageNum) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
-        final String deviceName  = extractDeviceName(iid);
+        final String deviceName = extractDeviceName(iid);
 
         if (context == null) {
             return null;
@@ -164,24 +165,23 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         final DefinitionNames definitionNames = new DefinitionNames();
 
         boolean includeDataStore = true;
-        Optional<Range<Integer>> range = Optional.empty();
+        Range<Integer> range = null;
 
-        if (pageNum.isPresent()) {
-            final int pageNumValue = pageNum.orElseThrow();
-            final int end = DEFAULT_PAGESIZE * pageNumValue - 1;
+        if (pageNum != null) {
+            final int end = DEFAULT_PAGESIZE * pageNum - 1;
             int start = end - DEFAULT_PAGESIZE;
-            if (pageNumValue == 1) {
+            if (pageNum == 1) {
                 start++;
             } else {
                 includeDataStore = false;
             }
-            range = Optional.of(Range.closed(start, end));
+            range = Range.closed(start, end);
         }
 
         final SwaggerObject doc;
 
         final SwaggerObject swaggerObject = swaggerGenerator.getAllModulesDoc(uriInfo, range, context,
-                Optional.of(deviceName), urlPrefix, definitionNames);
+                deviceName, urlPrefix, definitionNames);
 
         if (includeDataStore) {
             doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
@@ -230,7 +230,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         operationObject.put(DESCRIPTION_KEY, description);
         operationObject.put(SUMMARY_KEY, HttpMethod.GET + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR
                 + swaggerGenerator.getResourcePathPart(resourceType));
-        operationObject.set(TAGS_KEY, buildTagsValue(Optional.of(deviceName), "GET root"));
+        operationObject.set(TAGS_KEY, buildTagsValue("GET root", deviceName));
         final ObjectNode okResponse = JsonNodeFactory.instance.objectNode();
         okResponse.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();

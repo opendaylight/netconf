@@ -42,6 +42,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Components;
@@ -97,27 +98,23 @@ public abstract class BaseYangSwaggerGenerator {
         MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
 
-    protected BaseYangSwaggerGenerator(final Optional<DOMSchemaService> schemaService) {
-        this.schemaService = schemaService.orElse(null);
+    protected BaseYangSwaggerGenerator(final DOMSchemaService schemaService) {
+        this.schemaService = schemaService;
     }
 
     public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getAllModulesDoc(uriInfo, Optional.empty(), schemaContext, Optional.empty(), "", definitionNames);
+        return getAllModulesDoc(uriInfo, null, schemaContext, "Controller", "", definitionNames);
     }
 
-    public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final Optional<Range<Integer>> range,
-            final EffectiveModelContext schemaContext, final Optional<String> deviceName, final String context,
+    public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, @Nullable final Range<Integer> range,
+            final EffectiveModelContext schemaContext, final String deviceName, final String context,
             final DefinitionNames definitionNames) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
-        String name = "Controller";
-        if (deviceName.isPresent()) {
-            name = deviceName.orElseThrow();
-        }
 
-        final String title = name + " modules of RESTCONF";
+        final String title = deviceName + " modules of RESTCONF";
         final SwaggerObject doc = createSwaggerObject(schema, host, BASE_PATH, title);
         doc.setDefinitions(JsonNodeFactory.instance.objectNode());
         doc.setPaths(JsonNodeFactory.instance.objectNode());
@@ -127,16 +124,11 @@ public abstract class BaseYangSwaggerGenerator {
         return doc;
     }
 
-    public void fillDoc(final SwaggerObject doc, final Optional<Range<Integer>> range,
-            final EffectiveModelContext schemaContext, final String context, final Optional<String> deviceName,
+    public void fillDoc(final SwaggerObject doc, @Nullable final Range<Integer> range,
+            final EffectiveModelContext schemaContext, final String context, final String deviceName,
             final DefinitionNames definitionNames) {
         final SortedSet<Module> modules = getSortedModules(schemaContext);
-        final Set<Module> filteredModules;
-        if (range.isPresent()) {
-            filteredModules = filterByRange(modules, range.orElseThrow());
-        } else {
-            filteredModules = modules;
-        }
+        final Set<Module> filteredModules = range != null ? filterByRange(modules, range) : modules;
 
         for (final Module module : filteredModules) {
             final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
@@ -221,10 +213,10 @@ public abstract class BaseYangSwaggerGenerator {
             final String basePath, final String context, final EffectiveModelContext schemaContext) {
         final SwaggerObject doc = createSwaggerObject(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getSwaggerDocSpec(module, context, Optional.empty(), schemaContext, definitionNames, doc, true);
+        return getSwaggerDocSpec(module, context, null, schemaContext, definitionNames, doc, true);
     }
 
-    public SwaggerObject getSwaggerDocSpec(final Module module, final String context, final Optional<String> deviceName,
+    public SwaggerObject getSwaggerDocSpec(final Module module, final String context, final String deviceName,
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final SwaggerObject doc,
             final boolean isForSingleModule) {
         final ObjectNode definitions;
@@ -308,7 +300,7 @@ public abstract class BaseYangSwaggerGenerator {
         return doc;
     }
 
-    private static void addRootPostLink(final Module module, final Optional<String> deviceName,
+    private static void addRootPostLink(final Module module, final String deviceName,
             final ArrayNode pathParams, final String resourcePath, final ObjectNode paths) {
         if (containsListOrContainer(module.getChildNodes())) {
             final ObjectNode post = JsonNodeFactory.instance.objectNode();
@@ -357,7 +349,7 @@ public abstract class BaseYangSwaggerGenerator {
 
     public abstract String getResourcePathPart(String resourceType);
 
-    private void addPaths(final DataSchemaNode node, final Optional<String> deviceName, final String moduleName,
+    private void addPaths(final DataSchemaNode node, final String deviceName, final String moduleName,
             final ObjectNode paths, final ArrayNode parentPathParams, final EffectiveModelContext schemaContext,
             final boolean isConfig, final String parentName, final DefinitionNames definitionNames,
             final String resourcePath) {
@@ -404,7 +396,7 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     private static Map<String, ObjectNode> operations(final DataSchemaNode node, final String moduleName,
-            final Optional<String> deviceName, final ArrayNode pathParams, final boolean isConfig,
+            final String deviceName, final ArrayNode pathParams, final boolean isConfig,
             final String parentName, final DefinitionNames definitionNames) {
         final Map<String, ObjectNode> operations = new HashMap<>();
         final String discriminator = definitionNames.getDiscriminator(node);
@@ -514,7 +506,7 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     private static void addOperations(final OperationDefinition operDef, final String moduleName,
-            final Optional<String> deviceName, final ObjectNode paths, final String parentName,
+            final String deviceName, final ObjectNode paths, final String parentName,
             final DefinitionNames definitionNames, final String resourcePath) {
         final ObjectNode operations = JsonNodeFactory.instance.objectNode();
         operations.set("post", buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames));

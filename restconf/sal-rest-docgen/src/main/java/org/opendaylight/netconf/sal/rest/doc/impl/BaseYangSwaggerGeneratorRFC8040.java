@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 
 /**
@@ -20,11 +19,11 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGenerator {
     private final String basePath;
 
-    protected BaseYangSwaggerGeneratorRFC8040(final Optional<DOMSchemaService> schemaService) {
+    protected BaseYangSwaggerGeneratorRFC8040(final DOMSchemaService schemaService) {
         this(schemaService, "rests");
     }
 
-    protected BaseYangSwaggerGeneratorRFC8040(final Optional<DOMSchemaService> schemaService, final String basePath) {
+    protected BaseYangSwaggerGeneratorRFC8040(final DOMSchemaService schemaService, final String basePath) {
         super(schemaService);
         this.basePath = requireNonNull(basePath);
     }
