@@ -33,6 +33,24 @@
       "message": "Where are these values from?",
       "revId": "09ba968e62c96595e879690f5e64bb3ef5f43185",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f6bfbcd_2223aebe",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-25T08:11:50Z",
+      "side": 1,
+      "message": "These are from https://github.com/mifmif/Generex.",
+      "parentUuid": "26978f23_1a617736",
+      "revId": "09ba968e62c96595e879690f5e64bb3ef5f43185",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

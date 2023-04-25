@@ -69,6 +69,24 @@
       "parentUuid": "8f001535_89615fe0",
       "revId": "ee09086b9df7c6f234a49afe3c70d8d8e04ff24d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da5467ee_b2377338",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/SwaggerObjectTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-04-25T08:11:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a9057b1_7f1e8f58",
+      "revId": "ee09086b9df7c6f234a49afe3c70d8d8e04ff24d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
