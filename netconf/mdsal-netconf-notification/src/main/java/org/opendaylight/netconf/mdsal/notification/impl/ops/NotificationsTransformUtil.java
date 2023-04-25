@@ -11,13 +11,12 @@ import static com.google.common.base.Verify.verify;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Optional;
 import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory;
-import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeContext;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -27,8 +26,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfConfigChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
+import org.opendaylight.yangtools.yang.binding.EventInstantAware;
 import org.opendaylight.yangtools.yang.binding.Notification;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
@@ -42,7 +41,7 @@ public final class NotificationsTransformUtil {
 
     public NotificationsTransformUtil(final YangParserFactory parserFactory, final BindingRuntimeGenerator generator,
             final BindingDOMCodecFactory codecFactory) throws YangParserException {
-        final BindingRuntimeContext ctx = BindingRuntimeHelpers.createRuntimeContext(parserFactory, generator,
+        final var ctx = BindingRuntimeHelpers.createRuntimeContext(parserFactory, generator,
             Netconf.class, NetconfConfigChange.class, YangLibraryChange.class, YangLibraryUpdate.class);
         schemaContext = ctx.getEffectiveModelContext();
         verify(schemaContext.getOperations().stream()
@@ -55,6 +54,7 @@ public final class NotificationsTransformUtil {
     /**
      * Transform base notification for capabilities into NetconfNotification.
      */
+<<<<<<< HEAD:netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/netconf/mdsal/notification/impl/ops/NotificationsTransformUtil.java
     public NetconfNotification transform(final Notification notification, final SchemaPath path) {
         return transform(notification, Optional.empty(), path);
     }
@@ -67,12 +67,29 @@ public final class NotificationsTransformUtil {
             final SchemaPath path) {
         final ContainerNode containerNode = serializer.toNormalizedNodeNotification(notification);
         final DOMResult result = new DOMResult(XmlUtil.newDocument());
+=======
+    public NetconfNotification transform(final Notification<?> notification, final Absolute path) {
+        return transform(notification,
+            notification instanceof EventInstantAware aware ? Date.from(aware.eventInstant()) : null, path);
+    }
+
+    public NetconfNotification transform(final Notification<?> notification, final @Nullable Date eventTime,
+            final Absolute path) {
+        final var containerNode = serializer.toNormalizedNodeNotification(notification);
+        final var result = new DOMResult(XmlUtil.newDocument());
+>>>>>>> 6338139f1 (Propagate eventTime during notification transformation):netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/netconf/mdsal/notification/impl/NotificationsTransformUtil.java
         try {
             NetconfUtil.writeNormalizedNode(containerNode, result, path, schemaContext);
         } catch (final XMLStreamException | IOException e) {
             throw new IllegalStateException("Unable to serialize " + notification, e);
         }
+<<<<<<< HEAD:netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/netconf/mdsal/notification/impl/ops/NotificationsTransformUtil.java
         final Document node = (Document) result.getNode();
         return eventTime.isPresent() ? new NetconfNotification(node, eventTime.get()) : new NetconfNotification(node);
+=======
+
+        final var node = (Document) result.getNode();
+        return eventTime != null ? new NetconfNotification(node, eventTime) : new NetconfNotification(node);
+>>>>>>> 6338139f1 (Propagate eventTime during notification transformation):netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/netconf/mdsal/notification/impl/NotificationsTransformUtil.java
     }
 }
