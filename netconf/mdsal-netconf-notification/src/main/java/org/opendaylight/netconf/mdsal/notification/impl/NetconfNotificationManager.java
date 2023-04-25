@@ -257,75 +257,72 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
         }
     }
 
-    private static class BaseNotificationPublisherReg implements BaseNotificationPublisherRegistration {
-        static final Absolute CAPABILITY_CHANGE_SCHEMA_PATH = Absolute.of(NetconfCapabilityChange.QNAME);
-        static final Absolute SESSION_START_PATH = Absolute.of(NetconfSessionStart.QNAME);
-        static final Absolute SESSION_END_PATH = Absolute.of(NetconfSessionEnd.QNAME);
-
-        private final NotificationPublisherRegistration baseRegistration;
+    private static abstract class AbstractTransformedRegistration implements Registration {
+        private final NotificationPublisherRegistration delegate;
         private final NotificationsTransformUtil transformUtil;
 
-        BaseNotificationPublisherReg(final NotificationsTransformUtil transformUtil,
-                final NotificationPublisherRegistration baseRegistration) {
+        AbstractTransformedRegistration(final NotificationsTransformUtil transformUtil,
+                final NotificationPublisherRegistration delegate) {
             this.transformUtil = requireNonNull(transformUtil);
-            this.baseRegistration = baseRegistration;
+            this.delegate = requireNonNull(delegate);
         }
 
         @Override
-        public void close() {
-            baseRegistration.close();
+        public final void close() {
+            delegate.close();
         }
 
-        private NotificationMessage serializeNotification(final Notification<?> notification, final Absolute path) {
-            return transformUtil.transform(notification, path);
+        final void publishNotification(final Notification<?> notification, final Absolute path) {
+            delegate.onNotification(BASE_STREAM_NAME, transformUtil.transform(notification, path));
+        }
+    }
+
+    private static class BaseNotificationPublisherReg extends AbstractTransformedRegistration
+            implements BaseNotificationPublisherRegistration {
+        private static final Absolute CAPABILITY_CHANGE_SCHEMA_PATH = Absolute.of(NetconfCapabilityChange.QNAME);
+        private static final Absolute SESSION_START_PATH = Absolute.of(NetconfSessionStart.QNAME);
+        private static final Absolute SESSION_END_PATH = Absolute.of(NetconfSessionEnd.QNAME);
+
+        BaseNotificationPublisherReg(final NotificationsTransformUtil transformUtil,
+                final NotificationPublisherRegistration delegate) {
+            super(transformUtil, delegate);
         }
 
         @Override
         public void onCapabilityChanged(final NetconfCapabilityChange capabilityChange) {
-            baseRegistration.onNotification(BASE_STREAM_NAME,
-                    serializeNotification(capabilityChange, CAPABILITY_CHANGE_SCHEMA_PATH));
+            publishNotification(capabilityChange, CAPABILITY_CHANGE_SCHEMA_PATH);
         }
 
         @Override
         public void onSessionStarted(final NetconfSessionStart start) {
-            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(start, SESSION_START_PATH));
+            publishNotification(start, SESSION_START_PATH);
         }
 
         @Override
         public void onSessionEnded(final NetconfSessionEnd end) {
-            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(end, SESSION_END_PATH));
+            publishNotification(end, SESSION_END_PATH);
         }
     }
 
-    private static class YangLibraryPublisherReg implements YangLibraryPublisherRegistration {
-        static final Absolute YANG_LIBRARY_CHANGE_PATH = Absolute.of(YangLibraryChange.QNAME);
-        static final Absolute YANG_LIBRARY_UPDATE_PATH = Absolute.of(YangLibraryUpdate.QNAME);
-
-        private final NotificationPublisherRegistration baseRegistration;
-        private final NotificationsTransformUtil transformUtil;
+    private static class YangLibraryPublisherReg extends AbstractTransformedRegistration
+            implements YangLibraryPublisherRegistration {
+        private static final Absolute YANG_LIBRARY_CHANGE_PATH = Absolute.of(YangLibraryChange.QNAME);
+        private static final Absolute YANG_LIBRARY_UPDATE_PATH = Absolute.of(YangLibraryUpdate.QNAME);
 
         YangLibraryPublisherReg(final NotificationsTransformUtil transformUtil,
-                final NotificationPublisherRegistration baseRegistration) {
-            this.transformUtil = requireNonNull(transformUtil);
-            this.baseRegistration = baseRegistration;
+                final NotificationPublisherRegistration delegate) {
+            super(transformUtil, delegate);
         }
 
         @Override
         @Deprecated
         public void onYangLibraryChange(final YangLibraryChange yangLibraryChange) {
-            baseRegistration.onNotification(BASE_STREAM_NAME,
-                transformUtil.transform(yangLibraryChange, YANG_LIBRARY_CHANGE_PATH));
+            publishNotification(yangLibraryChange, YANG_LIBRARY_CHANGE_PATH);
         }
 
         @Override
         public void onYangLibraryUpdate(final YangLibraryUpdate yangLibraryUpdate) {
-            baseRegistration.onNotification(BASE_STREAM_NAME,
-                    transformUtil.transform(yangLibraryUpdate, YANG_LIBRARY_UPDATE_PATH));
-        }
-
-        @Override
-        public void close() {
-            baseRegistration.close();
+            publishNotification(yangLibraryUpdate, YANG_LIBRARY_UPDATE_PATH);
         }
     }
 
