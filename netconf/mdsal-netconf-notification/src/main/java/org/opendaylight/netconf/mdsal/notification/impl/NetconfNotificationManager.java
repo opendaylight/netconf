@@ -25,6 +25,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
@@ -34,7 +35,6 @@ import org.opendaylight.netconf.notifications.NetconfNotificationListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.netconf.notifications.NotificationPublisherRegistration;
-import org.opendaylight.netconf.notifications.NotificationRegistration;
 import org.opendaylight.netconf.notifications.YangLibraryPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
@@ -47,6 +47,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStart;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
+import org.opendaylight.yangtools.concepts.AbstractObjectRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.Notification;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
@@ -86,7 +88,7 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
             HashMultimap.create();
 
     @GuardedBy("this")
-    private final Set<NetconfNotificationStreamListener> streamListeners = new HashSet<>();
+    private final Set<StreamListenerReg> streamListeners = new HashSet<>();
 
     @GuardedBy("this")
     private final Map<StreamNameType, Stream> streamMetadata = new HashMap<>();
@@ -174,20 +176,16 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
     }
 
     @Override
-    public synchronized NotificationRegistration registerStreamListener(
-            final NetconfNotificationStreamListener listener) {
-        streamListeners.add(listener);
+    public synchronized Registration registerStreamListener(final NetconfNotificationStreamListener listener) {
+        final var reg = new StreamListenerReg(listener);
+        streamListeners.add(reg);
 
         // Notify about all already available
-        for (final Stream availableStream : streamMetadata.values()) {
+        for (var availableStream : streamMetadata.values()) {
             listener.onStreamRegistered(availableStream);
         }
 
-        return () -> {
-            synchronized (NetconfNotificationManager.this) {
-                streamListeners.remove(listener);
-            }
-        };
+        return reg;
     }
 
     @Override
@@ -240,14 +238,14 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
     }
 
     private synchronized void notifyStreamAdded(final Stream stream) {
-        for (final NetconfNotificationStreamListener streamListener : streamListeners) {
-            streamListener.onStreamRegistered(stream);
+        for (var streamListener : streamListeners) {
+            streamListener.getInstance().onStreamRegistered(stream);
         }
     }
 
     private synchronized void notifyStreamRemoved(final StreamNameType stream) {
-        for (final NetconfNotificationStreamListener streamListener : streamListeners) {
-            streamListener.onStreamUnregistered(stream);
+        for (var streamListener : streamListeners) {
+            streamListener.getInstance().onStreamUnregistered(stream);
         }
     }
 
@@ -378,6 +376,19 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
         @Override
         public void close() {
             notificationListeners.remove(listenedStream, this);
+        }
+    }
+
+    private final class StreamListenerReg extends AbstractObjectRegistration<NetconfNotificationStreamListener> {
+        StreamListenerReg(final @NonNull NetconfNotificationStreamListener instance) {
+            super(instance);
+        }
+
+        @Override
+        protected void removeRegistration() {
+            synchronized (NetconfNotificationManager.this) {
+                streamListeners.remove(this);
+            }
         }
     }
 }
