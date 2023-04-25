@@ -40,8 +40,8 @@ public final class NotificationMessage extends NetconfMessage {
     /**
      * Used for unknown/un-parse-able event-times.
      */
+    // FIXME: we should differentiate unknown and invalid event times
     public static final Date UNKNOWN_EVENT_TIME = new Date(0);
-
 
     /**
      * The ISO-like date-time formatter that formats or parses a date-time with
@@ -166,6 +166,7 @@ public final class NotificationMessage extends NetconfMessage {
         return accessor.isSupported(field) ? (int) accessor.getLong(field) : 0;
     }
 
+    // FIXME: use a proper parsing abstraction backed by java.time.Instant, which should be non-null
     private final Date eventTime;
 
     /**

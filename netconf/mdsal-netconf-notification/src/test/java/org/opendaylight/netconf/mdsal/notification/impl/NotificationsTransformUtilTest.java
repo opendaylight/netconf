@@ -63,8 +63,8 @@ public class NotificationsTransformUtilTest {
         netconfCapabilityChangeBuilder.setDeletedCapability(Set.of(new Uri("uri4"), new Uri("uri3")));
 
         final NetconfCapabilityChange capabilityChange = netconfCapabilityChangeBuilder.build();
-        final NotificationMessage transform = UTIL.transform(capabilityChange, DATE,
-            Absolute.of(NetconfCapabilityChange.QNAME));
+        final NotificationMessage transform = UTIL.transform(capabilityChange,
+            Absolute.of(NetconfCapabilityChange.QNAME), DATE);
 
         final String serialized = XmlUtil.toString(transform.getDocument());
 
