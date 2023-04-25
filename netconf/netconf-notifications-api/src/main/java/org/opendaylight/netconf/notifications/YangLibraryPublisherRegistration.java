@@ -7,10 +7,12 @@
  */
 package org.opendaylight.netconf.notifications;
 
+import org.opendaylight.yangtools.concepts.Registration;
+
 /**
  * Registration for yang-library publisher. This registration allows for publishing of YANG library notification using
- * generated classes
+ * generated classes.
  */
-public interface YangLibraryPublisherRegistration extends NotificationRegistration, YangLibraryNotificationListener {
+public interface YangLibraryPublisherRegistration extends Registration, YangLibraryNotificationListener {
 
 }
