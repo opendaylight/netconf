@@ -16,13 +16,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import javax.xml.transform.TransformerException;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 
 /**
  * Customized NetconfMessageToXMLEncoder that serializes additional header with
  * session metadata along with
- * {@link NetconfHelloMessage}
+ * {@link HelloMessage}
  * . Used by netconf clients to send information about the user, ip address,
  * protocol etc.
  *
@@ -45,12 +45,11 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader
 public final class NetconfHelloMessageToXMLEncoder extends NetconfMessageToXMLEncoder {
     @Override
     @VisibleForTesting
-    public void encode(ChannelHandlerContext ctx, NetconfMessage msg, ByteBuf out)
+    public void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out)
             throws IOException, TransformerException {
-        Preconditions.checkState(msg instanceof NetconfHelloMessage, "Netconf message of type %s expected, was %s",
-                NetconfHelloMessage.class, msg.getClass());
-        Optional<NetconfHelloMessageAdditionalHeader> headerOptional = ((NetconfHelloMessage) msg)
-                .getAdditionalHeader();
+        Preconditions.checkState(msg instanceof HelloMessage, "Netconf message of type %s expected, was %s",
+                HelloMessage.class, msg.getClass());
+        Optional<NetconfHelloMessageAdditionalHeader> headerOptional = ((HelloMessage) msg).getAdditionalHeader();
 
         // If additional header present, serialize it along with netconf hello message
         if (headerOptional.isPresent()) {

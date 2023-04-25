@@ -11,11 +11,11 @@ import io.netty.channel.Channel;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSessionListener;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 
 final class TestSessionNegotiator
         extends AbstractNetconfSessionNegotiator<TestingNetconfSession, NetconfSessionListener<TestingNetconfSession>> {
-    TestSessionNegotiator(final NetconfHelloMessage hello, final Promise<TestingNetconfSession> promise,
+    TestSessionNegotiator(final HelloMessage hello, final Promise<TestingNetconfSession> promise,
             final Channel channel, final Timer timer,
             final NetconfSessionListener<TestingNetconfSession> sessionListener, final long connectionTimeoutMillis) {
         super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis, 16384);
@@ -23,12 +23,12 @@ final class TestSessionNegotiator
 
     @Override
     protected TestingNetconfSession getSession(final NetconfSessionListener<TestingNetconfSession> sessionListener,
-            final Channel channel, final NetconfHelloMessage message) {
+            final Channel channel, final HelloMessage message) {
         return new TestingNetconfSession(sessionListener, channel, 0L);
     }
 
     @Override
-    protected void handleMessage(final NetconfHelloMessage netconfHelloMessage) {
+    protected void handleMessage(final HelloMessage netconfHelloMessage) {
         // No-op
     }
 }

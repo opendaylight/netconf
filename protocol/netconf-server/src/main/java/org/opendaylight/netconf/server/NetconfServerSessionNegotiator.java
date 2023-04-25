@@ -17,7 +17,7 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public final class NetconfServerSessionNegotiator
 
     private final long sessionId;
 
-    NetconfServerSessionNegotiator(final NetconfHelloMessage hello, final long sessionId,
+    NetconfServerSessionNegotiator(final HelloMessage hello, final long sessionId,
             final Promise<NetconfServerSession> promise, final Channel channel, final Timer timer,
             final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis,
             final @NonNegative int maximumIncomingChunkSize) {
@@ -40,7 +40,7 @@ public final class NetconfServerSessionNegotiator
     }
 
     @Override
-    protected void handleMessage(final NetconfHelloMessage netconfMessage) throws NetconfDocumentedException {
+    protected void handleMessage(final HelloMessage netconfMessage) throws NetconfDocumentedException {
         NetconfServerSession session = getSessionForHelloMessage(netconfMessage);
         replaceHelloMessageInboundHandler(session);
         // Negotiation successful after all non hello messages were processed
@@ -49,7 +49,7 @@ public final class NetconfServerSessionNegotiator
 
     @Override
     protected NetconfServerSession getSession(final NetconfServerSessionListener sessionListener, final Channel channel,
-            final NetconfHelloMessage message) {
+            final HelloMessage message) {
         final var additionalHeader = message.getAdditionalHeader();
         final var parsedHeader = additionalHeader.orElseGet(() -> {
             final var hostName = getHostName(channel.localAddress());
@@ -73,9 +73,9 @@ public final class NetconfServerSessionNegotiator
             return new SimpleImmutableEntry<>(Integer.toString(inetSocketAddress.getPort()),
                     inetSocketAddress.getHostString());
         } else if (socketAddress instanceof LocalAddress localAddress) {
-            return new SimpleImmutableEntry<>(UNKNOWN, localAddress.id());
+            return Map.entry(UNKNOWN, localAddress.id());
         } else {
-            return new SimpleImmutableEntry<>(UNKNOWN, UNKNOWN);
+            return Map.entry(UNKNOWN, UNKNOWN);
         }
     }
 }

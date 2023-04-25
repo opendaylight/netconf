@@ -10,6 +10,7 @@ package org.opendaylight.netconf.nettyutil.handler;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -19,7 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 
@@ -31,7 +32,7 @@ public class NetconfHelloMessageToXMLEncoderTest {
 
     @Test
     public void testEncode() throws Exception {
-        final NetconfMessage msg = new NetconfHelloMessage(XmlUtil.readXmlToDocument(
+        final NetconfMessage msg = new HelloMessage(XmlUtil.readXmlToDocument(
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"),
                 NetconfHelloMessageAdditionalHeader.fromString("[tomas;10.0.0.0:10000;tcp;client;]"));
         final ByteBuf destination = Unpooled.buffer();
@@ -44,7 +45,7 @@ public class NetconfHelloMessageToXMLEncoderTest {
 
     @Test
     public void testEncodeNoHeader() throws Exception {
-        final NetconfMessage msg = new NetconfHelloMessage(XmlUtil.readXmlToDocument(
+        final NetconfMessage msg = new HelloMessage(XmlUtil.readXmlToDocument(
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
         final ByteBuf destination = Unpooled.buffer();
         new NetconfHelloMessageToXMLEncoder().encode(ctx, msg, destination);
@@ -54,10 +55,10 @@ public class NetconfHelloMessageToXMLEncoderTest {
         assertThat(encoded, containsString("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testEncodeNotHello() throws Exception {
         final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
-        new NetconfHelloMessageToXMLEncoder().encode(ctx, msg, null);
+        assertThrows(IllegalStateException.class, () -> new NetconfHelloMessageToXMLEncoder().encode(ctx, msg, null));
     }
 }

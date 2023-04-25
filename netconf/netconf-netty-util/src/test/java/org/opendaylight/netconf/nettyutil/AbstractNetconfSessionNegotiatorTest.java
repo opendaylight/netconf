@@ -48,7 +48,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfSessionListener;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
@@ -73,8 +73,8 @@ public class AbstractNetconfSessionNegotiatorTest {
     private Timeout timeout;
     private EmbeddedChannel channel;
     private TestSessionNegotiator negotiator;
-    private NetconfHelloMessage hello;
-    private NetconfHelloMessage helloBase11;
+    private HelloMessage hello;
+    private HelloMessage helloBase11;
     private NetconfXMLToHelloMessageDecoder xmlToHello;
 
     @Before
@@ -87,9 +87,9 @@ public class AbstractNetconfSessionNegotiatorTest {
         channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
                 FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
-        hello = NetconfHelloMessage.createClientHello(Set.of(), Optional.empty());
-        helloBase11 = NetconfHelloMessage.createClientHello(
-            Set.of(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
+        hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
+        helloBase11 = HelloMessage.createClientHello(Set.of(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1),
+            Optional.empty());
         doReturn(promise).when(promise).setFailure(any());
         negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
     }
