@@ -11,7 +11,7 @@ import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 
 /**
- * Generic listener for netconf notifications.
+ * Generic listener for NETCONF notifications.
  */
 public interface NetconfNotificationListener {
     /**

@@ -5,25 +5,21 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.notifications;
 
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 
 /**
- * Collector of all notifications. Base or generic
+ * Collector of all notifications. Base or generic.
  */
 public interface NetconfNotificationCollector {
-
     /**
      * Add notification publisher for a particular stream.
      *
      * <p>
-     * Implementations should allow for multiple publishers of a single stream
-     * and its up to implementations to decide how to merge metadata (e.g. description)
-     * for the same stream when providing information about available stream
-     *
+     * Implementations should allow for multiple publishers of a single stream and its up to implementations to decide
+     * how to merge metadata (e.g. description) for the same stream when providing information about available stream.
      */
     NotificationPublisherRegistration registerNotificationPublisher(Stream stream);
 
@@ -42,7 +38,7 @@ public interface NetconfNotificationCollector {
      * This allows for a push model in addition to pull model for retrieving information about available streams.
      *
      * <p>
-     * The listener should receive callbacks for each stream available prior to the registration when its registered
+     * The listener should receive callbacks for each stream available prior to the registration when its registered.
      */
     NotificationRegistration registerStreamListener(NetconfNotificationStreamListener listener);
 
@@ -50,7 +46,6 @@ public interface NetconfNotificationCollector {
      * Simple listener that receives notifications about changes in stream availability.
      */
     interface NetconfNotificationStreamListener {
-
         /**
          * Stream becomes available in the collector (first publisher is registered).
          */

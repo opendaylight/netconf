@@ -5,14 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.notifications;
 
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 
 public interface NetconfNotificationRegistry {
-
     /**
      * Add listener for a certain notification type.
      */
@@ -28,5 +26,4 @@ public interface NetconfNotificationRegistry {
      * Get all the streams available.
      */
     Streams getNotificationPublishers();
-
 }
