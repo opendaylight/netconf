@@ -7,9 +7,11 @@
  */
 package org.opendaylight.netconf.notifications;
 
+import org.opendaylight.yangtools.concepts.Registration;
+
 /**
  * Registration for notification publisher. This registration allows for publishing any netconf notifications
  */
-public interface NotificationPublisherRegistration extends NetconfNotificationListener, NotificationRegistration {
+public interface NotificationPublisherRegistration extends Registration, NetconfNotificationListener {
 
 }
