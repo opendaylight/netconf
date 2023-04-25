@@ -32,8 +32,8 @@ import org.w3c.dom.Element;
 /**
  * Special kind of netconf message that contains a timestamp.
  */
-public final class NetconfNotification extends NetconfMessage {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfNotification.class);
+public final class NotificationMessage extends NetconfMessage {
+    private static final Logger LOG = LoggerFactory.getLogger(NotificationMessage.class);
     private static final String NOTIFICATION_TAG = "notification";
     private static final String EVENT_TIME_TAG = "eventTime";
 
@@ -171,7 +171,7 @@ public final class NetconfNotification extends NetconfMessage {
     /**
      * Create new notification and capture the timestamp in the constructor.
      */
-    public NetconfNotification(final Document notificationContent) {
+    public NotificationMessage(final Document notificationContent) {
         this(notificationContent, new Date());
     }
 
@@ -179,7 +179,7 @@ public final class NetconfNotification extends NetconfMessage {
      * Create new notification with provided timestamp.
      */
     @SuppressFBWarnings("EI_EXPOSE_REP2") // stores a reference to an externally mutable Date object
-    public NetconfNotification(final Document notificationContent, final Date eventTime) {
+    public NotificationMessage(final Document notificationContent, final Date eventTime) {
         super(wrapNotification(notificationContent, eventTime));
         this.eventTime = eventTime;
     }

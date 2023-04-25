@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfSession;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
@@ -109,7 +109,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
 
     @Override
     public void setSession(final NetconfSession session) {
-        this.netconfSession = session;
+        netconfSession = session;
     }
 
     @Override
@@ -131,7 +131,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
         }
 
         @Override
-        public void onNotification(final StreamNameType stream, final NetconfNotification notification) {
+        public void onNotification(final StreamNameType stream, final NotificationMessage notification) {
             if (filter == null) {
                 currentSession.sendMessage(notification);
                 return;
@@ -142,7 +142,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
                         SubtreeFilter.applySubtreeNotificationFilter(filter, notification.getDocument());
                 if (filtered.isPresent()) {
                     final Date eventTime = notification.getEventTime();
-                    currentSession.sendMessage(new NetconfNotification(filtered.orElseThrow(), eventTime));
+                    currentSession.sendMessage(new NotificationMessage(filtered.orElseThrow(), eventTime));
                 }
             } catch (DocumentedException e) {
                 LOG.warn("Failed to process notification {}", notification, e);
