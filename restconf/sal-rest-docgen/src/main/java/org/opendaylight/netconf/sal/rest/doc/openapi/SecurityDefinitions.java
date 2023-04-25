@@ -5,14 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.rest.doc.swagger;
+package org.opendaylight.netconf.sal.rest.doc.openapi;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class SecuritySchemes {
+public class SecurityDefinitions {
     private ObjectNode basicAuth;
 
-    public SecuritySchemes(ObjectNode basicAuth) {
+    public SecurityDefinitions(ObjectNode basicAuth) {
         this.basicAuth = basicAuth;
     }
 
