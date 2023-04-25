@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
@@ -80,7 +80,7 @@ public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
         assertNotNull(root);
         assertEquals(6, root.body().size());
         assertEquals("user-visited-page", root.getIdentifier().getNodeType().getLocalName());
-        assertEquals(NetconfNotification.RFC3339_DATE_PARSER.apply("2015-10-23T09:42:27.67175+00:00").toInstant(),
+        assertEquals(NotificationMessage.RFC3339_DATE_PARSER.apply("2015-10-23T09:42:27.67175+00:00").toInstant(),
                 ((DOMEvent) domNotification).getEventInstant());
     }
 }

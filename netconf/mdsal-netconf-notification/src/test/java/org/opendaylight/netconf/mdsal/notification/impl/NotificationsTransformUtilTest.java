@@ -20,7 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.binding.dom.codec.impl.di.DefaultBindingDOMCodecFactory;
 import org.opendaylight.mdsal.binding.generator.impl.DefaultBindingRuntimeGenerator;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
@@ -43,7 +43,7 @@ public class NotificationsTransformUtilTest {
             "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">"
                     + INNER_NOTIFICATION
                     + "<eventTime>"
-                    + NetconfNotification.RFC3339_DATE_FORMATTER.apply(DATE)
+                    + NotificationMessage.RFC3339_DATE_FORMATTER.apply(DATE)
                     + "</eventTime>"
                     + "</notification>";
 
@@ -63,7 +63,7 @@ public class NotificationsTransformUtilTest {
         netconfCapabilityChangeBuilder.setDeletedCapability(Set.of(new Uri("uri4"), new Uri("uri3")));
 
         final NetconfCapabilityChange capabilityChange = netconfCapabilityChangeBuilder.build();
-        final NetconfNotification transform = UTIL.transform(capabilityChange, DATE,
+        final NotificationMessage transform = UTIL.transform(capabilityChange, DATE,
             Absolute.of(NetconfCapabilityChange.QNAME));
 
         final String serialized = XmlUtil.toString(transform.getDocument());
@@ -81,11 +81,10 @@ public class NotificationsTransformUtilTest {
 
     @Test
     public void testTransformFromDOM() throws Exception {
-        final NetconfNotification netconfNotification =
-                new NetconfNotification(XmlUtil.readXmlToDocument(INNER_NOTIFICATION), DATE);
+        final NotificationMessage netconfNotification =
+                new NotificationMessage(XmlUtil.readXmlToDocument(INNER_NOTIFICATION), DATE);
 
         XMLUnit.setIgnoreWhitespace(true);
         compareXml(EXPECTED_NOTIFICATION, netconfNotification.toString());
     }
-
 }

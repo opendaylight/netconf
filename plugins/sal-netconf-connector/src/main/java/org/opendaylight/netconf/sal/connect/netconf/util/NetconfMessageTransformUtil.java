@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
@@ -37,7 +36,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfMessageUtil;
@@ -454,17 +453,16 @@ public final class NetconfMessageTransformUtil {
         }
 
         try {
-            return new SimpleEntry<>(
-                    NetconfNotification.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()).toInstant(),
+            return Map.entry(
+                    NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()).toInstant(),
                     notificationElement);
         } catch (final DocumentedException e) {
             throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message,
                     e);
         } catch (final DateTimeParseException e) {
             LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement,
-                    NetconfNotification.UNKNOWN_EVENT_TIME, e);
-            return new SimpleEntry<>(NetconfNotification.UNKNOWN_EVENT_TIME.toInstant(),
-                    notificationElement);
+                NotificationMessage.UNKNOWN_EVENT_TIME, e);
+            return Map.entry(NotificationMessage.UNKNOWN_EVENT_TIME.toInstant(), notificationElement);
         }
     }
 

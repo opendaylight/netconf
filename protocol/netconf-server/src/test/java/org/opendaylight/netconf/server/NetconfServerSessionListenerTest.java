@@ -28,7 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.api.monitoring.SessionListener;
@@ -144,7 +144,7 @@ public class NetconfServerSessionListenerTest {
 
     @Test
     public void testOnNotification() throws Exception {
-        listener.onNotification(session, new NetconfNotification(XmlUtil.readXmlToDocument("<notification/>")));
+        listener.onNotification(session, new NotificationMessage(XmlUtil.readXmlToDocument("<notification/>")));
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.NOTIFICATION)));
     }
 

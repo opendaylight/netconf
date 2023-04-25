@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
@@ -52,7 +52,7 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
         assertNotNull(root);
         assertEquals(1, root.body().size());
         assertEquals("interface-enabled", root.getIdentifier().getNodeType().getLocalName());
-        assertEquals(NetconfNotification.RFC3339_DATE_PARSER.apply("2008-07-08T00:01:00Z").toInstant(),
+        assertEquals(NotificationMessage.RFC3339_DATE_PARSER.apply("2008-07-08T00:01:00Z").toInstant(),
                 ((DOMEvent) domNotification).getEventInstant());
         assertEquals(Absolute.of(INTERFACES_QNAME, INTERFACE_QNAME, INTERFACE_ENABLED_NOTIFICATION_QNAME),
                 domNotification.getType());
