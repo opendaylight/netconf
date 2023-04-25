@@ -173,7 +173,7 @@ class NetconfClientSessionNegotiator
 
         @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
-        public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
             ctx.pipeline().remove(ExiConfirmationInboundHandler.EXI_CONFIRMED_HANDLER);
 
             NetconfMessage netconfMessage = (NetconfMessage) msg;
