@@ -24,7 +24,7 @@ public final class NetconfMessageUtil {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageUtil.class);
 
     private NetconfMessageUtil() {
-
+        // Hidden on purpose
     }
 
     public static boolean isOKMessage(final NetconfMessage message) throws NetconfDocumentedException {
@@ -36,14 +36,8 @@ public final class NetconfMessageUtil {
     }
 
     public static boolean isOKMessage(final XmlElement xmlElement) throws NetconfDocumentedException {
-        if (xmlElement.getChildElements().size() != 1) {
-            return false;
-        }
-        try {
-            return xmlElement.getOnlyChildElement().getName().equals(XmlNetconfConstants.OK);
-        } catch (DocumentedException e) {
-            throw new NetconfDocumentedException(e);
-        }
+        final var children = xmlElement.getChildElements();
+        return children.size() == 1 && children.get(0).getName().equals(XmlNetconfConstants.OK);
     }
 
     public static boolean isErrorMessage(final NetconfMessage message) throws NetconfDocumentedException {
