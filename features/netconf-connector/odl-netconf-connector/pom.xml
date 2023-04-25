@@ -49,10 +49,6 @@
             <artifactId>sal-netconf-connector</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-topology</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-encryption-service</artifactId>
             <type>xml</type>
