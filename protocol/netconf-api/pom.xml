@@ -52,8 +52,7 @@
     </dependency>
     <dependency>
       <groupId>org.xmlunit</groupId>
-      <artifactId>xmlunit-legacy</artifactId>
-      <scope>test</scope>
+      <artifactId>xmlunit-core</artifactId>
     </dependency>
   </dependencies>
 </project>

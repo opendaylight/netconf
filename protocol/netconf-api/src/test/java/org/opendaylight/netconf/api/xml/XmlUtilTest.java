@@ -8,16 +8,19 @@
 package org.opendaylight.netconf.api.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXParseException;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.builder.Transform;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.ElementSelectors;
 
 public class XmlUtilTest {
     private static final String XML_SNIPPET = """
@@ -41,11 +44,14 @@ public class XmlUtilTest {
         document.appendChild(top);
         assertEquals("top", XmlUtil.createDocumentCopy(document).getDocumentElement().getTagName());
 
-        XMLUnit.setIgnoreAttributeOrder(true);
-        XMLUnit.setIgnoreWhitespace(true);
+        final var diff = DiffBuilder.compare(document)
+            .withTest(XML_SNIPPET)
+            .ignoreWhitespace()
+            .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+            .checkForSimilar()
+            .build();
 
-        final Diff diff = XMLUnit.compareXML(XMLUnit.buildControlDocument(XML_SNIPPET), document);
-        assertTrue(diff.toString(), diff.similar());
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test
@@ -76,6 +82,6 @@ public class XmlUtilTest {
             </users>
             """;
 
-        assertEquals(input, XmlUtil.toString(XMLUnit.buildControlDocument(input)));
+        assertEquals(input, XmlUtil.toString(Transform.source(Input.from(input).build()).build().toDocument()));
     }
 }
