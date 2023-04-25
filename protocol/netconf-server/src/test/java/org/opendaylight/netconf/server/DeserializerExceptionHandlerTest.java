@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.server.util;
+package org.opendaylight.netconf.server;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -19,6 +19,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.junit.Before;
 import org.junit.Test;
+import org.opendaylight.netconf.server.DeserializerExceptionHandler;
 
 public class DeserializerExceptionHandlerTest {
     private DeserializerExceptionHandler handler;
