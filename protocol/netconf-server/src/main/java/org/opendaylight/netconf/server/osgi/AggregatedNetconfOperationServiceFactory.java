@@ -23,7 +23,6 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
-import org.opendaylight.netconf.util.CloseableUtil;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 
@@ -126,14 +125,9 @@ public class AggregatedNetconfOperationServiceFactory
                 .collect(ImmutableSet.toImmutableSet());
         }
 
-        @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
         public void close() {
-            try {
-                CloseableUtil.closeAll(services);
-            } catch (final Exception e) {
-                throw new IllegalStateException("Unable to properly close all aggregated services", e);
-            }
+            services.forEach(NetconfOperationService::close);
         }
     }
 }
