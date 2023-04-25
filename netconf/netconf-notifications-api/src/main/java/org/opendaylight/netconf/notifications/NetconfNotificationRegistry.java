@@ -7,15 +7,17 @@
  */
 package org.opendaylight.netconf.notifications;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
+import org.opendaylight.yangtools.concepts.Registration;
 
 public interface NetconfNotificationRegistry {
     /**
      * Add listener for a certain notification type.
      */
-    NotificationListenerRegistration registerNotificationListener(StreamNameType stream,
-                                                                  NetconfNotificationListener listener);
+    @NonNull Registration registerNotificationListener(@NonNull StreamNameType stream,
+        @NonNull NetconfNotificationListener listener);
 
     /**
      * Check stream availability.
