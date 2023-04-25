@@ -26,7 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
-import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 

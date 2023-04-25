@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.opendaylight.netconf.sal.rest.doc.openapi.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
