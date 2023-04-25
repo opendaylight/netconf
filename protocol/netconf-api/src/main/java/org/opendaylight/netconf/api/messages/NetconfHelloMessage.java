@@ -24,8 +24,7 @@ import org.w3c.dom.Element;
  * @see NetconfHelloMessageAdditionalHeader
  */
 public final class NetconfHelloMessage extends NetconfMessage {
-
-    public static final String HELLO_TAG = "hello";
+    private static final String HELLO_TAG = "hello";
 
     private final NetconfHelloMessageAdditionalHeader additionalHeader;
 
