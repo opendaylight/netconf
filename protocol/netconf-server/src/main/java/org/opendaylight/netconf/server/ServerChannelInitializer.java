@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
-import org.opendaylight.netconf.server.util.DeserializerExceptionHandler;
 
 public final class ServerChannelInitializer extends AbstractChannelInitializer<NetconfServerSession> {
     private static final String DESERIALIZER_EX_HANDLER_KEY = "deserializerExHandler";
