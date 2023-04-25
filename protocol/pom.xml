@@ -31,7 +31,7 @@
     <modules>
         <module>netconf-api</module>
         <module>netconf-client</module>
-        <module>netconf-impl</module>
+        <module>netconf-server</module>
         <module>netconf-util</module>
         <module>restconf-api</module>
     </modules>

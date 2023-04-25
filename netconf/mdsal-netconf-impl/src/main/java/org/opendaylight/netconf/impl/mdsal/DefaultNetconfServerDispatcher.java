@@ -12,8 +12,8 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.EventLoopGroup;
 import java.util.Map;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
-import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
-import org.opendaylight.netconf.impl.ServerChannelInitializer;
+import org.opendaylight.netconf.server.NetconfServerDispatcherImpl;
+import org.opendaylight.netconf.server.ServerChannelInitializer;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
