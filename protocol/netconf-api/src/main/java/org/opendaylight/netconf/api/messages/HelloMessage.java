@@ -23,18 +23,18 @@ import org.w3c.dom.Element;
  *
  * @see NetconfHelloMessageAdditionalHeader
  */
-public final class NetconfHelloMessage extends NetconfMessage {
+public final class HelloMessage extends NetconfMessage {
     private static final String HELLO_TAG = "hello";
 
     private final NetconfHelloMessageAdditionalHeader additionalHeader;
 
-    public NetconfHelloMessage(final Document doc, final NetconfHelloMessageAdditionalHeader additionalHeader) {
+    public HelloMessage(final Document doc, final NetconfHelloMessageAdditionalHeader additionalHeader) {
         super(doc);
         checkHelloMessage(doc);
         this.additionalHeader = additionalHeader;
     }
 
-    public NetconfHelloMessage(final Document doc) {
+    public HelloMessage(final Document doc) {
         this(doc, null);
     }
 
@@ -50,9 +50,9 @@ public final class NetconfHelloMessage extends NetconfMessage {
         }
     }
 
-    public static NetconfHelloMessage createClientHello(final Iterable<String> capabilities,
+    public static HelloMessage createClientHello(final Iterable<String> capabilities,
             final Optional<NetconfHelloMessageAdditionalHeader> additionalHeaderOptional) {
-        return new NetconfHelloMessage(createHelloMessageDoc(capabilities), additionalHeaderOptional.orElse(null));
+        return new HelloMessage(createHelloMessageDoc(capabilities), additionalHeaderOptional.orElse(null));
     }
 
     private static Document createHelloMessageDoc(final Iterable<String> capabilities) {
@@ -75,13 +75,13 @@ public final class NetconfHelloMessage extends NetconfMessage {
         return doc;
     }
 
-    public static NetconfHelloMessage createServerHello(final Set<String> capabilities, final long sessionId) {
+    public static HelloMessage createServerHello(final Set<String> capabilities, final long sessionId) {
         Document doc = createHelloMessageDoc(capabilities);
         Element sessionIdElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
                 XmlNetconfConstants.SESSION_ID);
         sessionIdElement.setTextContent(Long.toString(sessionId));
         doc.getDocumentElement().appendChild(sessionIdElement);
-        return new NetconfHelloMessage(doc);
+        return new HelloMessage(doc);
     }
 
     public static boolean isHelloMessage(final NetconfMessage msg) {

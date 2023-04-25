@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 
 public class NetconfXMLToHelloMessageDecoderTest {
@@ -33,8 +33,8 @@ public class NetconfXMLToHelloMessageDecoderTest {
         new NetconfXMLToHelloMessageDecoder().decode(null, src, out);
 
         assertEquals(1, out.size());
-        assertThat(out.get(0), CoreMatchers.instanceOf(NetconfHelloMessage.class));
-        final NetconfHelloMessage hello = (NetconfHelloMessage) out.get(0);
+        assertThat(out.get(0), CoreMatchers.instanceOf(HelloMessage.class));
+        final HelloMessage hello = (HelloMessage) out.get(0);
         assertTrue(hello.getAdditionalHeader().isPresent());
         assertEquals("[tomas;10.0.0.0:10000;tcp;client;]" + System.lineSeparator(),
                 hello.getAdditionalHeader().orElseThrow().toFormattedString());
@@ -50,8 +50,8 @@ public class NetconfXMLToHelloMessageDecoderTest {
         new NetconfXMLToHelloMessageDecoder().decode(null, src, out);
 
         assertEquals(1, out.size());
-        assertThat(out.get(0), CoreMatchers.instanceOf(NetconfHelloMessage.class));
-        final NetconfHelloMessage hello = (NetconfHelloMessage) out.get(0);
+        assertThat(out.get(0), CoreMatchers.instanceOf(HelloMessage.class));
+        final HelloMessage hello = (HelloMessage) out.get(0);
         assertFalse(hello.getAdditionalHeader().isPresent());
     }
 

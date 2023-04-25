@@ -25,12 +25,12 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 
 public class SimpleNetconfClientSessionListenerTest {
     private Channel channel;
     private ChannelPromise channelFuture;
-    private NetconfHelloMessage helloMessage;
+    private HelloMessage helloMessage;
     private NetconfMessage message;
     private NetconfClientSessionListener sessionListener;
     private NetconfClientSession clientSession;
@@ -45,7 +45,7 @@ public class SimpleNetconfClientSessionListenerTest {
         doReturn(channelFuture).when(channel).writeAndFlush(any(), any(ChannelPromise.class));
         doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
         final var caps = Set.of("a", "b");
-        helloMessage = NetconfHelloMessage.createServerHello(caps, 10);
+        helloMessage = HelloMessage.createServerHello(caps, 10);
         message = new NetconfMessage(helloMessage.getDocument());
         sessionListener = mock(NetconfClientSessionListener.class);
         clientSession = new NetconfClientSession(sessionListener, channel, 20L, caps);

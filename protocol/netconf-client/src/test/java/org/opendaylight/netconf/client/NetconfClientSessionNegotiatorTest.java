@@ -39,7 +39,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
@@ -51,7 +51,7 @@ import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.w3c.dom.Document;
 
 public class NetconfClientSessionNegotiatorTest {
-    private NetconfHelloMessage helloMessage;
+    private HelloMessage helloMessage;
     private ChannelPipeline pipeline;
     private ChannelPromise future;
     private Channel channel;
@@ -59,7 +59,7 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Before
     public void setUp() {
-        helloMessage = NetconfHelloMessage.createClientHello(Set.of("exi:1.0"), Optional.empty());
+        helloMessage = HelloMessage.createClientHello(Set.of("exi:1.0"), Optional.empty());
         pipeline = mockChannelPipeline();
         future = mockChannelFuture();
         channel = mockChannel();
@@ -135,17 +135,13 @@ public class NetconfClientSessionNegotiatorTest {
             timeout, 16384);
     }
 
-    private static NetconfHelloMessage createHelloMsg(final String name) throws Exception {
+    private static HelloMessage createHelloMsg(final String name) throws Exception {
         final InputStream stream = NetconfClientSessionNegotiatorTest.class.getResourceAsStream(name);
-        final Document doc = XmlUtil.readXmlToDocument(stream);
-
-        return new NetconfHelloMessage(doc);
+        return new HelloMessage(XmlUtil.readXmlToDocument(stream));
     }
 
     private static Set<String> createCapabilities(final String name) throws Exception {
-        NetconfHelloMessage hello = createHelloMsg(name);
-
-        return ImmutableSet.copyOf(NetconfMessageUtil.extractCapabilitiesFromHello(hello.getDocument()));
+        return ImmutableSet.copyOf(NetconfMessageUtil.extractCapabilitiesFromHello(createHelloMsg(name).getDocument()));
     }
 
     @Test
@@ -156,7 +152,7 @@ public class NetconfClientSessionNegotiatorTest {
 
         negotiator.channelActive(null);
         doReturn(null).when(future).cause();
-        negotiator.handleMessage(NetconfHelloMessage.createServerHello(Set.of("a", "b"), 10));
+        negotiator.handleMessage(HelloMessage.createServerHello(Set.of("a", "b"), 10));
         verify(promise).setSuccess(any());
     }
 
@@ -168,7 +164,7 @@ public class NetconfClientSessionNegotiatorTest {
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
         doReturn(null).when(future).cause();
-        negotiator.handleMessage(NetconfHelloMessage.createServerHello(Set.of("a", "b"), 10));
+        negotiator.handleMessage(HelloMessage.createServerHello(Set.of("a", "b"), 10));
         negotiator.channelActive(null);
         verify(promise).setSuccess(any());
     }
@@ -190,7 +186,7 @@ public class NetconfClientSessionNegotiatorTest {
 
         ChannelHandlerContext handlerContext = mock(ChannelHandlerContext.class);
         doReturn(pipeline).when(handlerContext).pipeline();
-        negotiator.handleMessage(NetconfHelloMessage.createServerHello(Set.of("exi:1.0"), 10));
+        negotiator.handleMessage(HelloMessage.createServerHello(Set.of("exi:1.0"), 10));
         Document expectedResult = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc-reply_ok.xml");
         channelInboundHandlerAdapter.channelRead(handlerContext, new NetconfMessage(expectedResult));
 

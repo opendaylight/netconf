@@ -18,7 +18,7 @@ import java.net.SocketAddress;
 import java.util.Set;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
@@ -132,10 +132,10 @@ public class NetconfServerSessionNegotiatorFactory
         return aggregatedOpService;
     }
 
-    private NetconfHelloMessage createHelloMessage(
-            final long sessionId, final NetconfMonitoringService capabilityProvider) {
-        return NetconfHelloMessage.createServerHello(Sets.union(transformCapabilities(capabilityProvider
-                .getCapabilities()), baseCapabilities), sessionId);
+    private HelloMessage createHelloMessage(final long sessionId, final NetconfMonitoringService capabilityProvider) {
+        return HelloMessage.createServerHello(Sets.union(
+            transformCapabilities(capabilityProvider.getCapabilities()), baseCapabilities),
+            sessionId);
     }
 
     public static Set<String> transformCapabilities(final Capabilities capabilities) {
