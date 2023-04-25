@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b9e3987_f8886ab0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-04-25T07:48:40Z",
+      "side": 1,
+      "message": "looks ok, please mark Ivan\u0027s comment as resolved or update your patch. For that reason can\u0027t give +1",
+      "revId": "09ba968e62c96595e879690f5e64bb3ef5f43185",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
