@@ -43,7 +43,7 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-impl</artifactId>
+      <artifactId>netconf-server</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
