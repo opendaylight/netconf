@@ -23,8 +23,8 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotificationListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
-import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.w3c.dom.Element;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -42,7 +42,7 @@ public class CreateSubscriptionTest {
     @Before
     public void setUp() {
         doReturn(true).when(notificationRegistry).isStreamAvailable(any(StreamNameType.class));
-        doReturn(mock(NotificationListenerRegistration.class)).when(notificationRegistry)
+        doReturn(mock(Registration.class)).when(notificationRegistry)
                 .registerNotificationListener(any(StreamNameType.class), any(NetconfNotificationListener.class));
     }
 
