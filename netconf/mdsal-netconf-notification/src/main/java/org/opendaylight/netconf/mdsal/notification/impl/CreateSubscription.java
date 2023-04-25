@@ -11,7 +11,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -139,8 +138,8 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
                 final Optional<Document> filtered =
                         SubtreeFilter.applySubtreeNotificationFilter(filter, notification.getDocument());
                 if (filtered.isPresent()) {
-                    final Date eventTime = notification.getEventTime();
-                    currentSession.sendMessage(new NotificationMessage(filtered.orElseThrow(), eventTime));
+                    currentSession.sendMessage(new NotificationMessage(filtered.orElseThrow(),
+                        notification.getEventTime()));
                 }
             } catch (DocumentedException e) {
                 LOG.warn("Failed to process notification {}", notification, e);
