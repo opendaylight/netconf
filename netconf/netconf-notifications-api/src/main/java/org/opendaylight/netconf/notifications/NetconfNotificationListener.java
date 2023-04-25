@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.notifications;
 
+import org.opendaylight.netconf.api.messages.NetconfNotification;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 
 /**
