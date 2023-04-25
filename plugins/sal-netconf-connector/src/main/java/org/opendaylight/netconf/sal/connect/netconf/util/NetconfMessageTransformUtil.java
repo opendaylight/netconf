@@ -454,7 +454,7 @@ public final class NetconfMessageTransformUtil {
 
         try {
             return Map.entry(
-                    NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()).toInstant(),
+                    NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()),
                     notificationElement);
         } catch (final DocumentedException e) {
             throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message,
@@ -462,7 +462,7 @@ public final class NetconfMessageTransformUtil {
         } catch (final DateTimeParseException e) {
             LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement,
                 NotificationMessage.UNKNOWN_EVENT_TIME, e);
-            return Map.entry(NotificationMessage.UNKNOWN_EVENT_TIME.toInstant(), notificationElement);
+            return Map.entry(NotificationMessage.UNKNOWN_EVENT_TIME, notificationElement);
         }
     }
 

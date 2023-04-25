@@ -10,11 +10,9 @@ package org.opendaylight.netconf.mdsal.notification.impl;
 import static com.google.common.base.Verify.verify;
 
 import java.io.IOException;
-import java.util.Date;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
@@ -54,12 +52,7 @@ public final class NotificationsTransformUtil {
      * Transform base notification for capabilities into NetconfNotification.
      */
     public @NonNull NotificationMessage transform(final Notification<?> notification, final Absolute path) {
-        return transform(notification,
-            notification instanceof EventInstantAware aware ? Date.from(aware.eventInstant()) : null, path);
-    }
-
-    public @NonNull NotificationMessage transform(final Notification<?> notification, final @Nullable Date eventTime,
-            final Absolute path) {
+        final var eventTime = notification instanceof EventInstantAware aware ? aware.eventInstant() : null;
         final var containerNode = serializer.toNormalizedNodeNotification(notification);
         final var result = new DOMResult(XmlUtil.newDocument());
         try {
