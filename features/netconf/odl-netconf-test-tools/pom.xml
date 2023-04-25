@@ -23,13 +23,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-netconf-connector</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-netconf-mdsal</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-test-perf</artifactId>
         </dependency>
     </dependencies>
