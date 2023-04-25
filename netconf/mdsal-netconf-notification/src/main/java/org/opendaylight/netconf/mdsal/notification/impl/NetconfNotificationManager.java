@@ -19,6 +19,7 @@ import com.google.common.collect.Multiset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.PreDestroy;
@@ -33,7 +34,6 @@ import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistrat
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.NetconfNotificationListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
-import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.netconf.notifications.NotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.YangLibraryPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
@@ -84,8 +84,7 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
     // since the listeners/publishers can block the whole notification processing
 
     @GuardedBy("this")
-    private final Multimap<StreamNameType, GenericNotificationListenerReg> notificationListeners =
-            HashMultimap.create();
+    private final Multimap<StreamNameType, ListenerReg> notificationListeners = HashMultimap.create();
 
     @GuardedBy("this")
     private final Set<StreamListenerReg> streamListeners = new HashSet<>();
@@ -113,10 +112,8 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
     @Override
     public synchronized void close() {
         // Unregister all listeners
-        // Use new list to avoid ConcurrentModificationException
-        for (final GenericNotificationListenerReg listenerReg : new ArrayList<>(notificationListeners.values())) {
-            listenerReg.close();
-        }
+        // Use new list to avoid ConcurrentModificationException when the registration removes itself
+        List.copyOf(notificationListeners.values()).forEach(ListenerReg::close);
         notificationListeners.clear();
 
         // Unregister all publishers
@@ -137,30 +134,16 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
             LOG.debug("Notification of type {} detected: {}", stream, notification);
         }
 
-        for (final GenericNotificationListenerReg listenerReg : notificationListeners.get(stream)) {
-            listenerReg.getListener().onNotification(stream, notification);
+        for (var listenerReg : notificationListeners.get(stream)) {
+            listenerReg.getInstance().onNotification(stream, notification);
         }
     }
 
     @Override
-    public synchronized NotificationListenerRegistration registerNotificationListener(
-            final StreamNameType stream,
+    public synchronized Registration registerNotificationListener(final StreamNameType stream,
             final NetconfNotificationListener listener) {
-        requireNonNull(stream);
-        requireNonNull(listener);
-
+        final var reg = new ListenerReg(listener, stream);
         LOG.trace("Notification listener registered for stream: {}", stream);
-
-        final GenericNotificationListenerReg reg = new GenericNotificationListenerReg(listener, stream) {
-            @Override
-            public void close() {
-                synchronized (NetconfNotificationManager.this) {
-                    LOG.trace("Notification listener unregistered for stream: {}", stream);
-                    super.close();
-                }
-            }
-        };
-
         notificationListeners.put(stream, reg);
         return reg;
     }
@@ -359,23 +342,20 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
         }
     }
 
-    private class GenericNotificationListenerReg implements NotificationListenerRegistration {
-        private final NetconfNotificationListener listener;
-        private final StreamNameType listenedStream;
+    private final class ListenerReg extends AbstractObjectRegistration<NetconfNotificationListener> {
+        private final StreamNameType stream;
 
-        GenericNotificationListenerReg(final NetconfNotificationListener listener,
-                                       final StreamNameType listenedStream) {
-            this.listener = listener;
-            this.listenedStream = listenedStream;
-        }
-
-        public NetconfNotificationListener getListener() {
-            return listener;
+        ListenerReg(final @NonNull NetconfNotificationListener instance, final @NonNull StreamNameType stream) {
+            super(instance);
+            this.stream = requireNonNull(stream);
         }
 
         @Override
-        public void close() {
-            notificationListeners.remove(listenedStream, this);
+        protected void removeRegistration() {
+            synchronized (NetconfNotificationManager.this) {
+                LOG.trace("Notification listener unregistered for stream: {}", stream);
+                notificationListeners.remove(stream, this);
+            }
         }
     }
 

@@ -22,11 +22,11 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
 import org.opendaylight.netconf.notifications.NetconfNotificationListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
-import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.netconf.util.messages.SubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -45,7 +45,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
     static final String CREATE_SUBSCRIPTION = "create-subscription";
 
     private final NetconfNotificationRegistry notifications;
-    private final List<NotificationListenerRegistration> subscriptions = new ArrayList<>();
+    private final List<Registration> subscriptions = new ArrayList<>();
     private NetconfSession netconfSession;
 
     public CreateSubscription(final String netconfSessionIdForReporting,
@@ -84,9 +84,8 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
                     getNetconfSessionIdForReporting());
         }
 
-        final NotificationListenerRegistration notificationListenerRegistration = notifications
-                .registerNotificationListener(streamNameType, new NotificationSubscription(netconfSession, filter));
-        subscriptions.add(notificationListenerRegistration);
+        subscriptions.add(notifications.registerNotificationListener(streamNameType,
+            new NotificationSubscription(netconfSession, filter)));
 
         return document.createElement(XmlNetconfConstants.OK);
     }
@@ -116,9 +115,8 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
     public void close() {
         netconfSession = null;
         // Unregister from notification streams
-        for (final NotificationListenerRegistration subscription : subscriptions) {
-            subscription.close();
-        }
+        subscriptions.forEach(Registration::close);
+        subscriptions.clear();
     }
 
     private static class NotificationSubscription implements NetconfNotificationListener {

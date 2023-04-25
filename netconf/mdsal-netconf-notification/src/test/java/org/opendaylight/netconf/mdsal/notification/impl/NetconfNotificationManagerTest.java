@@ -32,7 +32,6 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.NetconfNotificationListener;
-import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamBuilder;
@@ -130,14 +129,15 @@ public class NetconfNotificationManagerTest {
 
         final NetconfNotificationListener listener = mock(NetconfNotificationListener.class);
         doNothing().when(listener).onNotification(any(StreamNameType.class), any(NotificationMessage.class));
-        final NotificationListenerRegistration notificationListenerRegistration = netconfNotificationManager
-                .registerNotificationListener(NetconfNotificationManager.BASE_NETCONF_STREAM.getName(), listener);
+
         final NetconfCapabilityChange notification = capabilityChangedBuilder.build();
-        baseNotificationPublisherRegistration.onCapabilityChanged(notification);
 
-        verify(listener).onNotification(any(StreamNameType.class), any(NotificationMessage.class));
+        try (var reg = netconfNotificationManager.registerNotificationListener(
+                NetconfNotificationManager.BASE_NETCONF_STREAM.getName(), listener)) {
+            baseNotificationPublisherRegistration.onCapabilityChanged(notification);
 
-        notificationListenerRegistration.close();
+            verify(listener).onNotification(any(StreamNameType.class), any(NotificationMessage.class));
+        }
 
         baseNotificationPublisherRegistration.onCapabilityChanged(notification);
         verifyNoMoreInteractions(listener);
