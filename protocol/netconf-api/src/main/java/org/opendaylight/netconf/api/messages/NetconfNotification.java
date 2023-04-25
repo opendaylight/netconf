@@ -23,6 +23,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.function.Function;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -32,11 +33,15 @@ import org.w3c.dom.Element;
  * Special kind of netconf message that contains a timestamp.
  */
 public final class NetconfNotification extends NetconfMessage {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNotification.class);
+    private static final String NOTIFICATION_TAG = "notification";
+    private static final String EVENT_TIME_TAG = "eventTime";
 
-    public static final String NOTIFICATION = "notification";
-    public static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:netconf:capability:notification:1.0";
+    /**
+     * Used for unknown/un-parse-able event-times.
+     */
+    public static final Date UNKNOWN_EVENT_TIME = new Date(0);
+
 
     /**
      * The ISO-like date-time formatter that formats or parses a date-time with
@@ -161,13 +166,6 @@ public final class NetconfNotification extends NetconfMessage {
         return accessor.isSupported(field) ? (int) accessor.getLong(field) : 0;
     }
 
-    public static final String EVENT_TIME = "eventTime";
-
-    /**
-     * Used for unknown/un-parse-able event-times.
-     */
-    public static final Date UNKNOWN_EVENT_TIME = new Date(0);
-
     private final Date eventTime;
 
     /**
@@ -201,10 +199,12 @@ public final class NetconfNotification extends NetconfMessage {
         requireNonNull(eventTime);
 
         final Element baseNotification = notificationContent.getDocumentElement();
-        final Element entireNotification = notificationContent.createElementNS(NOTIFICATION_NAMESPACE, NOTIFICATION);
+        final Element entireNotification = notificationContent.createElementNS(
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0, NOTIFICATION_TAG);
         entireNotification.appendChild(baseNotification);
 
-        final Element eventTimeElement = notificationContent.createElementNS(NOTIFICATION_NAMESPACE, EVENT_TIME);
+        final Element eventTimeElement = notificationContent.createElementNS(
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0, EVENT_TIME_TAG);
         eventTimeElement.setTextContent(getSerializedEventTime(eventTime));
         entireNotification.appendChild(eventTimeElement);
 
