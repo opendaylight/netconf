@@ -52,7 +52,7 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
         assertNotNull(root);
         assertEquals(1, root.body().size());
         assertEquals("interface-enabled", root.getIdentifier().getNodeType().getLocalName());
-        assertEquals(NotificationMessage.RFC3339_DATE_PARSER.apply("2008-07-08T00:01:00Z").toInstant(),
+        assertEquals(NotificationMessage.RFC3339_DATE_PARSER.apply("2008-07-08T00:01:00Z"),
                 ((DOMEvent) domNotification).getEventInstant());
         assertEquals(Absolute.of(INTERFACES_QNAME, INTERFACE_QNAME, INTERFACE_ENABLED_NOTIFICATION_QNAME),
                 domNotification.getType());

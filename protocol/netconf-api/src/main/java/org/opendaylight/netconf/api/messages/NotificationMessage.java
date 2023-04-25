@@ -9,7 +9,6 @@ package org.opendaylight.netconf.api.messages;
 
 import static java.util.Objects.requireNonNull;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.text.ParsePosition;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -20,8 +19,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.util.Date;
 import java.util.function.Function;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.slf4j.Logger;
@@ -40,8 +39,8 @@ public final class NotificationMessage extends NetconfMessage {
     /**
      * Used for unknown/un-parse-able event-times.
      */
-    public static final Date UNKNOWN_EVENT_TIME = new Date(0);
-
+    // FIXME: we should differentiate unknown and invalid event times
+    public static final Instant UNKNOWN_EVENT_TIME = Instant.EPOCH;
 
     /**
      * The ISO-like date-time formatter that formats or parses a date-time with
@@ -51,14 +50,14 @@ public final class NotificationMessage extends NetconfMessage {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
     /**
-     * Provide a {@link String} representation of a {@link Date} object,
+     * Provide a {@link String} representation of a {@link Instant} object,
      * using the time-zone offset for UTC, {@code ZoneOffset.UTC}.
      */
-    public static final Function<Date, String> RFC3339_DATE_FORMATTER = date ->
-            DATE_TIME_FORMATTER.format(date.toInstant().atOffset(ZoneOffset.UTC));
+    public static final Function<Instant, String> RFC3339_DATE_FORMATTER = date ->
+            DATE_TIME_FORMATTER.format(date.atOffset(ZoneOffset.UTC));
 
     /**
-     * Parse a {@link String} object into a {@link Date} using the time-zone
+     * Parse a {@link String} object into a {@link Instant} using the time-zone
      * offset for UTC, {@code ZoneOffset.UTC}, and the system default time-zone,
      * {@code ZoneId.systemDefault()}.
      * <p>
@@ -69,7 +68,7 @@ public final class NotificationMessage extends NetconfMessage {
      *     caller.
      * </p>
      */
-    public static final Function<String, Date> RFC3339_DATE_PARSER = time -> {
+    public static final Function<String, Instant> RFC3339_DATE_PARSER = time -> {
         try {
             final ZonedDateTime localDateTime = ZonedDateTime.parse(time, DATE_TIME_FORMATTER);
             final int startAt = 0;
@@ -95,9 +94,9 @@ public final class NotificationMessage extends NetconfMessage {
                         reminderBuilder.toString());
             }
 
-            return Date.from(Instant.from(localDateTime));
+            return Instant.from(localDateTime);
         } catch (DateTimeParseException exception) {
-            Date res = handlePotentialLeapSecond(time);
+            final var res = handlePotentialLeapSecond(time);
             if (res != null) {
                 return res;
             }
@@ -111,10 +110,10 @@ public final class NotificationMessage extends NetconfMessage {
      * conversion is applied, replacing the second-of-minute of 60 with 59.
      *
      * @param time {@link String} representation of a time
-     *     @return {@code null} if time isn't ISO compliant or if the time doesn't have a leap second
-     *     else a {@link Date} as per as the RFC3339_DATE_PARSER.
+     * @return {@code null} if time isn't ISO compliant or if the time doesn't have a leap second else an
+     *         {@link Instant} as per as the RFC3339_DATE_PARSER.
      */
-    private static Date handlePotentialLeapSecond(final String time) {
+    private static Instant handlePotentialLeapSecond(final String time) {
         // Parse the string from offset 0, so we get the whole value.
         final int offset = 0;
         final TemporalAccessor parsed = DATE_TIME_FORMATTER.parseUnresolved(time, new ParsePosition(offset));
@@ -166,22 +165,21 @@ public final class NotificationMessage extends NetconfMessage {
         return accessor.isSupported(field) ? (int) accessor.getLong(field) : 0;
     }
 
-    private final Date eventTime;
+    private final @NonNull Instant eventTime;
 
     /**
      * Create new notification and capture the timestamp in the constructor.
      */
     public NotificationMessage(final Document notificationContent) {
-        this(notificationContent, new Date());
+        this(notificationContent, Instant.now());
     }
 
     /**
      * Create new notification with provided timestamp.
      */
-    @SuppressFBWarnings("EI_EXPOSE_REP2") // stores a reference to an externally mutable Date object
-    public NotificationMessage(final Document notificationContent, final Date eventTime) {
+    public NotificationMessage(final Document notificationContent, final Instant eventTime) {
         super(wrapNotification(notificationContent, eventTime));
-        this.eventTime = eventTime;
+        this.eventTime = requireNonNull(eventTime);
     }
 
     /**
@@ -189,12 +187,11 @@ public final class NotificationMessage extends NetconfMessage {
      *
      * @return notification event time
      */
-    @SuppressFBWarnings("EI_EXPOSE_REP")
-    public Date getEventTime() {
+    public @NonNull Instant getEventTime() {
         return eventTime;
     }
 
-    private static Document wrapNotification(final Document notificationContent, final Date eventTime) {
+    private static Document wrapNotification(final Document notificationContent, final Instant eventTime) {
         requireNonNull(notificationContent);
         requireNonNull(eventTime);
 
@@ -205,14 +202,10 @@ public final class NotificationMessage extends NetconfMessage {
 
         final Element eventTimeElement = notificationContent.createElementNS(
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0, EVENT_TIME_TAG);
-        eventTimeElement.setTextContent(getSerializedEventTime(eventTime));
+        eventTimeElement.setTextContent(RFC3339_DATE_FORMATTER.apply(eventTime));
         entireNotification.appendChild(eventTimeElement);
 
         notificationContent.appendChild(entireNotification);
         return notificationContent;
-    }
-
-    private static String getSerializedEventTime(final Date eventTime) {
-        return RFC3339_DATE_FORMATTER.apply(eventTime);
     }
 }

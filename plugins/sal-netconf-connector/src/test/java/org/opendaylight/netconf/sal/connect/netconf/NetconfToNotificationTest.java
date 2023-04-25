@@ -80,7 +80,7 @@ public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
         assertNotNull(root);
         assertEquals(6, root.body().size());
         assertEquals("user-visited-page", root.getIdentifier().getNodeType().getLocalName());
-        assertEquals(NotificationMessage.RFC3339_DATE_PARSER.apply("2015-10-23T09:42:27.67175+00:00").toInstant(),
+        assertEquals(NotificationMessage.RFC3339_DATE_PARSER.apply("2015-10-23T09:42:27.67175+00:00"),
                 ((DOMEvent) domNotification).getEventInstant());
     }
 }

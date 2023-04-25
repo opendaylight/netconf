@@ -12,7 +12,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 public class NotificationsTransformUtilTest {
-    private static final Date DATE = new Date();
+    private static final Instant EVENT_TIME = Instant.now();
     private static final String INNER_NOTIFICATION =
             "<netconf-capability-change xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-notifications\">"
                     + "<deleted-capability>uri4</deleted-capability>"
@@ -45,7 +45,7 @@ public class NotificationsTransformUtilTest {
             "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">"
                     + INNER_NOTIFICATION
                     + "<eventTime>"
-                    + NotificationMessage.RFC3339_DATE_FORMATTER.apply(DATE)
+                    + NotificationMessage.RFC3339_DATE_FORMATTER.apply(EVENT_TIME)
                     + "</eventTime>"
                     + "</notification>";
 
@@ -63,7 +63,7 @@ public class NotificationsTransformUtilTest {
             withSettings().extraInterfaces(EventInstantAware.class).defaultAnswer(Answers.CALLS_REAL_METHODS));
         doReturn(Set.of(new Uri("uri1"))).when(capabilityChange).getAddedCapability();
         doReturn(Set.of(new Uri("uri4"), new Uri("uri3"))).when(capabilityChange).getDeletedCapability();
-        doReturn(DATE.toInstant()).when((EventInstantAware) capabilityChange).eventInstant();
+        doReturn(EVENT_TIME).when((EventInstantAware) capabilityChange).eventInstant();
 
         final var notification = UTIL.transform(capabilityChange, Absolute.of(NetconfCapabilityChange.QNAME));
 
@@ -72,7 +72,7 @@ public class NotificationsTransformUtilTest {
 
     @Test
     public void testTransformFromDOM() throws Exception {
-        final var notification = new NotificationMessage(XmlUtil.readXmlToDocument(INNER_NOTIFICATION), DATE);
+        final var notification = new NotificationMessage(XmlUtil.readXmlToDocument(INNER_NOTIFICATION), EVENT_TIME);
 
         XMLUnit.setIgnoreWhitespace(true);
         compareXml(EXPECTED_NOTIFICATION, notification.toString());

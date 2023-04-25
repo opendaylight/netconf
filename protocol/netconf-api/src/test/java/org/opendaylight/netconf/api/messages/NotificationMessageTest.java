@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api.messages;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Date;
+import java.time.Instant;
 import org.junit.Test;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.w3c.dom.Document;
@@ -26,8 +25,7 @@ public class NotificationMessageTest {
         final Element rootElement = document.createElement("test-root");
         document.appendChild(rootElement);
 
-        final Date eventTime = new Date();
-        eventTime.setTime(10000000);
+        final Instant eventTime = Instant.ofEpochMilli(10_000_000);
 
         final NotificationMessage netconfNotification = new NotificationMessage(document, eventTime);
         final Document resultDoc = netconfNotification.getDocument();
@@ -48,9 +46,7 @@ public class NotificationMessageTest {
 
         final Element eventTimeElement = (Element) childNodes.item(0);
 
-        assertEquals(eventTime.getTime(), NotificationMessage.RFC3339_DATE_PARSER
-                .apply(eventTimeElement.getTextContent()).getTime());
-
+        assertEquals(eventTime, NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()));
         assertEquals(eventTime, netconfNotification.getEventTime());
     }
 }

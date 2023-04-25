@@ -20,7 +20,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,21 +87,21 @@ public class NetconfNotificationManagerTest {
                 "2015-10-23T23:59:60.20001Z",
                 "1985-04-12T23:59:60.52Z"
         )) {
-            final Date apply = NotificationMessage.RFC3339_DATE_PARSER.apply(time);
-            final Date parse = new SimpleDateFormat(RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT).parse(iterator.next());
-            assertEquals(parse.getTime(), apply.getTime());
+            final var apply = NotificationMessage.RFC3339_DATE_PARSER.apply(time);
+            final var parse = new SimpleDateFormat(RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT).parse(iterator.next());
+            assertEquals(parse.toInstant(), apply);
             // Testing that we're consistent from formatting to parsing.
             final String dateString = NotificationMessage.RFC3339_DATE_FORMATTER.apply(apply);
-            final Date date1 = NotificationMessage.RFC3339_DATE_PARSER.apply(dateString);
+            final var date1 = NotificationMessage.RFC3339_DATE_PARSER.apply(dateString);
             final String dateString1 = NotificationMessage.RFC3339_DATE_FORMATTER.apply(date1);
             assertEquals(apply, date1);
             assertEquals(dateString, dateString1);
         }
 
         // Testing that we're consistent from formatting to parsing.
-        final Date date0 = Date.from(Instant.ofEpochMilli(0));
+        final var date0 = Instant.ofEpochMilli(0);
         final String dateString0 = NotificationMessage.RFC3339_DATE_FORMATTER.apply(date0);
-        final Date date1 = NotificationMessage.RFC3339_DATE_PARSER.apply(dateString0);
+        final var date1 = NotificationMessage.RFC3339_DATE_PARSER.apply(dateString0);
         final String dateString1 = NotificationMessage.RFC3339_DATE_FORMATTER.apply(date1);
         assertEquals(date0, date1);
         assertEquals(dateString0, dateString1);
