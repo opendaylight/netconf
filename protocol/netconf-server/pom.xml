@@ -16,7 +16,7 @@
     <relativePath>../../parent</relativePath>
   </parent>
 
-  <artifactId>netconf-impl</artifactId>
+  <artifactId>netconf-server</artifactId>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 
@@ -101,26 +101,6 @@
             <Export-Package>org.opendaylight.netconf.impl.*</Export-Package>
           </instructions>
         </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
