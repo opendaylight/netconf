@@ -173,7 +173,7 @@ class NetconfClientSessionNegotiator
 
         @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
-        public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
             ctx.pipeline().remove(ExiConfirmationInboundHandler.EXI_CONFIRMED_HANDLER);
 
             NetconfMessage netconfMessage = (NetconfMessage) msg;
@@ -185,8 +185,8 @@ class NetconfClientSessionNegotiator
                     session.startExiCommunication(startExiMessage);
                 } catch (RuntimeException e) {
                     // Unable to add exi, continue without exi
-                    LOG.warn("Unable to start exi communication, Communication will continue without exi on session "
-                            + "{}", session, e);
+                    LOG.warn("Unable to start exi communication, Communication will continue without exi on session {}",
+                        session, e);
                 }
 
                 // Error response

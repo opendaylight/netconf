@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -27,28 +26,28 @@ public final class NetconfMessageUtil {
         // Hidden on purpose
     }
 
-    public static boolean isOKMessage(final NetconfMessage message) throws NetconfDocumentedException {
+    public static boolean isOKMessage(final NetconfMessage message) {
         return isOKMessage(message.getDocument());
     }
 
-    public static boolean isOKMessage(final Document document) throws NetconfDocumentedException {
+    public static boolean isOKMessage(final Document document) {
         return isOKMessage(XmlElement.fromDomDocument(document));
     }
 
-    public static boolean isOKMessage(final XmlElement xmlElement) throws NetconfDocumentedException {
+    public static boolean isOKMessage(final XmlElement xmlElement) {
         final var children = xmlElement.getChildElements();
         return children.size() == 1 && children.get(0).getName().equals(XmlNetconfConstants.OK);
     }
 
-    public static boolean isErrorMessage(final NetconfMessage message) throws NetconfDocumentedException {
+    public static boolean isErrorMessage(final NetconfMessage message) {
         return isErrorMessage(message.getDocument());
     }
 
-    public static boolean isErrorMessage(final Document document) throws NetconfDocumentedException {
+    public static boolean isErrorMessage(final Document document) {
         return isErrorMessage(XmlElement.fromDomDocument(document));
     }
 
-    public static boolean isErrorMessage(final XmlElement xmlElement) throws NetconfDocumentedException {
+    public static boolean isErrorMessage(final XmlElement xmlElement) {
         // In the case of multiple rpc-error messages, size will not be 1 but we still want to report as Error
         return xmlElement.getChildElements().stream()
             .anyMatch(result -> DocumentedException.RPC_ERROR.equals(result.getName()));
