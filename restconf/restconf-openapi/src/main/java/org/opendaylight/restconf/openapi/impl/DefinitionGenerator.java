@@ -109,6 +109,7 @@ public class DefinitionGenerator {
     private static final String ENUM_KEY = "enum";
     private static final String TITLE_KEY = "title";
     private static final String DEFAULT_KEY = "default";
+    private static final String EXAMPLE_KEY = "example";
     private static final String FORMAT_KEY = "format";
     private static final String NAMESPACE_KEY = "namespace";
     public static final String INPUT = "input";
@@ -715,7 +716,8 @@ public class DefinitionGenerator {
         }
 
         property.set(ENUM_KEY, enumNames);
-        setDefaultValue(property, enumLeafType.getValues().iterator().next().getName());
+        enumLeafType.getDefaultValue().ifPresent(v -> setDefaultValue(property, ((String) v)));
+        setExampleValue(property, enumLeafType.getValues().iterator().next().getName());
         return STRING_TYPE;
     }
 
@@ -946,6 +948,10 @@ public class DefinitionGenerator {
         if (required.size() > 0) {
             node.setRequired(required);
         }
+    }
+
+    private static void setExampleValue(final ObjectNode property, final String value) {
+        property.put(EXAMPLE_KEY, value);
     }
 
     private static void setDefaultValue(final ObjectNode property, final String value) {
