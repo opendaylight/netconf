@@ -23,37 +23,32 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.netconf.notifications.NotificationRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamBuilder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NotificationToMdsalWriterTest {
-
     @Mock
     private DataBroker dataBroker;
+    @Mock
+    private Registration registration;
 
     private NotificationToMdsalWriter writer;
-
-    @Mock
-    private NotificationRegistration notificationRegistration;
 
     @Before
     public void setUp() {
         final NetconfNotificationCollector notificationCollector = mock(NetconfNotificationCollector.class);
 
-        doReturn(notificationRegistration).when(notificationCollector).registerStreamListener(any(
-                NetconfNotificationCollector.NetconfNotificationStreamListener.class));
+        doReturn(registration).when(notificationCollector).registerStreamListener(any());
 
         WriteTransaction tx = mock(WriteTransaction.class);
-        doNothing().when(tx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class),
-            any(DataObject.class));
-        doNothing().when(tx).delete(any(LogicalDatastoreType.class), any(InstanceIdentifier.class));
+        doNothing().when(tx).merge(any(), any(), any());
+        doNothing().when(tx).delete(any(), any());
         doReturn(emptyFluentFuture()).when(tx).commit();
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
 
@@ -62,9 +57,9 @@ public class NotificationToMdsalWriterTest {
 
     @Test
     public void testStreamRegisteration() {
-        final StreamNameType testStreamName = new StreamNameType("TESTSTREAM");
-        final Stream testStream = new StreamBuilder().setName(testStreamName).build();
-        final InstanceIdentifier<Stream> streamIdentifier = InstanceIdentifier.create(Netconf.class)
+        final var testStreamName = new StreamNameType("TESTSTREAM");
+        final var testStream = new StreamBuilder().setName(testStreamName).build();
+        final var streamIdentifier = InstanceIdentifier.create(Netconf.class)
                 .child(Streams.class).child(Stream.class, testStream.key());
 
         writer.onStreamRegistered(testStream);
@@ -79,14 +74,13 @@ public class NotificationToMdsalWriterTest {
 
     @Test
     public void testClose() {
-        doNothing().when(notificationRegistration).close();
+        doNothing().when(registration).close();
 
-        final InstanceIdentifier<Netconf> streamIdentifier = InstanceIdentifier.create(Netconf.class);
+        final var streamIdentifier = InstanceIdentifier.create(Netconf.class);
 
         writer.close();
 
         verify(dataBroker.newWriteOnlyTransaction()).delete(LogicalDatastoreType.OPERATIONAL, streamIdentifier);
-        verify(notificationRegistration).close();
+        verify(registration).close();
     }
-
 }
