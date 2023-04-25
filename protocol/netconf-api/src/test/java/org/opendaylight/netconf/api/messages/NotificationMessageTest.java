@@ -18,8 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class NetconfNotificationTest {
-
+public class NotificationMessageTest {
     @Test
     public void testWrapNotification() throws Exception {
         final Document document = UntrustedXML.newDocumentBuilder().newDocument();
@@ -30,7 +29,7 @@ public class NetconfNotificationTest {
         final Date eventTime = new Date();
         eventTime.setTime(10000000);
 
-        final NetconfNotification netconfNotification = new NetconfNotification(document, eventTime);
+        final NotificationMessage netconfNotification = new NotificationMessage(document, eventTime);
         final Document resultDoc = netconfNotification.getDocument();
         final NodeList nodeList = resultDoc.getElementsByTagNameNS(
             "urn:ietf:params:netconf:capability:notification:1.0", "notification");
@@ -49,10 +48,9 @@ public class NetconfNotificationTest {
 
         final Element eventTimeElement = (Element) childNodes.item(0);
 
-        assertEquals(eventTime.getTime(), NetconfNotification.RFC3339_DATE_PARSER
+        assertEquals(eventTime.getTime(), NotificationMessage.RFC3339_DATE_PARSER
                 .apply(eventTimeElement.getTextContent()).getTime());
 
         assertEquals(eventTime, netconfNotification.getEventTime());
-
     }
 }
