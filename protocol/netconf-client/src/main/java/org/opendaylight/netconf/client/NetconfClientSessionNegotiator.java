@@ -22,7 +22,7 @@ import javax.xml.xpath.XPathExpression;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
@@ -52,7 +52,7 @@ class NetconfClientSessionNegotiator
 
     private final NetconfStartExiMessage startExi;
 
-    NetconfClientSessionNegotiator(final NetconfHelloMessage hello, final NetconfStartExiMessage startExi,
+    NetconfClientSessionNegotiator(final HelloMessage hello, final NetconfStartExiMessage startExi,
             final Promise<NetconfClientSession> promise, final Channel channel, final Timer timer,
             final NetconfClientSessionListener sessionListener, final long connectionTimeoutMillis,
             final @NonNegative int maximumIncomingChunkSize) {
@@ -62,7 +62,7 @@ class NetconfClientSessionNegotiator
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected void handleMessage(final NetconfHelloMessage netconfMessage) throws NetconfDocumentedException {
+    protected void handleMessage(final HelloMessage netconfMessage) throws NetconfDocumentedException {
         if (!ifNegotiatedAlready()) {
             LOG.debug("Server hello message received, starting negotiation on channel {}", channel);
             try {
@@ -109,7 +109,7 @@ class NetconfClientSessionNegotiator
         });
     }
 
-    private boolean shouldUseExi(final NetconfHelloMessage helloMsg) {
+    private boolean shouldUseExi(final HelloMessage helloMsg) {
         return containsExi10Capability(helloMsg.getDocument()) && containsExi10Capability(localHello().getDocument());
     }
 
@@ -143,7 +143,7 @@ class NetconfClientSessionNegotiator
 
     @Override
     protected NetconfClientSession getSession(final NetconfClientSessionListener sessionListener, final Channel channel,
-                                              final NetconfHelloMessage message) {
+                                              final HelloMessage message) {
         final long sessionId = extractSessionId(message.getDocument());
 
         // Copy here is important: it disconnects the strings from the document

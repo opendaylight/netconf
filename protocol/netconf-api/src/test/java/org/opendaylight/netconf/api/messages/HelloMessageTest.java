@@ -15,17 +15,16 @@ import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 
-public class NetconfHelloMessageTest {
-    private final Set<String> caps = Set.of("cap1");
-
+public class HelloMessageTest {
     @Test
     public void testConstructor() throws NetconfDocumentedException {
+        var caps = Set.of("cap1");
         var additionalHeader = new NetconfHelloMessageAdditionalHeader("name", "host", "1", "transp", "id");
-        var message = NetconfHelloMessage.createClientHello(caps, Optional.of(additionalHeader));
-        assertTrue(NetconfHelloMessage.isHelloMessage(message));
+        var message = HelloMessage.createClientHello(caps, Optional.of(additionalHeader));
+        assertTrue(HelloMessage.isHelloMessage(message));
         assertEquals(Optional.of(additionalHeader), message.getAdditionalHeader());
 
-        var serverMessage = NetconfHelloMessage.createServerHello(caps, 100L);
-        assertTrue(NetconfHelloMessage.isHelloMessage(serverMessage));
+        var serverMessage = HelloMessage.createServerHello(caps, 100L);
+        assertTrue(HelloMessage.isHelloMessage(serverMessage));
     }
 }

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
 /**
  * Customized NetconfXMLToMessageDecoder that reads additional header with
  * session metadata from
- * {@link NetconfHelloMessage}*
+ * {@link HelloMessage}*
  * This handler should be replaced in pipeline by regular message handler as last step of negotiation.
  * It serves as a message barrier and halts all non-hello netconf messages.
  * Netconf messages after hello should be processed once the negotiation succeeded.
@@ -91,7 +91,7 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
             Document doc = XmlUtil.readXmlToDocument(new ByteArrayInputStream(bytes));
 
             final NetconfMessage message = getNetconfMessage(additionalHeader, doc);
-            if (message instanceof NetconfHelloMessage) {
+            if (message instanceof HelloMessage) {
                 Preconditions.checkState(!helloReceived,
                         "Multiple hello messages received, unexpected hello: %s", message);
                 out.add(message);
@@ -109,11 +109,11 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
 
     private static NetconfMessage getNetconfMessage(final String additionalHeader, final Document doc) {
         NetconfMessage msg = new NetconfMessage(doc);
-        if (NetconfHelloMessage.isHelloMessage(msg)) {
+        if (HelloMessage.isHelloMessage(msg)) {
             if (additionalHeader != null) {
-                return new NetconfHelloMessage(doc, NetconfHelloMessageAdditionalHeader.fromString(additionalHeader));
+                return new HelloMessage(doc, NetconfHelloMessageAdditionalHeader.fromString(additionalHeader));
             } else {
-                return new NetconfHelloMessage(doc);
+                return new HelloMessage(doc);
             }
         }
 

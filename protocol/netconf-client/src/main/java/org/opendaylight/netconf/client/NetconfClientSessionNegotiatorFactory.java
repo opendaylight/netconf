@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
@@ -130,7 +130,7 @@ public class NetconfClientSessionNegotiatorFactory
             final NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory,
             final Channel channel, final Promise<NetconfClientSession> promise) {
         return new NetconfClientSessionNegotiator(
-            NetconfHelloMessage.createClientHello(clientCapabilities, additionalHeader),
+            HelloMessage.createClientHello(clientCapabilities, additionalHeader),
             NetconfStartExiMessage.create(options, START_EXI_MESSAGE_ID), promise, channel, timer,
                 sessionListenerFactory.getSessionListener(), connectionTimeoutMillis, maximumIncomingChunkSize);
     }

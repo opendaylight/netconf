@@ -28,8 +28,8 @@ import io.netty.channel.EventLoop;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.EOFException;
-import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +38,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 
@@ -56,7 +56,7 @@ public class AbstractNetconfSessionTest {
     @Mock
     private ChannelPromise writeFuture;
 
-    private NetconfHelloMessage clientHello;
+    private HelloMessage clientHello;
 
     @Before
     public void setUp() throws Exception {
@@ -79,7 +79,7 @@ public class AbstractNetconfSessionTest {
             return null;
         }).when(eventLoop).execute(any(Runnable.class));
 
-        clientHello = NetconfHelloMessage.createClientHello(Collections.emptySet(), Optional.empty());
+        clientHello = HelloMessage.createClientHello(Set.of(), Optional.empty());
     }
 
     @Test
@@ -147,8 +147,7 @@ public class AbstractNetconfSessionTest {
     @Test
     public void testSendMessage() throws Exception {
         final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
-        final NetconfHelloMessage hello = NetconfHelloMessage.createClientHello(Collections.emptySet(),
-            Optional.empty());
+        final HelloMessage hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
         testingNetconfSession.sendMessage(hello);
         verify(channel).writeAndFlush(hello, writeFuture);
     }

@@ -30,7 +30,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
@@ -77,7 +77,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         LOG.debug("Default maximum incoming NETCONF chunk size is {} bytes", DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
-    private final @NonNull NetconfHelloMessage localHello;
+    private final @NonNull HelloMessage localHello;
     protected final Channel channel;
 
     private final @NonNegative int maximumIncomingChunkSize;
@@ -91,11 +91,11 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     @GuardedBy("this")
     private State state = State.IDLE;
 
-    protected AbstractNetconfSessionNegotiator(final NetconfHelloMessage hello, final Promise<S> promise,
+    protected AbstractNetconfSessionNegotiator(final HelloMessage hello, final Promise<S> promise,
                                                final Channel channel, final Timer timer, final L sessionListener,
                                                final long connectionTimeoutMillis,
                                                final @NonNegative int maximumIncomingChunkSize) {
-        this.localHello = requireNonNull(hello);
+        localHello = requireNonNull(hello);
         this.promise = requireNonNull(promise);
         this.channel = requireNonNull(channel);
         this.timer = timer;
@@ -106,14 +106,14 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     }
 
     @Deprecated(since = "4.0.1", forRemoval = true)
-    protected AbstractNetconfSessionNegotiator(final NetconfHelloMessage hello, final Promise<S> promise,
+    protected AbstractNetconfSessionNegotiator(final HelloMessage hello, final Promise<S> promise,
                                                final Channel channel, final Timer timer,
                                                final L sessionListener, final long connectionTimeoutMillis) {
         this(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis,
             DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
-    protected final @NonNull NetconfHelloMessage localHello() {
+    protected final @NonNull HelloMessage localHello() {
         return localHello;
     }
 
@@ -248,7 +248,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         }
     }
 
-    protected final S getSessionForHelloMessage(final NetconfHelloMessage netconfMessage)
+    protected final S getSessionForHelloMessage(final HelloMessage netconfMessage)
             throws NetconfDocumentedException {
         final Document doc = netconfMessage.getDocument();
 
@@ -260,7 +260,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         return getSession(sessionListener, channel, netconfMessage);
     }
 
-    protected abstract S getSession(L sessionListener, Channel channel, NetconfHelloMessage message)
+    protected abstract S getSession(L sessionListener, Channel channel, HelloMessage message)
         throws NetconfDocumentedException;
 
     /**
@@ -316,7 +316,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         LOG.debug("Changing state from : {} to : {} for channel: {}", state, newState, channel);
         checkState(isStateChangePermitted(state, newState),
                 "Cannot change state from %s to %s for channel %s", state, newState, channel);
-        this.state = newState;
+        state = newState;
     }
 
     private static boolean containsBase11Capability(final Document doc) {
@@ -376,7 +376,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
 
         LOG.debug("Negotiation read invoked on channel {}", channel);
         try {
-            handleMessage((NetconfHelloMessage) msg);
+            handleMessage((HelloMessage) msg);
         } catch (final Exception e) {
             LOG.debug("Unexpected error while handling negotiation message {} on channel {}", msg, channel, e);
             negotiationFailed(e);
@@ -389,5 +389,5 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         negotiationFailed(cause);
     }
 
-    protected abstract void handleMessage(NetconfHelloMessage msg) throws Exception;
+    protected abstract void handleMessage(HelloMessage msg) throws Exception;
 }
