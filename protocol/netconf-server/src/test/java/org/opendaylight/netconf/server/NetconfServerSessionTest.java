@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
@@ -93,7 +93,7 @@ public class NetconfServerSessionTest {
     public void testSendNotification() throws Exception {
         doNothing().when(listener).onNotification(any(), any());
         final Document msgDoc = XmlUtil.readXmlToDocument("<notification></notification>");
-        final NetconfNotification notif = new NetconfNotification(msgDoc);
+        final NotificationMessage notif = new NotificationMessage(msgDoc);
         session.sendMessage(notif);
         channel.runPendingTasks();
         final Object o = channel.readOutbound();

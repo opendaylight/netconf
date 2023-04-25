@@ -13,7 +13,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.api.monitoring.SessionListener;
@@ -114,7 +114,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
         throw new IllegalStateException("Unable to process incoming message", failure);
     }
 
-    public void onNotification(final NetconfServerSession session, final NetconfNotification notification) {
+    public void onNotification(final NetconfServerSession session, final NotificationMessage notification) {
         monitoringSessionListener.onSessionEvent(SessionEvent.notification(session));
     }
 

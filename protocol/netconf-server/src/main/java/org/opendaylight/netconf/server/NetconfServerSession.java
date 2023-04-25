@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSession;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
@@ -93,7 +93,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     @Override
     public ChannelFuture sendMessage(final NetconfMessage netconfMessage) {
         final ChannelFuture channelFuture = super.sendMessage(netconfMessage);
-        if (netconfMessage instanceof NetconfNotification notification) {
+        if (netconfMessage instanceof NotificationMessage notification) {
             outNotification++;
             sessionListener.onNotification(this, notification);
         }

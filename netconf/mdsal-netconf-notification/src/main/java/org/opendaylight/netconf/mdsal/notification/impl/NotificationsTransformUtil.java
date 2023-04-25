@@ -19,7 +19,7 @@ import org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeContext;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
@@ -53,16 +53,16 @@ public final class NotificationsTransformUtil {
     /**
      * Transform base notification for capabilities into NetconfNotification.
      */
-    public NetconfNotification transform(final Notification<?> notification, final Absolute path) {
+    public NotificationMessage transform(final Notification<?> notification, final Absolute path) {
         return transform(notification, Optional.empty(), path);
     }
 
-    public NetconfNotification transform(final Notification<?> notification, final Date eventTime,
+    public NotificationMessage transform(final Notification<?> notification, final Date eventTime,
             final Absolute path) {
         return transform(notification, Optional.ofNullable(eventTime), path);
     }
 
-    private NetconfNotification transform(final Notification<?> notification, final Optional<Date> eventTime,
+    private NotificationMessage transform(final Notification<?> notification, final Optional<Date> eventTime,
             final Absolute path) {
         final ContainerNode containerNode = serializer.toNormalizedNodeNotification(notification);
         final DOMResult result = new DOMResult(XmlUtil.newDocument());
@@ -72,7 +72,7 @@ public final class NotificationsTransformUtil {
             throw new IllegalStateException("Unable to serialize " + notification, e);
         }
         final Document node = (Document) result.getNode();
-        return eventTime.isPresent() ? new NetconfNotification(node, eventTime.orElseThrow())
-            : new NetconfNotification(node);
+        return eventTime.isPresent() ? new NotificationMessage(node, eventTime.orElseThrow())
+            : new NotificationMessage(node);
     }
 }

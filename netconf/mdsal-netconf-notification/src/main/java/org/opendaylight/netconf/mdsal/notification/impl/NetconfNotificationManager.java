@@ -27,7 +27,7 @@ import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
-import org.opendaylight.netconf.api.messages.NetconfNotification;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.NetconfNotificationListener;
@@ -129,7 +129,7 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
     }
 
     @Override
-    public synchronized void onNotification(final StreamNameType stream, final NetconfNotification notification) {
+    public synchronized void onNotification(final StreamNameType stream, final NotificationMessage notification) {
         LOG.debug("Notification of type {} detected", stream);
         if (LOG.isTraceEnabled()) {
             LOG.debug("Notification of type {} detected: {}", stream, notification);
@@ -282,7 +282,7 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
         }
 
         @Override
-        public void onNotification(final StreamNameType stream, final NetconfNotification notification) {
+        public void onNotification(final StreamNameType stream, final NotificationMessage notification) {
             checkState(baseListener != null, "Already closed");
             checkArgument(stream.equals(registeredStream));
             baseListener.onNotification(stream, notification);
@@ -308,7 +308,7 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
             baseRegistration.close();
         }
 
-        private NetconfNotification serializeNotification(final Notification<?> notification, final Absolute path) {
+        private NotificationMessage serializeNotification(final Notification<?> notification, final Absolute path) {
             return transformUtil.transform(notification, path);
         }
 
