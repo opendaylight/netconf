@@ -74,8 +74,7 @@
 
         <dependency>
             <groupId>org.xmlunit</groupId>
-            <artifactId>xmlunit-legacy</artifactId>
-            <scope>test</scope>
+            <artifactId>xmlunit-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>

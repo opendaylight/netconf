@@ -7,17 +7,13 @@
  */
 package org.opendaylight.netconf.mdsal.notification.impl;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
 
 import java.util.Date;
 import java.util.Set;
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -31,6 +27,9 @@ import org.opendaylight.yangtools.yang.binding.EventInstantAware;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.ElementSelectors;
 
 public class NotificationsTransformUtilTest {
     private static final Date DATE = new Date();
@@ -73,15 +72,16 @@ public class NotificationsTransformUtilTest {
     public void testTransformFromDOM() throws Exception {
         final var notification = new NotificationMessage(XmlUtil.readXmlToDocument(INNER_NOTIFICATION), DATE);
 
-        XMLUnit.setIgnoreWhitespace(true);
         compareXml(EXPECTED_NOTIFICATION, notification.toString());
     }
 
     private static void compareXml(final String expected, final String actual) throws Exception {
-        XMLUnit.setIgnoreWhitespace(true);
-        final var diff = new Diff(expected, actual);
-        final var detailedDiff = new DetailedDiff(diff);
-        detailedDiff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
-        assertTrue(detailedDiff.toString(), detailedDiff.similar());
+        final var diff = DiffBuilder.compare(expected)
+            .withTest(actual)
+            .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+            .checkForSimilar()
+            .build();
+
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 }
