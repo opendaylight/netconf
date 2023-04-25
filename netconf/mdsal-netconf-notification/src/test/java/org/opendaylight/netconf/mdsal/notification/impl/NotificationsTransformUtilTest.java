@@ -34,20 +34,19 @@ import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 public class NotificationsTransformUtilTest {
     private static final Date DATE = new Date();
-    private static final String INNER_NOTIFICATION =
-            "<netconf-capability-change xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-notifications\">"
-                    + "<deleted-capability>uri4</deleted-capability>"
-                    + "<deleted-capability>uri3</deleted-capability>"
-                    + "<added-capability>uri1</added-capability>"
-                    + "</netconf-capability-change>";
+    private static final String INNER_NOTIFICATION = """
+            <netconf-capability-change xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-notifications">
+                <deleted-capability>uri4</deleted-capability>
+                <deleted-capability>uri3</deleted-capability>
+                <added-capability>uri1</added-capability>
+            </netconf-capability-change>
+        """;
 
     private static final String EXPECTED_NOTIFICATION =
-            "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">"
-                    + INNER_NOTIFICATION
-                    + "<eventTime>"
-                    + NotificationMessage.RFC3339_DATE_FORMATTER.apply(DATE)
-                    + "</eventTime>"
-                    + "</notification>";
+        "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">\n"
+        + INNER_NOTIFICATION
+        + "    <eventTime>" + NotificationMessage.RFC3339_DATE_FORMATTER.apply(DATE) + "</eventTime>\n"
+        + "</notification>\n";
 
     private static NotificationsTransformUtil UTIL;
 
