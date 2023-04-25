@@ -26,6 +26,7 @@ import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.capability.YangModuleCapability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
+import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -81,7 +82,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     }
 
     @Override
-    public MdsalNetconfOperationService createService(final String netconfSessionIdForReporting) {
+    public NetconfOperationService createService(final String netconfSessionIdForReporting) {
         return new MdsalNetconfOperationService(currentSchemaContext, netconfSessionIdForReporting, dataBroker,
                 rpcService);
     }

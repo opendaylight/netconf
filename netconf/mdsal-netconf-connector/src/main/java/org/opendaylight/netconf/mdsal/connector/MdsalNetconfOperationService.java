@@ -7,31 +7,49 @@
  */
 package org.opendaylight.netconf.mdsal.connector;
 
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
+import org.opendaylight.netconf.mdsal.connector.ops.Commit;
+import org.opendaylight.netconf.mdsal.connector.ops.CopyConfig;
+import org.opendaylight.netconf.mdsal.connector.ops.DiscardChanges;
+import org.opendaylight.netconf.mdsal.connector.ops.EditConfig;
+import org.opendaylight.netconf.mdsal.connector.ops.Lock;
+import org.opendaylight.netconf.mdsal.connector.ops.RuntimeRpc;
+import org.opendaylight.netconf.mdsal.connector.ops.Unlock;
+import org.opendaylight.netconf.mdsal.connector.ops.Validate;
+import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
+import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 
-public class MdsalNetconfOperationService implements NetconfOperationService {
+final class MdsalNetconfOperationService implements NetconfOperationService {
+    private final ImmutableSet<NetconfOperation> operations;
+    private final TransactionProvider transactionProvider;
 
-    private final OperationProvider operationProvider;
+    MdsalNetconfOperationService(final CurrentSchemaContext schemaContext, final String netconfSessionIdForReporting,
+            final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
+        transactionProvider = new TransactionProvider(dataBroker, netconfSessionIdForReporting);
+        operations = ImmutableSet.of(
+            new Commit(netconfSessionIdForReporting, transactionProvider),
+            new DiscardChanges(netconfSessionIdForReporting, transactionProvider),
+            new EditConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
+            new CopyConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
+            new Get(netconfSessionIdForReporting, schemaContext, transactionProvider),
+            new GetConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
+            new Lock(netconfSessionIdForReporting),
+            new Unlock(netconfSessionIdForReporting),
+            new RuntimeRpc(netconfSessionIdForReporting, schemaContext, rpcService),
+            new Validate(netconfSessionIdForReporting, transactionProvider));
+    }
 
-    public MdsalNetconfOperationService(final CurrentSchemaContext schemaContext,
-                                        final String netconfSessionIdForReporting,
-                                        final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
-        this.operationProvider = new OperationProvider(netconfSessionIdForReporting, schemaContext, dataBroker,
-                rpcService);
+    @Override
+    public ImmutableSet<NetconfOperation> getNetconfOperations() {
+        return operations;
     }
 
     @Override
     public void close() {
-
+        // No-op
     }
-
-    @Override
-    public Set<NetconfOperation> getNetconfOperations() {
-        return operationProvider.getOperations();
-    }
-
 }
