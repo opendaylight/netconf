@@ -44,18 +44,16 @@ import org.opendaylight.yangtools.yang.common.Empty;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CapabilityChangeNotificationProducerTest {
-
-    private CapabilityChangeNotificationProducer capabilityChangeNotificationProducer;
-
     @Mock
     private BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
     @Mock
-    private ListenerRegistration listenerRegistration;
-
+    private ListenerRegistration<?> listenerRegistration;
     @Mock
     private NetconfNotificationCollector netconfNotificationCollector;
     @Mock
     private DataBroker dataBroker;
+
+    private CapabilityChangeNotificationProducer capabilityChangeNotificationProducer;
 
     @Before
     public void setUp() {

@@ -45,20 +45,18 @@ import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SessionNotificationProducerTest {
-
     private static final Logger LOG = LoggerFactory.getLogger(SessionNotificationProducerTest.class);
-
-    private SessionNotificationProducer publisher;
 
     @Mock
     private BaseNotificationPublisherRegistration registration;
     @Mock
-    private ListenerRegistration listenerRegistration;
-
+    private ListenerRegistration<?> listenerRegistration;
     @Mock
     private NetconfNotificationCollector netconfNotificationCollector;
     @Mock
     private DataBroker dataBroker;
+
+    private SessionNotificationProducer publisher;
 
     @Before
     public void setUp() {
