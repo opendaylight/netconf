@@ -116,7 +116,6 @@ public class NetconfServerSessionListenerTest {
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
     }
 
-    @SuppressWarnings("checkstyle:RegexpSinglelineJava")
     @Test
     public void testOnMessageDocumentedFail() throws Exception {
         final Document reply =
@@ -139,8 +138,6 @@ public class NetconfServerSessionListenerTest {
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.OUT_RPC_ERROR)));
         channel.runPendingTasks();
         final NetconfMessage sentMsg = channel.readOutbound();
-        System.out.println(XmlUtil.toString(sentMsg.getDocument()));
-        System.out.println(XmlUtil.toString(reply));
         final Diff diff = XMLUnit.compareXML(reply, sentMsg.getDocument());
         assertTrue(diff.toString(), diff.similar());
     }
