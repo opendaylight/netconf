@@ -5,14 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.notifications;
 
 /**
- * Registration for yang-library publisher.
- * This registration allows for publishing of yang library notification using generated classes
+ * Registration for yang-library publisher. This registration allows for publishing of YANG library notification using
+ * generated classes
  */
-public interface YangLibraryPublisherRegistration
-        extends NotificationRegistration, YangLibraryNotificationListener {
+public interface YangLibraryPublisherRegistration extends NotificationRegistration, YangLibraryNotificationListener {
 
 }

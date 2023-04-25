@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.notifications;
 
 /**
- * Registration for base notification publisher.
- * This registration allows for publishing of base netconf notifications using generated classes
+ * Registration for base notification publisher. This registration allows for publishing of base netconf notifications
+ * using generated classes
  */
 public interface BaseNotificationPublisherRegistration
         extends NotificationRegistration, BaseNetconfNotificationListener {
