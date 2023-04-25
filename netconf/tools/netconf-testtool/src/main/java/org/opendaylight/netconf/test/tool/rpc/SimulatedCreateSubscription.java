@@ -27,16 +27,16 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.impl.NetconfServerSession;
-import org.opendaylight.netconf.impl.mapping.operations.DefaultNetconfOperation;
+import org.opendaylight.netconf.server.NetconfServerSession;
+import org.opendaylight.netconf.server.mapping.operations.DefaultNetconfOperation;
 import org.opendaylight.netconf.util.mapping.AbstractLastNetconfOperation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public class SimulatedCreateSubscription extends AbstractLastNetconfOperation implements DefaultNetconfOperation {
-
     private final Map<Notification, NetconfMessage> notifications;
+
     private NetconfServerSession session;
     private ScheduledExecutorService scheduledExecutorService;
 
