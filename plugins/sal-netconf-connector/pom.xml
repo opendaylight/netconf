@@ -113,7 +113,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-impl</artifactId>
+      <artifactId>netconf-server</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
