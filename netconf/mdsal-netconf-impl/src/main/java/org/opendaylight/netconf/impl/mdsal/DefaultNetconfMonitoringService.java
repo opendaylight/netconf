@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.osgi.NetconfMonitoringServiceImpl;
 import org.osgi.service.component.annotations.Activate;
