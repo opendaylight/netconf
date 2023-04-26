@@ -69,9 +69,9 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BaseYangSwaggerGenerator {
+public abstract class BaseYangOpenApiGenerator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BaseYangSwaggerGenerator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BaseYangOpenApiGenerator.class);
 
     private static final String API_VERSION = "1.0.0";
     private static final String SWAGGER_VERSION = "2.0";
@@ -97,7 +97,7 @@ public abstract class BaseYangSwaggerGenerator {
         MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
 
-    protected BaseYangSwaggerGenerator(final Optional<DOMSchemaService> schemaService) {
+    protected BaseYangOpenApiGenerator(final Optional<DOMSchemaService> schemaService) {
         this.schemaService = schemaService.orElse(null);
     }
 
