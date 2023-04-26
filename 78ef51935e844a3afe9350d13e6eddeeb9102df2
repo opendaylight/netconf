@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5195a5c4_3522817d",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-26T08:01:11Z",
+      "side": 0,
+      "message": "We can online this below.",
+      "revId": "78ef51935e844a3afe9350d13e6eddeeb9102df2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

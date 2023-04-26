@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b54ab864_ddfd5564",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiGeneratorRFC8040.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-26T08:01:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed456fa5_991cd49d",
+      "revId": "a0085d7c3d8a0424e12a8048c3ca8d95425cdd31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3aeea3c5_7d8f7f52",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-04-26T07:51:40Z",
       "side": 1,
       "message": "Wrong formatting.",
+      "revId": "a0085d7c3d8a0424e12a8048c3ca8d95425cdd31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7700b909_1fe1a70f",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiGeneratorRFC8040.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-26T08:01:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3aeea3c5_7d8f7f52",
       "revId": "a0085d7c3d8a0424e12a8048c3ca8d95425cdd31",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
