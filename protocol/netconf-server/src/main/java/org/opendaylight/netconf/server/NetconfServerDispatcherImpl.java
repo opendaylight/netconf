@@ -12,8 +12,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalServerChannel;
 import java.net.InetSocketAddress;
-import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
+import org.opendaylight.netconf.server.api.NetconfServerDispatcher;
 
 public class NetconfServerDispatcherImpl extends AbstractNetconfDispatcher<NetconfServerSession,
         NetconfServerSessionListener> implements NetconfServerDispatcher {

@@ -9,7 +9,7 @@ package org.opendaylight.netconf.tcp;
 
 import io.netty.channel.ChannelFuture;
 import java.net.InetSocketAddress;
-import org.opendaylight.netconf.api.NetconfServerDispatcher;
+import org.opendaylight.netconf.server.api.NetconfServerDispatcher;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
