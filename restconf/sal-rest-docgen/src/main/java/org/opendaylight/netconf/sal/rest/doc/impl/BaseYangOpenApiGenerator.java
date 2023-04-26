@@ -353,8 +353,15 @@ public abstract class BaseYangOpenApiGenerator {
                 final String newParent = parentName + "_" + node.getQName().getLocalName();
                 final String localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
                 final String newResourcePath = resourcePath + "/" + createPath(childNode, pathParams, localName);
+                final ArrayNode filteredPathParams = JsonNodeFactory.instance.arrayNode();
+                for (final JsonNode param: pathParams) {
+                    final String regex = ".*\\{" + param.get("name").asText() + "\\}.*";
+                    if (newResourcePath.matches(regex)) {
+                        filteredPathParams.add(param);
+                    }
+                }
                 final boolean newIsConfig = isConfig && childNode.isConfiguration();
-                addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
+                addPaths(childNode, deviceName, moduleName, paths, filteredPathParams, schemaContext,
                     newIsConfig, newParent, definitionNames, newResourcePath);
             }
         }
