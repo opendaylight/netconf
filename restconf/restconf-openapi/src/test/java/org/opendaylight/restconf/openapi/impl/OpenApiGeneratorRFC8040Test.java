@@ -30,6 +30,7 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
     private static final String CHOICE_TEST_MODULE = "choice-test";
+    private static final String PATH_PARAMS_TEST_MODULE = "path-params-test";
     private static final String RECURSIVE_TEST_MODULE = "recursive";
 
     private final OpenApiGeneratorRFC8040 generator = new OpenApiGeneratorRFC8040(SCHEMA_SERVICE);
@@ -216,5 +217,29 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
             assertFalse(patch.isMissingNode());
             assertEquals(expectedSize, patch.get("parameters").size());
         }
+    }
+
+    /**
+     * Test that request parameters are correctly numbered.
+     *
+     * <p>
+     * It means we should have name and name1, etc. when we have the same parameter in path multiple times.
+     */
+    @Test
+    public void testParametersNumbering() {
+        final var module = CONTEXT.findModule(PATH_PARAMS_TEST_MODULE).orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+
+        var pathToList1 = "/rests/data/path-params-test:cont/list1={name}";
+        assertTrue(doc.getPaths().containsKey(pathToList1));
+        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList1));
+
+        var pathToList2 = "/rests/data/path-params-test:cont/list1={name}/list2={name1}";
+        assertTrue(doc.getPaths().containsKey(pathToList2));
+        assertEquals(List.of("name", "name1"), getPathParameters(doc.getPaths(), pathToList2));
+
+        var pathToList3 = "/rests/data/path-params-test:cont/list3={name}";
+        assertTrue(doc.getPaths().containsKey(pathToList3));
+        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList3));
     }
 }

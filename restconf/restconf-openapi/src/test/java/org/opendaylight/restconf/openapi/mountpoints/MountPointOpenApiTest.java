@@ -112,7 +112,7 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         final Map<String, Path> paths = mountPointApi.getPaths();
         assertNotNull(paths);
 
-        assertEquals("Unexpected api list size", 31, paths.size());
+        assertEquals("Unexpected api list size", 35, paths.size());
 
         final List<JsonNode> getOperations = new ArrayList<>();
         final List<JsonNode> postOperations = new ArrayList<>();
@@ -128,11 +128,11 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
             Optional.ofNullable(path.getValue().getDelete()).ifPresent(deleteOperations::add);
         }
 
-        assertEquals("Unexpected GET paths size", 23, getOperations.size());
-        assertEquals("Unexpected POST paths size", 29, postOperations.size());
-        assertEquals("Unexpected PUT paths size", 21, putOperations.size());
-        assertEquals("Unexpected PATCH paths size", 21, patchOperations.size());
-        assertEquals("Unexpected DELETE paths size", 21, deleteOperations.size());
+        assertEquals("Unexpected GET paths size", 27, getOperations.size());
+        assertEquals("Unexpected POST paths size", 33, postOperations.size());
+        assertEquals("Unexpected PUT paths size", 25, putOperations.size());
+        assertEquals("Unexpected PATCH paths size", 25, patchOperations.size());
+        assertEquals("Unexpected DELETE paths size", 25, deleteOperations.size());
     }
 
     /**
@@ -181,5 +181,32 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
             assertFalse(patch.isMissingNode());
             assertEquals(expectedSize, patch.get("parameters").size());
         }
+    }
+
+    /**
+     * Test that request parameters are correctly numbered.
+     *
+     * <p>
+     * It means we should have name and name1, etc. when we have the same parameter in path multiple times.
+     */
+    @Test
+    public void testParametersNumberingForMountPointApi() throws Exception {
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+
+        var pathToList1 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}";
+        assertTrue(mountPointApi.getPaths().containsKey(pathToList1));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList1));
+
+        var pathToList2 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list2={name1}";
+        assertTrue(mountPointApi.getPaths().containsKey(pathToList2));
+        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.getPaths(), pathToList2));
+
+        var pathToList3 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
+        assertTrue(mountPointApi.getPaths().containsKey(pathToList3));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList3));
     }
 }
