@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-public class NetconfOperationRouterImpl implements NetconfOperationRouter {
+public class NetconfOperationRouterImpl implements NetconfOperationRouter, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfOperationRouterImpl.class);
 
     private final NetconfOperationService netconfOperationServiceSnapshot;
