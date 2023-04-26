@@ -277,27 +277,12 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>mdsal-netconf-notification</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>mdsal-netconf-ssh</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>mdsal-netconf-tcp</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-topology</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-topology-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -324,17 +309,35 @@
                 <version>${project.version}</version>
                 <type>test-jar</type>
             </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-topology-singleton</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+
+            <!-- Applications -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-console</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-events-mdsal</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-topology</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-topology-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-topology-singleton</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
+            <!-- Shaded third-party libraries -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>shaded-exificient</artifactId>
