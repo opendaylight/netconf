@@ -11,8 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
-import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
+import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactoryListener;

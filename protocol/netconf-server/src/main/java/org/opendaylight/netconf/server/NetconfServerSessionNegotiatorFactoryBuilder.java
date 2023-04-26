@@ -13,9 +13,9 @@ import static java.util.Objects.requireNonNull;
 import io.netty.util.Timer;
 import java.util.Set;
 import org.checkerframework.checker.index.qual.NonNegative;
-import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
+import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 
 public class NetconfServerSessionNegotiatorFactoryBuilder {
