@@ -9,8 +9,8 @@ package org.opendaylight.netconf.test.tool.operations;
 
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 
 /**
  * Creator which enables testtool users to inject own. implementation of {@link NetconfOperationService}

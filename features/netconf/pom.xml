@@ -33,7 +33,6 @@
     <module>odl-netconf-api</module>
     <module>odl-netconf-client</module>
     <module>odl-netconf-impl</module>
-    <module>odl-netconf-mapping-api</module>
     <module>odl-netconf-mdsal</module>
     <module>odl-netconf-netty-util</module>
     <module>odl-netconf-notifications-api</module>

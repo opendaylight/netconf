@@ -19,10 +19,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
-import org.opendaylight.netconf.mapping.api.NetconfOperation;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
+import org.opendaylight.netconf.server.api.operations.NetconfOperation;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactoryListener;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 
