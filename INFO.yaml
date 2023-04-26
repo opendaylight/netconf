@@ -34,7 +34,7 @@ repositories:
     - netconf
 committers:
     - <<: *odl_netconf_ptl
-    - name: 'Tomas Cere'
+    - name: 'Tomáš Cére'
       email: 'tomas.cere@pantheon.tech'
       company: 'pantheon'
       id: 'tcere'
