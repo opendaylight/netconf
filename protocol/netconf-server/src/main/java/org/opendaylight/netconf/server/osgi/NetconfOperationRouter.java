@@ -11,7 +11,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.w3c.dom.Document;
 
-public interface NetconfOperationRouter extends AutoCloseable {
+public interface NetconfOperationRouter {
 
     Document onNetconfMessage(Document message, NetconfServerSession session) throws DocumentedException;
 }
