@@ -12,7 +12,7 @@ import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.netconf.server.SessionIdProvider;
+import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.yangtools.concepts.Registration;
 
 

@@ -15,6 +15,8 @@ import java.net.InetSocketAddress;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.opendaylight.netconf.server.api.SessionIdProvider;
+import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 
 public class NetconfDispatcherImplTest {

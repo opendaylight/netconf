@@ -17,7 +17,7 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.ServerChannelInitializer;
-import org.opendaylight.netconf.server.SessionIdProvider;
+import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentFactory;

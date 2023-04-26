@@ -5,11 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.server;
+package org.opendaylight.netconf.server.impl;
 
 import java.util.concurrent.atomic.AtomicLong;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.osgi.service.component.annotations.Component;
 
 /**

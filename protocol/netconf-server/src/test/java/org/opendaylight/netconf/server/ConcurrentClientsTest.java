@@ -70,6 +70,8 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.nettyutil.NeverReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
+import org.opendaylight.netconf.server.api.SessionIdProvider;
+import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;

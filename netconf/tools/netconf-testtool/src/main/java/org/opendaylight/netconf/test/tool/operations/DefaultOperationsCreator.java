@@ -13,7 +13,7 @@ import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.server.SessionIdProvider;
+import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.test.tool.rpc.DataList;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedCommit;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedCreateSubscription;

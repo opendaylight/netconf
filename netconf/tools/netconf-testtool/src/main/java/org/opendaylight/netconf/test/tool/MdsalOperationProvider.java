@@ -35,7 +35,7 @@ import org.opendaylight.netconf.mdsal.connector.ops.Lock;
 import org.opendaylight.netconf.mdsal.connector.ops.Unlock;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
-import org.opendaylight.netconf.server.SessionIdProvider;
+import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;

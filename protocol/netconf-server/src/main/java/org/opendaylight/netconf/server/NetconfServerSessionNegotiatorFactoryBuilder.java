@@ -16,6 +16,7 @@ import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
+import org.opendaylight.netconf.server.api.SessionIdProvider;
 
 public class NetconfServerSessionNegotiatorFactoryBuilder {
     private Timer timer;

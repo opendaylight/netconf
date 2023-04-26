@@ -25,6 +25,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiatorFactory;
+import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.osgi.NetconfOperationRouterImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
