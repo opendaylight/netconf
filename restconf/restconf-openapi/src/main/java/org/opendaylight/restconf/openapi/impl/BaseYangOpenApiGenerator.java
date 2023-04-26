@@ -345,6 +345,7 @@ public abstract class BaseYangOpenApiGenerator {
                 final boolean newIsConfig = isConfig && childNode.isConfiguration();
                 addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
                     newIsConfig, newParent, definitionNames, newResourcePath);
+                pathParams.removeAll();
             }
         }
     }
