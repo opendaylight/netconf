@@ -329,7 +329,7 @@ public abstract class BaseYangOpenApiGenerator {
             final String resourcePath) {
         LOG.debug("Adding path: [{}]", resourcePath);
 
-        final ArrayNode pathParams = JsonUtil.copy(parentPathParams);
+        ArrayNode pathParams = JsonUtil.copy(parentPathParams);
         Iterable<? extends DataSchemaNode> childSchemaNodes = Collections.emptySet();
         if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
@@ -356,6 +356,7 @@ public abstract class BaseYangOpenApiGenerator {
                 final boolean newIsConfig = isConfig && childNode.isConfiguration();
                 addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
                     newIsConfig, newParent, definitionNames, newResourcePath);
+                pathParams = JsonNodeFactory.instance.arrayNode();
             }
         }
     }

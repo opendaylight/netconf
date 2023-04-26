@@ -26,6 +26,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
     private static final String CHOICE_TEST_MODULE = "choice-test";
+    private static final String PATH_PARAMS_TEST_MODULE = "path-params-test";
     private static final String PROPERTIES = "properties";
     private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
 
@@ -166,5 +167,33 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         JsonNode secondContainer = schemas.get("choice-test_second-container");
         assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
+    }
+
+    @Test
+    public void testPathsWithSimilarKeys() {
+        final var module = CONTEXT.findModule(PATH_PARAMS_TEST_MODULE).orElseThrow();
+        final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+
+        var parameterNamesList1 = getPatchParametersNames(doc.getPaths(), "/rests/data/path-params-test:cont"
+                + "/list1={name}");
+        assertEquals(List.of("name"), parameterNamesList1);
+
+        var parameterNamesList2 = getPatchParametersNames(doc.getPaths(), "/rests/data/path-params-test:cont"
+                + "/list1={name}/list2={name1}");
+        assertEquals(List.of("name", "name1"), parameterNamesList2);
+
+        var parameterNamesList3 = getPatchParametersNames(doc.getPaths(), "/rests/data/path-params-test:cont"
+                + "/list3={name}");
+        assertEquals(List.of("name"), parameterNamesList3);
+    }
+
+    private static List<String> getPatchParametersNames(final ObjectNode paths, final String path) {
+        final var jsonNode = paths.get(path)
+                .get("patch")
+                .get("parameters")
+                .elements();
+        return ImmutableList.copyOf(jsonNode).stream()
+                .map(parameter -> parameter.get("name").asText())
+                .toList();
     }
 }
