@@ -1,8 +1,8 @@
 .. _netconf:
 
-#######
-NetConf
-#######
+##############################
+NETCONF/RESTCONF documentation
+##############################
 
 .. toctree::
    :maxdepth: 1
