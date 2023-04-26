@@ -12,7 +12,7 @@ import java.util.Collection;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 
@@ -23,8 +23,8 @@ public final class NetconfState {
     private Sessions sessions;
 
     public NetconfState(final NetconfMonitoringService monitoringService) {
-        this.sessions = monitoringService.getSessions();
-        this.schemas = monitoringService.getSchemas();
+        sessions = monitoringService.getSessions();
+        schemas = monitoringService.getSchemas();
     }
 
     public NetconfState() {

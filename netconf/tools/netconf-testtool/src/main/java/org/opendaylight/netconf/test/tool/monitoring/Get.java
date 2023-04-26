@@ -9,9 +9,9 @@ package org.opendaylight.netconf.test.tool.monitoring;
 
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.AbstractNetconfOperation;
 import org.opendaylight.netconf.server.api.operations.HandlingPriority;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;

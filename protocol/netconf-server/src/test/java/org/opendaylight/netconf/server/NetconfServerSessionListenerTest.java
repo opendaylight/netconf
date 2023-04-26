@@ -29,10 +29,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
-import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
-import org.opendaylight.netconf.api.monitoring.SessionEvent;
-import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
+import org.opendaylight.netconf.server.api.monitoring.SessionListener;
 import org.opendaylight.netconf.server.osgi.NetconfOperationRouterImpl;
 import org.w3c.dom.Document;
 

@@ -14,10 +14,10 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -28,11 +28,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public final class GetSchema extends AbstractSingletonNetconfOperation {
+    private static final Logger LOG = LoggerFactory.getLogger(GetSchema.class);
     private static final String GET_SCHEMA = "get-schema";
     private static final String IDENTIFIER = "identifier";
     private static final String VERSION = "version";
 
-    private static final Logger LOG = LoggerFactory.getLogger(GetSchema.class);
     private final NetconfMonitoringService monitoring;
 
     public GetSchema(final String netconfSessionIdForReporting, final NetconfMonitoringService monitoring) {

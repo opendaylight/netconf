@@ -25,7 +25,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
@@ -40,7 +40,6 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class MonitoringToMdsalWriterTest {
-
     private static final InstanceIdentifier<NetconfState> INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(NetconfState.class);
 
