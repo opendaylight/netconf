@@ -9,12 +9,14 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -27,6 +29,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
+import org.opendaylight.netconf.sal.rest.doc.swagger.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -101,5 +104,33 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
 
         assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
             "/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
+    }
+
+    /**
+     * Test that request parameters are correctly numbered.
+     *
+     * <p>
+     * It means we should have name and name1, etc. when we have the same parameter in path multiple times.
+     */
+    @Test
+    public void testParametersNumberingForMountPointApi() throws Exception {
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        swagger.onMountPointCreated(INSTANCE_ID);
+
+        final OpenApiObject mountPointApi = (OpenApiObject) swagger.getMountPointApi(mockInfo, 1L, Optional.empty(),
+                OAversion.V3_0);
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+
+        var pathToList1 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}";
+        assertTrue(mountPointApi.getPaths().has(pathToList1));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList1));
+
+        var pathToList2 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list2={name1}";
+        assertTrue(mountPointApi.getPaths().has(pathToList2));
+        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.getPaths(), pathToList2));
+
+        var pathToList3 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
+        assertTrue(mountPointApi.getPaths().has(pathToList3));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList3));
     }
 }
