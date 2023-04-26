@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
-import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX;
+import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator.MODULE_NAME_SUFFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.COMPONENTS_PREFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.NAME_KEY;
