@@ -1,7 +1,7 @@
 .. _netconf:
 
 ##############################
-NETCONF/RESTCONF documentation
+NETCONF/RESTCONF Documentation
 ##############################
 
 .. toctree::
