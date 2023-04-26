@@ -29,12 +29,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>odl-netconf-mapping-api</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-util</artifactId>
             <type>xml</type>
             <classifier>features</classifier>

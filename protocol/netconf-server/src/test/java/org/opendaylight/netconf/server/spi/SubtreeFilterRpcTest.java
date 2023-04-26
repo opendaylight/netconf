@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.util.messages;
+package org.opendaylight.netconf.server.spi;
 
 import static org.junit.Assert.assertTrue;
 
@@ -42,7 +41,7 @@ public class SubtreeFilterRpcTest {
         return result;
     }
 
-    public SubtreeFilterRpcTest(int directoryIndex) {
+    public SubtreeFilterRpcTest(final int directoryIndex) {
         this.directoryIndex = directoryIndex;
     }
 
@@ -63,7 +62,7 @@ public class SubtreeFilterRpcTest {
 
     }
 
-    public Document getDocument(String fileName) throws SAXException, IOException {
+    public Document getDocument(final String fileName) throws SAXException, IOException {
         return XmlUtil.readXmlToDocument(
                 getClass().getResourceAsStream("/subtree/rpc/" + directoryIndex + "/" + fileName));
     }

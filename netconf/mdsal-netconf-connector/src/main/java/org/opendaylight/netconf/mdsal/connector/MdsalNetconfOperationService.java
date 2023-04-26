@@ -10,8 +10,6 @@ package org.opendaylight.netconf.mdsal.connector;
 import com.google.common.collect.ImmutableSet;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.netconf.mapping.api.NetconfOperation;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mdsal.connector.ops.Commit;
 import org.opendaylight.netconf.mdsal.connector.ops.CopyConfig;
 import org.opendaylight.netconf.mdsal.connector.ops.DiscardChanges;
@@ -22,6 +20,8 @@ import org.opendaylight.netconf.mdsal.connector.ops.Unlock;
 import org.opendaylight.netconf.mdsal.connector.ops.Validate;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
+import org.opendaylight.netconf.server.api.operations.NetconfOperation;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 
 final class MdsalNetconfOperationService implements NetconfOperationService {
     private final ImmutableSet<NetconfOperation> operations;

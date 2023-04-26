@@ -103,10 +103,6 @@
             <artifactId>rfc6991</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>netconf-mapping-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>mdsal-netconf-monitoring</artifactId>
         </dependency>
