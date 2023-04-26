@@ -10,20 +10,17 @@ package org.opendaylight.netconf.mdsal.connector.ops.get;
 import static java.util.Objects.requireNonNull;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Before;
@@ -37,13 +34,11 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
 @RunWith(value = Parameterized.class)
 public class FilterContentValidatorTest {
-
     private static final int TEST_CASE_COUNT = 13;
     private static final Pattern LIST_ENTRY_PATTERN =
             Pattern.compile("(?<listName>.*)\\[\\{(?<keys>(.*)(, .*)*)\\}\\]");
@@ -55,14 +50,14 @@ public class FilterContentValidatorTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() throws Exception {
-        final List<Object[]> result = new ArrayList<>();
-        final Path path = Paths.get(FilterContentValidatorTest.class.getResource("/filter/expected.txt").toURI());
-        final List<String> expected = Files.readAllLines(path);
+        final var result = new ArrayList<Object[]>();
+        final var expected = Files.readAllLines(
+            Paths.get(FilterContentValidatorTest.class.getResource("/filter/expected.txt").toURI()));
         if (expected.size() != TEST_CASE_COUNT) {
             throw new InitializationError("Number of lines in results file must be same as test case count");
         }
         for (int i = 1; i <= TEST_CASE_COUNT; i++) {
-            final Document document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class.getResourceAsStream(
+            final var document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class.getResourceAsStream(
                     "/filter/f" + i + ".xml"));
             result.add(new Object[]{document, expected.get(i - 1)});
         }
@@ -76,11 +71,11 @@ public class FilterContentValidatorTest {
 
     @Before
     public void setUp() throws Exception {
-        final SchemaContext context = YangParserTestUtils.parseYangResources(FilterContentValidatorTest.class,
+        final var context = YangParserTestUtils.parseYangResources(FilterContentValidatorTest.class,
             "/yang/filter-validator-test-mod-0.yang", "/yang/filter-validator-test-augment.yang",
             "/yang/mdsal-netconf-mapping-test.yang");
 
-        final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
+        final var currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
         validator = new FilterContentValidator(currentContext);
     }
@@ -90,7 +85,7 @@ public class FilterContentValidatorTest {
         assumeThat(expected, startsWith("success"));
 
         final String expId = expected.replace("success=", "");
-        final YangInstanceIdentifier actual = validator.validate(filterContent);
+        final var actual = validator.validate(filterContent);
         assertEquals(fromString(expId), actual);
     }
 
@@ -98,30 +93,26 @@ public class FilterContentValidatorTest {
     public void testValidateError() {
         assumeThat(expected, startsWith("error"));
 
-        try {
-            validator.validate(filterContent);
-            fail(XmlUtil.toString(filterContent) + " is not valid and should throw exception.");
-        } catch (final DocumentedException e) {
-            final String expectedExceptionClass = expected.replace("error=", "");
-            assertEquals(expectedExceptionClass, e.getClass().getName());
-        }
+        final var ex = assertThrows(DocumentedException.class, () -> validator.validate(filterContent));
+        final String expectedExceptionClass = expected.replace("error=", "");
+        assertEquals(expectedExceptionClass, ex.getClass().getName());
     }
 
     private static YangInstanceIdentifier fromString(final String input) {
         //remove first /
         final String yid = input.substring(1);
-        final List<String> pathElements = Arrays.asList(yid.split("/"));
-        final YangInstanceIdentifier.InstanceIdentifierBuilder builder = YangInstanceIdentifier.builder();
+        final var pathElements = Arrays.asList(yid.split("/"));
+        final var builder = YangInstanceIdentifier.builder();
         //if not specified, PathArguments inherit namespace and revision from previous PathArgument
         QName prev = null;
-        for (final String pathElement : pathElements) {
-            final Matcher matcher = LIST_ENTRY_PATTERN.matcher(pathElement);
+        for (var pathElement : pathElements) {
+            final var matcher = LIST_ENTRY_PATTERN.matcher(pathElement);
             if (matcher.matches()) {
                 prev = parseListEntry(builder, prev, matcher);
             } else {
-                final QName qName = createNodeQName(prev, pathElement);
-                builder.node(qName);
-                prev = qName;
+                final var qname = createNodeQName(prev, pathElement);
+                builder.node(qname);
+                prev = qname;
             }
         }
         return builder.build();
@@ -129,17 +120,14 @@ public class FilterContentValidatorTest {
 
     private static QName parseListEntry(final YangInstanceIdentifier.InstanceIdentifierBuilder builder,
                                         final QName prev, final Matcher matcher) {
-        final Map<QName, Object> keys = new HashMap<>();
+        final var keys = new HashMap<QName, Object>();
         final String listName = matcher.group("listName");
         final QName listQName = createNodeQName(prev, listName);
         final String keysString = matcher.group("keys");
-        final String[] split = keysString.split(",");
-        for (final String s : split) {
-            final Matcher keyMatcher = KEY_VALUE_PATTERN.matcher(s.trim());
+        for (var str : keysString.split(",")) {
+            final Matcher keyMatcher = KEY_VALUE_PATTERN.matcher(str.trim());
             if (keyMatcher.matches()) {
-                final QName keyName = QName.create(keyMatcher.group("key"));
-                final String keyValue = keyMatcher.group("value");
-                keys.put(keyName, keyValue);
+                keys.put(QName.create(keyMatcher.group("key")), keyMatcher.group("value"));
             }
         }
         builder.nodeWithKey(listQName, keys);

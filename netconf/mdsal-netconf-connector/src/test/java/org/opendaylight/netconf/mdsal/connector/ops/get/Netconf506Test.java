@@ -11,44 +11,35 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.Test;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
-import org.w3c.dom.Document;
 
 public class Netconf506Test {
-
     private static final QName BASE = QName.create("urn:dummy:mod-0", "2016-03-01", "mainroot");
 
     @Test
     public void testValidateTypes() throws Exception {
-        final SchemaContext context = YangParserTestUtils.parseYangResources(Bug8084.class,
+        final var context = YangParserTestUtils.parseYangResources(Bug8084.class,
                 "/yang/filter-validator-test-mod-0.yang", "/yang/mdsal-netconf-mapping-test.yang");
-        final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
+        final var currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
-        final FilterContentValidator validator = new FilterContentValidator(currentContext);
+        final var validator = new FilterContentValidator(currentContext);
 
-        final Document document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class
+        final var document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class
                 .getResourceAsStream("/filter/netconf506.xml"));
 
-        final XmlElement xmlElement = XmlElement.fromDomDocument(document);
-        final YangInstanceIdentifier actual = validator.validate(xmlElement);
+        final var xmlElement = XmlElement.fromDomDocument(document);
+        final var actual = validator.validate(xmlElement);
 
-        final Map<QName, Object> inputs = new HashMap<>();
-        inputs.put(QName.create(BASE, "name"), "foo");
-
-        final YangInstanceIdentifier expected = YangInstanceIdentifier.builder()
-                .node(BASE)
-                .node(QName.create(BASE, "leafref-key-list"))
-                .nodeWithKey(QName.create(BASE, "leafref-key-list"), inputs)
-                .build();
-        assertEquals(expected, actual);
+        assertEquals(YangInstanceIdentifier.builder()
+            .node(BASE)
+            .node(QName.create(BASE, "leafref-key-list"))
+            .nodeWithKey(QName.create(BASE, "leafref-key-list"), QName.create(BASE, "name"), "foo")
+            .build(), actual);
     }
 }

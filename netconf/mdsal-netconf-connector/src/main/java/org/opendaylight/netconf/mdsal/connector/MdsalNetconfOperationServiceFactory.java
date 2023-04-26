@@ -31,10 +31,8 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.Submodule;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
@@ -89,20 +87,23 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
 
     @Override
     public Set<Capability> getCapabilities() {
+        // FIXME: cache returned set
         return transformCapabilities(currentSchemaContext.getCurrentContext(), rootSchemaSourceProviderDependency);
     }
 
+    // FIXME: ImmutableSet
     static Set<Capability> transformCapabilities(
-            final SchemaContext currentContext,
+            final EffectiveModelContext currentContext,
             final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
-        final Set<Capability> capabilities = new HashSet<>();
+        final var capabilities = new HashSet<Capability>();
 
         // Added by netconf-impl by default
         // capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
 
-        for (final Module module : currentContext.getModules()) {
+        // FIXME: rework in terms of ModuleEffectiveStatement
+        for (var module : currentContext.getModules()) {
             moduleToCapability(module, rootSchemaSourceProviderDependency).ifPresent(capabilities::add);
-            for (final Submodule submodule : module.getSubmodules()) {
+            for (var submodule : module.getSubmodules()) {
                 moduleToCapability(submodule, rootSchemaSourceProviderDependency).ifPresent(capabilities::add);
             }
         }
