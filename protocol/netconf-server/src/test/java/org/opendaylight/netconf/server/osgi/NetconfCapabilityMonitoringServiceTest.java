@@ -107,7 +107,7 @@ public class NetconfCapabilityMonitoringServiceTest {
         monitoringService.onCapabilitiesChanged(capabilities, Set.of());
         monitoringService.setNotificationPublisher(notificationPublisher);
         monitoringService.registerListener(listener);
-        capabilitiesSize = monitoringService.getCapabilities().getCapability().size();
+        capabilitiesSize = monitoringService.getCapabilities().requireCapability().size();
     }
 
     @Test
@@ -123,7 +123,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     @Test
     public void testGetSchemas() {
         Schemas schemas = monitoringService.getSchemas();
-        Schema schema = schemas.getSchema().values().iterator().next();
+        Schema schema = schemas.nonnullSchema().values().iterator().next();
         assertEquals(TEST_MODULE_NAMESPACE, schema.getNamespace());
         assertEquals(TEST_MODULE_NAME, schema.getIdentifier());
         assertEquals(TEST_MODULE_REV, schema.getVersion());
@@ -162,7 +162,7 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     @Test
     public void testClose() {
-        assertEquals(6, monitoringService.getCapabilities().getCapability().size());
+        assertEquals(6, monitoringService.getCapabilities().requireCapability().size());
         monitoringService.close();
         assertEquals(Set.of(), monitoringService.getCapabilities().getCapability());
     }
@@ -186,9 +186,9 @@ public class NetconfCapabilityMonitoringServiceTest {
 
         //verify listener calls
         final List<Capabilities> listenerValues = monitoringListenerCaptor.getAllValues();
-        final Set<Uri> afterRegisterState = listenerValues.get(0).getCapability();
-        final Set<Uri> afterAddState = listenerValues.get(1).getCapability();
-        final Set<Uri> afterRemoveState = listenerValues.get(2).getCapability();
+        final Set<Uri> afterRegisterState = listenerValues.get(0).requireCapability();
+        final Set<Uri> afterAddState = listenerValues.get(1).requireCapability();
+        final Set<Uri> afterRemoveState = listenerValues.get(2).requireCapability();
 
         assertEquals(capabilitiesSize, afterRegisterState.size());
         assertEquals(capabilitiesSize + 1, afterAddState.size());
