@@ -10,6 +10,9 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.BeforeClass;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -24,5 +27,12 @@ public abstract class AbstractApiDocTest {
         CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/yang");
         SCHEMA_SERVICE = mock(DOMSchemaService.class);
         when(SCHEMA_SERVICE.getGlobalContext()).thenReturn(CONTEXT);
+    }
+
+    protected static List<String> getPathParameters(final ObjectNode paths, final String path) {
+        final var params = new ArrayList<String>();
+        paths.get(path).get("post").get("parameters").elements()
+            .forEachRemaining(p -> params.add(p.get("name").asText()));
+        return params;
     }
 }
