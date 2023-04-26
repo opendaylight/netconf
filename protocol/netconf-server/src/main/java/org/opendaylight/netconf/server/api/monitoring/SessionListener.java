@@ -5,14 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+package org.opendaylight.netconf.server.api.monitoring;
 
-package org.opendaylight.netconf.api.monitoring;
-
-/**
- * Created by mmarsale on 13.2.2015.
- */
 public interface SessionListener {
-
     /**
      * Callback used to notify about netconf session start.
      *

@@ -5,16 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.api.monitoring;
+package org.opendaylight.netconf.server.api.monitoring;
 
 /**
- * Class represents change in netconf session.
+ * Class represents change in a {@link NetconfManagementSession}.
  */
 public final class SessionEvent {
     private final NetconfManagementSession session;
     private final Type type;
 
-    private SessionEvent(NetconfManagementSession session, Type type) {
+    private SessionEvent(final NetconfManagementSession session, final Type type) {
         this.session = session;
         this.type = type;
     }
@@ -37,19 +37,19 @@ public final class SessionEvent {
         return type;
     }
 
-    public static SessionEvent inRpcSuccess(NetconfManagementSession session) {
+    public static SessionEvent inRpcSuccess(final NetconfManagementSession session) {
         return new SessionEvent(session, Type.IN_RPC_SUCCESS);
     }
 
-    public static SessionEvent inRpcFail(NetconfManagementSession session) {
+    public static SessionEvent inRpcFail(final NetconfManagementSession session) {
         return new SessionEvent(session, Type.IN_RPC_FAIL);
     }
 
-    public static SessionEvent outRpcError(NetconfManagementSession session) {
+    public static SessionEvent outRpcError(final NetconfManagementSession session) {
         return new SessionEvent(session, Type.OUT_RPC_ERROR);
     }
 
-    public static SessionEvent notification(NetconfManagementSession session) {
+    public static SessionEvent notification(final NetconfManagementSession session) {
         return new SessionEvent(session, Type.NOTIFICATION);
     }
 
@@ -57,7 +57,6 @@ public final class SessionEvent {
      * Session event type.
      */
     public enum Type {
-
         /**
          * Correct rpc message received.
          */
