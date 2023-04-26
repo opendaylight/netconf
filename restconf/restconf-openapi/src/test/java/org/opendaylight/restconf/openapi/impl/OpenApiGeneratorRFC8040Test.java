@@ -14,7 +14,9 @@ import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.restconf.openapi.AbstractOpenApiTest;
@@ -29,6 +31,7 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
     private static final String CHOICE_TEST_MODULE = "choice-test";
+    private static final String PATH_PARAMS_TEST_MODULE = "path-params-test";
     private static final String PROPERTIES = "properties";
     private final OpenApiGeneratorRFC8040 generator = new OpenApiGeneratorRFC8040(SCHEMA_SERVICE);
 
@@ -169,5 +172,32 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         JsonNode secondContainer = schemas.get("choice-test_second-container");
         assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
+    }
+
+    @Test
+    public void testPathsWithSimilarKeys() {
+        final var module = CONTEXT.findModule(PATH_PARAMS_TEST_MODULE).orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+
+        var pathWithParamsList1 = "/rests/data/path-params-test:cont/list1={name}";
+        assertEquals(List.of("name"), getParametersNamesList(doc.getPaths(), pathWithParamsList1));
+
+        var pathWithParamsList2 = "/rests/data/path-params-test:cont/list1={name}/list2={name1}";
+        assertEquals(List.of("name", "name1"), getParametersNamesList(doc.getPaths(), pathWithParamsList2));
+
+        var pathWithParamsList3 = "/rests/data/path-params-test:cont/list3={name}";
+        assertEquals(List.of("name"), getParametersNamesList(doc.getPaths(), pathWithParamsList3));
+    }
+
+    private static List<String> getParametersNamesList(final Map<String, Path> paths, final String path) {
+        var parametersList = new ArrayList<JsonNode>();
+        var parameters = paths.get(path)
+                .getPost()
+                .get("parameters")
+                .elements();
+        parameters.forEachRemaining(parametersList::add);
+        return parametersList.stream()
+                .map(item -> item.get("name").asText())
+                .toList();
     }
 }
