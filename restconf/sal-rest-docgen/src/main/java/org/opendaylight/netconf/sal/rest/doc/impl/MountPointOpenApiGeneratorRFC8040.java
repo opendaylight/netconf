@@ -10,36 +10,36 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
+import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointOpenApi;
 
 /**
  * MountPoint generator implementation for RFC 8040.
  *
  * @author Thomas Pantelis
  */
-public class MountPointSwaggerGeneratorRFC8040 extends BaseYangSwaggerGeneratorRFC8040 implements AutoCloseable {
-    private final MountPointSwagger mountPointSwagger;
+public class MountPointOpenApiGeneratorRFC8040 extends BaseYangOpenApiGeneratorRFC8040 implements AutoCloseable {
+    private final MountPointOpenApi mountPointOpenApi;
 
-    public MountPointSwaggerGeneratorRFC8040(final DOMSchemaService schemaService,
+    public MountPointOpenApiGeneratorRFC8040(final DOMSchemaService schemaService,
             final DOMMountPointService mountService) {
         super(Optional.of(schemaService));
-        mountPointSwagger = new MountPointSwagger(schemaService, mountService, this);
-        mountPointSwagger.init();
+        mountPointOpenApi = new MountPointOpenApi(schemaService, mountService, this);
+        mountPointOpenApi.init();
     }
 
-    public MountPointSwaggerGeneratorRFC8040(final DOMSchemaService schemaService,
+    public MountPointOpenApiGeneratorRFC8040(final DOMSchemaService schemaService,
             final DOMMountPointService mountService, final String basePath) {
         super(Optional.of(schemaService), basePath);
-        mountPointSwagger = new MountPointSwagger(schemaService, mountService, this);
-        mountPointSwagger.init();
+        mountPointOpenApi = new MountPointOpenApi(schemaService, mountService, this);
+        mountPointOpenApi.init();
     }
 
-    public MountPointSwagger getMountPointSwagger() {
-        return mountPointSwagger;
+    public MountPointOpenApi getMountPointOpenApi() {
+        return mountPointOpenApi;
     }
 
     @Override
     public void close() {
-        mountPointSwagger.close();
+        mountPointOpenApi.close();
     }
 }

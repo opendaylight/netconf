@@ -17,14 +17,14 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
  *
  * @author Thomas Pantelis
  */
-public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGenerator {
+public abstract class BaseYangOpenApiGeneratorRFC8040 extends BaseYangOpenApiGenerator {
     private final String basePath;
 
-    protected BaseYangSwaggerGeneratorRFC8040(final Optional<DOMSchemaService> schemaService) {
+    protected BaseYangOpenApiGeneratorRFC8040(final Optional<DOMSchemaService> schemaService) {
         this(schemaService, "rests");
     }
 
-    protected BaseYangSwaggerGeneratorRFC8040(final Optional<DOMSchemaService> schemaService, final String basePath) {
+    protected BaseYangOpenApiGeneratorRFC8040(final Optional<DOMSchemaService> schemaService, final String basePath) {
         super(schemaService);
         this.basePath = requireNonNull(basePath);
     }
