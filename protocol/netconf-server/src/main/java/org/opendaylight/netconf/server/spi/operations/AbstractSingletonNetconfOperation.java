@@ -5,24 +5,24 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.util.mapping;
+package org.opendaylight.netconf.server.spi.operations;
 
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.mapping.api.HandlingPriority;
-import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
+import org.opendaylight.netconf.server.api.operations.HandlingPriority;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class AbstractSingletonNetconfOperation extends AbstractLastNetconfOperation {
 
-    protected AbstractSingletonNetconfOperation(String netconfSessionIdForReporting) {
+    protected AbstractSingletonNetconfOperation(final String netconfSessionIdForReporting) {
         super(netconfSessionIdForReporting);
     }
 
     @Override
-    protected Element handle(Document document, XmlElement operationElement,
-                             NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
+    protected Element handle(final Document document, final XmlElement operationElement,
+                             final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
         return handleWithNoSubsequentOperations(document, operationElement);
     }
 
@@ -30,5 +30,4 @@ public abstract class AbstractSingletonNetconfOperation extends AbstractLastNetc
     protected HandlingPriority getHandlingPriority() {
         return HandlingPriority.HANDLE_WITH_MAX_PRIORITY;
     }
-
 }

@@ -7,16 +7,19 @@
  */
 package org.opendaylight.netconf.test.tool;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.Sets;
 import java.io.File;
 import java.util.Optional;
 import java.util.Set;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
-import org.opendaylight.netconf.mapping.api.NetconfOperation;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
+import org.opendaylight.netconf.server.api.operations.NetconfOperation;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.test.tool.rpc.DataList;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedCommit;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedCreateSubscription;
@@ -29,14 +32,14 @@ import org.opendaylight.netconf.test.tool.rpc.SimulatedUnLock;
 import org.opendaylight.yangtools.concepts.Registration;
 
 class SimulatedOperationProvider implements NetconfOperationServiceFactory {
-    private final Set<Capability> caps;
+    private final @NonNull Set<Capability> caps;
     private final SimulatedOperationService simulatedOperationService;
 
     SimulatedOperationProvider(final SessionIdProvider idProvider,
                                final Set<Capability> caps,
                                final Optional<File> notificationsFile,
                                final Optional<File> initialConfigXMLFile) {
-        this.caps = caps;
+        this.caps = requireNonNull(caps);
         simulatedOperationService = new SimulatedOperationService(
             idProvider.getCurrentSessionId(), notificationsFile, initialConfigXMLFile);
     }
@@ -90,7 +93,7 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
 
         @Override
         public void close() {
+            // No-op
         }
-
     }
 }

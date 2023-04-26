@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.util.messages;
+package org.opendaylight.netconf.server.spi;
 
 import java.util.Map;
 import java.util.Objects;
@@ -15,7 +15,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation.OperationNameAndNamespace;
+import org.opendaylight.netconf.server.spi.operations.AbstractNetconfOperation.OperationNameAndNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -30,7 +30,7 @@ public final class SubtreeFilter {
     private static final Logger LOG = LoggerFactory.getLogger(SubtreeFilter.class);
 
     private SubtreeFilter() {
-
+        // Hidden on purpose
     }
 
     public static Document applyRpcSubtreeFilter(final Document requestDocument,
