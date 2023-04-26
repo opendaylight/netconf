@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.server;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -19,7 +21,7 @@ import org.opendaylight.netconf.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.server.osgi.NetconfOperationRouter;
+import org.opendaylight.netconf.server.osgi.NetconfOperationRouterImpl;
 import org.opendaylight.netconf.util.messages.SubtreeFilter;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -34,13 +36,12 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionListener.class);
 
     private final SessionListener monitoringSessionListener;
-    private final NetconfOperationRouter operationRouter;
+    private final NetconfOperationRouterImpl operationRouter;
     private final AutoCloseable onSessionDownCloseable;
 
-    public NetconfServerSessionListener(final NetconfOperationRouter operationRouter,
-                                        final NetconfMonitoringService monitoringService,
-                                        final AutoCloseable onSessionDownCloseable) {
-        this.operationRouter = operationRouter;
+    NetconfServerSessionListener(final NetconfOperationRouterImpl operationRouter,
+            final NetconfMonitoringService monitoringService, final AutoCloseable onSessionDownCloseable) {
+        this.operationRouter = requireNonNull(operationRouter);
         monitoringSessionListener = monitoringService.getSessionListener();
         this.onSessionDownCloseable = onSessionDownCloseable;
     }

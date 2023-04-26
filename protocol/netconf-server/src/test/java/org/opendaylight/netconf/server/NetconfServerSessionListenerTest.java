@@ -33,13 +33,13 @@ import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.server.osgi.NetconfOperationRouter;
+import org.opendaylight.netconf.server.osgi.NetconfOperationRouterImpl;
 import org.w3c.dom.Document;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfServerSessionListenerTest {
     @Mock
-    private NetconfOperationRouter router;
+    private NetconfOperationRouterImpl router;
     @Mock
     private NetconfMonitoringService monitoring;
     @Mock

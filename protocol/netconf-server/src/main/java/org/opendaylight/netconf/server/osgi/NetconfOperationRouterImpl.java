@@ -37,14 +37,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-public class NetconfOperationRouterImpl implements NetconfOperationRouter {
+// Non-final for testing
+public class NetconfOperationRouterImpl implements NetconfOperationRouter, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfOperationRouterImpl.class);
 
     private final NetconfOperationService netconfOperationServiceSnapshot;
     private final Collection<NetconfOperation> allNetconfOperations;
 
     public NetconfOperationRouterImpl(final NetconfOperationService netconfOperationServiceSnapshot,
-                                      final NetconfMonitoringService netconfMonitoringService, final String sessionId) {
+            final NetconfMonitoringService netconfMonitoringService, final String sessionId) {
         this.netconfOperationServiceSnapshot = requireNonNull(netconfOperationServiceSnapshot);
 
         final Set<NetconfOperation> ops = new HashSet<>();
@@ -59,8 +60,8 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public Document onNetconfMessage(final Document message, final NetconfServerSession session) throws
-            DocumentedException {
+    public Document onNetconfMessage(final Document message, final NetconfServerSession session)
+            throws DocumentedException {
         requireNonNull(allNetconfOperations, "Operation router was not initialized properly");
 
         final NetconfOperationExecution netconfOperationExecution;
