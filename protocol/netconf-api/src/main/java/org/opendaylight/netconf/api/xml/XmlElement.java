@@ -257,7 +257,7 @@ public final class XmlElement {
         return children.get(0);
     }
 
-    public String getTextContent() throws DocumentedException {
+    public @NonNull String getTextContent() throws DocumentedException {
         final var children = element.getChildNodes();
         final var length = children.getLength();
         if (length == 0) {
@@ -268,8 +268,8 @@ public final class XmlElement {
                 return textChild.getTextContent().trim();
             }
         }
-        throw new DocumentedException(getName() + " should contain text.",
-                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
+        throw new DocumentedException(getName() + " should contain text",
+            ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
     }
 
     public Optional<String> getOnlyTextContentOptionally() {
