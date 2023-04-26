@@ -15,9 +15,13 @@
         <relativePath>../../parent</relativePath>
     </parent>
 
-    <artifactId>mdsal-netconf-notification</artifactId>
-    <name>${project.artifactId}</name>
+    <artifactId>netconf-events-mdsal</artifactId>
+    <name>NETCONF Events with MD-SAL</name>
     <packaging>bundle</packaging>
+    <description>
+        Implementation of NETCONF events, as implied by RFC5277, RFC6241, RFC7950, RFC8640 and others. Provides,
+        inter alia, the lifecycle of NETCONF Event streams, with respect to event publishers and subscribers.
+    </description>
 
     <dependencies>
         <dependency>
