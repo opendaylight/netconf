@@ -91,7 +91,7 @@ public class NetconfSessionMonitoringServiceTest {
     @Test
     public void testClose() {
         monitoringService.onSessionUp(sessionMock1);
-        assertEquals(1, monitoringService.getSessions().getSession().size());
+        assertEquals(1, monitoringService.getSessions().nonnullSession().size());
         monitoringService.close();
         assertNull(monitoringService.getSessions().getSession());
     }
