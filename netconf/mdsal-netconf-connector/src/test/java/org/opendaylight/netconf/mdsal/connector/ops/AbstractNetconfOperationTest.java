@@ -40,12 +40,12 @@ import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
 import org.opendaylight.mdsal.dom.spi.store.DOMStore;
 import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStoreFactory;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.mapping.api.NetconfOperation;
-import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
+import org.opendaylight.netconf.server.api.operations.NetconfOperation;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.util.test.NetconfXmlUnitRecursiveQualifier;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
@@ -106,7 +106,7 @@ public abstract class AbstractNetconfOperationTest {
 
         final SerializedDOMDataBroker sdb = new SerializedDOMDataBroker(datastores,
             MoreExecutors.listeningDecorator(listenableFutureExecutor));
-        this.transactionProvider = new TransactionProvider(sdb, SESSION_ID_FOR_REPORTING);
+        transactionProvider = new TransactionProvider(sdb, SESSION_ID_FOR_REPORTING);
     }
 
     protected CurrentSchemaContext getCurrentSchemaContext() {

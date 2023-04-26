@@ -11,7 +11,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.NetconfServerSession;
-import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

@@ -10,7 +10,7 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -19,10 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/* FIXME Duplicated code
-   netconf/netconf/config-netconf-connector/src/main/java/org/opendaylight/netconf/confignetconfconnector/
-   operations/UnLock.java
-*/
 public class Unlock extends AbstractSingletonNetconfOperation {
     private static final Logger LOG = LoggerFactory.getLogger(Unlock.class);
     private static final String OPERATION_NAME = "unlock";

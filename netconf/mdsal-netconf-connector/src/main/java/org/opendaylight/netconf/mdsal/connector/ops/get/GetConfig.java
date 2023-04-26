@@ -28,10 +28,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class GetConfig extends AbstractGet {
-
     private static final Logger LOG = LoggerFactory.getLogger(GetConfig.class);
-
     private static final String OPERATION_NAME = "get-config";
+
     private final TransactionProvider transactionProvider;
 
     public GetConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
