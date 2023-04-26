@@ -16,6 +16,23 @@
       "message": "We can online this below.",
       "revId": "78ef51935e844a3afe9350d13e6eddeeb9102df2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08d5a5eb_4ba76a61",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/openapi/SecurityDefinitions.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-26T08:04:18Z",
+      "side": 0,
+      "message": "This is important class - do not delete it.",
+      "revId": "78ef51935e844a3afe9350d13e6eddeeb9102df2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
