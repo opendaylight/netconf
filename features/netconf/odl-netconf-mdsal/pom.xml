@@ -55,7 +55,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mdsal-netconf-notification</artifactId>
+            <artifactId>netconf-events-mdsal</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

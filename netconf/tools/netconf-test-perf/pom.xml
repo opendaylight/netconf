@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>mdsal-netconf-notification</artifactId>
+            <artifactId>netconf-events-mdsal</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
