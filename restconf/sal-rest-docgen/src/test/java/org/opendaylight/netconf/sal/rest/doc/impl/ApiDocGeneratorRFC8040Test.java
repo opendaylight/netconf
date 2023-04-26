@@ -27,6 +27,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String REVISION_DATE_2 = "2009-11-20";
     private static final String CHOICE_TEST_MODULE = "choice-test";
     private static final String PROPERTIES = "properties";
+    private static final String PATH_PARAMS_TEST_MODULE = "path-params-test";
     private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
 
     /**
@@ -168,5 +169,30 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         JsonNode secondContainer = definitions.get("choice-test_second-container");
         assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
+    }
+
+    /**
+     * Test that request parameters are correctly numbered.
+     *
+     * <p>
+     * It means we should have name and name1, etc. when we have the same parameter in path multiple times.
+     */
+    @Test
+    public void testParametersNumbering() {
+        final var module = CONTEXT.findModule(PATH_PARAMS_TEST_MODULE).orElseThrow();
+        final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+                ApiDocServiceImpl.OAversion.V3_0);
+
+        var pathToList1 = "/rests/data/path-params-test:cont/list1={name}";
+        assertTrue(doc.getPaths().has(pathToList1));
+        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList1));
+
+        var pathToList2 = "/rests/data/path-params-test:cont/list1={name}/list2={name1}";
+        assertTrue(doc.getPaths().has(pathToList2));
+        assertEquals(List.of("name", "name1"), getPathParameters(doc.getPaths(), pathToList2));
+
+        var pathToList3 = "/rests/data/path-params-test:cont/list3={name}";
+        assertTrue(doc.getPaths().has(pathToList3));
+        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList3));
     }
 }

@@ -249,7 +249,7 @@ public abstract class BaseYangSwaggerGenerator {
                 LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
             }
         } catch (final IOException e) {
-            LOG.error("Exception occured in DefinitionGenerator", e);
+            LOG.error("Exception occurred in DefinitionGenerator", e);
         }
 
         final ObjectNode paths = JsonNodeFactory.instance.objectNode();
@@ -408,6 +408,7 @@ public abstract class BaseYangSwaggerGenerator {
                 final boolean newIsConfig = isConfig && childNode.isConfiguration();
                 addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
                     newIsConfig, newParent, definitionNames, oaversion, newResourcePath);
+                pathParams.removeAll();
             }
         }
     }
