@@ -413,7 +413,7 @@ public abstract class BaseYangSwaggerGenerator {
                     node.getDescription().orElse(""), pathParams);
             operations.put("put", put);
 
-            final ObjectNode patch = buildPatch(parentName, nodeName, moduleName, deviceName,
+            final ObjectNode patch = buildPatch(parentName, nodeName, moduleName, discriminator, deviceName,
                     node.getDescription().orElse(""), pathParams);
             operations.put("patch", patch);
 

@@ -149,8 +149,8 @@ public final class OperationBuilder {
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
-        final String defName = parentName + CONFIG + "_" + nodeName + TOP;
-        final String xmlDefName = parentName + CONFIG + "_" + nodeName;
+        final String defName = parentName + CONFIG + "_" + nodeName + TOP + discriminator;
+        final String xmlDefName = parentName + CONFIG + "_" + nodeName + discriminator;
         insertRequestBodyParameter(value, defName, xmlDefName, nodeName + CONFIG);
         value.set(PARAMETERS_KEY, parameters);
 
@@ -164,15 +164,16 @@ public final class OperationBuilder {
         return value;
     }
 
-    public static ObjectNode buildPatch(final String parentName, final String nodeName, final String moduleName,
-            final Optional<String> deviceName, final String description, final ArrayNode pathParams) {
+    public static ObjectNode buildPatch(final String parentName, final String nodeName, final String discriminator,
+            final String moduleName, final Optional<String> deviceName, final String description,
+            final ArrayNode pathParams) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
-        final String defName = parentName + CONFIG + "_" + nodeName + TOP;
-        final String xmlDefName = parentName + CONFIG + "_" + nodeName;
+        final String defName = parentName + CONFIG + "_" + nodeName + TOP + discriminator;
+        final String xmlDefName = parentName + CONFIG + "_" + nodeName + discriminator;
         insertRequestBodyParameter(value, defName, xmlDefName, nodeName + CONFIG);
         value.set(PARAMETERS_KEY, parameters);
 
