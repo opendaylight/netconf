@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.api.monitoring;
+package org.opendaylight.netconf.server.api.monitoring;
 
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
@@ -14,5 +13,4 @@ import org.opendaylight.netconf.api.capability.Capability;
 public interface CapabilityListener {
 
     void onCapabilitiesChanged(Set<Capability> added, Set<Capability> removed);
-
 }

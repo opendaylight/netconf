@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.api.monitoring;
+package org.opendaylight.netconf.server.api.monitoring;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -51,7 +51,6 @@ public interface NetconfMonitoringService {
     Registration registerSessionsListener(SessionsListener listener);
 
     interface CapabilitiesListener {
-
         /**
          * Callback used to notify about a change in used capabilities.
          *
@@ -90,6 +89,5 @@ public interface NetconfMonitoringService {
          * @param sessions updated sessions
          */
         void onSessionsUpdated(Collection<Session> sessions);
-
     }
 }
