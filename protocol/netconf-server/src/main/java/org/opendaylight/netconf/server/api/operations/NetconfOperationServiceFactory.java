@@ -5,12 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.mapping.api;
+package org.opendaylight.netconf.server.api.operations;
 
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.capability.Capability;
-import org.opendaylight.netconf.api.monitoring.CapabilityListener;
+import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.yangtools.concepts.Registration;
 
 /**

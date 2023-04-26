@@ -13,8 +13,8 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.yangtools.concepts.Registration;
 
 public class NetconfMonitoringOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {

@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.util.mapping;
+package org.opendaylight.netconf.server.api.operations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -19,8 +18,9 @@ import org.junit.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.mapping.api.HandlingPriority;
-import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
+import org.opendaylight.netconf.server.api.operations.AbstractNetconfOperation;
+import org.opendaylight.netconf.server.api.operations.HandlingPriority;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,7 +32,7 @@ public class AbstractNetconfOperationTest {
 
         protected NetconfOperationImpl(final String netconfSessionIdForReporting) {
             super(netconfSessionIdForReporting);
-            this.handleRun = false;
+            handleRun = false;
         }
 
         @Override
@@ -43,7 +43,7 @@ public class AbstractNetconfOperationTest {
         @Override
         protected Element handle(final Document document, final XmlElement message,
                 final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
-            this.handleRun = true;
+            handleRun = true;
             try {
                 return XmlUtil.readXmlToElement("<element/>");
             } catch (SAXException | IOException e) {

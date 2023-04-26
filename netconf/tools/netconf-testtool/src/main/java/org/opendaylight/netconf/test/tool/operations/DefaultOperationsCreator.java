@@ -11,9 +11,9 @@ import com.google.common.collect.Sets;
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
-import org.opendaylight.netconf.mapping.api.NetconfOperation;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
+import org.opendaylight.netconf.server.api.operations.NetconfOperation;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.test.tool.rpc.DataList;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedCommit;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedCreateSubscription;
@@ -65,6 +65,5 @@ public final class DefaultOperationsCreator implements OperationsCreator {
         @Override
         public void close() {
         }
-
     }
 }

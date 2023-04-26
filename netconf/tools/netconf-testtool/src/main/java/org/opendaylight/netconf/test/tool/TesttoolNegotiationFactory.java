@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

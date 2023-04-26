@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.mapping.api;
+package org.opendaylight.netconf.server.api.operations;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class HandlingPriority implements Comparable<HandlingPriority> {
-
     public static final HandlingPriority CANNOT_HANDLE = new HandlingPriority();
     public static final HandlingPriority HANDLE_WITH_DEFAULT_PRIORITY = new HandlingPriority(Integer.MIN_VALUE);
     public static final HandlingPriority HANDLE_WITH_MAX_PRIORITY = new HandlingPriority(Integer.MAX_VALUE);
@@ -51,7 +50,7 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
     }
 
     public boolean isCannotHandle() {
-        return this.equals(CANNOT_HANDLE);
+        return equals(CANNOT_HANDLE);
     }
 
     @Override
@@ -82,16 +81,7 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof HandlingPriority)) {
-            return false;
-        }
-
-        HandlingPriority that = (HandlingPriority) obj;
-
-        return Objects.equals(priority, that.priority);
+        return this == obj || obj instanceof HandlingPriority other && Objects.equals(priority, other.priority);
     }
 
     @Override
@@ -101,8 +91,6 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("priority", priority)
-                .toString();
+        return MoreObjects.toStringHelper(this).add("priority", priority).toString();
     }
 }
