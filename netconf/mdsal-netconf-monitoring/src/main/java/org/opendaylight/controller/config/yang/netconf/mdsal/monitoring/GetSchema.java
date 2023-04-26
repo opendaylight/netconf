@@ -7,9 +7,12 @@
  */
 package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
-import java.util.HashMap;
+import static java.util.Objects.requireNonNull;
+
 import java.util.Map;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -24,17 +27,17 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public final class GetSchema extends AbstractSingletonNetconfOperation {
+final class GetSchema extends AbstractSingletonNetconfOperation {
     private static final String GET_SCHEMA = "get-schema";
     private static final String IDENTIFIER = "identifier";
     private static final String VERSION = "version";
 
     private static final Logger LOG = LoggerFactory.getLogger(GetSchema.class);
-    private final NetconfMonitoringService cap;
+    private final NetconfMonitoringService monitoring;
 
-    public GetSchema(final String netconfSessionIdForReporting, final NetconfMonitoringService cap) {
+    GetSchema(final String netconfSessionIdForReporting, final NetconfMonitoringService monitoring) {
         super(netconfSessionIdForReporting);
-        this.cap = cap;
+        this.monitoring = requireNonNull(monitoring);
     }
 
     @Override
@@ -50,33 +53,28 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement xml)
             throws DocumentedException {
-        final GetSchemaEntry entry;
-
-        entry = new GetSchemaEntry(xml);
+        final var entry = new GetSchemaEntry(xml);
 
         final String schema;
         try {
-            schema = cap.getSchemaForCapability(entry.identifier, entry.version);
+            schema = monitoring.getSchemaForCapability(entry.identifier, Optional.ofNullable(entry.version));
         } catch (final IllegalStateException e) {
-            final Map<String, String> errorInfo = new HashMap<>();
-            // FIXME: so we have an <operation-failed>e.getMessage()</operation-failed> ??? In which namespace? Why?
-            errorInfo.put(ErrorTag.OPERATION_FAILED.elementBody(), e.getMessage());
             LOG.warn("Rpc error: {}", ErrorTag.OPERATION_FAILED, e);
-            throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION,
-                    ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR, errorInfo);
+            throw new DocumentedException(e.getMessage(), e,
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR,
+                // FIXME: so we have an <operation-failed>e.getMessage()</operation-failed> ??? In which namespace? Why?
+                Map.of(ErrorTag.OPERATION_FAILED.elementBody(), e.getMessage()));
         }
 
-        final Element getSchemaResult;
-        getSchemaResult = XmlUtil.createTextElement(document, XmlNetconfConstants.DATA_KEY, schema,
+        final var getSchemaResult = XmlUtil.createTextElement(document, XmlNetconfConstants.DATA_KEY, schema,
                 Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING));
         LOG.trace("{} operation successful", GET_SCHEMA);
-
         return getSchemaResult;
     }
 
     private static final class GetSchemaEntry {
-        private final String identifier;
-        private final Optional<String> version;
+        private final @NonNull String identifier;
+        private final @Nullable String version;
 
         GetSchemaEntry(final XmlElement getSchemaElement) throws DocumentedException {
             getSchemaElement.checkName(GET_SCHEMA);
@@ -90,12 +88,11 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
                 throw DocumentedException.wrap(e);
             }
             identifier = identifierElement.getTextContent();
-            final Optional<XmlElement> versionElement = getSchemaElement
-                    .getOnlyChildElementWithSameNamespaceOptionally(VERSION);
+            final var versionElement = getSchemaElement.getOnlyChildElementWithSameNamespaceOptionally(VERSION);
             if (versionElement.isPresent()) {
-                version = Optional.of(versionElement.orElseThrow().getTextContent());
+                version = versionElement.orElseThrow().getTextContent();
             } else {
-                version = Optional.empty();
+                version = null;
             }
         }
     }
