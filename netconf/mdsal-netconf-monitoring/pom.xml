@@ -50,7 +50,7 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-mapping-api</artifactId>
+      <artifactId>netconf-server</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>

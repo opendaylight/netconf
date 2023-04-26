@@ -5,31 +5,28 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.controller.netconf.mapping.api;
+package org.opendaylight.netconf.server.api.operations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.opendaylight.netconf.mapping.api.HandlingPriority;
 
 public class HandlingPriorityTest {
+    @Test
+    public void testHandlingPriority() throws Exception {
+        assertEquals(0,
+            HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
+        assertEquals(-1, HandlingPriority.CANNOT_HANDLE.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
+        assertEquals(1, HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.CANNOT_HANDLE));
 
-    @Test public void testHandlingPriority() throws Exception {
-        assertTrue(
-            HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY)
-                == 0);
-        assertTrue(HandlingPriority.CANNOT_HANDLE.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY) == -1);
-        assertTrue(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.CANNOT_HANDLE) == 1);
-
-        assertTrue(
-            HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_MAX_PRIORITY) == -1);
-        assertTrue(
-            HandlingPriority.HANDLE_WITH_MAX_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY) == 1);
-        assertTrue(HandlingPriority.getHandlingPriority(Integer.MIN_VALUE)
-            .compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY) == 0);
+        assertEquals(-1,
+            HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_MAX_PRIORITY));
+        assertEquals(1,
+            HandlingPriority.HANDLE_WITH_MAX_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
+        assertEquals(0, HandlingPriority.getHandlingPriority(Integer.MIN_VALUE)
+            .compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
 
         HandlingPriority prio = HandlingPriority.getHandlingPriority(10);
         assertTrue(prio.increasePriority(1).compareTo(HandlingPriority.getHandlingPriority(11)) == 0);

@@ -12,9 +12,9 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.mapping.api.HandlingPriority;
-import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
-import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation;
+import org.opendaylight.netconf.server.api.operations.AbstractNetconfOperation;
+import org.opendaylight.netconf.server.api.operations.HandlingPriority;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -24,8 +24,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class Get extends AbstractNetconfOperation {
-
     private static final Logger LOG = LoggerFactory.getLogger(Get.class);
+
     private final NetconfMonitoringService netconfMonitor;
 
     public Get(final NetconfMonitoringService netconfMonitor) {

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.util.messages;
+package org.opendaylight.netconf.server.spi;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -37,14 +36,14 @@ public class SubtreeFilterNotificationTest {
 
     @Parameters
     public static Collection<Object[]> data() {
-        List<Object[]> result = new ArrayList<>();
+        var result = new ArrayList<Object[]>();
         for (int i = 0; i < 5; i++) {
             result.add(new Object[]{i});
         }
         return result;
     }
 
-    public SubtreeFilterNotificationTest(int directoryIndex) {
+    public SubtreeFilterNotificationTest(final int directoryIndex) {
         this.directoryIndex = directoryIndex;
     }
 
@@ -70,7 +69,7 @@ public class SubtreeFilterNotificationTest {
         }
     }
 
-    public Document getDocument(String fileName) throws SAXException, IOException {
+    public Document getDocument(final String fileName) throws SAXException, IOException {
         return XmlUtil.readXmlToDocument(getClass().getResourceAsStream(
                 "/subtree/notification/" + directoryIndex + "/" + fileName));
     }

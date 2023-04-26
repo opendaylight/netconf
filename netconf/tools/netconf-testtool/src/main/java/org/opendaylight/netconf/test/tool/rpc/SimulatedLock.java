@@ -9,12 +9,11 @@ package org.opendaylight.netconf.test.tool.rpc;
 
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.util.mapping.AbstractLastNetconfOperation;
+import org.opendaylight.netconf.server.api.operations.AbstractLastNetconfOperation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class SimulatedLock extends AbstractLastNetconfOperation {
-
     public SimulatedLock(final String netconfSessionIdForReporting) {
         super(netconfSessionIdForReporting);
     }

@@ -25,10 +25,10 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.mapping.api.HandlingPriority;
-import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
-import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
+import org.opendaylight.netconf.server.api.operations.HandlingPriority;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -54,9 +54,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class RuntimeRpc extends AbstractSingletonNetconfOperation {
-
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpc.class);
-
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
 
     static {
@@ -164,13 +162,10 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     }
 
     @Override
-    public Document handle(final Document requestMessage,
-                           final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
-
+    public Document handle(final Document requestMessage, final NetconfOperationChainedExecution subsequentOperation)
+            throws DocumentedException {
         final XmlElement requestElement = getRequestElementWithCheck(requestMessage);
-
         final Document document = XmlUtil.newDocument();
-
         final XmlElement operationElement = requestElement.getOnlyChildElement();
         final Map<String, Attr> attributes = requestElement.getAttributes();
 
