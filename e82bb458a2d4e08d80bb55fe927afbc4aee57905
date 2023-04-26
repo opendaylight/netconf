@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea71d3db_78e1226b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-04-26T07:16:44Z",
+      "side": 1,
+      "message": "Wrong JIRA ID.",
+      "revId": "e82bb458a2d4e08d80bb55fe927afbc4aee57905",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
