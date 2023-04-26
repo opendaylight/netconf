@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
+import java.util.Iterator;
 import java.util.List;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
@@ -26,6 +27,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
     private static final String CHOICE_TEST_MODULE = "choice-test";
+    private static final String PATH_PARAMS_TEST_MODULE = "path-params-test";
     private static final String PROPERTIES = "properties";
     private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
 
@@ -166,5 +168,41 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         JsonNode secondContainer = schemas.get("choice-test_second-container");
         assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
+    }
+
+    @Test
+    public void testPathsWithSimilarKeys() {
+        final var module = CONTEXT.findModule(PATH_PARAMS_TEST_MODULE).orElseThrow();
+        final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+
+        Iterator<JsonNode> parametersList1 = doc.getPaths()
+                .get("/rests/data/path-params-test:cont/list1={name}")
+                .get("patch")
+                .get("parameters")
+                .elements();
+        List<String> parameterNamesList1 = ImmutableList.copyOf(parametersList1).stream()
+                .map(parameter -> parameter.get("name").asText())
+                .toList();
+        assertEquals(List.of("name"), parameterNamesList1);
+
+        Iterator<JsonNode> parametersList2 = doc.getPaths()
+                .get("/rests/data/path-params-test:cont/list1={name}/list2={name1}")
+                .get("patch")
+                .get("parameters")
+                .elements();
+        List<String> parameterNamesList2 = ImmutableList.copyOf(parametersList2).stream()
+                .map(parameter -> parameter.get("name").asText())
+                .toList();
+        assertEquals(List.of("name", "name1"), parameterNamesList2);
+
+        Iterator<JsonNode> parametersList3 = doc.getPaths()
+                .get("/rests/data/path-params-test:cont/list3={name1}")
+                .get("patch")
+                .get("parameters")
+                .elements();
+        List<String> parameterNamesList3 = ImmutableList.copyOf(parametersList3).stream()
+                .map(parameter -> parameter.get("name").asText())
+                .toList();
+        assertEquals(List.of("name1"), parameterNamesList3);
     }
 }
