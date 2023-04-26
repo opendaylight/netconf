@@ -8,9 +8,9 @@
 package org.opendaylight.netconf.server.events.mdsal;
 
 import java.util.Set;
-import org.opendaylight.netconf.mapping.api.NetconfOperation;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
+import org.opendaylight.netconf.server.api.operations.NetconfOperation;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 
 final class NetconfNotificationOperationService implements NetconfOperationService {
     private final CreateSubscription createSubscription;

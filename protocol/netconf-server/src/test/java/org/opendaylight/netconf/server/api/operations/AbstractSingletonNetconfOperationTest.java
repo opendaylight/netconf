@@ -5,28 +5,25 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.util.mapping;
+package org.opendaylight.netconf.server.api.operations;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class AbstractSingletonNetconfOperationTest {
-    class SingletonNCOperationImpl extends AbstractSingletonNetconfOperation {
-
-        protected SingletonNCOperationImpl(String netconfSessionIdForReporting) {
+    private static final class SingletonNCOperationImpl extends AbstractSingletonNetconfOperation {
+        SingletonNCOperationImpl(final String netconfSessionIdForReporting) {
             super(netconfSessionIdForReporting);
         }
 
         @Override
-        protected Element handleWithNoSubsequentOperations(Document document,
-                                                           XmlElement operationElement) throws DocumentedException {
+        protected Element handleWithNoSubsequentOperations(final Document document,
+                final XmlElement operationElement) throws DocumentedException {
             return null;
         }
 

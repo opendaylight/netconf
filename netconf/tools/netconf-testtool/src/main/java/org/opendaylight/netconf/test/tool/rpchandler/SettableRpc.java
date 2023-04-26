@@ -12,9 +12,9 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.mapping.api.HandlingPriority;
-import org.opendaylight.netconf.mapping.api.NetconfOperation;
-import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
+import org.opendaylight.netconf.server.api.operations.HandlingPriority;
+import org.opendaylight.netconf.server.api.operations.NetconfOperation;
+import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -26,7 +26,6 @@ import org.w3c.dom.Document;
  * {@link NetconfOperation} which is able to handle it.
  */
 class SettableRpc implements NetconfOperation {
-
     private final RpcHandler rpcHandler;
 
     SettableRpc(final RpcHandler rpcHandler) {
@@ -64,5 +63,4 @@ class SettableRpc implements NetconfOperation {
             throw DocumentedException.fromXMLDocument(document);
         }
     }
-
 }

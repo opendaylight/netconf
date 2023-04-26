@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.util.mapping;
+package org.opendaylight.netconf.server.api.operations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -17,24 +16,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.mapping.api.HandlingPriority;
-import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class AbstractLastNetconfOperationTest {
-    class LastNetconfOperationImplTest extends AbstractLastNetconfOperation {
-
+    private static final class LastNetconfOperationImplTest extends AbstractLastNetconfOperation {
         boolean handleWithNoSubsequentOperationsRun;
 
-        protected LastNetconfOperationImplTest(String netconfSessionIdForReporting) {
+        protected LastNetconfOperationImplTest(final String netconfSessionIdForReporting) {
             super(netconfSessionIdForReporting);
             handleWithNoSubsequentOperationsRun = false;
         }
 
         @Override
-        protected Element handleWithNoSubsequentOperations(Document document,
-                                                           XmlElement operationElement) throws DocumentedException {
+        protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+                throws DocumentedException {
             handleWithNoSubsequentOperationsRun = true;
             return null;
         }
