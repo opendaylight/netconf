@@ -15,7 +15,6 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPostOperation;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPut;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getTypeParentNode;
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -111,8 +110,6 @@ public abstract class BaseYangOpenApiGenerator {
 
         final String title = name + " modules of RESTCONF";
         final OpenApiObject doc = createOpenApiObject(schema, host, BASE_PATH, title);
-        doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
-                new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         doc.setPaths(new HashMap<>());
 
         fillDoc(doc, range, schemaContext, context, deviceName, definitionNames);
@@ -220,15 +217,13 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getOpenApiDocSpec(final Module module, final String context, final Optional<String> deviceName,
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
-        final Components components = new Components(JsonNodeFactory.instance.objectNode(),
-                new SecuritySchemes(OPEN_API_BASIC_AUTH));
         try {
             if (isForSingleModule) {
-                components.setSchemas(jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, true));
-                doc.setComponents(components);
+                doc.getComponents().setSchemas(jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames,
+                    true));
             } else {
-                components.setSchemas(jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, false));
-                addFields(doc.getComponents().getSchemas(), components.getSchemas().fields());
+                doc.getComponents().setSchemas(jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames,
+                    false));
             }
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
@@ -316,6 +311,8 @@ public abstract class BaseYangOpenApiGenerator {
         doc.setInfo(info);
         doc.setServers(convertToServers(ImmutableList.of(schema), host, basePath));
         doc.setSecurity(SECURITY);
+        doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
+                new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         return doc;
     }
 
