@@ -13,10 +13,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+
+import java.util.*;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +26,8 @@ import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public final class MountPointOpenApiTest extends AbstractApiDocTest {
     private static final String HTTP_URL = "http://localhost/path";
@@ -67,7 +67,7 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
     }
 
     @Test
-    public void testGetDataStoreApi() throws Exception {
+    public void testGetDataStoreApiByModule() throws Exception {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         openApi.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
 
@@ -90,5 +90,49 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
 
         assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
             "/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
+    }
+
+    /**
+     * Test that gets {@link OpenApiObject} with all paths including yang models.
+     * @throws Exception if something wrong with {@link MountPointOpenApiTest#HTTP_URL}
+     */
+    @Test
+    public void testGetDataStoreApi() throws Exception {
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
+
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("failed to find Datastore API", mountPointApi);
+
+        final Map<String, Path> paths = mountPointApi.getPaths();
+        assertNotNull(paths);
+
+        assertEquals("Unexpected api list size", 26, paths.size());
+
+        final Set<JsonNode> getOperations = new HashSet<>();
+        final Set<JsonNode> postOperations = new HashSet<>();
+        final Set<JsonNode> putOperations = new HashSet<>();
+        final Set<JsonNode> deleteOperations = new HashSet<>();
+        final Set<JsonNode> patchOperations = new HashSet<>();
+
+        for (final Map.Entry<String, Path> path : paths.entrySet()) {
+            addIfNotNull(path.getValue().getGet(), getOperations);
+            addIfNotNull(path.getValue().getPatch(), patchOperations);
+            addIfNotNull(path.getValue().getPost(), postOperations);
+            addIfNotNull(path.getValue().getPut(), putOperations);
+            addIfNotNull(path.getValue().getDelete(), deleteOperations);
+        }
+
+        assertEquals("Unexpected GET operations list size", 18, getOperations.size());
+        assertEquals("Unexpected PATCH operations list size", 16, patchOperations.size());
+        assertEquals("Unexpected POST operations list size", 24, postOperations.size());
+        assertEquals("Unexpected PUT operations list size", 16, putOperations.size());
+        assertEquals("Unexpected DELETE operations list size", 16, deleteOperations.size());
+    }
+
+    private void addIfNotNull(JsonNode operation, Set<JsonNode> operations) {
+        if (operation != null) {
+            operations.add(operation);
+        }
     }
 }
