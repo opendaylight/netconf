@@ -9,15 +9,12 @@ package org.opendaylight.netconf.test.tool;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -31,42 +28,31 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SchemasBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SessionsBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema.Location;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema.Location.Enumeration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaKey;
 import org.opendaylight.yangtools.concepts.NoOpObjectRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 
 public class DummyMonitoringService implements NetconfMonitoringService {
-
     private static final Sessions EMPTY_SESSIONS = new SessionsBuilder().build();
-    private static final Function<Capability, Uri> CAPABILITY_URI_FUNCTION =
-        capability -> new Uri(capability.getCapabilityUri());
-
-    private static final Function<Capability, Schema> CAPABILITY_SCHEMA_FUNCTION = capability -> new SchemaBuilder()
-            .setIdentifier(capability.getModuleName().orElseThrow())
-            .setNamespace(new Uri(capability.getModuleNamespace().orElseThrow()))
-            .setFormat(Yang.VALUE)
-            .setVersion(capability.getRevision().orElse(""))
-            .setLocation(Set.of(new Location(Enumeration.NETCONF)))
-            .withKey(new SchemaKey(Yang.VALUE, capability.getModuleName().orElseThrow(),
-                capability.getRevision().orElse("")))
-            .build();
 
     private final Capabilities capabilities;
     private final ArrayListMultimap<String, Capability> capabilityMultiMap;
     private final Schemas schemas;
 
     public DummyMonitoringService(final Set<Capability> capabilities) {
+        this.capabilities = new CapabilitiesBuilder()
+            .setCapability(capabilities.stream()
+                .map(capability -> new Uri(capability.getCapabilityUri()))
+                .collect(ImmutableSet.toImmutableSet()))
+            .build();
 
-        this.capabilities = new CapabilitiesBuilder().setCapability(
-                ImmutableSet.copyOf(Collections2.transform(capabilities, CAPABILITY_URI_FUNCTION))).build();
-
-        Set<Capability> moduleCapabilities = new HashSet<>();
+        final var moduleCapabilities = new HashSet<Capability>();
         capabilityMultiMap = ArrayListMultimap.create();
-        for (Capability cap : capabilities) {
+        for (var cap : capabilities) {
             cap.getModuleName().ifPresent(moduleName -> {
                 capabilityMultiMap.put(moduleName, cap);
                 moduleCapabilities.add(cap);
@@ -74,9 +60,18 @@ public class DummyMonitoringService implements NetconfMonitoringService {
         }
 
         schemas = new SchemasBuilder()
-                .setSchema(Maps.uniqueIndex(Collections2.transform(moduleCapabilities, CAPABILITY_SCHEMA_FUNCTION),
-                    Schema::key))
-                .build();
+            .setSchema(BindingMap.of(moduleCapabilities.stream()
+                .map(capability -> new SchemaBuilder()
+                    .setIdentifier(capability.getModuleName().orElseThrow())
+                    .setNamespace(new Uri(capability.getModuleNamespace().orElseThrow()))
+                    .setFormat(Yang.VALUE)
+                    .setVersion(capability.getRevision().orElse(""))
+                    .setLocation(Set.of(new Location(Enumeration.NETCONF)))
+                    .withKey(new SchemaKey(Yang.VALUE, capability.getModuleName().orElseThrow(),
+                        capability.getRevision().orElse("")))
+                    .build())
+                .collect(Collectors.toList())))
+            .build();
     }
 
     @Override
@@ -111,9 +106,9 @@ public class DummyMonitoringService implements NetconfMonitoringService {
 
     @Override
     public String getSchemaForCapability(final String moduleName, final Optional<String> revision) {
-        final List<Capability> capabilityList = capabilityMultiMap.get(moduleName);
+        final var capabilityList = capabilityMultiMap.get(moduleName);
         if (revision.isPresent()) {
-            for (Capability capability : capabilityList) {
+            for (var capability : capabilityList) {
                 if (capability.getRevision().orElseThrow().equals(revision.orElseThrow())) {
                     return capability.getCapabilitySchema().orElseThrow();
                 }
