@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.server.events.mdsal;
 
 import java.util.Set;
-import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
+import org.opendaylight.netconf.server.api.notifications.NetconfNotificationRegistry;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 

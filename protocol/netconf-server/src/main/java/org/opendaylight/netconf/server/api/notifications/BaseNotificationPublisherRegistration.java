@@ -5,13 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.notifications;
+package org.opendaylight.netconf.server.api.notifications;
 
 import org.opendaylight.yangtools.concepts.Registration;
 
 /**
- * Registration for notification publisher. This registration allows for publishing any netconf notifications
+ * Registration for base notification publisher. This registration allows for publishing of base NETCONF notifications
+ * using generated classes.
  */
-public interface NotificationPublisherRegistration extends Registration, NetconfNotificationListener {
+public interface BaseNotificationPublisherRegistration extends Registration, BaseNetconfNotificationListener {
 
 }

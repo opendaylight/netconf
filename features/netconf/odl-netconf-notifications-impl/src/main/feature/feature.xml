@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0" name="odl-netconf-notifications-impl-${project.version}">
-    <feature name="odl-netconf-notifications-impl" version="${project.version}">
-        <feature version="[11,12)">odl-mdsal-binding-runtime</feature>
-    </feature>
-</features>
