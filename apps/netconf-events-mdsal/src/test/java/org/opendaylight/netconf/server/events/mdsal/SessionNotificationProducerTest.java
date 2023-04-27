@@ -28,8 +28,8 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationTyp
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
-import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
-import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
+import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
+import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;

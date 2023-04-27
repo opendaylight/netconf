@@ -29,9 +29,9 @@ import org.opendaylight.mdsal.binding.dom.codec.impl.di.DefaultBindingDOMCodecFa
 import org.opendaylight.mdsal.binding.generator.impl.DefaultBindingRuntimeGenerator;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
-import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.netconf.notifications.NetconfNotificationListener;
+import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
+import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
+import org.opendaylight.netconf.server.api.notifications.NetconfNotificationListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamBuilder;

@@ -267,11 +267,6 @@
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-notifications-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>mdsal-netconf-ssh</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -411,13 +406,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-netconf-netty-util</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>odl-netconf-notifications-api</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>
