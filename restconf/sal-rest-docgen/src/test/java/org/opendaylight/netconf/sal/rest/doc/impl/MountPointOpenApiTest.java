@@ -28,6 +28,8 @@ import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public final class MountPointOpenApiTest extends AbstractApiDocTest {
     private static final String HTTP_URL = "http://localhost/path";
@@ -67,7 +69,7 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
     }
 
     @Test
-    public void testGetDataStoreApi() throws Exception {
+    public void testGetDataStoreApiByModule() throws Exception {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         openApi.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
 
@@ -90,5 +92,49 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
 
         assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
             "/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
+    }
+
+    /**
+     * Test that gets {@link OpenApiObject} with all paths including yang models.
+     * @throws Exception if something wrong with {@link MountPointOpenApiTest#HTTP_URL}
+     */
+    @Test
+    public void testGetDataStoreApi() throws Exception {
+        EffectiveModelContext context = YangParserTestUtils.parseYangResource("/yang/choice-test.yang");
+        DOMSchemaService schemaService = mock(DOMSchemaService.class);
+        when(schemaService.getGlobalContext()).thenReturn(context);
+
+        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
+        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
+
+        final DOMMountPointService service = mock(DOMMountPointService.class);
+        when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
+
+        MountPointOpenApi api = new MountPointOpenApiGeneratorRFC8040(schemaService, service).getMountPointOpenApi();
+
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        api.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
+
+        final OpenApiObject mountPointApi = api.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("failed to find Datastore API", mountPointApi);
+
+        final Map<String, Path> paths = mountPointApi.getPaths();
+        assertNotNull(paths);
+
+        assertEquals("Unexpected api list size", 4, paths.size());
+
+        final Set<String> actualUrls = new TreeSet<>();
+
+        for (final Map.Entry<String, Path> path : paths.entrySet()) {
+            actualUrls.add(path.getKey());
+            final JsonNode getOperation = path.getValue().getGet();
+            assertNotNull("unexpected operation method on " + path, getOperation);
+            assertNotNull("expected non-null desc on " + path, getOperation.get("description"));
+        }
+
+        assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
+                "/rests/operations" + INSTANCE_URL + "yang-ext:mount",
+                "/rests/data" + INSTANCE_URL + "yang-ext:mount/choice-test:second-container",
+                "/rests/data" + INSTANCE_URL + "yang-ext:mount/choice-test:first-container"), actualUrls);
     }
 }
