@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b80857ed_9a69dd22",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-04-27T09:28:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb16c743_5624710d",
+      "revId": "b7d84e7d407e46ed0407f701a08925fc5a73185e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e001ce37_8dd32cac",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8923e7e6_5c50e181",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-04-27T09:28:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e001ce37_8dd32cac",
+      "revId": "b7d84e7d407e46ed0407f701a08925fc5a73185e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc168263_dbbc31db",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-04-26T08:01:11Z",
       "side": 1,
       "message": "IMHO: We have everything for security in base generator.",
+      "revId": "b7d84e7d407e46ed0407f701a08925fc5a73185e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77e132b0_c0960a59",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-04-27T09:28:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc168263_dbbc31db",
       "revId": "b7d84e7d407e46ed0407f701a08925fc5a73185e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

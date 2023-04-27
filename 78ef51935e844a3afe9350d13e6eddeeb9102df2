@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce5025b8_0ec2beeb",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-04-27T09:28:42Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "5195a5c4_3522817d",
+      "revId": "78ef51935e844a3afe9350d13e6eddeeb9102df2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08d5a5eb_4ba76a61",
@@ -49,6 +67,24 @@
       "side": 0,
       "message": "ACK, this was used for swagger (OAS2). Now its no more needed.",
       "parentUuid": "08d5a5eb_4ba76a61",
+      "revId": "78ef51935e844a3afe9350d13e6eddeeb9102df2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d33036b5_9e10a71b",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/openapi/SecurityDefinitions.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-04-27T09:28:42Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "ea789d71_b7e39a46",
       "revId": "78ef51935e844a3afe9350d13e6eddeeb9102df2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
