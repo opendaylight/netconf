@@ -8,10 +8,10 @@
 package org.opendaylight.netconf.test.tool.monitoring;
 
 import java.util.Set;
-import org.opendaylight.controller.config.yang.netconf.mdsal.monitoring.GetSchema;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
+import org.opendaylight.netconf.server.impl.monitoring.GetSchema;
 
 public class NetconfMonitoringOperationService implements NetconfOperationService {
     private final NetconfMonitoringService monitor;
