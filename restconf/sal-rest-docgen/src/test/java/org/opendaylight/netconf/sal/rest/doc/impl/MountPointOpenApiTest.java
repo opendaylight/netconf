@@ -91,4 +91,31 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
         assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
             "/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
     }
+
+    @Test
+    public void testGetDataStoreApiWithDataStore() throws Exception {
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
+
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("failed to find Datastore API", mountPointApi);
+
+        final Map<String, Path> paths = mountPointApi.getPaths();
+        assertNotNull(paths);
+
+        assertEquals("Unexpected api list size", 26, paths.size());
+
+//        final Set<String> actualUrls = new TreeSet<>();
+
+        // TODO Find way to check for ANY operation present
+//        for (final Map.Entry<String, Path> path : paths.entrySet()) {
+//            actualUrls.add(path.getKey());
+//            final JsonNode getOperation = path.getValue().getGet();
+//            assertNotNull("unexpected operation method on " + path, getOperation);
+//            assertNotNull("expected non-null desc on " + path, getOperation.get("description"));
+//        }
+        // TODO Expand urls set
+//        assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
+//            "/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
+    }
 }
