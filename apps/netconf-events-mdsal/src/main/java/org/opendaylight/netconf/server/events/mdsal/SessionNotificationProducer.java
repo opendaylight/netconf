@@ -10,7 +10,10 @@ package org.opendaylight.netconf.server.events.mdsal;
 import java.util.Collection;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdOrZeroType;
@@ -32,10 +35,8 @@ import org.slf4j.LoggerFactory;
  * Listens on changes in NetconfState/Sessions/Session datastore and publishes them.
  */
 @Component(service = { })
-public class SessionNotificationProducer extends OperationalDatastoreListener<Session> {
+public class SessionNotificationProducer implements DataTreeChangeListener<Session>, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SessionNotificationProducer.class);
-    private static final InstanceIdentifier<Session> SESSION_INSTANCE_IDENTIFIER =
-            InstanceIdentifier.builder(NetconfState.class).child(Sessions.class).child(Session.class).build();
 
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
     private final ListenerRegistration<?> sessionListenerRegistration;
@@ -44,12 +45,14 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
     public SessionNotificationProducer(
             @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
-        super(SESSION_INSTANCE_IDENTIFIER);
-
         baseNotificationPublisherRegistration = notifManager.registerBaseNotificationPublisher();
-        sessionListenerRegistration = registerOnChanges(dataBroker);
+        sessionListenerRegistration = dataBroker.registerDataTreeChangeListener(
+            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL,
+                InstanceIdentifier.builder(NetconfState.class).child(Sessions.class).child(Session.class).build()),
+            this);
     }
 
+    @Override
     @Deactivate
     public void close() {
         if (baseNotificationPublisherRegistration != null) {

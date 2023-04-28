@@ -13,7 +13,10 @@ import java.util.Collection;
 import java.util.Set;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -37,11 +40,8 @@ import org.slf4j.LoggerFactory;
  * netconf notification stream listener.
  */
 @Component(service = { })
-public final class CapabilityChangeNotificationProducer extends OperationalDatastoreListener<Capabilities>
-        implements AutoCloseable {
+public final class CapabilityChangeNotificationProducer implements DataTreeChangeListener<Capabilities>, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityChangeNotificationProducer.class);
-    private static final InstanceIdentifier<Capabilities> CAPABILITIES_INSTANCE_IDENTIFIER =
-            InstanceIdentifier.builder(NetconfState.class).child(Capabilities.class).build();
 
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
     private final ListenerRegistration<?> capabilityChangeListenerRegistration;
@@ -50,9 +50,10 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     public CapabilityChangeNotificationProducer(
             @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
-        super(CAPABILITIES_INSTANCE_IDENTIFIER);
         baseNotificationPublisherRegistration = notifManager.registerBaseNotificationPublisher();
-        capabilityChangeListenerRegistration = registerOnChanges(dataBroker);
+        capabilityChangeListenerRegistration = dataBroker.registerDataTreeChangeListener(
+                DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL,
+                    InstanceIdentifier.builder(NetconfState.class).child(Capabilities.class).build()), this);
     }
 
     @Deactivate
