@@ -21,7 +21,6 @@ import io.netty.handler.logging.LoggingHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import org.opendaylight.netconf.util.NetconfConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +49,7 @@ public class EchoServer implements Runnable {
                     });
 
             // Start the server.
-            LocalAddress localAddress = NetconfConfiguration.NETCONF_LOCAL_ADDRESS;
+            LocalAddress localAddress = new LocalAddress("netconf");
             ChannelFuture future = bootstrap.bind(localAddress).sync();
 
             // Wait until the server socket is closed.
