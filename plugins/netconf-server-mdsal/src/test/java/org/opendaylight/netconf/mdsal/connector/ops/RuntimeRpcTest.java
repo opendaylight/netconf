@@ -45,7 +45,7 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.server.api.operations.HandlingPriority;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
-import org.opendaylight.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;

@@ -47,7 +47,7 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecode
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
-import org.opendaylight.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.w3c.dom.Document;
 
 public class NetconfClientSessionNegotiatorTest {

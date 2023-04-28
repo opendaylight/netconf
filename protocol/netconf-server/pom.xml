@@ -119,9 +119,7 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-util</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
+      <artifactId>netconf-test-util</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>

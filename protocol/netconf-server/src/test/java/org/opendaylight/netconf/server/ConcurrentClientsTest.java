@@ -73,7 +73,7 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
-import org.opendaylight.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;

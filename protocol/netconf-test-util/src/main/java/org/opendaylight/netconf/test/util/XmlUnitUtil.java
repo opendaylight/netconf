@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.util.test;
+package org.opendaylight.netconf.test.util;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertNodeTestPasses;
 import static org.junit.Assert.assertEquals;
@@ -24,11 +23,11 @@ import org.w3c.dom.Text;
 
 public final class XmlUnitUtil {
     private XmlUnitUtil() {
-
+        // Hidden on purpose
     }
 
-    public static void assertContainsElementWithText(final Document doc,
-                                                     final String textToFind) throws NodeTestException {
+    public static void assertContainsElementWithText(final Document doc, final String textToFind)
+            throws NodeTestException {
         NodeTest nt = new NodeTest(doc);
         NodeTester tester = new AbstractNodeTester() {
 

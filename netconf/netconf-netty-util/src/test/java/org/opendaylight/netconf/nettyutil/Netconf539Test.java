@@ -32,7 +32,7 @@ import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
-import org.opendaylight.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.w3c.dom.Document;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)

@@ -29,7 +29,7 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
-import org.opendaylight.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.test.util.XmlFileLoader;
 
 public class MessageParserTest {
     private NetconfMessage msg;

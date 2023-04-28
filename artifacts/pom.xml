@@ -72,6 +72,12 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-test-util</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>mdsal-netconf-monitoring</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -283,12 +289,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-ssh</artifactId>
-                <version>${project.version}</version>
-                <type>test-jar</type>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-util</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
             </dependency>
