@@ -30,12 +30,5 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-util</artifactId>
         </dependency>
-        <dependency>
-            <!-- finalname="etc/netconf.cfg" -->
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-util</artifactId>
-            <type>cfg</type>
-            <classifier>config</classifier>
-        </dependency>
     </dependencies>
 </project>
