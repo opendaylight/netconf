@@ -104,8 +104,11 @@
     </dependency>
     <dependency>
       <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-legacy</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
