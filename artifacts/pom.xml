@@ -67,7 +67,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>mdsal-netconf-connector</artifactId>
+                <artifactId>netconf-server-mdsal</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
