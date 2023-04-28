@@ -12,6 +12,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -28,8 +29,8 @@ public final class Validate extends AbstractConfigOperation {
 
     private final TransactionProvider transactionProvider;
 
-    public Validate(final String netconfSessionIdForReporting, final TransactionProvider transactionProvider) {
-        super(netconfSessionIdForReporting);
+    public Validate(final SessionIdType sessionId, final TransactionProvider transactionProvider) {
+        super(sessionId);
         this.transactionProvider = transactionProvider;
     }
 
@@ -43,7 +44,7 @@ public final class Validate extends AbstractConfigOperation {
         }
 
         transactionProvider.validateTransaction();
-        LOG.trace("<validate> request completed successfully on session {}", getNetconfSessionIdForReporting());
+        LOG.trace("<validate> request completed successfully on session {}", sessionId().getValue());
         return document.createElement(XmlNetconfConstants.OK);
     }
 

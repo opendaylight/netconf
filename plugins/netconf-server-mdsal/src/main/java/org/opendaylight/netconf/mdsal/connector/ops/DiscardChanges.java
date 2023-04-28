@@ -14,6 +14,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -28,8 +29,8 @@ public class DiscardChanges extends AbstractSingletonNetconfOperation {
 
     private final TransactionProvider transactionProvider;
 
-    public DiscardChanges(final String netconfSessionIdForReporting, final TransactionProvider transactionProvider) {
-        super(netconfSessionIdForReporting);
+    public DiscardChanges(final SessionIdType sessionId, final TransactionProvider transactionProvider) {
+        super(sessionId);
         this.transactionProvider = transactionProvider;
     }
 
@@ -43,8 +44,8 @@ public class DiscardChanges extends AbstractSingletonNetconfOperation {
             LOG.warn("Abort failed ", e);
             final Map<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ErrorTag.OPERATION_FAILED.elementBody(),
-                    "Operation failed. Use 'get-config' or 'edit-config' before triggering "
-                            + OPERATION_NAME + " operation");
+                "Operation failed. Use 'get-config' or 'edit-config' before triggering " + OPERATION_NAME
+                + " operation");
             throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                     ErrorSeverity.ERROR, errorInfo);
         }

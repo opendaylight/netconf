@@ -7,26 +7,30 @@
  */
 package org.opendaylight.netconf.server.api.operations;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Map;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public abstract class AbstractNetconfOperation implements NetconfOperation {
-    private final String netconfSessionIdForReporting;
+    private final @NonNull SessionIdType sessionId;
 
-    protected AbstractNetconfOperation(final String netconfSessionIdForReporting) {
-        this.netconfSessionIdForReporting = netconfSessionIdForReporting;
+    protected AbstractNetconfOperation(final SessionIdType sessionId) {
+        this.sessionId = requireNonNull(sessionId);
     }
 
-    public final String getNetconfSessionIdForReporting() {
-        return netconfSessionIdForReporting;
+    public final @NonNull SessionIdType sessionId() {
+        return sessionId;
     }
 
     @Override
@@ -129,7 +133,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
             // no problem
         }
         sb.append(", namespace=").append(getOperationNamespace());
-        sb.append(", session=").append(netconfSessionIdForReporting);
+        sb.append(", session=").append(sessionId.getValue());
         sb.append('}');
         return sb.toString();
     }

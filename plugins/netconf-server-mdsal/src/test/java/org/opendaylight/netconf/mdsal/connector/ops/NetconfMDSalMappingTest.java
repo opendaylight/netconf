@@ -21,6 +21,7 @@ import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -539,7 +540,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     }
 
     private class TestingGetConfig extends GetConfig {
-        TestingGetConfig(final String sessionId, final CurrentSchemaContext schemaContext,
+        TestingGetConfig(final SessionIdType sessionId, final CurrentSchemaContext schemaContext,
                          final TransactionProvider transactionProvider) {
             super(sessionId, schemaContext, transactionProvider);
         }

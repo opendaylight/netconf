@@ -15,6 +15,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -31,8 +32,8 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
     private final AutoCloseable sessionResources;
     private NetconfServerSession session;
 
-    public DefaultCloseSession(final String netconfSessionIdForReporting, final AutoCloseable sessionResources) {
-        super(netconfSessionIdForReporting);
+    public DefaultCloseSession(final SessionIdType sessionId, final AutoCloseable sessionResources) {
+        super(sessionId);
         this.sessionResources = sessionResources;
     }
 
@@ -53,9 +54,9 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
         try {
             sessionResources.close();
             requireNonNull(session, "Session was not set").delayedClose();
-            LOG.info("Session {} closing", session.getSessionId());
+            LOG.info("Session {} closing", session.sessionId().getValue());
         } catch (final Exception e) {
-            throw new DocumentedException("Unable to properly close session " + getNetconfSessionIdForReporting(), e,
+            throw new DocumentedException("Unable to properly close session " + sessionId().getValue(), e,
                     ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR,
                     // FIXME: i.e. <error>exception.toString()</error>? That looks wrong on a few levels.
                     Map.of(ErrorSeverity.ERROR.elementBody(), e.getMessage()));

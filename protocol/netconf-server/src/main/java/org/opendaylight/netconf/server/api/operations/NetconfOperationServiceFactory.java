@@ -11,6 +11,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.concepts.Registration;
 
 /**
@@ -30,5 +31,5 @@ public interface NetconfOperationServiceFactory {
      */
     @NonNull Registration registerCapabilityListener(CapabilityListener listener);
 
-    @NonNull NetconfOperationService createService(String netconfSessionIdForReporting);
+    @NonNull NetconfOperationService createService(@NonNull SessionIdType sessionId);
 }

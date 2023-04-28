@@ -12,13 +12,15 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class AbstractSingletonNetconfOperationTest {
     private static final class SingletonNCOperationImpl extends AbstractSingletonNetconfOperation {
-        SingletonNCOperationImpl(final String netconfSessionIdForReporting) {
-            super(netconfSessionIdForReporting);
+        SingletonNCOperationImpl(final SessionIdType sessionId) {
+            super(sessionId);
         }
 
         @Override
@@ -35,7 +37,7 @@ public class AbstractSingletonNetconfOperationTest {
 
     @Test
     public void testAbstractSingletonNetconfOperation() throws Exception {
-        SingletonNCOperationImpl operation = new SingletonNCOperationImpl("");
-        assertEquals(operation.getHandlingPriority(), HandlingPriority.HANDLE_WITH_MAX_PRIORITY);
+        SingletonNCOperationImpl operation = new SingletonNCOperationImpl(new SessionIdType(Uint32.TEN));
+        assertEquals(HandlingPriority.HANDLE_WITH_MAX_PRIORITY, operation.getHandlingPriority());
     }
 }

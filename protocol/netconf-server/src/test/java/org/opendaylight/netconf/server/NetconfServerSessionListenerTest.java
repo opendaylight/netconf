@@ -34,6 +34,8 @@ import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.server.api.monitoring.SessionListener;
 import org.opendaylight.netconf.server.osgi.NetconfOperationRouterImpl;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -62,7 +64,7 @@ public class NetconfServerSessionListenerTest {
         doNothing().when(monitoringListener).onSessionDown(any());
         doNothing().when(monitoringListener).onSessionEvent(any());
         channel = new EmbeddedChannel();
-        session = new NetconfServerSession(null, channel, 0L, null);
+        session = new NetconfServerSession(null, channel, new SessionIdType(Uint32.ONE), null);
         listener = new NetconfServerSessionListener(router, monitoring, closeable);
     }
 

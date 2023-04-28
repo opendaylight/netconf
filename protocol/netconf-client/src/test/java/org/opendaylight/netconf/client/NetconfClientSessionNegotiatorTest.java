@@ -48,6 +48,8 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 
 public class NetconfClientSessionNegotiatorTest {
@@ -152,7 +154,7 @@ public class NetconfClientSessionNegotiatorTest {
 
         negotiator.channelActive(null);
         doReturn(null).when(future).cause();
-        negotiator.handleMessage(HelloMessage.createServerHello(Set.of("a", "b"), 10));
+        negotiator.handleMessage(HelloMessage.createServerHello(Set.of("a", "b"), new SessionIdType(Uint32.TEN)));
         verify(promise).setSuccess(any());
     }
 
@@ -164,7 +166,7 @@ public class NetconfClientSessionNegotiatorTest {
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
         doReturn(null).when(future).cause();
-        negotiator.handleMessage(HelloMessage.createServerHello(Set.of("a", "b"), 10));
+        negotiator.handleMessage(HelloMessage.createServerHello(Set.of("a", "b"), new SessionIdType(Uint32.TEN)));
         negotiator.channelActive(null);
         verify(promise).setSuccess(any());
     }
@@ -186,7 +188,7 @@ public class NetconfClientSessionNegotiatorTest {
 
         ChannelHandlerContext handlerContext = mock(ChannelHandlerContext.class);
         doReturn(pipeline).when(handlerContext).pipeline();
-        negotiator.handleMessage(HelloMessage.createServerHello(Set.of("exi:1.0"), 10));
+        negotiator.handleMessage(HelloMessage.createServerHello(Set.of("exi:1.0"), new SessionIdType(Uint32.TEN)));
         Document expectedResult = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc-reply_ok.xml");
         channelInboundHandlerAdapter.channelRead(handlerContext, new NetconfMessage(expectedResult));
 

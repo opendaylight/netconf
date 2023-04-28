@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import static java.util.Objects.requireNonNull;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -16,6 +18,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.EOFException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfExiSession;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSession;
@@ -28,6 +31,7 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.UnsupportedOption;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,19 +39,18 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
         extends SimpleChannelInboundHandler<Object> implements NetconfSession, NetconfExiSession {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSession.class);
 
-
     private final L sessionListener;
-    private final long sessionId;
+    private final @NonNull SessionIdType sessionId;
     private boolean up = false;
 
     private ChannelHandler delayedEncoder;
 
     private final Channel channel;
 
-    protected AbstractNetconfSession(final L sessionListener, final Channel channel, final long sessionId) {
+    protected AbstractNetconfSession(final L sessionListener, final Channel channel, final SessionIdType sessionId) {
         this.sessionListener = sessionListener;
         this.channel = channel;
-        this.sessionId = sessionId;
+        this.sessionId = requireNonNull(sessionId);
         LOG.debug("Session {} created", sessionId);
     }
 
@@ -109,7 +112,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "{");
-        sb.append("sessionId=").append(sessionId);
+        sb.append("sessionId=").append(sessionId.getValue());
         sb.append(", channel=").append(channel);
         sb.append('}');
         return sb.toString();
@@ -167,7 +170,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
         return up;
     }
 
-    public final long getSessionId() {
+    public final @NonNull SessionIdType sessionId() {
         return sessionId;
     }
 

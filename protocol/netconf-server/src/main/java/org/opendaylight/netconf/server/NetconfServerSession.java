@@ -29,6 +29,7 @@ import org.opendaylight.netconf.nettyutil.AbstractNetconfSession;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -68,7 +69,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     private volatile boolean delayedClose;
 
     public NetconfServerSession(final NetconfServerSessionListener sessionListener, final Channel channel,
-                                final long sessionId, final NetconfHelloMessageAdditionalHeader header) {
+                                final SessionIdType sessionId, final NetconfHelloMessageAdditionalHeader header) {
         super(sessionListener, channel, sessionId);
         this.header = header;
         this.sessionListener = sessionListener;
@@ -118,8 +119,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
 
     @Override
     public Session toManagementSession() {
-        final SessionBuilder builder = new SessionBuilder()
-                .withKey(new SessionKey(Uint32.valueOf(getSessionId())));
+        final SessionBuilder builder = new SessionBuilder().withKey(new SessionKey(sessionId().getValue()));
         final InetAddress address1 = InetAddresses.forString(header.getAddress());
         final IpAddress address;
         if (address1 instanceof Inet4Address) {

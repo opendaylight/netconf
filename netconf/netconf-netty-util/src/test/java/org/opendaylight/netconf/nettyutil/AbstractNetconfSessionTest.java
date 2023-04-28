@@ -41,9 +41,12 @@ import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AbstractNetconfSessionTest {
+    private static final SessionIdType SESSION_ID = new SessionIdType(Uint32.ONE);
 
     @Mock
     private NetconfSessionListener<TestingNetconfSession> listener;
@@ -84,22 +87,22 @@ public class AbstractNetconfSessionTest {
 
     @Test
     public void testHandleMessage() throws Exception {
-        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
+        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, SESSION_ID);
         testingNetconfSession.handleMessage(clientHello);
         verify(listener).onMessage(testingNetconfSession, clientHello);
     }
 
     @Test
     public void testSessionUp() throws Exception {
-        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
+        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, SESSION_ID);
         testingNetconfSession.sessionUp();
         verify(listener).onSessionUp(testingNetconfSession);
-        assertEquals(1L, testingNetconfSession.getSessionId());
+        assertEquals(SESSION_ID, testingNetconfSession.sessionId());
     }
 
     @Test
     public void testClose() throws Exception {
-        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
+        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, SESSION_ID);
         testingNetconfSession.sessionUp();
         testingNetconfSession.close();
         verify(channel).close();
@@ -108,7 +111,7 @@ public class AbstractNetconfSessionTest {
 
     @Test
     public void testReplaceHandlers() throws Exception {
-        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
+        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, SESSION_ID);
         final ChannelHandler mock = mock(ChannelHandler.class);
 
         testingNetconfSession.replaceMessageDecoder(mock);
@@ -127,7 +130,7 @@ public class AbstractNetconfSessionTest {
 
     @Test
     public void testStartExi() throws Exception {
-        TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
+        TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, SESSION_ID);
         testingNetconfSession = spy(testingNetconfSession);
 
         testingNetconfSession.startExiCommunication(NetconfStartExiMessage.create(EXIParameters.empty(), "4"));
@@ -136,7 +139,7 @@ public class AbstractNetconfSessionTest {
 
     @Test
     public void testEndOfInput() throws Exception {
-        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
+        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, SESSION_ID);
         testingNetconfSession.endOfInput();
         verifyNoMoreInteractions(listener);
         testingNetconfSession.sessionUp();
@@ -146,7 +149,7 @@ public class AbstractNetconfSessionTest {
 
     @Test
     public void testSendMessage() throws Exception {
-        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
+        final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, SESSION_ID);
         final HelloMessage hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
         testingNetconfSession.sendMessage(hello);
         verify(channel).writeAndFlush(hello, writeFuture);

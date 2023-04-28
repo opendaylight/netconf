@@ -25,6 +25,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
@@ -32,7 +33,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.NeverReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
-
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 
 /**
  * Synchronous netconf client suitable for testing.
@@ -44,16 +45,14 @@ public class TestingNetconfClient implements Closeable {
     private final String label;
     private final NetconfClientSession clientSession;
     private final NetconfClientSessionListener sessionListener;
-    private final long sessionId;
 
     public TestingNetconfClient(final String clientLabel,
                                 final NetconfClientDispatcher netconfClientDispatcher,
                                 final NetconfClientConfiguration config) throws InterruptedException {
-        this.label = clientLabel;
+        label = clientLabel;
         sessionListener = config.getSessionListener();
         Future<NetconfClientSession> clientFuture = netconfClientDispatcher.createClient(config);
         clientSession = get(clientFuture);
-        this.sessionId = clientSession.getSessionId();
     }
 
     private static NetconfClientSession get(final Future<NetconfClientSession> clientFuture)
@@ -90,13 +89,13 @@ public class TestingNetconfClient implements Closeable {
     public String toString() {
         final StringBuilder sb = new StringBuilder("TestingNetconfClient{");
         sb.append("label=").append(label);
-        sb.append(", sessionId=").append(sessionId);
+        sb.append(", sessionId=").append(sessionId().getValue());
         sb.append('}');
         return sb.toString();
     }
 
-    public long getSessionId() {
-        return sessionId;
+    public @NonNull SessionIdType sessionId() {
+        return clientSession.sessionId();
     }
 
     public Set<String> getCapabilities() {

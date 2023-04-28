@@ -22,6 +22,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.ops.Datastore;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -50,8 +51,8 @@ abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     private final CurrentSchemaContext schemaContext;
     private final FilterContentValidator validator;
 
-    AbstractGet(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
-        super(netconfSessionIdForReporting);
+    AbstractGet(final SessionIdType sessionId, final CurrentSchemaContext schemaContext) {
+        super(sessionId);
         this.schemaContext = schemaContext;
         validator = new FilterContentValidator(schemaContext);
     }

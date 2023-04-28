@@ -19,6 +19,8 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -27,8 +29,8 @@ public class AbstractNetconfOperationTest {
     private static class NetconfOperationImpl extends AbstractNetconfOperation {
         public boolean handleRun;
 
-        NetconfOperationImpl(final String netconfSessionIdForReporting) {
-            super(netconfSessionIdForReporting);
+        NetconfOperationImpl(final SessionIdType sessionId) {
+            super(sessionId);
         }
 
         @Override
@@ -48,7 +50,7 @@ public class AbstractNetconfOperationTest {
         }
     }
 
-    private final NetconfOperationImpl netconfOperation = new NetconfOperationImpl("str");
+    private final NetconfOperationImpl netconfOperation = new NetconfOperationImpl(new SessionIdType(Uint32.ONE));
     private NetconfOperationChainedExecution operation;
 
     @Before
@@ -59,9 +61,9 @@ public class AbstractNetconfOperationTest {
     @Test
     public void testAbstractNetconfOperation() throws Exception {
         Document helloMessage = XmlFileLoader.xmlFileToDocument("netconfMessages/edit_config.xml");
-        assertEquals(netconfOperation.getNetconfSessionIdForReporting(), "str");
+        assertEquals(new SessionIdType(Uint32.ONE), netconfOperation.sessionId());
         assertNotNull(netconfOperation.canHandle(helloMessage));
-        assertEquals(netconfOperation.getHandlingPriority(), HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY);
+        assertEquals(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY, netconfOperation.getHandlingPriority());
 
         netconfOperation.handle(helloMessage, operation);
         assertTrue(netconfOperation.handleRun);

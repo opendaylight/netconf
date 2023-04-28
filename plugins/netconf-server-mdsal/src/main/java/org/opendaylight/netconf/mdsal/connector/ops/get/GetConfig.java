@@ -17,6 +17,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.Datastore;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -33,9 +34,9 @@ public class GetConfig extends AbstractGet {
 
     private final TransactionProvider transactionProvider;
 
-    public GetConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
-                     final TransactionProvider transactionProvider) {
-        super(netconfSessionIdForReporting, schemaContext);
+    public GetConfig(final SessionIdType sessionId, final CurrentSchemaContext schemaContext,
+            final TransactionProvider transactionProvider) {
+        super(sessionId, schemaContext);
         this.transactionProvider = transactionProvider;
     }
 
@@ -47,7 +48,7 @@ public class GetConfig extends AbstractGet {
             getConfigExecution = GetConfigExecution.fromXml(operationElement, OPERATION_NAME);
 
         } catch (final DocumentedException e) {
-            LOG.warn("Get request processing failed on session: {}", getNetconfSessionIdForReporting(), e);
+            LOG.warn("Get request processing failed on session: {}", sessionId().getValue(), e);
             throw e;
         }
 
