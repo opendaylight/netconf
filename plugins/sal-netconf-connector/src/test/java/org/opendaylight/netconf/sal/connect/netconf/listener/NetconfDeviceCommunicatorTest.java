@@ -68,6 +68,7 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswo
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -100,7 +101,7 @@ public class NetconfDeviceCommunicatorTest {
         // FIXME: spy() except we override the MockMaker in use
         spySession = mock(NetconfClientSession.class, withSettings()
             .spiedInstance(new NetconfClientSession(mock(NetconfClientSessionListener.class), mock(Channel.class),
-                SESSION_ID.toJava(), Set.of()))
+                new SessionIdType(SESSION_ID), Set.of()))
             .defaultAnswer(CALLS_REAL_METHODS)
             .mockMaker(MockMakers.SUBCLASS));
     }

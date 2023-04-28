@@ -22,12 +22,14 @@ import org.junit.Test;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.NetconfServerSession;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 
 public class DefaultStopExiTest {
     @Test
     public void testHandleWithNoSubsequentOperations() throws Exception {
-        final DefaultStopExi exi = new DefaultStopExi("");
+        final DefaultStopExi exi = new DefaultStopExi(new SessionIdType(Uint32.ONE));
         final Document doc = XmlUtil.newDocument();
         Channel channel = mock(Channel.class);
         doReturn("mockChannel").when(channel).toString();
@@ -36,8 +38,7 @@ public class DefaultStopExiTest {
         ChannelHandler channelHandler = mock(ChannelHandler.class);
         doReturn(channelHandler).when(pipeline).replace(anyString(), anyString(), any(ChannelHandler.class));
 
-        NetconfServerSession serverSession = new NetconfServerSession(null, channel, 2L, null);
-        exi.setNetconfSession(serverSession);
+        exi.setNetconfSession(new NetconfServerSession(null, channel, new SessionIdType(Uint32.TWO), null));
 
         assertNotNull(exi.handleWithNoSubsequentOperations(doc,
                 XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"))));

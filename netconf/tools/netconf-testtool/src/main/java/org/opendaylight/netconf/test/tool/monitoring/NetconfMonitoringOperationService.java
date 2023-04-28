@@ -12,17 +12,20 @@ import org.opendaylight.controller.config.yang.netconf.mdsal.monitoring.GetSchem
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 
 public class NetconfMonitoringOperationService implements NetconfOperationService {
     private final NetconfMonitoringService monitor;
+    private final SessionIdType sessionId;
 
-    public NetconfMonitoringOperationService(final NetconfMonitoringService monitor) {
+    public NetconfMonitoringOperationService(final SessionIdType sessionId, final NetconfMonitoringService monitor) {
+        this.sessionId = sessionId;
         this.monitor = monitor;
     }
 
     @Override
     public Set<NetconfOperation> getNetconfOperations() {
-        return Set.of(new Get(monitor), new GetSchema("testtool-session", monitor));
+        return Set.of(new Get(sessionId, monitor), new GetSchema(sessionId, monitor));
     }
 
     @Override

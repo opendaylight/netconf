@@ -30,6 +30,7 @@ import org.opendaylight.netconf.server.mapping.operations.DefaultCloseSession;
 import org.opendaylight.netconf.server.mapping.operations.DefaultNetconfOperation;
 import org.opendaylight.netconf.server.mapping.operations.DefaultStartExi;
 import org.opendaylight.netconf.server.mapping.operations.DefaultStopExi;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -45,7 +46,7 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter, AutoC
     private final Collection<NetconfOperation> allNetconfOperations;
 
     public NetconfOperationRouterImpl(final NetconfOperationService netconfOperationServiceSnapshot,
-            final NetconfMonitoringService netconfMonitoringService, final String sessionId) {
+            final NetconfMonitoringService netconfMonitoringService, final SessionIdType sessionId) {
         this.netconfOperationServiceSnapshot = requireNonNull(netconfOperationServiceSnapshot);
 
         final Set<NetconfOperation> ops = new HashSet<>();

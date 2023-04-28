@@ -23,6 +23,7 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactoryListener;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 
@@ -96,8 +97,8 @@ public class AggregatedNetconfOperationServiceFactory
     }
 
     @Override
-    public final synchronized NetconfOperationService createService(final String netconfSessionIdForReporting) {
-        return new AggregatedNetconfOperation(factories, netconfSessionIdForReporting);
+    public final synchronized NetconfOperationService createService(final SessionIdType sessionId) {
+        return new AggregatedNetconfOperation(factories, sessionId);
     }
 
     @Override
@@ -111,10 +112,9 @@ public class AggregatedNetconfOperationServiceFactory
     private static final class AggregatedNetconfOperation implements NetconfOperationService {
         private final ImmutableSet<NetconfOperationService> services;
 
-        AggregatedNetconfOperation(final Set<NetconfOperationServiceFactory> factories,
-                                   final String netconfSessionIdForReporting) {
+        AggregatedNetconfOperation(final Set<NetconfOperationServiceFactory> factories, final SessionIdType sessionId) {
             services = factories.stream()
-                .map(factory -> factory.createService(netconfSessionIdForReporting))
+                .map(factory -> factory.createService(sessionId))
                 .collect(ImmutableSet.toImmutableSet());
         }
 

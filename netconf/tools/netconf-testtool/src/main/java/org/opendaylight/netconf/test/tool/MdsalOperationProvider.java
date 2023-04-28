@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.test.tool;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -36,6 +38,7 @@ import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
@@ -91,23 +94,22 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
     }
 
     @Override
-    public NetconfOperationService createService(final String netconfSessionIdForReporting) {
-        return new MdsalOperationService(Long.parseLong(netconfSessionIdForReporting), schemaContext, caps,
-            sourceProvider);
+    public NetconfOperationService createService(final SessionIdType sessionId) {
+        return new MdsalOperationService(sessionId, schemaContext, caps, sourceProvider);
     }
 
     static class MdsalOperationService implements NetconfOperationService {
-        private final String currentSessionId;
+        private final SessionIdType currentSessionId;
         private final EffectiveModelContext schemaContext;
         private final Set<Capability> caps;
         private final DOMSchemaService schemaService;
         private final DOMDataBroker dataBroker;
         private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
-        MdsalOperationService(final long currentSessionId, final EffectiveModelContext schemaContext,
+        MdsalOperationService(final SessionIdType currentSessionId, final EffectiveModelContext schemaContext,
                               final Set<Capability> caps,
                               final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
-            this.currentSessionId = String.valueOf(currentSessionId);
+            this.currentSessionId = requireNonNull(currentSessionId);
             this.schemaContext = schemaContext;
             this.caps = caps;
             this.sourceProvider = sourceProvider;
@@ -193,15 +195,16 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                 .build();
         }
 
-        private static DOMDataBroker createDataStore(final DOMSchemaService schemaService, final long sessionId) {
-            LOG.debug("Session {}: Creating data stores for simulated device", sessionId);
+        private static DOMDataBroker createDataStore(final DOMSchemaService schemaService,
+                final SessionIdType sessionId) {
+            LOG.debug("Session {}: Creating data stores for simulated device", sessionId.getValue());
             final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
             final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
 
             ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(16, 16,
                 "CommitFutures", MdsalOperationProvider.class);
 
-            final EnumMap<LogicalDatastoreType, DOMStore> datastores = new EnumMap<>(LogicalDatastoreType.class);
+            final var datastores = new EnumMap<LogicalDatastoreType, DOMStore>(LogicalDatastoreType.class);
             datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
             datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
 

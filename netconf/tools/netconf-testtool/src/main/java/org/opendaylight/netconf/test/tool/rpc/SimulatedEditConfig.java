@@ -11,6 +11,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.operations.AbstractLastNetconfOperation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -21,8 +22,8 @@ public class SimulatedEditConfig extends AbstractLastNetconfOperation {
     private static final String REMOVE_EDIT_CONFIG = "remove";
     private final DataList storage;
 
-    public SimulatedEditConfig(final String netconfSessionIdForReporting, final DataList storage) {
-        super(netconfSessionIdForReporting);
+    public SimulatedEditConfig(final SessionIdType sessionId, final DataList storage) {
+        super(sessionId);
         this.storage = storage;
     }
 
@@ -49,18 +50,15 @@ public class SimulatedEditConfig extends AbstractLastNetconfOperation {
     private boolean containsDelete(final XmlElement element) {
         for (final Attr o : element.getAttributes().values()) {
             if (o.getLocalName().equals(OPERATION)
-                    && (o.getValue().equals(DELETE_EDIT_CONFIG) || o.getValue()
-                            .equals(REMOVE_EDIT_CONFIG))) {
+                && (o.getValue().equals(DELETE_EDIT_CONFIG) || o.getValue().equals(REMOVE_EDIT_CONFIG))) {
                 return true;
             }
-
         }
 
         for (final XmlElement xmlElement : element.getChildElements()) {
             if (containsDelete(xmlElement)) {
                 return true;
             }
-
         }
 
         return false;

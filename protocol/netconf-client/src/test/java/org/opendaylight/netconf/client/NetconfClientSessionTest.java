@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import static org.junit.Assert.assertEquals;
@@ -13,11 +12,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.collect.Lists;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import java.util.Collection;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -27,6 +25,8 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfClientSessionTest {
@@ -40,8 +40,8 @@ public class NetconfClientSessionTest {
     @Test
     public void testNetconfClientSession() throws Exception {
         final NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-        final long sessId = 20L;
-        final Collection<String> caps = Lists.newArrayList("cap1", "cap2");
+        final var sessId = new SessionIdType(Uint32.valueOf(20));
+        final var caps = List.of("cap1", "cap2");
 
         final NetconfEXICodec codec = NetconfEXICodec.forParameters(EXIParameters.empty());
         final ChannelPipeline pipeline = mock(ChannelPipeline.class);

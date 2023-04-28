@@ -22,25 +22,26 @@ import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 
 final class MdsalNetconfOperationService implements NetconfOperationService {
     private final ImmutableSet<NetconfOperation> operations;
     private final TransactionProvider transactionProvider;
 
-    MdsalNetconfOperationService(final CurrentSchemaContext schemaContext, final String netconfSessionIdForReporting,
+    MdsalNetconfOperationService(final CurrentSchemaContext schemaContext, final SessionIdType sessionId,
             final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
-        transactionProvider = new TransactionProvider(dataBroker, netconfSessionIdForReporting);
+        transactionProvider = new TransactionProvider(dataBroker, sessionId);
         operations = ImmutableSet.of(
-            new Commit(netconfSessionIdForReporting, transactionProvider),
-            new DiscardChanges(netconfSessionIdForReporting, transactionProvider),
-            new EditConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
-            new CopyConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
-            new Get(netconfSessionIdForReporting, schemaContext, transactionProvider),
-            new GetConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
-            new Lock(netconfSessionIdForReporting),
-            new Unlock(netconfSessionIdForReporting),
-            new RuntimeRpc(netconfSessionIdForReporting, schemaContext, rpcService),
-            new Validate(netconfSessionIdForReporting, transactionProvider));
+            new Commit(sessionId, transactionProvider),
+            new DiscardChanges(sessionId, transactionProvider),
+            new EditConfig(sessionId, schemaContext, transactionProvider),
+            new CopyConfig(sessionId, schemaContext, transactionProvider),
+            new Get(sessionId, schemaContext, transactionProvider),
+            new GetConfig(sessionId, schemaContext, transactionProvider),
+            new Lock(sessionId),
+            new Unlock(sessionId),
+            new RuntimeRpc(sessionId, schemaContext, rpcService),
+            new Validate(sessionId, transactionProvider));
     }
 
     @Override

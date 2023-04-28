@@ -49,7 +49,7 @@ public record NetconfSessionPreferences(
 
     public static @NonNull NetconfSessionPreferences fromNetconfSession(final NetconfClientSession session) {
         return fromStrings(session.getServerCapabilities(), CapabilityOrigin.DeviceAdvertised,
-            Uint32.valueOf(session.getSessionId()));
+           session.sessionId().getValue());
     }
 
     @VisibleForTesting

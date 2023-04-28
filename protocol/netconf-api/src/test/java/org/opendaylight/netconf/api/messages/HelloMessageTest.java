@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 public class HelloMessageTest {
     @Test
@@ -24,7 +26,7 @@ public class HelloMessageTest {
         assertTrue(HelloMessage.isHelloMessage(message));
         assertEquals(Optional.of(additionalHeader), message.getAdditionalHeader());
 
-        var serverMessage = HelloMessage.createServerHello(caps, 100L);
+        var serverMessage = HelloMessage.createServerHello(caps, new SessionIdType(Uint32.valueOf(100)));
         assertTrue(HelloMessage.isHelloMessage(serverMessage));
     }
 }

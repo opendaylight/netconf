@@ -29,6 +29,7 @@ import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
 import org.opendaylight.netconf.server.api.operations.HandlingPriority;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -65,9 +66,9 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     private final CurrentSchemaContext schemaContext;
     private final DOMRpcService rpcService;
 
-    public RuntimeRpc(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
-                      final DOMRpcService rpcService) {
-        super(netconfSessionIdForReporting);
+    public RuntimeRpc(final SessionIdType sessionId, final CurrentSchemaContext schemaContext,
+            final DOMRpcService rpcService) {
+        super(sessionId);
         this.schemaContext = schemaContext;
         this.rpcService = rpcService;
     }

@@ -9,8 +9,8 @@ package org.opendaylight.netconf.test.tool.operations;
 
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
-import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 
 /**
  * Creator which enables testtool users to inject own. implementation of {@link NetconfOperationService}
@@ -20,10 +20,8 @@ public interface OperationsCreator {
      * Creates instance of {@link NetconfOperationService} based on caller context.
      *
      * @param capabilities Model capabilities.
-     * @param idProvider Provider's session context.
-     * @param netconfSessionIdForReporting Netconf SessionId for reporting
+     * @param sessionId Netconf SessionId for reporting
      * @return Instance of {@link NetconfOperationService}.
      */
-    NetconfOperationService getNetconfOperationService(Set<Capability> capabilities, SessionIdProvider idProvider,
-        String netconfSessionIdForReporting);
+    NetconfOperationService getNetconfOperationService(Set<Capability> capabilities, SessionIdType sessionId);
 }
