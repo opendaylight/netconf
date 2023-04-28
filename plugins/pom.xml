@@ -30,6 +30,7 @@
 
     <modules>
         <module>netconf-dom-api</module>
+        <module>netconf-server-mdsal</module>
         <module>sal-netconf-connector</module>
     </modules>
 </project>
