@@ -17,6 +17,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSession;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class NetconfClientSession extends AbstractNetconfSession<NetconfClientSe
      */
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "'this' passed to logger")
     public NetconfClientSession(final NetconfClientSessionListener sessionListener, final Channel channel,
-                                final long sessionId, final Collection<String> capabilities) {
+                                final SessionIdType sessionId, final Collection<String> capabilities) {
         super(sessionListener, channel, sessionId);
         this.capabilities = capabilities;
         LOG.debug("Client Session {} created", this);

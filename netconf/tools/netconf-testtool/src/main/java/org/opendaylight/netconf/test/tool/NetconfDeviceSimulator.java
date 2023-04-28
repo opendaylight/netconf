@@ -52,7 +52,6 @@ import org.opendaylight.netconf.ssh.SshProxyServerConfiguration;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.customrpc.SettableOperationProvider;
-import org.opendaylight.netconf.test.tool.monitoring.NetconfMonitoringOperationService;
 import org.opendaylight.netconf.test.tool.monitoring.NetconfMonitoringOperationServiceFactory;
 import org.opendaylight.netconf.test.tool.operations.DefaultOperationsCreator;
 import org.opendaylight.netconf.test.tool.operations.OperationsProvider;
@@ -142,24 +141,22 @@ public class NetconfDeviceSimulator implements Closeable {
                 idProvider, transformedCapabilities, schemaContext, sourceProvider);
         } else if (configuration.isXmlConfigurationProvided()) {
             LOG.info("using SimulatedOperationProvider.");
-            operationProvider = new SimulatedOperationProvider(idProvider, transformedCapabilities,
+            operationProvider = new SimulatedOperationProvider(transformedCapabilities,
                     Optional.ofNullable(configuration.getNotificationFile()),
                     Optional.ofNullable(configuration.getInitialConfigXMLFile()));
         } else if (configuration.isNotificationsSupported()) {
             LOG.info("using SimulatedOperationProvider.");
-            operationProvider = new SimulatedOperationProvider(idProvider, transformedCapabilities,
+            operationProvider = new SimulatedOperationProvider(transformedCapabilities,
                     Optional.ofNullable(configuration.getNotificationFile()),
                     Optional.empty());
         } else {
             LOG.info("using OperationsProvider.");
-            operationProvider = new OperationsProvider(idProvider, transformedCapabilities,
-                requireNonNullElseGet(configuration.getOperationsCreator(),
-                    () -> new DefaultOperationsCreator(idProvider.getCurrentSessionId())));
+            operationProvider = new OperationsProvider(transformedCapabilities,
+                requireNonNullElseGet(configuration.getOperationsCreator(), DefaultOperationsCreator::new));
         }
 
         final NetconfMonitoringOperationServiceFactory monitoringService =
-                new NetconfMonitoringOperationServiceFactory(
-                        new NetconfMonitoringOperationService(monitoringService1));
+                new NetconfMonitoringOperationServiceFactory(monitoringService1);
         aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(operationProvider);
         aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(monitoringService);
         if (configuration.getRpcConfigFile() != null) {

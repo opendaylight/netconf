@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.server;
 
+import static java.util.Objects.requireNonNull;
+
 import io.netty.channel.Channel;
 import io.netty.channel.local.LocalAddress;
 import io.netty.util.Timer;
@@ -16,10 +18,12 @@ import java.net.SocketAddress;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,15 +32,15 @@ public final class NetconfServerSessionNegotiator
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiator.class);
     private static final String UNKNOWN = "unknown";
 
-    private final long sessionId;
+    private final @NonNull SessionIdType sessionId;
 
-    NetconfServerSessionNegotiator(final HelloMessage hello, final long sessionId,
+    NetconfServerSessionNegotiator(final HelloMessage hello, final SessionIdType sessionId,
             final Promise<NetconfServerSession> promise, final Channel channel, final Timer timer,
             final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis,
             final @NonNegative int maximumIncomingChunkSize) {
         super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis,
             maximumIncomingChunkSize);
-        this.sessionId = sessionId;
+        this.sessionId = requireNonNull(sessionId);
     }
 
     @Override

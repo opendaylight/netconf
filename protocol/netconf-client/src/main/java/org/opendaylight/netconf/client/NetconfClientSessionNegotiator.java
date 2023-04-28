@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.HelloMessage;
@@ -28,6 +29,8 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -122,7 +125,7 @@ class NetconfClientSessionNegotiator
         return false;
     }
 
-    private static long extractSessionId(final Document doc) {
+    private static @NonNull SessionIdType extractSessionId(final Document doc) {
         String textContent = getSessionIdWithXPath(doc, SESSION_ID_X_PATH);
         if (Strings.isNullOrEmpty(textContent)) {
             textContent = getSessionIdWithXPath(doc, SESSION_ID_X_PATH_NO_NAMESPACE);
@@ -131,8 +134,7 @@ class NetconfClientSessionNegotiator
                         .toString(doc));
             }
         }
-
-        return Long.parseLong(textContent);
+        return new SessionIdType(Uint32.valueOf(textContent));
     }
 
     private static String getSessionIdWithXPath(final Document doc, final XPathExpression sessionIdXPath) {
@@ -143,13 +145,11 @@ class NetconfClientSessionNegotiator
     @Override
     protected NetconfClientSession getSession(final NetconfClientSessionListener sessionListener, final Channel channel,
                                               final HelloMessage message) {
-        final long sessionId = extractSessionId(message.getDocument());
+        final var sessionId = extractSessionId(message.getDocument());
 
         // Copy here is important: it disconnects the strings from the document
-        Set<String> capabilities = ImmutableSet.copyOf(NetconfMessageUtil.extractCapabilitiesFromHello(message
-                .getDocument()));
-
-        capabilities = INTERNER.intern(capabilities);
+        final var capabilities = INTERNER.intern(ImmutableSet.copyOf(
+            NetconfMessageUtil.extractCapabilitiesFromHello(message .getDocument())));
 
         return new NetconfClientSession(sessionListener, channel, sessionId, capabilities);
     }

@@ -20,6 +20,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -43,9 +44,9 @@ public final class EditConfig extends AbstractEdit {
 
     private final TransactionProvider transactionProvider;
 
-    public EditConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
+    public EditConfig(final SessionIdType sessionId, final CurrentSchemaContext schemaContext,
             final TransactionProvider transactionProvider) {
-        super(netconfSessionIdForReporting, schemaContext);
+        super(sessionId, schemaContext);
         this.transactionProvider = requireNonNull(transactionProvider);
     }
 

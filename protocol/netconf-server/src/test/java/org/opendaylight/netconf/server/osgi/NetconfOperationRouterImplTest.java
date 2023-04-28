@@ -17,8 +17,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -33,7 +31,9 @@ import org.opendaylight.netconf.server.api.operations.HandlingPriority;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -73,15 +73,13 @@ public class NetconfOperationRouterImplTest {
         doReturn(XmlUtil.readXmlToDocument(DEFAULT_PRIORITY_REPLY)).when(defaultPrioMock).handle(any(Document.class),
                 any(NetconfOperationChainedExecution.class));
 
-        final Set<NetconfOperation> operations = new HashSet<>();
-        operations.add(maxPrioMock);
-        operations.add(defaultPrioMock);
-        doReturn(operations).when(operationService).getNetconfOperations();
+        doReturn(Set.of(maxPrioMock, defaultPrioMock)).when(operationService).getNetconfOperations();
         doNothing().when(operationService).close();
 
-        operationRouter = new NetconfOperationRouterImpl(operationService, null, "session-1");
-        doReturn(Collections.emptySet()).when(operationService2).getNetconfOperations();
-        emptyOperationRouter = new NetconfOperationRouterImpl(operationService2, null, "session-1");
+        final var sessionId = new SessionIdType(Uint32.ONE);
+        operationRouter = new NetconfOperationRouterImpl(operationService, null, sessionId);
+        doReturn(Set.of()).when(operationService2).getNetconfOperations();
+        emptyOperationRouter = new NetconfOperationRouterImpl(operationService2, null, sessionId);
     }
 
     @Test

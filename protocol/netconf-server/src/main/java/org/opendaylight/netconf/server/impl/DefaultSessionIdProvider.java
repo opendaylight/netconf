@@ -7,10 +7,12 @@
  */
 package org.opendaylight.netconf.server.impl;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -19,7 +21,7 @@ import org.osgi.service.component.annotations.Component;
 @Singleton
 @Component(immediate = true, property = "type=default")
 public final class DefaultSessionIdProvider implements SessionIdProvider {
-    private final AtomicLong sessionCounter = new AtomicLong();
+    private final AtomicInteger sessionCounter = new AtomicInteger();
 
     @Inject
     public DefaultSessionIdProvider() {
@@ -27,12 +29,11 @@ public final class DefaultSessionIdProvider implements SessionIdProvider {
     }
 
     @Override
-    public long getNextSessionId() {
-        return sessionCounter.incrementAndGet();
-    }
-
-    @Override
-    public long getCurrentSessionId() {
-        return sessionCounter.get();
+    public SessionIdType getNextSessionId() {
+        int bits;
+        do {
+            bits = sessionCounter.incrementAndGet();
+        } while (bits == 0);
+        return new SessionIdType(Uint32.fromIntBits(bits));
     }
 }

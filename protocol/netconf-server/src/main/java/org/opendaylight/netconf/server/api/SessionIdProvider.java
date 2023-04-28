@@ -7,9 +7,11 @@
  */
 package org.opendaylight.netconf.server.api;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+
+@NonNullByDefault
 public interface SessionIdProvider {
 
-    long getNextSessionId();
-
-    long getCurrentSessionId();
+    SessionIdType getNextSessionId();
 }

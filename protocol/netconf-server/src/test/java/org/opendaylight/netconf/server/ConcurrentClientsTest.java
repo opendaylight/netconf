@@ -15,7 +15,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -28,9 +27,7 @@ import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -74,6 +71,7 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFac
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
@@ -102,11 +100,11 @@ public class ConcurrentClientsTest {
 
     @Parameterized.Parameters()
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
+        return List.of(new Object[][]{
             { 4, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
             { 1, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
             // empty set of capabilities = only base 1.0 netconf capability
-            { 4, TestingNetconfClientRunnable.class, Collections.emptySet()},
+            { 4, TestingNetconfClientRunnable.class, Set.of()},
             { 4, TestingNetconfClientRunnable.class, getOnlyExiServerCaps()},
             { 4, TestingNetconfClientRunnable.class, getOnlyChunkServerCaps()},
             { 4, BlockingClientRunnable.class, getOnlyExiServerCaps()},
@@ -220,14 +218,14 @@ public class ConcurrentClientsTest {
     }
 
     public static Set<String> getOnlyExiServerCaps() {
-        return Sets.newHashSet(
+        return Set.of(
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0
         );
     }
 
     public static Set<String> getOnlyChunkServerCaps() {
-        return Sets.newHashSet(
+        return Set.of(
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1
         );
@@ -281,7 +279,7 @@ public class ConcurrentClientsTest {
 
         @Override
         public Set<Capability> getCapabilities() {
-            return Collections.emptySet();
+            return Set.of();
         }
 
         @Override
@@ -291,12 +289,12 @@ public class ConcurrentClientsTest {
         }
 
         @Override
-        public NetconfOperationService createService(final String netconfSessionIdForReporting) {
+        public NetconfOperationService createService(final SessionIdType sessionId) {
             return new NetconfOperationService() {
 
                 @Override
                 public Set<NetconfOperation> getNetconfOperations() {
-                    return Sets.newHashSet(operations);
+                    return Set.of(operations);
                 }
 
                 @Override
@@ -366,20 +364,20 @@ public class ConcurrentClientsTest {
                 final TestingNetconfClient netconfClient =
                         new TestingNetconfClient(Thread.currentThread().getName(), netconfClientDispatcher,
                                 getClientConfig());
-                long sessionId = netconfClient.getSessionId();
+                final var sessionId = netconfClient.sessionId();
                 LOG.info("Client with session id {}: hello exchanged", sessionId);
 
                 final NetconfMessage getMessage = XmlFileLoader
                         .xmlFileToNetconfMessage("netconfMessages/getConfig.xml");
                 NetconfMessage result = netconfClient.sendRequest(getMessage).get();
-                LOG.info("Client with session id {}: got result {}", sessionId, result);
+                LOG.info("Client with session id {}: got result {}", sessionId.getValue(), result);
 
                 checkState(NetconfMessageUtil.isErrorMessage(result) == false,
                         "Received error response: " + XmlUtil.toString(result.getDocument()) + " to request: "
                                 + XmlUtil.toString(getMessage.getDocument()));
 
                 netconfClient.close();
-                LOG.info("Client with session id {}: ended", sessionId);
+                LOG.info("Client with session id {}: ended", sessionId.getValue());
             } catch (final Exception e) {
                 throw new IllegalStateException(Thread.currentThread().getName(), e);
             }

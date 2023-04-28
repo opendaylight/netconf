@@ -26,6 +26,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.HelloMessage;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 public class SimpleNetconfClientSessionListenerTest {
     private Channel channel;
@@ -45,10 +47,10 @@ public class SimpleNetconfClientSessionListenerTest {
         doReturn(channelFuture).when(channel).writeAndFlush(any(), any(ChannelPromise.class));
         doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
         final var caps = Set.of("a", "b");
-        helloMessage = HelloMessage.createServerHello(caps, 10);
+        helloMessage = HelloMessage.createServerHello(caps, new SessionIdType(Uint32.TEN));
         message = new NetconfMessage(helloMessage.getDocument());
         sessionListener = mock(NetconfClientSessionListener.class);
-        clientSession = new NetconfClientSession(sessionListener, channel, 20L, caps);
+        clientSession = new NetconfClientSession(sessionListener, channel, new SessionIdType(Uint32.valueOf(20)), caps);
     }
 
     private void mockEventLoop() {

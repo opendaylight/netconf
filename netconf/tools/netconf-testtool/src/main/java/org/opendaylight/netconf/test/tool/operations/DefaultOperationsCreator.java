@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.test.tool.operations;
 
-import com.google.common.collect.Sets;
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
-import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.test.tool.rpc.DataList;
@@ -23,43 +23,36 @@ import org.opendaylight.netconf.test.tool.rpc.SimulatedGet;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedGetConfig;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedLock;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedUnLock;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 
 public final class DefaultOperationsCreator implements OperationsCreator {
-    private final SimulatedOperationService simulatedOperationService;
-
-    public DefaultOperationsCreator(final long currentSessionId) {
-        simulatedOperationService = new SimulatedOperationService(currentSessionId);
-    }
 
     @Override
     public NetconfOperationService getNetconfOperationService(final Set<Capability> caps,
-            final SessionIdProvider idProvider, final String netconfSessionIdForReporting) {
-        return simulatedOperationService;
+            final SessionIdType sessionId) {
+        return new SimulatedOperationService(sessionId);
     }
 
     static class SimulatedOperationService implements NetconfOperationService {
-        private final long currentSessionId;
+        private final SessionIdType currentSessionId;
 
-        SimulatedOperationService(final long currentSessionId) {
-            this.currentSessionId = currentSessionId;
+        SimulatedOperationService(final SessionIdType currentSessionId) {
+            this.currentSessionId = requireNonNull(currentSessionId);
         }
 
         @Override
         public Set<NetconfOperation> getNetconfOperations() {
             final DataList storage = new DataList();
-            final SimulatedGet sGet = new SimulatedGet(String.valueOf(currentSessionId), storage);
-            final SimulatedEditConfig sEditConfig = new SimulatedEditConfig(String.valueOf(currentSessionId), storage);
-            final SimulatedGetConfig sGetConfig = new SimulatedGetConfig(
-                String.valueOf(currentSessionId), storage, Optional.empty());
-            final SimulatedCommit sCommit = new SimulatedCommit(String.valueOf(currentSessionId));
-            final SimulatedLock sLock = new SimulatedLock(String.valueOf(currentSessionId));
-            final SimulatedUnLock sUnlock = new SimulatedUnLock(String.valueOf(currentSessionId));
-            final SimulatedCreateSubscription sCreateSubs = new SimulatedCreateSubscription(
-                String.valueOf(currentSessionId), Optional.empty());
-            final SimulatedDiscardChanges sDiscardChanges = new SimulatedDiscardChanges(
-                String.valueOf(currentSessionId));
-            return Sets.newHashSet(
-                sGet, sGetConfig, sEditConfig, sCommit, sLock, sUnlock, sCreateSubs, sDiscardChanges);
+            final SimulatedGet sGet = new SimulatedGet(currentSessionId, storage);
+            final SimulatedEditConfig sEditConfig = new SimulatedEditConfig(currentSessionId, storage);
+            final SimulatedGetConfig sGetConfig = new SimulatedGetConfig(currentSessionId, storage, Optional.empty());
+            final SimulatedCommit sCommit = new SimulatedCommit(currentSessionId);
+            final SimulatedLock sLock = new SimulatedLock(currentSessionId);
+            final SimulatedUnLock sUnlock = new SimulatedUnLock(currentSessionId);
+            final SimulatedCreateSubscription sCreateSubs = new SimulatedCreateSubscription(currentSessionId,
+                Optional.empty());
+            final SimulatedDiscardChanges sDiscardChanges = new SimulatedDiscardChanges(currentSessionId);
+            return Set.of(sGet, sGetConfig, sEditConfig, sCommit, sLock, sUnlock, sCreateSubs, sDiscardChanges);
         }
 
         @Override

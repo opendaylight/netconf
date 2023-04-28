@@ -12,6 +12,8 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 final class TestSessionNegotiator
         extends AbstractNetconfSessionNegotiator<TestingNetconfSession, NetconfSessionListener<TestingNetconfSession>> {
@@ -24,7 +26,7 @@ final class TestSessionNegotiator
     @Override
     protected TestingNetconfSession getSession(final NetconfSessionListener<TestingNetconfSession> sessionListener,
             final Channel channel, final HelloMessage message) {
-        return new TestingNetconfSession(sessionListener, channel, 0L);
+        return new TestingNetconfSession(sessionListener, channel, new SessionIdType(Uint32.ONE));
     }
 
     @Override

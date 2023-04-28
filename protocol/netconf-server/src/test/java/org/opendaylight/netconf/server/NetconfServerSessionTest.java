@@ -34,9 +34,11 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfSsh;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.monitoring.rev220718.NetconfTcp;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -59,7 +61,7 @@ public class NetconfServerSessionTest {
         final NetconfHelloMessageAdditionalHeader header =
                 new NetconfHelloMessageAdditionalHeader(USER, HOST, PORT, SSH_TRANSPORT, SESSION_ID);
         channel = new EmbeddedChannel();
-        session = new NetconfServerSession(listener, channel, 1L, header);
+        session = new NetconfServerSession(listener, channel, new SessionIdType(Uint32.ONE), header);
         doNothing().when(listener).onSessionUp(any());
         msg = new NetconfMessage(XmlUtil.readXmlToDocument("<rpc-reply></rpc-reply>"));
     }
@@ -136,7 +138,7 @@ public class NetconfServerSessionTest {
         final NetconfHelloMessageAdditionalHeader header =
                 new NetconfHelloMessageAdditionalHeader(USER, HOST, PORT, TCP_TRANSPORT, SESSION_ID);
         final EmbeddedChannel ch = new EmbeddedChannel();
-        final NetconfServerSession tcpSession = new NetconfServerSession(listener, ch, 1L, header);
+        final var tcpSession = new NetconfServerSession(listener, ch, new SessionIdType(Uint32.ONE), header);
         tcpSession.sessionUp();
         final Session managementSession = tcpSession.toManagementSession();
         assertEquals(HOST, managementSession.getSourceHost().getIpAddress().getIpv4Address().getValue());
@@ -150,7 +152,7 @@ public class NetconfServerSessionTest {
         final NetconfHelloMessageAdditionalHeader header =
                 new NetconfHelloMessageAdditionalHeader(USER, HOST, PORT, "http", SESSION_ID);
         final EmbeddedChannel ch = new EmbeddedChannel();
-        final NetconfServerSession tcpSession = new NetconfServerSession(listener, ch, 1L, header);
+        final var tcpSession = new NetconfServerSession(listener, ch, new SessionIdType(Uint32.ONE), header);
         tcpSession.sessionUp();
         tcpSession.toManagementSession();
         tcpSession.close();
@@ -161,7 +163,7 @@ public class NetconfServerSessionTest {
         final NetconfHelloMessageAdditionalHeader header =
                 new NetconfHelloMessageAdditionalHeader(USER, "::1", PORT, SSH_TRANSPORT, SESSION_ID);
         final EmbeddedChannel ch = new EmbeddedChannel();
-        final NetconfServerSession tcpSession = new NetconfServerSession(listener, ch, 1L, header);
+        final var tcpSession = new NetconfServerSession(listener, ch, new SessionIdType(Uint32.ONE), header);
         tcpSession.sessionUp();
         final Session managementSession = tcpSession.toManagementSession();
         assertEquals("::1", managementSession.getSourceHost().getIpAddress().getIpv6Address().getValue());
