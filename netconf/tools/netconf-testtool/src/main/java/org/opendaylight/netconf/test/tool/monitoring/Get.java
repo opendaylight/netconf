@@ -15,6 +15,7 @@ import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.AbstractNetconfOperation;
 import org.opendaylight.netconf.server.api.operations.HandlingPriority;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -28,8 +29,8 @@ public class Get extends AbstractNetconfOperation {
 
     private final NetconfMonitoringService netconfMonitor;
 
-    public Get(final NetconfMonitoringService netconfMonitor) {
-        super(MonitoringConstants.MODULE_NAME);
+    public Get(final SessionIdType sessionId, final NetconfMonitoringService netconfMonitor) {
+        super(sessionId);
         this.netconfMonitor = netconfMonitor;
     }
 

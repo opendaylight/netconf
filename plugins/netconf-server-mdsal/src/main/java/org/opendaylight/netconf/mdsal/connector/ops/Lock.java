@@ -11,6 +11,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -28,8 +29,8 @@ public class Lock extends AbstractSingletonNetconfOperation {
     private static final String OPERATION_NAME = "lock";
     private static final String TARGET_KEY = "target";
 
-    public Lock(final String netconfSessionIdForReporting) {
-        super(netconfSessionIdForReporting);
+    public Lock(final SessionIdType sessionId) {
+        super(sessionId);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class Lock extends AbstractSingletonNetconfOperation {
             throws DocumentedException {
         final Datastore targetDatastore = extractTargetParameter(operationElement);
         if (targetDatastore == Datastore.candidate) {
-            LOG.debug("Locking candidate datastore on session: {}", getNetconfSessionIdForReporting());
+            LOG.debug("Locking candidate datastore on session: {}", sessionId().getValue());
             return document.createElement(XmlNetconfConstants.OK);
         }
 

@@ -19,6 +19,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -35,8 +36,8 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
 
     private final NetconfMonitoringService monitoring;
 
-    public GetSchema(final String netconfSessionIdForReporting, final NetconfMonitoringService monitoring) {
-        super(netconfSessionIdForReporting);
+    public GetSchema(final SessionIdType sessionId, final NetconfMonitoringService monitoring) {
+        super(sessionId);
         this.monitoring = requireNonNull(monitoring);
     }
 

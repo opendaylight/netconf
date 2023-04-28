@@ -9,25 +9,22 @@ package org.opendaylight.netconf.test.tool.operations;
 
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
-import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.concepts.Registration;
 
 public class OperationsProvider implements NetconfOperationServiceFactory {
     private final Set<Capability> caps;
-    private final SessionIdProvider idProvider;
     private final OperationsCreator operationsCreator;
 
-    public OperationsProvider(final SessionIdProvider idProvider, final Set<Capability> caps) {
-        this(idProvider, caps, new DefaultOperationsCreator(idProvider.getCurrentSessionId()));
+    public OperationsProvider(final Set<Capability> caps) {
+        this(caps, new DefaultOperationsCreator());
     }
 
-    public OperationsProvider(final SessionIdProvider idProvider, final Set<Capability> caps,
-            final OperationsCreator operationsCreator) {
+    public OperationsProvider(final Set<Capability> caps, final OperationsCreator operationsCreator) {
         this.caps = caps;
-        this.idProvider = idProvider;
         this.operationsCreator = operationsCreator;
     }
 
@@ -43,7 +40,7 @@ public class OperationsProvider implements NetconfOperationServiceFactory {
     }
 
     @Override
-    public NetconfOperationService createService(final String netconfSessionIdForReporting) {
-        return operationsCreator.getNetconfOperationService(caps, idProvider, netconfSessionIdForReporting);
+    public NetconfOperationService createService(final SessionIdType sessionId) {
+        return operationsCreator.getNetconfOperationService(caps, sessionId);
     }
 }

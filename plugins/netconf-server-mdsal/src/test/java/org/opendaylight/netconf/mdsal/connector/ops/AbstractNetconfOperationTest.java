@@ -48,7 +48,9 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.test.util.NetconfXmlUnitRecursiveQualifier;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.slf4j.Logger;
@@ -61,7 +63,7 @@ import org.xml.sax.SAXException;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public abstract class AbstractNetconfOperationTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfOperationTest.class);
-    protected static final String SESSION_ID_FOR_REPORTING = "netconf-test-session1";
+    protected static final SessionIdType SESSION_ID_FOR_REPORTING = new SessionIdType(Uint32.valueOf(123));
     private static final String RPC_REPLY_ELEMENT = "rpc-reply";
     private static final String DATA_ELEMENT = "data";
     protected static final Document RPC_REPLY_OK = getReplyOk();

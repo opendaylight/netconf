@@ -17,6 +17,7 @@ import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,18 +41,17 @@ public class TesttoolNegotiationFactory extends NetconfServerSessionNegotiatorFa
     }
 
     @Override
-    protected NetconfOperationService getOperationServiceForAddress(
-            final String netconfSessionIdForReporting, final SocketAddress socketAddress) {
+    protected NetconfOperationService getOperationServiceForAddress(final SessionIdType sessionId,
+            final SocketAddress socketAddress) {
         if (cachedOperationServices.containsKey(socketAddress)) {
             LOG.debug("Session {}: Getting cached operation service factory for test tool device on address {}",
-                    netconfSessionIdForReporting, socketAddress);
+                sessionId.getValue(), socketAddress);
             return cachedOperationServices.get(socketAddress);
         } else {
-            final NetconfOperationService service = getOperationServiceFactory()
-                .createService(netconfSessionIdForReporting);
+            final NetconfOperationService service = getOperationServiceFactory().createService(sessionId);
             cachedOperationServices.put(socketAddress, service);
             LOG.debug("Session {}: Creating new operation service factory for test tool device on address {}",
-                    netconfSessionIdForReporting, socketAddress);
+                sessionId.getValue(), socketAddress);
             return service;
         }
     }
