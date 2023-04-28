@@ -91,9 +91,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-util</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
+      <artifactId>netconf-test-util</artifactId>
     </dependency>
   </dependencies>
 </project>
