@@ -33,6 +33,8 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.opendaylight.netconf.server.NetconfServerSessionListener;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 
 public class DefaultCloseSessionTest {
@@ -51,7 +53,7 @@ public class DefaultCloseSessionTest {
     public void testDefaultCloseSession() throws Exception {
         AutoCloseable res = mock(AutoCloseable.class);
         doNothing().when(res).close();
-        DefaultCloseSession close = new DefaultCloseSession("", res);
+        DefaultCloseSession close = new DefaultCloseSession(new SessionIdType(Uint32.TEN), res);
         final Document doc = XmlUtil.newDocument();
         final XmlElement elem = XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"));
         final Channel channel = mock(Channel.class);
@@ -73,7 +75,7 @@ public class DefaultCloseSessionTest {
         doNothing().when(listener).onSessionTerminated(any(NetconfServerSession.class),
                 any(NetconfTerminationReason.class));
         final NetconfServerSession session =
-                new NetconfServerSession(listener, channel, 1L,
+                new NetconfServerSession(listener, channel, new SessionIdType(Uint32.ONE),
                         NetconfHelloMessageAdditionalHeader.fromString("[netconf;10.12.0.102:48528;ssh;;;;;;]"));
         close.setNetconfSession(session);
         close.handleWithNoSubsequentOperations(doc, elem);
@@ -91,12 +93,12 @@ public class DefaultCloseSessionTest {
         final NetconfDocumentedException expectedCause = new NetconfDocumentedException("testMessage");
         final AutoCloseable res = mock(AutoCloseable.class);
         doThrow(expectedCause).when(res).close();
-        final DefaultCloseSession session = new DefaultCloseSession("testSession", res);
+        final DefaultCloseSession session = new DefaultCloseSession(new SessionIdType(Uint32.TEN), res);
         XmlElement elem = XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"));
 
         final DocumentedException ex = assertThrows(DocumentedException.class,
             () -> session.handleWithNoSubsequentOperations(XmlUtil.newDocument(), elem));
-        assertEquals("Unable to properly close session testSession", ex.getMessage());
+        assertEquals("Unable to properly close session 10", ex.getMessage());
         assertSame(expectedCause, ex.getCause());
     }
 }

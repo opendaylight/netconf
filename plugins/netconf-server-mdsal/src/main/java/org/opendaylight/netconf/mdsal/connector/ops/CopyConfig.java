@@ -31,6 +31,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -65,15 +66,15 @@ public final class CopyConfig extends AbstractEdit {
 
     private final TransactionProvider transactionProvider;
 
-    public CopyConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
+    public CopyConfig(final SessionIdType sessionId, final CurrentSchemaContext schemaContext,
                       final TransactionProvider transactionProvider) {
-        super(netconfSessionIdForReporting, schemaContext);
+        super(sessionId, schemaContext);
         this.transactionProvider = transactionProvider;
     }
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
-        throws DocumentedException {
+            throws DocumentedException {
         final XmlElement targetElement = extractTargetElement(operationElement, OPERATION_NAME);
         final String target = targetElement.getName();
         if (Datastore.running.toString().equals(target)) {

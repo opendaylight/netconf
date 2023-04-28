@@ -23,6 +23,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -36,12 +37,12 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
     static final String CONFIG_KEY = "config";
     private static final int TIMEOUT_MS = 5000;
 
-    protected AbstractConfigOperation(final String netconfSessionIdForReporting) {
-        super(netconfSessionIdForReporting);
+    protected AbstractConfigOperation(final SessionIdType sessionId) {
+        super(sessionId);
     }
 
-    protected static NodeList getElementsByTagName(final XmlElement parent, final String key) throws
-        DocumentedException {
+    protected static NodeList getElementsByTagName(final XmlElement parent, final String key)
+            throws DocumentedException {
         final Element domParent = parent.getDomElement();
         final NodeList elementsByTagName;
 

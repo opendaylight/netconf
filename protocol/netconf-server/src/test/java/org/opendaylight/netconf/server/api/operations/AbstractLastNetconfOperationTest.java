@@ -16,6 +16,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -23,8 +25,8 @@ public class AbstractLastNetconfOperationTest {
     private static final class LastNetconfOperationImplTest extends AbstractLastNetconfOperation {
         boolean handleWithNoSubsequentOperationsRun;
 
-        protected LastNetconfOperationImplTest(final String netconfSessionIdForReporting) {
-            super(netconfSessionIdForReporting);
+        protected LastNetconfOperationImplTest(final SessionIdType sessionId) {
+            super(sessionId);
             handleWithNoSubsequentOperationsRun = false;
         }
 
@@ -45,7 +47,7 @@ public class AbstractLastNetconfOperationTest {
 
     @Before
     public void setUp() throws Exception {
-        netconfOperation = new LastNetconfOperationImplTest("");
+        netconfOperation = new LastNetconfOperationImplTest(new SessionIdType(Uint32.ONE));
     }
 
     @Test

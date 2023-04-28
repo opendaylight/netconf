@@ -18,6 +18,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -43,8 +44,8 @@ abstract class AbstractEdit extends AbstractConfigOperation {
 
     final CurrentSchemaContext schemaContext;
 
-    AbstractEdit(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
-        super(netconfSessionIdForReporting);
+    AbstractEdit(final SessionIdType sessionId, final CurrentSchemaContext schemaContext) {
+        super(sessionId);
         this.schemaContext = schemaContext;
     }
 

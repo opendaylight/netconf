@@ -29,6 +29,7 @@ import org.opendaylight.netconf.test.tool.rpc.SimulatedGet;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedGetConfig;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedLock;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedUnLock;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.concepts.Registration;
 
 class SimulatedOperationProvider implements NetconfOperationServiceFactory {
@@ -62,13 +63,13 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
     }
 
     static class SimulatedOperationService implements NetconfOperationService {
-        private final long currentSessionId;
+        private final SessionIdType currentSessionId;
         private final Optional<File> notificationsFile;
         private final Optional<File> initialConfigXMLFile;
 
-        SimulatedOperationService(final long currentSessionId, final Optional<File> notificationsFile,
+        SimulatedOperationService(final SessionIdType currentSessionId, final Optional<File> notificationsFile,
                                   final Optional<File> initialConfigXMLFile) {
-            this.currentSessionId = currentSessionId;
+            this.currentSessionId = requireNonNull(currentSessionId);
             this.notificationsFile = notificationsFile;
             this.initialConfigXMLFile = initialConfigXMLFile;
         }
@@ -76,17 +77,16 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
         @Override
         public Set<NetconfOperation> getNetconfOperations() {
             final DataList storage = new DataList();
-            final SimulatedGet sGet = new SimulatedGet(String.valueOf(currentSessionId), storage);
-            final SimulatedEditConfig sEditConfig = new SimulatedEditConfig(String.valueOf(currentSessionId), storage);
-            final SimulatedGetConfig sGetConfig = new SimulatedGetConfig(
-                String.valueOf(currentSessionId), storage, initialConfigXMLFile);
-            final SimulatedCommit sCommit = new SimulatedCommit(String.valueOf(currentSessionId));
-            final SimulatedLock sLock = new SimulatedLock(String.valueOf(currentSessionId));
-            final SimulatedUnLock sUnlock = new SimulatedUnLock(String.valueOf(currentSessionId));
-            final SimulatedCreateSubscription sCreateSubs = new SimulatedCreateSubscription(
-                    String.valueOf(currentSessionId), notificationsFile);
-            final SimulatedDiscardChanges sDiscardChanges = new SimulatedDiscardChanges(
-                String.valueOf(currentSessionId));
+            final SimulatedGet sGet = new SimulatedGet(currentSessionId, storage);
+            final SimulatedEditConfig sEditConfig = new SimulatedEditConfig(currentSessionId, storage);
+            final SimulatedGetConfig sGetConfig = new SimulatedGetConfig(currentSessionId, storage,
+                initialConfigXMLFile);
+            final SimulatedCommit sCommit = new SimulatedCommit(currentSessionId);
+            final SimulatedLock sLock = new SimulatedLock(currentSessionId);
+            final SimulatedUnLock sUnlock = new SimulatedUnLock(currentSessionId);
+            final SimulatedCreateSubscription sCreateSubs = new SimulatedCreateSubscription(currentSessionId,
+                notificationsFile);
+            final SimulatedDiscardChanges sDiscardChanges = new SimulatedDiscardChanges(currentSessionId);
             return Sets.newHashSet(
                 sGet, sGetConfig, sEditConfig, sCommit, sLock, sUnlock, sCreateSubs, sDiscardChanges);
         }

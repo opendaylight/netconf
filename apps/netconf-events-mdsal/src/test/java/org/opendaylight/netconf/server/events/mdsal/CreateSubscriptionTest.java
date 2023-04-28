@@ -23,8 +23,10 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationListener;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationRegistry;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.w3c.dom.Element;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -47,7 +49,8 @@ public class CreateSubscriptionTest {
 
     @Test
     public void testHandleWithNoSubsequentOperations() throws Exception {
-        final CreateSubscription createSubscription = new CreateSubscription("id", notificationRegistry);
+        final CreateSubscription createSubscription = new CreateSubscription(new SessionIdType(Uint32.TEN),
+            notificationRegistry);
         createSubscription.setSession(mock(NetconfSession.class));
 
         final Element e = XmlUtil.readXmlToElement(CREATE_SUBSCRIPTION_XML);

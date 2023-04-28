@@ -27,6 +27,7 @@ import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.osgi.NetconfOperationRouterImpl;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 
@@ -107,31 +108,30 @@ public class NetconfServerSessionNegotiatorFactory
     public NetconfServerSessionNegotiator getSessionNegotiator(
             final NetconfSessionListenerFactory<NetconfServerSessionListener> defunctSessionListenerFactory,
             final Channel channel, final Promise<NetconfServerSession> promise) {
-        final long sessionId = idProvider.getNextSessionId();
+        final var sessionId = idProvider.getNextSessionId();
 
         return new NetconfServerSessionNegotiator(createHelloMessage(sessionId, monitoringService), sessionId, promise,
-            channel, timer, getListener(Long.toString(sessionId), channel.parent().localAddress()),
+            channel, timer, getListener(sessionId, channel.parent().localAddress()),
             connectionTimeoutMillis, maximumIncomingChunkSize);
     }
 
-    private NetconfServerSessionListener getListener(final String netconfSessionIdForReporting,
-                                                     final SocketAddress socketAddress) {
-        final var service = getOperationServiceForAddress(netconfSessionIdForReporting, socketAddress);
+    private NetconfServerSessionListener getListener(final SessionIdType sessionId, final SocketAddress socketAddress) {
+        final var service = getOperationServiceForAddress(sessionId, socketAddress);
         return new NetconfServerSessionListener(
-            new NetconfOperationRouterImpl(service, monitoringService, netconfSessionIdForReporting), monitoringService,
-            service);
+            new NetconfOperationRouterImpl(service, monitoringService, sessionId), monitoringService, service);
     }
 
-    protected NetconfOperationService getOperationServiceForAddress(final String netconfSessionIdForReporting,
+    protected NetconfOperationService getOperationServiceForAddress(final SessionIdType sessionId,
                                                                     final SocketAddress socketAddress) {
-        return aggregatedOpService.createService(netconfSessionIdForReporting);
+        return aggregatedOpService.createService(sessionId);
     }
 
     protected final NetconfOperationServiceFactory getOperationServiceFactory() {
         return aggregatedOpService;
     }
 
-    private HelloMessage createHelloMessage(final long sessionId, final NetconfMonitoringService capabilityProvider) {
+    private HelloMessage createHelloMessage(final SessionIdType sessionId,
+            final NetconfMonitoringService capabilityProvider) {
         return HelloMessage.createServerHello(Sets.union(
             transformCapabilities(capabilityProvider.getCapabilities()), baseCapabilities),
             sessionId);

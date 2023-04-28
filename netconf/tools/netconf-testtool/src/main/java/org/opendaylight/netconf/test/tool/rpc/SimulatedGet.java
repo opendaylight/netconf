@@ -10,14 +10,15 @@ package org.opendaylight.netconf.test.tool.rpc;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.operations.AbstractLastNetconfOperation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class SimulatedGet extends AbstractLastNetconfOperation {
     private final DataList storage;
 
-    public SimulatedGet(final String netconfSessionIdForReporting, final DataList storage) {
-        super(netconfSessionIdForReporting);
+    public SimulatedGet(final SessionIdType sessionId, final DataList storage) {
+        super(sessionId);
         this.storage = storage;
     }
 

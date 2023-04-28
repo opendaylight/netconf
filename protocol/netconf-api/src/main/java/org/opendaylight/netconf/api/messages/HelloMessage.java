@@ -14,6 +14,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -75,11 +76,11 @@ public final class HelloMessage extends NetconfMessage {
         return doc;
     }
 
-    public static HelloMessage createServerHello(final Set<String> capabilities, final long sessionId) {
+    public static HelloMessage createServerHello(final Set<String> capabilities, final SessionIdType sessionId) {
         Document doc = createHelloMessageDoc(capabilities);
         Element sessionIdElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
                 XmlNetconfConstants.SESSION_ID);
-        sessionIdElement.setTextContent(Long.toString(sessionId));
+        sessionIdElement.setTextContent(sessionId.getValue().toCanonicalString());
         doc.getDocumentElement().appendChild(sessionIdElement);
         return new HelloMessage(doc);
     }
