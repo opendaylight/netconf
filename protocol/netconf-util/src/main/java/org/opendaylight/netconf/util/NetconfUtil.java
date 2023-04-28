@@ -21,7 +21,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -148,7 +147,7 @@ public final class NetconfUtil {
     public static void writeNormalizedNode(final NormalizedNode normalized, final DOMResult result,
             final EffectiveModelContext context, final @Nullable Absolute path) throws IOException, XMLStreamException {
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
-        try (var streamWriter = newWriter(xmlWriter, context, path);
+        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path);
              var writer = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
             writer.write(normalized);
             writer.flush();
@@ -178,7 +177,7 @@ public final class NetconfUtil {
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
-        try (var streamWriter = newWriter(xmlWriter, context, path);
+        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path);
              var writer = NormalizedMetadataWriter.forStreamWriter(streamWriter)) {
             writer.write(normalized, metadata);
             writer.flush();
@@ -201,7 +200,7 @@ public final class NetconfUtil {
             final EffectiveModelContext context, final @Nullable Absolute path) throws IOException, XMLStreamException {
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
-        try (var streamWriter = newWriter(xmlWriter, context, path);
+        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path);
              var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
             final Iterator<PathArgument> it = query.getPathArguments().iterator();
             final PathArgument first = it.next();
@@ -233,7 +232,7 @@ public final class NetconfUtil {
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
-        try (var streamWriter = newWriter(xmlWriter, context, path);
+        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path);
              var writer = new EmptyListXmlMetadataWriter(streamWriter, xmlWriter,
                  streamWriter.getExtensions().getInstance(StreamWriterMetadataExtension.class), metadata)) {
             final Iterator<PathArgument> it = query.getPathArguments().iterator();
@@ -262,7 +261,7 @@ public final class NetconfUtil {
         }
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
-        try (var streamWriter = newWriter(xmlWriter, context, path);
+        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path);
              var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
             final Iterator<PathArgument> it = query.getPathArguments().iterator();
             final PathArgument first = it.next();
@@ -298,7 +297,7 @@ public final class NetconfUtil {
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         try {
-            try (var streamWriter = newWriter(xmlWriter, context, path);
+            try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path);
                  var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
                 final PathArgument first = rootNode.element();
                 StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType())
@@ -416,12 +415,5 @@ public final class NetconfUtil {
     public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final EffectiveModelContext schemaContext,
             final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
         return transformDOMSourceToNormalizedNode(new EmptyMountPointContext(schemaContext), value);
-    }
-
-    // FIXME: this should not be needed once we have yangtools-10.0.1.
-    private static @NonNull NormalizedNodeStreamWriter newWriter(final XMLStreamWriter writer,
-            final EffectiveModelContext context, final @Nullable Absolute path) {
-        return path == null ? XMLStreamNormalizedNodeStreamWriter.create(writer, context)
-            : XMLStreamNormalizedNodeStreamWriter.create(writer, context, path);
     }
 }
