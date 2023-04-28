@@ -53,10 +53,6 @@
       <artifactId>netconf-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-util</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.netconf.model</groupId>
       <artifactId>rfc6022</artifactId>
     </dependency>
