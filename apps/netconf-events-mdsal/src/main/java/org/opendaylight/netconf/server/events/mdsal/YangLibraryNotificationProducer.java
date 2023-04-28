@@ -9,7 +9,10 @@ package org.opendaylight.netconf.server.events.mdsal;
 
 import java.util.Collection;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.server.api.notifications.YangLibraryPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
@@ -22,20 +25,15 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * Listens on the set of modules and submodules changes in data store and publishes
- * to base netconf notification stream listener a server-specific identifier representing
- * the current set of modules and submodules.
+ * Listens on the set of modules and submodules changes in data store and publishes to base NETCONF notification stream
+ * listener a server-specific identifier representing the current set of modules and submodules.
  *
  * @deprecated ietf-yang-library:yang-library-change was deprecated in the new RFC8525.
  *             Use {@link YangLibraryNotificationProducerRFC8525}.
  */
 @Component(service = { })
 @Deprecated(forRemoval = true)
-public final class YangLibraryNotificationProducer extends OperationalDatastoreListener<ModulesState>
-        implements AutoCloseable {
-    private static final InstanceIdentifier<ModulesState> MODULES_STATE_INSTANCE_IDENTIFIER =
-            InstanceIdentifier.create(ModulesState.class);
-
+public final class YangLibraryNotificationProducer implements DataTreeChangeListener<ModulesState>, AutoCloseable {
     private final ListenerRegistration<?> yangLibraryChangeListenerRegistration;
     private final YangLibraryPublisherRegistration yangLibraryPublisherRegistration;
 
@@ -43,9 +41,9 @@ public final class YangLibraryNotificationProducer extends OperationalDatastoreL
     public YangLibraryNotificationProducer(
             @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
-        super(MODULES_STATE_INSTANCE_IDENTIFIER);
         yangLibraryPublisherRegistration = notifManager.registerYangLibraryPublisher();
-        yangLibraryChangeListenerRegistration = registerOnChanges(dataBroker);
+        yangLibraryChangeListenerRegistration = dataBroker.registerDataTreeChangeListener(
+            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(ModulesState.class)), this);
     }
 
     @Deactivate
