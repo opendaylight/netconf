@@ -28,18 +28,16 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.protocol.AuthorizedKeysDecoder;
 import org.opendaylight.netconf.callhome.protocol.StatusRecorder;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1.DeviceStatus;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1Builder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.NetconfCallhomeServer;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.AllowedDevices;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.DeviceBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.DeviceKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.Ssh;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.SshBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev201015.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.NetconfCallhomeServer;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.AllowedDevices;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.Device;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.Device.DeviceStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.DeviceBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.DeviceKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.device.transport.Ssh;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.device.transport.SshBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
@@ -168,17 +166,17 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
 
     void asForceListedDevice(final String id, final PublicKey serverKey) {
         NodeId nid = new NodeId(id);
-        Device device = newDevice(id, serverKey, Device1.DeviceStatus.DISCONNECTED);
+        Device device = newDevice(id, serverKey, DeviceStatus.DISCONNECTED);
         writeDevice(nid, device);
     }
 
     void asUnlistedDevice(final String id, final PublicKey serverKey) {
         NodeId nid = new NodeId(id);
-        Device device = newDevice(id, serverKey, Device1.DeviceStatus.FAILEDNOTALLOWED);
+        Device device = newDevice(id, serverKey, DeviceStatus.FAILEDNOTALLOWED);
         writeDevice(nid, device);
     }
 
-    private static Device newDevice(final String id, final PublicKey serverKey, final Device1.DeviceStatus status) {
+    private static Device newDevice(final String id, final PublicKey serverKey, final DeviceStatus status) {
         // used only for netconf devices that are connected via SSH transport and global credentials
         String sshEncodedKey = serverKey.toString();
         try {
@@ -192,7 +190,7 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
             .setTransport(new SshBuilder()
                 .setSshClientParams(new SshClientParamsBuilder().setHostKey(sshEncodedKey).build())
                 .build())
-            .addAugmentation(new Device1Builder().setDeviceStatus(status).build())
+            .setDeviceStatus(status)
             .build();
     }
 
@@ -222,7 +220,7 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
     }
 
     private static Device withConnectedStatus(final Device opDev) {
-        return deviceWithStatus(opDev, Device1.DeviceStatus.CONNECTED);
+        return deviceWithStatus(opDev, DeviceStatus.CONNECTED);
     }
 
     private static Device withFailedStatus(final Device opDev) {
@@ -240,7 +238,7 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
     private static Device deviceWithStatus(final Device opDev, final DeviceStatus status) {
         final DeviceBuilder deviceBuilder = new DeviceBuilder()
             .setUniqueId(opDev.getUniqueId())
-            .addAugmentation(new Device1Builder().setDeviceStatus(status).build());
+            .setDeviceStatus(status);
         if (opDev.getTransport() != null) {
             deviceBuilder.setTransport(opDev.getTransport());
         } else {

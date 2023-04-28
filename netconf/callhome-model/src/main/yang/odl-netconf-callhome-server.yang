@@ -12,6 +12,10 @@ module odl-netconf-callhome-server {
   description
    "This module defines the northbound interface for OpenDaylight NETCONF Callhome.";
 
+  revision 2023-04-28 {
+    description "This revision integrates device-status leaf, formerly hosted in callhome-device.yang";
+  }
+
   revision 2020-10-15 {
     description
      "This revision adds connectivity details for one of the supported transport protocols";
@@ -107,6 +111,18 @@ module odl-netconf-callhome-server {
         }
         unique transport/ssh/ssh-client-params/host-key;
         unique transport/tls/tls-client-params/certificate-id;
+
+        leaf device-status {
+          config false;
+          type enumeration {
+            enum CONNECTED;
+            enum FAILED_AUTH_FAILURE;
+            enum FAILED_NOT_ALLOWED;
+            enum FAILED;
+            enum DISCONNECTED;
+          }
+          default DISCONNECTED;
+        }
       }
     }
   }
