@@ -69,10 +69,6 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>shaded-exificient</artifactId>
     </dependency>
     <dependency>

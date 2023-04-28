@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
-import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
-import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_QNAME;
+import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_DATA_QNAME;
+import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_QNAME;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -40,8 +40,8 @@ import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfMessageUtil;
+import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
-import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
@@ -240,7 +240,7 @@ public final class NetconfMessageTransformUtil {
                                                        final EffectiveModelContext ctx) {
         final Element element = getNetconfFilterElement();
         try {
-            NetconfUtil.writeFilter(identifier, new DOMResult(element), ctx, null);
+            NormalizedDataUtil.writeFilter(identifier, new DOMResult(element), ctx, null);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize filter element for path " + identifier, e);
         }
@@ -262,7 +262,7 @@ public final class NetconfMessageTransformUtil {
 
         for (final FieldsFilter filter : fieldsFilters) {
             try {
-                NetconfUtil.writeFilter(filter.path(), new DOMResult(element), ctx, null, filter.fields());
+                NormalizedDataUtil.writeFilter(filter.path(), new DOMResult(element), ctx, null, filter.fields());
             } catch (IOException | XMLStreamException e) {
                 throw new IllegalStateException(String.format(
                         "Unable to serialize filter element for path %s with fields: %s",
@@ -386,9 +386,9 @@ public final class NetconfMessageTransformUtil {
                         nnWriter.write(lastChildOverride.orElseThrow());
                     }
                 }
-                NetconfUtil.writeNormalizedNode(result.getResult(), metadata, new DOMResult(element), ctx, null);
+                NormalizedDataUtil.writeNormalizedNode(result.getResult(), metadata, new DOMResult(element), ctx, null);
             } else {
-                NetconfUtil.writeNormalizedNode(dataPath, metadata, new DOMResult(element), ctx, null);
+                NormalizedDataUtil.writeNormalizedNode(dataPath, metadata, new DOMResult(element), ctx, null);
             }
         } catch (final IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
@@ -539,7 +539,7 @@ public final class NetconfMessageTransformUtil {
         stack.enterSchemaTree(YangConstants.operationInputQName(operationPath.lastNodeIdentifier().getModule()));
         final var inputInference = stack.toSchemaTreeInference();
 
-        final XMLStreamWriter writer = NetconfUtil.XML_FACTORY.createXMLStreamWriter(result);
+        final XMLStreamWriter writer = NormalizedDataUtil.XML_FACTORY.createXMLStreamWriter(result);
         try {
             try (NormalizedNodeStreamWriter normalizedNodeStreamWriter =
                     XMLStreamNormalizedNodeStreamWriter.create(writer, inputInference)) {

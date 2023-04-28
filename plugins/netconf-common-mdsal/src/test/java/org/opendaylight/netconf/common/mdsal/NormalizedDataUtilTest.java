@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.util;
+package org.opendaylight.netconf.common.mdsal;
 
 import static org.junit.Assert.assertFalse;
 
@@ -28,12 +28,12 @@ import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
-public class NetconfUtilTest {
+public class NormalizedDataUtilTest {
     @Test
     public void testWriteNormalizedNode() throws Exception {
         final var context = BindingRuntimeHelpers.createEffectiveModel(List.of($YangModuleInfoImpl.getInstance()));
         final var result = new DOMResult(XmlUtil.newDocument());
-        NetconfUtil.writeNormalizedNode(Builders.containerBuilder()
+        NormalizedDataUtil.writeNormalizedNode(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(Sessions.QNAME))
             .withChild(Builders.mapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(Session.QNAME))

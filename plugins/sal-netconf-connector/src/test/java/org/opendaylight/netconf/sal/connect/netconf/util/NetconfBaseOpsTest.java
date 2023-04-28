@@ -34,12 +34,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractTestModelTest;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
-import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -194,14 +194,14 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     public void testGetConfigRunningData() throws Exception {
         final var dataOpt = baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
         assertTrue(dataOpt.isPresent());
-        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().getIdentifier().getNodeType());
+        assertEquals(NormalizedDataUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().getIdentifier().getNodeType());
     }
 
     @Test
     public void testGetData() throws Exception {
         final var dataOpt = baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
         assertTrue(dataOpt.isPresent());
-        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().getIdentifier().getNodeType());
+        assertEquals(NormalizedDataUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().getIdentifier().getNodeType());
     }
 
     @Test

@@ -34,11 +34,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
@@ -207,7 +207,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         final NormalizedNode dataNode;
         try {
-            dataNode = NetconfUtil.transformDOMSourceToNormalizedNode(schemaContext, filteredBody).getResult();
+            dataNode = NormalizedDataUtil.transformDOMSourceToNormalizedNode(schemaContext, filteredBody).getResult();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             LOG.warn("Failed to transform {}", rpcResult, e);
             return Optional.empty();

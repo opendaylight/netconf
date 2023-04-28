@@ -40,7 +40,11 @@
       <artifactId>rfc6470</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-common-mdsal</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-client</artifactId>
     </dependency>
     <dependency>
@@ -90,10 +94,6 @@
     <dependency>
       <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
       <artifactId>rfc6991-ietf-inet-types</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-util</artifactId>
     </dependency>
     <dependency>
       <groupId>com.guicedee.services</groupId>

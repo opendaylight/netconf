@@ -7,15 +7,15 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
+import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_DATA_QNAME;
+import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.appendListKeyNodes;
+import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.writeSchemalessFilter;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_OPERATION_QNAME;
-import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
-import static org.opendaylight.netconf.util.NetconfUtil.appendListKeyNodes;
-import static org.opendaylight.netconf.util.NetconfUtil.writeSchemalessFilter;
 
 import java.util.List;
 import java.util.Optional;

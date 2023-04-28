@@ -57,6 +57,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-common-mdsal</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-config</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -104,11 +109,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-test-perf</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-util</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

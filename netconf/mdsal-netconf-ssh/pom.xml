@@ -75,10 +75,5 @@
       <artifactId>netty-handler</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-util</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 </project>
