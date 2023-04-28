@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.util;
+package org.opendaylight.netconf.common.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
@@ -42,7 +42,7 @@ final class EmptyListXmlMetadataWriter extends ForwardingNormalizedNodeStreamWri
     EmptyListXmlMetadataWriter(final @NonNull NormalizedNodeStreamWriter writer,
             final @NonNull XMLStreamWriter xmlStreamWriter, final @NonNull StreamWriterMetadataExtension metaWriter,
             final @NonNull NormalizedMetadata metadata) {
-        this.dataWriterDelegate = new EmptyListXmlWriter(requireNonNull(writer), requireNonNull(xmlStreamWriter));
+        dataWriterDelegate = new EmptyListXmlWriter(requireNonNull(writer), requireNonNull(xmlStreamWriter));
         this.metaWriter = requireNonNull(metaWriter);
         this.metadata = requireNonNull(metadata);
     }

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.util;
+package org.opendaylight.netconf.common.mdsal;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -48,7 +48,10 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-public final class NetconfUtil {
+/**
+ * Utility methods to work with {@link NormalizedNode} and related constructs in the context of NETCONF protocol.
+ */
+public final class NormalizedDataUtil {
     /**
      * Shim interface to handle differences around namespace handling between various XMLStreamWriter implementations.
      * Specifically:
@@ -87,7 +90,7 @@ public final class NetconfUtil {
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NormalizedDataUtil.class);
 
     // FIXME: document what exactly this QName means, as it is not referring to a tangible node nor the ietf-module.
     // FIXME: what is this contract saying?
@@ -110,7 +113,7 @@ public final class NetconfUtil {
 
     private static final NamespaceSetter XML_NAMESPACE_SETTER = NamespaceSetter.forFactory(XML_FACTORY);
 
-    private NetconfUtil() {
+    private NormalizedDataUtil() {
         // No-op
     }
 

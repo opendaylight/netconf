@@ -83,11 +83,11 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-server</artifactId>
+      <artifactId>netconf-common-mdsal</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-util</artifactId>
+      <artifactId>netconf-server</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf.model</groupId>

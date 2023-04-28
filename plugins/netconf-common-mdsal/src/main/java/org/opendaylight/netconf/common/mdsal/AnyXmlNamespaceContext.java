@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.util;
+package org.opendaylight.netconf.common.mdsal;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -60,7 +60,7 @@ final class AnyXmlNamespaceContext implements Immutable, NamespaceContext {
             }
         }
 
-        this.uriToPrefix = uriToPrefixBuilder.build();
+        uriToPrefix = uriToPrefixBuilder.build();
         this.prefixToUri = ImmutableBiMap.copyOf(prefixToUriBuilder);
     }
 

@@ -19,7 +19,7 @@ import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.util.NetconfUtil;
+import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfConfigChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
@@ -56,7 +56,7 @@ final class NotificationsTransformUtil {
         final var containerNode = serializer.toNormalizedNodeNotification(notification);
         final var result = new DOMResult(XmlUtil.newDocument());
         try {
-            NetconfUtil.writeNormalizedNode(containerNode, result, schemaContext, path);
+            NormalizedDataUtil.writeNormalizedNode(containerNode, result, schemaContext, path);
         } catch (final XMLStreamException | IOException e) {
             throw new IllegalStateException("Unable to serialize " + notification, e);
         }

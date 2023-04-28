@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import org.opendaylight.netconf.api.EffectiveOperation;
-import org.opendaylight.netconf.util.NetconfUtil;
+import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
@@ -44,7 +44,7 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
         if (data instanceof DOMSourceAnyxmlNode) {
             final NormalizedNodeResult node;
             try {
-                node = NetconfUtil.transformDOMSourceToNormalizedNode(mountContext,
+                node = NormalizedDataUtil.transformDOMSourceToNormalizedNode(mountContext,
                     ((DOMSourceAnyxmlNode)data).body());
                 return NormalizedNodes.findNode(node.getResult(), path.getPathArguments());
             } catch (final XMLStreamException | URISyntaxException | IOException | SAXException e) {

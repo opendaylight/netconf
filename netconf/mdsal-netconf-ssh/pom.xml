@@ -77,7 +77,7 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-util</artifactId>
+      <artifactId>netconf-common-mdsal</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

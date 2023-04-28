@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_DATA_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.GET_SCHEMA_QNAME;
@@ -27,7 +28,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.createEditConfigStructure;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toFilterStructure;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
-import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -54,12 +54,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.util.FieldsFilter;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
@@ -340,8 +340,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final DOMSourceAnyxmlNode data = (DOMSourceAnyxmlNode) compositeNodeRpcResult.value()
                 .findChildByArg(toId(NETCONF_DATA_QNAME)).orElseThrow();
 
-        NormalizedNodeResult nodeResult =
-                NetconfUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.body());
+        NormalizedNodeResult nodeResult = NormalizedDataUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.body());
         ContainerNode result = (ContainerNode) nodeResult.getResult();
         final ContainerNode state = (ContainerNode) result.getChildByArg(toId(NetconfState.QNAME));
         final ContainerNode schemas = (ContainerNode) state.getChildByArg(toId(Schemas.QNAME));
@@ -1154,7 +1153,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     private static Node checkBasePartOfActionRequest(final NetconfMessage actionRequest) {
         Node baseRpc = actionRequest.getDocument().getFirstChild();
-        checkNode(baseRpc, "rpc", "rpc", NetconfUtil.NETCONF_QNAME.getNamespace().toString());
+        checkNode(baseRpc, "rpc", "rpc", NormalizedDataUtil.NETCONF_QNAME.getNamespace().toString());
         assertTrue(baseRpc.getLocalName().equals("rpc"));
         assertTrue(baseRpc.getNodeName().equals("rpc"));
 
