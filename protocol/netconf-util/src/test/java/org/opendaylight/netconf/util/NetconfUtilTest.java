@@ -7,13 +7,10 @@
  */
 package org.opendaylight.netconf.util;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 import javax.xml.transform.dom.DOMResult;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -27,14 +24,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
-import org.w3c.dom.Document;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.ElementSelectors;
 
 public class NetconfUtilTest {
-    @BeforeClass
-    public static void classSetUp() {
-        XMLUnit.setIgnoreWhitespace(true);
-    }
-
     @Test
     public void testWriteNormalizedNode() throws Exception {
         final var context = BindingRuntimeHelpers.createEffectiveModel(List.of($YangModuleInfoImpl.getInstance()));
@@ -50,9 +44,21 @@ public class NetconfUtilTest {
                     .build())
                 .build())
             .build(), result, context, Absolute.of(NetconfState.QNAME));
-        final var actual = (Document) result.getNode();
-        final var expected = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/sessions.xml"));
-        final Diff diff = XMLUnit.compareXML(expected, actual);
-        assertTrue(diff.toString(), diff.similar());
+
+        final var diff = DiffBuilder.compare(result.getNode())
+            .withTest("""
+                <sessions xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <session>
+                        <session-id>1</session-id>
+                        <username>admin</username>
+                    </session>
+                </sessions>
+                """)
+            .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+            .ignoreWhitespace()
+            .checkForSimilar()
+            .build();
+
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 }
