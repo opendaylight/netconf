@@ -7,12 +7,9 @@
  */
 package org.opendaylight.netconf.util;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
+import java.util.List;
 import javax.xml.transform.dom.DOMResult;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -27,57 +24,34 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.w3c.dom.Document;
 
 public class NetconfUtilTest {
-
     @BeforeClass
     public static void classSetUp() {
         XMLUnit.setIgnoreWhitespace(true);
     }
 
     @Test
-    public void testConflictingVersionDetection() throws Exception {
-        final Document document = XmlUtil.readXmlToDocument(getClass()
-                .getResourceAsStream("/netconfMessages/conflictingversion/conflictingVersionResponse.xml"));
-
-        final IllegalStateException e = assertThrows(IllegalStateException.class,
-            () -> NetconfUtil.checkIsMessageOk(document));
-        assertThat(e.getMessage(), containsString("Optimistic lock failed. Expected parent version 21, was 18"));
-    }
-
-    @Test
     public void testWriteNormalizedNode() throws Exception {
-        final EffectiveModelContext context = BindingRuntimeHelpers.createEffectiveModel(
-            Collections.singletonList($YangModuleInfoImpl.getInstance()));
-        final LeafNode<?> username = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(Session.QNAME, "username")))
-                .withValue("admin")
-                .build();
-        final MapEntryNode session1 = Builders.mapEntryBuilder()
-                .withNodeIdentifier(
-                        NodeIdentifierWithPredicates.of(Session.QNAME, QName.create(Session.QNAME, "session-id"), 1L))
-                .withChild(username)
-                .build();
-        final MapNode sessionList = Builders.mapBuilder()
+        final var context = BindingRuntimeHelpers.createEffectiveModel(List.of($YangModuleInfoImpl.getInstance()));
+        final var result = new DOMResult(XmlUtil.newDocument());
+        NetconfUtil.writeNormalizedNode(Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(Sessions.QNAME))
+            .withChild(Builders.mapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(Session.QNAME))
-                .withChild(session1)
-                .build();
-        final ContainerNode sessions = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(Sessions.QNAME))
-                .withChild(sessionList)
-                .build();
-        final DOMResult result = new DOMResult(XmlUtil.newDocument());
-        NetconfUtil.writeNormalizedNode(sessions, result, context, Absolute.of(NetconfState.QNAME));
-        final Document actual = (Document) result.getNode();
-        final Document expected = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/sessions.xml"));
+                .withChild(Builders.mapEntryBuilder()
+                    .withNodeIdentifier(
+                        NodeIdentifierWithPredicates.of(Session.QNAME, QName.create(Session.QNAME, "session-id"), 1L))
+                    .withChild(ImmutableNodes.leafNode(QName.create(Session.QNAME, "username"), "admin"))
+                    .build())
+                .build())
+            .build(), result, context, Absolute.of(NetconfState.QNAME));
+        final var actual = (Document) result.getNode();
+        final var expected = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/sessions.xml"));
         final Diff diff = XMLUnit.compareXML(expected, actual);
         assertTrue(diff.toString(), diff.similar());
     }

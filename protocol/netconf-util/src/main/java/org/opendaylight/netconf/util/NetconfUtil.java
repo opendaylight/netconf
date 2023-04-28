@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.util;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
@@ -23,9 +21,6 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.api.StreamWriterMetadataExtension;
@@ -50,7 +45,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -118,21 +112,6 @@ public final class NetconfUtil {
 
     private NetconfUtil() {
         // No-op
-    }
-
-    public static Document checkIsMessageOk(final Document response) throws DocumentedException {
-        final XmlElement docElement = XmlElement.fromDomDocument(response);
-        // FIXME: we should throw DocumentedException here
-        checkState(XmlNetconfConstants.RPC_REPLY_KEY.equals(docElement.getName()));
-        final XmlElement element = docElement.getOnlyChildElement();
-        if (XmlNetconfConstants.OK.equals(element.getName())) {
-            return response;
-        }
-
-        LOG.warn("Can not load last configuration. Operation failed.");
-        // FIXME: we should be throwing a DocumentedException here
-        throw new IllegalStateException("Can not load last configuration. Operation failed: "
-                + XmlUtil.toString(response));
     }
 
     /**
