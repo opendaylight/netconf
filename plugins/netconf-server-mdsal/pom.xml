@@ -16,7 +16,7 @@
     <relativePath>../../parent</relativePath>
   </parent>
 
-  <artifactId>mdsal-netconf-connector</artifactId>
+  <artifactId>netconf-server-mdsal</artifactId>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 
