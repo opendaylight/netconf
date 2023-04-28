@@ -12,7 +12,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import org.opendaylight.netconf.util.messages.FramingMechanism;
+import org.opendaylight.netconf.api.messages.FramingMechanism;
 
 /**
  * netconf message part constants as bytes.
