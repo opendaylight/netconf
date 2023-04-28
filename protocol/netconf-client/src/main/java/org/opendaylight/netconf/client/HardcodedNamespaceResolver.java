@@ -5,24 +5,18 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.util.xml;
+package org.opendaylight.netconf.client;
 
-import com.google.common.collect.ImmutableMap;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import javax.xml.namespace.NamespaceContext;
 
 // http://www.ibm.com/developerworks/library/x-nmspccontext/
-public class HardcodedNamespaceResolver implements NamespaceContext {
-    private final Map<String/* prefix */, String/* namespace */> prefixesToNamespaces;
+final class HardcodedNamespaceResolver implements NamespaceContext {
+    private final Map<String, String> prefixesToNamespaces;
 
-    public HardcodedNamespaceResolver(final String prefix, final String namespace) {
-        this(ImmutableMap.of(prefix, namespace));
-    }
-
-    public HardcodedNamespaceResolver(final Map<String, String> prefixesToNamespaces) {
-        this.prefixesToNamespaces = Collections.unmodifiableMap(prefixesToNamespaces);
+    HardcodedNamespaceResolver(final String prefix, final String namespace) {
+        prefixesToNamespaces = Map.of(prefix, namespace);
     }
 
     /**
@@ -34,11 +28,11 @@ public class HardcodedNamespaceResolver implements NamespaceContext {
      */
     @Override
     public String getNamespaceURI(final String prefix) {
-        if (prefixesToNamespaces.containsKey(prefix)) {
-            return prefixesToNamespaces.get(prefix);
+        final var namespace = prefixesToNamespaces.get(prefix);
+        if (namespace == null) {
+            throw new IllegalStateException("Prefix mapping not found for " + prefix);
         }
-
-        throw new IllegalStateException("Prefix mapping not found for " + prefix);
+        return namespace;
     }
 
     @Override
