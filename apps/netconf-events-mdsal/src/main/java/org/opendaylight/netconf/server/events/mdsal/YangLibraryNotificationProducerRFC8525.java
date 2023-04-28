@@ -9,7 +9,10 @@ package org.opendaylight.netconf.server.events.mdsal;
 
 import java.util.Collection;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.server.api.notifications.YangLibraryPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
@@ -22,16 +25,13 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * Listens on the modules, submodules, datastores, and datastore schemas changes in data store and publishes
- * to base netconf notification stream listener a server-specific identifier representing
- * the current set of modules, submodules, datastores, and datastore schemas.
+ * Listens on the modules, submodules, datastores, and datastore schemas changes in data store and publishes to base
+ * NETCONF notification stream listener a server-specific identifier representing the current set of modules,
+ * submodules, datastores, and datastore schemas.
  */
 @Component(service = { })
-public final class YangLibraryNotificationProducerRFC8525 extends OperationalDatastoreListener<YangLibrary>
-        implements AutoCloseable {
-    private static final InstanceIdentifier<YangLibrary> YANG_LIBRARY_INSTANCE_IDENTIFIER =
-            InstanceIdentifier.create(YangLibrary.class);
-
+public final class YangLibraryNotificationProducerRFC8525
+        implements DataTreeChangeListener<YangLibrary>, AutoCloseable {
     private final ListenerRegistration<?> yangLibraryChangeListenerRegistration;
     private final YangLibraryPublisherRegistration yangLibraryPublisherRegistration;
 
@@ -39,9 +39,10 @@ public final class YangLibraryNotificationProducerRFC8525 extends OperationalDat
     public YangLibraryNotificationProducerRFC8525(
             @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
-        super(YANG_LIBRARY_INSTANCE_IDENTIFIER);
         yangLibraryPublisherRegistration = notifManager.registerYangLibraryPublisher();
-        yangLibraryChangeListenerRegistration = registerOnChanges(dataBroker);
+        yangLibraryChangeListenerRegistration = dataBroker.registerDataTreeChangeListener(
+            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(YangLibrary.class)),
+            this);
     }
 
     @Deactivate
