@@ -9,7 +9,7 @@ package org.opendaylight.netconf.nettyutil.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.opendaylight.netconf.util.messages.FramingMechanism;
+import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

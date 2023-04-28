@@ -5,16 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
-import org.opendaylight.netconf.util.messages.FramingMechanism;
+import org.opendaylight.netconf.api.messages.FramingMechanism;
 
 public class FramingMechanismHandlerFactoryTest {
-
     @Test
     public void testCreate() throws Exception {
         MatcherAssert.assertThat(FramingMechanismHandlerFactory
