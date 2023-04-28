@@ -116,7 +116,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>mdsal-netconf-connector</artifactId>
+            <artifactId>netconf-server-mdsal</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
