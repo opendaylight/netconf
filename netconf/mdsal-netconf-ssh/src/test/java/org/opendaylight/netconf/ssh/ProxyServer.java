@@ -20,7 +20,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import java.net.InetSocketAddress;
-import org.opendaylight.netconf.util.NetconfConfiguration;
 
 public class ProxyServer implements Runnable {
     private final ProxyHandlerFactory proxyHandlerFactory;
@@ -35,7 +34,7 @@ public class ProxyServer implements Runnable {
         final EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
-            final LocalAddress localAddress = NetconfConfiguration.NETCONF_LOCAL_ADDRESS;
+            final LocalAddress localAddress = new LocalAddress("netconf");
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)

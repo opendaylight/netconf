@@ -15,6 +15,7 @@ import com.google.common.base.Stopwatch;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.local.LocalAddress;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.HashedWheelTimer;
@@ -32,7 +33,6 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswo
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
 import org.opendaylight.netconf.shaded.sshd.common.util.security.SecurityUtils;
 import org.opendaylight.netconf.ssh.EchoClientHandler.State;
-import org.opendaylight.netconf.util.NetconfConfiguration;
 
 public class SSHTest {
     public static final String AHOJ = "ahoj\n";
@@ -67,7 +67,7 @@ public class SSHTest {
         final InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 10831);
         try (var sshProxyServer = new SshProxyServer(minaTimerEx, nettyGroup, nioExec)) {
             sshProxyServer.bind(new SshProxyServerConfigurationBuilder()
-                .setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS)
+                .setBindingAddress(addr).setLocalAddress(new LocalAddress("netconf"))
                 .setAuthenticator((username, password) -> true)
                 .setKeyPairProvider(SecurityUtils.createGeneratorHostKeyProvider(sshKeyPair.toPath()))
                 .setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
