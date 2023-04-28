@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.ssh;
 
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.local.LocalAddress;
 import io.netty.channel.nio.NioEventLoopGroup;
 import java.io.File;
 import java.net.InetSocketAddress;
@@ -23,7 +24,6 @@ import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.util.security.SecurityUtils;
-import org.opendaylight.netconf.util.NetconfConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class SSHServerTest {
         final InetSocketAddress addr = InetSocketAddress.createUnresolved(HOST, PORT);
         server = new SshProxyServer(minaTimerEx, clientGroup, nioExec);
         server.bind(new SshProxyServerConfigurationBuilder()
-                .setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS)
+                .setBindingAddress(addr).setLocalAddress(new LocalAddress("netconf"))
                 .setAuthenticator((username, password) -> true)
                 .setKeyPairProvider(SecurityUtils.createGeneratorHostKeyProvider(sshKeyPair.toPath()))
                 .setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
