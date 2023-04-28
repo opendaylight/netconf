@@ -5,27 +5,25 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSession;
+import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfHelloMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
-import org.opendaylight.netconf.util.messages.FramingMechanism;
 
 public abstract class AbstractChannelInitializer<S extends NetconfSession> {
-
     public static final String NETCONF_MESSAGE_DECODER = "netconfMessageDecoder";
     public static final String NETCONF_MESSAGE_AGGREGATOR = "aggregator";
     public static final String NETCONF_MESSAGE_ENCODER = "netconfMessageEncoder";
     public static final String NETCONF_MESSAGE_FRAME_ENCODER = "frameEncoder";
     public static final String NETCONF_SESSION_NEGOTIATOR = "negotiator";
 
-    public void initialize(Channel ch, Promise<S> promise) {
+    public void initialize(final Channel ch, final Promise<S> promise) {
         ch.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         initializeMessageDecoder(ch);
         ch.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
@@ -35,13 +33,13 @@ public abstract class AbstractChannelInitializer<S extends NetconfSession> {
         initializeSessionNegotiator(ch, promise);
     }
 
-    protected void initializeMessageEncoder(Channel ch) {
+    protected void initializeMessageEncoder(final Channel ch) {
         // Special encoding handler for hello message to include additional header if available,
         // it is thrown away after successful negotiation
         ch.pipeline().addLast(NETCONF_MESSAGE_ENCODER, new NetconfHelloMessageToXMLEncoder());
     }
 
-    protected void initializeMessageDecoder(Channel ch) {
+    protected void initializeMessageDecoder(final Channel ch) {
         // Special decoding handler for hello message to parse additional header if available,
         // it is thrown away after successful negotiation
         ch.pipeline().addLast(NETCONF_MESSAGE_DECODER, new NetconfXMLToHelloMessageDecoder());
@@ -52,5 +50,4 @@ public abstract class AbstractChannelInitializer<S extends NetconfSession> {
      * identified by {@link AbstractChannelInitializer#NETCONF_MESSAGE_DECODER}, (or any other custom decoder processor)
      */
     protected abstract void initializeSessionNegotiator(Channel ch, Promise<S> promise);
-
 }
