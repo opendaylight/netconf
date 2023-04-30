@@ -24,13 +24,14 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.ConnectionOper.ConnectionStatus;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.AvailableCapabilitiesBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.ClusteredConnectionStatusBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.UnavailableCapabilitiesBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.available.capabilities.AvailableCapability;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.unavailable.capabilities.UnavailableCapabilityBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.ConnectionOper.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.oper.AvailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.oper.ClusteredConnectionStatusBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.oper.UnavailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.oper.available.capabilities.AvailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.oper.unavailable.capabilities.UnavailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -43,7 +44,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint16;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +89,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
     }
 
     public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities,
-            final Uint32 sessionId) {
+            final SessionIdType sessionId) {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
@@ -104,7 +104,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
     }
 
     public void updateClusteredDeviceData(final boolean up, final String masterAddress,
-            final NetconfDeviceCapabilities capabilities, final Uint32 sessionId) {
+            final NetconfDeviceCapabilities capabilities, final SessionIdType sessionId) {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
@@ -158,7 +158,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
     }
 
     private NetconfNodeBuilder newNetconfNodeBuilder(final boolean up, final NetconfDeviceCapabilities capabilities,
-            final Uint32 sessionId) {
+            final SessionIdType sessionId) {
         return new NetconfNodeBuilder()
             .setHost(id.host())
             .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))

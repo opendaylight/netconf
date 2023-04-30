@@ -26,7 +26,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.ConnectionOper.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.ConnectionOper.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.augment.test.rev160808.Node1;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -115,7 +116,7 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
         wtx.commit().get(5, TimeUnit.SECONDS);
 
-        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), Uint32.ONE);
+        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), new SessionIdType(Uint32.ONE));
 
         assertEquals(Optional.of(dataTestId), domDataBroker.newReadOnlyTransaction()
             .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf)

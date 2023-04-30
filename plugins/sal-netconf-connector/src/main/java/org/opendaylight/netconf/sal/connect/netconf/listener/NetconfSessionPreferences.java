@@ -24,9 +24,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public record NetconfSessionPreferences(
         @NonNull ImmutableMap<String, CapabilityOrigin> nonModuleCaps,
         @NonNull ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps,
-        @Nullable Uint32 sessionId) {
+        @Nullable SessionIdType sessionId) {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionPreferences.class);
     private static final ParameterMatcher MODULE_PARAM = new ParameterMatcher("module=");
     private static final ParameterMatcher REVISION_PARAM = new ParameterMatcher("revision=");
@@ -49,7 +49,7 @@ public record NetconfSessionPreferences(
 
     public static @NonNull NetconfSessionPreferences fromNetconfSession(final NetconfClientSession session) {
         return fromStrings(session.getServerCapabilities(), CapabilityOrigin.DeviceAdvertised,
-           session.sessionId().getValue());
+           session.sessionId());
     }
 
     @VisibleForTesting
@@ -58,7 +58,7 @@ public record NetconfSessionPreferences(
     }
 
     public static @NonNull NetconfSessionPreferences fromStrings(final Collection<String> capabilities,
-            final CapabilityOrigin capabilityOrigin, final Uint32 sessionId) {
+            final CapabilityOrigin capabilityOrigin, final SessionIdType sessionId) {
         final var moduleBasedCaps = new HashMap<QName, CapabilityOrigin>();
         final var nonModuleCaps = new HashMap<String, CapabilityOrigin>();
 

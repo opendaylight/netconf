@@ -9,7 +9,7 @@ package org.opendaylight.netconf.callhome.protocol;
 
 import java.net.SocketAddress;
 import java.security.PublicKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.Protocol.Name;
 
 /**
  * Protocol level Session Context for incoming Call Home connections.
