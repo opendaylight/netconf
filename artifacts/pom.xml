@@ -134,6 +134,15 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- NETCONF Transport features -->
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>odl-netconf-transport-api</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+
             <!-- YANG models -->
             <!-- RFC5277 NETCONF Event Notifications -->
             <dependency>
@@ -217,6 +226,13 @@
                 <artifactId>keystore-none</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>odl-netconf-keystore</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
 
             <!-- Truststore API and implementations. This is a manifestation of draft-ietf-netconf-truststore. -->
             <dependency>
@@ -228,6 +244,13 @@
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>truststore-none</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>odl-netconf-truststore</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
             </dependency>
 
             <dependency>
