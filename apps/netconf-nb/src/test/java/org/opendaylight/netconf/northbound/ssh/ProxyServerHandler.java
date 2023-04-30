@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.ssh;
+package org.opendaylight.netconf.northbound.ssh;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
 
 public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyServerHandler.class);
+
     private final Bootstrap clientBootstrap;
     private final LocalAddress localAddress;
-
 
     private Channel clientChannel;
 
