@@ -391,13 +391,6 @@
             <!-- netconf-connector features -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>features-netconf-connector</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>odl-netconf-clustered-topology</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
@@ -447,13 +440,6 @@
             </dependency>
 
             <!-- yanglib features -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>features-yanglib</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-yanglib</artifactId>
@@ -524,13 +510,6 @@
             </dependency>
 
             <!-- restconf features -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>features-restconf</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-mdsal-apidocs</artifactId>
