@@ -40,8 +40,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Command is Apache Mina SSH terminology for objects handling ssh data.
  */
-public class RemoteNetconfCommand implements AsyncCommand {
-
+final class RemoteNetconfCommand implements AsyncCommand {
     private static final Logger LOG = LoggerFactory.getLogger(RemoteNetconfCommand.class);
 
     private final EventLoopGroup clientEventGroup;
