@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.ssh;
+package org.opendaylight.netconf.northbound;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import org.opendaylight.netconf.auth.AuthProvider;
+import org.opendaylight.netconf.northbound.ssh.SshProxyServer;
+import org.opendaylight.netconf.northbound.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.server.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;

@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.ssh;
+package org.opendaylight.netconf.northbound.ssh;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,7 +25,6 @@ import org.slf4j.LoggerFactory;
  * and reads from delegate server and writes to remote client.
  */
 final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
-
     private static final Logger LOG = LoggerFactory.getLogger(SshProxyClientHandler.class);
 
     private final IoInputStream in;
