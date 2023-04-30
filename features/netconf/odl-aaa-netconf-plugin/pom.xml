@@ -18,7 +18,7 @@
 
     <artifactId>odl-aaa-netconf-plugin</artifactId>
     <packaging>feature</packaging>
-    <name>OpenDaylight :: AAA :: ODL NETCONF Plugin</name>
+    <name>OpenDaylight :: Netconf :: AAA Authorization Plugin</name>
 
     <dependencies>
         <dependency>
@@ -29,11 +29,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>aaa-authn-odl-plugin</artifactId>
+            <artifactId>netconf-auth</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>netconf-auth</artifactId>
+            <artifactId>netconf-auth-aaa</artifactId>
         </dependency>
     </dependencies>
 </project>

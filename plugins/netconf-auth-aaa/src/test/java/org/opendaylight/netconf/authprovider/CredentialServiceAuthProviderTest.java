@@ -22,6 +22,7 @@ import org.opendaylight.aaa.api.AuthenticationException;
 import org.opendaylight.aaa.api.Claim;
 import org.opendaylight.aaa.api.PasswordCredentialAuth;
 import org.opendaylight.aaa.api.PasswordCredentials;
+import org.opendaylight.netconf.auth.aaa.CredentialServiceAuthProvider;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CredentialServiceAuthProviderTest {
