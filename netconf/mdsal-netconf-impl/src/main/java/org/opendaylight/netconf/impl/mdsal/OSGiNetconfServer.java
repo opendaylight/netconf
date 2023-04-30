@@ -51,7 +51,7 @@ public final class OSGiNetconfServer {
             final ComponentFactory<DefaultNetconfMonitoringService> monitoringFactory,
             @Reference(target = "(component.factory=" + DefaultNetconfServerDispatcher.FACTORY_NAME + ")")
             final ComponentFactory<DefaultNetconfServerDispatcher> dispatcherFactory,
-            @Reference(target = "(" + NetconfMapperAggregator.OSGI_TYPE + ")")
+            @Reference(target = "(type=mapper-aggregator-registry)")
             final NetconfOperationServiceFactory mapperAggregatorRegistry,
             @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
             final ScheduledThreadPool sshScheduledExecutor,
