@@ -15,7 +15,6 @@ import org.w3c.dom.Document;
  * Wraps the execution of a single netconf operation.
  */
 public interface NetconfOperationChainedExecution {
-
     /**
      * Check if this is termination point in operation execution.
      *
@@ -37,11 +36,9 @@ public interface NetconfOperationChainedExecution {
         }
 
         @Override
-        public Document execute(Document requestMessage) {
+        public Document execute(final Document requestMessage) {
             throw new IllegalStateException("This execution represents the termination point in operation execution "
                     + "and cannot be executed itself");
         }
     };
-
-
 }
