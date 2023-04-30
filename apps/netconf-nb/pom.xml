@@ -44,6 +44,10 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-server</artifactId>
         </dependency>
         <dependency>

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.ssh;
+package org.opendaylight.netconf.northbound.ssh;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,8 +40,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Command is Apache Mina SSH terminology for objects handling ssh data.
  */
-public class RemoteNetconfCommand implements AsyncCommand {
-
+final class RemoteNetconfCommand implements AsyncCommand {
     private static final Logger LOG = LoggerFactory.getLogger(RemoteNetconfCommand.class);
 
     private final EventLoopGroup clientEventGroup;
@@ -55,7 +54,7 @@ public class RemoteNetconfCommand implements AsyncCommand {
     private Channel clientChannel;
     private ChannelFuture clientChannelFuture;
 
-    public RemoteNetconfCommand(final EventLoopGroup clientEventGroup, final LocalAddress localAddress) {
+    RemoteNetconfCommand(final EventLoopGroup clientEventGroup, final LocalAddress localAddress) {
         this.clientEventGroup = clientEventGroup;
         this.localAddress = localAddress;
     }
@@ -163,15 +162,13 @@ public class RemoteNetconfCommand implements AsyncCommand {
         return netconfHelloMessageAdditionalHeader.getAddress();
     }
 
-    public static class NetconfCommandFactory implements SubsystemFactory {
-
+    static class NetconfCommandFactory implements SubsystemFactory {
         public static final String NETCONF = "netconf";
 
         private final EventLoopGroup clientBootstrap;
         private final LocalAddress localAddress;
 
-        public NetconfCommandFactory(final EventLoopGroup clientBootstrap, final LocalAddress localAddress) {
-
+        NetconfCommandFactory(final EventLoopGroup clientBootstrap, final LocalAddress localAddress) {
             this.clientBootstrap = clientBootstrap;
             this.localAddress = localAddress;
         }
