@@ -49,12 +49,12 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUti
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.OdlHelloMessageCapabilities;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.Protocol.Name;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.KeyAuth;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.OdlHelloMessageCapabilities;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.KeyAuth;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.LoginPwUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.common.Decimal64;
@@ -276,7 +276,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
         if (credentials
-                instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225
+                instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430
                     .credentials.credentials.LoginPassword loginPassword) {
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         }

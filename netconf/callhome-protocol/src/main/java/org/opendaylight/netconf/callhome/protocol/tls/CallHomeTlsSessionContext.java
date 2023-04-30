@@ -28,7 +28,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.TlsClientChannelInitializer;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.Protocol.Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -86,7 +86,7 @@ import org.w3c.dom.Element;
 public class NetconfDeviceCommunicatorTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicatorTest.class);
-    private static final Uint32 SESSION_ID = Uint32.ONE;
+    private static final SessionIdType SESSION_ID = new SessionIdType(Uint32.ONE);
 
     @Mock
     RemoteDevice<NetconfDeviceCommunicator> mockDevice;
@@ -101,7 +101,7 @@ public class NetconfDeviceCommunicatorTest {
         // FIXME: spy() except we override the MockMaker in use
         spySession = mock(NetconfClientSession.class, withSettings()
             .spiedInstance(new NetconfClientSession(mock(NetconfClientSessionListener.class), mock(Channel.class),
-                new SessionIdType(SESSION_ID), Set.of()))
+                SESSION_ID, Set.of()))
             .defaultAnswer(CALLS_REAL_METHODS)
             .mockMaker(MockMakers.SUBCLASS));
     }
