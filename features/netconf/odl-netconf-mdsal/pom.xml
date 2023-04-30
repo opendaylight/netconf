@@ -29,23 +29,17 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>odl-netconf-ssh</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
+            <artifactId>odl-netconf-client</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>odl-netconf-client</artifactId>
+            <artifactId>odl-aaa-netconf-plugin</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>netconf-server-mdsal</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mdsal-netconf-ssh</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

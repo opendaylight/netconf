@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.ssh;
+package org.opendaylight.netconf.northbound.ssh;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,30 +20,30 @@ class ProxyClientHandler extends ChannelInboundHandlerAdapter {
     private final ChannelHandlerContext remoteCtx;
 
 
-    ProxyClientHandler(ChannelHandlerContext remoteCtx) {
+    ProxyClientHandler(final ChannelHandlerContext remoteCtx) {
         this.remoteCtx = remoteCtx;
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) {
+    public void channelActive(final ChannelHandlerContext ctx) {
         LOG.info("client active");
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
         ByteBuf bb = (ByteBuf) msg;
         LOG.info(">{}", bb.toString(StandardCharsets.UTF_8));
         remoteCtx.write(msg);
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
+    public void channelReadComplete(final ChannelHandlerContext ctx) {
         LOG.debug("Flushing server ctx");
         remoteCtx.flush();
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
         // Close the connection when an exception is raised.
         LOG.warn("Unexpected exception from downstream", cause);
         ctx.close();
@@ -51,7 +51,7 @@ class ProxyClientHandler extends ChannelInboundHandlerAdapter {
 
     // called both when local or remote connection dies
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
+    public void channelInactive(final ChannelHandlerContext ctx) {
         LOG.debug("channelInactive() called, closing remote client ctx");
         remoteCtx.close();
     }
