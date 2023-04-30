@@ -30,7 +30,7 @@ import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.Protocol.Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

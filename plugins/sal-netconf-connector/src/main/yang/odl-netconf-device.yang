@@ -7,6 +7,11 @@ module odl-netconf-device {
      of an OpenDaylight southbound NETCONF device.";
 
   import ietf-inet-types { prefix inet; }
+  import ietf-netconf { prefix nc; }
+
+  revision 2023-04-30 {
+    description "Use ietf-netconf's session-id-type";
+  }
 
   revision 2022-12-25;
 
@@ -221,9 +226,7 @@ module odl-netconf-device {
   grouping connection-oper {
     leaf session-id {
       config false;
-      type uint32 {
-        range "1..max";
-      }
+      type nc:session-id-type;
     }
 
     leaf connection-status {
