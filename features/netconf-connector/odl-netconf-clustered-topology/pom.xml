@@ -23,12 +23,6 @@
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-ssh</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-netconf-connector</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
