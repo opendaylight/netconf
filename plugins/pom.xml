@@ -29,6 +29,7 @@
     </properties>
 
     <modules>
+        <module>netconf-auth-aaa</module>
         <module>netconf-common-mdsal</module>
         <module>netconf-dom-api</module>
         <module>netconf-server-mdsal</module>

@@ -35,7 +35,6 @@
     <module>mdsal-netconf-yang-library</module>
     <module>netconf-netty-util</module>
     <module>netconf-auth</module>
-    <module>aaa-authn-odl-plugin</module>
     <module>yanglib</module>
     <module>tools</module>
 

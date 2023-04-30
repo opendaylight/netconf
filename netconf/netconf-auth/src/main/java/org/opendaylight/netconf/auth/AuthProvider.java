@@ -5,14 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.auth;
 
 /**
  * Authentication Service definition for netconf.
  */
 public interface AuthProvider {
-
     /**
      * Authenticate user by username/password.
      *
@@ -21,5 +19,4 @@ public interface AuthProvider {
      * @return true if authentication is successful, false otherwise
      */
     boolean authenticated(String username, String password);
-
 }

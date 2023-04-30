@@ -16,17 +16,13 @@
         <relativePath>../../parent</relativePath>
     </parent>
 
-    <artifactId>aaa-authn-odl-plugin</artifactId>
+    <artifactId>netconf-auth-aaa</artifactId>
     <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>aaa-authn-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

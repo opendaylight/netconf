@@ -42,12 +42,6 @@
       </dependency>
       <dependency>
           <groupId>${project.groupId}</groupId>
-          <artifactId>odl-aaa-netconf-plugin-no-cluster</artifactId>
-          <type>xml</type>
-          <classifier>features</classifier>
-      </dependency>
-      <dependency>
-          <groupId>${project.groupId}</groupId>
           <artifactId>odl-netconf-all</artifactId>
           <type>xml</type>
           <classifier>features</classifier>
