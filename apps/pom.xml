@@ -35,5 +35,6 @@
         <module>netconf-topology-singleton</module>
         <module>callhome-provider</module>
         <module>netconf-console</module>
+        <module>netconf-nb</module>
     </modules>
 </project>

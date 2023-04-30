@@ -71,7 +71,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mdsal-netconf-impl</artifactId>
+            <artifactId>netconf-nb</artifactId>
         </dependency>
     </dependencies>
 </project>

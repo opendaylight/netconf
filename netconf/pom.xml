@@ -34,7 +34,6 @@
     <module>mdsal-netconf-tcp</module>
     <module>mdsal-netconf-monitoring</module>
     <module>mdsal-netconf-yang-library</module>
-    <module>mdsal-netconf-impl</module>
     <module>netconf-netty-util</module>
     <module>netconf-auth</module>
     <module>aaa-authn-odl-plugin</module>
