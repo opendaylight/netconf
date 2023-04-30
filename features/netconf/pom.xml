@@ -36,7 +36,6 @@
     <module>odl-netconf-mdsal</module>
     <module>odl-netconf-netty-util</module>
     <module>odl-netconf-ssh</module>
-    <module>odl-netconf-tcp</module>
     <module>odl-netconf-util</module>
 
     <!-- CSIT features -->
