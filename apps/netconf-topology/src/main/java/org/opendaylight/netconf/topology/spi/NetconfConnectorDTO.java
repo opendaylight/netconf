@@ -9,7 +9,7 @@ package org.opendaylight.netconf.topology.spi;
 
 import java.util.List;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 

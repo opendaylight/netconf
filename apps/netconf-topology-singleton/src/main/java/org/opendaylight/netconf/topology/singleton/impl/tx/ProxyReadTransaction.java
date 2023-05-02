@@ -10,7 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl.tx;
 import akka.actor.ActorRef;
 import akka.util.Timeout;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
 
@@ -19,7 +19,6 @@ import scala.concurrent.Future;
  * {@link org.opendaylight.netconf.topology.singleton.impl.actors.ReadTransactionActor}.
  */
 public class ProxyReadTransaction extends ProxyReadWriteTransaction implements DOMDataTreeReadTransaction {
-
     public ProxyReadTransaction(final RemoteDeviceId id, final Future<Object> masterTxActorFuture,
             final ExecutionContext executionContext, final Timeout askTimeout) {
         super(id, masterTxActorFuture, executionContext, askTimeout);

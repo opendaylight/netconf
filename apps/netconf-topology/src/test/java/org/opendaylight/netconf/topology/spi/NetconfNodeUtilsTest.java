@@ -10,7 +10,6 @@ package org.opendaylight.netconf.topology.spi;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -22,8 +21,8 @@ import org.opendaylight.yangtools.yang.common.Uint16;
 public class NetconfNodeUtilsTest {
     @Test
     public void testCreateRemoteDeviceId() {
-        final Host host = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
-        final RemoteDeviceId id = NetconfNodeUtils.toRemoteDeviceId(new NodeId("testing-node"), new NetconfNodeBuilder()
+        final var host = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
+        final var id = NetconfNodeUtils.toRemoteDeviceId(new NodeId("testing-node"), new NetconfNodeBuilder()
             .setHost(host)
             .setPort(new PortNumber(Uint16.valueOf(9999)))
             .build());

@@ -20,7 +20,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
@@ -116,8 +116,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
                     return;
                 }
 
-                if (response instanceof NormalizedNodeMessage) {
-                    final NormalizedNodeMessage data = (NormalizedNodeMessage) response;
+                if (response instanceof NormalizedNodeMessage data) {
                     settableFuture.set(Optional.of(data.getNode()));
                 }
             }
