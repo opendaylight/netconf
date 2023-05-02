@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.schema;
+package org.opendaylight.netconf.client.mdsal;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -24,14 +24,14 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 
-public class YangLibrarySchemaYangSourceProviderTest {
+public class LibrarySchemaYangSourceProviderTest {
     private SourceIdentifier workingSid;
-    private YangLibrarySchemaYangSourceProvider yangLibrarySchemaYangSourceProvider;
+    private LibrarySchemaSourceProvider yangLibrarySchemaYangSourceProvider;
 
     @Before
     public void setUp() throws Exception {
         workingSid = new SourceIdentifier("abc");
-        yangLibrarySchemaYangSourceProvider = new YangLibrarySchemaYangSourceProvider(
+        yangLibrarySchemaYangSourceProvider = new LibrarySchemaSourceProvider(
             new RemoteDeviceId("id", new InetSocketAddress("localhost", 22)),
             Map.of(workingSid, getClass().getResource("/schemas/config-test-rpc.yang")));
     }
@@ -46,7 +46,7 @@ public class YangLibrarySchemaYangSourceProviderTest {
     @Test
     public void testGetSourceFailure() throws InterruptedException, MalformedURLException {
         final var sourceIdentifierURLMap = Map.of(workingSid, new URL("http://non-existing-entity.yang"));
-        final var failingYangLibrarySchemaYangSourceProvider = new YangLibrarySchemaYangSourceProvider(
+        final var failingYangLibrarySchemaYangSourceProvider = new LibrarySchemaSourceProvider(
             new RemoteDeviceId("id", new InetSocketAddress("localhost", 22)), sourceIdentifierURLMap);
 
         final var future = failingYangLibrarySchemaYangSourceProvider.getSource(workingSid);
