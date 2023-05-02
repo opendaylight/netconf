@@ -27,6 +27,7 @@ import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurati
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.DatastoreBackedPublicKeyAuth;
 import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
+import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
 import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
@@ -41,7 +42,6 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswo
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
-import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -172,7 +172,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                         libraryModulesSchemas.getAvailableModels().entrySet()) {
                     registeredYangLibSources
                             .add(schemaResourcesDTO.getSchemaRegistry().registerSchemaSource(
-                                    new YangLibrarySchemaYangSourceProvider(remoteDeviceId,
+                                    new LibrarySchemaSourceProvider(remoteDeviceId,
                                             libraryModulesSchemas.getAvailableModels()),
                                     PotentialSchemaSource
                                             .create(sourceIdentifierURLEntry.getKey(), YangTextSchemaSource.class,
