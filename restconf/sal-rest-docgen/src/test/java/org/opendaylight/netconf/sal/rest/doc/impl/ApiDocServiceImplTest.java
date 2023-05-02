@@ -51,7 +51,8 @@ public final class ApiDocServiceImplTest extends AbstractApiDocTest {
     public void getListOfMounts() throws Exception {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         // simulate the behavior of JacksonJaxbJsonProvider
-        final String result = MAPPER.writer().writeValueAsString(apiDocService.getListOfMounts(mockInfo).getEntity());
+        final String result = MAPPER.writer().writeValueAsString(
+                apiDocService.getListOfMounts(mockInfo).get().getEntity());
         assertEquals("[{\"instance\":\"/nodes/node=123/\",\"id\":1}]", result);
     }
 }
