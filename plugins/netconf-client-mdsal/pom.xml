@@ -15,7 +15,7 @@
     <relativePath>../../parent</relativePath>
   </parent>
 
-  <artifactId>sal-netconf-connector</artifactId>
+  <artifactId>netconf-client-mdsal</artifactId>
   <packaging>bundle</packaging>
 
   <dependencies>

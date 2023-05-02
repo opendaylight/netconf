@@ -103,7 +103,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>sal-netconf-connector</artifactId>
+                <artifactId>netconf-client-mdsal</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

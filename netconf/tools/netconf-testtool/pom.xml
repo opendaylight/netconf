@@ -63,15 +63,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>sal-netconf-connector</artifactId>
-        </dependency>
-       <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>mockito-configuration</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <artifactId>netconf-client-mdsal</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -121,6 +113,11 @@
         <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>org.apache.karaf.features.core</artifactId>
+        </dependency>
+
+       <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>mockito-configuration</artifactId>
         </dependency>
         <dependency>
             <groupId>org.xmlunit</groupId>

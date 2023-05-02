@@ -54,11 +54,11 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-netty-util</artifactId>
+      <artifactId>netconf-client-mdsal</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>sal-netconf-connector</artifactId>
+      <artifactId>netconf-netty-util</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>

@@ -30,9 +30,9 @@
 
     <modules>
         <module>netconf-auth-aaa</module>
+        <module>netconf-client-mdsal</module>
         <module>netconf-common-mdsal</module>
         <module>netconf-dom-api</module>
         <module>netconf-server-mdsal</module>
-        <module>sal-netconf-connector</module>
     </modules>
 </project>
