@@ -23,8 +23,20 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-draft-clemm-netmod-yang-network-topo-01-minimal</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-mdsal-broker</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.aaa</groupId>
+            <artifactId>odl-aaa-encryption-service</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -35,11 +47,12 @@
             <classifier>features</classifier>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>odl-mdsal-model-draft-clemm-netmod-yang-network-topo-01-minimal</artifactId>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-netconf-model-rfc6022</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
+
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -47,12 +60,6 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>sal-netconf-connector</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.aaa</groupId>
-            <artifactId>odl-aaa-encryption-service</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
         </dependency>
     </dependencies>
 </project>

@@ -57,11 +57,13 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-
         <dependency>
-            <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-netconf-model-rfc8040</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
         </dependency>
+
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-common-models</artifactId>

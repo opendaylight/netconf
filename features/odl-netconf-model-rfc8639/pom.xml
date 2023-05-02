@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright © 2017 Red Hat, Inc. and others.
+ Copyright © 2023 PANTHEON.tech, s.r.o. and others.
 
  This program and the accompanying materials are made available under the
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -16,61 +16,45 @@
         <relativePath>../parent</relativePath>
     </parent>
 
-    <artifactId>odl-netconf-api</artifactId>
+    <artifactId>odl-netconf-model-rfc8639</artifactId>
     <packaging>feature</packaging>
-    <name>OpenDaylight :: Netconf :: API</name>
+    <name>OpenDaylight :: Netconf :: RFC8639 Models</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>odl-netty-4</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>odl-yangtools-parser-api</artifactId>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc8040</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>odl-mdsal-model-rfc8525</artifactId>
+            <artifactId>odl-mdsal-model-rfc8343</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc8528</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc8529</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-model-rfc5277</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-model-rfc6241</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-model-rfc6470</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-model-rfc8526</artifactId>
+            <artifactId>odl-netconf-model-rfc8341</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
 
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-auth</artifactId>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>rfc8639</artifactId>
         </dependency>
     </dependencies>
 </project>

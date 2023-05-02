@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright © 2017 Red Hat, Inc. and others.
+ Copyright © 2023 PANTHEON.tech, s.r.o. and others.
 
  This program and the accompanying materials are made available under the
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -16,26 +16,21 @@
         <relativePath>../parent</relativePath>
     </parent>
 
-    <artifactId>odl-netconf-util</artifactId>
+    <artifactId>odl-netconf-model-rfc5277</artifactId>
     <packaging>feature</packaging>
+    <name>OpenDaylight :: Netconf :: RFC5277 Models</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>odl-yangtools-codec</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-api</artifactId>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc6991</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
 
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-common-mdsal</artifactId>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>rfc5277</artifactId>
         </dependency>
     </dependencies>
 </project>

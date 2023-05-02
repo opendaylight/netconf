@@ -11,6 +11,5 @@
         <feature version="[12,13)">odl-netty-4</feature>
         <feature version="[10,11)">odl-yangtools-parser-api</feature>
         <feature version="[11,12)">odl-mdsal-model-rfc8525</feature>
-        <feature version="[11,12)">odl-mdsal-model-rfc8342</feature>
     </feature>
 </features>
