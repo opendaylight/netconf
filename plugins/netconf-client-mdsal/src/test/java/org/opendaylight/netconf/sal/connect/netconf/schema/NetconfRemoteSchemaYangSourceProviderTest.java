@@ -26,6 +26,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.client.mdsal.MonitoringSchemaSourceProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
@@ -45,7 +46,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
     @Mock
     private DOMRpcService service;
 
-    private NetconfRemoteSchemaYangSourceProvider provider;
+    private MonitoringSchemaSourceProvider provider;
 
     @Before
     public void setUp() throws Exception {
@@ -53,7 +54,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         final FluentFuture<DOMRpcResult> response = FluentFutures.immediateFluentFuture(value);
         doReturn(response).when(service).invokeRpc(any(QName.class), any(ContainerNode.class));
 
-        provider = new NetconfRemoteSchemaYangSourceProvider(
+        provider = new MonitoringSchemaSourceProvider(
                 new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("localhost", 17830)), service);
     }
 
@@ -63,7 +64,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         final YangTextSchemaSource source = provider.getSource(identifier).get();
         assertEquals(identifier, source.getIdentifier());
         verify(service).invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME,
-                NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest("test", Optional.of("2016-02-08")));
+                MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Optional.of("2016-02-08")));
     }
 
     private static ContainerNode getNode() throws ParserConfigurationException {
