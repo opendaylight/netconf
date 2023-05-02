@@ -17,10 +17,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
-import org.opendaylight.netconf.sal.connect.api.RpcTransformer;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -74,7 +74,6 @@ public final class SchemalessNetconfDeviceRpc implements Rpcs.Schemaless {
                 ret.setException(new DOMRpcImplementationNotAvailableException(cause,
                     "Unable to invoke rpc %s on device %s", type, deviceId));
             }
-
         }, MoreExecutors.directExecutor());
         return ret;
     }
