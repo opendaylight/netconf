@@ -132,6 +132,13 @@
             <!-- NETCONF Transport features -->
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>odl-netconf-transport</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>odl-netconf-transport-api</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
