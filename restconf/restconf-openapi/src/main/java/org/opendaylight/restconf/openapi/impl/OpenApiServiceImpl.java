@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -76,53 +77,54 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public synchronized Response getAllModulesDoc(final UriInfo uriInfo) {
+    public CompletableFuture<Response> getAllModulesDoc(final UriInfo uriInfo) {
         final DefinitionNames definitionNames = new DefinitionNames();
         final OpenApiObject doc = openApiGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames);
-        return Response.ok(doc).build();
+        return CompletableFuture.supplyAsync(() -> Response.ok(doc).build());
     }
 
     /**
      * Generates Swagger compliant document listing APIs for module.
      */
     @Override
-    public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
-        return Response.ok(
+    public CompletableFuture<Response> getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
+        return CompletableFuture.supplyAsync(() -> Response.ok(
             openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo))
-            .build();
+            .build());
     }
 
     /**
      * Redirects to embedded swagger ui.
      */
     @Override
-    public synchronized Response getApiExplorer(final UriInfo uriInfo) {
-        return Response.seeOther(uriInfo.getBaseUriBuilder().path("../explorer/index.html").build()).build();
+    public CompletableFuture<Response> getApiExplorer(final UriInfo uriInfo) {
+        return CompletableFuture.supplyAsync(() ->
+                Response.seeOther(uriInfo.getBaseUriBuilder().path("../explorer/index.html").build()).build());
     }
 
     @Override
-    public synchronized Response getListOfMounts(final UriInfo uriInfo) {
+    public CompletableFuture<Response> getListOfMounts(final UriInfo uriInfo) {
         final List<MountPointInstance> entity = mountPointOpenApiRFC8040
                 .getInstanceIdentifiers().entrySet().stream()
                 .map(MountPointInstance::new).collect(Collectors.toList());
-        return Response.ok(entity).build();
+        return CompletableFuture.supplyAsync(() -> Response.ok(entity).build());
     }
 
     @Override
-    public synchronized Response getMountDocByModule(final String instanceNum, final String module,
+    public CompletableFuture<Response> getMountDocByModule(final String instanceNum, final String module,
                                                      final String revision, final UriInfo uriInfo) {
         final OpenApiObject api = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
             module, revision);
-        return Response.ok(api).build();
+        return CompletableFuture.supplyAsync(() -> Response.ok(api).build());
     }
 
     @Override
-    public synchronized Response getMountDoc(final String instanceNum, final UriInfo uriInfo) {
+    public CompletableFuture<Response> getMountDoc(final String instanceNum, final UriInfo uriInfo) {
         final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
         final Optional<Integer> pageNum = stringPageNum != null ? Optional.of(Integer.valueOf(stringPageNum))
                 : Optional.empty();
         final OpenApiObject api = mountPointOpenApiRFC8040.getMountPointApi(uriInfo,
                 Long.parseLong(instanceNum), pageNum);
-        return Response.ok(api).build();
+        return CompletableFuture.supplyAsync(() -> Response.ok(api).build());
     }
 }
