@@ -29,8 +29,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toFilterStructure;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,8 +53,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
+import org.opendaylight.netconf.client.mdsal.MonitoringSchemaSourceProvider;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
-import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.util.FieldsFilter;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -266,7 +264,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void testGetSchemaRequest() throws Exception {
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(GET_SCHEMA_QNAME,
-                NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest("module", Optional.of("2012-12-12")));
+                MonitoringSchemaSourceProvider.createGetSchemaRequest("module", Optional.of("2012-12-12")));
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get-schema xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<format>yang</format>\n"
@@ -323,9 +321,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         assertTrue(compositeNodeRpcResult.errors().isEmpty());
         assertNotNull(compositeNodeRpcResult.value());
 
-        final List<DataContainerChild> values = Lists.newArrayList(
-                NetconfRemoteSchemaYangSourceProvider
-                        .createGetSchemaRequest("module", Optional.of("2012-12-12")).body());
+        final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest(
+            "module", Optional.of("2012-12-12")).body();
 
         final Map<QName, Object> keys = new HashMap<>();
         for (final DataContainerChild value : values) {
@@ -345,7 +342,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final ContainerNode state = (ContainerNode) result.getChildByArg(toId(NetconfState.QNAME));
         final ContainerNode schemas = (ContainerNode) state.getChildByArg(toId(Schemas.QNAME));
         final MapNode schemaParent = (MapNode) schemas.getChildByArg(toId(Schema.QNAME));
-        assertEquals(1, Iterables.size(schemaParent.body()));
+        assertEquals(1, schemaParent.body().size());
 
         assertEquals(schemaNode, schemaParent.body().iterator().next());
     }
@@ -406,9 +403,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testEditConfigRequest() throws Exception {
-        final List<DataContainerChild> values = Lists.newArrayList(
-                NetconfRemoteSchemaYangSourceProvider
-                        .createGetSchemaRequest("module", Optional.of("2012-12-12")).body());
+        final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest(
+            "module", Optional.of("2012-12-12")).body();
 
         final Map<QName, Object> keys = new HashMap<>();
         for (final DataContainerChild value : values) {

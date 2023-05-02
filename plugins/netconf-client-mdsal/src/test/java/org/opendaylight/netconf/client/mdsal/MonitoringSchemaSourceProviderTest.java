@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.schema;
+package org.opendaylight.netconf.client.mdsal;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,12 +40,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfRemoteSchemaYangSourceProviderTest {
-
+public class MonitoringSchemaSourceProviderTest {
     @Mock
     private DOMRpcService service;
 
-    private NetconfRemoteSchemaYangSourceProvider provider;
+    private MonitoringSchemaSourceProvider provider;
 
     @Before
     public void setUp() throws Exception {
@@ -53,7 +52,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         final FluentFuture<DOMRpcResult> response = FluentFutures.immediateFluentFuture(value);
         doReturn(response).when(service).invokeRpc(any(QName.class), any(ContainerNode.class));
 
-        provider = new NetconfRemoteSchemaYangSourceProvider(
+        provider = new MonitoringSchemaSourceProvider(
                 new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("localhost", 17830)), service);
     }
 
@@ -63,7 +62,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         final YangTextSchemaSource source = provider.getSource(identifier).get();
         assertEquals(identifier, source.getIdentifier());
         verify(service).invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME,
-                NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest("test", Optional.of("2016-02-08")));
+                MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Optional.of("2016-02-08")));
     }
 
     private static ContainerNode getNode() throws ParserConfigurationException {
