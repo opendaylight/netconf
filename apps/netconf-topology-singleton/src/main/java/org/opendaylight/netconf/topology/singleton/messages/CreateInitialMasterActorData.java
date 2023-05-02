@@ -9,8 +9,8 @@ package org.opendaylight.netconf.topology.singleton.messages;
 
 import java.util.List;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 
 /**

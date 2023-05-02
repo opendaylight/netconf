@@ -21,9 +21,9 @@ import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DefaultDOMRpcException;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
-import org.opendaylight.netconf.sal.connect.api.RpcTransformer;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -50,11 +50,10 @@ public final class NetconfDeviceRpc implements Rpcs.Normalized {
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
     public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
-        final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = communicator.sendRequest(
-            transformer.toRpcRequest(type, input), type);
+        final var delegateFuture = communicator.sendRequest(transformer.toRpcRequest(type, input), type);
 
-        final SettableFuture<DOMRpcResult> ret = SettableFuture.create();
-        Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
+        final var ret = SettableFuture.<DOMRpcResult>create();
+        Futures.addCallback(delegateFuture, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<NetconfMessage> result) {
                 final DOMRpcResult rpcResult;

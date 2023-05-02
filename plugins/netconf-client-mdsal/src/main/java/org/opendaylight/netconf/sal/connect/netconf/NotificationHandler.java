@@ -17,9 +17,9 @@ import java.util.function.Predicate;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.api.NotificationTransformer;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

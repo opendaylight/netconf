@@ -41,9 +41,9 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
-import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
+import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
