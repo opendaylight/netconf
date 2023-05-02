@@ -45,10 +45,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-events-mdsal</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>mdsal-netconf-yang-library</artifactId>
         </dependency>
         <dependency>

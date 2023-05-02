@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.server.events.mdsal;
+package org.opendaylight.netconf.server.mdsal.notifications;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.doReturn;
@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -62,6 +63,9 @@ public class NotificationsTransformUtilTest {
         doReturn(Set.of(new Uri("uri1"))).when(capabilityChange).getAddedCapability();
         doReturn(Set.of(new Uri("uri4"), new Uri("uri3"))).when(capabilityChange).getDeletedCapability();
         doReturn(EVENT_TIME).when((EventInstantAware) capabilityChange).eventInstant();
+        doReturn(null).when(capabilityChange).getChangedBy();
+        doReturn(null).when(capabilityChange).getModifiedCapability();
+        doReturn(Map.of()).when(capabilityChange).augmentations();
 
         final var notification = UTIL.transform(capabilityChange, Absolute.of(NetconfCapabilityChange.QNAME));
 

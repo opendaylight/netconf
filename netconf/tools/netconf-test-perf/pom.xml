@@ -41,11 +41,11 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-events-mdsal</artifactId>
+            <artifactId>netconf-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-server</artifactId>
+            <artifactId>netconf-server-mdsal</artifactId>
         </dependency>
         <dependency>
             <groupId>com.guicedee.services</groupId>

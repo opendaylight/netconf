@@ -297,11 +297,6 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-events-mdsal</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>netconf-nb</artifactId>
                 <version>${project.version}</version>

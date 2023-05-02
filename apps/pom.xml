@@ -29,7 +29,6 @@
     </properties>
 
     <modules>
-        <module>netconf-events-mdsal</module>
         <module>netconf-topology</module>
         <module>netconf-topology-impl</module>
         <module>netconf-topology-singleton</module>
