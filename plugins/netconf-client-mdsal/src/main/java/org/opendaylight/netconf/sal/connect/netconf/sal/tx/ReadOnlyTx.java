@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 
 public final class ReadOnlyTx extends AbstractReadOnlyTx {

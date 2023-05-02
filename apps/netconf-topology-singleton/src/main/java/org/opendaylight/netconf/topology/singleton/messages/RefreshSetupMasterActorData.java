@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.messages;
 
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 
 /**
