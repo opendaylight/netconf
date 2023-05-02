@@ -5,19 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.schema;
+package org.opendaylight.netconf.client.mdsal;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_DATA_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.GET_SCHEMA_QNAME;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
@@ -42,8 +39,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSourceProvider<YangTextSchemaSource> {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfRemoteSchemaYangSourceProvider.class);
+/**
+ * A {@link SchemaSourceProvider} producing {@link YangTextSchemaSource}s based on a device's
+ * {@code ietf-netconf-monitoring} interface. The set of available sources is not pre-determined and each request is
+ * dispatched to the device, i.e. this provider reflects real-time updates to available schemas.
+ */
+public final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangTextSchemaSource> {
+    private static final Logger LOG = LoggerFactory.getLogger(MonitoringSchemaSourceProvider.class);
     private static final NodeIdentifier FORMAT_PATHARG =
             NodeIdentifier.create(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "format").intern());
     private static final NodeIdentifier GET_SCHEMA_PATHARG =
@@ -61,8 +63,8 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
     private final DOMRpcService rpc;
     private final RemoteDeviceId id;
 
-    public NetconfRemoteSchemaYangSourceProvider(final RemoteDeviceId id, final DOMRpcService rpc) {
-        this.id = id;
+    public MonitoringSchemaSourceProvider(final RemoteDeviceId id, final DOMRpcService rpc) {
+        this.id = requireNonNull(id);
         this.rpc = requireNonNull(rpc);
     }
 
@@ -108,7 +110,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
                             id + ": Unexpected response to get-schema, schema not present in message for: "
                                 + sourceIdentifier));
                     LOG.debug("{}: YANG Schema successfully retrieved for {}:{}", id, moduleName, revision);
-                    return new NetconfYangTextSchemaSource(id, sourceIdentifier, moduleName,
+                    return new CachedYangTextSchemaSource(id, sourceIdentifier, moduleName,
                         schemaString.getBytes(StandardCharsets.UTF_8));
                 }
 
@@ -118,34 +120,5 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
                     "%s: YANG schema was not successfully retrieved for %s. Errors: %s", id, sourceIdentifier,
                     input.errors()));
             }, MoreExecutors.directExecutor());
-    }
-
-    static class NetconfYangTextSchemaSource extends YangTextSchemaSource {
-        private final RemoteDeviceId id;
-        private final byte[] schemaBytes;
-        private final String symbolicName;
-
-        NetconfYangTextSchemaSource(final RemoteDeviceId id, final SourceIdentifier sourceIdentifier,
-                final String symbolicName, final byte[] schemaBytes) {
-            super(sourceIdentifier);
-            this.symbolicName = requireNonNull(symbolicName);
-            this.id = id;
-            this.schemaBytes = schemaBytes.clone();
-        }
-
-        @Override
-        protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
-            return toStringHelper.add("device", id);
-        }
-
-        @Override
-        public InputStream openStream() {
-            return new ByteArrayInputStream(schemaBytes);
-        }
-
-        @Override
-        public Optional<String> getSymbolicName() {
-            return Optional.of(symbolicName);
-        }
     }
 }
