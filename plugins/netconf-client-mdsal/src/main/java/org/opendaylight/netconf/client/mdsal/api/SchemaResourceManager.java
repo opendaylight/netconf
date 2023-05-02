@@ -9,7 +9,7 @@ package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
+import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
 
 @Beta
 @NonNullByDefault
