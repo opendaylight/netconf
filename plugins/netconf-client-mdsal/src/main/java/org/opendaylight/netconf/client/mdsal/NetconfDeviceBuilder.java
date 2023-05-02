@@ -5,15 +5,15 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf;
+package org.opendaylight.netconf.client.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
+import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 
 public class NetconfDeviceBuilder {
