@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.auth;
+package org.opendaylight.netconf.client.mdsal;
 
 import com.google.common.base.Strings;
 import java.io.IOException;
@@ -22,8 +22,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
-
+public final class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(DatastoreBackedPublicKeyAuth.class);
 
     private final String username;
@@ -31,6 +30,7 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
     private final NetconfKeystoreAdapter keystoreAdapter;
     private final AAAEncryptionService encryptionService;
 
+    // FIXME: do not use Optional here and deal with atomic set
     private Optional<KeyPair> keyPair = Optional.empty();
 
     public DatastoreBackedPublicKeyAuth(final String username, final String pairId,
