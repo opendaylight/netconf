@@ -58,6 +58,7 @@
         <module>odl-netconf-ssh</module>
         <module>odl-netconf-test-tools</module>
         <module>odl-netconf-topology</module>
+        <module>odl-netconf-transport</module>
         <module>odl-netconf-transport-api</module>
         <module>odl-netconf-truststore</module>
         <module>odl-netconf-util</module>
