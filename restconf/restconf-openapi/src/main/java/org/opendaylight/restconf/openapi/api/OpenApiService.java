@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.api;
 
+import java.util.concurrent.CompletableFuture;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -27,7 +28,7 @@ public interface OpenApiService {
     @GET
     @Path("/single")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getAllModulesDoc(@Context javax.ws.rs.core.UriInfo uriInfo);
+    CompletableFuture<Response> getAllModulesDoc(@Context javax.ws.rs.core.UriInfo uriInfo);
 
     /**
      * Generates Swagger compliant document listing APIs for module.
@@ -35,7 +36,7 @@ public interface OpenApiService {
     @GET
     @Path("/{module}({revision})")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getDocByModule(@PathParam("module") String module,
+    CompletableFuture<Response> getDocByModule(@PathParam("module") String module,
                             @PathParam("revision") String revision, @Context javax.ws.rs.core.UriInfo uriInfo);
 
     /**
@@ -44,7 +45,7 @@ public interface OpenApiService {
     @GET
     @Path("/ui")
     @Produces(MediaType.TEXT_HTML)
-    Response getApiExplorer(@Context javax.ws.rs.core.UriInfo uriInfo);
+    CompletableFuture<Response> getApiExplorer(@Context javax.ws.rs.core.UriInfo uriInfo);
 
     /**
      * Generates index document for Swagger UI. This document lists out all
@@ -54,7 +55,7 @@ public interface OpenApiService {
     @GET
     @Path("/mounts")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getListOfMounts(@Context javax.ws.rs.core.UriInfo uriInfo);
+    CompletableFuture<Response> getListOfMounts(@Context javax.ws.rs.core.UriInfo uriInfo);
 
     /**
      * Generates Swagger compliant document listing APIs for module.
@@ -62,7 +63,7 @@ public interface OpenApiService {
     @GET
     @Path("/mounts/{instance}/{module}({revision})")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getMountDocByModule(@PathParam("instance") String instanceNum,
+    CompletableFuture<Response> getMountDocByModule(@PathParam("instance") String instanceNum,
                                  @PathParam("module") String module, @PathParam("revision") String revision,
                                  @Context javax.ws.rs.core.UriInfo uriInfo);
 
@@ -72,7 +73,7 @@ public interface OpenApiService {
     @GET
     @Path("/mounts/{instance}")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getMountDoc(@PathParam("instance") String instanceNum,
+    CompletableFuture<Response> getMountDoc(@PathParam("instance") String instanceNum,
                          @Context javax.ws.rs.core.UriInfo uriInfo);
 
 }
