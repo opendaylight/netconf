@@ -16,7 +16,6 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
-import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.slf4j.Logger;
@@ -76,7 +75,7 @@ final class DeviceSourcesResolver implements Callable<DeviceSources> {
 
         final var sourceProvider = availableSchemas instanceof LibraryModulesSchemas libraryModule
             ? new YangLibrarySchemaYangSourceProvider(id, libraryModule.getAvailableModels())
-                : new NetconfRemoteSchemaYangSourceProvider(id, deviceRpc);
+                : new MonitoringSchemaSourceProvider(id, deviceRpc);
         return new DeviceSources(requiredSources, providedSources, sourceProvider);
     }
 }
