@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.schema;
+package org.opendaylight.netconf.client.mdsal;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -16,7 +16,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
-import org.opendaylight.netconf.client.mdsal.CachedYangTextSchemaSource;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -26,16 +25,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides YANG schema sources from yang library.
+ * Provides YANG schema sources from YANG library. The set of available sources is pre-determined when this provider
+ * is created, but each source is acquired on demand.
  */
-public final class YangLibrarySchemaYangSourceProvider implements SchemaSourceProvider<YangTextSchemaSource> {
-    private static final Logger LOG = LoggerFactory.getLogger(YangLibrarySchemaYangSourceProvider.class);
+public final class LibrarySchemaSourceProvider implements SchemaSourceProvider<YangTextSchemaSource> {
+    private static final Logger LOG = LoggerFactory.getLogger(LibrarySchemaSourceProvider.class);
 
     private final ImmutableMap<SourceIdentifier, URL> availableSources;
     private final RemoteDeviceId id;
 
-    public YangLibrarySchemaYangSourceProvider(final RemoteDeviceId id,
-            final Map<SourceIdentifier, URL> availableSources) {
+    public LibrarySchemaSourceProvider(final RemoteDeviceId id, final Map<SourceIdentifier, URL> availableSources) {
         this.id = requireNonNull(id);
         this.availableSources = ImmutableMap.copyOf(availableSources);
     }
@@ -54,8 +53,7 @@ public final class YangLibrarySchemaYangSourceProvider implements SchemaSourcePr
                 "Unable to download remote schema for " + sourceIdentifier + " from " + url, e));
         }
 
-        final var yangSource = new CachedYangTextSchemaSource(id, sourceIdentifier,
-            url.toString(), schemaContent);
+        final var yangSource = new CachedYangTextSchemaSource(id, sourceIdentifier, url.toString(), schemaContent);
         LOG.debug("Source {} downloaded from a yang library's url {}", sourceIdentifier, url);
         return Futures.immediateFuture(yangSource);
     }
