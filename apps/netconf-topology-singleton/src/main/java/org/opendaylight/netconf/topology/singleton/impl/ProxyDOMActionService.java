@@ -25,8 +25,8 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMActionServiceExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringActionException;
 import org.opendaylight.netconf.topology.singleton.messages.ContainerNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
@@ -58,7 +58,7 @@ public class ProxyDOMActionService implements Actions.Normalized {
      *
      * @param actorSystem ActorSystem
      * @param masterActorRef ActorRef
-     * @param remoteDeviceId {@link org.opendaylight.netconf.sal.connect.api.RemoteDeviceId} ref
+     * @param remoteDeviceId {@link RemoteDeviceId} ref
      * @param actorResponseWaitTime Timeout
      */
     public ProxyDOMActionService(final ActorSystem actorSystem, final ActorRef masterActorRef,

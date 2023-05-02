@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.api;
 
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 
 /**
  * Provides API for connection ODL (master) with device.

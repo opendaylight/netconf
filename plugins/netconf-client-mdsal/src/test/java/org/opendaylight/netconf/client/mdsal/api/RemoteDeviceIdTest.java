@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.api;
+package org.opendaylight.netconf.client.mdsal.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -20,10 +20,10 @@ public class RemoteDeviceIdTest {
 
         final var remoteDeviceId = new RemoteDeviceId("test", address);
 
-        assertEquals(true, remoteDeviceId.equals(remoteDeviceId));
-        assertEquals(false, remoteDeviceId.equals(this));
-        assertEquals(false, remoteDeviceId.equals(new RemoteDeviceId("test-diff", address)));
-        assertEquals(true, remoteDeviceId.equals(new RemoteDeviceId("test", address)));
+        assertEquals(remoteDeviceId, remoteDeviceId);
+        assertNotEquals(remoteDeviceId, this);
+        assertNotEquals(new RemoteDeviceId("test-diff", address), remoteDeviceId);
+        assertEquals(new RemoteDeviceId("test", address), remoteDeviceId);
     }
 
     @Test

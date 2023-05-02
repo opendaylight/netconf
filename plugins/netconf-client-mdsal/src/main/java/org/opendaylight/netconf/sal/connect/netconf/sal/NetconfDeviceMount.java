@@ -20,13 +20,13 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.client.mdsal.api.SchemalessRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.netconf.sal.connect.api.NetconfRpcService;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
-import org.opendaylight.netconf.sal.connect.api.SchemalessRpcService;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -54,8 +54,7 @@ public class NetconfDeviceMount implements AutoCloseable {
     public void onDeviceConnected(final EffectiveModelContext initialCtx,
             final RemoteDeviceServices services, final DOMDataBroker broker,
             final NetconfDataTreeService dataTreeService) {
-        onDeviceConnected(initialCtx, services, new NetconfDeviceNotificationService(), broker,
-            dataTreeService);
+        onDeviceConnected(initialCtx, services, new NetconfDeviceNotificationService(), broker, dataTreeService);
     }
 
     public synchronized void onDeviceConnected(final EffectiveModelContext initialCtx,
