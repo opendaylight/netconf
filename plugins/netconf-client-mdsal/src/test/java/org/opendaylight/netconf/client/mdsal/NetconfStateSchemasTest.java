@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf;
+package org.opendaylight.netconf.client.mdsal;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -64,14 +64,14 @@ import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemasTest.class);
-
     private static final NetconfSessionPreferences CAPS = NetconfSessionPreferences.fromStrings(Set.of(
         "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04"));
+
     private final RemoteDeviceId deviceId = new RemoteDeviceId("device", new InetSocketAddress(99));
     private final int numberOfSchemas = 73;
     private final int numberOfLegalSchemas = numberOfSchemas - 3;
+
     private ContainerNode compositeNodeSchemas;
 
     @Mock

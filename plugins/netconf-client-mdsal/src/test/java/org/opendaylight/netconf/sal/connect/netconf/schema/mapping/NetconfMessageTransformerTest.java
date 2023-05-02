@@ -54,8 +54,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
-import org.opendaylight.netconf.sal.connect.netconf.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.util.FieldsFilter;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
@@ -267,13 +267,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     public void testGetSchemaRequest() throws Exception {
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(GET_SCHEMA_QNAME,
                 NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest("module", Optional.of("2012-12-12")));
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get-schema xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<format>yang</format>\n"
-                + "<identifier>module</identifier>\n"
-                + "<version>2012-12-12</version>\n"
-                + "</get-schema>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get-schema xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<format>yang</format>
+        	<identifier>module</identifier>
+        	<version>2012-12-12</version>
+        	</get-schema>
+        	</rpc>""");
     }
 
     @Test
@@ -362,22 +363,23 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<schemas>\n"
-                + "<schema>\n"
-                + "<version/>\n"
-                + "</schema>\n"
-                + "</schemas>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "<source>\n"
-                + "<running/>\n"
-                + "</source>\n"
-                + "</get-config>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get-config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<schemas>
+        	<schema>
+        	<version/>
+        	</schema>
+        	</schemas>
+        	</netconf-state>
+        	</filter>
+        	<source>
+        	<running/>
+        	</source>
+        	</get-config>
+        	</rpc>""");
     }
 
     @Test
@@ -390,18 +392,19 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<schemas/>\n"
-                + "</netconf-state>"
-                + "</filter>\n"
-                + "<source>\n"
-                + "<running/>\n"
-                + "</source>\n"
-                + "</get-config>"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get-config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<schemas/>
+        	</netconf-state>\
+        	</filter>
+        	<source>
+        	<running/>
+        	</source>
+        	</get-config>\
+        	</rpc>""");
     }
 
     @Test
@@ -433,24 +436,25 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 NetconfMessageTransformUtil.wrap(NETCONF_EDIT_CONFIG_QNAME, editConfigStructure, target);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_EDIT_CONFIG_QNAME, wrap);
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<edit-config>\n"
-                + "<target>\n"
-                + "<candidate/>\n"
-                + "</target>\n"
-                + "<config>\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<schemas>\n"
-                + "<schema>\n"
-                + "<identifier>module</identifier>\n"
-                + "<version>2012-12-12</version>\n"
-                + "<format>yang</format>\n"
-                + "</schema>\n"
-                + "</schemas>\n"
-                + "</netconf-state>\n"
-                + "</config>\n"
-                + "</edit-config>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<edit-config>
+        	<target>
+        	<candidate/>
+        	</target>
+        	<config>
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<schemas>
+        	<schema>
+        	<identifier>module</identifier>
+        	<version>2012-12-12</version>
+        	<format>yang</format>
+        	</schema>
+        	</schemas>
+        	</netconf-state>
+        	</config>
+        	</edit-config>
+        	</rpc>""");
     }
 
     private static void assertSimilarXml(final NetconfMessage netconfMessage, final String xmlContent)
@@ -471,17 +475,18 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, filter));
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-                + "<get xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<capabilities>\n"
-                + "<capability>a:b:c</capability>\n"
-                + "</capabilities>\n"
-                + "</netconf-state>"
-                + "</filter>\n"
-                + "</get>"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\
+        	<get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<capabilities>
+        	<capability>a:b:c</capability>
+        	</capabilities>
+        	</netconf-state>\
+        	</filter>
+        	</get>\
+        	</rpc>""");
     }
 
     @Test
@@ -494,17 +499,19 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<capabilities>\n"
-                + "<capability/>\n"
-                + "</capabilities>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>\n");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get>
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<capabilities>
+        	<capability/>
+        	</capabilities>
+        	</netconf-state>
+        	</filter>
+        	</get>
+        	</rpc>
+        	""");
     }
 
     @Test
@@ -517,17 +524,19 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<datastores>\n"
-                + "<datastore/>\n"
-                + "</datastores>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>\n");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get>
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<datastores>
+        	<datastore/>
+        	</datastores>
+        	</netconf-state>
+        	</filter>
+        	</get>
+        	</rpc>
+        	""");
     }
 
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
@@ -887,18 +896,19 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<statistics>\n"
-                + "<netconf-start-time/>\n"
-                + "</statistics>\n"
-                + "<datastores/>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get>
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<statistics>
+        	<netconf-start-time/>
+        	</statistics>
+        	<datastores/>
+        	</netconf-state>
+        	</filter>
+        	</get>
+        	</rpc>""");
     }
 
     @Test
@@ -921,16 +931,17 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<capabilities/>\n"
-                + "<datastores/>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get>
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<capabilities/>
+        	<datastores/>
+        	</netconf-state>
+        	</filter>
+        	</get>
+        	</rpc>""");
     }
 
     @Test
@@ -947,13 +958,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\"/>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get>
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring"/>
+        	</filter>
+        	</get>
+        	</rpc>""");
     }
 
     @Test
@@ -973,23 +985,23 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<schemas>\n"
-                + "<schema>\n"
-                + "<version/>\n"
-                + "<namespace/>\n"
-                // explicitly fetched list keys - identifier and format
-                + "<identifier/>\n"
-                + "<format/>\n"
-                + "</schema>\n"
-                + "</schemas>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get>
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<schemas>
+        	<schema>
+        	<version/>
+        	<namespace/>
+        	<identifier/>
+        	<format/>
+        	</schema>
+        	</schemas>
+        	</netconf-state>
+        	</filter>
+        	</get>
+        	</rpc>""");
     }
 
     @Test
@@ -1014,26 +1026,27 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<datastores>\n"
-                + "<datastore>\n"
-                + "<locks>\n"
-                + "<partial-lock>\n"
-                + "<locked-time/>\n"
-                + "<locked-by-session/>\n"
-                + "<lock-id/>\n"
-                + "</partial-lock>\n"
-                + "</locks>\n"
-                + "<name/>\n"
-                + "</datastore>\n"
-                + "</datastores>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get>
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<datastores>
+        	<datastore>
+        	<locks>
+        	<partial-lock>
+        	<locked-time/>
+        	<locked-by-session/>
+        	<lock-id/>
+        	</partial-lock>
+        	</locks>
+        	<name/>
+        	</datastore>
+        	</datastores>
+        	</netconf-state>
+        	</filter>
+        	</get>
+        	</rpc>""");
     }
 
     @Test
@@ -1052,20 +1065,21 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<datastores>\n"
-                + "<datastore/>\n"
-                + "</datastores>\n"
-                + "<sessions>\n"
-                + "<session/>\n"
-                + "</sessions>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get>
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<datastores>
+        	<datastore/>
+        	</datastores>
+        	<sessions>
+        	<session/>
+        	</sessions>
+        	</netconf-state>
+        	</filter>
+        	</get>
+        	</rpc>""");
     }
 
     @Test
@@ -1087,23 +1101,24 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<sessions>\n"
-                + "<session>\n"
-                + "<session-id>1</session-id>\n"
-                + "</session>\n"
-                + "<session>\n"
-                + "<session-id>2</session-id>\n"
-                + "<transport/>\n"
-                + "</session>\n"
-                + "</sessions>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+        	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        	<get>
+        	<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        	<netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+        	<sessions>
+        	<session>
+        	<session-id>1</session-id>
+        	</session>
+        	<session>
+        	<session-id>2</session-id>
+        	<transport/>
+        	</session>
+        	</sessions>
+        	</netconf-state>
+        	</filter>
+        	</get>
+        	</rpc>""");
     }
 
     @Test
