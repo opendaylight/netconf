@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60b49d0f_f1a423b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-02T14:10:36Z",
+      "side": 1,
+      "message": "In addition, please add unit test(s).",
+      "revId": "87b151f3a8473d859eb1eb7fb5dead818449b303",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7e6b3bc_74a3b998",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-02T14:10:36Z",
+      "side": 1,
+      "message": "Instead of filtering - can we rework logic of generating parameters to contains those and only those which are needed in particular request?",
+      "revId": "87b151f3a8473d859eb1eb7fb5dead818449b303",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
