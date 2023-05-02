@@ -38,9 +38,9 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <reference id="mountPointService"
                interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
     <reference id="deviceActionFactory"
-               interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
+               interface="org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory"/>
     <reference id="schemaManager"
-               interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
+               interface="org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager"/>
     <reference id="baseSchemas"
                interface="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas"/>
     <odl:clustered-app-config

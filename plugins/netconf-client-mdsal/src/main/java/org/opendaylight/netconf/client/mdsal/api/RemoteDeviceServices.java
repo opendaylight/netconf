@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.api;
+package org.opendaylight.netconf.client.mdsal.api;
 
 import static java.util.Objects.requireNonNull;
 
@@ -15,8 +15,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Actions;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 

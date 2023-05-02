@@ -11,10 +11,10 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceServices;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;

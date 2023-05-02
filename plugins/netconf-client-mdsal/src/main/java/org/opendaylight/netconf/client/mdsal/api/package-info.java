@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 /**
- * API for netconf connector.
+ * API for NETCONF southbound with MD-SAL.
  */
-package org.opendaylight.netconf.sal.connect.api;
+package org.opendaylight.netconf.client.mdsal.api;
