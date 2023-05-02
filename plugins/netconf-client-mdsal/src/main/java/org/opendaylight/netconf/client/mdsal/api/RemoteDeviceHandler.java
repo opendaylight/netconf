@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.client.mdsal.api;
 
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
+import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 
 public interface RemoteDeviceHandler extends AutoCloseable {
