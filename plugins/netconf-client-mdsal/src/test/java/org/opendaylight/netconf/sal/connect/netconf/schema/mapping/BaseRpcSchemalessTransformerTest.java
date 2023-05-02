@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.netconf.AbstractBaseSchemasTest;
+import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
@@ -43,22 +43,24 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         XMLUnit.setIgnoreAttributeOrder(true);
     }
 
-    private static final String EXP_RPC = "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "   <edit-config>\n"
-            + "       <target>\n"
-            + "           <candidate/>\n"
-            + "       </target>\n"
-            + "       <config>\n"
-            + "           <top xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "               <users xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:operation=\"replace\">\n"
-            + "                   <user>\n"
-            + "                       <name>fred</name>\n"
-            + "                   </user>\n"
-            + "               </users>\n"
-            + "           </top>\n"
-            + "       </config>\n"
-            + "   </edit-config>\n"
-            + "</rpc>\n";
+    private static final String EXP_RPC = """
+    	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    	   <edit-config>
+    	       <target>
+    	           <candidate/>
+    	       </target>
+    	       <config>
+    	           <top xmlns="http://example.com/schema/1.2/config">
+    	               <users xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:operation="replace">
+    	                   <user>
+    	                       <name>fred</name>
+    	                   </user>
+    	               </users>
+    	           </top>
+    	       </config>
+    	   </edit-config>
+    	</rpc>
+    	""";
 
     BaseRpcSchemalessTransformer transformer;
 
