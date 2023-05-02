@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf;
+package org.opendaylight.netconf.client.mdsal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,7 +33,6 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
-
     private static final QName INTERFACES_QNAME = QName
             .create("org:opendaylight:notification:test:ns:yang:nested-notification", "2014-07-08", "interfaces");
     private static final QName INTERFACE_QNAME = QName.create(INTERFACES_QNAME, "interface");
