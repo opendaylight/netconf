@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
@@ -70,7 +71,7 @@ public class NetconfDeviceDataBrokerTest {
     @Before
     public void setUp() throws Exception {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpcService).invokeNetconf(any(), any());
-        dataBroker = getDataBroker(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+        dataBroker = getDataBroker(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
     }
 
     @Test
@@ -91,12 +92,13 @@ public class NetconfDeviceDataBrokerTest {
     public void testWritableRunningCandidateWriteTransaction() {
         testWriteTransaction(WriteCandidateRunningTx.class,
             NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString(),
-            NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
     }
 
     @Test
     public void testCandidateWriteTransaction() {
-        testWriteTransaction(WriteCandidateTx.class, NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+        testWriteTransaction(WriteCandidateTx.class,
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
     }
 
     @Test

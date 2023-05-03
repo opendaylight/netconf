@@ -97,6 +97,7 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProviderImpl;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
@@ -107,7 +108,6 @@ import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -409,7 +409,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         masterSalFacade.onDeviceConnected(new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
             new EmptyMountPointContext(deviceSchemaContext)),
             NetconfSessionPreferences.fromStrings(
-                List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString())),
+                List.of(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0)),
             new RemoteDeviceServices(deviceRpcService, null));
 
         final var masterMountPoint = awaitMountPoint(masterMountPointService);
@@ -483,10 +483,11 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         verify(masterMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
 
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
-        masterSalFacade.onDeviceConnected(new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
-            new EmptyMountPointContext(deviceSchemaContext)), NetconfSessionPreferences.fromStrings(List.of(
-                    NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString())),
-                new RemoteDeviceServices(deviceRpcService, null));
+        masterSalFacade.onDeviceConnected(
+            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), new EmptyMountPointContext(deviceSchemaContext)),
+            NetconfSessionPreferences.fromStrings(List.of(
+                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0)),
+            new RemoteDeviceServices(deviceRpcService, null));
 
         verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
 
