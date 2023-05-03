@@ -43,6 +43,7 @@ import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
@@ -92,6 +93,7 @@ public class NetconfTopologyManager
     private final AAAEncryptionService encryptionService;
     private final RpcProviderService rpcProviderService;
     private final DeviceActionFactory deviceActionFactory;
+    private final NetconfKeystoreAdapter keystoreAdapter;
     private final SchemaResourceManager resourceManager;
 
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
@@ -111,7 +113,8 @@ public class NetconfTopologyManager
                                   final AAAEncryptionService encryptionService,
                                   final RpcProviderService rpcProviderService,
                                   final DeviceActionFactory deviceActionFactory,
-                                  final SchemaResourceManager resourceManager) {
+                                  final SchemaResourceManager resourceManager,
+                                  final NetconfKeystoreAdapter keystoreAdapter) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
@@ -129,6 +132,7 @@ public class NetconfTopologyManager
         this.rpcProviderService = requireNonNull(rpcProviderService);
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         this.resourceManager = requireNonNull(resourceManager);
+        this.keystoreAdapter = requireNonNull(keystoreAdapter);
     }
 
     // Blueprint init method
@@ -315,6 +319,7 @@ public class NetconfTopologyManager
                     deviceId))
                 .setIdleTimeout(writeTxIdleTimeout)
                 .setEncryptionService(encryptionService)
+                .setKeystoreAdapter(keystoreAdapter)
                 .build();
     }
 }

@@ -21,7 +21,7 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.protocol.Specification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.protocol.specification.TlsCase;
 
