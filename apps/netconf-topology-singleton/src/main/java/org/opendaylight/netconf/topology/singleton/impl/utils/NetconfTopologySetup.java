@@ -22,11 +22,11 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NetconfTopologySetup {
-
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
     private final DOMRpcProviderService rpcProviderRegistry;
     private final DOMActionProviderService actionProviderRegistry;
@@ -43,6 +43,7 @@ public class NetconfTopologySetup {
     private final Duration idleTimeout;
     private final AAAEncryptionService encryptionService;
     private final BaseNetconfSchemas baseSchemas;
+    private final NetconfKeystoreAdapter keystoreAdapter;
 
     NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
@@ -61,6 +62,7 @@ public class NetconfTopologySetup {
         idleTimeout = builder.getIdleTimeout();
         encryptionService = builder.getEncryptionService();
         baseSchemas = builder.getBaseSchemas();
+        keystoreAdapter = builder.getKeystoreAdapter();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -123,6 +125,10 @@ public class NetconfTopologySetup {
         return encryptionService;
     }
 
+    public NetconfKeystoreAdapter getKeystoreAdapter() {
+        return keystoreAdapter;
+    }
+
     public BaseNetconfSchemas getBaseSchemas() {
         return baseSchemas;
     }
@@ -144,6 +150,7 @@ public class NetconfTopologySetup {
         private Duration idleTimeout;
         private AAAEncryptionService encryptionService;
         private BaseNetconfSchemas baseSchemas;
+        private NetconfKeystoreAdapter keystoreAdapter;
 
         public NetconfTopologySetupBuilder() {
 
@@ -297,6 +304,15 @@ public class NetconfTopologySetup {
 
         public NetconfTopologySetupBuilder setEncryptionService(final AAAEncryptionService encryptionService) {
             this.encryptionService = encryptionService;
+            return this;
+        }
+
+        NetconfKeystoreAdapter getKeystoreAdapter() {
+            return requireNonNull(keystoreAdapter);
+        }
+
+        public NetconfTopologySetupBuilder setKeystoreAdapter(final NetconfKeystoreAdapter keystoreAdapter) {
+            this.keystoreAdapter = keystoreAdapter;
             return this;
         }
 
