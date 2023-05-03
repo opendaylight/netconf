@@ -7,30 +7,9 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.mountpoints;
 
-import static com.google.common.base.Preconditions.checkState;
-import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.DEFAULT_PAGESIZE;
-import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator.BASE_PATH;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.DESCRIPTION_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.RESPONSES_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TAGS_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildTagsValue;
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
-
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Range;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicLong;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -46,6 +25,22 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.DEFAULT_PAGESIZE;
+import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator.BASE_PATH;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.*;
 
 public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
@@ -143,13 +138,10 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         if (context == null) {
             return null;
         }
-
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
             return generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
         }
-        final OpenApiObject openApiObject = openApiGenerator.getApiDeclaration(module, revision, uriInfo, context,
-                urlPrefix);
-        return openApiObject;
+        return openApiGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix);
     }
 
     public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum) {
@@ -178,25 +170,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             range = Optional.of(Range.closed(start, end));
         }
 
-        // FIXME get rid of this object and thus eliminate need to mutate fields
-        final OpenApiObject doc;
-
         final OpenApiObject openApiObject = openApiGenerator.getAllModulesDoc(uriInfo, range, context,
                 Optional.of(deviceName), urlPrefix, definitionNames);
-
+        final var paths = new HashMap<>(openApiObject.getPaths());
         if (includeDataStore) {
-            doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
-            // Creating mutable copy of map
-            var paths = new HashMap<>(doc.getPaths());
-            paths.putAll(openApiObject.getPaths());
-            doc.setPaths(paths);
-            doc.getInfo().setTitle(openApiObject.getInfo().getTitle());
-            addFields(doc.getComponents().getSchemas(), openApiObject.getComponents().getSchemas().fields());
-        } else {
-            doc = openApiObject;
+            paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
         }
-
-        return doc;
+        openApiObject.setPaths(paths);
+        return openApiObject;
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -204,14 +185,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private OpenApiObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
-            final String deviceName) {
-        final OpenApiObject declaration = openApiGenerator.createOpenApiObject(
-                openApiGenerator.createSchemaFromUriInfo(uriInfo),
-                openApiGenerator.createHostFromUriInfo(uriInfo),
-                BASE_PATH,
-                context);
+    private OpenApiObject generateDataStoreApiDoc(final UriInfo info, final String context, final String deviceName) {
+        final var openApiObject = openApiGenerator.createOpenApiObject(openApiGenerator.createSchemaFromUriInfo(info),
+                openApiGenerator.createHostFromUriInfo(info), BASE_PATH, context);
+        openApiObject.setPaths(getDataStoreApiPaths(context, deviceName));
+        return openApiObject;
+    }
 
+    private Map<String, Path> getDataStoreApiPaths(final String context, final String deviceName) {
         final var data = new Path();
         data.setGet(createGetPathItem("data",
                 "Queries the config (startup) datastore on the mounted hosted.", deviceName));
@@ -220,11 +201,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         operations.setGet(createGetPathItem("operations",
                 "Queries the available operations (RPC calls) on the mounted hosted.", deviceName));
 
-        final var paths = Map.of(openApiGenerator.getResourcePath("data", context), data,
-                openApiGenerator.getResourcePath("operations", context), operations);
-        declaration.setPaths(paths);
-
-        return declaration;
+        return Map.of(openApiGenerator.getResourcePath("data", context), data,
+            openApiGenerator.getResourcePath("operations", context), operations);
     }
 
     private ObjectNode createGetPathItem(final String resourceType, final String description, final String deviceName) {
