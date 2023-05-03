@@ -16,6 +16,23 @@
       "message": "We have lost produces.",
       "revId": "3216583c23b75eb9768171947ea07f4355a45053",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28d3b577_74f16f5e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T12:07:07Z",
+      "side": 1,
+      "message": "That\u0027s OK:\n```\nIn OpenAPI 2.0, mimetypes supported by the API are defined in the “consumes” and “produces” sections. Consumes and produces have been eliminated in version 3.0.\n```\nhttps://blog.stoplight.io/difference-between-open-v2-v3-v31",
+      "revId": "3216583c23b75eb9768171947ea07f4355a45053",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
