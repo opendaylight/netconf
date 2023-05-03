@@ -17,7 +17,6 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TAGS_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildTagsValue;
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -178,25 +177,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             range = Optional.of(Range.closed(start, end));
         }
 
-        // FIXME get rid of this object and thus eliminate need to mutate fields
-        final OpenApiObject doc;
-
         final OpenApiObject openApiObject = openApiGenerator.getAllModulesDoc(uriInfo, range, context,
                 Optional.of(deviceName), urlPrefix, definitionNames);
-
         if (includeDataStore) {
-            doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
-            // Creating mutable copy of map
-            var paths = new HashMap<>(doc.getPaths());
-            paths.putAll(openApiObject.getPaths());
-            doc.setPaths(paths);
-            doc.getInfo().setTitle(openApiObject.getInfo().getTitle());
-            addFields(doc.getComponents().getSchemas(), openApiObject.getComponents().getSchemas().fields());
-        } else {
-            doc = openApiObject;
+            final var paths = new HashMap<>(openApiObject.getPaths());
+            paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
+            openApiObject.setPaths(paths);
         }
-
-        return doc;
+        return openApiObject;
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -204,14 +192,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private OpenApiObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
-            final String deviceName) {
-        final OpenApiObject declaration = openApiGenerator.createOpenApiObject(
-                openApiGenerator.createSchemaFromUriInfo(uriInfo),
-                openApiGenerator.createHostFromUriInfo(uriInfo),
-                BASE_PATH,
-                context);
+    private OpenApiObject generateDataStoreApiDoc(final UriInfo info, final String context, final String deviceName) {
+        final var openApiObject = openApiGenerator.createOpenApiObject(openApiGenerator.createSchemaFromUriInfo(info),
+                openApiGenerator.createHostFromUriInfo(info), BASE_PATH, context);
+        openApiObject.setPaths(getDataStoreApiPaths(context, deviceName));
+        return openApiObject;
+    }
 
+    private Map<String, Path> getDataStoreApiPaths(final String context, final String deviceName) {
         final var data = new Path();
         data.setGet(createGetPathItem("data",
                 "Queries the config (startup) datastore on the mounted hosted.", deviceName));
@@ -220,14 +208,12 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         operations.setGet(createGetPathItem("operations",
                 "Queries the available operations (RPC calls) on the mounted hosted.", deviceName));
 
-        final var paths = Map.of(openApiGenerator.getResourcePath("data", context), data,
-                openApiGenerator.getResourcePath("operations", context), operations);
-        declaration.setPaths(paths);
-
-        return declaration;
+        return Map.of(openApiGenerator.getResourcePath("data", context), data,
+            openApiGenerator.getResourcePath("operations", context), operations);
     }
 
-    private ObjectNode createGetPathItem(final String resourceType, final String description, final String deviceName) {
+    private static ObjectNode createGetPathItem(final String resourceType, final String description,
+            final String deviceName) {
         final ObjectNode operationObject = JsonNodeFactory.instance.objectNode();
         operationObject.put(DESCRIPTION_KEY, description);
         operationObject.put(SUMMARY_KEY, HttpMethod.GET + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR
