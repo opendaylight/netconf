@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5d1eb22_3ddb020b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T11:06:49Z",
+      "side": 1,
+      "message": "This is just WIP patch.",
+      "revId": "6b3cfe324113d13e9cc2f8fc373976d30ecbb661",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
