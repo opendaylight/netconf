@@ -189,9 +189,6 @@ public final class NetconfMessageTransformUtil {
             .create("urn:ietf:params:netconf:capability:rollback-on-error:1.0");
     public static final String ROLLBACK_ON_ERROR_OPTION = "rollback-on-error";
 
-    public static final URI NETCONF_NOTIFICATONS_URI = URI
-            .create("urn:ietf:params:netconf:capability:notification:1.0");
-
     public static final URI NETCONF_RUNNING_WRITABLE_URI = URI
             .create("urn:ietf:params:netconf:capability:writable-running:1.0");
 

@@ -163,8 +163,9 @@ public record NetconfSessionPreferences(
     }
 
     public boolean isNotificationsSupported() {
-        return containsPartialNonModuleCapability(NetconfMessageTransformUtil.NETCONF_NOTIFICATONS_URI.toString())
-                || containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS);
+        return containsPartialNonModuleCapability(
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0)
+            || containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS);
     }
 
     public boolean isMonitoringSupported() {
