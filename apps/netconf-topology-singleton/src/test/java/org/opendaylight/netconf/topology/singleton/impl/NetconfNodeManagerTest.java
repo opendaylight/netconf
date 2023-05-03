@@ -59,6 +59,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
@@ -108,33 +109,26 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
     @Mock
     private DOMMountPointService mockMountPointService;
-
     @Mock
     private DOMMountPointService.DOMMountPointBuilder mockMountPointBuilder;
-
     @Mock
     private ObjectRegistration<DOMMountPoint> mockMountPointReg;
-
     @Mock
     private DataBroker mockDataBroker;
-
     @Mock
     private NetconfDataTreeService netconfService;
-
     @Mock
     private DOMDataBroker mockDeviceDataBroker;
-
     @Mock
     private Rpcs.Normalized mockRpcService;
-
     @Mock
     private Actions.Normalized mockActionService;
-
     @Mock
     private NetconfDeviceSchemasResolver mockSchemasResolver;
-
     @Mock
     private EffectiveModelContextFactory mockSchemaContextFactory;
+    @Mock
+    private NetconfKeystoreAdapter keystoreAdapter;
 
     private ActorSystem slaveSystem;
     private ActorSystem masterSystem;
@@ -169,9 +163,13 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         .collect(Collectors.toList());
 
         NetconfTopologySetup masterSetup = new NetconfTopologySetup.NetconfTopologySetupBuilder()
-                .setActorSystem(masterSystem).setDataBroker(mockDataBroker).setSchemaResourceDTO(
-                        new NetconfDevice.SchemaResourcesDTO(masterSchemaRepository, masterSchemaRepository,
-                                mockSchemaContextFactory, mockSchemasResolver)).setBaseSchemas(BASE_SCHEMAS).build();
+                .setActorSystem(masterSystem)
+                .setDataBroker(mockDataBroker)
+                .setSchemaResourceDTO(new NetconfDevice.SchemaResourcesDTO(
+                    masterSchemaRepository, masterSchemaRepository, mockSchemaContextFactory, mockSchemasResolver))
+                .setBaseSchemas(BASE_SCHEMAS)
+                .setKeystoreAdapter(keystoreAdapter)
+                .build();
 
         testMasterActorRef = TestActorRef.create(masterSystem, Props.create(TestMasterActor.class, masterSetup,
                 DEVICE_ID, responseTimeout, mockMountPointService).withDispatcher(Dispatchers.DefaultDispatcherId()),
@@ -182,9 +180,13 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 TextToIRTransformer.create(slaveSchemaRepository, slaveSchemaRepository));
 
         NetconfTopologySetup slaveSetup = new NetconfTopologySetup.NetconfTopologySetupBuilder()
-                .setActorSystem(slaveSystem).setDataBroker(mockDataBroker).setSchemaResourceDTO(
-                        new NetconfDevice.SchemaResourcesDTO(slaveSchemaRepository, slaveSchemaRepository,
-                                mockSchemaContextFactory, mockSchemasResolver)).setBaseSchemas(BASE_SCHEMAS).build();
+                .setActorSystem(slaveSystem)
+                .setDataBroker(mockDataBroker)
+                .setSchemaResourceDTO(new NetconfDevice.SchemaResourcesDTO(
+                    slaveSchemaRepository, slaveSchemaRepository, mockSchemaContextFactory, mockSchemasResolver))
+                .setBaseSchemas(BASE_SCHEMAS)
+                .setKeystoreAdapter(keystoreAdapter)
+                .build();
 
         netconfNodeManager = new NetconfNodeManager(slaveSetup, DEVICE_ID, responseTimeout,
                 mockMountPointService);
