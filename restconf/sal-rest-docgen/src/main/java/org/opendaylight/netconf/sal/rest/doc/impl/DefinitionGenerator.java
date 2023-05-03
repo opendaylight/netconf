@@ -109,6 +109,7 @@ public class DefinitionGenerator {
     private static final String ENUM_KEY = "enum";
     private static final String TITLE_KEY = "title";
     private static final String DEFAULT_KEY = "default";
+    private static final String EXAMPLE_KEY = "example";
     private static final String FORMAT_KEY = "format";
     private static final String NAMESPACE_KEY = "namespace";
     public static final String INPUT = "input";
@@ -637,7 +638,7 @@ public class DefinitionGenerator {
             final DefinitionNames definitionNames) {
         final String jsonType;
         if (leafTypeDef instanceof BinaryTypeDefinition) {
-            jsonType = processBinaryType(property);
+            jsonType = processBinaryType(property, leafTypeDef);
 
         } else if (leafTypeDef instanceof BitsTypeDefinition) {
             jsonType = processBitsType((BitsTypeDefinition) leafTypeDef, property);
@@ -653,7 +654,7 @@ public class DefinitionGenerator {
             jsonType = processStringType(leafTypeDef, property, node.getQName().getLocalName());
 
         } else if (leafTypeDef instanceof UnionTypeDefinition) {
-            jsonType = processUnionType((UnionTypeDefinition) leafTypeDef);
+            jsonType = processUnionType((UnionTypeDefinition) leafTypeDef, property);
 
         } else if (leafTypeDef instanceof EmptyTypeDefinition) {
             jsonType = OBJECT_TYPE;
@@ -662,7 +663,8 @@ public class DefinitionGenerator {
                 stack, definitions, definitionNames);
         } else if (leafTypeDef instanceof BooleanTypeDefinition) {
             jsonType = BOOLEAN_TYPE;
-            setDefaultValue(property, true);
+            leafTypeDef.getDefaultValue().ifPresent(v -> setDefaultValue(property, true));
+            setExampleValue(property, String.valueOf(true));
         } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition) {
             jsonType = processNumberType((RangeRestrictedTypeDefinition<?, ?>) leafTypeDef, property);
         } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition) {
@@ -699,7 +701,9 @@ public class DefinitionGenerator {
         return jsonType;
     }
 
-    private static String processBinaryType(final ObjectNode property) {
+    private static String processBinaryType(final ObjectNode property, TypeDefinition<?> leafrefType) {
+        leafrefType.getDefaultValue().ifPresent(v -> setDefaultValue(property, ((String) v)));
+        setExampleValue(property, "SGVsbG8sIHdvcmxkIQ==");
         property.put(FORMAT_KEY, "byte");
         return STRING_TYPE;
     }
@@ -712,7 +716,8 @@ public class DefinitionGenerator {
         }
 
         property.set(ENUM_KEY, enumNames);
-        setDefaultValue(property, enumLeafType.getValues().iterator().next().getName());
+        enumLeafType.getDefaultValue().ifPresent(v -> setDefaultValue(property, ((String) v)));
+        setExampleValue(property, enumLeafType.getValues().iterator().next().getName());
         return STRING_TYPE;
     }
 
@@ -726,6 +731,8 @@ public class DefinitionGenerator {
             final SchemaNode node = leafTypeDef.getIdentities().iterator().next();
             definitionName = node.getQName().getLocalName() + definitionNames.getDiscriminator(node);
         }
+        leafTypeDef.getDefaultValue().ifPresent(v -> setDefaultValue(property,(String) v));
+        setExampleValue(property, "example-identity");
         property.put(REF_KEY, COMPONENTS_PREFIX + definitionName);
         return STRING_TYPE;
     }
@@ -778,6 +785,9 @@ public class DefinitionGenerator {
         }
         property.set(ENUM_KEY, enumNames);
         property.put(DEFAULT_KEY, enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1));
+        bitsType.getDefaultValue()
+                .ifPresent(v -> setDefaultValue(property, bitsType.getBits().iterator().next().getName()));
+        setExampleValue(property, "01101");
         return STRING_TYPE;
     }
 
@@ -809,9 +819,12 @@ public class DefinitionGenerator {
             } catch (IllegalArgumentException ex) {
                 LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
             }
-            setDefaultValue(property, defaultValue);
+            final String finalDefaultValue = defaultValue;
+            stringType.getDefaultValue().ifPresent(v -> setDefaultValue(property, finalDefaultValue));
+            setExampleValue(property, defaultValue);
         } else {
-            setDefaultValue(property, "Some " + nodeName);
+            stringType.getDefaultValue().ifPresent(v -> setDefaultValue(property, "Some " + nodeName));
+            setExampleValue(property, "Some " + nodeName);
         }
         return STRING_TYPE;
     }
@@ -827,6 +840,7 @@ public class DefinitionGenerator {
 
         if (leafTypeDef instanceof DecimalTypeDefinition) {
             maybeLower.ifPresent(number -> setDefaultValue(property, ((Decimal64) number).decimalValue()));
+            setExampleValue(property, maybeLower.orElseThrow().toString());
             return NUMBER_TYPE;
         }
         if (leafTypeDef instanceof Uint8TypeDefinition
@@ -837,14 +851,16 @@ public class DefinitionGenerator {
 
             property.put(FORMAT_KEY, INT32_FORMAT);
             maybeLower.ifPresent(number -> setDefaultValue(property, Integer.valueOf(number.toString())));
+            setExampleValue(property, maybeLower.orElseThrow().toString());
         } else if (leafTypeDef instanceof Uint32TypeDefinition
                 || leafTypeDef instanceof Int64TypeDefinition) {
 
             property.put(FORMAT_KEY, INT64_FORMAT);
             maybeLower.ifPresent(number -> setDefaultValue(property, Long.valueOf(number.toString())));
+            setExampleValue(property, maybeLower.orElseThrow().toString());
         } else {
             //uint64
-            setDefaultValue(property, 0);
+            setExampleValue(property, "0");
         }
         return INTEGER_TYPE;
     }
@@ -868,12 +884,14 @@ public class DefinitionGenerator {
                     .findFirst();
             container.ifPresent(c -> setDefaultValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
                     c.getQName().getLocalName())));
+            setExampleValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
+                    module.orElseThrow().getName()));
         }
 
         return STRING_TYPE;
     }
 
-    private static String processUnionType(final UnionTypeDefinition unionType) {
+    private static String processUnionType(final UnionTypeDefinition unionType, final ObjectNode property) {
         boolean isStringTakePlace = false;
         boolean isNumberTakePlace = false;
         boolean isBooleanTakePlace = false;
@@ -895,14 +913,22 @@ public class DefinitionGenerator {
             }
         }
         if (isStringTakePlace) {
+            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, STRING_TYPE));
+            setExampleValue(property, STRING_TYPE);
             return STRING_TYPE;
         }
         if (isBooleanTakePlace) {
             if (isNumberTakePlace) {
+                unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, STRING_TYPE));
+                setExampleValue(property, STRING_TYPE);
                 return STRING_TYPE;
             }
+            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, BOOLEAN_TYPE));
+            setExampleValue(property, BOOLEAN_TYPE);
             return BOOLEAN_TYPE;
         }
+        unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, NUMBER_TYPE));
+        setExampleValue(property, NUMBER_TYPE);
         return NUMBER_TYPE;
     }
 
@@ -940,6 +966,10 @@ public class DefinitionGenerator {
         if (required.size() > 0) {
             node.set(REQUIRED_KEY, required);
         }
+    }
+
+    private static void setExampleValue(final ObjectNode property, final String value) {
+        property.put(EXAMPLE_KEY, value);
     }
 
     private static void setDefaultValue(final ObjectNode property, final String value) {
