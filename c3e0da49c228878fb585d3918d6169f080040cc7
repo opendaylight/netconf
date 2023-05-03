@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61f9122d_1d6bf124",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T08:15:09Z",
+      "side": 1,
+      "message": "The logic of the test is useless as we can reuse existing logic (from parent class) and get path for module we would like to test.",
+      "revId": "c3e0da49c228878fb585d3918d6169f080040cc7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
