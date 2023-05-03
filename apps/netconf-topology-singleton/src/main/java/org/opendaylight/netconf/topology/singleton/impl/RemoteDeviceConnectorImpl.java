@@ -32,6 +32,7 @@ import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
 import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -41,7 +42,6 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.Authenticat
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -88,7 +88,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         this.remoteDeviceId = remoteDeviceId;
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
-        keystoreAdapter = new NetconfKeystoreAdapter(netconfTopologyDeviceSetup.getDataBroker());
+        keystoreAdapter = netconfTopologyDeviceSetup.getKeystoreAdapter();
     }
 
     @Override

@@ -10,11 +10,11 @@ package org.opendaylight.netconf.callhome.mount.tls;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.EventLoopGroup;
-import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServer;
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServerBuilder;
 import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -29,16 +29,17 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
     private final NetconfCallHomeTlsServer server;
 
     @Activate
-    public NetconfCallHomeTlsService(@Reference final DataBroker dataBroker,
+    public NetconfCallHomeTlsService(@Reference final NetconfKeystoreAdapter keystoreAdapter,
             @Reference final TlsAllowedDevicesMonitor allowedDevicesMonitor,
             @Reference final CallHomeNetconfSubsystemListener subsystemListener,
             @Reference(target = "(type=global-boss-group)") final EventLoopGroup bossGroup,
             @Reference(target = "(type=global-worker-group)") final EventLoopGroup workerGroup) {
-        // FIXME: tie together with OSGi Config Admin
-        this(dataBroker, allowedDevicesMonitor, subsystemListener, bossGroup, workerGroup, defaultTlsConfiguration());
+        this(keystoreAdapter, allowedDevicesMonitor, subsystemListener, bossGroup, workerGroup,
+            // FIXME: tie together with OSGi Config Admin
+            defaultTlsConfiguration());
     }
 
-    public NetconfCallHomeTlsService(final DataBroker dataBroker,
+    public NetconfCallHomeTlsService(final NetconfKeystoreAdapter keystoreAdapter,
                                      final TlsAllowedDevicesMonitor allowedDevicesMonitor,
                                      final CallHomeNetconfSubsystemListener subsystemListener,
                                      final EventLoopGroup bossGroup,
@@ -50,7 +51,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
             .setTimeout(config.getTimeout())
             .setMaxConnections(config.getMaxConnections())
             .setAllowedDevicesMonitor(requireNonNull(allowedDevicesMonitor))
-            .setSslHandlerFactory(new SslHandlerFactoryAdapter(dataBroker, allowedDevicesMonitor))
+            .setSslHandlerFactory(new SslHandlerFactoryAdapter(keystoreAdapter, allowedDevicesMonitor))
             .setSubsystemListener(requireNonNull(subsystemListener))
             .setBossGroup(requireNonNull(bossGroup))
             .setWorkerGroup(requireNonNull(workerGroup))
