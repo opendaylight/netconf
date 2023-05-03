@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a73e68b5_b0817103",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T07:34:03Z",
+      "side": 1,
+      "message": "`didn\u0027t work`",
+      "revId": "a749e9fb8436628c84a8d54d4a65250969ac2a24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11e10c61_26e873a4",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T07:34:03Z",
+      "side": 1,
+      "message": "Please write better explanation.",
+      "revId": "a749e9fb8436628c84a8d54d4a65250969ac2a24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb1b92e4_c11010cc",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T07:34:03Z",
+      "side": 1,
+      "message": "`Exception` is so generic that we do not know where it were thrown. IMO In addition, we do not need `throws` part in tests in this case.",
+      "revId": "a749e9fb8436628c84a8d54d4a65250969ac2a24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8caba677_b7ff784c",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T07:34:03Z",
+      "side": 1,
+      "message": "`final`",
+      "revId": "a749e9fb8436628c84a8d54d4a65250969ac2a24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5a5f8f6_60c2899a",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T07:34:03Z",
+      "side": 1,
+      "message": "`final`",
+      "revId": "a749e9fb8436628c84a8d54d4a65250969ac2a24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82a69a59_4cdcb518",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T07:34:03Z",
+      "side": 1,
+      "message": "`Failed`",
+      "revId": "a749e9fb8436628c84a8d54d4a65250969ac2a24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34fe7baa_350e8e9a",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T07:34:03Z",
+      "side": 1,
+      "message": "List of what?",
+      "revId": "a749e9fb8436628c84a8d54d4a65250969ac2a24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da1c5bff_dd7105e1",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T07:34:03Z",
+      "side": 1,
+      "message": "IMO we do not need `actualUrls`. We can use `enotrySet`, probbaly.",
+      "revId": "a749e9fb8436628c84a8d54d4a65250969ac2a24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
