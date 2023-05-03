@@ -50,33 +50,6 @@ public class Configuration {
         }
     }
 
-    public static class IllegalValueException extends ConfigurationException {
-        private static final long serialVersionUID = -1172346869408302687L;
-
-        private final String key;
-        private final String value;
-
-        IllegalValueException(final String key, final String value) {
-            super("Key has an illegal value. Key: " + key + ", Value: " + value);
-            this.key = key;
-            this.value = value;
-        }
-
-        IllegalValueException(final String key, final String value, final Exception cause) {
-            super("Key has an illegal value. Key: " + key + ", Value: " + value, cause);
-            this.key = key;
-            this.value = value;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
     private Properties properties;
 
     public Configuration() {
@@ -85,7 +58,7 @@ public class Configuration {
 
     public Configuration(final String path) throws ConfigurationException {
         try {
-            this.properties = readFromPath(path);
+            properties = readFromPath(path);
         } catch (IOException ioe) {
             throw new ReadException(path, ioe);
         }
@@ -117,18 +90,5 @@ public class Configuration {
             throw new MissingException(key);
         }
         return result;
-    }
-
-    public int getAsPort(final String key) {
-        String keyValue = get(key);
-        try {
-            int newPort = Integer.parseInt(keyValue);
-            if (newPort < 0 || newPort > 65535) {
-                throw new IllegalValueException(key, keyValue);
-            }
-            return newPort;
-        } catch (NumberFormatException e) {
-            throw new IllegalValueException(key, keyValue, e);
-        }
     }
 }
