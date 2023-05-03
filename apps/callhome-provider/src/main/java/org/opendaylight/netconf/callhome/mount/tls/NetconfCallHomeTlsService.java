@@ -31,12 +31,17 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
 
     private NetconfCallHomeTlsServer server;
 
-    public NetconfCallHomeTlsService(final Configuration config,
-                                     final DataBroker dataBroker,
+    public NetconfCallHomeTlsService(final DataBroker dataBroker, final TlsAllowedDevicesMonitor allowedDevicesMonitor,
+            final CallHomeNetconfSubsystemListener subsystemListener, final EventLoopGroup bossGroup,
+            final EventLoopGroup workerGroup) {
+        this(dataBroker, allowedDevicesMonitor, subsystemListener, bossGroup, workerGroup, defaultTlsConfiguration());
+    }
+
+    public NetconfCallHomeTlsService(final DataBroker dataBroker,
                                      final TlsAllowedDevicesMonitor allowedDevicesMonitor,
                                      final CallHomeNetconfSubsystemListener subsystemListener,
                                      final EventLoopGroup bossGroup,
-                                     final EventLoopGroup workerGroup) {
+                                     final EventLoopGroup workerGroup, final Configuration config) {
         this.config = requireNonNull(config);
         this.subsystemListener = requireNonNull(subsystemListener);
         this.bossGroup = requireNonNull(bossGroup);
@@ -62,6 +67,16 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
         server.start();
 
         LOG.info("Initializing Call Home TLS server instance completed successfuly");
+    }
+
+    // FIXME: convert to OSGi/MD-SAL configuration
+    private static Configuration defaultTlsConfiguration() {
+        final var conf = new Configuration();
+        conf.setHost("0.0.0.0");
+        conf.setPort(4335);
+        conf.setTimeout(10_000);
+        conf.setMaxConnections(64);
+        return conf;
     }
 
     @Override
