@@ -33,6 +33,24 @@
       "message": "We are not using this formatting.",
       "revId": "35de792c8de7e6ded3be788853ba2660c42f16a2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f057fa5_d12e2bb5",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-03T11:58:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "301c65fd_60c3a113",
+      "revId": "35de792c8de7e6ded3be788853ba2660c42f16a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
