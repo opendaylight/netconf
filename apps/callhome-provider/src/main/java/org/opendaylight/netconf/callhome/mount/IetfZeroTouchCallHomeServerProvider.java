@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -46,6 +48,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,46 +62,43 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     private final DataBroker dataBroker;
     private final CallHomeMountDispatcher mountDispacher;
     private final CallHomeAuthProviderImpl authProvider;
+    private final CallhomeStatusReporter statusReporter;
+    private final int port;
 
     protected NetconfCallHomeServer server;
 
     private ListenerRegistration<IetfZeroTouchCallHomeServerProvider> listenerReg = null;
 
-    private static final String CALL_HOME_PORT_KEY = "DefaultCallHomePort";
-    private int port = 0; // 0 = use default in NetconfCallHomeBuilder
-    private final CallhomeStatusReporter statusReporter;
-
     public IetfZeroTouchCallHomeServerProvider(final DataBroker dataBroker,
             final CallHomeMountDispatcher mountDispacher) {
-        this.dataBroker = dataBroker;
-        this.mountDispacher = mountDispacher;
+        this(dataBroker, mountDispacher, Uint16.valueOf(4334));
+    }
+
+    public IetfZeroTouchCallHomeServerProvider(final DataBroker dataBroker,
+            final CallHomeMountDispatcher mountDispacher, final Uint16 port) {
+        this.dataBroker = requireNonNull(dataBroker);
+        this.mountDispacher = requireNonNull(mountDispacher);
+
+        LOG.info("Setting port for call home server to {}", port);
+        this.port = port.toJava();
+
         // FIXME: these should be separate components
         authProvider = new CallHomeAuthProviderImpl(dataBroker);
         statusReporter = new CallhomeStatusReporter(dataBroker);
-    }
 
-    public void init() {
+        LOG.info("Initializing provider for {}", APPNAME);
+
         // Register itself as a listener to changes in Devices subtree
         try {
-            LOG.info("Initializing provider for {}", APPNAME);
             initializeServer();
-            listenerReg = dataBroker.registerDataTreeChangeListener(
-                DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES), this);
-            LOG.info("Initialization complete for {}", APPNAME);
         } catch (IOException | Configuration.ConfigurationException e) {
             LOG.error("Unable to successfully initialize", e);
+            return;
         }
-    }
 
-    public void setPort(final String portStr) {
-        try {
-            Configuration configuration = new Configuration();
-            configuration.set(CALL_HOME_PORT_KEY, portStr);
-            port = configuration.getAsPort(CALL_HOME_PORT_KEY);
-            LOG.info("Setting port for call home server to {}", portStr);
-        } catch (Configuration.ConfigurationException e) {
-            LOG.error("Problem trying to set port for call home server {}", portStr, e);
-        }
+        listenerReg = dataBroker.registerDataTreeChangeListener(
+            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES), this);
+        LOG.info("Initialization complete for {}", APPNAME);
     }
 
     private void initializeServer() throws IOException {
