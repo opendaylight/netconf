@@ -40,6 +40,10 @@ public final class XmlNetconfConstants {
     public static final String URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0 = "urn:ietf:params:xml:ns:netconf:exi:1.0";
     public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0 =
             "urn:ietf:params:netconf:capability:notification:1.0";
+    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_ROLLBACK_ON_ERROR_1_0 =
+            "urn:ietf:params:netconf:capability:rollback-on-error:1.0";
+    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_WRITABLE_RUNNING_1_0 =
+            "urn:ietf:params:netconf:capability:writable-running:1.0";
 
     public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0 =
             "urn:ietf:params:netconf:capability:exi:1.0";

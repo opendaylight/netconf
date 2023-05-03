@@ -43,7 +43,6 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.tx.AbstractWriteTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateRunningTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteRunningTx;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.monitoring.rev220718.NetconfTcp;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
@@ -91,7 +90,7 @@ public class NetconfDeviceDataBrokerTest {
     @Test
     public void testWritableRunningCandidateWriteTransaction() {
         testWriteTransaction(WriteCandidateRunningTx.class,
-            NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString(),
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_WRITABLE_RUNNING_1_0,
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
     }
 
@@ -103,7 +102,8 @@ public class NetconfDeviceDataBrokerTest {
 
     @Test
     public void testRunningWriteTransaction() {
-        testWriteTransaction(WriteRunningTx.class, NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString());
+        testWriteTransaction(WriteRunningTx.class,
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_WRITABLE_RUNNING_1_0);
     }
 
     @Test

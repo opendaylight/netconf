@@ -35,7 +35,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_VALIDATE_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_VALIDATE_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.ROLLBACK_ON_ERROR_OPTION;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toFilterStructure;
 
 import com.google.common.collect.Iterables;
@@ -77,7 +76,7 @@ public final class NetconfBaseOps {
     private static final NodeIdentifier CONFIG_SOURCE_NODEID = NodeIdentifier.create(ConfigSource.QNAME);
     private static final NodeIdentifier CONFIG_TARGET_NODEID = NodeIdentifier.create(ConfigTarget.QNAME);
     private static final LeafNode<String> NETCONF_ERROR_OPTION_ROLLBACK =
-        ImmutableNodes.leafNode(NETCONF_ERROR_OPTION_NODEID, ROLLBACK_ON_ERROR_OPTION);
+        ImmutableNodes.leafNode(NETCONF_ERROR_OPTION_NODEID, "rollback-on-error");
 
     private final NetconfRpcService rpc;
     private final MountPointContext mountContext;

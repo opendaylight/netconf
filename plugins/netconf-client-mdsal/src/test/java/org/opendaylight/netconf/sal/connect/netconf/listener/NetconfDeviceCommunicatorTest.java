@@ -142,7 +142,7 @@ public class NetconfDeviceCommunicatorTest {
     public void testOnSessionUp() {
         final var testCapability = "urn:opendaylight:params:xml:ns:test?module=test-module&revision=2014-06-02";
         final var serverCapabilities = Set.of(
-            NetconfMessageTransformUtil.NETCONF_ROLLBACK_ON_ERROR_URI.toString(),
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_ROLLBACK_ON_ERROR_1_0,
             NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString(),
             testCapability);
         doReturn(serverCapabilities).when(spySession).getServerCapabilities();
@@ -157,7 +157,7 @@ public class NetconfDeviceCommunicatorTest {
 
         NetconfSessionPreferences actualCapabilites = netconfSessionPreferences.getValue();
         assertTrue(actualCapabilites.containsNonModuleCapability(
-                NetconfMessageTransformUtil.NETCONF_ROLLBACK_ON_ERROR_URI.toString()));
+                "urn:ietf:params:netconf:capability:rollback-on-error:1.0"));
         assertFalse(actualCapabilites.containsNonModuleCapability(testCapability));
         assertEquals(Set.of(QName.create("urn:opendaylight:params:xml:ns:test", "2014-06-02", "test-module")),
                 actualCapabilites.moduleBasedCaps().keySet());

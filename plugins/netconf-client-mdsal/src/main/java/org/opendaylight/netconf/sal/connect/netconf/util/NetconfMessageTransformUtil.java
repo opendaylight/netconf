@@ -185,12 +185,6 @@ public final class NetconfMessageTransformUtil {
     public static final URI NETCONF_ACTION_NAMESPACE = URI.create("urn:ietf:params:xml:ns:yang:1");
     public static final String NETCONF_ACTION = "action";
 
-    public static final URI NETCONF_ROLLBACK_ON_ERROR_URI = URI
-            .create("urn:ietf:params:netconf:capability:rollback-on-error:1.0");
-    public static final String ROLLBACK_ON_ERROR_OPTION = "rollback-on-error";
-
-    public static final URI NETCONF_RUNNING_WRITABLE_URI = URI
-            .create("urn:ietf:params:netconf:capability:writable-running:1.0");
 
     public static final @NonNull QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
     public static final @NonNull NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);

@@ -151,7 +151,8 @@ public record NetconfSessionPreferences(
     }
 
     public boolean isRollbackSupported() {
-        return containsNonModuleCapability(NetconfMessageTransformUtil.NETCONF_ROLLBACK_ON_ERROR_URI.toString());
+        return containsNonModuleCapability(
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_ROLLBACK_ON_ERROR_1_0);
     }
 
     public boolean isCandidateSupported() {
@@ -159,7 +160,7 @@ public record NetconfSessionPreferences(
     }
 
     public boolean isRunningWritable() {
-        return containsNonModuleCapability(NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString());
+        return containsNonModuleCapability(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_WRITABLE_RUNNING_1_0);
     }
 
     public boolean isNotificationsSupported() {
@@ -170,8 +171,8 @@ public record NetconfSessionPreferences(
 
     public boolean isMonitoringSupported() {
         return containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING)
-                || containsPartialNonModuleCapability(
-                        NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
+            || containsPartialNonModuleCapability(
+                NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
     }
 
     /**
