@@ -12,10 +12,9 @@ import static java.util.Objects.requireNonNull;
 import io.netty.handler.ssl.SslHandler;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
 import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +25,10 @@ public class SslHandlerFactoryAdapter implements SslHandlerFactory {
     private final TlsAllowedDevicesMonitor allowedDevicesMonitor;
     private final SslHandlerFactory sslHandlerFactory;
 
-    public SslHandlerFactoryAdapter(final DataBroker dataBroker,
+    public SslHandlerFactoryAdapter(final NetconfKeystoreAdapter keystoreAdapter,
             final @NonNull TlsAllowedDevicesMonitor allowedDevicesMonitor) {
         this.allowedDevicesMonitor = requireNonNull(allowedDevicesMonitor);
-        sslHandlerFactory = new SslHandlerFactoryImpl(new NetconfKeystoreAdapter(dataBroker));
+        sslHandlerFactory = new SslHandlerFactoryImpl(keystoreAdapter);
     }
 
     @Override

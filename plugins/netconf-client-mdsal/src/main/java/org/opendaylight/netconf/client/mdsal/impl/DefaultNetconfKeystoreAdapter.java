@@ -5,12 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal;
+package org.opendaylight.netconf.client.mdsal.impl;
 
 import static java.util.Objects.requireNonNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
@@ -30,62 +31,66 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<Keystore> {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfKeystoreAdapter.class);
+@Singleton
+@Component(service = NetconfKeystoreAdapter.class)
+public final class DefaultNetconfKeystoreAdapter
+        implements NetconfKeystoreAdapter, ClusteredDataTreeChangeListener<Keystore>, AutoCloseable {
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultNetconfKeystoreAdapter.class);
 
+    // FIXME: this is rather ugly: use atomic updates with immutable maps, as updates are expected to be rare while
+    //        access is expected to be frequent
     private final Map<String, KeyCredential> pairs = Collections.synchronizedMap(new HashMap<>());
     private final Map<String, PrivateKey> privateKeys = Collections.synchronizedMap(new HashMap<>());
     private final Map<String, TrustedCertificate> trustedCertificates = Collections.synchronizedMap(new HashMap<>());
 
-    public NetconfKeystoreAdapter(final DataBroker dataBroker) {
-        dataBroker.registerDataTreeChangeListener(
+    private final @NonNull Registration reg;
+
+    @Inject
+    @Activate
+    public DefaultNetconfKeystoreAdapter(@Reference final DataBroker dataBroker) {
+        reg = dataBroker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
             this);
     }
 
+    @Deactivate
+    @PreDestroy
+    @Override
+    public void close() {
+        reg.close();
+    }
+
+    @Override
     public Optional<KeyCredential> getKeypairFromId(final String keyId) {
         return Optional.ofNullable(pairs.get(keyId));
     }
 
-    /**
-     * Using private keys and trusted certificates to create a new JDK <code>KeyStore</code> which
-     * will be used by TLS clients to create <code>SSLEngine</code>. The private keys are essential
-     * to create JDK <code>KeyStore</code> while the trusted certificates are optional.
-     *
-     * @return A JDK KeyStore object
-     * @throws GeneralSecurityException If any security exception occurred
-     * @throws IOException If there is an I/O problem with the keystore data
-     */
-    public KeyStore getJavaKeyStore() throws GeneralSecurityException, IOException {
-        return getJavaKeyStore(Collections.emptySet());
-    }
-
-    /**
-     * Using private keys and trusted certificates to create a new JDK <code>KeyStore</code> which
-     * will be used by TLS clients to create <code>SSLEngine</code>. The private keys are essential
-     * to create JDK <code>KeyStore</code> while the trusted certificates are optional.
-     *
-     * @param allowedKeys Set of keys to include during KeyStore generation, empty set will creatr
-     *                   a KeyStore with all possible keys.
-     * @return A JDK KeyStore object
-     * @throws GeneralSecurityException If any security exception occurred
-     * @throws IOException If there is an I/O problem with the keystore data
-     */
+    @Override
     public KeyStore getJavaKeyStore(final Set<String> allowedKeys) throws GeneralSecurityException, IOException {
         requireNonNull(allowedKeys);
 
@@ -158,7 +163,7 @@ public final class NetconfKeystoreAdapter implements ClusteredDataTreeChangeList
     }
 
     private static byte[] base64Decode(final String base64) {
-        return Base64.getMimeDecoder().decode(base64.getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+        return Base64.getMimeDecoder().decode(base64.getBytes(StandardCharsets.US_ASCII));
     }
 
     @Override
@@ -192,7 +197,7 @@ public final class NetconfKeystoreAdapter implements ClusteredDataTreeChangeList
         switch (objectModification.getModificationType()) {
             case SUBTREE_MODIFIED:
             case WRITE:
-                final PrivateKey privateKey = objectModification.getDataAfter();
+                final var privateKey = objectModification.getDataAfter();
                 privateKeys.put(privateKey.getName(), privateKey);
                 break;
             case DELETE:
@@ -207,7 +212,7 @@ public final class NetconfKeystoreAdapter implements ClusteredDataTreeChangeList
         switch (objectModification.getModificationType()) {
             case SUBTREE_MODIFIED:
             case WRITE:
-                final TrustedCertificate trustedCertificate = objectModification.getDataAfter();
+                final var trustedCertificate = objectModification.getDataAfter();
                 trustedCertificates.put(trustedCertificate.getName(), trustedCertificate);
                 break;
             case DELETE:

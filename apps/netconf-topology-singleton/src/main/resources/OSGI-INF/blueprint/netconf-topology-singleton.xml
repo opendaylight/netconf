@@ -43,6 +43,8 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                interface="org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager"/>
     <reference id="baseSchemas"
                interface="org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas"/>
+    <reference id="keystoreAdapter"
+               interface="org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter"/>
     <odl:clustered-app-config
             id="singletonConfig"
             binding-class="org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config"
@@ -71,6 +73,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument ref="rpcProvider" />
         <argument ref="deviceActionFactory"/>
         <argument ref="schemaManager"/>
+        <argument ref="keystoreAdapter"/>
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>

@@ -36,6 +36,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
@@ -67,36 +68,28 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
 
     @Mock
     private DataBroker dataBroker;
-
     @Mock
     private DOMRpcProviderService rpcProviderRegistry;
-
     @Mock
     private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-
     @Mock
     private ScheduledExecutorService keepaliveExecutor;
-
     @Mock
     private ListeningExecutorService processingExecutor;
-
     @Mock
     private ActorSystem actorSystem;
-
     @Mock
     private EventExecutor eventExecutor;
-
     @Mock
     private NetconfClientDispatcher clientDispatcher;
-
     @Mock
     private TransactionChain txChain;
-
     @Mock
     private WriteTransaction writeTx;
-
     @Mock
     private DeviceActionFactory deviceActionFactory;
+    @Mock
+    private NetconfKeystoreAdapter keystoreAdapter;
 
     private NetconfTopologySetup.NetconfTopologySetupBuilder builder;
     private RemoteDeviceId remoteDeviceId;
@@ -116,7 +109,8 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
                 .setActorSystem(actorSystem)
                 .setEventExecutor(eventExecutor)
                 .setNetconfClientDispatcher(clientDispatcher)
-                .setTopologyId(TOPOLOGY_ID);
+                .setTopologyId(TOPOLOGY_ID)
+                .setKeystoreAdapter(keystoreAdapter);
     }
 
     @Test

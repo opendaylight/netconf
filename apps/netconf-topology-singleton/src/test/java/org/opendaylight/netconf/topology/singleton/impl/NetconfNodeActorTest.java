@@ -86,6 +86,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
@@ -147,45 +148,34 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     @Mock
     private Rpcs.Normalized mockDOMRpcService;
-
     @Mock
     private Actions.Normalized mockDOMActionService;
-
     @Mock
     private DOMMountPointService mockMountPointService;
-
     @Mock
     private DOMMountPointService.DOMMountPointBuilder mockMountPointBuilder;
-
     @Mock
     private ObjectRegistration<DOMMountPoint> mockMountPointReg;
-
     @Mock
     private DOMDataBroker mockDOMDataBroker;
-
     @Mock
     private NetconfDataTreeService netconfService;
-
     @Mock
     private SchemaSourceRegistration<?> mockSchemaSourceReg1;
-
     @Mock
     private SchemaSourceRegistration<?> mockSchemaSourceReg2;
-
     @Mock
     private SchemaSourceRegistry mockRegistry;
-
     @Mock
     private EffectiveModelContextFactory mockSchemaContextFactory;
-
     @Mock
     private SchemaRepository mockSchemaRepository;
-
     @Mock
     private EffectiveModelContext mockSchemaContext;
-
     @Mock
     private SchemaResourcesDTO schemaResourceDTO;
+    @Mock
+    private NetconfKeystoreAdapter keystoreAdapter;
 
     @Before
     public void setup() {
@@ -197,9 +187,13 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         doReturn(masterSchemaRepository).when(schemaResourceDTO).getSchemaRepository();
         doReturn(mockRegistry).when(schemaResourceDTO).getSchemaRegistry();
-        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system)
-                .setIdleTimeout(Duration.ofSeconds(1)).setSchemaResourceDTO(schemaResourceDTO)
-                .setBaseSchemas(BASE_SCHEMAS).build();
+        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create()
+            .setActorSystem(system)
+            .setIdleTimeout(Duration.ofSeconds(1))
+            .setSchemaResourceDTO(schemaResourceDTO)
+            .setBaseSchemas(BASE_SCHEMAS)
+            .setKeystoreAdapter(keystoreAdapter)
+            .build();
 
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
 
@@ -234,8 +228,12 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final RemoteDeviceId newRemoteDeviceId = new RemoteDeviceId("netconf-topology2",
                 new InetSocketAddress(InetAddresses.forString("127.0.0.2"), 9999));
 
-        final NetconfTopologySetup newSetup = NetconfTopologySetupBuilder.create().setBaseSchemas(BASE_SCHEMAS)
-                .setSchemaResourceDTO(schemaResourceDTO).setActorSystem(system).build();
+        final NetconfTopologySetup newSetup = NetconfTopologySetupBuilder.create()
+            .setBaseSchemas(BASE_SCHEMAS)
+            .setSchemaResourceDTO(schemaResourceDTO)
+            .setActorSystem(system)
+            .setKeystoreAdapter(keystoreAdapter)
+            .build();
 
         masterRef.tell(new RefreshSetupMasterActorData(newSetup, newRemoteDeviceId), testKit.getRef());
 
@@ -345,6 +343,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
                 .setSchemaResourceDTO(schemaResourceDTO2)
                 .setBaseSchemas(BASE_SCHEMAS)
                 .setActorSystem(system)
+                .setKeystoreAdapter(keystoreAdapter)
                 .build();
 
         final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT,
@@ -424,9 +423,13 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(repository).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(repository).when(schemaResourceDTO2).getSchemaRepository();
-        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system)
-                .setSchemaResourceDTO(schemaResourceDTO2).setIdleTimeout(Duration.ofSeconds(1))
-                .setBaseSchemas(BASE_SCHEMAS).build();
+        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create()
+            .setActorSystem(system)
+            .setSchemaResourceDTO(schemaResourceDTO2)
+            .setIdleTimeout(Duration.ofSeconds(1))
+            .setBaseSchemas(BASE_SCHEMAS)
+            .setKeystoreAdapter(keystoreAdapter)
+            .build();
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
         ActorRef actor = TestActorRef.create(system, props, "master_messages_2");
 
@@ -671,9 +674,12 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
-        final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(
-                NetconfTopologySetupBuilder.create().setSchemaResourceDTO(schemaResourceDTO2).setActorSystem(system)
-                .setBaseSchemas(BASE_SCHEMAS).build(), remoteDeviceId, TIMEOUT, mockMountPointService));
+        final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(NetconfTopologySetupBuilder.create()
+                .setSchemaResourceDTO(schemaResourceDTO2)
+                .setActorSystem(system)
+                .setBaseSchemas(BASE_SCHEMAS)
+                .setKeystoreAdapter(keystoreAdapter)
+                .build(), remoteDeviceId, TIMEOUT, mockMountPointService));
 
         doReturn(Futures.immediateFuture(mockSchemaContext))
                 .when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());
