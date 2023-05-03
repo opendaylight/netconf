@@ -96,8 +96,6 @@ public class NetconfTopologyManager
 
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
     private Registration rpcReg;
-    private String privateKeyPath;
-    private String privateKeyPassphrase;
 
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
                                   final DOMRpcProviderService rpcProviderRegistry,
@@ -252,20 +250,6 @@ public class NetconfTopologyManager
         } catch (Exception e) {
             LOG.warn("Error closing {}", closeable, e);
         }
-    }
-
-    /**
-     * Sets the private key path from location specified in configuration file using blueprint.
-     */
-    public void setPrivateKeyPath(final String privateKeyPath) {
-        this.privateKeyPath = privateKeyPath;
-    }
-
-    /**
-     * Sets the private key passphrase from location specified in configuration file using blueprint.
-     */
-    public void setPrivateKeyPassphrase(final String privateKeyPassphrase) {
-        this.privateKeyPassphrase = privateKeyPassphrase;
     }
 
     private ListenerRegistration<NetconfTopologyManager> registerDataTreeChangeListener() {
