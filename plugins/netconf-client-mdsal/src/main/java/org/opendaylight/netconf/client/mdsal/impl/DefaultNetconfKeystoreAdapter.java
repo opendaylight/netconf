@@ -7,10 +7,13 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -25,7 +28,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +49,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -60,15 +61,61 @@ import org.slf4j.LoggerFactory;
 @Component(service = NetconfKeystoreAdapter.class)
 public final class DefaultNetconfKeystoreAdapter
         implements NetconfKeystoreAdapter, ClusteredDataTreeChangeListener<Keystore>, AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultNetconfKeystoreAdapter.class);
+    /**
+     * Internal state, updated atomically.
+     */
+    private record State(
+        @NonNull Map<String, KeyCredential> pairs,
+        @NonNull Map<String, PrivateKey> privateKeys,
+        @NonNull Map<String, TrustedCertificate> trustedCertificates) {
 
-    // FIXME: this is rather ugly: use atomic updates with immutable maps, as updates are expected to be rare while
-    //        access is expected to be frequent
-    private final Map<String, KeyCredential> pairs = Collections.synchronizedMap(new HashMap<>());
-    private final Map<String, PrivateKey> privateKeys = Collections.synchronizedMap(new HashMap<>());
-    private final Map<String, TrustedCertificate> trustedCertificates = Collections.synchronizedMap(new HashMap<>());
+        State {
+            requireNonNull(pairs);
+            requireNonNull(privateKeys);
+            requireNonNull(trustedCertificates);
+        }
+
+        @NonNull StateBuilder newBuilder() {
+            return new StateBuilder(new HashMap<>(pairs), new HashMap<>(privateKeys),
+                new HashMap<>(trustedCertificates));
+        }
+    }
+
+    /**
+     * Intermediate builder for State.
+     */
+    private record StateBuilder(
+        @NonNull HashMap<String, KeyCredential> pairs,
+        @NonNull HashMap<String, PrivateKey> privateKeys,
+        @NonNull HashMap<String, TrustedCertificate> trustedCertificates) {
+
+        StateBuilder {
+            requireNonNull(pairs);
+            requireNonNull(privateKeys);
+            requireNonNull(trustedCertificates);
+        }
+
+        @NonNull State build() {
+            return new State(Map.copyOf(pairs), Map.copyOf(privateKeys), Map.copyOf(trustedCertificates));
+        }
+    }
+
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultNetconfKeystoreAdapter.class);
+    private static final char[] EMPTY_CHARS = { };
+    private static final VarHandle STATE_VH;
+
+    static {
+        try {
+            STATE_VH = MethodHandles.lookup().findVarHandle(DefaultNetconfKeystoreAdapter.class, "state", State.class);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     private final @NonNull Registration reg;
+
+    @SuppressWarnings("unused")
+    private volatile @NonNull State state = new State(Map.of(), Map.of(), Map.of());
 
     @Inject
     @Activate
@@ -87,58 +134,60 @@ public final class DefaultNetconfKeystoreAdapter
 
     @Override
     public Optional<KeyCredential> getKeypairFromId(final String keyId) {
-        return Optional.ofNullable(pairs.get(keyId));
+        return Optional.ofNullable(currentState().pairs.get(keyId));
     }
 
     @Override
     public KeyStore getJavaKeyStore(final Set<String> allowedKeys) throws GeneralSecurityException, IOException {
         requireNonNull(allowedKeys);
-
-        final KeyStore keyStore = KeyStore.getInstance("JKS");
-
-        keyStore.load(null, null);
-
-        synchronized (privateKeys) {
-            if (privateKeys.isEmpty()) {
-                throw new KeyStoreException("No keystore private key found");
-            }
-
-            for (Map.Entry<String, PrivateKey> entry : privateKeys.entrySet()) {
-                if (!allowedKeys.isEmpty() && !allowedKeys.contains(entry.getKey())) {
-                    continue;
-                }
-                final java.security.PrivateKey key = getJavaPrivateKey(entry.getValue().getData());
-
-                final List<X509Certificate> certificateChain =
-                        getCertificateChain(entry.getValue().getCertificateChain().toArray(new String[0]));
-                if (certificateChain.isEmpty()) {
-                    throw new CertificateException("No certificate chain associated with private key found");
-                }
-
-                keyStore.setKeyEntry(entry.getKey(), key, "".toCharArray(),
-                        certificateChain.stream().toArray(Certificate[]::new));
-            }
+        final var current = currentState();
+        if (current.privateKeys.isEmpty()) {
+            throw new KeyStoreException("No keystore private key found");
         }
 
-        synchronized (trustedCertificates) {
-            for (Map.Entry<String, TrustedCertificate> entry : trustedCertificates.entrySet()) {
-                final List<X509Certificate> x509Certificates =
-                        getCertificateChain(new String[] {entry.getValue().getCertificate()});
+        final var keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(null, null);
 
-                keyStore.setCertificateEntry(entry.getKey(), x509Certificates.get(0));
+        // Private keys first
+        for (var entry : current.privateKeys.entrySet()) {
+            final var alias = entry.getKey();
+            if (!allowedKeys.isEmpty() && !allowedKeys.contains(alias)) {
+                continue;
             }
+
+            final var privateKey = entry.getValue();
+            final var key = getJavaPrivateKey(privateKey.getData());
+            // TODO: do not do toArray()?
+            // TODO: require() here and filter in update path
+            final var certificateChain = getCertificateChain(privateKey.getCertificateChain().toArray(new String[0]));
+            // TODO: filter these and do not throw?
+            if (certificateChain.isEmpty()) {
+                throw new CertificateException("No certificate chain associated with private key found");
+            }
+
+            keyStore.setKeyEntry(alias, key, EMPTY_CHARS, certificateChain.toArray(Certificate[]::new));
+        }
+
+        for (var entry : current.trustedCertificates.entrySet()) {
+            // TODO: ahem: single entry and single get
+            final var x509Certificates = getCertificateChain(new String[] { entry.getValue().getCertificate() });
+            keyStore.setCertificateEntry(entry.getKey(), x509Certificates.get(0));
         }
 
         return keyStore;
     }
 
+    private @NonNull State currentState() {
+        return verifyNotNull((@NonNull State) STATE_VH.getAcquire(this));
+    }
+
     private static java.security.PrivateKey getJavaPrivateKey(final String base64PrivateKey)
             throws GeneralSecurityException {
-        final byte[] encodedKey = base64Decode(base64PrivateKey);
-        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedKey);
+        final var keySpec = new PKCS8EncodedKeySpec(base64Decode(base64PrivateKey));
         java.security.PrivateKey key;
 
         try {
+            // FIXME: cache instances, or something smarter?
             final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             key = keyFactory.generatePrivate(keySpec);
         } catch (InvalidKeySpecException ignore) {
@@ -151,10 +200,12 @@ public final class DefaultNetconfKeystoreAdapter
 
     private static List<X509Certificate> getCertificateChain(final String[] base64Certificates)
             throws GeneralSecurityException {
-        final CertificateFactory factory = CertificateFactory.getInstance("X.509");
-        final List<X509Certificate> certificates = new ArrayList<>();
+        // TODO: https://stackoverflow.com/questions/43809909/is-certificatefactory-getinstancex-509-thread-safe
+        //        indicates this is thread-safe in most cases, but can we get a better assurance?
+        final var factory = CertificateFactory.getInstance("X.509");
+        final var certificates = new ArrayList<X509Certificate>();
 
-        for (String cert : base64Certificates) {
+        for (var cert : base64Certificates) {
             final byte[] buffer = base64Decode(cert);
             certificates.add((X509Certificate)factory.generateCertificate(new ByteArrayInputStream(buffer)));
         }
@@ -168,32 +219,39 @@ public final class DefaultNetconfKeystoreAdapter
 
     @Override
     public void onDataTreeChanged(final Collection<DataTreeModification<Keystore>> changes) {
-        LOG.debug("Keystore updated: {}", changes);
+        LOG.debug("Starting update with {} changes", changes.size());
+        final var builder = currentState().newBuilder();
+        onDataTreeChanged(builder, changes);
+        STATE_VH.setRelease(this, builder.build());
+        LOG.debug("Update finished");
+    }
 
-        for (final DataTreeModification<Keystore> change : changes) {
-            final DataObjectModification<Keystore> rootNode = change.getRootNode();
+    private static void onDataTreeChanged(final StateBuilder builder,
+            final Collection<DataTreeModification<Keystore>> changes) {
+        for (var change : changes) {
+            LOG.debug("Processing change {}", change);
+            final var rootNode = change.getRootNode();
 
-            for (final DataObjectModification<? extends DataObject> changedChild : rootNode.getModifiedChildren()) {
+            for (var changedChild : rootNode.getModifiedChildren()) {
                 if (changedChild.getDataType().equals(KeyCredential.class)) {
-                    final Keystore dataAfter = rootNode.getDataAfter();
-
-                    pairs.clear();
+                    final var dataAfter = rootNode.getDataAfter();
+                    builder.pairs.clear();
                     if (dataAfter != null) {
                         dataAfter.nonnullKeyCredential().values()
-                            .forEach(pair -> pairs.put(pair.key().getKeyId(), pair));
+                            .forEach(pair -> builder.pairs.put(pair.key().getKeyId(), pair));
                     }
-
                 } else if (changedChild.getDataType().equals(PrivateKey.class)) {
-                    onPrivateKeyChanged((DataObjectModification<PrivateKey>)changedChild);
+                    onPrivateKeyChanged(builder.privateKeys, (DataObjectModification<PrivateKey>)changedChild);
                 } else if (changedChild.getDataType().equals(TrustedCertificate.class)) {
-                    onTrustedCertificateChanged((DataObjectModification<TrustedCertificate>)changedChild);
+                    onTrustedCertificateChanged(builder.trustedCertificates,
+                        (DataObjectModification<TrustedCertificate>)changedChild);
                 }
-
             }
         }
     }
 
-    private void onPrivateKeyChanged(final DataObjectModification<PrivateKey> objectModification) {
+    private static void onPrivateKeyChanged(final HashMap<String, PrivateKey> privateKeys,
+            final DataObjectModification<PrivateKey> objectModification) {
         switch (objectModification.getModificationType()) {
             case SUBTREE_MODIFIED:
             case WRITE:
@@ -208,7 +266,8 @@ public final class DefaultNetconfKeystoreAdapter
         }
     }
 
-    private void onTrustedCertificateChanged(final DataObjectModification<TrustedCertificate> objectModification) {
+    private static void onTrustedCertificateChanged(final HashMap<String, TrustedCertificate> trustedCertificates,
+            final DataObjectModification<TrustedCertificate> objectModification) {
         switch (objectModification.getModificationType()) {
             case SUBTREE_MODIFIED:
             case WRITE:
