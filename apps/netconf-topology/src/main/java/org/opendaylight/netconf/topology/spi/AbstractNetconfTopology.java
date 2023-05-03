@@ -42,6 +42,7 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
 import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -52,7 +53,6 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.Authenticat
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.api.NetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -104,7 +104,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                       final DataBroker dataBroker, final DOMMountPointService mountPointService,
                                       final AAAEncryptionService encryptionService,
                                       final DeviceActionFactory deviceActionFactory,
-                                      final BaseNetconfSchemas baseSchemas) {
+                                      final BaseNetconfSchemas baseSchemas,
+                                      final NetconfKeystoreAdapter keystoreAdapter) {
         this.topologyId = requireNonNull(topologyId);
         this.clientDispatcher = clientDispatcher;
         this.eventExecutor = eventExecutor;
@@ -116,8 +117,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.mountPointService = mountPointService;
         this.encryptionService = encryptionService;
         this.baseSchemas = requireNonNull(baseSchemas);
-
-        keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
+        this.keystoreAdapter = requireNonNull(keystoreAdapter);
 
         // FIXME: this should be a put(), as we are initializing and will be re-populating the datastore with all the
         //        devices. Whatever has been there before should be nuked to properly re-align lifecycle.
