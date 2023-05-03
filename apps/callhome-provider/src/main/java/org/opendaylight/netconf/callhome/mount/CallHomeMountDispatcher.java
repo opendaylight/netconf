@@ -19,7 +19,6 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.callhome.mount.CallHomeMountSessionContext.CloseCallback;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
@@ -51,12 +50,6 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final AAAEncryptionService encryptionService;
 
     protected CallHomeTopology topology;
-
-    private final CloseCallback onCloseHandler = deviceContext -> {
-        final var nodeId = deviceContext.getId();
-        LOG.info("Removing {} from Netconf Topology.", nodeId);
-        topology.disconnectNode(nodeId);
-    };
 
     private final DeviceActionFactory deviceActionFactory;
     private final BaseNetconfSchemas baseSchemas;
@@ -109,7 +102,11 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     @Override
     public void onNetconfSubsystemOpened(final CallHomeProtocolSessionContext session,
                                          final CallHomeChannelActivator activator) {
-        final var deviceContext = sessionManager().createSession(session, activator, onCloseHandler);
+        final var deviceContext = sessionManager().createSession(session, activator, device -> {
+            final var nodeId = device.getId();
+            LOG.info("Removing {} from Netconf Topology.", nodeId);
+            topology.disconnectNode(nodeId);
+        });
         if (deviceContext != null) {
             final NodeId nodeId = deviceContext.getId();
             final Node configNode = deviceContext.getConfigNode();
