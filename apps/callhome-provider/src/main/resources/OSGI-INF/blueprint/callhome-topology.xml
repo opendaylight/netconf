@@ -62,7 +62,6 @@
     </bean>
 
     <bean id="netconfCallHomeService" class="org.opendaylight.netconf.callhome.mount.tls.NetconfCallHomeTlsService"
-          init-method="init"
           destroy-method="close">
         <argument ref="dataBroker" />
         <argument ref="allowedDevicesMonitor" />

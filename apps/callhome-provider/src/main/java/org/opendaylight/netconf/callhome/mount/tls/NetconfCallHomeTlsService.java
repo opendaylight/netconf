@@ -15,21 +15,13 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListen
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServer;
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServerBuilder;
 import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
-import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NetconfCallHomeTlsService implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfCallHomeTlsService.class);
 
-    private final Configuration config;
-    private final SslHandlerFactory sslHandlerFactory;
-    private final CallHomeNetconfSubsystemListener subsystemListener;
-    private final EventLoopGroup bossGroup;
-    private final EventLoopGroup workerGroup;
-    private final TlsAllowedDevicesMonitor allowedDevicesMonitor;
-
-    private NetconfCallHomeTlsServer server;
+    private final NetconfCallHomeTlsServer server;
 
     public NetconfCallHomeTlsService(final DataBroker dataBroker, final TlsAllowedDevicesMonitor allowedDevicesMonitor,
             final CallHomeNetconfSubsystemListener subsystemListener, final EventLoopGroup bossGroup,
@@ -42,27 +34,17 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
                                      final CallHomeNetconfSubsystemListener subsystemListener,
                                      final EventLoopGroup bossGroup,
                                      final EventLoopGroup workerGroup, final Configuration config) {
-        this.config = requireNonNull(config);
-        this.subsystemListener = requireNonNull(subsystemListener);
-        this.bossGroup = requireNonNull(bossGroup);
-        this.workerGroup = requireNonNull(workerGroup);
-        this.allowedDevicesMonitor = requireNonNull(allowedDevicesMonitor);
-        sslHandlerFactory = new SslHandlerFactoryAdapter(dataBroker, allowedDevicesMonitor);
-    }
-
-    public void init() {
         LOG.info("Initializing Call Home TLS server instance");
-
-        final NetconfCallHomeTlsServerBuilder builder = new NetconfCallHomeTlsServerBuilder();
-        server = builder.setHost(config.getHost())
+        server = new NetconfCallHomeTlsServerBuilder()
+            .setHost(config.getHost())
             .setPort(config.getPort())
             .setTimeout(config.getTimeout())
             .setMaxConnections(config.getMaxConnections())
-            .setSslHandlerFactory(sslHandlerFactory)
-            .setSubsystemListener(subsystemListener)
-            .setBossGroup(bossGroup)
-            .setWorkerGroup(workerGroup)
-            .setAllowedDevicesMonitor(allowedDevicesMonitor)
+            .setAllowedDevicesMonitor(requireNonNull(allowedDevicesMonitor))
+            .setSslHandlerFactory(new SslHandlerFactoryAdapter(dataBroker, allowedDevicesMonitor))
+            .setSubsystemListener(requireNonNull(subsystemListener))
+            .setBossGroup(requireNonNull(bossGroup))
+            .setWorkerGroup(requireNonNull(workerGroup))
             .build();
         server.start();
 
