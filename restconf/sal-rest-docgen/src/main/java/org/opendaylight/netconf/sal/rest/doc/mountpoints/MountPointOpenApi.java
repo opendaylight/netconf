@@ -137,18 +137,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
-        final String deviceName  = extractDeviceName(iid);
 
         if (context == null) {
             return null;
         }
-
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
-            return generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
+            return generateDataStoreApiDoc(uriInfo, iid, urlPrefix);
         }
-        final OpenApiObject openApiObject = openApiGenerator.getApiDeclaration(module, revision, uriInfo, context,
-                urlPrefix);
-        return openApiObject;
+        return openApiGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix);
     }
 
     public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum) {
@@ -176,23 +172,13 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             }
             range = Optional.of(Range.closed(start, end));
         }
-
-        // FIXME get rid of this object and thus eliminate need to mutate fields
-        final OpenApiObject doc;
-
         final OpenApiObject openApiObject = openApiGenerator.getAllModulesDoc(uriInfo, range, context,
                 Optional.of(deviceName), urlPrefix, definitionNames);
-
         if (includeDataStore) {
-            doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
-            addFields(doc.getPaths() ,openApiObject.getPaths().fields());
-            addFields(doc.getComponents().getSchemas(), openApiObject.getComponents().getSchemas().fields());
-            doc.getInfo().setTitle(openApiObject.getInfo().getTitle());
-        } else {
-            doc = openApiObject;
+            final ObjectNode dataStoreApiPaths = getDataStoreApiPaths(urlPrefix, deviceName);
+            addFields(openApiObject.getPaths(), dataStoreApiPaths.fields());
         }
-
-        return doc;
+        return openApiObject;
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -200,23 +186,22 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private OpenApiObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
-            final String deviceName) {
-        final OpenApiObject declaration = openApiGenerator.createOpenApiObject(
-                openApiGenerator.createSchemaFromUriInfo(uriInfo),
-                openApiGenerator.createHostFromUriInfo(uriInfo),
-                BASE_PATH,
-                context);
+    private OpenApiObject generateDataStoreApiDoc(final UriInfo info, final YangInstanceIdentifier iid,
+            final String urlPrefix) {
+        final var openApiObject = openApiGenerator.createOpenApiObject(openApiGenerator.createSchemaFromUriInfo(info),
+                openApiGenerator.createHostFromUriInfo(info), BASE_PATH, urlPrefix);
+        final var deviceName = extractDeviceName(iid);
+        openApiObject.setPaths(getDataStoreApiPaths(urlPrefix, deviceName));
+        return openApiObject;
+    }
 
+    private ObjectNode getDataStoreApiPaths(final String context, final String deviceName) {
         final ObjectNode pathsObject = JsonNodeFactory.instance.objectNode();
         createGetPathItem("data", "Queries the config (startup) datastore on the mounted hosted.",
                 context, deviceName, pathsObject);
         createGetPathItem("operations", "Queries the available operations (RPC calls) on the mounted hosted.",
                 context, deviceName, pathsObject);
-
-        declaration.setPaths(pathsObject);
-
-        return declaration;
+        return pathsObject;
     }
 
     private void createGetPathItem(final String resourceType, final String description, final String context,
