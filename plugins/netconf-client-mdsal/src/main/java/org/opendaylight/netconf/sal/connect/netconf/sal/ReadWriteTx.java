@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.util.concurrent.FluentFuture;
 import java.util.Optional;
@@ -19,11 +18,11 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
-public class ReadWriteTx<T extends DOMDataTreeReadTransaction> implements DOMDataTreeReadWriteTransaction {
+class ReadWriteTx<T extends DOMDataTreeReadTransaction> implements DOMDataTreeReadWriteTransaction {
     private final DOMDataTreeWriteTransaction delegateWriteTx;
     final T delegateReadTx;
 
-    public ReadWriteTx(final T delegateReadTx, final DOMDataTreeWriteTransaction delegateWriteTx) {
+    ReadWriteTx(final T delegateReadTx, final DOMDataTreeWriteTransaction delegateWriteTx) {
         this.delegateReadTx = delegateReadTx;
         this.delegateWriteTx = delegateWriteTx;
     }

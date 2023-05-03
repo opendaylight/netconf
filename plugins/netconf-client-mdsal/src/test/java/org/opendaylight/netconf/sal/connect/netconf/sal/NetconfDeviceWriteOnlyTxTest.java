@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,7 +53,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
-
     private final RemoteDeviceId id = new RemoteDeviceId("test-mount", new InetSocketAddress(99));
 
     @Mock

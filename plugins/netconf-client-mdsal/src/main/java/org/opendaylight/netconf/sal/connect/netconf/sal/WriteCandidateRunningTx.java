@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
@@ -20,27 +20,26 @@ import org.slf4j.LoggerFactory;
  *     <li>Running datastore is locked as the first thing and this lock has to succeed</li>
  * </ul>
  */
-public class WriteCandidateRunningTx extends WriteCandidateTx {
+class WriteCandidateRunningTx extends WriteCandidateTx {
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateRunningTx.class);
 
-    public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps,
-            final boolean rollbackSupport) {
+    WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps, final boolean rollbackSupport) {
         this(id, netOps, rollbackSupport, true);
     }
 
-    public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps,
-            final boolean rollbackSupport, final boolean isLockAllowed) {
+    WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
+            final boolean isLockAllowed) {
         super(id, netconfOps, rollbackSupport, isLockAllowed);
     }
 
     @Override
-    protected synchronized void init() {
+    synchronized void init() {
         lockRunning();
         super.init();
     }
 
     @Override
-    protected void cleanupOnSuccess() {
+    void cleanupOnSuccess() {
         super.cleanupOnSuccess();
         unlockRunning();
     }

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -43,18 +43,17 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
-
+abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     private static final Logger LOG  = LoggerFactory.getLogger(AbstractWriteTx.class);
 
-    protected final RemoteDeviceId id;
-    protected final NetconfBaseOps netOps;
-    protected final boolean rollbackSupport;
-    protected final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
+    final RemoteDeviceId id;
+    final NetconfBaseOps netOps;
+    final boolean rollbackSupport;
+    final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
     private final List<TxListener> listeners = new CopyOnWriteArrayList<>();
     // Allow commit to be called only once
-    protected volatile boolean finished = false;
-    protected final boolean isLockAllowed;
+    volatile boolean finished = false;
+    final boolean isLockAllowed;
 
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "Behavior-only subclasses")
     AbstractWriteTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
@@ -66,15 +65,15 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         init();
     }
 
-    protected static boolean isSuccess(final DOMRpcResult result) {
+    static boolean isSuccess(final DOMRpcResult result) {
         return result.errors().isEmpty();
     }
 
-    protected void checkNotFinished() {
+    void checkNotFinished() {
         checkState(!isFinished(), "%s: Transaction %s already finished", id, getIdentifier());
     }
 
-    protected boolean isFinished() {
+    boolean isFinished() {
         return finished;
     }
 
@@ -90,9 +89,9 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     }
 
     // FIXME: only called from ctor which needs @SuppressDBWarnings. Refactor class hierarchy without this method (here)
-    protected abstract void init();
+    abstract void init();
 
-    protected abstract void cleanup();
+    abstract void cleanup();
 
     @Override
     public Object getIdentifier() {
@@ -176,7 +175,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         return FluentFuture.from(resultFuture);
     }
 
-    protected final ListenableFuture<RpcResult<Void>> commitConfiguration() {
+    final ListenableFuture<RpcResult<Void>> commitConfiguration() {
         listeners.forEach(listener -> listener.onTransactionSubmitted(this));
         checkNotFinished();
         finished = true;
@@ -202,7 +201,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         return result;
     }
 
-    protected abstract ListenableFuture<RpcResult<Void>> performCommit();
+    abstract ListenableFuture<RpcResult<Void>> performCommit();
 
     private void checkEditable(final LogicalDatastoreType store) {
         checkNotFinished();
@@ -210,11 +209,11 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
                 "Can edit only configuration data, not %s", store);
     }
 
-    protected abstract void editConfig(YangInstanceIdentifier path, Optional<NormalizedNode> data,
-                                       DataContainerChild editStructure,
-                                       Optional<EffectiveOperation> defaultOperation, String operation);
+    abstract void editConfig(YangInstanceIdentifier path, Optional<NormalizedNode> data,
+                             DataContainerChild editStructure, Optional<EffectiveOperation> defaultOperation,
+                             String operation);
 
-    protected ListenableFuture<RpcResult<Void>> resultsToTxStatus() {
+    ListenableFuture<RpcResult<Void>> resultsToTxStatus() {
         final SettableFuture<RpcResult<Void>> transformed = SettableFuture.create();
 
         Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<List<DOMRpcResult>>() {

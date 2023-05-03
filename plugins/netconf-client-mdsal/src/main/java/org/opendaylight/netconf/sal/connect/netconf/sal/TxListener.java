@@ -5,11 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 interface TxListener {
-
     /**
      * Invoked, when transaction completes successfully.
      * @param transaction transaction
@@ -35,6 +33,4 @@ interface TxListener {
      * @param transaction transaction
      */
     void onTransactionSubmitted(AbstractWriteTx transaction);
-
-
 }

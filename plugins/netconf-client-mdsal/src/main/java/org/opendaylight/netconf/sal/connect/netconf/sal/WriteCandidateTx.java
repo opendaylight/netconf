@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -45,20 +45,20 @@ import org.slf4j.LoggerFactory;
  *   <li>Commit and Unlock candidate datastore async</li>
  * </ol>
  */
-public class WriteCandidateTx extends AbstractWriteTx {
+class WriteCandidateTx extends AbstractWriteTx {
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateTx.class);
 
-    public WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport) {
+    WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport) {
         this(id, netconfOps, rollbackSupport, true);
     }
 
-    public WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
+    WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
             final boolean isLockAllowed) {
         super(id, netconfOps, rollbackSupport, isLockAllowed);
     }
 
     @Override
-    protected synchronized void init() {
+    synchronized void init() {
         LOG.trace("{}: Initializing {} transaction", id, getClass().getSimpleName());
         lock();
     }
@@ -90,7 +90,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
     }
 
     @Override
-    protected void cleanup() {
+    void cleanup() {
         discardChanges();
         cleanupOnSuccess();
     }
@@ -125,7 +125,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
         return txResult;
     }
 
-    protected void cleanupOnSuccess() {
+    void cleanupOnSuccess() {
         unlock();
     }
 

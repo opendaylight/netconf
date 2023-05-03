@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -75,16 +75,15 @@ abstract class AbstractReadOnlyTx implements DOMDataTreeReadTransaction {
     @Override
     public final FluentFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
-        switch (store) {
-            case CONFIGURATION:
-                return readConfigurationData(path);
-            case OPERATIONAL:
-                return readOperationalData(path);
-            default:
+        return switch (store) {
+            case CONFIGURATION -> readConfigurationData(path);
+            case OPERATIONAL -> readOperationalData(path);
+            default -> {
                 LOG.info("Unknown datastore type: {}.", store);
                 throw new IllegalArgumentException(String.format(
                     "%s, Cannot read data %s for %s datastore, unknown datastore type", id, path, store));
-        }
+            }
+        };
     }
 
     @Override

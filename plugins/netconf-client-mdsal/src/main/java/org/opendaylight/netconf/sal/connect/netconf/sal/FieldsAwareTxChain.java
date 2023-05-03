@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static java.util.Objects.requireNonNull;
 
@@ -19,7 +19,7 @@ import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsTransactionChain;
 public final class FieldsAwareTxChain extends AbstractTxChain implements NetconfDOMFieldsTransactionChain {
     private final NetconfDOMDataBrokerFieldsExtension dataBrokerFieldsExtension;
 
-    public FieldsAwareTxChain(final DOMDataBroker dataBroker, final DOMTransactionChainListener listener,
+    FieldsAwareTxChain(final DOMDataBroker dataBroker, final DOMTransactionChainListener listener,
                               final NetconfDOMDataBrokerFieldsExtension dataBrokerFieldsExtension) {
         super(dataBroker, listener);
         this.dataBrokerFieldsExtension = requireNonNull(dataBrokerFieldsExtension);

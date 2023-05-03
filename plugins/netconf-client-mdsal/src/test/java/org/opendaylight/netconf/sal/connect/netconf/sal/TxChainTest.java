@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -17,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -27,7 +27,6 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class TxChainTest {
-
     @Mock
     private DOMDataBroker broker;
     @Mock
@@ -46,7 +45,8 @@ public class TxChainTest {
     private AutoCloseable registration2;
     @Mock
     private AutoCloseable registration3;
-    private final ArgumentCaptor<TxListener> captor = ArgumentCaptor.forClass(TxListener.class);
+    @Captor
+    private ArgumentCaptor<TxListener> captor;
     private TxChain chain;
 
     @Before

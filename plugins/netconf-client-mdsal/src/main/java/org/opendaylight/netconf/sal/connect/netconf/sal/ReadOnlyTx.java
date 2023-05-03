@@ -5,13 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 
-public final class ReadOnlyTx extends AbstractReadOnlyTx {
-    public ReadOnlyTx(final NetconfBaseOps netconfOps, final RemoteDeviceId id) {
+final class ReadOnlyTx extends AbstractReadOnlyTx {
+    ReadOnlyTx(final NetconfBaseOps netconfOps, final RemoteDeviceId id) {
         super(netconfOps, id);
     }
 }

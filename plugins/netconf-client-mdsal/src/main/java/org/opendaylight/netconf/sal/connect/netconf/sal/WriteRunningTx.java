@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
+package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
@@ -40,23 +40,22 @@ import org.slf4j.LoggerFactory;
  *   <li>Unlock running datastore on tx commit</li>
  * </ol>
  */
-public class WriteRunningTx extends AbstractWriteTx {
-
+class WriteRunningTx extends AbstractWriteTx {
     private static final Logger LOG  = LoggerFactory.getLogger(WriteRunningTx.class);
+
     private final List<Change> changes = new ArrayList<>();
 
-    public WriteRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps,
-                          final boolean rollbackSupport) {
+    WriteRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps, final boolean rollbackSupport) {
         this(id, netOps, rollbackSupport, true);
     }
 
-    public WriteRunningTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
+    WriteRunningTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
             final boolean isLockAllowed) {
         super(id, netconfOps, rollbackSupport, isLockAllowed);
     }
 
     @Override
-    protected synchronized void init() {
+    synchronized void init() {
         lock();
     }
 
@@ -69,7 +68,7 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     @Override
-    protected void cleanup() {
+    void cleanup() {
         unlock();
     }
 
@@ -99,7 +98,6 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     private static final class Change {
-
         private final DataContainerChild editStructure;
         private final Optional<EffectiveOperation> defaultOperation;
 
