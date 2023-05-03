@@ -19,7 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;

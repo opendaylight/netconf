@@ -37,7 +37,7 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
-import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;

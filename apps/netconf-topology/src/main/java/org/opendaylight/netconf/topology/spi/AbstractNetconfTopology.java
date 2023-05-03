@@ -40,6 +40,7 @@ import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
 import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -52,7 +53,6 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswo
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
-import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.api.NetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
