@@ -47,7 +47,6 @@
     </bean>
 
     <bean id="callhomeDispatcher" class="org.opendaylight.netconf.callhome.mount.CallHomeMountDispatcher">
-        <argument value="topology-netconf"/>
         <argument ref="eventExecutor"/>
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>
