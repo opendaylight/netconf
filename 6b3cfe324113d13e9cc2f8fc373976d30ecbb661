@@ -16,6 +16,24 @@
       "message": "This is just WIP patch.",
       "revId": "6b3cfe324113d13e9cc2f8fc373976d30ecbb661",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c02ed90f_d436d256",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-03T11:27:35Z",
+      "side": 1,
+      "message": "Resolved",
+      "parentUuid": "a5d1eb22_3ddb020b",
+      "revId": "6b3cfe324113d13e9cc2f8fc373976d30ecbb661",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
