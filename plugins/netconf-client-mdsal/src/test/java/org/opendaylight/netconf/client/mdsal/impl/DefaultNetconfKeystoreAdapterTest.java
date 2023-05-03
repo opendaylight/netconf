@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.sal;
+package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfKeystoreAdapterTest {
+public class DefaultNetconfKeystoreAdapterTest {
     private static final String XML_ELEMENT_PRIVATE_KEY = "private-key";
     private static final String XML_ELEMENT_NAME = "name";
     private static final String XML_ELEMENT_DATA = "data";
@@ -58,12 +58,12 @@ public class NetconfKeystoreAdapterTest {
     @Before
     public void setUp() {
         doReturn(listenerRegistration).when(dataBroker)
-            .registerDataTreeChangeListener(any(DataTreeIdentifier.class), any(NetconfKeystoreAdapter.class));
+            .registerDataTreeChangeListener(any(DataTreeIdentifier.class), any(DefaultNetconfKeystoreAdapter.class));
     }
 
     @Test
     public void testKeystoreAdapterInit() throws Exception {
-        final var keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
+        final DefaultNetconfKeystoreAdapter keystoreAdapter = new DefaultNetconfKeystoreAdapter(dataBroker);
         final var ex = assertThrows(KeyStoreException.class, keystoreAdapter::getJavaKeyStore);
         assertThat(ex.getMessage(), startsWith("No keystore private key found"));
     }
@@ -84,7 +84,7 @@ public class NetconfKeystoreAdapterTest {
         final var privateKey = getPrivateKey();
         doReturn(privateKey).when(childObjectModification).getDataAfter();
 
-        final var keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
+        final var keystoreAdapter = new DefaultNetconfKeystoreAdapter(dataBroker);
         keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification));
 
         final var keyStore = keystoreAdapter.getJavaKeyStore();
@@ -124,7 +124,7 @@ public class NetconfKeystoreAdapterTest {
         doReturn(trustedCertificate).when(childObjectModification2).getDataAfter();
 
         // Apply configurations
-        final var keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
+        final var keystoreAdapter = new DefaultNetconfKeystoreAdapter(dataBroker);
         keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
 
         // Check result
