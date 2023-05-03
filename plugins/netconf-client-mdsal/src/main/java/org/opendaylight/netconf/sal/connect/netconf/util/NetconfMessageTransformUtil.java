@@ -14,7 +14,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
-import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayDeque;
@@ -181,10 +180,6 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull NodeIdentifier NETCONF_GET_NODEID = NodeIdentifier.create(NETCONF_GET_QNAME);
     public static final @NonNull Absolute NETCONF_GET_PATH = toPath(NETCONF_GET_QNAME);
     public static final @NonNull QName NETCONF_RPC_QNAME = QName.create(NETCONF_QNAME, "rpc").intern();
-    public static final QName YANG_QNAME = null;
-    public static final URI NETCONF_ACTION_NAMESPACE = URI.create("urn:ietf:params:xml:ns:yang:1");
-    public static final String NETCONF_ACTION = "action";
-
 
     public static final @NonNull QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
     public static final @NonNull NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);
@@ -474,7 +469,7 @@ public final class NetconfMessageTransformUtil {
         // set msg id
         rpcNS.setAttribute(MESSAGE_ID_ATTR, counter.getNewMessageId(MESSAGE_ID_PREFIX));
 
-        final Element actionNS = document.createElementNS(NETCONF_ACTION_NAMESPACE.toString(), NETCONF_ACTION);
+        final Element actionNS = document.createElementNS(YangConstants.RFC6020_YANG_NAMESPACE_STRING, "action");
         final DataSchemaContextNode<?> rootSchemaContextNode = dataSchemaContextTree.getRoot();
         final Element actionData = prepareActionData(rootSchemaContextNode, actionNS,
                 domDataTreeIdentifier.getRootIdentifier().getPathArguments().iterator(), document);

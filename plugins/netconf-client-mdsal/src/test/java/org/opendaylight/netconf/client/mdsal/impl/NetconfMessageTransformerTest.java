@@ -1158,7 +1158,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         assertTrue(messageId.getNodeValue().contains("m-"));
         Node childAction = baseRpc.getFirstChild();
 
-        checkNode(childAction, "action", "action", NetconfMessageTransformUtil.NETCONF_ACTION_NAMESPACE.toString());
+        checkNode(childAction, "action", "action", "urn:ietf:params:xml:ns:yang:1");
         return childAction;
     }
 
