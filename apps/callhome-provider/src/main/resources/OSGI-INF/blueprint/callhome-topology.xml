@@ -41,11 +41,9 @@
                interface="org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor"/>
 
     <bean id="callhomeProvider" class="org.opendaylight.netconf.callhome.mount.IetfZeroTouchCallHomeServerProvider"
-          init-method="init"
           destroy-method="close" >
         <argument ref="dataBroker" />
         <argument ref="callhomeDispatcher" />
-        <property name="port" value="4334" />
     </bean>
 
     <bean id="callhomeDispatcher" class="org.opendaylight.netconf.callhome.mount.CallHomeMountDispatcher">
