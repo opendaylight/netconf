@@ -15,17 +15,26 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListen
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServer;
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServerBuilder;
 import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(service = { })
 public class NetconfCallHomeTlsService implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfCallHomeTlsService.class);
 
     private final NetconfCallHomeTlsServer server;
 
-    public NetconfCallHomeTlsService(final DataBroker dataBroker, final TlsAllowedDevicesMonitor allowedDevicesMonitor,
-            final CallHomeNetconfSubsystemListener subsystemListener, final EventLoopGroup bossGroup,
-            final EventLoopGroup workerGroup) {
+    @Activate
+    public NetconfCallHomeTlsService(@Reference final DataBroker dataBroker,
+            @Reference final TlsAllowedDevicesMonitor allowedDevicesMonitor,
+            @Reference final CallHomeNetconfSubsystemListener subsystemListener,
+            @Reference(target = "(type=global-boss-group)") final EventLoopGroup bossGroup,
+            @Reference(target = "(type=global-worker-group)") final EventLoopGroup workerGroup) {
+        // FIXME: tie together with OSGi Config Admin
         this(dataBroker, allowedDevicesMonitor, subsystemListener, bossGroup, workerGroup, defaultTlsConfiguration());
     }
 
@@ -51,7 +60,6 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
         LOG.info("Initializing Call Home TLS server instance completed successfuly");
     }
 
-    // FIXME: convert to OSGi/MD-SAL configuration
     private static Configuration defaultTlsConfiguration() {
         final var conf = new Configuration();
         conf.setHost("0.0.0.0");
@@ -61,6 +69,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
         return conf;
     }
 
+    @Deactivate
     @Override
     public void close() {
         server.stop();

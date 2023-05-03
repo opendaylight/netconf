@@ -9,7 +9,6 @@ package org.opendaylight.netconf.callhome.mount;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -49,11 +48,16 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(service = { })
 public final class IetfZeroTouchCallHomeServerProvider
-    implements AutoCloseable, DataTreeChangeListener<AllowedDevices> {
+        implements AutoCloseable, DataTreeChangeListener<AllowedDevices> {
     private static final String APPNAME = "CallHomeServer";
     static final InstanceIdentifier<AllowedDevices> ALL_DEVICES = InstanceIdentifier.create(NetconfCallhomeServer.class)
             .child(AllowedDevices.class);
@@ -69,8 +73,10 @@ public final class IetfZeroTouchCallHomeServerProvider
     private NetconfCallHomeServer server;
     private ListenerRegistration<IetfZeroTouchCallHomeServerProvider> listenerReg = null;
 
-    public IetfZeroTouchCallHomeServerProvider(final DataBroker dataBroker,
-            final CallHomeMountDispatcher mountDispacher) {
+    @Activate
+    public IetfZeroTouchCallHomeServerProvider(@Reference final DataBroker dataBroker,
+            @Reference final CallHomeMountDispatcher mountDispacher) {
+        // FIXME: make this configurable
         this(dataBroker, mountDispacher, Uint16.valueOf(4334));
     }
 
@@ -115,14 +121,7 @@ public final class IetfZeroTouchCallHomeServerProvider
         LOG.info("Initialization complete for Call Home server instance");
     }
 
-    @VisibleForTesting
-    void assertValid(final Object obj, final String description) {
-        if (obj == null) {
-            throw new IllegalStateException(
-                "Failed to find " + description + " in IetfZeroTouchCallHomeProvider.initialize()");
-        }
-    }
-
+    @Deactivate
     @Override
     public void close() {
         authProvider.close();
