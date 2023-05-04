@@ -17,19 +17,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.rest.doc.AbstractApiDocTest;
+import org.opendaylight.netconf.sal.rest.doc.AbstractOpenApiTest;
 import org.opendaylight.netconf.sal.rest.doc.DocGenTestHelper;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.yangtools.yang.common.Revision;
 
-public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
+public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
     private static final String NAME = "toaster2";
     private static final String REVISION_DATE = "2009-11-20";
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
     private static final String CHOICE_TEST_MODULE = "choice-test";
     private static final String PROPERTIES = "properties";
-    private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
+    private final OpenApiGeneratorRFC8040 generator = new OpenApiGeneratorRFC8040(SCHEMA_SERVICE);
 
     /**
      * Test that paths are generated according to the model.
@@ -37,7 +37,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     @Test
     public void testPaths() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
-        final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
         assertEquals(List.of("/rests/data",
             "/rests/data/toaster2:toaster",
@@ -66,7 +66,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 "/rests/data/toaster2:lst/lst1={key1},{key2}");
 
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
-        final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
         for (final String path : configPaths) {
             final JsonNode node = doc.getPaths().get(path);
@@ -84,7 +84,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     @Test
     public void testSchemas() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
-        final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
         final ObjectNode schemas = doc.getComponents().getSchemas();
         assertNotNull(schemas);
@@ -139,7 +139,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     @Test
     public void testRPC() {
         final var module = CONTEXT.findModule(NAME_2, Revision.of(REVISION_DATE_2)).orElseThrow();
-        final OpenApiObject doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
         assertNotNull(doc);
 
         final ObjectNode schemas = doc.getComponents().getSchemas();
@@ -156,7 +156,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     @Test
     public void testChoice() {
         final var module = CONTEXT.findModule(CHOICE_TEST_MODULE).orElseThrow();
-        final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
         assertNotNull(doc);
 
         final var schemas = doc.getComponents().getSchemas();

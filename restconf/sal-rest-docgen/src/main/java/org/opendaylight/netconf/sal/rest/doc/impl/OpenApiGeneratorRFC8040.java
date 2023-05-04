@@ -16,12 +16,12 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
  *
  * @author Thomas Pantelis
  */
-public class ApiDocGeneratorRFC8040 extends BaseYangOpenApiGeneratorRFC8040 {
-    public ApiDocGeneratorRFC8040(final DOMSchemaService schemaService) {
+public class OpenApiGeneratorRFC8040 extends BaseYangOpenApiGeneratorRFC8040 {
+    public OpenApiGeneratorRFC8040(final DOMSchemaService schemaService) {
         super(Optional.of(schemaService));
     }
 
-    public ApiDocGeneratorRFC8040(final DOMSchemaService schemaService, final String basePath) {
+    public OpenApiGeneratorRFC8040(final DOMSchemaService schemaService, final String basePath) {
         super(Optional.of(schemaService), basePath);
     }
 }
