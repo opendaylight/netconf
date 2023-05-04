@@ -21,19 +21,19 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.protocol.Specification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.protocol.specification.TlsCase;
 
 public final class SslHandlerFactoryImpl implements SslHandlerFactory {
-    private final NetconfKeystoreAdapter keystoreAdapter;
+    private final KeyStoreProvider keystoreAdapter;
     private final @Nullable Specification specification;
 
-    public SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter) {
+    public SslHandlerFactoryImpl(final KeyStoreProvider keystoreAdapter) {
         this(keystoreAdapter, null);
     }
 
-    public SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter, final Specification specification) {
+    public SslHandlerFactoryImpl(final KeyStoreProvider keystoreAdapter, final Specification specification) {
         this.keystoreAdapter = requireNonNull(keystoreAdapter);
         this.specification = specification;
     }

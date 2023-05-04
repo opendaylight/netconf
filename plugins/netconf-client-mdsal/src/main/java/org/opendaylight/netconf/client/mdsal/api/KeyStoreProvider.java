@@ -11,14 +11,9 @@ package org.opendaylight.netconf.client.mdsal.api;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.util.Optional;
 import java.util.Set;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
 
-public interface NetconfKeystoreAdapter {
-
-    Optional<KeyCredential> getKeypairFromId(String keyId);
-
+public interface KeyStoreProvider {
     /**
      * Using private keys and trusted certificates to create a new JDK <code>KeyStore</code> which
      * will be used by TLS clients to create <code>SSLEngine</code>. The private keys are essential

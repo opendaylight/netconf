@@ -14,7 +14,7 @@ import java.security.KeyPair;
 import java.util.Optional;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.aaa.encrypt.PKIUtil;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyCredentialProvider;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
@@ -27,18 +27,18 @@ public final class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
 
     private final String username;
     private final String pairId;
-    private final NetconfKeystoreAdapter keystoreAdapter;
+    private final KeyCredentialProvider credentialProvider;
     private final AAAEncryptionService encryptionService;
 
     // FIXME: do not use Optional here and deal with atomic set
     private Optional<KeyPair> keyPair = Optional.empty();
 
     public DatastoreBackedPublicKeyAuth(final String username, final String pairId,
-                                        final NetconfKeystoreAdapter keystoreAdapter,
+                                        final KeyCredentialProvider credentialProvider,
                                         final AAAEncryptionService encryptionService) {
         this.username = username;
         this.pairId = pairId;
-        this.keystoreAdapter = keystoreAdapter;
+        this.credentialProvider = credentialProvider;
         this.encryptionService = encryptionService;
 
         // try to immediately retrieve the pair from the adapter
@@ -62,7 +62,7 @@ public final class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
 
     private boolean tryToSetKeyPair() {
         LOG.debug("Trying to retrieve keypair for: {}", pairId);
-        final Optional<KeyCredential> keypairOptional = keystoreAdapter.getKeypairFromId(pairId);
+        final Optional<KeyCredential> keypairOptional = credentialProvider.getKeypairFromId(pairId);
 
         if (keypairOptional.isPresent()) {
             final KeyCredential dsKeypair = keypairOptional.orElseThrow();

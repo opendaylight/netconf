@@ -41,7 +41,8 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyCredentialProvider;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
@@ -56,9 +57,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-@Component(service = NetconfKeystoreAdapter.class)
-public final class DefaultNetconfKeystoreAdapter
-        implements NetconfKeystoreAdapter, ClusteredDataTreeChangeListener<Keystore>, AutoCloseable {
+@Component(service = { KeyCredentialProvider.class, KeyStoreProvider.class })
+public final class NetconfKeystoreAdapter
+        implements KeyCredentialProvider, KeyStoreProvider, ClusteredDataTreeChangeListener<Keystore>, AutoCloseable {
     /**
      * Internal state, updated atomically.
      */
@@ -132,13 +133,13 @@ public final class DefaultNetconfKeystoreAdapter
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultNetconfKeystoreAdapter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfKeystoreAdapter.class);
     private static final char[] EMPTY_CHARS = { };
     private static final VarHandle STATE_VH;
 
     static {
         try {
-            STATE_VH = MethodHandles.lookup().findVarHandle(DefaultNetconfKeystoreAdapter.class, "state", State.class);
+            STATE_VH = MethodHandles.lookup().findVarHandle(NetconfKeystoreAdapter.class, "state", State.class);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -151,7 +152,7 @@ public final class DefaultNetconfKeystoreAdapter
 
     @Inject
     @Activate
-    public DefaultNetconfKeystoreAdapter(@Reference final DataBroker dataBroker) {
+    public NetconfKeystoreAdapter(@Reference final DataBroker dataBroker) {
         reg = dataBroker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
             this);
