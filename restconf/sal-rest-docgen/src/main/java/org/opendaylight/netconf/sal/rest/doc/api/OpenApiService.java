@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  */
 @Path("/")
-public interface ApiDocService {
+public interface OpenApiService {
 
     @GET
     @Path("/single")
