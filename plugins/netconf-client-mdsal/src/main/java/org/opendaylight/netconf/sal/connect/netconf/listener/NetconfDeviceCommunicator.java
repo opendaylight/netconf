@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
 import com.google.common.base.Strings;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
@@ -38,7 +39,6 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
-import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -380,7 +380,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             if (semaphore != null && !semaphore.tryAcquire()) {
                 LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
                     + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.name());
-                return FluentFutures.immediateFailedFluentFuture(new NetconfDocumentedException(
+                return Futures.immediateFailedFuture(new NetconfDocumentedException(
                         "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
                         + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
             }
@@ -400,7 +400,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         if (currentSession == null) {
             LOG.warn("{}: Session is disconnected, failing RPC request {}",
                     id, message);
-            return FluentFutures.immediateFluentFuture(createSessionDownRpcResult());
+            return Futures.immediateFuture(createSessionDownRpcResult());
         }
 
         final Request req = new Request(new UncancellableFuture<>(true), message);
