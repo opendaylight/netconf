@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -24,7 +25,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -280,7 +280,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         final Request request = pollRequest();
         if (request != null) {
             request.future.set(RpcResultBuilder.<NetconfMessage>failed()
-                .withRpcError(toRpcError(new NetconfDocumentedException(failure.getMessage(),
+                .withRpcError(toRpcError(new DocumentedException(failure.getMessage(),
                     ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR)))
                 .build());
         } else {
@@ -324,15 +324,21 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.trace("{}: Matched request: {} to response: {}", id, msgToS(request.request), msgToS(message));
         }
 
-        try {
-            NetconfMessageTransformUtil.checkValidReply(request.request, message);
-        } catch (final NetconfDocumentedException e) {
+        final String inputMsgId = request.request.getDocument().getDocumentElement()
+            .getAttribute(NetconfMessageTransformUtil.MESSAGE_ID_ATTR);
+        final String outputMsgId = message.getDocument().getDocumentElement()
+            .getAttribute(NetconfMessageTransformUtil.MESSAGE_ID_ATTR);
+        if (!inputMsgId.equals(outputMsgId)) {
+            // FIXME: we should be able to transform directly to RpcError without an intermediate exception
+            final var ex = new DocumentedException("Response message contained unknown \"message-id\"", null,
+                ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, ErrorSeverity.ERROR,
+                ImmutableMap.of("actual-message-id", outputMsgId, "expected-message-id", inputMsgId));
             LOG.warn("{}: Invalid request-reply match, reply message contains different message-id, "
-                + "request: {}, response: {}", id, msgToS(request.request), msgToS(message), e);
+                + "request: {}, response: {}", id, msgToS(request.request), msgToS(message));
 
-            request.future.set(RpcResultBuilder.<NetconfMessage>failed().withRpcError(toRpcError(e)).build());
+            request.future.set(RpcResultBuilder.<NetconfMessage>failed().withRpcError(toRpcError(ex)).build());
 
-            //recursively processing message to eventually find matching request
+            // recursively processing message to eventually find matching request
             processMessage(message);
             return;
         }
@@ -381,7 +387,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             if (semaphore != null && !semaphore.tryAcquire()) {
                 LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
                     + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.name());
-                return Futures.immediateFailedFuture(new NetconfDocumentedException(
+                return Futures.immediateFailedFuture(new DocumentedException(
                         "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
                         + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
             }
