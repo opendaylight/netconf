@@ -35,6 +35,7 @@ import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
@@ -79,7 +80,6 @@ public final class NetconfMessageTransformUtil {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
 
     public static final String MESSAGE_ID_PREFIX = "m";
-    public static final String MESSAGE_ID_ATTR = "message-id";
 
     public static final @NonNull QName CREATE_SUBSCRIPTION_RPC_QNAME =
             QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
@@ -407,7 +407,7 @@ public final class NetconfMessageTransformUtil {
         final Element rpcNS =
                 document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
         // set msg id
-        rpcNS.setAttribute(MESSAGE_ID_ATTR, counter.getNewMessageId(MESSAGE_ID_PREFIX));
+        rpcNS.setAttribute(XmlNetconfConstants.MESSAGE_ID, counter.getNewMessageId(MESSAGE_ID_PREFIX));
         final Element elementNS = document.createElementNS(rpcQName.getNamespace().toString(), rpcQName.getLocalName());
         rpcNS.appendChild(elementNS);
         document.appendChild(rpcNS);
@@ -420,7 +420,7 @@ public final class NetconfMessageTransformUtil {
         final Element rpcNS =
                 document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
         // set msg id
-        rpcNS.setAttribute(MESSAGE_ID_ATTR, counter.getNewMessageId(MESSAGE_ID_PREFIX));
+        rpcNS.setAttribute(XmlNetconfConstants.MESSAGE_ID, counter.getNewMessageId(MESSAGE_ID_PREFIX));
 
         final Element actionNS = document.createElementNS(YangConstants.RFC6020_YANG_NAMESPACE_STRING, "action");
         final DataSchemaContextNode<?> rootSchemaContextNode = dataSchemaContextTree.getRoot();
