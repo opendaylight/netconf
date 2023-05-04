@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
@@ -33,7 +32,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -46,7 +44,6 @@ import org.opendaylight.netconf.sal.rest.doc.openapi.Components;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Info;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.openapi.SecuritySchemes;
-import org.opendaylight.netconf.sal.rest.doc.openapi.Server;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -310,15 +307,10 @@ public abstract class BaseYangOpenApiGenerator {
         info.setTitle(title);
         info.setVersion(API_VERSION);
         doc.setInfo(info);
-        doc.setServers(convertToServers(ImmutableList.of(schema), host, basePath));
         doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
                 new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         doc.setSecurity(SECURITY);
         return doc;
-    }
-
-    private static List<Server> convertToServers(final List<String> schemes, final String host, final String basePath) {
-        return ImmutableList.of(new Server(schemes.get(0) + "://" + host + basePath));
     }
 
     public abstract String getResourcePath(String resourceType, String context);
