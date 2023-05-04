@@ -40,9 +40,11 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.Empty;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
@@ -275,7 +277,10 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     public void onError(final NetconfClientSession session, final Exception failure) {
         final Request request = pollRequest();
         if (request != null) {
-            request.future.set(NetconfMessageTransformUtil.toRpcResult(failure));
+            request.future.set(RpcResultBuilder.<NetconfMessage>failed()
+                .withRpcError(toRpcError(new NetconfDocumentedException(failure.getMessage(),
+                    ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR)))
+                .build());
         } else {
             LOG.warn("{}: Ignoring unsolicited failure {}", id, failure.toString());
         }
@@ -323,9 +328,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.warn("{}: Invalid request-reply match, reply message contains different message-id, "
                 + "request: {}, response: {}", id, msgToS(request.request), msgToS(message), e);
 
-            request.future.set(RpcResultBuilder.<NetconfMessage>failed()
-                .withRpcError(NetconfMessageTransformUtil.toRpcError(e))
-                .build());
+            request.future.set(RpcResultBuilder.<NetconfMessage>failed().withRpcError(toRpcError(e)).build());
 
             //recursively processing message to eventually find matching request
             processMessage(message);
@@ -338,9 +341,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.warn("{}: Error reply from remote device, request: {}, response: {}",
                 id, msgToS(request.request), msgToS(message), e);
 
-            request.future.set(RpcResultBuilder.<NetconfMessage>failed()
-                .withRpcError(NetconfMessageTransformUtil.toRpcError(e))
-                .build());
+            request.future.set(RpcResultBuilder.<NetconfMessage>failed().withRpcError(toRpcError(e)).build());
             return;
         }
 
@@ -349,6 +350,27 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     private static String msgToS(final NetconfMessage msg) {
         return XmlUtil.toString(msg.getDocument());
+    }
+
+    private static RpcError toRpcError(final NetconfDocumentedException ex) {
+        final var errorInfo = ex.getErrorInfo();
+        final String infoString;
+        if (errorInfo != null) {
+            final var sb = new StringBuilder();
+            for (var e : errorInfo.entrySet()) {
+                final var tag = e.getKey();
+                sb.append('<').append(tag).append('>').append(e.getValue()).append("</").append(tag).append('>');
+            }
+            infoString = sb.toString();
+        } else {
+            infoString = "";
+        }
+
+        return ex.getErrorSeverity() == ErrorSeverity.ERROR
+            ? RpcResultBuilder.newError(ex.getErrorType(), ex.getErrorTag(), ex.getLocalizedMessage(), null,
+                infoString, ex.getCause())
+            : RpcResultBuilder.newWarning(ex.getErrorType(), ex.getErrorTag(), ex.getLocalizedMessage(), null,
+                infoString, ex.getCause());
     }
 
     @Override

@@ -51,9 +51,6 @@ import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.common.RpcResult;
-import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -284,24 +281,6 @@ public final class NetconfMessageTransformUtil {
         if (NetconfMessageUtil.isErrorMessage(output)) {
             throw NetconfDocumentedException.fromXMLDocument(output.getDocument());
         }
-    }
-
-    public static RpcError toRpcError(final NetconfDocumentedException ex) {
-        final StringBuilder infoBuilder = new StringBuilder();
-        final Map<String, String> errorInfo = ex.getErrorInfo();
-        if (errorInfo != null) {
-            for (final Entry<String, String> e : errorInfo.entrySet()) {
-                infoBuilder.append('<').append(e.getKey()).append('>').append(e.getValue())
-                        .append("</").append(e.getKey()).append('>');
-
-            }
-        }
-
-        return ex.getErrorSeverity() == ErrorSeverity.ERROR
-                ? RpcResultBuilder.newError(ex.getErrorType(), ex.getErrorTag(),
-                        ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause())
-                : RpcResultBuilder.newWarning(ex.getErrorType(), ex.getErrorTag(),
-                        ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause());
     }
 
     public static NodeIdentifier toId(final PathArgument arg) {
@@ -538,12 +517,5 @@ public final class NetconfMessageTransformUtil {
                 LOG.warn("Unable to close resource properly", e);
             }
         }
-    }
-
-    public static RpcResult<NetconfMessage> toRpcResult(final Exception failure) {
-        return RpcResultBuilder.<NetconfMessage>failed()
-                .withRpcError(toRpcError(new NetconfDocumentedException(failure.getMessage(),
-                    ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR)))
-                .build();
     }
 }
