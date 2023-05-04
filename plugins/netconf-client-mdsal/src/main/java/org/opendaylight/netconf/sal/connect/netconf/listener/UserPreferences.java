@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 
 /**
  * DTO with user capabilities to override or merge with device specific capabilities.
