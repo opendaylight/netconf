@@ -10,7 +10,7 @@ package org.opendaylight.netconf.test.tool.client.stress;
 import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
+import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 
 abstract class AbstractExecutionStrategy implements ExecutionStrategy {
     private final Parameters params;

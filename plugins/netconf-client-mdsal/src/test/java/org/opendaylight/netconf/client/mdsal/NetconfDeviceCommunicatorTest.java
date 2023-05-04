@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.listener;
+package org.opendaylight.netconf.client.mdsal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -85,7 +85,6 @@ import org.w3c.dom.Element;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceCommunicatorTest {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicatorTest.class);
     private static final SessionIdType SESSION_ID = new SessionIdType(Uint32.ONE);
 
