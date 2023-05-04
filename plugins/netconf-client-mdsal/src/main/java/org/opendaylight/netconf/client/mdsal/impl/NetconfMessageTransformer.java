@@ -62,7 +62,6 @@ import org.opendaylight.netconf.client.mdsal.api.ActionTransformer;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;

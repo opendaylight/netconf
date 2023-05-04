@@ -17,12 +17,12 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.impl.BaseRpcSchemalessTransformer;
+import org.opendaylight.netconf.client.mdsal.impl.MessageCounter;
 import org.opendaylight.netconf.client.mdsal.impl.SchemalessMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
-import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 
 public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final BaseNetconfSchemas baseSchemas;
