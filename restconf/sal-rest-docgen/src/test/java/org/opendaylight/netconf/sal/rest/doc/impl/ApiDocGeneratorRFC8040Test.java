@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.junit.Test;
+import org.opendaylight.netconf.sal.rest.doc.AbstractApiDocTest;
+import org.opendaylight.netconf.sal.rest.doc.DocGenTestHelper;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.yangtools.yang.common.Revision;
 
