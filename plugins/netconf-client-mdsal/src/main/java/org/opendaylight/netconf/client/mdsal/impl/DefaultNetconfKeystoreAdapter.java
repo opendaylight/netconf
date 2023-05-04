@@ -25,11 +25,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -100,6 +98,40 @@ public final class DefaultNetconfKeystoreAdapter
         }
     }
 
+    private static final class SecurityHelper {
+        private CertificateFactory certFactory;
+        private KeyFactory dsaFactory;
+        private KeyFactory rsaFactory;
+
+        java.security.PrivateKey getJavaPrivateKey(final String base64PrivateKey) throws GeneralSecurityException {
+            final var keySpec = new PKCS8EncodedKeySpec(base64Decode(base64PrivateKey));
+
+            if (rsaFactory == null) {
+                rsaFactory = KeyFactory.getInstance("RSA");
+            }
+            try {
+                return rsaFactory.generatePrivate(keySpec);
+            } catch (InvalidKeySpecException ignore) {
+                // Ignored
+            }
+
+            if (dsaFactory == null) {
+                dsaFactory = KeyFactory.getInstance("DSA");
+            }
+            return dsaFactory.generatePrivate(keySpec);
+        }
+
+        private X509Certificate getCertificate(final String base64Certificate) throws GeneralSecurityException {
+            // TODO: https://stackoverflow.com/questions/43809909/is-certificatefactory-getinstancex-509-thread-safe
+            //        indicates this is thread-safe in most cases, but can we get a better assurance?
+            if (certFactory == null) {
+                certFactory = CertificateFactory.getInstance("X.509");
+            }
+            return (X509Certificate) certFactory.generateCertificate(
+                new ByteArrayInputStream(base64Decode(base64Certificate)));
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(DefaultNetconfKeystoreAdapter.class);
     private static final char[] EMPTY_CHARS = { };
     private static final VarHandle STATE_VH;
@@ -148,6 +180,8 @@ public final class DefaultNetconfKeystoreAdapter
         final var keyStore = KeyStore.getInstance("JKS");
         keyStore.load(null, null);
 
+        final var helper = new SecurityHelper();
+
         // Private keys first
         for (var entry : current.privateKeys.entrySet()) {
             final var alias = entry.getKey();
@@ -156,22 +190,23 @@ public final class DefaultNetconfKeystoreAdapter
             }
 
             final var privateKey = entry.getValue();
-            final var key = getJavaPrivateKey(privateKey.getData());
-            // TODO: do not do toArray()?
-            // TODO: require() here and filter in update path
-            final var certificateChain = getCertificateChain(privateKey.getCertificateChain().toArray(new String[0]));
-            // TODO: filter these and do not throw?
-            if (certificateChain.isEmpty()) {
-                throw new CertificateException("No certificate chain associated with private key found");
+            final var key = helper.getJavaPrivateKey(privateKey.getData());
+            // TODO: requireCertificateChain() here and filter in update path
+            final var certChain = privateKey.getCertificateChain();
+            if (certChain == null || certChain.isEmpty()) {
+                throw new CertificateException("No certificate chain associated with private key " + alias + " found");
             }
 
-            keyStore.setKeyEntry(alias, key, EMPTY_CHARS, certificateChain.toArray(Certificate[]::new));
+            final var chain = new Certificate[certChain.size()];
+            int idx = 0;
+            for (var cert : certChain) {
+                chain[idx++] = helper.getCertificate(cert);
+            }
+            keyStore.setKeyEntry(alias, key, EMPTY_CHARS, chain);
         }
 
         for (var entry : current.trustedCertificates.entrySet()) {
-            // TODO: ahem: single entry and single get
-            final var x509Certificates = getCertificateChain(new String[] { entry.getValue().getCertificate() });
-            keyStore.setCertificateEntry(entry.getKey(), x509Certificates.get(0));
+            keyStore.setCertificateEntry(entry.getKey(), helper.getCertificate(entry.getValue().getCertificate()));
         }
 
         return keyStore;
@@ -179,38 +214,6 @@ public final class DefaultNetconfKeystoreAdapter
 
     private @NonNull State currentState() {
         return verifyNotNull((@NonNull State) STATE_VH.getAcquire(this));
-    }
-
-    private static java.security.PrivateKey getJavaPrivateKey(final String base64PrivateKey)
-            throws GeneralSecurityException {
-        final var keySpec = new PKCS8EncodedKeySpec(base64Decode(base64PrivateKey));
-        java.security.PrivateKey key;
-
-        try {
-            // FIXME: cache instances, or something smarter?
-            final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            key = keyFactory.generatePrivate(keySpec);
-        } catch (InvalidKeySpecException ignore) {
-            final KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-            key = keyFactory.generatePrivate(keySpec);
-        }
-
-        return key;
-    }
-
-    private static List<X509Certificate> getCertificateChain(final String[] base64Certificates)
-            throws GeneralSecurityException {
-        // TODO: https://stackoverflow.com/questions/43809909/is-certificatefactory-getinstancex-509-thread-safe
-        //        indicates this is thread-safe in most cases, but can we get a better assurance?
-        final var factory = CertificateFactory.getInstance("X.509");
-        final var certificates = new ArrayList<X509Certificate>();
-
-        for (var cert : base64Certificates) {
-            final byte[] buffer = base64Decode(cert);
-            certificates.add((X509Certificate)factory.generateCertificate(new ByteArrayInputStream(buffer)));
-        }
-
-        return certificates;
     }
 
     private static byte[] base64Decode(final String base64) {
