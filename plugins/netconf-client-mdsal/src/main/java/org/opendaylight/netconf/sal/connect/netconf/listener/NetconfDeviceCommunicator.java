@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
@@ -31,6 +32,7 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.NetconfMessageUtil;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -335,13 +337,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             return;
         }
 
-        try {
-            NetconfMessageTransformUtil.checkSuccessReply(message);
-        } catch (final NetconfDocumentedException e) {
+        if (NetconfMessageUtil.isErrorMessage(message)) {
+            // FIXME: we should be able to transform directly to RpcError without an intermediate exception
+            final var ex = DocumentedException.fromXMLDocument(message.getDocument());
             LOG.warn("{}: Error reply from remote device, request: {}, response: {}",
-                id, msgToS(request.request), msgToS(message), e);
-
-            request.future.set(RpcResultBuilder.<NetconfMessage>failed().withRpcError(toRpcError(e)).build());
+                id, msgToS(request.request), msgToS(message), ex);
+            request.future.set(RpcResultBuilder.<NetconfMessage>failed().withRpcError(toRpcError(ex)).build());
             return;
         }
 
@@ -352,7 +353,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         return XmlUtil.toString(msg.getDocument());
     }
 
-    private static RpcError toRpcError(final NetconfDocumentedException ex) {
+    private static RpcError toRpcError(final DocumentedException ex) {
         final var errorInfo = ex.getErrorInfo();
         final String infoString;
         if (errorInfo != null) {

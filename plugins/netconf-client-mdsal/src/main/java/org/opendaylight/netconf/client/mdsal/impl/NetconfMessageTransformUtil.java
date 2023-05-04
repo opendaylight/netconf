@@ -38,7 +38,6 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.client.NetconfMessageUtil;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
@@ -274,12 +273,6 @@ public final class NetconfMessageTransformUtil {
             throw new NetconfDocumentedException("Response message contained unknown \"message-id\"", null,
                     ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, ErrorSeverity.ERROR,
                     ImmutableMap.of("actual-message-id", outputMsgId, "expected-message-id", inputMsgId));
-        }
-    }
-
-    public static void checkSuccessReply(final NetconfMessage output) throws NetconfDocumentedException {
-        if (NetconfMessageUtil.isErrorMessage(output)) {
-            throw NetconfDocumentedException.fromXMLDocument(output.getDocument());
         }
     }
 
