@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2014 Brocade Communications Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2023 PANTHEON.tech s.r.o. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.rest.doc.impl;
+package org.opendaylight.netconf.sal.rest.doc.helper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -19,13 +19,13 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
 
-final class DocGenTestHelper {
+public final class DocGenTestHelper {
 
     private DocGenTestHelper() {
         // hidden on purpose
     }
 
-    static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
+    public static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
         final URI uri = new URI(urlPrefix);
         final UriBuilder mockBuilder = mock(UriBuilder.class);
 
