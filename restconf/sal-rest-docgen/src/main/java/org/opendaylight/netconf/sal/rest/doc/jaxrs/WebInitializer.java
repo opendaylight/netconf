@@ -17,7 +17,7 @@ import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
-import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
+import org.opendaylight.netconf.sal.rest.doc.api.OpenApiService;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -37,14 +37,14 @@ public final class WebInitializer implements AutoCloseable {
     @Inject
     @Activate
     public WebInitializer(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
-            @Reference final ServletSupport servletSupport, @Reference final ApiDocService apiDocService)
+            @Reference final ServletSupport servletSupport, @Reference final OpenApiService openApiService)
                 throws ServletException {
         final var webContextBuilder = WebContext.builder()
             .name("OpenAPI")
             .contextPath("/apidoc")
             .supportsSessions(true)
             .addServlet(ServletDetails.builder()
-                .servlet(servletSupport.createHttpServletBuilder(new ApiDocApplication(apiDocService)).build())
+                .servlet(servletSupport.createHttpServletBuilder(new OpenApiApplication(openApiService)).build())
                 .addUrlPattern("/openapi3/apis/*")
                 .build())
             .addResource(ResourceDetails.builder().name("/explorer").build());
