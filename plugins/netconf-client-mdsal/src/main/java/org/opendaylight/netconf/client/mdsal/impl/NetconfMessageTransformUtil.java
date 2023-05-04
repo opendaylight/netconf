@@ -12,7 +12,6 @@ import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_Q
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -33,7 +32,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.EffectiveOperation;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -46,9 +44,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata.Builder;
-import org.opendaylight.yangtools.yang.common.ErrorSeverity;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -262,18 +257,6 @@ public final class NetconfMessageTransformUtil {
                 .withNodeIdentifier(NETCONF_FILTER_NODEID)
                 .withValue(new DOMSource(element))
                 .build();
-    }
-
-    public static void checkValidReply(final NetconfMessage input, final NetconfMessage output)
-            throws NetconfDocumentedException {
-        final String inputMsgId = input.getDocument().getDocumentElement().getAttribute(MESSAGE_ID_ATTR);
-        final String outputMsgId = output.getDocument().getDocumentElement().getAttribute(MESSAGE_ID_ATTR);
-
-        if (!inputMsgId.equals(outputMsgId)) {
-            throw new NetconfDocumentedException("Response message contained unknown \"message-id\"", null,
-                    ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, ErrorSeverity.ERROR,
-                    ImmutableMap.of("actual-message-id", outputMsgId, "expected-message-id", inputMsgId));
-        }
     }
 
     public static NodeIdentifier toId(final PathArgument arg) {
