@@ -87,7 +87,6 @@ public final class NetconfMessageTransformUtil {
 
     // Blank document used for creation of new DOM nodes
     private static final Document BLANK_DOCUMENT = XmlUtil.newDocument();
-    public static final String EVENT_TIME = "eventTime";
 
     private NetconfMessageTransformUtil() {
 
@@ -115,11 +114,12 @@ public final class NetconfMessageTransformUtil {
 
     public static final @NonNull NodeIdentifier NETCONF_DATA_NODEID = NodeIdentifier.create(NETCONF_DATA_QNAME);
 
-    public static final @NonNull QName NETCONF_RPC_REPLY_QNAME = QName.create(NETCONF_QNAME, "rpc-reply").intern();
+    public static final @NonNull QName NETCONF_RPC_REPLY_QNAME =
+        QName.create(NETCONF_QNAME, XmlNetconfConstants.RPC_REPLY_KEY).intern();
     public static final @NonNull NodeIdentifier NETCONF_RPC_REPLY_NODEID =
         NodeIdentifier.create(NETCONF_RPC_REPLY_QNAME);
 
-    public static final @NonNull QName NETCONF_OK_QNAME = QName.create(NETCONF_QNAME, "ok").intern();
+    public static final @NonNull QName NETCONF_OK_QNAME = QName.create(NETCONF_QNAME, XmlNetconfConstants.OK).intern();
     public static final @NonNull QName NETCONF_ERROR_OPTION_QNAME =
         QName.create(NETCONF_QNAME, "error-option").intern();
     public static final @NonNull NodeIdentifier NETCONF_ERROR_OPTION_NODEID =
@@ -157,7 +157,8 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull NodeIdentifier NETCONF_EDIT_CONFIG_NODEID =
         NodeIdentifier.create(NETCONF_EDIT_CONFIG_QNAME);
     public static final @NonNull Absolute NETCONF_EDIT_CONFIG_PATH = toPath(NETCONF_EDIT_CONFIG_QNAME);
-    public static final @NonNull QName NETCONF_GET_CONFIG_QNAME = QName.create(NETCONF_QNAME, "get-config");
+    public static final @NonNull QName NETCONF_GET_CONFIG_QNAME =
+        QName.create(NETCONF_QNAME, XmlNetconfConstants.GET_CONFIG).intern();
     public static final @NonNull NodeIdentifier NETCONF_GET_CONFIG_NODEID =
         NodeIdentifier.create(NETCONF_GET_CONFIG_QNAME);
     public static final @NonNull Absolute NETCONF_GET_CONFIG_PATH = toPath(NETCONF_GET_CONFIG_QNAME);
@@ -165,10 +166,12 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull Absolute NETCONF_DISCARD_CHANGES_PATH = toPath(NETCONF_DISCARD_CHANGES_QNAME);
     public static final @NonNull QName NETCONF_TYPE_QNAME = QName.create(NETCONF_QNAME, "type").intern();
     public static final @NonNull QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter").intern();
-    public static final @NonNull QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get").intern();
+    public static final @NonNull QName NETCONF_GET_QNAME =
+        QName.create(NETCONF_QNAME, XmlNetconfConstants.GET).intern();
     public static final @NonNull NodeIdentifier NETCONF_GET_NODEID = NodeIdentifier.create(NETCONF_GET_QNAME);
     public static final @NonNull Absolute NETCONF_GET_PATH = toPath(NETCONF_GET_QNAME);
-    public static final @NonNull QName NETCONF_RPC_QNAME = QName.create(NETCONF_QNAME, "rpc").intern();
+    public static final @NonNull QName NETCONF_RPC_QNAME =
+        QName.create(NETCONF_QNAME, XmlNetconfConstants.RPC_KEY).intern();
 
     public static final @NonNull QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
     public static final @NonNull NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);
@@ -378,14 +381,15 @@ public final class NetconfMessageTransformUtil {
         final XmlElement eventTimeElement;
         final XmlElement notificationElement;
 
-        if (childElements.get(0).getName().equals(EVENT_TIME)) {
+        if (childElements.get(0).getName().equals(XmlNetconfConstants.EVENT_TIME)) {
             eventTimeElement = childElements.get(0);
             notificationElement = childElements.get(1);
-        } else if (childElements.get(1).getName().equals(EVENT_TIME)) {
+        } else if (childElements.get(1).getName().equals(XmlNetconfConstants.EVENT_TIME)) {
             eventTimeElement = childElements.get(1);
             notificationElement = childElements.get(0);
         } else {
-            throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message);
+            throw new IllegalArgumentException(
+                "Notification payload does not contain " + XmlNetconfConstants.EVENT_TIME + " " + message);
         }
 
         try {
@@ -393,8 +397,8 @@ public final class NetconfMessageTransformUtil {
                     NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()),
                     notificationElement);
         } catch (final DocumentedException e) {
-            throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message,
-                    e);
+            throw new IllegalArgumentException(
+                "Notification payload does not contain " + XmlNetconfConstants.EVENT_TIME + " " + message, e);
         } catch (final DateTimeParseException e) {
             LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement,
                 NotificationMessage.UNKNOWN_EVENT_TIME, e);
