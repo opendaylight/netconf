@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
 import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
@@ -23,7 +24,7 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
-import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
+import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -44,8 +45,8 @@ public class NetconfTopologySetup {
     private final Duration idleTimeout;
     private final AAAEncryptionService encryptionService;
     private final BaseNetconfSchemas baseSchemas;
-    private final CredentialProvider credentialProvider;
-    private final KeyStoreProvider keyStoreProvider;
+    private final @NonNull CredentialProvider credentialProvider;
+    private final @NonNull SslHandlerFactoryProvider sslHandlerFactoryProvider;
 
     NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
@@ -65,7 +66,7 @@ public class NetconfTopologySetup {
         encryptionService = builder.getEncryptionService();
         baseSchemas = builder.getBaseSchemas();
         credentialProvider = builder.getCredentialProvider();
-        keyStoreProvider = builder.getKeyStoreProvider();
+        sslHandlerFactoryProvider = builder.getSslHandlerFactoryProvider();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -128,12 +129,12 @@ public class NetconfTopologySetup {
         return encryptionService;
     }
 
-    public CredentialProvider getCredentialProvider() {
-        return requireNonNull(credentialProvider);
+    public @NonNull CredentialProvider getCredentialProvider() {
+        return credentialProvider;
     }
 
-    public KeyStoreProvider getKeyStoreProvider() {
-        return requireNonNull(keyStoreProvider);
+    public @NonNull SslHandlerFactoryProvider getSslHandlerFactoryProvider() {
+        return sslHandlerFactoryProvider;
     }
 
     public BaseNetconfSchemas getBaseSchemas() {
@@ -158,7 +159,7 @@ public class NetconfTopologySetup {
         private AAAEncryptionService encryptionService;
         private BaseNetconfSchemas baseSchemas;
         private CredentialProvider credentialProvider;
-        private KeyStoreProvider keyStoreProvider;
+        private SslHandlerFactoryProvider sslHandlerFactoryProvider;
 
         public NetconfTopologySetupBuilder() {
 
@@ -315,7 +316,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        CredentialProvider getCredentialProvider() {
+        @NonNull CredentialProvider getCredentialProvider() {
             return requireNonNull(credentialProvider);
         }
 
@@ -324,12 +325,13 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        KeyStoreProvider getKeyStoreProvider() {
-            return requireNonNull(keyStoreProvider);
+        @NonNull SslHandlerFactoryProvider getSslHandlerFactoryProvider() {
+            return requireNonNull(sslHandlerFactoryProvider);
         }
 
-        public NetconfTopologySetupBuilder setKeyStoreProvider(final KeyStoreProvider keyStoreProvider) {
-            this.keyStoreProvider = keyStoreProvider;
+        public NetconfTopologySetupBuilder setSslHandlerFactoryProvider(
+                final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
+            this.sslHandlerFactoryProvider = sslHandlerFactoryProvider;
             return this;
         }
 

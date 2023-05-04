@@ -37,9 +37,9 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
@@ -92,7 +92,7 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
     @Mock
     private CredentialProvider credentialProvider;
     @Mock
-    private KeyStoreProvider keyStoreProvider;
+    private SslHandlerFactoryProvider sslHandlerFactoryProvider;
 
     private NetconfTopologySetup.NetconfTopologySetupBuilder builder;
     private RemoteDeviceId remoteDeviceId;
@@ -114,7 +114,7 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
                 .setNetconfClientDispatcher(clientDispatcher)
                 .setTopologyId(TOPOLOGY_ID)
                 .setCredentialProvider(credentialProvider)
-                .setKeyStoreProvider(keyStoreProvider);
+                .setSslHandlerFactoryProvider(sslHandlerFactoryProvider);
     }
 
     @Test

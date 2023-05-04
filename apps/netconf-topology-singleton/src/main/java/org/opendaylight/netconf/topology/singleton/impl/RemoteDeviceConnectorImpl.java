@@ -31,17 +31,16 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
 import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.TimedReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
-import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -74,7 +73,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     private final RemoteDeviceId remoteDeviceId;
     private final AAAEncryptionService encryptionService;
     private final CredentialProvider credentialProvider;
-    private final KeyStoreProvider keyStoreProvider;
+    private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
     private final DeviceActionFactory deviceActionFactory;
 
     // FIXME: this seems to be a builder-like transition between {start,stop}RemoteDeviceConnection. More documentation
@@ -88,7 +87,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
         credentialProvider = netconfTopologyDeviceSetup.getCredentialProvider();
-        keyStoreProvider = netconfTopologyDeviceSetup.getKeyStoreProvider();
+        sslHandlerFactoryProvider = netconfTopologyDeviceSetup.getSslHandlerFactoryProvider();
     }
 
     @Override
@@ -245,7 +244,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
         } else if (protocol.getName() == Name.TLS) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withSslHandlerFactory(new SslHandlerFactoryImpl(keyStoreProvider, protocol.getSpecification()))
+                    .withSslHandlerFactory(sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification()))
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
         } else {
             throw new IllegalStateException("Unsupported protocol type: " + protocol.getName());

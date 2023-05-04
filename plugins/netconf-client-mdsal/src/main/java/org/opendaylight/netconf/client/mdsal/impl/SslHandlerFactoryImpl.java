@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.util;
+package org.opendaylight.netconf.client.mdsal.impl;
 
 import static java.util.Objects.requireNonNull;
 
@@ -19,23 +19,15 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.protocol.Specification;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.protocol.specification.TlsCase;
 
-public final class SslHandlerFactoryImpl implements SslHandlerFactory {
-    private final KeyStoreProvider keyStoreProvider;
-    private final @Nullable Specification specification;
+final class SslHandlerFactoryImpl implements SslHandlerFactory {
+    private final DefaultSslHandlerFactoryProvider keyStoreProvider;
+    private final Set<String> excludedVersions;
 
-    public SslHandlerFactoryImpl(final KeyStoreProvider keyStoreProvider) {
-        this(keyStoreProvider, null);
-    }
-
-    public SslHandlerFactoryImpl(final KeyStoreProvider keyStoreProvider, final Specification specification) {
+    SslHandlerFactoryImpl(final DefaultSslHandlerFactoryProvider keyStoreProvider, final Set<String> excludedVersions) {
         this.keyStoreProvider = requireNonNull(keyStoreProvider);
-        this.specification = specification;
+        this.excludedVersions = requireNonNull(excludedVersions);
     }
 
     @Override
@@ -57,14 +49,12 @@ public final class SslHandlerFactoryImpl implements SslHandlerFactory {
 
             final String[] engineProtocols = engine.getSupportedProtocols();
             final String[] enabledProtocols;
-            if (specification instanceof TlsCase tlsSpecification) {
-                final Set<String> protocols = Sets.newHashSet(engineProtocols);
-                protocols.removeAll(tlsSpecification.getTls().getExcludedVersions());
+            if (!excludedVersions.isEmpty()) {
+                final var protocols = Sets.newHashSet(engineProtocols);
+                protocols.removeAll(excludedVersions);
                 enabledProtocols = protocols.toArray(new String[0]);
-            } else if (specification == null) {
-                enabledProtocols = engineProtocols;
             } else {
-                throw new IllegalArgumentException("Cannot get TLS specification from: " + specification);
+                enabledProtocols = engineProtocols;
             }
 
             engine.setEnabledProtocols(enabledProtocols);

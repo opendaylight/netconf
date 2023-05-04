@@ -37,7 +37,10 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
+import org.opendaylight.netconf.client.SslHandlerFactory;
+import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.protocol.Specification;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.protocol.specification.TlsCase;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
@@ -51,9 +54,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-@Component(service = KeyStoreProvider.class)
-public final class DefaultKeyStoreProvider
-        implements KeyStoreProvider, ClusteredDataTreeChangeListener<Keystore>, AutoCloseable {
+@Component(service = SslHandlerFactoryProvider.class)
+public final class DefaultSslHandlerFactoryProvider
+        implements SslHandlerFactoryProvider, ClusteredDataTreeChangeListener<Keystore>, AutoCloseable {
     /**
      * Internal state, updated atomically.
      */
@@ -122,16 +125,17 @@ public final class DefaultKeyStoreProvider
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultKeyStoreProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultSslHandlerFactoryProvider.class);
     private static final char[] EMPTY_CHARS = { };
 
+    private final @NonNull SslHandlerFactory nospecFactory = new SslHandlerFactoryImpl(this, Set.of());
     private final @NonNull Registration reg;
 
     private volatile @NonNull State state = new State(Map.of(), Map.of());
 
     @Inject
     @Activate
-    public DefaultKeyStoreProvider(@Reference final DataBroker dataBroker) {
+    public DefaultSslHandlerFactoryProvider(@Reference final DataBroker dataBroker) {
         reg = dataBroker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
             this);
@@ -145,7 +149,43 @@ public final class DefaultKeyStoreProvider
     }
 
     @Override
-    public KeyStore getJavaKeyStore(final Set<String> allowedKeys) throws GeneralSecurityException, IOException {
+    public SslHandlerFactory getSslHandlerFactory(final Specification specification) {
+        if (specification == null) {
+            return nospecFactory;
+        }
+        if (specification instanceof TlsCase tlsSpecification) {
+            final var excludedVersions = tlsSpecification.nonnullTls().getExcludedVersions();
+            return excludedVersions == null || excludedVersions.isEmpty() ? nospecFactory
+                : new SslHandlerFactoryImpl(this, excludedVersions);
+        }
+        throw new IllegalArgumentException("Cannot get TLS specification from: " + specification);
+    }
+
+    /**
+     * Using private keys and trusted certificates to create a new JDK <code>KeyStore</code> which
+     * will be used by TLS clients to create <code>SSLEngine</code>. The private keys are essential
+     * to create JDK <code>KeyStore</code> while the trusted certificates are optional.
+     *
+     * @return A JDK KeyStore object
+     * @throws GeneralSecurityException If any security exception occurred
+     * @throws IOException If there is an I/O problem with the keystore data
+     */
+    KeyStore getJavaKeyStore() throws GeneralSecurityException, IOException {
+        return getJavaKeyStore(Set.of());
+    }
+
+    /**
+     * Using private keys and trusted certificates to create a new JDK <code>KeyStore</code> which
+     * will be used by TLS clients to create <code>SSLEngine</code>. The private keys are essential
+     * to create JDK <code>KeyStore</code> while the trusted certificates are optional.
+     *
+     * @param allowedKeys Set of keys to include during KeyStore generation, empty set will create
+     *                   a KeyStore with all possible keys.
+     * @return A JDK KeyStore object
+     * @throws GeneralSecurityException If any security exception occurred
+     * @throws IOException If there is an I/O problem with the keystore data
+     */
+    KeyStore getJavaKeyStore(final Set<String> allowedKeys) throws GeneralSecurityException, IOException {
         requireNonNull(allowedKeys);
         final var current = state;
         if (current.privateKeys.isEmpty()) {

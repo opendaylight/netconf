@@ -59,12 +59,12 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
-import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -131,7 +131,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     @Mock
     private CredentialProvider credentialProvider;
     @Mock
-    private KeyStoreProvider keyStoreProvider;
+    private SslHandlerFactoryProvider sslHandlerFactoryProvider;
 
     private ActorSystem slaveSystem;
     private ActorSystem masterSystem;
@@ -172,7 +172,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                     masterSchemaRepository, masterSchemaRepository, mockSchemaContextFactory, mockSchemasResolver))
                 .setBaseSchemas(BASE_SCHEMAS)
                 .setCredentialProvider(credentialProvider)
-                .setKeyStoreProvider(keyStoreProvider)
+                .setSslHandlerFactoryProvider(sslHandlerFactoryProvider)
                 .build();
 
         testMasterActorRef = TestActorRef.create(masterSystem, Props.create(TestMasterActor.class, masterSetup,
@@ -190,7 +190,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                     slaveSchemaRepository, slaveSchemaRepository, mockSchemaContextFactory, mockSchemasResolver))
                 .setBaseSchemas(BASE_SCHEMAS)
                 .setCredentialProvider(credentialProvider)
-                .setKeyStoreProvider(keyStoreProvider)
+                .setSslHandlerFactoryProvider(sslHandlerFactoryProvider)
                 .build();
 
         netconfNodeManager = new NetconfNodeManager(slaveSetup, DEVICE_ID, responseTimeout,

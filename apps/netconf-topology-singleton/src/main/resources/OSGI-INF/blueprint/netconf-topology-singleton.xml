@@ -45,8 +45,8 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                interface="org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas"/>
     <reference id="credentialProvider"
                interface="org.opendaylight.netconf.client.mdsal.api.CredentialProvider"/>
-    <reference id="keyStoreProvider"
-               interface="org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider"/>
+    <reference id="sslHandlerFactoryProvider"
+               interface="org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider"/>
     <reference id="encryptionService"
                interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
 
@@ -74,7 +74,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument ref="deviceActionFactory"/>
         <argument ref="schemaManager"/>
         <argument ref="credentialProvider"/>
-        <argument ref="keyStoreProvider"/>
+        <argument ref="sslHandlerFactoryProvider"/>
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>

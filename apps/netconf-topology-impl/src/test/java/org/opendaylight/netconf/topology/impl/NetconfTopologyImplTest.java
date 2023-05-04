@@ -11,13 +11,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -43,12 +43,13 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
-import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemas;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -104,7 +105,7 @@ public class NetconfTopologyImplTest {
     @Mock
     private CredentialProvider credentialProvider;
     @Mock
-    private KeyStoreProvider keyStoreProvider;
+    private SslHandlerFactoryProvider sslHandlerFactoryProvider;
     @Mock
     private WriteTransaction wtx;
 
@@ -119,7 +120,7 @@ public class NetconfTopologyImplTest {
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
             mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker, mountPointService,
-            encryptionService, rpcProviderService, credentialProvider, keyStoreProvider);
+            encryptionService, rpcProviderService, credentialProvider, sslHandlerFactoryProvider);
         //verify initialization of topology
         verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.builder(NetworkTopology.class)
                 .child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))).build(),
@@ -131,11 +132,11 @@ public class NetconfTopologyImplTest {
     @Test
     public void testOnDataTreeChange() {
         final DataObjectModification<Node> newNode = mock(DataObjectModification.class);
-        when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.WRITE);
+        doReturn(DataObjectModification.ModificationType.WRITE).when(newNode).getModificationType();
 
         NodeKey key = new NodeKey(NODE_ID);
         PathArgument pa = IdentifiableItem.of(Node.class, key);
-        when(newNode.getIdentifier()).thenReturn(pa);
+        doReturn(pa).when(newNode).getIdentifier();
 
         final NodeBuilder nn = new NodeBuilder()
                 .withKey(key)
@@ -152,21 +153,20 @@ public class NetconfTopologyImplTest {
                         .setPassword("testpassword")
                         .build())
                     .build());
-
-        when(newNode.getDataAfter()).thenReturn(nn.build());
+        doReturn(nn.build()).when(newNode).getDataAfter();
 
         final Collection<DataTreeModification<Node>> changes = new HashSet<>();
         final DataTreeModification<Node> ch = mock(DataTreeModification.class);
-        when(ch.getRootNode()).thenReturn(newNode);
+        doReturn(newNode).when(ch).getRootNode();
         changes.add(ch);
         spyTopology.onDataTreeChanged(changes);
         verify(spyTopology).connectNode(NetconfTopologyImpl.getNodeId(pa), nn.build());
 
-        when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.DELETE);
+        doReturn(DataObjectModification.ModificationType.DELETE).when(newNode).getModificationType();
         spyTopology.onDataTreeChanged(changes);
         verify(spyTopology).disconnectNode(NetconfTopologyImpl.getNodeId(pa));
 
-        when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED);
+        doReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED).when(newNode).getModificationType();
         spyTopology.onDataTreeChanged(changes);
 
         //one in previous creating and deleting node and one in updating
@@ -208,12 +208,15 @@ public class NetconfTopologyImplTest {
         assertNotNull(configuration3.getAuthHandler());
         assertNull(configuration3.getSslHandlerFactory());
 
+        final var sslHandlerFactory = mock(SslHandlerFactory.class);
+        doReturn(sslHandlerFactory).when(sslHandlerFactoryProvider).getSslHandlerFactory(null);
+
         final NetconfReconnectingClientConfiguration configuration4 =
                 spyTopology.getClientConfig(sessionListener, nodeBuilder
                         .setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build(), NODE_ID);
         assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, configuration4.getProtocol());
         assertNull(configuration4.getAuthHandler());
-        assertNotNull(configuration4.getSslHandlerFactory());
+        assertSame(sslHandlerFactory, configuration4.getSslHandlerFactory());
     }
 
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
@@ -236,10 +239,10 @@ public class NetconfTopologyImplTest {
                                           final AAAEncryptionService encryptionService,
                                           final RpcProviderService rpcProviderService,
                                           final CredentialProvider credentialProvider,
-                                          final KeyStoreProvider keyStoreProvider) {
+                                          final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, rpcProviderService,
-                BASE_SCHEMAS, credentialProvider, keyStoreProvider, null);
+                BASE_SCHEMAS, credentialProvider, sslHandlerFactoryProvider, null);
         }
 
         @Override

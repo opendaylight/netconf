@@ -44,9 +44,9 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
@@ -95,7 +95,7 @@ public class NetconfTopologyManager
     private final RpcProviderService rpcProviderService;
     private final DeviceActionFactory deviceActionFactory;
     private final CredentialProvider credentialProvider;
-    private final KeyStoreProvider keyStoreProvider;
+    private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
     private final SchemaResourceManager resourceManager;
 
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
@@ -115,7 +115,7 @@ public class NetconfTopologyManager
                                   final DeviceActionFactory deviceActionFactory,
                                   final SchemaResourceManager resourceManager,
                                   final CredentialProvider credentialProvider,
-                                  final KeyStoreProvider keyStoreProvider) {
+                                  final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
@@ -134,7 +134,7 @@ public class NetconfTopologyManager
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         this.resourceManager = requireNonNull(resourceManager);
         this.credentialProvider = requireNonNull(credentialProvider);
-        this.keyStoreProvider = requireNonNull(keyStoreProvider);
+        this.sslHandlerFactoryProvider = requireNonNull(sslHandlerFactoryProvider);
     }
 
     // Blueprint init method
@@ -308,7 +308,7 @@ public class NetconfTopologyManager
                 .setIdleTimeout(writeTxIdleTimeout)
                 .setEncryptionService(encryptionService)
                 .setCredentialProvider(credentialProvider)
-                .setKeyStoreProvider(keyStoreProvider)
+                .setSslHandlerFactoryProvider(sslHandlerFactoryProvider)
                 .build();
     }
 }

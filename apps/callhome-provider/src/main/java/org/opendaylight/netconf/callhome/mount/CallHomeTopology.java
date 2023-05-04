@@ -17,8 +17,8 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 
 // Non-final for mocking
@@ -29,9 +29,9 @@ public class CallHomeTopology extends AbstractNetconfTopology {
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas,
             final DeviceActionFactory deviceActionFactory, final CredentialProvider credentialProvider,
-            final KeyStoreProvider keyStoreProvider) {
+            final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
             schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory,
-            baseSchemas, credentialProvider, keyStoreProvider);
+            baseSchemas, credentialProvider, sslHandlerFactoryProvider);
     }
 }
