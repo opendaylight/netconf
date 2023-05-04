@@ -133,7 +133,7 @@ public abstract class BaseYangOpenApiGenerator {
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
 
-            getOpenApiDocSpec(module, context, deviceName, schemaContext, definitionNames, doc, false);
+            getOpenApiSpec(module, context, deviceName, schemaContext, definitionNames, doc, false);
         }
     }
 
@@ -191,7 +191,7 @@ public abstract class BaseYangOpenApiGenerator {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
 
-        return getOpenApiDocSpec(module, schema, host, BASE_PATH, context, schemaContext);
+        return getOpenApiSpec(module, schema, host, BASE_PATH, context, schemaContext);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -207,14 +207,14 @@ public abstract class BaseYangOpenApiGenerator {
         return uriInfo.getBaseUri().getScheme();
     }
 
-    public OpenApiObject getOpenApiDocSpec(final Module module, final String schema, final String host,
+    public OpenApiObject getOpenApiSpec(final Module module, final String schema, final String host,
             final String basePath, final String context, final EffectiveModelContext schemaContext) {
         final OpenApiObject doc = createOpenApiObject(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getOpenApiDocSpec(module, context, Optional.empty(), schemaContext, definitionNames, doc, true);
+        return getOpenApiSpec(module, context, Optional.empty(), schemaContext, definitionNames, doc, true);
     }
 
-    public OpenApiObject getOpenApiDocSpec(final Module module, final String context, final Optional<String> deviceName,
+    public OpenApiObject getOpenApiSpec(final Module module, final String context, final Optional<String> deviceName,
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
         try {
