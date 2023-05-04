@@ -58,8 +58,9 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
@@ -128,7 +129,9 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     @Mock
     private EffectiveModelContextFactory mockSchemaContextFactory;
     @Mock
-    private NetconfKeystoreAdapter keystoreAdapter;
+    private CredentialProvider credentialProvider;
+    @Mock
+    private KeyStoreProvider keyStoreProvider;
 
     private ActorSystem slaveSystem;
     private ActorSystem masterSystem;
@@ -168,7 +171,8 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 .setSchemaResourceDTO(new NetconfDevice.SchemaResourcesDTO(
                     masterSchemaRepository, masterSchemaRepository, mockSchemaContextFactory, mockSchemasResolver))
                 .setBaseSchemas(BASE_SCHEMAS)
-                .setKeystoreAdapter(keystoreAdapter)
+                .setCredentialProvider(credentialProvider)
+                .setKeyStoreProvider(keyStoreProvider)
                 .build();
 
         testMasterActorRef = TestActorRef.create(masterSystem, Props.create(TestMasterActor.class, masterSetup,
@@ -185,7 +189,8 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 .setSchemaResourceDTO(new NetconfDevice.SchemaResourcesDTO(
                     slaveSchemaRepository, slaveSchemaRepository, mockSchemaContextFactory, mockSchemasResolver))
                 .setBaseSchemas(BASE_SCHEMAS)
-                .setKeystoreAdapter(keystoreAdapter)
+                .setCredentialProvider(credentialProvider)
+                .setKeyStoreProvider(keyStoreProvider)
                 .build();
 
         netconfNodeManager = new NetconfNodeManager(slaveSetup, DEVICE_ID, responseTimeout,

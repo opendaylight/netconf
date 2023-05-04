@@ -16,10 +16,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -31,8 +29,9 @@ import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
 import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -59,7 +58,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev22
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Empty;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
@@ -75,7 +73,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     private final NetconfTopologySetup netconfTopologyDeviceSetup;
     private final RemoteDeviceId remoteDeviceId;
     private final AAAEncryptionService encryptionService;
-    private final NetconfKeystoreAdapter keystoreAdapter;
+    private final CredentialProvider credentialProvider;
+    private final KeyStoreProvider keyStoreProvider;
     private final DeviceActionFactory deviceActionFactory;
 
     // FIXME: this seems to be a builder-like transition between {start,stop}RemoteDeviceConnection. More documentation
@@ -88,7 +87,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         this.remoteDeviceId = remoteDeviceId;
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
-        keystoreAdapter = netconfTopologyDeviceSetup.getKeystoreAdapter();
+        credentialProvider = netconfTopologyDeviceSetup.getCredentialProvider();
+        keyStoreProvider = netconfTopologyDeviceSetup.getKeyStoreProvider();
     }
 
     @Override
@@ -168,15 +168,11 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL);
                 }
 
-                for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry :
-                        libraryModulesSchemas.getAvailableModels().entrySet()) {
-                    registeredYangLibSources
-                            .add(schemaResourcesDTO.getSchemaRegistry().registerSchemaSource(
-                                    new LibrarySchemaSourceProvider(remoteDeviceId,
-                                            libraryModulesSchemas.getAvailableModels()),
-                                    PotentialSchemaSource
-                                            .create(sourceIdentifierURLEntry.getKey(), YangTextSchemaSource.class,
-                                                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                for (var sourceIdentifierURLEntry : libraryModulesSchemas.getAvailableModels().entrySet()) {
+                    registeredYangLibSources.add(schemaResourcesDTO.getSchemaRegistry().registerSchemaSource(
+                        new LibrarySchemaSourceProvider(remoteDeviceId, libraryModulesSchemas.getAvailableModels()),
+                        PotentialSchemaSource.create(sourceIdentifierURLEntry.getKey(), YangTextSchemaSource.class,
+                            PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
             }
         }
@@ -249,7 +245,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
         } else if (protocol.getName() == Name.TLS) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withSslHandlerFactory(new SslHandlerFactoryImpl(keystoreAdapter, protocol.getSpecification()))
+                    .withSslHandlerFactory(new SslHandlerFactoryImpl(keyStoreProvider, protocol.getSpecification()))
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
         } else {
             throw new IllegalStateException("Unsupported protocol type: " + protocol.getName());
@@ -292,7 +288,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         if (credentials instanceof KeyAuth keyAuth) {
             final var keyPair = keyAuth.getKeyBased();
             return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getKeyId(),
-                    keystoreAdapter, encryptionService);
+                    credentialProvider, encryptionService);
         }
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
     }

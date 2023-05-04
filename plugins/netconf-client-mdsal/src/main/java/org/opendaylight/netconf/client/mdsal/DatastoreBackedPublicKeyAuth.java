@@ -14,11 +14,10 @@ import java.security.KeyPair;
 import java.util.Optional;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.aaa.encrypt.PKIUtil;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,18 +26,18 @@ public final class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
 
     private final String username;
     private final String pairId;
-    private final NetconfKeystoreAdapter keystoreAdapter;
+    private final CredentialProvider credentialProvider;
     private final AAAEncryptionService encryptionService;
 
     // FIXME: do not use Optional here and deal with atomic set
     private Optional<KeyPair> keyPair = Optional.empty();
 
     public DatastoreBackedPublicKeyAuth(final String username, final String pairId,
-                                        final NetconfKeystoreAdapter keystoreAdapter,
+                                        final CredentialProvider credentialProvider,
                                         final AAAEncryptionService encryptionService) {
         this.username = username;
         this.pairId = pairId;
-        this.keystoreAdapter = keystoreAdapter;
+        this.credentialProvider = credentialProvider;
         this.encryptionService = encryptionService;
 
         // try to immediately retrieve the pair from the adapter
@@ -62,23 +61,21 @@ public final class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
 
     private boolean tryToSetKeyPair() {
         LOG.debug("Trying to retrieve keypair for: {}", pairId);
-        final Optional<KeyCredential> keypairOptional = keystoreAdapter.getKeypairFromId(pairId);
-
-        if (keypairOptional.isPresent()) {
-            final KeyCredential dsKeypair = keypairOptional.orElseThrow();
-            final String passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
-
-            try {
-                keyPair = Optional.of(new PKIUtil().decodePrivateKey(
-                    new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey()).replace("\\n", "\n")),
-                    encryptionService.decrypt(passPhrase)));
-            } catch (IOException exception) {
-                LOG.warn("Unable to decode private key, id={}", pairId, exception);
-                return false;
-            }
-            return true;
+        final var dsKeypair = credentialProvider.credentialForId(pairId);
+        if (dsKeypair == null) {
+            LOG.debug("Unable to retrieve keypair for: {}", pairId);
+            return false;
         }
-        LOG.debug("Unable to retrieve keypair for: {}", pairId);
-        return false;
+
+        final String passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
+        try {
+            keyPair = Optional.of(new PKIUtil().decodePrivateKey(
+                new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey()).replace("\\n", "\n")),
+                encryptionService.decrypt(passPhrase)));
+        } catch (IOException exception) {
+            LOG.warn("Unable to decode private key, id={}", pairId, exception);
+            return false;
+        }
+        return true;
     }
 }

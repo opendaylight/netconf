@@ -27,8 +27,9 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
@@ -75,11 +76,12 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             @Reference final DOMMountPointService mountPointService,
             @Reference final AAAEncryptionService encryptionService,
             @Reference final RpcProviderService rpcProviderService, @Reference final BaseNetconfSchemas baseSchemas,
-            @Reference final NetconfKeystoreAdapter keystoreAdapter,
+            @Reference final CredentialProvider credentialProvider,
+            @Reference final KeyStoreProvider keyStoreProvider,
             @Reference final DeviceActionFactory deviceActionFactory) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, clientDispatcher, eventExecutor, keepaliveExecutor,
             processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService, encryptionService,
-            rpcProviderService, baseSchemas, keystoreAdapter, deviceActionFactory);
+            rpcProviderService, baseSchemas, credentialProvider, keyStoreProvider, deviceActionFactory);
     }
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
@@ -87,10 +89,11 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
-            final BaseNetconfSchemas baseSchemas, final NetconfKeystoreAdapter keystoreAdapter) {
+            final BaseNetconfSchemas baseSchemas, final CredentialProvider credentialProvider,
+            final KeyStoreProvider keyStoreProvider) {
         this(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, rpcProviderService,
-                baseSchemas, keystoreAdapter, null);
+                baseSchemas, credentialProvider, keyStoreProvider, null);
     }
 
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
@@ -100,11 +103,11 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
-            final BaseNetconfSchemas baseSchemas, final NetconfKeystoreAdapter keystoreAdapter,
-            final DeviceActionFactory deviceActionFactory) {
+            final BaseNetconfSchemas baseSchemas, final CredentialProvider credentialProvider,
+            final KeyStoreProvider keyStoreProvider, final DeviceActionFactory deviceActionFactory) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory,
-                baseSchemas, keystoreAdapter);
+                baseSchemas, credentialProvider, keyStoreProvider);
 
         LOG.debug("Registering datastore listener");
         dtclReg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(

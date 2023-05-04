@@ -14,7 +14,7 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListen
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServer;
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServerBuilder;
 import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -29,17 +29,17 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
     private final NetconfCallHomeTlsServer server;
 
     @Activate
-    public NetconfCallHomeTlsService(@Reference final NetconfKeystoreAdapter keystoreAdapter,
+    public NetconfCallHomeTlsService(@Reference final KeyStoreProvider keyStoreProvider,
             @Reference final TlsAllowedDevicesMonitor allowedDevicesMonitor,
             @Reference final CallHomeNetconfSubsystemListener subsystemListener,
             @Reference(target = "(type=global-boss-group)") final EventLoopGroup bossGroup,
             @Reference(target = "(type=global-worker-group)") final EventLoopGroup workerGroup) {
-        this(keystoreAdapter, allowedDevicesMonitor, subsystemListener, bossGroup, workerGroup,
+        this(keyStoreProvider, allowedDevicesMonitor, subsystemListener, bossGroup, workerGroup,
             // FIXME: tie together with OSGi Config Admin
             defaultTlsConfiguration());
     }
 
-    public NetconfCallHomeTlsService(final NetconfKeystoreAdapter keystoreAdapter,
+    public NetconfCallHomeTlsService(final KeyStoreProvider keyStoreProvider,
                                      final TlsAllowedDevicesMonitor allowedDevicesMonitor,
                                      final CallHomeNetconfSubsystemListener subsystemListener,
                                      final EventLoopGroup bossGroup,
@@ -51,7 +51,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
             .setTimeout(config.getTimeout())
             .setMaxConnections(config.getMaxConnections())
             .setAllowedDevicesMonitor(requireNonNull(allowedDevicesMonitor))
-            .setSslHandlerFactory(new SslHandlerFactoryAdapter(keystoreAdapter, allowedDevicesMonitor))
+            .setSslHandlerFactory(new SslHandlerFactoryAdapter(keyStoreProvider, allowedDevicesMonitor))
             .setSubsystemListener(requireNonNull(subsystemListener))
             .setBossGroup(requireNonNull(bossGroup))
             .setWorkerGroup(requireNonNull(workerGroup))

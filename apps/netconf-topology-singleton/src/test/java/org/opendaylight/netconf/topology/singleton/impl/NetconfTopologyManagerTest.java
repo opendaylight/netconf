@@ -59,8 +59,9 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -126,14 +127,16 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         final AAAEncryptionService encryptionService = mock(AAAEncryptionService.class);
         final DeviceActionFactory deviceActionFactory = mock(DeviceActionFactory.class);
         final RpcProviderService rpcProviderService = mock(RpcProviderService.class);
-        final NetconfKeystoreAdapter keystoreAdapter = mock(NetconfKeystoreAdapter.class);
+        final CredentialProvider credentialProvider = mock(CredentialProvider.class);
+        final KeyStoreProvider keyStoreProvider = mock(KeyStoreProvider.class);
 
         final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(Uint16.ZERO).build();
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, rpcProviderRegistry,
                 actionProviderRegistry, clusterSingletonServiceProvider, keepaliveExecutor, processingThreadPool,
                 actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
                 mountPointService, encryptionService, rpcProviderService, deviceActionFactory,
-                new DefaultSchemaResourceManager(new DefaultYangParserFactory()), keystoreAdapter) {
+                new DefaultSchemaResourceManager(new DefaultYangParserFactory()), credentialProvider,
+                keyStoreProvider) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,

@@ -15,22 +15,23 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 
 // Non-final for mocking
 public class CallHomeTopology extends AbstractNetconfTopology {
-
     public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas,
-            final DeviceActionFactory deviceActionFactory, final NetconfKeystoreAdapter keystoreAdapter) {
+            final DeviceActionFactory deviceActionFactory, final CredentialProvider credentialProvider,
+            final KeyStoreProvider keyStoreProvider) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
             schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory,
-            baseSchemas, keystoreAdapter);
+            baseSchemas, credentialProvider, keyStoreProvider);
     }
 }

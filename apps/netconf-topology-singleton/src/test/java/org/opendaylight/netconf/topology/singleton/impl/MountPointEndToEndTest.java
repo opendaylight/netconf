@@ -100,8 +100,9 @@ import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProvi
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -197,7 +198,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     @Mock private ThreadPool mockThreadPool;
     @Mock private ScheduledThreadPool mockKeepaliveExecutor;
     @Mock private DeviceActionFactory deviceActionFactory;
-    @Mock private NetconfKeystoreAdapter keystoreAdapter;
+    @Mock private CredentialProvider credentialProvider;
+    @Mock private KeyStoreProvider keyStoreProvider;
 
     @Mock private ActorSystemProvider mockMasterActorSystemProvider;
     @Mock private DOMMountPointListener masterMountPointListener;
@@ -318,7 +320,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 mockRpcProviderRegistry, mockActionProviderRegistry, masterClusterSingletonServiceProvider,
                 mockKeepaliveExecutor, mockThreadPool, mockMasterActorSystemProvider, eventExecutor,
                 mockClientDispatcher, TOPOLOGY_ID, config, masterMountPointService, mockEncryptionService,
-                mockRpcProviderService, deviceActionFactory, resourceManager, keystoreAdapter) {
+                mockRpcProviderService, deviceActionFactory, resourceManager, credentialProvider, keyStoreProvider) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                     final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -359,7 +361,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             mockActionProviderRegistry, mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
                 mockSlaveActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
                 slaveMountPointService, mockEncryptionService, mockRpcProviderService, deviceActionFactory,
-                resourceManager, keystoreAdapter) {
+                resourceManager, credentialProvider, keyStoreProvider) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,

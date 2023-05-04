@@ -21,27 +21,27 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.protocol.Specification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.protocol.specification.TlsCase;
 
 public final class SslHandlerFactoryImpl implements SslHandlerFactory {
-    private final NetconfKeystoreAdapter keystoreAdapter;
+    private final KeyStoreProvider keyStoreProvider;
     private final @Nullable Specification specification;
 
-    public SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter) {
-        this(keystoreAdapter, null);
+    public SslHandlerFactoryImpl(final KeyStoreProvider keyStoreProvider) {
+        this(keyStoreProvider, null);
     }
 
-    public SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter, final Specification specification) {
-        this.keystoreAdapter = requireNonNull(keystoreAdapter);
+    public SslHandlerFactoryImpl(final KeyStoreProvider keyStoreProvider, final Specification specification) {
+        this.keyStoreProvider = requireNonNull(keyStoreProvider);
         this.specification = specification;
     }
 
     @Override
     public SslHandler createSslHandler(final Set<String> allowedKeys) {
         try {
-            final KeyStore keyStore = keystoreAdapter.getJavaKeyStore(allowedKeys);
+            final KeyStore keyStore = keyStoreProvider.getJavaKeyStore(allowedKeys);
 
             final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(keyStore, "".toCharArray());

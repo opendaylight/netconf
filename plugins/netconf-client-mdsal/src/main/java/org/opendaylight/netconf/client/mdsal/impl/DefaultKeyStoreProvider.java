@@ -7,13 +7,10 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
-import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -29,7 +26,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -41,10 +37,9 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -56,26 +51,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-@Component(service = NetconfKeystoreAdapter.class)
-public final class DefaultNetconfKeystoreAdapter
-        implements NetconfKeystoreAdapter, ClusteredDataTreeChangeListener<Keystore>, AutoCloseable {
+@Component(service = KeyStoreProvider.class)
+public final class DefaultKeyStoreProvider
+        implements KeyStoreProvider, ClusteredDataTreeChangeListener<Keystore>, AutoCloseable {
     /**
      * Internal state, updated atomically.
      */
     private record State(
-        @NonNull Map<String, KeyCredential> pairs,
         @NonNull Map<String, PrivateKey> privateKeys,
         @NonNull Map<String, TrustedCertificate> trustedCertificates) {
 
         State {
-            requireNonNull(pairs);
             requireNonNull(privateKeys);
             requireNonNull(trustedCertificates);
         }
 
         @NonNull StateBuilder newBuilder() {
-            return new StateBuilder(new HashMap<>(pairs), new HashMap<>(privateKeys),
-                new HashMap<>(trustedCertificates));
+            return new StateBuilder(new HashMap<>(privateKeys), new HashMap<>(trustedCertificates));
         }
     }
 
@@ -83,18 +75,16 @@ public final class DefaultNetconfKeystoreAdapter
      * Intermediate builder for State.
      */
     private record StateBuilder(
-        @NonNull HashMap<String, KeyCredential> pairs,
         @NonNull HashMap<String, PrivateKey> privateKeys,
         @NonNull HashMap<String, TrustedCertificate> trustedCertificates) {
 
         StateBuilder {
-            requireNonNull(pairs);
             requireNonNull(privateKeys);
             requireNonNull(trustedCertificates);
         }
 
         @NonNull State build() {
-            return new State(Map.copyOf(pairs), Map.copyOf(privateKeys), Map.copyOf(trustedCertificates));
+            return new State(Map.copyOf(privateKeys), Map.copyOf(trustedCertificates));
         }
     }
 
@@ -132,26 +122,16 @@ public final class DefaultNetconfKeystoreAdapter
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultNetconfKeystoreAdapter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultKeyStoreProvider.class);
     private static final char[] EMPTY_CHARS = { };
-    private static final VarHandle STATE_VH;
-
-    static {
-        try {
-            STATE_VH = MethodHandles.lookup().findVarHandle(DefaultNetconfKeystoreAdapter.class, "state", State.class);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
 
     private final @NonNull Registration reg;
 
-    @SuppressWarnings("unused")
-    private volatile @NonNull State state = new State(Map.of(), Map.of(), Map.of());
+    private volatile @NonNull State state = new State(Map.of(), Map.of());
 
     @Inject
     @Activate
-    public DefaultNetconfKeystoreAdapter(@Reference final DataBroker dataBroker) {
+    public DefaultKeyStoreProvider(@Reference final DataBroker dataBroker) {
         reg = dataBroker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
             this);
@@ -165,14 +145,9 @@ public final class DefaultNetconfKeystoreAdapter
     }
 
     @Override
-    public Optional<KeyCredential> getKeypairFromId(final String keyId) {
-        return Optional.ofNullable(currentState().pairs.get(keyId));
-    }
-
-    @Override
     public KeyStore getJavaKeyStore(final Set<String> allowedKeys) throws GeneralSecurityException, IOException {
         requireNonNull(allowedKeys);
-        final var current = currentState();
+        final var current = state;
         if (current.privateKeys.isEmpty()) {
             throw new KeyStoreException("No keystore private key found");
         }
@@ -212,10 +187,6 @@ public final class DefaultNetconfKeystoreAdapter
         return keyStore;
     }
 
-    private @NonNull State currentState() {
-        return verifyNotNull((@NonNull State) STATE_VH.getAcquire(this));
-    }
-
     private static byte[] base64Decode(final String base64) {
         return Base64.getMimeDecoder().decode(base64.getBytes(StandardCharsets.US_ASCII));
     }
@@ -223,9 +194,9 @@ public final class DefaultNetconfKeystoreAdapter
     @Override
     public void onDataTreeChanged(final Collection<DataTreeModification<Keystore>> changes) {
         LOG.debug("Starting update with {} changes", changes.size());
-        final var builder = currentState().newBuilder();
+        final var builder = state.newBuilder();
         onDataTreeChanged(builder, changes);
-        STATE_VH.setRelease(this, builder.build());
+        state = builder.build();
         LOG.debug("Update finished");
     }
 
@@ -236,14 +207,7 @@ public final class DefaultNetconfKeystoreAdapter
             final var rootNode = change.getRootNode();
 
             for (var changedChild : rootNode.getModifiedChildren()) {
-                if (changedChild.getDataType().equals(KeyCredential.class)) {
-                    final var dataAfter = rootNode.getDataAfter();
-                    builder.pairs.clear();
-                    if (dataAfter != null) {
-                        dataAfter.nonnullKeyCredential().values()
-                            .forEach(pair -> builder.pairs.put(pair.key().getKeyId(), pair));
-                    }
-                } else if (changedChild.getDataType().equals(PrivateKey.class)) {
+                if (changedChild.getDataType().equals(PrivateKey.class)) {
                     onPrivateKeyChanged(builder.privateKeys, (DataObjectModification<PrivateKey>)changedChild);
                 } else if (changedChild.getDataType().equals(TrustedCertificate.class)) {
                     onTrustedCertificateChanged(builder.trustedCertificates,

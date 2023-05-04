@@ -27,8 +27,9 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
@@ -54,7 +55,8 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
     private final AAAEncryptionService encryptionService;
-    private final NetconfKeystoreAdapter keystoreAdapter;
+    private final CredentialProvider credentialProvider;
+    private final KeyStoreProvider keyStoreProvider;
 
     protected CallHomeTopology topology;
 
@@ -66,9 +68,10 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
             final DataBroker dataBroker, final DOMMountPointService mountService,
-            final AAAEncryptionService encryptionService, final NetconfKeystoreAdapter keystoreAdapter) {
+            final AAAEncryptionService encryptionService, final CredentialProvider credentialProvider,
+            final KeyStoreProvider keyStoreProvider) {
         this(topologyId, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider, baseSchemas,
-            dataBroker, mountService, encryptionService, keystoreAdapter, null);
+            dataBroker, mountService, encryptionService, credentialProvider, keyStoreProvider, null);
     }
 
     @Activate
@@ -80,19 +83,20 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
             @Reference final SchemaResourceManager schemaRepositoryProvider,
             @Reference final BaseNetconfSchemas baseSchemas, @Reference final DataBroker dataBroker,
             @Reference final DOMMountPointService mountService, @Reference final AAAEncryptionService encryptionService,
-            @Reference final NetconfKeystoreAdapter keystoreAdapter,
+            @Reference final CredentialProvider credentialProvider,
+            @Reference final KeyStoreProvider keyStoreProvider,
             @Reference final DeviceActionFactory deviceActionFactory) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, eventExecutor, keepaliveExecutor, processingExecutor,
-            schemaRepositoryProvider, baseSchemas, dataBroker, mountService, encryptionService, keystoreAdapter,
-            deviceActionFactory);
+            schemaRepositoryProvider, baseSchemas, dataBroker, mountService, encryptionService, credentialProvider,
+            keyStoreProvider, deviceActionFactory);
     }
 
     public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
             final DataBroker dataBroker, final DOMMountPointService mountService,
-            final AAAEncryptionService encryptionService,
-            final NetconfKeystoreAdapter keystoreAdapter, final DeviceActionFactory deviceActionFactory) {
+            final AAAEncryptionService encryptionService, final CredentialProvider credentialProvider,
+            final KeyStoreProvider keyStoreProvider, final DeviceActionFactory deviceActionFactory) {
         this.topologyId = topologyId;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
@@ -103,7 +107,8 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         this.dataBroker = dataBroker;
         this.mountService = mountService;
         this.encryptionService = encryptionService;
-        this.keystoreAdapter = requireNonNull(keystoreAdapter);
+        this.credentialProvider = requireNonNull(credentialProvider);
+        this.keyStoreProvider = requireNonNull(keyStoreProvider);
     }
 
     @Override
@@ -144,7 +149,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     void createTopology() {
         topology = new CallHomeTopology(topologyId, this, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountService, encryptionService, baseSchemas,
-                deviceActionFactory, keystoreAdapter);
+                deviceActionFactory, credentialProvider, keyStoreProvider);
     }
 
     @VisibleForTesting

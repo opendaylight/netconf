@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class DefaultNetconfKeystoreAdapterTest {
+public class DefaultKeyStoreProviderTest {
     private static final String XML_ELEMENT_PRIVATE_KEY = "private-key";
     private static final String XML_ELEMENT_NAME = "name";
     private static final String XML_ELEMENT_DATA = "data";
@@ -58,12 +58,12 @@ public class DefaultNetconfKeystoreAdapterTest {
     @Before
     public void setUp() {
         doReturn(listenerRegistration).when(dataBroker)
-            .registerDataTreeChangeListener(any(DataTreeIdentifier.class), any(DefaultNetconfKeystoreAdapter.class));
+            .registerDataTreeChangeListener(any(DataTreeIdentifier.class), any(DefaultKeyStoreProvider.class));
     }
 
     @Test
     public void testKeystoreAdapterInit() throws Exception {
-        final DefaultNetconfKeystoreAdapter keystoreAdapter = new DefaultNetconfKeystoreAdapter(dataBroker);
+        final DefaultKeyStoreProvider keystoreAdapter = new DefaultKeyStoreProvider(dataBroker);
         final var ex = assertThrows(KeyStoreException.class, keystoreAdapter::getJavaKeyStore);
         assertThat(ex.getMessage(), startsWith("No keystore private key found"));
     }
@@ -84,7 +84,7 @@ public class DefaultNetconfKeystoreAdapterTest {
         final var privateKey = getPrivateKey();
         doReturn(privateKey).when(childObjectModification).getDataAfter();
 
-        final var keystoreAdapter = new DefaultNetconfKeystoreAdapter(dataBroker);
+        final var keystoreAdapter = new DefaultKeyStoreProvider(dataBroker);
         keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification));
 
         final var keyStore = keystoreAdapter.getJavaKeyStore();
@@ -124,7 +124,7 @@ public class DefaultNetconfKeystoreAdapterTest {
         doReturn(trustedCertificate).when(childObjectModification2).getDataAfter();
 
         // Apply configurations
-        final var keystoreAdapter = new DefaultNetconfKeystoreAdapter(dataBroker);
+        final var keystoreAdapter = new DefaultKeyStoreProvider(dataBroker);
         keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
 
         // Check result

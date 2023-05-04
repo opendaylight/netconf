@@ -14,7 +14,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
 import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +25,10 @@ public class SslHandlerFactoryAdapter implements SslHandlerFactory {
     private final TlsAllowedDevicesMonitor allowedDevicesMonitor;
     private final SslHandlerFactory sslHandlerFactory;
 
-    public SslHandlerFactoryAdapter(final NetconfKeystoreAdapter keystoreAdapter,
+    public SslHandlerFactoryAdapter(final KeyStoreProvider keyStoreProvider,
             final @NonNull TlsAllowedDevicesMonitor allowedDevicesMonitor) {
         this.allowedDevicesMonitor = requireNonNull(allowedDevicesMonitor);
-        sslHandlerFactory = new SslHandlerFactoryImpl(keystoreAdapter);
+        sslHandlerFactory = new SslHandlerFactoryImpl(keyStoreProvider);
     }
 
     @Override

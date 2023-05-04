@@ -41,8 +41,9 @@ import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
 import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -86,7 +87,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     private final NetconfClientDispatcher clientDispatcher;
     private final EventExecutor eventExecutor;
     private final DeviceActionFactory deviceActionFactory;
-    private final NetconfKeystoreAdapter keystoreAdapter;
+    private final CredentialProvider credentialProvider;
+    private final KeyStoreProvider keystoreProvider;
     private final SchemaResourceManager schemaManager;
     private final BaseNetconfSchemas baseSchemas;
 
@@ -105,7 +107,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                       final AAAEncryptionService encryptionService,
                                       final DeviceActionFactory deviceActionFactory,
                                       final BaseNetconfSchemas baseSchemas,
-                                      final NetconfKeystoreAdapter keystoreAdapter) {
+                                      final CredentialProvider credentialProvider,
+                                      final KeyStoreProvider keystoreProvider) {
         this.topologyId = requireNonNull(topologyId);
         this.clientDispatcher = clientDispatcher;
         this.eventExecutor = eventExecutor;
@@ -117,7 +120,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.mountPointService = mountPointService;
         this.encryptionService = encryptionService;
         this.baseSchemas = requireNonNull(baseSchemas);
-        this.keystoreAdapter = requireNonNull(keystoreAdapter);
+        this.credentialProvider = requireNonNull(credentialProvider);
+        this.keystoreProvider = requireNonNull(keystoreProvider);
 
         // FIXME: this should be a put(), as we are initializing and will be re-populating the datastore with all the
         //        devices. Whatever has been there before should be nuked to properly re-align lifecycle.
@@ -313,7 +317,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                     .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
         } else if (protocol.getName() == Name.TLS) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                .withSslHandlerFactory(new SslHandlerFactoryImpl(keystoreAdapter, protocol.getSpecification()))
+                .withSslHandlerFactory(new SslHandlerFactoryImpl(keystoreProvider, protocol.getSpecification()))
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
         } else {
             throw new IllegalStateException("Unsupported protocol type: " + protocol.getName());
@@ -351,8 +355,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
         if (credentials instanceof KeyAuth keyAuth) {
             final var keyPair = keyAuth.getKeyBased();
-            return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getKeyId(),
-                    keystoreAdapter, encryptionService);
+            return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getKeyId(), credentialProvider,
+                encryptionService);
         }
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
     }

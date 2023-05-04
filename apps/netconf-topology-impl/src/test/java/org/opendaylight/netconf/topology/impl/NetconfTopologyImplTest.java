@@ -46,7 +46,8 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemas;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
@@ -101,7 +102,9 @@ public class NetconfTopologyImplTest {
     @Mock
     private RpcProviderService rpcProviderService;
     @Mock
-    private NetconfKeystoreAdapter keystoreAdapter;
+    private CredentialProvider credentialProvider;
+    @Mock
+    private KeyStoreProvider keyStoreProvider;
     @Mock
     private WriteTransaction wtx;
 
@@ -116,7 +119,7 @@ public class NetconfTopologyImplTest {
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
             mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker, mountPointService,
-            encryptionService, rpcProviderService, keystoreAdapter);
+            encryptionService, rpcProviderService, credentialProvider, keyStoreProvider);
         //verify initialization of topology
         verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.builder(NetworkTopology.class)
                 .child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))).build(),
@@ -232,10 +235,11 @@ public class NetconfTopologyImplTest {
                                           final DataBroker dataBroker, final DOMMountPointService mountPointService,
                                           final AAAEncryptionService encryptionService,
                                           final RpcProviderService rpcProviderService,
-                                          final NetconfKeystoreAdapter keystoreAdapter) {
+                                          final CredentialProvider credentialProvider,
+                                          final KeyStoreProvider keyStoreProvider) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, rpcProviderService,
-                BASE_SCHEMAS, keystoreAdapter, null);
+                BASE_SCHEMAS, credentialProvider, keyStoreProvider, null);
         }
 
         @Override

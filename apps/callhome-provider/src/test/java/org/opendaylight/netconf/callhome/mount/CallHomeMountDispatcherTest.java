@@ -34,7 +34,8 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
-import org.opendaylight.netconf.client.mdsal.api.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
+import org.opendaylight.netconf.client.mdsal.api.KeyStoreProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
@@ -57,7 +58,8 @@ public class CallHomeMountDispatcherTest {
     private CallHomeProtocolSessionContext mockProtoSess;
     private AAAEncryptionService mockEncryptionService;
     private BaseNetconfSchemas mockBaseSchemas;
-    private NetconfKeystoreAdapter mockKeystoreAdapter;
+    private CredentialProvider mockCredentialProvider;
+    private KeyStoreProvider mockKeyStoreProvider;
 
     @Before
     public void setup() {
@@ -73,11 +75,12 @@ public class CallHomeMountDispatcherTest {
         mockProtoSess = mock(CallHomeProtocolSessionContext.class);
         mockEncryptionService = mock(AAAEncryptionService.class);
         mockBaseSchemas = mock(BaseNetconfSchemas.class);
-        mockKeystoreAdapter = mock(NetconfKeystoreAdapter.class);
+        mockCredentialProvider = mock(CredentialProvider.class);
+        mockKeyStoreProvider = mock(KeyStoreProvider.class);
 
         instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
                 mockProcessingExecutor, mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount,
-                mockEncryptionService, mockKeystoreAdapter) {
+                mockEncryptionService, mockCredentialProvider, mockKeyStoreProvider) {
             @Override
             CallHomeMountSessionManager sessionManager() {
                 return mockSessMgr;
