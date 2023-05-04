@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
+import org.opendaylight.netconf.sal.rest.doc.api.OpenApiService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointOpenApi;
 import org.opendaylight.netconf.sal.rest.doc.openapi.MountPointInstance;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component
 @Singleton
-public final class ApiDocServiceImpl implements ApiDocService {
+public final class OpenApiServiceImpl implements OpenApiService {
     // FIXME: make this configurable
     public static final int DEFAULT_PAGESIZE = 20;
 
@@ -51,34 +51,34 @@ public final class ApiDocServiceImpl implements ApiDocService {
     private static final String PAGE_NUM = "pageNum";
 
     private final MountPointOpenApi mountPointOpenApiRFC8040;
-    private final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040;
+    private final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040;
 
     @Inject
     @Activate
-    public ApiDocServiceImpl(final @Reference DOMSchemaService schemaService,
+    public OpenApiServiceImpl(final @Reference DOMSchemaService schemaService,
                              final @Reference DOMMountPointService mountPointService) {
         this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService),
-            new ApiDocGeneratorRFC8040(schemaService));
+            new OpenApiGeneratorRFC8040(schemaService));
     }
 
-    public ApiDocServiceImpl(final DOMSchemaService schemaService,
+    public OpenApiServiceImpl(final DOMSchemaService schemaService,
                              final DOMMountPointService mountPointService,
                              final String basePath) {
         this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, basePath),
-            new ApiDocGeneratorRFC8040(schemaService, basePath));
+            new OpenApiGeneratorRFC8040(schemaService, basePath));
     }
 
     @VisibleForTesting
-    ApiDocServiceImpl(final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040,
-                      final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040) {
+    OpenApiServiceImpl(final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040,
+                      final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040) {
         mountPointOpenApiRFC8040 = requireNonNull(mountPointOpenApiGeneratorRFC8040).getMountPointOpenApi();
-        this.apiDocGeneratorRFC8040 = requireNonNull(apiDocGeneratorRFC8040);
+        this.openApiGeneratorRFC8040 = requireNonNull(openApiGeneratorRFC8040);
     }
 
     @Override
     public synchronized Response getAllModulesDoc(final UriInfo uriInfo) {
         final DefinitionNames definitionNames = new DefinitionNames();
-        final OpenApiObject doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames);
+        final OpenApiObject doc = openApiGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames);
         return Response.ok(doc).build();
     }
 
@@ -88,7 +88,7 @@ public final class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
         return Response.ok(
-            apiDocGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo))
+            openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo))
             .build();
     }
 
