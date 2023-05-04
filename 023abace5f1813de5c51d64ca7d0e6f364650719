@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1747133e_71933085",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-04T16:26:42Z",
+      "side": 1,
+      "message": "This one is for discussion. IDK how it was missed during NETCONF-984 but here it is. I think it\u0027s OK to left it in this patch and maybe change name if you think this one is not fit. Left your suggestions under this comment.",
+      "range": {
+        "startLine": 18,
+        "startChar": 19,
+        "endLine": 18,
+        "endChar": 43
+      },
+      "revId": "023abace5f1813de5c51d64ca7d0e6f364650719",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
