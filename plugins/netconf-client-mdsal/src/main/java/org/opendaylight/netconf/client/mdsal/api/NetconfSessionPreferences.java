@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.listener;
+package org.opendaylight.netconf.client.mdsal.api;
 
 import static java.util.Objects.requireNonNull;
 
@@ -32,7 +32,6 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// FIXME: propagate to API with immutable semantics
 public record NetconfSessionPreferences(
         @NonNull ImmutableMap<String, CapabilityOrigin> nonModuleCaps,
         @NonNull ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps,

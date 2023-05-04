@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.client.mdsal.api;
 
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 
 /**
  * Remote device.
