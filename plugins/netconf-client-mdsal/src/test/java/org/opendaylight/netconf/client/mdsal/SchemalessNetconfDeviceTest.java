@@ -25,10 +25,10 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.SchemalessMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 
 public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 

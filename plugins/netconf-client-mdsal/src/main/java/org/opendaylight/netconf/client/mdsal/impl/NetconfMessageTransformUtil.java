@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.util;
+package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_DATA_QNAME;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_QNAME;
@@ -39,7 +39,6 @@ import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfMessageUtil;
-import org.opendaylight.netconf.client.mdsal.impl.MessageCounter;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
@@ -86,7 +85,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public final class NetconfMessageTransformUtil {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
 
     public static final String MESSAGE_ID_PREFIX = "m";

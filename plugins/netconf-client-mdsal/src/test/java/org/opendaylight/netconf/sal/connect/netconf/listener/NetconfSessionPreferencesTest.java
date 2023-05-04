@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 
 public class NetconfSessionPreferencesTest {
     @Test

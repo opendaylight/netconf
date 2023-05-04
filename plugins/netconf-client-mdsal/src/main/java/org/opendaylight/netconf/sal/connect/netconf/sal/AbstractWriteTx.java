@@ -29,7 +29,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;

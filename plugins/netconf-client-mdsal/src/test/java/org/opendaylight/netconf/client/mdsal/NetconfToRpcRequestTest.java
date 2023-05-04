@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
+import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toId;
 
 import java.util.Collection;
 import org.junit.Before;

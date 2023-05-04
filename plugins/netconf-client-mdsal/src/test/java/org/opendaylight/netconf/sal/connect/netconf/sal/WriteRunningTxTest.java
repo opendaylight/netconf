@@ -26,8 +26,8 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.AbstractTestModelTest;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)

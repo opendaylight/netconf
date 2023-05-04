@@ -8,8 +8,8 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfRpcFutureCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
