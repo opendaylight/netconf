@@ -87,7 +87,6 @@ public final class NetconfMessageTransformUtil {
 
     // Blank document used for creation of new DOM nodes
     private static final Document BLANK_DOCUMENT = XmlUtil.newDocument();
-    public static final String EVENT_TIME = "eventTime";
 
     private NetconfMessageTransformUtil() {
 

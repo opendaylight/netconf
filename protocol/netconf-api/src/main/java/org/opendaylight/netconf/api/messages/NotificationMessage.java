@@ -33,8 +33,6 @@ import org.w3c.dom.Element;
  */
 public final class NotificationMessage extends NetconfMessage {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationMessage.class);
-    private static final String NOTIFICATION_TAG = "notification";
-    private static final String EVENT_TIME_TAG = "eventTime";
 
     /**
      * Used for unknown/un-parse-able event-times.
@@ -197,11 +195,12 @@ public final class NotificationMessage extends NetconfMessage {
 
         final Element baseNotification = notificationContent.getDocumentElement();
         final Element entireNotification = notificationContent.createElementNS(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0, NOTIFICATION_TAG);
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0,
+            XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME);
         entireNotification.appendChild(baseNotification);
 
         final Element eventTimeElement = notificationContent.createElementNS(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0, EVENT_TIME_TAG);
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0, XmlNetconfConstants.EVENT_TIME);
         eventTimeElement.setTextContent(RFC3339_DATE_FORMATTER.apply(eventTime));
         entireNotification.appendChild(eventTimeElement);
 
