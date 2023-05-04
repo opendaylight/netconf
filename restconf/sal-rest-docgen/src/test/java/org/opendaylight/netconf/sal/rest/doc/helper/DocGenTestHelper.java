@@ -44,7 +44,8 @@ public final class DocGenTestHelper {
     /**
      * Checks whether object {@code mainObject} contains in properties/items key $ref with concrete value.
      */
-    public static void containsReferences(final JsonNode mainObject, final String childObject, final String expectedRef) {
+    public static void containsReferences(final JsonNode mainObject, final String childObject,
+            final String expectedRef) {
         final JsonNode properties = mainObject.get("properties");
         assertNotNull(properties);
 

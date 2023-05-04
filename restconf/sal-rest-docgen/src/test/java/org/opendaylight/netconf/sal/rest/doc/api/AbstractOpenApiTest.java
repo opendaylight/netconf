@@ -15,7 +15,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public abstract class AbstractApiDocTest {
+public abstract class AbstractOpenApiTest {
     protected static EffectiveModelContext CONTEXT;
     protected static DOMSchemaService SCHEMA_SERVICE;
 
