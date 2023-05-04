@@ -14,6 +14,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -91,7 +92,7 @@ public class SchemalessMessageTransformer implements NotificationTransformer, Rp
                 doc.createElementNS(NetconfMessageTransformUtil.NETCONF_RPC_QNAME.getNamespace().toString(),
                 NetconfMessageTransformUtil.NETCONF_RPC_QNAME.getLocalName());
         // set msg id
-        rpcNS.setAttribute(NetconfMessageTransformUtil.MESSAGE_ID_ATTR,
+        rpcNS.setAttribute(XmlNetconfConstants.MESSAGE_ID,
                 counter.getNewMessageId(NetconfMessageTransformUtil.MESSAGE_ID_PREFIX));
         rpcNS.appendChild(payload);
         doc.appendChild(rpcNS);

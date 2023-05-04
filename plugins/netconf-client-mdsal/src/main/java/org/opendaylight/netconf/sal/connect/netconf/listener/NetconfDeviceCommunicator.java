@@ -41,7 +41,6 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -326,9 +325,9 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         }
 
         final String inputMsgId = request.request.getDocument().getDocumentElement()
-            .getAttribute(NetconfMessageTransformUtil.MESSAGE_ID_ATTR);
+            .getAttribute(XmlNetconfConstants.MESSAGE_ID);
         final String outputMsgId = message.getDocument().getDocumentElement()
-            .getAttribute(NetconfMessageTransformUtil.MESSAGE_ID_ATTR);
+            .getAttribute(XmlNetconfConstants.MESSAGE_ID);
         if (!inputMsgId.equals(outputMsgId)) {
             // FIXME: we should be able to transform directly to RpcError without an intermediate exception
             final var ex = new NetconfDocumentedException("Response message contained unknown \"message-id\"", null,
