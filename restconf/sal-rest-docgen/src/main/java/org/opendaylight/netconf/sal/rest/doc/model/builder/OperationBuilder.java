@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.HttpMethod;
@@ -55,7 +54,7 @@ public final class OperationBuilder {
     private static final String CONTENT = "content";
     private static final ArrayNode CONSUMES_PUT_POST;
     private static final String ENUM_KEY = "enum";
-    private static final List<String> MIME_TYPES = ImmutableList.of(MediaType.APPLICATION_XML,
+    private static final List<String> MIME_TYPES = List.of(MediaType.APPLICATION_XML,
             MediaType.APPLICATION_JSON);
     private static final String OBJECT = "object";
     private static final String REQUIRED_KEY = "required";

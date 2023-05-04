@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import java.util.List;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
@@ -49,7 +49,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
             "/rests/operations/toaster2:make-toast",
             "/rests/operations/toaster2:cancel-toast",
             "/rests/operations/toaster2:restock-toaster"),
-            ImmutableList.copyOf(doc.getPaths().fieldNames()));
+            Lists.newArrayList(doc.getPaths().fieldNames()));
     }
 
     /**
