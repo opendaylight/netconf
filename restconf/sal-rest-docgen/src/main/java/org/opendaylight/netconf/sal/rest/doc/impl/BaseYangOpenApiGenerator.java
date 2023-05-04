@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
@@ -310,7 +309,7 @@ public abstract class BaseYangOpenApiGenerator {
         info.setTitle(title);
         info.setVersion(API_VERSION);
         doc.setInfo(info);
-        doc.setServers(convertToServers(ImmutableList.of(schema), host, basePath));
+        doc.setServers(convertToServers(List.of(schema), host, basePath));
         doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
                 new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         doc.setSecurity(SECURITY);
@@ -318,7 +317,7 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     private static List<Server> convertToServers(final List<String> schemes, final String host, final String basePath) {
-        return ImmutableList.of(new Server(schemes.get(0) + "://" + host + basePath));
+        return List.of(new Server(schemes.get(0) + "://" + host + basePath));
     }
 
     public abstract String getResourcePath(String resourceType, String context);
