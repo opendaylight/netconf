@@ -12,10 +12,12 @@ import java.util.Set;
 
 public interface SslHandlerFactory {
     /**
-     * This factory is used by the TLS client to create SslHandler that will be added
-     * into the channel pipeline when the channel is active.
+     * This factory is used by the TLS client to create SslHandler that will be added into the channel pipeline when
+     * the channel is active.
      */
-    SslHandler createSslHandler();
+    default SslHandler createSslHandler() {
+        return createSslHandler(Set.of());
+    }
 
     SslHandler createSslHandler(Set<String> allowedKeys);
 }

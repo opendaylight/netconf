@@ -39,11 +39,6 @@ public final class SslHandlerFactoryImpl implements SslHandlerFactory {
     }
 
     @Override
-    public SslHandler createSslHandler() {
-        return createSslHandler(Set.of());
-    }
-
-    @Override
     public SslHandler createSslHandler(final Set<String> allowedKeys) {
         try {
             final KeyStore keyStore = keystoreAdapter.getJavaKeyStore(allowedKeys);
