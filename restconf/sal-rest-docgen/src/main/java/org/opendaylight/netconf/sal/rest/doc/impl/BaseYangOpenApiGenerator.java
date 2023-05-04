@@ -309,15 +309,11 @@ public abstract class BaseYangOpenApiGenerator {
         info.setTitle(title);
         info.setVersion(API_VERSION);
         doc.setInfo(info);
-        doc.setServers(convertToServers(List.of(schema), host, basePath));
+        doc.setServers(List.of(new Server(schema + "://" + host + basePath)));
         doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
                 new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         doc.setSecurity(SECURITY);
         return doc;
-    }
-
-    private static List<Server> convertToServers(final List<String> schemes, final String host, final String basePath) {
-        return List.of(new Server(schemes.get(0) + "://" + host + basePath));
     }
 
     public abstract String getResourcePath(String resourceType, String context);
