@@ -19,7 +19,9 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.netconf.sal.rest.doc.api.AbstractApiDocTest;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
+import org.opendaylight.netconf.sal.rest.doc.helper.DocGenTestHelper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
