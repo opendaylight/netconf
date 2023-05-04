@@ -12,18 +12,18 @@ import static java.util.Objects.requireNonNull;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import java.util.Set;
 import javax.ws.rs.core.Application;
-import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
+import org.opendaylight.netconf.sal.rest.doc.api.OpenApiService;
 
 // FIXME: hide this class
-public final class ApiDocApplication extends Application {
-    private final ApiDocService apiDocService;
+public final class OpenApiApplication extends Application {
+    private final OpenApiService openApiService;
 
-    public ApiDocApplication(final ApiDocService apiDocService) {
-        this.apiDocService = requireNonNull(apiDocService);
+    public OpenApiApplication(final OpenApiService openApiService) {
+        this.openApiService = requireNonNull(openApiService);
     }
 
     @Override
     public Set<Object> getSingletons() {
-        return Set.of(apiDocService, new JaxbContextResolver(), new JacksonJaxbJsonProvider());
+        return Set.of(openApiService, new JaxbContextResolver(), new JacksonJaxbJsonProvider());
     }
 }

@@ -9,8 +9,8 @@ package org.opendaylight.netconf.sal.rest.doc.mountpoints;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.DEFAULT_PAGESIZE;
 import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator.BASE_PATH;
+import static org.opendaylight.netconf.sal.rest.doc.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.DESCRIPTION_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.RESPONSES_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_KEY;
@@ -144,7 +144,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         }
 
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
-            return generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
+            return generateDataStoreOpenApi(uriInfo, urlPrefix, deviceName);
         }
         final OpenApiObject openApiObject = openApiGenerator.getApiDeclaration(module, revision, uriInfo, context,
                 urlPrefix);
@@ -192,7 +192,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private OpenApiObject generateDataStoreApiDoc(final UriInfo info, final String context, final String deviceName) {
+    private OpenApiObject generateDataStoreOpenApi(final UriInfo info, final String context, final String deviceName) {
         final var openApiObject = openApiGenerator.createOpenApiObject(openApiGenerator.createSchemaFromUriInfo(info),
                 openApiGenerator.createHostFromUriInfo(info), BASE_PATH, context);
         openApiObject.setPaths(getDataStoreApiPaths(context, deviceName));

@@ -19,13 +19,13 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.AbstractApiDocTest;
+import org.opendaylight.netconf.sal.rest.doc.AbstractOpenApiTest;
 import org.opendaylight.netconf.sal.rest.doc.DocGenTestHelper;
-import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
+import org.opendaylight.netconf.sal.rest.doc.api.OpenApiService;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
-public final class ApiDocServiceImplTest extends AbstractApiDocTest {
+public final class OpenApiServiceImplTest extends AbstractOpenApiTest {
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
@@ -33,7 +33,7 @@ public final class ApiDocServiceImplTest extends AbstractApiDocTest {
             .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private ApiDocService apiDocService;
+    private OpenApiService openApiService;
 
     @Before
     public void before() {
@@ -44,16 +44,16 @@ public final class ApiDocServiceImplTest extends AbstractApiDocTest {
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
         final MountPointOpenApiGeneratorRFC8040 mountPointRFC8040 =
                 new MountPointOpenApiGeneratorRFC8040(SCHEMA_SERVICE, service);
-        final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040 = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
+        final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(SCHEMA_SERVICE);
         mountPointRFC8040.getMountPointOpenApi().onMountPointCreated(INSTANCE_ID);
-        apiDocService = new ApiDocServiceImpl(mountPointRFC8040, apiDocGeneratorRFC8040);
+        openApiService = new OpenApiServiceImpl(mountPointRFC8040, openApiGeneratorRFC8040);
     }
 
     @Test
     public void getListOfMounts() throws Exception {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         // simulate the behavior of JacksonJaxbJsonProvider
-        final String result = MAPPER.writer().writeValueAsString(apiDocService.getListOfMounts(mockInfo).getEntity());
+        final String result = MAPPER.writer().writeValueAsString(openApiService.getListOfMounts(mockInfo).getEntity());
         assertEquals("[{\"instance\":\"/nodes/node=123/\",\"id\":1}]", result);
     }
 }

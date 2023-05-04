@@ -12,10 +12,10 @@ import static org.junit.Assert.assertNotNull;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.rest.doc.AbstractApiDocTest;
+import org.opendaylight.netconf.sal.rest.doc.AbstractOpenApiTest;
 import org.opendaylight.yangtools.yang.common.Revision;
 
-public final class DefinitionGeneratorTest extends AbstractApiDocTest {
+public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
     @Test
     public void testConvertToJsonSchema() throws IOException {
         final var module = CONTEXT.findModule("opflex", Revision.of("2014-05-28")).orElseThrow();
