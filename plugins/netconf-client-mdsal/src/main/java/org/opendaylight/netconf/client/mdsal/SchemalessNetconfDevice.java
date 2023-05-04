@@ -20,7 +20,6 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.impl.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.client.mdsal.impl.MessageCounter;
 import org.opendaylight.netconf.client.mdsal.impl.SchemalessMessageTransformer;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
 
