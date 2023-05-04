@@ -42,7 +42,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
-import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
+import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;

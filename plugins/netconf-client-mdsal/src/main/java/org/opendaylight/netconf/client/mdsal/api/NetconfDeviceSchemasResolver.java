@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.client.mdsal.api;
 
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**

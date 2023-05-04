@@ -16,7 +16,7 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.BaseSchema;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

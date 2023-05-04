@@ -14,7 +14,7 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceSalFacade;
 
 /**
  * {@link NetconfDeviceSalFacade} specialization for netconf topology.

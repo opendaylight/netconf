@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceMount;
+import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
