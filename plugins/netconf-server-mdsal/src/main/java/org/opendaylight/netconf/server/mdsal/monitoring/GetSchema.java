@@ -30,6 +30,9 @@ import org.w3c.dom.Element;
 
 public final class GetSchema extends AbstractSingletonNetconfOperation {
     private static final Logger LOG = LoggerFactory.getLogger(GetSchema.class);
+    public static final String URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING =
+        "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
+
     private static final String GET_SCHEMA = "get-schema";
     private static final String IDENTIFIER = "identifier";
     private static final String VERSION = "version";
@@ -48,7 +51,7 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
 
     @Override
     protected String getOperationNamespace() {
-        return XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING;
+        return URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING;
     }
 
     @Override
@@ -68,7 +71,7 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
         }
 
         final var getSchemaResult = XmlUtil.createTextElement(document, XmlNetconfConstants.DATA_KEY, schema,
-                Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING));
+                Optional.of(URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING));
         LOG.trace("{} operation successful", GET_SCHEMA);
         return getSchemaResult;
     }
@@ -79,7 +82,7 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
 
         GetSchemaEntry(final XmlElement getSchemaElement) throws DocumentedException {
             getSchemaElement.checkName(GET_SCHEMA);
-            getSchemaElement.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING);
+            getSchemaElement.checkNamespace(URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING);
 
             final XmlElement identifierElement;
             try {

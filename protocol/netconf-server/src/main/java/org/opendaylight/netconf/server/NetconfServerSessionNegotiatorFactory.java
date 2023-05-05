@@ -17,9 +17,9 @@ import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.Set;
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.HelloMessage;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
@@ -35,11 +35,10 @@ public class NetconfServerSessionNegotiatorFactory
     implements NetconfSessionNegotiatorFactory<NetconfServerSession, NetconfServerSessionListener> {
 
     public static final Set<String> DEFAULT_BASE_CAPABILITIES = ImmutableSet.of(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0
-    );
+        CapabilityURN.BASE_1_0,
+        CapabilityURN.BASE_1_1,
+        CapabilityURN.EXI,
+        CapabilityURN.NOTIFICATION);
 
     private final @NonNegative int maximumIncomingChunkSize;
     private final Timer timer;
@@ -90,7 +89,7 @@ public class NetconfServerSessionNegotiatorFactory
         final ImmutableSet.Builder<String> b = ImmutableSet.builder();
         b.addAll(baseCapabilities);
         // Base 1.0 capability is supported by default
-        b.add(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0);
+        b.add(CapabilityURN.BASE_1_0);
         return b.build();
     }
 

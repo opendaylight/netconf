@@ -114,8 +114,9 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
     @Override
     public Set<QName> getAvailableYangSchemasQNames() {
-        return getAvailableYangSchemas().stream().map(RemoteYangSchema::getQName)
-                .collect(ImmutableSet.toImmutableSet());
+        return availableYangSchemas.stream()
+            .map(RemoteYangSchema::getQName)
+            .collect(ImmutableSet.toImmutableSet());
     }
 
     /**

@@ -34,8 +34,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.mdsal.AbstractTestModelTest;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -158,8 +158,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     private AbstractNetconfDataTreeService getNetconService() {
-        NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(
-                List.of(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0));
+        NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
         return AbstractNetconfDataTreeService.of(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs,

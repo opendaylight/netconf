@@ -97,7 +97,7 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProviderImpl;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
@@ -413,8 +413,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
             new EmptyMountPointContext(deviceSchemaContext)),
-            NetconfSessionPreferences.fromStrings(
-                List.of(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0)),
+            NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE)),
             new RemoteDeviceServices(deviceRpcService, null));
 
         final var masterMountPoint = awaitMountPoint(masterMountPointService);
@@ -490,8 +489,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), new EmptyMountPointContext(deviceSchemaContext)),
-            NetconfSessionPreferences.fromStrings(List.of(
-                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0)),
+            NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE)),
             new RemoteDeviceServices(deviceRpcService, null));
 
         verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
