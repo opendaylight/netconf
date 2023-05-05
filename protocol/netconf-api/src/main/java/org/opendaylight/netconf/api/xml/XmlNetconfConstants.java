@@ -38,6 +38,9 @@ public final class XmlNetconfConstants {
     public static final String URN_IETF_PARAMS_NETCONF_BASE_1_0 = "urn:ietf:params:netconf:base:1.0";
     public static final String URN_IETF_PARAMS_NETCONF_BASE_1_1 = "urn:ietf:params:netconf:base:1.1";
     public static final String URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0 = "urn:ietf:params:xml:ns:netconf:exi:1.0";
+    public static final String URN_IETF_PARAMS_XML_NS_NETCONF_NOTIFICATION_1_0 =
+        "urn:ietf:params:xml:ns:netconf:notification:1.0";
+
     public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0 =
             "urn:ietf:params:netconf:capability:notification:1.0";
     public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_ROLLBACK_ON_ERROR_1_0 =

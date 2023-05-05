@@ -30,7 +30,7 @@ public class NotificationMessageTest {
         final NotificationMessage netconfNotification = new NotificationMessage(document, eventTime);
         final Document resultDoc = netconfNotification.getDocument();
         final NodeList nodeList = resultDoc.getElementsByTagNameNS(
-            "urn:ietf:params:netconf:capability:notification:1.0", "notification");
+            "urn:ietf:params:xml:ns:netconf:notification:1.0", "notification");
 
         assertNotNull(nodeList);
         // expected only the one NOTIFICATION tag
@@ -38,7 +38,7 @@ public class NotificationMessageTest {
 
         final Element entireNotification = (Element) nodeList.item(0);
         final NodeList childNodes = entireNotification.getElementsByTagNameNS(
-            "urn:ietf:params:netconf:capability:notification:1.0", "eventTime");
+            "urn:ietf:params:xml:ns:netconf:notification:1.0", "eventTime");
 
         assertNotNull(childNodes);
         // expected only the one EVENT_TIME tag

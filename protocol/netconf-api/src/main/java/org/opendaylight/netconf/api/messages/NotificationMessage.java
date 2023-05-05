@@ -195,12 +195,12 @@ public final class NotificationMessage extends NetconfMessage {
 
         final Element baseNotification = notificationContent.getDocumentElement();
         final Element entireNotification = notificationContent.createElementNS(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0,
+            XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_NOTIFICATION_1_0,
             XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME);
         entireNotification.appendChild(baseNotification);
 
         final Element eventTimeElement = notificationContent.createElementNS(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0, XmlNetconfConstants.EVENT_TIME);
+            XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_NOTIFICATION_1_0, XmlNetconfConstants.EVENT_TIME);
         eventTimeElement.setTextContent(RFC3339_DATE_FORMATTER.apply(eventTime));
         entireNotification.appendChild(eventTimeElement);
 
