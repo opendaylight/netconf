@@ -22,6 +22,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
@@ -47,8 +48,7 @@ import org.slf4j.LoggerFactory;
 @Component(service = NetconfOperationServiceFactory.class, immediate = true, property = "type=mdsal-netconf-connector")
 public final class MdsalNetconfOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalNetconfOperationServiceFactory.class);
-    private static final BasicCapability VALIDATE_CAPABILITY =
-            new BasicCapability("urn:ietf:params:netconf:capability:validate:1.0");
+    private static final BasicCapability VALIDATE_CAPABILITY = new BasicCapability(CapabilityURN.VALIDATE);
 
     private final DOMDataBroker dataBroker;
     private final DOMRpcService rpcService;
@@ -98,7 +98,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
         final var capabilities = new HashSet<Capability>();
 
         // Added by netconf-impl by default
-        // capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
+        // capabilities.add(new BasicCapability(CapabilityURN.CANDIDATE));
 
         // FIXME: rework in terms of ModuleEffectiveStatement
         for (var module : currentContext.getModules()) {
@@ -149,6 +149,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     public Registration registerCapabilityListener(final CapabilityListener listener) {
         // Advertise validate capability only if DOMDataBroker provides DOMDataTransactionValidator
         if (dataBroker.getExtensions().get(DOMDataTransactionValidator.class) != null) {
+            // FIXME: support VALIDATE_1_1 as well!
             listener.onCapabilitiesChanged(Set.of(VALIDATE_CAPABILITY), Set.of());
         }
         // Advertise namespaces of supported YANG models as NETCONF capabilities

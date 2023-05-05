@@ -23,7 +23,6 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,8 +35,8 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
@@ -414,15 +413,13 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             this.remoteSessionCapabilities = remoteSessionCapabilities;
 
             // If device supports notifications and does not contain necessary modules, add them automatically
-            if (remoteSessionCapabilities.containsNonModuleCapability(
-                    XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0)) {
-                deviceSources.getRequiredSourcesQName().addAll(
-                        Arrays.asList(
-                                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                                        .$YangModuleInfoImpl.getInstance().getName(),
-                                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                                        .$YangModuleInfoImpl.getInstance().getName()
-                        )
+            if (remoteSessionCapabilities.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
+                // FIXME: mutable collection modification!
+                deviceSources.getRequiredSourcesQName().addAll(List.of(
+                    org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                        .$YangModuleInfoImpl.getInstance().getName(),
+                    org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                        .$YangModuleInfoImpl.getInstance().getName())
                 );
             }
 

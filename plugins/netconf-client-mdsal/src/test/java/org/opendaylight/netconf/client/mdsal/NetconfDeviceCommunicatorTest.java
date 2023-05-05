@@ -53,6 +53,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockMakers;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -142,7 +143,7 @@ public class NetconfDeviceCommunicatorTest {
     public void testOnSessionUp() {
         final var testCapability = "urn:opendaylight:params:xml:ns:test?module=test-module&revision=2014-06-02";
         final var serverCapabilities = Set.of(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_ROLLBACK_ON_ERROR_1_0,
+            CapabilityURN.ROLLBACK_ON_ERROR,
             NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString(),
             testCapability);
         doReturn(serverCapabilities).when(spySession).getServerCapabilities();

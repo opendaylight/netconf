@@ -15,13 +15,12 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.Lists;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.Collection;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -90,16 +89,11 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 
     private static NetconfSessionPreferences getSessionCaps(final boolean addMonitor,
                                                             final Collection<String> additionalCapabilities) {
-        final ArrayList<String> capabilities = Lists.newArrayList(
-                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
-
+        final var capabilities = Lists.newArrayList(CapabilityURN.BASE, CapabilityURN.BASE_1_1);
         if (addMonitor) {
             capabilities.add(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
         }
-
         capabilities.addAll(additionalCapabilities);
-
         return NetconfSessionPreferences.fromStrings(capabilities);
     }
 }
