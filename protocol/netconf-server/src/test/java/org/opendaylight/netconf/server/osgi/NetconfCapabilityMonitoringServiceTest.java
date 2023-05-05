@@ -15,8 +15,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
 import java.util.HashSet;
 import java.util.List;
@@ -139,8 +137,8 @@ public class NetconfCapabilityMonitoringServiceTest {
             exp.add(new Uri(capability.getCapabilityUri()));
         }
         //candidate and url capabilities are added by monitoring service automatically
-        exp.add(new Uri(URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0));
-        exp.add(new Uri(URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0));
+        exp.add(new Uri("urn:ietf:params:netconf:capability:candidate:1.0"));
+        exp.add(new Uri("urn:ietf:params:netconf:capability:url:1.0?scheme=file"));
         Capabilities expected = new CapabilitiesBuilder().setCapability(exp).build();
         Capabilities actual = monitoringService.getCapabilities();
         assertEquals(new HashSet<>(expected.getCapability()), new HashSet<>(actual.getCapability()));

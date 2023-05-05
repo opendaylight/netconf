@@ -23,10 +23,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.opendaylight.netconf.api.messages.HelloMessage;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
@@ -55,8 +55,8 @@ public class Netconf539Test {
         channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
             FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
-        final HelloMessage serverHello = HelloMessage.createClientHello(
-            Set.of(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
+        final HelloMessage serverHello = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1),
+            Optional.empty());
         negotiator = new TestSessionNegotiator(serverHello, promise, channel, new HashedWheelTimer(), listener, 100L);
     }
 

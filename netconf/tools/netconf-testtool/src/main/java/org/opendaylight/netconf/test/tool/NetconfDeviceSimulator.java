@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.northbound.ssh.SshProxyServer;
 import org.opendaylight.netconf.northbound.ssh.SshProxyServerConfiguration;
 import org.opendaylight.netconf.northbound.ssh.SshProxyServerConfigurationBuilder;
@@ -108,7 +109,7 @@ public class NetconfDeviceSimulator implements Closeable {
                 return input;
             }
         }));
-        transformedCapabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
+        transformedCapabilities.add(new BasicCapability(CapabilityURN.CANDIDATE));
         final NetconfMonitoringService monitoringService1 = new DummyMonitoringService(transformedCapabilities);
         final SessionIdProvider idProvider = new DefaultSessionIdProvider();
 

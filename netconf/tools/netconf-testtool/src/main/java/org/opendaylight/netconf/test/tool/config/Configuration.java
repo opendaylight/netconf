@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import java.io.File;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
@@ -22,20 +22,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Configuration {
-
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
     public static final Set<String> DEFAULT_BASE_CAPABILITIES_EXI = ImmutableSet.of(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0
-    );
+        CapabilityURN.BASE,
+        CapabilityURN.BASE_1_1,
+        CapabilityURN.EXI,
+        CapabilityURN.NOTIFICATION);
 
     public static final Set<String> DEFAULT_BASE_CAPABILITIES = ImmutableSet.of(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1
-    );
+        CapabilityURN.BASE,
+        CapabilityURN.BASE_1_1);
 
     public static final Set<YangResource> DEFAULT_YANG_RESOURCES = ImmutableSet.of(
             new YangResource("ietf-netconf-monitoring", "2010-10-04",
