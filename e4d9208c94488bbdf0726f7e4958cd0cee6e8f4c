@@ -16,6 +16,24 @@
       "message": "This patch for some reason increase heap-space memory..",
       "revId": "e4d9208c94488bbdf0726f7e4958cd0cee6e8f4c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37277f4e_350032f0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-05T14:06:03Z",
+      "side": 1,
+      "message": "So this is not true, the problem was in the other patch:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/104878/13",
+      "parentUuid": "c1e3ed86_f1d4e14d",
+      "revId": "e4d9208c94488bbdf0726f7e4958cd0cee6e8f4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
