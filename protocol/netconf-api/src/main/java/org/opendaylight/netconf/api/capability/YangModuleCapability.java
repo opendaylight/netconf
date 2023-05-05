@@ -15,7 +15,6 @@ import org.opendaylight.yangtools.yang.model.api.ModuleLike;
  * Yang model representing capability.
  */
 public final class YangModuleCapability extends BasicCapability {
-
     private final String content;
     private final String revision;
     private final String moduleName;
@@ -35,8 +34,8 @@ public final class YangModuleCapability extends BasicCapability {
     }
 
     private static String toCapabilityURI(final ModuleLike module) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(module.getNamespace()).append("?module=").append(module.getName());
+        final StringBuilder sb = new StringBuilder()
+            .append(module.getNamespace()).append("?module=").append(module.getName());
         module.getRevision().ifPresent(revision -> sb.append("&revision=").append(revision));
         return sb.toString();
     }

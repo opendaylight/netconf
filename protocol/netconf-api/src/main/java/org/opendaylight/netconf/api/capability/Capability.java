@@ -14,7 +14,7 @@ import java.util.Optional;
  * Contains capability URI announced by server hello message and optionally its
  * corresponding yang schema that can be retrieved by get-schema rpc.
  */
-public interface Capability {
+public sealed interface Capability permits ProtocolCapability, YangModuleCapability {
 
     String getCapabilityUri();
 
