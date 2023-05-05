@@ -8,10 +8,6 @@
 package org.opendaylight.netconf.api.xml;
 
 public final class XmlNetconfConstants {
-    private XmlNetconfConstants() {
-
-    }
-
     public static final String CAPABILITY = "capability";
     public static final String CAPABILITIES = "capabilities";
     public static final String COMMIT = "commit";
@@ -35,25 +31,11 @@ public final class XmlNetconfConstants {
     public static final String RPC_REPLY_KEY = "rpc-reply";
 
     public static final String URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0 = "urn:ietf:params:xml:ns:netconf:base:1.0";
-    public static final String URN_IETF_PARAMS_NETCONF_BASE_1_0 = "urn:ietf:params:netconf:base:1.0";
-    public static final String URN_IETF_PARAMS_NETCONF_BASE_1_1 = "urn:ietf:params:netconf:base:1.1";
     public static final String URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0 = "urn:ietf:params:xml:ns:netconf:exi:1.0";
     public static final String URN_IETF_PARAMS_XML_NS_NETCONF_NOTIFICATION_1_0 =
         "urn:ietf:params:xml:ns:netconf:notification:1.0";
 
-    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0 =
-            "urn:ietf:params:netconf:capability:notification:1.0";
-    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_ROLLBACK_ON_ERROR_1_0 =
-            "urn:ietf:params:netconf:capability:rollback-on-error:1.0";
-    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_WRITABLE_RUNNING_1_0 =
-            "urn:ietf:params:netconf:capability:writable-running:1.0";
-
-    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0 =
-            "urn:ietf:params:netconf:capability:exi:1.0";
-    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0 =
-            "urn:ietf:params:netconf:capability:candidate:1.0";
-    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0 =
-            "urn:ietf:params:netconf:capability:url:1.0?scheme=file";
-    public static final String URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING =
-            "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
+    private XmlNetconfConstants() {
+        // Hidden on purpose
+    }
 }

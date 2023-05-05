@@ -15,8 +15,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -75,8 +74,8 @@ public class NetconfCapabilityMonitoringServiceTest {
         moduleCapability2 = new YangModuleCapability(TEST_MODULE_NAMESPACE.getValue(), TEST_MODULE_NAME,
             TEST_MODULE_REV2, TEST_MODULE_CONTENT2);
 
-        capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));
-        capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.1"));
+        capabilities.add(new BasicCapability(CapabilityURN.BASE));
+        capabilities.add(new BasicCapability(CapabilityURN.BASE_1_1));
         capabilities.add(new BasicCapability("urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;"
                 + "revision=2010-09-24"));
 
@@ -139,8 +138,8 @@ public class NetconfCapabilityMonitoringServiceTest {
             exp.add(new Uri(capability.getCapabilityUri()));
         }
         //candidate and url capabilities are added by monitoring service automatically
-        exp.add(new Uri(URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0));
-        exp.add(new Uri(URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0));
+        exp.add(new Uri("urn:ietf:params:netconf:capability:candidate:1.0"));
+        exp.add(new Uri("urn:ietf:params:netconf:capability:url:1.0?scheme=file"));
         Capabilities expected = new CapabilitiesBuilder().setCapability(exp).build();
         Capabilities actual = monitoringService.getCapabilities();
         assertEquals(new HashSet<>(expected.getCapability()), new HashSet<>(actual.getCapability()));

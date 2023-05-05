@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -150,21 +150,19 @@ public record NetconfSessionPreferences(
     }
 
     public boolean isRollbackSupported() {
-        return containsNonModuleCapability(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_ROLLBACK_ON_ERROR_1_0);
+        return containsNonModuleCapability(CapabilityURN.ROLLBACK_ON_ERROR);
     }
 
     public boolean isCandidateSupported() {
-        return containsNonModuleCapability(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
+        return containsNonModuleCapability(CapabilityURN.CANDIDATE);
     }
 
     public boolean isRunningWritable() {
-        return containsNonModuleCapability(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_WRITABLE_RUNNING_1_0);
+        return containsNonModuleCapability(CapabilityURN.WRITABLE_RUNNING);
     }
 
     public boolean isNotificationsSupported() {
-        return containsPartialNonModuleCapability(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0)
+        return containsPartialNonModuleCapability(CapabilityURN.NOTIFICATION)
             || containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS);
     }
 

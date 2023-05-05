@@ -43,10 +43,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
@@ -218,17 +218,11 @@ public class ConcurrentClientsTest {
     }
 
     public static Set<String> getOnlyExiServerCaps() {
-        return Set.of(
-                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0
-        );
+        return Set.of(CapabilityURN.BASE, CapabilityURN.EXI);
     }
 
     public static Set<String> getOnlyChunkServerCaps() {
-        return Set.of(
-                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1
-        );
+        return Set.of(CapabilityURN.BASE, CapabilityURN.BASE_1_1);
     }
 
     public Runnable getInstanceOfClientRunnable() throws Exception {
