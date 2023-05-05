@@ -7,24 +7,18 @@
  */
 package org.opendaylight.netconf.api.capability;
 
-import java.util.Collection;
-import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * Contains capability URI announced by server hello message and optionally its
  * corresponding yang schema that can be retrieved by get-schema rpc.
  */
-public interface Capability {
-
-    String getCapabilityUri();
-
-    Optional<String> getModuleNamespace();
-
-    Optional<String> getModuleName();
-
-    Optional<String> getRevision();
-
-    Optional<String> getCapabilitySchema();
-
-    Collection<String> getLocation();
+@NonNullByDefault
+public sealed interface Capability permits ProtocolCapability, YangModuleCapability {
+    /**
+     * Return this capability's URN.
+     *
+     * @return An URN
+     */
+    String urn();
 }

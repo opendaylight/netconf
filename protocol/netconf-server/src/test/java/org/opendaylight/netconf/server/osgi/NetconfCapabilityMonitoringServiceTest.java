@@ -28,8 +28,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
+import org.opendaylight.netconf.api.capability.ProtocolCapability;
 import org.opendaylight.netconf.api.capability.YangModuleCapability;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
@@ -89,8 +89,8 @@ public class NetconfCapabilityMonitoringServiceTest {
         doReturn(Optional.of(TEST_MODULE_DATE2)).when(moduleMock2).getRevision();
         moduleCapability2 = new YangModuleCapability(moduleMock2, TEST_MODULE_CONTENT2);
 
-        capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));
-        capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.1"));
+        capabilities.add(ProtocolCapability.BASE_1_0);
+        capabilities.add(ProtocolCapability.BASE_1_1);
         capabilities.add(new BasicCapability("urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;"
                 + "revision=2010-09-24"));
 
@@ -149,8 +149,8 @@ public class NetconfCapabilityMonitoringServiceTest {
     @Test
     public void testGetCapabilities() {
         Set<Uri> exp = new HashSet<>();
-        for (Capability capability : capabilities) {
-            exp.add(new Uri(capability.getCapabilityUri()));
+        for (var capability : capabilities) {
+            exp.add(new Uri(capability.urn()));
         }
         //candidate and url capabilities are added by monitoring service automatically
         exp.add(new Uri(URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0));
