@@ -16,10 +16,10 @@ import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiatorFactory;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
@@ -34,20 +34,19 @@ public class NetconfClientSessionNegotiatorFactory
         implements NetconfSessionNegotiatorFactory<NetconfClientSession, NetconfClientSessionListener> {
 
     public static final Set<String> EXI_CLIENT_CAPABILITIES = ImmutableSet.of(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0);
+        CapabilityURN.BASE_1_0,
+        CapabilityURN.BASE_1_1,
+        CapabilityURN.EXI);
 
     public static final Set<String> LEGACY_EXI_CLIENT_CAPABILITIES = ImmutableSet.of(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0);
+        CapabilityURN.BASE_1_0,
+        CapabilityURN.EXI);
 
     public static final Set<String> DEFAULT_CLIENT_CAPABILITIES = ImmutableSet.of(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
+        CapabilityURN.BASE_1_0,
+        CapabilityURN.BASE_1_1);
 
-    public static final Set<String> LEGACY_FRAMING_CLIENT_CAPABILITIES = ImmutableSet.of(
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0);
+    public static final Set<String> LEGACY_FRAMING_CLIENT_CAPABILITIES = ImmutableSet.of(CapabilityURN.BASE_1_0);
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientSessionNegotiatorFactory.class);
     private static final String START_EXI_MESSAGE_ID = "default-start-exi";

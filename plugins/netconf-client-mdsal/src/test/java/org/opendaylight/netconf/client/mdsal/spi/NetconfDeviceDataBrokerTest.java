@@ -32,7 +32,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
@@ -66,7 +66,7 @@ public class NetconfDeviceDataBrokerTest {
     @Before
     public void setUp() throws Exception {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpcService).invokeNetconf(any(), any());
-        dataBroker = getDataBroker(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
+        dataBroker = getDataBroker(CapabilityURN.CANDIDATE);
     }
 
     @Test
@@ -85,21 +85,17 @@ public class NetconfDeviceDataBrokerTest {
 
     @Test
     public void testWritableRunningCandidateWriteTransaction() {
-        testWriteTransaction(WriteCandidateRunningTx.class,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_WRITABLE_RUNNING_1_0,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
+        testWriteTransaction(WriteCandidateRunningTx.class, CapabilityURN.WRITABLE_RUNNING, CapabilityURN.CANDIDATE);
     }
 
     @Test
     public void testCandidateWriteTransaction() {
-        testWriteTransaction(WriteCandidateTx.class,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
+        testWriteTransaction(WriteCandidateTx.class, CapabilityURN.CANDIDATE);
     }
 
     @Test
     public void testRunningWriteTransaction() {
-        testWriteTransaction(WriteRunningTx.class,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_WRITABLE_RUNNING_1_0);
+        testWriteTransaction(WriteRunningTx.class, CapabilityURN.WRITABLE_RUNNING);
     }
 
     @Test
