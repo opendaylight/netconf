@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.api.capability.Capability;
+import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;

@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.api.capability.Capability;
+import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;

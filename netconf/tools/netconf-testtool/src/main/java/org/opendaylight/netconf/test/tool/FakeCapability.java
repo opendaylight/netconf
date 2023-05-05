@@ -8,8 +8,8 @@
 package org.opendaylight.netconf.test.tool;
 
 import java.util.Optional;
-import org.opendaylight.netconf.api.capability.BasicCapability;
-import org.opendaylight.netconf.api.capability.YangModuleCapability;
+import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
+import org.opendaylight.netconf.server.api.monitoring.YangModuleCapability;
 
 /**
  * Can be passed instead of YangModuleCapability when building capabilities

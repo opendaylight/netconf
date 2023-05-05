@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.server.api.monitoring;
 
 import java.util.Set;
-import org.opendaylight.netconf.api.capability.Capability;
 
 public interface CapabilityListener {
 
