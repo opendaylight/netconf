@@ -75,8 +75,9 @@ public final class SubtreeFilter {
     }
 
     private static void removeEventTimeNode(final Document document) {
-        final Node eventTimeNode = document.getDocumentElement().getElementsByTagNameNS(XmlNetconfConstants
-                .URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0, XmlNetconfConstants.EVENT_TIME).item(0);
+        final Node eventTimeNode = document.getDocumentElement()
+            .getElementsByTagNameNS("urn:ietf:params:xml:ns:netconf:notification:1.0", XmlNetconfConstants.EVENT_TIME)
+            .item(0);
         document.getDocumentElement().removeChild(eventTimeNode);
     }
 

@@ -36,7 +36,7 @@ public final class NetconfNotification extends NetconfMessage {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNotification.class);
 
     public static final String NOTIFICATION = "notification";
-    public static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:netconf:capability:notification:1.0";
+    public static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:xml:ns:netconf:notification:1.0";
 
     /**
      * The ISO-like date-time formatter that formats or parses a date-time with

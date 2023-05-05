@@ -42,7 +42,7 @@ public class NotificationsTransformUtilTest {
                     + "</netconf-capability-change>";
 
     private static final String EXPECTED_NOTIFICATION =
-            "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">"
+            "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">"
                     + INNER_NOTIFICATION
                     + "<eventTime>"
                     + NetconfNotification.RFC3339_DATE_FORMATTER.apply(DATE)
