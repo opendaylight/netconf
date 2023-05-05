@@ -7,51 +7,71 @@
  */
 package org.opendaylight.netconf.api.capability;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 
 /**
- * Yang model representing capability.
+ * A capability representing a YANG module, as defined in
+ * <a href="https://datatracker.ietf.org/doc/html/rfc6020#section-5.6.4">RFC6020, section 5.6.4</a>.
  */
-public final class YangModuleCapability extends BasicCapability {
-
+// FIXME: this does not really follow the spec -- it does not expose feature/deviate parameters and it requires
+//        schema content (i.e. YANG file)
+public final class YangModuleCapability extends ParameterizedCapability {
+    private final @NonNull String uri;
     private final String content;
+    // TODO: Revision
     private final String revision;
+    // TODO: UnresolvedQName.Unqualified ?
     private final String moduleName;
-    private final String moduleNamespace;
+    // TODO: XMLNamespace
+    private final @NonNull String moduleNamespace;
 
-    public YangModuleCapability(final ModuleLike module, final String moduleContent) {
-        super(toCapabilityURI(module));
-        content = moduleContent;
-        moduleName = module.getName();
-        moduleNamespace = module.getNamespace().toString();
-        revision = module.getRevision().map(Revision::toString).orElse(null);
+    // FIXME: without yang.model.api inference
+    @Deprecated
+    public YangModuleCapability(final ModuleLike module, final String content) {
+        this(module.getNamespace().toString(), module.getName(),
+            module.getRevision().map(Revision::toString).orElse(null), content);
+    }
+
+    public YangModuleCapability(final String namespace, final @Nullable String module,
+            final @Nullable String revision, final String content) {
+        moduleNamespace = requireNonNull(namespace);
+        moduleName = module;
+        this.revision = revision;
+        this.content = requireNonNull(content);
+
+        final var sb = new StringBuilder().append(namespace);
+        if (module != null) {
+            sb.append("?module=").append(module);
+        }
+        if (revision != null) {
+            sb.append("&revision=").append(revision);
+        }
+        uri = sb.toString();
     }
 
     @Override
+    public String urn() {
+        return moduleNamespace;
+    }
+
     public Optional<String> getCapabilitySchema() {
         return Optional.of(content);
     }
 
-    private static String toCapabilityURI(final ModuleLike module) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(module.getNamespace()).append("?module=").append(module.getName());
-        module.getRevision().ifPresent(revision -> sb.append("&revision=").append(revision));
-        return sb.toString();
-    }
-
-    @Override
     public Optional<String> getModuleName() {
         return Optional.of(moduleName);
     }
 
-    @Override
     public Optional<String> getModuleNamespace() {
         return Optional.of(moduleNamespace);
     }
 
-    @Override
     public Optional<String> getRevision() {
         return Optional.ofNullable(revision);
     }

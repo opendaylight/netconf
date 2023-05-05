@@ -28,8 +28,9 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
+import org.opendaylight.netconf.api.capability.SimpleCapability;
+import org.opendaylight.netconf.api.capability.CapabilityURN;
 import org.opendaylight.netconf.api.capability.YangModuleCapability;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
@@ -89,10 +90,10 @@ public class NetconfCapabilityMonitoringServiceTest {
         doReturn(Optional.of(TEST_MODULE_DATE2)).when(moduleMock2).getRevision();
         moduleCapability2 = new YangModuleCapability(moduleMock2, TEST_MODULE_CONTENT2);
 
-        capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));
-        capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.1"));
-        capabilities.add(new BasicCapability("urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;"
-                + "revision=2010-09-24"));
+        capabilities.add(SimpleCapability.BASE_1_0);
+        capabilities.add(SimpleCapability.BASE_1_1);
+        capabilities.add(new YangModuleCapability("urn:ietf:params:xml:ns:yang:ietf-inet-types", "ietf-inet-types",
+            "2010-09-24", ""));
 
         doReturn(capabilities).when(operationServiceFactoryMock).getCapabilities();
         doReturn(null).when(operationServiceFactoryMock)
@@ -113,7 +114,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     @Test
     public void testListeners() {
         HashSet<Capability> added = new HashSet<>();
-        added.add(new BasicCapability("toAdd"));
+        added.add(SimpleCapability.EXI);
         monitoringService.onCapabilitiesChanged(added, Set.of());
         //onCapabilitiesChanged and onSchemasChanged are invoked also after listener registration
         verify(listener, times(2)).onCapabilitiesChanged(any());
@@ -149,8 +150,8 @@ public class NetconfCapabilityMonitoringServiceTest {
     @Test
     public void testGetCapabilities() {
         Set<Uri> exp = new HashSet<>();
-        for (Capability capability : capabilities) {
-            exp.add(new Uri(capability.getCapabilityUri()));
+        for (var capability : capabilities) {
+            exp.add(new Uri(capability.urn()));
         }
         //candidate and url capabilities are added by monitoring service automatically
         exp.add(new Uri(URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0));
@@ -169,10 +170,10 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     @Test
     public void testOnCapabilitiesChanged() {
-        final String capUri = "test";
+        final String capUri = CapabilityURN.PARTIAL_LOCK;
         final Uri uri = new Uri(capUri);
         final HashSet<Capability> testCaps = new HashSet<>();
-        testCaps.add(new BasicCapability(capUri));
+        testCaps.add(SimpleCapability.PARTIAL_LOCK);
         final ArgumentCaptor<NetconfCapabilityChange> capabilityChangeCaptor =
                 ArgumentCaptor.forClass(NetconfCapabilityChange.class);
         final ArgumentCaptor<Capabilities> monitoringListenerCaptor = ArgumentCaptor.forClass(Capabilities.class);

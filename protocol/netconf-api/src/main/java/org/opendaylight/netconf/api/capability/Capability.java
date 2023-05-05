@@ -7,24 +7,27 @@
  */
 package org.opendaylight.netconf.api.capability;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.net.URI;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 
 /**
  * Contains capability URI announced by server hello message and optionally its
  * corresponding yang schema that can be retrieved by get-schema rpc.
  */
-public interface Capability {
+@NonNullByDefault
+public sealed interface Capability permits SimpleCapability, ParameterizedCapability {
+    /**
+     * Return this capability's URN.
+     *
+     * @return An URN string
+     */
+    String urn();
 
-    String getCapabilityUri();
-
-    Optional<String> getModuleNamespace();
-
-    Optional<String> getModuleName();
-
-    Optional<String> getRevision();
-
-    Optional<String> getCapabilitySchema();
-
-    Collection<String> getLocation();
+    /**
+     * Return this capability formatted as a URI, suitable for encoding as a {@link HelloMessage} advertizement.
+     *
+     * @return A URI
+     */
+    URI toURI();
 }

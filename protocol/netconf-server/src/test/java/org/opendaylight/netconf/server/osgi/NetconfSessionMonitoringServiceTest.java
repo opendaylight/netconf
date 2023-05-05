@@ -30,8 +30,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
+import org.opendaylight.netconf.api.capability.SimpleCapability;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
@@ -82,7 +82,7 @@ public class NetconfSessionMonitoringServiceTest {
     public void testListeners() {
         monitoringService.onSessionUp(sessionMock1);
         HashSet<Capability> added = new HashSet<>();
-        added.add(new BasicCapability("toAdd"));
+        added.add(SimpleCapability.WITH_OPERATIONAL_DEFAULTS);
         monitoringService.onSessionDown(sessionMock1);
         verify(listener).onSessionStarted(any());
         verify(listener).onSessionEnded(any());

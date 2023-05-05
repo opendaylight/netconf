@@ -21,15 +21,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
+import org.opendaylight.netconf.api.capability.SimpleCapability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.yangtools.concepts.Registration;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AggregatedNetconfOperationServiceFactoryTest {
-
     private final Set<Capability> factory1Caps = new HashSet<>();
     private final Set<Capability> factory2Caps = new HashSet<>();
 
@@ -54,11 +53,11 @@ public class AggregatedNetconfOperationServiceFactoryTest {
 
     @Before
     public void setUp() throws Exception {
-        factory1Caps.add(new BasicCapability("AAA"));
-        factory1Caps.add(new BasicCapability("BBB"));
+        factory1Caps.add(SimpleCapability.BASE_1_0);
+        factory1Caps.add(SimpleCapability.CANDIDATE);
 
-        factory2Caps.add(new BasicCapability("CCC"));
-        factory2Caps.add(new BasicCapability("DDD"));
+        factory2Caps.add(SimpleCapability.BASE_1_1);
+        factory2Caps.add(SimpleCapability.NOTIFICATION);
 
         aggregatedFactory = new AggregatedNetconfOperationServiceFactory();
 

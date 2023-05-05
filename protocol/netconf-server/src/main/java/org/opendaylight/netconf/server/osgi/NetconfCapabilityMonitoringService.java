@@ -8,22 +8,20 @@
 package org.opendaylight.netconf.server.osgi;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.opendaylight.netconf.api.capability.BasicCapability;
+import java.util.stream.Collectors;
 import org.opendaylight.netconf.api.capability.Capability;
+import org.opendaylight.netconf.api.capability.SimpleCapability;
+import org.opendaylight.netconf.api.capability.YangModuleCapability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
@@ -48,11 +46,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
 final class NetconfCapabilityMonitoringService implements CapabilityListener, AutoCloseable {
     private static final Schema.Location NETCONF_LOCATION = new Schema.Location(Schema.Location.Enumeration.NETCONF);
     private static final Set<Schema.Location> NETCONF_LOCATIONS = Set.of(NETCONF_LOCATION);
-    private static final BasicCapability CANDIDATE_CAPABILITY =
-            new BasicCapability(URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
-    private static final BasicCapability URL_CAPABILITY =
-            new BasicCapability(URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0);
-    private static final Function<Capability, Uri> CAPABILITY_TO_URI = input -> new Uri(input.getCapabilityUri());
+    private static final Function<Capability, Uri> CAPABILITY_TO_URI = input -> new Uri(input.urn());
 
     private final NetconfOperationServiceFactory netconfOperationProvider;
     private final Map<Uri, Capability> capabilities = new HashMap<>();
@@ -78,9 +72,10 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
 
     synchronized String getSchemaForModuleRevision(final String moduleName, final Optional<String> revision) {
         final Map<String, String> revisionMapRequest = mappedModulesToRevisionToSchema.get(moduleName);
-        checkState(revisionMapRequest != null,
-                "Capability for module %s not present, available modules : %s",
-                moduleName, Collections2.transform(capabilities.values(), CAPABILITY_TO_URI));
+        if (revisionMapRequest == null) {
+            throw new IllegalStateException("Capability for module %s not present, available modules : %s".formatted(
+                capabilities.values().stream().map(CAPABILITY_TO_URI).collect(Collectors.toSet())));
+        }
 
         final String revToLookup = revision.orElse("");
         final String schema = revisionMapRequest.get(revToLookup);
@@ -102,27 +97,27 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
     }
 
     private void updateCapabilityToSchemaMap(final Set<Capability> added, final Set<Capability> removed) {
-        for (final Capability cap : added) {
-            if (isValidModuleCapability(cap)) {
-                mappedModulesToRevisionToSchema.computeIfAbsent(cap.getModuleName().orElseThrow(), k -> new HashMap<>())
-                    .put(cap.getRevision().orElse(""), cap.getCapabilitySchema().orElseThrow());
+        for (var cap : added) {
+            if (cap instanceof YangModuleCapability moduleCap && isValidModuleCapability(moduleCap)) {
+                mappedModulesToRevisionToSchema.computeIfAbsent(moduleCap.getModuleName().orElseThrow(),
+                    k -> new HashMap<>())
+                    .put(moduleCap.getRevision().orElse(""), moduleCap.getCapabilitySchema().orElseThrow());
             }
         }
-        for (final Capability cap : removed) {
-            if (isValidModuleCapability(cap)) {
-                final Map<String, String> revisionMap =
-                    mappedModulesToRevisionToSchema.get(cap.getModuleName().orElseThrow());
+        for (var cap : removed) {
+            if (cap instanceof YangModuleCapability moduleCap && isValidModuleCapability(moduleCap)) {
+                final var revisionMap = mappedModulesToRevisionToSchema.get(moduleCap.getModuleName().orElseThrow());
                 if (revisionMap != null) {
-                    revisionMap.remove(cap.getRevision().orElseThrow());
+                    revisionMap.remove(moduleCap.getRevision().orElseThrow());
                     if (revisionMap.isEmpty()) {
-                        mappedModulesToRevisionToSchema.remove(cap.getModuleName().orElseThrow());
+                        mappedModulesToRevisionToSchema.remove(moduleCap.getModuleName().orElseThrow());
                     }
                 }
             }
         }
     }
 
-    private static boolean isValidModuleCapability(final Capability cap) {
+    private static boolean isValidModuleCapability(final YangModuleCapability cap) {
         return cap.getModuleName().isPresent() && cap.getCapabilitySchema().isPresent();
     }
 
@@ -145,15 +140,15 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
     }
 
     private static Schemas transformSchemas(final Set<Capability> caps) {
-        final Map<SchemaKey, Schema> schemas = Maps.newHashMapWithExpectedSize(caps.size());
-        for (final Capability cap : caps) {
-            if (isValidModuleCapability(cap)) {
-                final SchemaKey key = new SchemaKey(Yang.VALUE, cap.getModuleName().orElseThrow(),
-                    cap.getRevision().orElse(""));
+        final var schemas = Maps.<SchemaKey, Schema>newHashMapWithExpectedSize(caps.size());
+        for (var cap : caps) {
+            if (cap instanceof YangModuleCapability moduleCap && isValidModuleCapability(moduleCap)) {
+                final var key = new SchemaKey(Yang.VALUE, moduleCap.getModuleName().orElseThrow(),
+                    moduleCap.getRevision().orElse(""));
                 schemas.put(key, new SchemaBuilder()
                     .withKey(key)
-                    .setNamespace(new Uri(cap.getModuleNamespace().orElseThrow()))
-                    .setLocation(transformLocations(cap.getLocation()))
+                    .setNamespace(new Uri(moduleCap.getModuleNamespace().orElseThrow()))
+                    .setLocation(NETCONF_LOCATIONS)
                     .build());
             }
         }
@@ -161,25 +156,10 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
         return new SchemasBuilder().setSchema(schemas).build();
     }
 
-    private static Set<Schema.Location> transformLocations(final Collection<String> locations) {
-        if (locations.isEmpty()) {
-            return NETCONF_LOCATIONS;
-        }
-
-        final var b = ImmutableSet.<Schema.Location>builder();
-        b.add(NETCONF_LOCATION);
-
-        for (final String location : locations) {
-            b.add(new Schema.Location(new Uri(location)));
-        }
-
-        return b.build();
-    }
-
     private static Set<Capability> setupCapabilities(final Set<Capability> caps) {
         Set<Capability> capabilities = new HashSet<>(caps);
-        capabilities.add(CANDIDATE_CAPABILITY);
-        capabilities.add(URL_CAPABILITY);
+        capabilities.add(SimpleCapability.CANDIDATE);
+        capabilities.add(SimpleCapability.URL);
         // TODO rollback on error not supported EditConfigXmlParser:100
         // [RFC6241] 8.5.  Rollback-on-Error Capability
         // capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:rollback-on-error:1.0"));
@@ -218,8 +198,8 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
             .setChangedBy(new ChangedByBuilder()
                 .setServerOrUser(new ServerBuilder().setServer(Empty.value()).build())
                 .build())
-            .setDeletedCapability(Set.copyOf(Collections2.transform(removed, CAPABILITY_TO_URI)))
-            .setAddedCapability(Set.copyOf(Collections2.transform(added, CAPABILITY_TO_URI)))
+            .setDeletedCapability(removed.stream().map(CAPABILITY_TO_URI).collect(ImmutableSet.toImmutableSet()))
+            .setAddedCapability(added.stream().map(CAPABILITY_TO_URI).collect(ImmutableSet.toImmutableSet()))
             // TODO modified should be computed ... but why ?
             .setModifiedCapability(Set.of())
             .build();
@@ -232,7 +212,7 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
 
     private void onCapabilitiesRemoved(final Set<Capability> removedCaps) {
         for (final Capability addedCap : removedCaps) {
-            capabilities.remove(new Uri(addedCap.getCapabilityUri()));
+            capabilities.remove(new Uri(addedCap.urn()));
         }
     }
 
