@@ -5,7 +5,7 @@
   ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
   ~ and is available at http://www.eclipse.org/legal/epl-v10.html
   -->
-<notification xmlns="urn:ietf:params:netconf:capability:notification:1.0">
+<notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
     <netconf-session-end xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-notifications">
         <username>admin</username>
         <session-id>2</session-id>

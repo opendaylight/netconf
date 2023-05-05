@@ -43,7 +43,7 @@ public class NotificationsTransformUtilTest {
         """;
 
     private static final String EXPECTED_NOTIFICATION =
-        "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">\n"
+        "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">\n"
         + INNER_NOTIFICATION
         + "    <eventTime>" + NotificationMessage.RFC3339_DATE_FORMATTER.apply(EVENT_TIME) + "</eventTime>\n"
         + "</notification>\n";
