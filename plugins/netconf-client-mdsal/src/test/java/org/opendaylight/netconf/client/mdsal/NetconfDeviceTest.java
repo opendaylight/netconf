@@ -24,8 +24,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -45,8 +43,8 @@ import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -117,7 +115,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
                 schemaContext) -> {
-            final Module first = Iterables.getFirst(SCHEMA_CONTEXT.getModules(), null);
+            final Module first = SCHEMA_CONTEXT.getModules().iterator().next();
             final QName qName = QName.create(first.getQNameModule(), first.getName());
             final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
             final NetconfStateSchemas.RemoteYangSchema source2 =
@@ -137,8 +135,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setBaseSchemas(BASE_SCHEMAS)
                 .build();
         // Monitoring supported
-        final NetconfSessionPreferences sessionCaps =
-                getSessionCaps(true, Lists.newArrayList(TEST_CAPABILITY, TEST_CAPABILITY2));
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(true, List.of(TEST_CAPABILITY, TEST_CAPABILITY2));
         device.onRemoteSessionUp(sessionCaps, listener);
 
         verify(facade, timeout(5000)).onDeviceConnected(any(NetconfDeviceSchema.class),
@@ -148,8 +145,6 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     public void testNetconfDeviceFailFirstSchemaFailSecondEmpty() throws Exception {
-        final ArrayList<String> capList = Lists.newArrayList(TEST_CAPABILITY);
-
         final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
 
@@ -174,7 +169,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .build();
 
         // Monitoring not supported
-        final NetconfSessionPreferences sessionCaps = getSessionCaps(false, capList);
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(false, List.of(TEST_CAPABILITY));
         device.onRemoteSessionUp(sessionCaps, listener);
 
         verify(facade, timeout(5000)).onDeviceDisconnected();
@@ -205,7 +200,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
             schemaContext) -> {
-            final Module first = Iterables.getFirst(SCHEMA_CONTEXT.getModules(), null);
+            final Module first = SCHEMA_CONTEXT.getModules().iterator().next();
             final QName qName = QName.create(first.getQNameModule(), first.getName());
             final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
             final NetconfStateSchemas.RemoteYangSchema source2 =
@@ -271,8 +266,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setBaseSchemas(BASE_SCHEMAS)
                 .build();
 
-        final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
-                Lists.newArrayList(TEST_CAPABILITY));
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(true, List.of(TEST_CAPABILITY));
         device.onRemoteSessionUp(sessionCaps, listener);
 
         device.onNotification(NOTIFICATION);
@@ -305,7 +299,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setBaseSchemas(BASE_SCHEMAS)
                 .build();
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
-                Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+                List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
         device.onRemoteSessionUp(sessionCaps, listener);
 
         verify(schemaContextProviderFactory, timeout(5000)).createEffectiveModelContext(anyCollection());
@@ -341,7 +335,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setBaseSchemas(BASE_SCHEMAS)
                 .build();
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
-                Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+                List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
         //session up, start schema resolution
         device.onRemoteSessionUp(sessionCaps, listener);
         //session closed
@@ -373,7 +367,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDevice netconfSpy = spy(device);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
-                Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+                List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
         final Map<QName, CapabilityOrigin> moduleBasedCaps = new HashMap<>();
         moduleBasedCaps.putAll(sessionCaps.moduleBasedCaps());
         moduleBasedCaps
@@ -407,8 +401,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .build();
         final NetconfDevice netconfSpy = spy(device);
 
-        final NetconfSessionPreferences sessionCaps = getSessionCaps(false,
-                Lists.newArrayList(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0));
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(false, List.of(CapabilityURN.NOTIFICATION));
 
         netconfSpy.onRemoteSessionUp(sessionCaps, listener);
 
@@ -447,7 +440,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDevice netconfSpy = spy(device);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false,
-                Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+                List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
 
         netconfSpy.onRemoteSessionUp(sessionCaps, listener);
 
@@ -551,18 +544,14 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     public NetconfSessionPreferences getSessionCaps(final boolean addMonitor,
                                                     final Collection<String> additionalCapabilities) {
-        final ArrayList<String> capabilities = Lists.newArrayList(
-                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
-
+        final var capabilities = new ArrayList<String>();
+        capabilities.add(CapabilityURN.BASE_1_0);
+        capabilities.add(CapabilityURN.BASE_1_1);
         if (addMonitor) {
             capabilities.add(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
         }
-
         capabilities.addAll(additionalCapabilities);
-
-        return NetconfSessionPreferences.fromStrings(
-                capabilities);
+        return NetconfSessionPreferences.fromStrings(capabilities);
     }
 
     public NetconfDeviceCommunicator getListener() throws Exception {

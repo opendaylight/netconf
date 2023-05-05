@@ -47,10 +47,10 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.opendaylight.netconf.api.messages.HelloMessage;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
@@ -88,8 +88,7 @@ public class AbstractNetconfSessionNegotiatorTest {
                 FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
-        helloBase11 = HelloMessage.createClientHello(Set.of(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1),
-            Optional.empty());
+        helloBase11 = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
         doReturn(promise).when(promise).setFailure(any());
         negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
     }
