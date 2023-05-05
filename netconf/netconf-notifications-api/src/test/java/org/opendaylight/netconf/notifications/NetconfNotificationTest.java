@@ -32,8 +32,8 @@ public class NetconfNotificationTest {
 
         final NetconfNotification netconfNotification = new NetconfNotification(document, eventTime);
         final Document resultDoc = netconfNotification.getDocument();
-        final NodeList nodeList = resultDoc.getElementsByTagNameNS(NetconfNotification.NOTIFICATION_NAMESPACE,
-                NetconfNotification.NOTIFICATION);
+        final NodeList nodeList = resultDoc.getElementsByTagNameNS(
+            "urn:ietf:params:xml:ns:netconf:notification:1.0", "notification");
 
         assertNotNull(nodeList);
         // expected only the one NOTIFICATION tag
@@ -41,7 +41,7 @@ public class NetconfNotificationTest {
 
         final Element entireNotification = (Element) nodeList.item(0);
         final NodeList childNodes = entireNotification.getElementsByTagNameNS(
-                NetconfNotification.NOTIFICATION_NAMESPACE, NetconfNotification.EVENT_TIME);
+            "urn:ietf:params:xml:ns:netconf:notification:1.0", "eventTime");
 
         assertNotNull(childNodes);
         // expected only the one EVENT_TIME tag
