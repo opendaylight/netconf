@@ -22,10 +22,10 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
-import org.opendaylight.netconf.api.capability.BasicCapability;
-import org.opendaylight.netconf.api.capability.Capability;
-import org.opendaylight.netconf.api.capability.YangModuleCapability;
+import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
+import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
+import org.opendaylight.netconf.server.api.monitoring.YangModuleCapability;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactoryListener;
@@ -113,8 +113,10 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
 
     private static Optional<YangModuleCapability> moduleToCapability(final ModuleLike module,
             final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
-        final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(module.getName(),
-                module.getRevision().map(Revision::toString).orElse(null));
+        final String moduleNamespace = module.getNamespace().toString();
+        final String moduleName = module.getName();
+        final String revision = module.getRevision().map(Revision::toString).orElse(null);
+        final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(moduleName, revision);
 
         InputStream sourceStream = null;
         String source;
@@ -135,7 +137,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
         }
 
         if (source != null) {
-            return Optional.of(new YangModuleCapability(module, source));
+            return Optional.of(new YangModuleCapability(moduleNamespace, moduleName, revision, source));
         }
 
         LOG.warn("Missing source for module {}. This module will not be available from netconf server",

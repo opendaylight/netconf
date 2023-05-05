@@ -34,9 +34,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import org.opendaylight.netconf.api.capability.BasicCapability;
-import org.opendaylight.netconf.api.capability.Capability;
-import org.opendaylight.netconf.api.capability.YangModuleCapability;
 import org.opendaylight.netconf.northbound.ssh.SshProxyServer;
 import org.opendaylight.netconf.northbound.ssh.SshProxyServerConfiguration;
 import org.opendaylight.netconf.northbound.ssh.SshProxyServerConfigurationBuilder;
@@ -44,7 +41,10 @@ import org.opendaylight.netconf.server.NetconfServerDispatcherImpl;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.ServerChannelInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
+import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
+import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.server.api.monitoring.YangModuleCapability;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
@@ -347,8 +347,10 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private static void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities,
                                             final ModuleLike module) {
-        final var sourceId = new SourceIdentifier(module.getName(),
-            module.getRevision().map(Revision::toString).orElse(null));
+        final var moduleNamespace = module.getNamespace().toString();
+        final var moduleName = module.getName();
+        final var revision = module.getRevision().map(Revision::toString).orElse(null);
+        final var sourceId = new SourceIdentifier(moduleName, revision);
 
         final String moduleContent;
         try {
@@ -359,7 +361,7 @@ public class NetconfDeviceSimulator implements Closeable {
                 "Cannot retrieve schema source for module " + sourceId + " from schema repository", e);
         }
 
-        capabilities.add(new YangModuleCapability(module, moduleContent));
+        capabilities.add(new YangModuleCapability(moduleNamespace, moduleName, revision, moduleContent));
     }
 
     private static void registerSource(final SharedSchemaRepository consumer, final String resource,

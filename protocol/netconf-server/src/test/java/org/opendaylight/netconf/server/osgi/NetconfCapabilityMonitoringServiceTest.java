@@ -28,10 +28,10 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.netconf.api.capability.BasicCapability;
-import org.opendaylight.netconf.api.capability.Capability;
-import org.opendaylight.netconf.api.capability.YangModuleCapability;
+import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
+import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.server.api.monitoring.YangModuleCapability;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -40,21 +40,15 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
-import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.model.api.Module;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfCapabilityMonitoringServiceTest {
-
     private static final String TEST_MODULE_CONTENT = "content";
     private static final String TEST_MODULE_CONTENT2 = "content2";
     private static final String TEST_MODULE_REV = "1970-01-01";
     private static final String TEST_MODULE_REV2 = "1970-01-02";
     private static final Uri TEST_MODULE_NAMESPACE = new Uri("testModuleNamespace");
     private static final String TEST_MODULE_NAME = "testModule";
-    private static final Revision  TEST_MODULE_DATE = Revision.of(TEST_MODULE_REV);
-    private static final Revision TEST_MODULE_DATE2 = Revision.of(TEST_MODULE_REV2);
 
     private YangModuleCapability moduleCapability1;
     private YangModuleCapability moduleCapability2;
@@ -62,10 +56,6 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     private final Set<Capability> capabilities = new HashSet<>();
 
-    @Mock
-    private Module moduleMock;
-    @Mock
-    private Module moduleMock2;
     @Mock
     private NetconfOperationServiceFactory operationServiceFactoryMock;
     @Mock
@@ -77,17 +67,13 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     @Before
     public void setUp() {
-        doReturn(XMLNamespace.of(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock).getNamespace();
-        doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
-        doReturn(Optional.of(TEST_MODULE_DATE)).when(moduleMock).getRevision();
-        moduleCapability1 = new YangModuleCapability(moduleMock, TEST_MODULE_CONTENT);
+        moduleCapability1 = new YangModuleCapability(TEST_MODULE_NAMESPACE.getValue(), TEST_MODULE_NAME,
+            TEST_MODULE_REV, TEST_MODULE_CONTENT);
 
         capabilities.add(moduleCapability1);
 
-        doReturn(XMLNamespace.of(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock2).getNamespace();
-        doReturn(TEST_MODULE_NAME).when(moduleMock2).getName();
-        doReturn(Optional.of(TEST_MODULE_DATE2)).when(moduleMock2).getRevision();
-        moduleCapability2 = new YangModuleCapability(moduleMock2, TEST_MODULE_CONTENT2);
+        moduleCapability2 = new YangModuleCapability(TEST_MODULE_NAMESPACE.getValue(), TEST_MODULE_NAME,
+            TEST_MODULE_REV2, TEST_MODULE_CONTENT2);
 
         capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));
         capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.1"));

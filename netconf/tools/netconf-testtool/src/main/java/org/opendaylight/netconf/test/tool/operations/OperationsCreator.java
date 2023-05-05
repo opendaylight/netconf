@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.test.tool.operations;
 
 import java.util.Set;
-import org.opendaylight.netconf.api.capability.Capability;
+import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 
