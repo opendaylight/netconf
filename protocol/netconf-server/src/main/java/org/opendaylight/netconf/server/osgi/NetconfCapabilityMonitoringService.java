@@ -8,8 +8,6 @@
 package org.opendaylight.netconf.server.osgi;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
@@ -22,6 +20,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
@@ -48,10 +47,9 @@ import org.opendaylight.yangtools.yang.common.Empty;
 final class NetconfCapabilityMonitoringService implements CapabilityListener, AutoCloseable {
     private static final Schema.Location NETCONF_LOCATION = new Schema.Location(Schema.Location.Enumeration.NETCONF);
     private static final Set<Schema.Location> NETCONF_LOCATIONS = Set.of(NETCONF_LOCATION);
-    private static final BasicCapability CANDIDATE_CAPABILITY =
-            new BasicCapability(URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
-    private static final BasicCapability URL_CAPABILITY =
-            new BasicCapability(URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0);
+    private static final BasicCapability CANDIDATE_CAPABILITY = new BasicCapability(CapabilityURN.CANDIDATE);
+    // FIXME: hard-coded scheme here
+    private static final BasicCapability URL_CAPABILITY = new BasicCapability(CapabilityURN.URL + "?scheme=file");
     private static final Function<Capability, Uri> CAPABILITY_TO_URI = input -> new Uri(input.getCapabilityUri());
 
     private final NetconfOperationServiceFactory netconfOperationProvider;
@@ -180,9 +178,9 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
         Set<Capability> capabilities = new HashSet<>(caps);
         capabilities.add(CANDIDATE_CAPABILITY);
         capabilities.add(URL_CAPABILITY);
-        // TODO rollback on error not supported EditConfigXmlParser:100
+        // FIXME: rollback on error not supported EditConfigXmlParser:100
         // [RFC6241] 8.5.  Rollback-on-Error Capability
-        // capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:rollback-on-error:1.0"));
+        // capabilities.add(new BasicCapability(CapabilityURN.ROLLBACK_ON_ERROR));
         return capabilities;
     }
 
