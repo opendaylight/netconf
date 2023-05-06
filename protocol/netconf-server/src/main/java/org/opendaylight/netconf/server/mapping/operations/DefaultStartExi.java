@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.server.mapping.operations;
 
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -54,8 +55,7 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document,
                                                        final XmlElement operationElement) {
-        final Element getSchemaResult = document.createElementNS(
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.OK);
+        final Element getSchemaResult = document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
         LOG.trace("{} operation successful", START_EXI);
         return getSchemaResult;
     }
@@ -67,7 +67,7 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
 
     @Override
     protected String getOperationNamespace() {
-        return XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0;
+        return NamespaceURN.EXI;
     }
 
     @Override

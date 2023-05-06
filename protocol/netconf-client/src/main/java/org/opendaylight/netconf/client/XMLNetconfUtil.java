@@ -12,12 +12,11 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.NamespaceURN;
 
 final class XMLNetconfUtil {
     private static final XPathFactory FACTORY = XPathFactory.newInstance();
-    private static final NamespaceContext NS_CONTEXT = new HardcodedNamespaceResolver("netconf",
-        XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+    private static final NamespaceContext NS_CONTEXT = new HardcodedNamespaceResolver("netconf", NamespaceURN.BASE);
 
     private XMLNetconfUtil() {
         // Hidden on purpose

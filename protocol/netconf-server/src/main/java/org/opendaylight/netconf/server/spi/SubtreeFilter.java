@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.xml.XMLConstants;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -36,14 +37,13 @@ public final class SubtreeFilter {
     public static Document applyRpcSubtreeFilter(final Document requestDocument,
                                                  final Document rpcReply) throws DocumentedException {
         OperationNameAndNamespace operationNameAndNamespace = new OperationNameAndNamespace(requestDocument);
-        if (XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0.equals(operationNameAndNamespace.getNamespace())
+        if (NamespaceURN.BASE.equals(operationNameAndNamespace.getNamespace())
                 && XmlNetconfConstants.GET.equals(operationNameAndNamespace.getOperationName())
                 || XmlNetconfConstants.GET_CONFIG.equals(operationNameAndNamespace.getOperationName())) {
             // process subtree filtering here, in case registered netconf operations do
             // not implement filtering.
             Optional<XmlElement> maybeFilter = operationNameAndNamespace.getOperationElement()
-                    .getOnlyChildElementOptionally(XmlNetconfConstants.FILTER,
-                            XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+                    .getOnlyChildElementOptionally(XmlNetconfConstants.FILTER, NamespaceURN.BASE);
             if (maybeFilter.isEmpty()) {
                 return rpcReply;
             }
@@ -77,16 +77,14 @@ public final class SubtreeFilter {
 
     private static void removeEventTimeNode(final Document document) {
         final Node eventTimeNode = document.getDocumentElement()
-            .getElementsByTagNameNS(
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_NOTIFICATION_1_0, XmlNetconfConstants.EVENT_TIME)
+            .getElementsByTagNameNS(NamespaceURN.NOTIFICATION, XmlNetconfConstants.EVENT_TIME)
             .item(0);
         document.getDocumentElement().removeChild(eventTimeNode);
     }
 
     private static boolean isSupported(final XmlElement filter) {
         return "subtree".equals(filter.getAttribute("type"))
-                || "subtree".equals(filter.getAttribute("type",
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+                || "subtree".equals(filter.getAttribute("type", NamespaceURN.BASE));
     }
 
     private static Document extractNotificationContent(final Document notification) throws DocumentedException {
@@ -119,8 +117,7 @@ public final class SubtreeFilter {
         Element rpcReply = originalReplyDocument.getDocumentElement();
         Node rpcReplyDst = result.importNode(rpcReply, false);
         result.appendChild(rpcReplyDst);
-        XmlElement dataSrc = XmlElement.fromDomElement(rpcReply).getOnlyChildElement("data",
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+        XmlElement dataSrc = XmlElement.fromDomElement(rpcReply).getOnlyChildElement("data", NamespaceURN.BASE);
         Element dataDst = (Element) result.importNode(dataSrc.getDomElement(), false);
         rpcReplyDst.appendChild(dataDst);
         addSubtree(filter, dataSrc, XmlElement.fromDomElement(dataDst));

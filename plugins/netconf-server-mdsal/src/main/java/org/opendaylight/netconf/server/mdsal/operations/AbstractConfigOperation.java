@@ -19,8 +19,8 @@ import java.net.URLStreamHandler;
 import java.util.Base64;
 import java.util.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -66,8 +66,7 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
                 ErrorType.PROTOCOL, ErrorTag.MISSING_ELEMENT, ErrorSeverity.ERROR));
 
         final Document document = getDocumentFromUrl(urlElement.getTextContent());
-        return XmlElement.fromDomElementWithExpected(document.getDocumentElement(), CONFIG_KEY,
-            XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+        return XmlElement.fromDomElementWithExpected(document.getDocumentElement(), CONFIG_KEY, NamespaceURN.BASE);
     }
 
     /**

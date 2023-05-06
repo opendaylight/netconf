@@ -20,7 +20,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -54,7 +53,7 @@ public class NetconfDocumentedExceptionTest {
 
             @Override
             public String getNamespaceURI(final String prefix) {
-                return XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
+                return NamespaceURN.BASE;
             }
         });
     }

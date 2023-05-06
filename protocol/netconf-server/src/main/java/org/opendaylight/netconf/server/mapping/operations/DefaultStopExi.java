@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.server.mapping.operations;
 
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -34,8 +35,7 @@ public class DefaultStopExi extends AbstractSingletonNetconfOperation implements
 
         netconfSession.stopExiCommunication();
 
-        Element getSchemaResult = document.createElementNS(
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.OK);
+        Element getSchemaResult = document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
         LOG.trace("{} operation successful", STOP_EXI);
         return getSchemaResult;
     }
@@ -47,7 +47,7 @@ public class DefaultStopExi extends AbstractSingletonNetconfOperation implements
 
     @Override
     protected String getOperationNamespace() {
-        return XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0;
+        return NamespaceURN.EXI;
     }
 
     @Override

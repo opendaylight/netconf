@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
@@ -179,15 +180,15 @@ abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
         private static Optional<Datastore> parseSource(final XmlElement xml) throws DocumentedException {
             final Optional<XmlElement> sourceElement = xml.getOnlyChildElementOptionally(XmlNetconfConstants.SOURCE_KEY,
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+                NamespaceURN.BASE);
             return sourceElement.isEmpty() ? Optional.empty()
                 : Optional.of(Datastore.valueOf(sourceElement.orElseThrow().getOnlyChildElement().getName()));
         }
 
-        private static void validateInputRpc(final XmlElement xml, final String operationName) throws
-                DocumentedException {
+        private static void validateInputRpc(final XmlElement xml, final String operationName)
+                throws DocumentedException {
             xml.checkName(operationName);
-            xml.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+            xml.checkNamespace(NamespaceURN.BASE);
         }
 
         public Optional<Datastore> getDatastore() {

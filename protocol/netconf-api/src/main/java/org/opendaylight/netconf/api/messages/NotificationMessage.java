@@ -21,6 +21,7 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.slf4j.Logger;
@@ -195,12 +196,11 @@ public final class NotificationMessage extends NetconfMessage {
 
         final Element baseNotification = notificationContent.getDocumentElement();
         final Element entireNotification = notificationContent.createElementNS(
-            XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_NOTIFICATION_1_0,
-            XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME);
+            NamespaceURN.NOTIFICATION, XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME);
         entireNotification.appendChild(baseNotification);
 
         final Element eventTimeElement = notificationContent.createElementNS(
-            XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_NOTIFICATION_1_0, XmlNetconfConstants.EVENT_TIME);
+            NamespaceURN.NOTIFICATION, XmlNetconfConstants.EVENT_TIME);
         eventTimeElement.setTextContent(RFC3339_DATE_FORMATTER.apply(eventTime));
         entireNotification.appendChild(eventTimeElement);
 

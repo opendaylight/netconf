@@ -13,6 +13,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import javax.xml.XMLConstants;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -64,7 +65,7 @@ public final class SendErrorExceptionUtil {
             final Element incommingRpc = incommingDocument.getDocumentElement();
             Preconditions.checkState(
                 XmlNetconfConstants.RPC_KEY.equals(incommingRpc.getLocalName())
-                && XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0.equals(incommingRpc.getNamespaceURI()),
+                && NamespaceURN.BASE.equals(incommingRpc.getNamespaceURI()),
                     "Missing %s element", XmlNetconfConstants.RPC_KEY);
 
             final Element rpcReply = errorDocument.getDocumentElement();

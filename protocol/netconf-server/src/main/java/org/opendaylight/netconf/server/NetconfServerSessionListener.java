@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
@@ -151,14 +152,10 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
     }
 
     private static void checkMessageId(final Node rootNode) throws DocumentedException {
-
         final NamedNodeMap attributes = rootNode.getAttributes();
-
-        if (attributes.getNamedItemNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
-                XmlNetconfConstants.MESSAGE_ID) != null) {
+        if (attributes.getNamedItemNS(NamespaceURN.BASE, XmlNetconfConstants.MESSAGE_ID) != null) {
             return;
         }
-
         if (attributes.getNamedItem(XmlNetconfConstants.MESSAGE_ID) != null) {
             return;
         }

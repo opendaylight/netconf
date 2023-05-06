@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -73,7 +74,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
 
     protected static XmlElement getRequestElementWithCheck(final Document message) throws DocumentedException {
         return XmlElement.fromDomElementWithExpected(message.getDocumentElement(), XmlNetconfConstants.RPC_KEY,
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+            NamespaceURN.BASE);
     }
 
     protected HandlingPriority getHandlingPriority() {
@@ -81,7 +82,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
     }
 
     protected String getOperationNamespace() {
-        return XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
+        return NamespaceURN.BASE;
     }
 
     protected abstract String getOperationName();
@@ -99,13 +100,13 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
 
         Element response = handle(document, operationElement, subsequentOperation);
         Element rpcReply = XmlUtil.createElement(document, XmlNetconfConstants.RPC_REPLY_KEY,
-                Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+                Optional.of(NamespaceURN.BASE));
 
         if (XmlElement.fromDomElement(response).hasNamespace()) {
             rpcReply.appendChild(response);
         } else {
             Element responseNS = XmlUtil.createElement(document, response.getNodeName(),
-                    Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+                    Optional.of(NamespaceURN.BASE));
             NodeList list = response.getChildNodes();
             while (list.getLength() != 0) {
                 responseNS.appendChild(list.item(0));

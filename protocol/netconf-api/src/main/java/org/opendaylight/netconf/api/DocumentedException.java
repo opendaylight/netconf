@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.api;
 
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.RPC_REPLY_KEY;
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -199,19 +198,19 @@ public class DocumentedException extends Exception {
 
     // FIXME: NETCONF-793: remove all of these in favor of YangNetconfErrorAware
     public ErrorType getErrorType() {
-        return this.errorType;
+        return errorType;
     }
 
     public ErrorTag getErrorTag() {
-        return this.errorTag;
+        return errorTag;
     }
 
     public ErrorSeverity getErrorSeverity() {
-        return this.errorSeverity;
+        return errorSeverity;
     }
 
     public Map<String, String> getErrorInfo() {
-        return this.errorInfo;
+        return errorInfo;
     }
 
     // FIXME: this really should be an spi/util method (or even netconf-util-w3c-dom?) as this certainly is not the
@@ -221,10 +220,10 @@ public class DocumentedException extends Exception {
         try {
             doc = BUILDER_FACTORY.newDocumentBuilder().newDocument();
 
-            Node rpcReply = doc.createElementNS(URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, RPC_REPLY_KEY);
+            Node rpcReply = doc.createElementNS(NamespaceURN.BASE, RPC_REPLY_KEY);
             doc.appendChild(rpcReply);
 
-            Node rpcError = doc.createElementNS(URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, RPC_ERROR);
+            Node rpcError = doc.createElementNS(NamespaceURN.BASE, RPC_ERROR);
             rpcReply.appendChild(rpcError);
 
             rpcError.appendChild(createTextNode(doc, ERROR_TYPE, getErrorType().elementBody()));
@@ -239,7 +238,7 @@ public class DocumentedException extends Exception {
                  * <bad-element>rpc</bad-element> </error-info>
                  */
 
-                Node errorInfoNode = doc.createElementNS(URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, ERROR_INFO);
+                Node errorInfoNode = doc.createElementNS(NamespaceURN.BASE, ERROR_INFO);
                 errorInfoNode.setPrefix(rpcReply.getPrefix());
                 rpcError.appendChild(errorInfoNode);
 
@@ -256,15 +255,15 @@ public class DocumentedException extends Exception {
     }
 
     private static Node createTextNode(final Document doc, final String tag, final String textContent) {
-        Node node = doc.createElementNS(URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, tag);
+        Node node = doc.createElementNS(NamespaceURN.BASE, tag);
         node.setTextContent(textContent);
         return node;
     }
 
     @Override
     public String toString() {
-        return "NetconfDocumentedException{" + "message=" + getMessage() + ", errorType=" + this.errorType
-                + ", errorTag=" + this.errorTag + ", errorSeverity=" + this.errorSeverity + ", errorInfo="
-                + this.errorInfo + '}';
+        return "NetconfDocumentedException{" + "message=" + getMessage() + ", errorType=" + errorType
+                + ", errorTag=" + errorTag + ", errorSeverity=" + errorSeverity + ", errorInfo="
+                + errorInfo + '}';
     }
 }

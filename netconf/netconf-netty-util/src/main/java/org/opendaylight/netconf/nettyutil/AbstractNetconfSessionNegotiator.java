@@ -28,6 +28,7 @@ import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.CapabilityURN;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
@@ -321,9 +322,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     }
 
     private static boolean containsBase11Capability(final Document doc) {
-        final NodeList nList = doc.getElementsByTagNameNS(
-            XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
-            XmlNetconfConstants.CAPABILITY);
+        final NodeList nList = doc.getElementsByTagNameNS(NamespaceURN.BASE, XmlNetconfConstants.CAPABILITY);
         for (int i = 0; i < nList.getLength(); i++) {
             if (nList.item(i).getTextContent().contains(CapabilityURN.BASE_1_1)) {
                 return true;

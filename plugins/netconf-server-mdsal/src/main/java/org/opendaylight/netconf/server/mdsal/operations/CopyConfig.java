@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.server.mdsal.operations;
 
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,6 +24,7 @@ import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -184,7 +183,7 @@ public final class CopyConfig extends AbstractEdit {
     }
 
     private Node transformNormalizedNode(final Document document, final ContainerNode data) {
-        final Element configElement = document.createElementNS(URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, CONFIG_KEY);
+        final Element configElement = document.createElementNS(NamespaceURN.BASE, CONFIG_KEY);
         final DOMResult result = new DOMResult(configElement);
         try {
             final XMLStreamWriter xmlWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(result);

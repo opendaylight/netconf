@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -155,8 +156,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             throw DocumentedException.wrap(e);
         }
         if (result.value() == null) {
-            return XmlUtil.createElement(document, XmlNetconfConstants.OK,
-                Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.of(NamespaceURN.BASE));
         }
         return transformNormalizedNode(document, result.value(),
                 Absolute.of(rpcDefinition.getQName(), rpcDefinition.getOutput().getQName()));
@@ -172,7 +172,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
         final Element response = handle(document, operationElement, subsequentOperation);
         final Element rpcReply = XmlUtil.createElement(document, XmlNetconfConstants.RPC_REPLY_KEY,
-                Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+                Optional.of(NamespaceURN.BASE));
 
         if (XmlElement.fromDomElement(response).hasNamespace()) {
             rpcReply.appendChild(response);
