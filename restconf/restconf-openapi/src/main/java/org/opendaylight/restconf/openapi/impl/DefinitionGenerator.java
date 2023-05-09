@@ -7,14 +7,14 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.COMPONENTS_PREFIX;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.CONFIG;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.NAME_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.POST_SUFFIX;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_KEY;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_SUFFIX;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.MODULE_NAME_SUFFIX;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.COMPONENTS_PREFIX;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.CONFIG;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.NAME_KEY;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.POST_SUFFIX;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TOP;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.XML_KEY;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.XML_SUFFIX;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

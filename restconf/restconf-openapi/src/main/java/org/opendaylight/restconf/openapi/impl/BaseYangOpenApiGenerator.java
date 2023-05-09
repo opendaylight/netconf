@@ -7,16 +7,16 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildDelete;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildGet;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPatch;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPost;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPostOperation;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPut;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getTypeParentNode;
 import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TOP;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildDelete;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildGet;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPatch;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPost;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPostOperation;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPut;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.getTypeParentNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
