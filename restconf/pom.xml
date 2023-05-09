@@ -32,7 +32,7 @@
         <module>restconf-common</module>
         <module>restconf-nb</module>
         <module>sal-rest-connector-config</module>
-        <module>sal-rest-docgen</module>
+        <module>restconf-openapi</module>
         <module>wadl-generator</module>
         <module>websocket-client</module>
         <!--
