@@ -14,7 +14,7 @@ import java.io.IOException;
 import org.junit.Test;
 import org.opendaylight.yangtools.yang.common.Revision;
 
-public final class SwaggerObjectTest extends AbstractApiDocTest {
+public final class DefinitionGeneratorTest extends AbstractApiDocTest {
     @Test
     public void testConvertToJsonSchema() throws IOException {
         final var module = CONTEXT.findModule("opflex", Revision.of("2014-05-28")).orElseThrow();
