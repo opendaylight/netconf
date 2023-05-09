@@ -566,7 +566,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>sal-rest-docgen</artifactId>
+                <artifactId>restconf-openapi</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
