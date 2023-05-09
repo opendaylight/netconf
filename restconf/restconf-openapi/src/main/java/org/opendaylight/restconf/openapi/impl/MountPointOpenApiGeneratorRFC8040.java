@@ -10,7 +10,7 @@ package org.opendaylight.restconf.openapi.impl;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointOpenApi;
+import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
 
 /**
  * MountPoint generator implementation for RFC 8040.
