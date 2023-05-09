@@ -21,6 +21,8 @@ import org.opendaylight.netconf.sal.rest.doc.DocGenTestHelper;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.restconf.openapi.api.AbstractOpenApiTest;
+import org.opendaylight.restconf.openapi.model.OpenApiObject;
+import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
