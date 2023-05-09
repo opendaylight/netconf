@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import java.util.Set;
 import javax.ws.rs.core.Application;
-import org.opendaylight.netconf.sal.rest.doc.api.OpenApiService;
+import org.opendaylight.restconf.openapi.api.OpenApiService;
 
 // FIXME: hide this class
 public final class OpenApiApplication extends Application {

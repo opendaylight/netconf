@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.api.OpenApiService;
+import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointOpenApi;
 import org.opendaylight.netconf.sal.rest.doc.openapi.MountPointInstance;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;

@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.api.AbstractOpenApiTest;
+import org.opendaylight.restconf.openapi.api.AbstractOpenApiTest;
 import org.opendaylight.netconf.sal.rest.doc.helper.DocGenTestHelper;
 import org.opendaylight.netconf.sal.rest.doc.impl.MountPointOpenApiGeneratorRFC8040;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
