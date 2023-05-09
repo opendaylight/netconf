@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f828be6_bb2410a9",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-09T10:52:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3047950_4ce229db",
+      "revId": "ed968e4324cca0ec594dbb43925f44d508aea97b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f82f6700_fd8d0e72",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ed7f62f_fae1a947",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-09T10:52:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f82f6700_fd8d0e72",
+      "revId": "ed968e4324cca0ec594dbb43925f44d508aea97b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76b066fd_f662a355",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-05-09T10:07:19Z",
       "side": 1,
       "message": "Missing final keyword",
+      "revId": "ed968e4324cca0ec594dbb43925f44d508aea97b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "344d77e9_4eec8805",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointOpenApiTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-09T10:52:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76b066fd_f662a355",
       "revId": "ed968e4324cca0ec594dbb43925f44d508aea97b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
