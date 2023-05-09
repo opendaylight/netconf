@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -37,6 +39,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yanglib.api.YangLibService;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -194,9 +197,9 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
             final var yangTextSchemaSource = yangTextSchemaFuture.get();
             return yangTextSchemaSource.asCharSource(StandardCharsets.UTF_8).read();
         } catch (InterruptedException | ExecutionException e) {
-            throw new IllegalStateException("Unable to get schema " + sourceId, e);
+            throw new WebApplicationException("Unable to get schema " + sourceId, e);
         } catch (IOException e) {
-            throw new IllegalStateException("Unable to read schema " + sourceId, e);
+            throw new WebApplicationException("Unable to read schema " + sourceId, e);
         }
     }
 
