@@ -46,7 +46,6 @@ import org.opendaylight.netconf.sal.rest.doc.openapi.Info;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.openapi.SecuritySchemes;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Server;
-import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -324,7 +323,6 @@ public abstract class BaseYangOpenApiGenerator {
             final String resourcePath) {
         LOG.debug("Adding path: [{}]", resourcePath);
 
-        final ArrayNode pathParams = JsonUtil.copy(parentPathParams);
         Iterable<? extends DataSchemaNode> childSchemaNodes = Collections.emptySet();
         if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
@@ -332,7 +330,7 @@ public abstract class BaseYangOpenApiGenerator {
         }
 
         final ObjectNode path = JsonNodeFactory.instance.objectNode();
-        path.setAll(operations(node, moduleName, deviceName, pathParams, isConfig, parentName, definitionNames));
+        path.setAll(operations(node, moduleName, deviceName, parentPathParams, isConfig, parentName, definitionNames));
         paths.set(resourcePath, path);
 
         if (node instanceof ActionNodeContainer) {
@@ -347,9 +345,9 @@ public abstract class BaseYangOpenApiGenerator {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 final String newParent = parentName + "_" + node.getQName().getLocalName();
                 final String localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
-                final String newResourcePath = resourcePath + "/" + createPath(childNode, pathParams, localName);
+                final String newResourcePath = resourcePath + "/" + createPath(childNode, parentPathParams, localName);
                 final boolean newIsConfig = isConfig && childNode.isConfiguration();
-                addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
+                addPaths(childNode, deviceName, moduleName, paths, parentPathParams, schemaContext,
                     newIsConfig, newParent, definitionNames, newResourcePath);
             }
         }
