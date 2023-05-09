@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f48384ad_7005467d",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/api/AbstractApiDocTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-09T09:27:24Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d07de29d_c4e54906",
+      "revId": "7676f1c2bbd740dd1a7c78598a1154dcffae6c64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "640cd872_bad7a75a",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-05-04T16:56:36Z",
       "side": 1,
       "message": "Same here - can\u0027t place this helper near classes in different packages so now it has it\u0027s own package.",
+      "revId": "7676f1c2bbd740dd1a7c78598a1154dcffae6c64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44f88e95_89f25f98",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/helper/DocGenTestHelper.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-09T09:27:24Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "640cd872_bad7a75a",
       "revId": "7676f1c2bbd740dd1a7c78598a1154dcffae6c64",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
