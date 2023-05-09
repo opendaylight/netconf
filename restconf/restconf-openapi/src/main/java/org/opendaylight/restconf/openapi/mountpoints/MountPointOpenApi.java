@@ -17,6 +17,7 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.S
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TAGS_KEY;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildTagsValue;
+import static org.opendaylight.restconf.openapi.util.JsonUtil.addFields;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
