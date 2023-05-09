@@ -26,10 +26,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.helper.DocGenTestHelper;
-import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
-import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.restconf.openapi.api.AbstractOpenApiTest;
 import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
+import org.opendaylight.restconf.openapi.model.OpenApiObject;
+import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
