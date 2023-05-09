@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.rest.doc.model.builder;
+package org.opendaylight.restconf.openapi.model.builder;
 
 import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.INPUT;
 import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.INPUT_SUFFIX;
