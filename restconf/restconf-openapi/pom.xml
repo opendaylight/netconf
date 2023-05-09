@@ -15,7 +15,7 @@
     <relativePath>../../parent</relativePath>
   </parent>
 
-  <artifactId>sal-rest-docgen</artifactId>
+  <artifactId>restconf-openapi</artifactId>
   <packaging>bundle</packaging>
 
   <dependencies>
