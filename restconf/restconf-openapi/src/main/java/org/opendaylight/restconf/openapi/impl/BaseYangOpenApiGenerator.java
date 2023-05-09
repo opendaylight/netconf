@@ -235,41 +235,35 @@ public abstract class BaseYangOpenApiGenerator {
         LOG.debug("child nodes size [{}]", dataSchemaNodes.size());
         for (final DataSchemaNode node : dataSchemaNodes) {
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                LOG.debug("Is Configuration node [{}] [{}]", node.isConfiguration(), node.getQName().getLocalName());
+                final boolean isConfig = node.isConfiguration();
+                LOG.debug("Is Configuration node [{}] [{}]", isConfig, node.getQName().getLocalName());
 
-                final String localName = module.getName() + ":" + node.getQName().getLocalName();
+                final String localName = moduleName + ":" + node.getQName().getLocalName();
                 final String resourcePath  = getResourcePath("data", context);
 
-                if (node.isConfiguration()) {
-                    final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
-                    /*
-                     * When there are two or more top container or list nodes
-                     * whose config statement is true in module, make sure that
-                     * only one root post link is added for this module.
-                     */
-                    if (isForSingleModule && !hasAddRootPostLink) {
-                        LOG.debug("Has added root post link for module {}", module.getName());
-                        addRootPostLink(module, deviceName, pathParams, resourcePath, paths);
+                final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
+                /*
+                 * When there are two or more top container or list nodes
+                 * whose config statement is true in module, make sure that
+                 * only one root post link is added for this module.
+                 */
+                if (isConfig && isForSingleModule && !hasAddRootPostLink) {
+                    LOG.debug("Has added root post link for module {}", moduleName);
+                    addRootPostLink(module, deviceName, pathParams, resourcePath, paths);
 
-                        hasAddRootPostLink = true;
-                    }
-
-                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName);
-                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, true, module.getName(),
-                        definitionNames, resolvedPath);
-                } else  {
-                    final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
-                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName);
-                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, false, moduleName,
-                        definitionNames, resolvedPath);
+                    hasAddRootPostLink = true;
                 }
+
+                final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName);
+                addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, isConfig,
+                    moduleName, definitionNames, resolvedPath);
             }
         }
 
         for (final RpcDefinition rpcDefinition : module.getRpcs()) {
             final String resolvedPath = getResourcePath("operations", context) + "/" + moduleName + ":"
                     + rpcDefinition.getQName().getLocalName();
-            addOperations(rpcDefinition, moduleName, deviceName, paths, module.getName(), definitionNames,
+            addOperations(rpcDefinition, moduleName, deviceName, paths, moduleName, definitionNames,
                 resolvedPath);
         }
 
