@@ -9,7 +9,6 @@ package org.opendaylight.restconf.openapi.mountpoints;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASE_PATH;
 import static org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.DESCRIPTION_KEY;
@@ -18,6 +17,7 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.S
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TAGS_KEY;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildTagsValue;
+import static org.opendaylight.restconf.openapi.util.JsonUtil.addFields;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
