@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "c9fcd3e5db469a23d212454ac037152300f366f8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ae440f6_ace8e4d4",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-09T12:44:02Z",
+      "side": 1,
+      "message": "Mixed usage of \u0027var\u0027.",
+      "revId": "c9fcd3e5db469a23d212454ac037152300f366f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41aaadc9_1b4e29ad",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-09T12:44:02Z",
+      "side": 1,
+      "message": "Extract this to separate method:\n```\n    private static List\u003cString\u003e getPatchParametersNames(final ObjectNode paths, final String path) {\n        final var jsonNode \u003d paths.get(path)\n                .get(\"patch\")\n                .get(\"parameters\")\n                .elements();\n        return ImmutableList.copyOf(jsonNode).stream()\n                .map(parameter -\u003e parameter.get(\"name\").asText())\n                .toList();\n    }\n```",
+      "revId": "c9fcd3e5db469a23d212454ac037152300f366f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
