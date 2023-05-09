@@ -64,6 +64,13 @@ public final class ApiDocServiceImpl implements ApiDocService {
             new ApiDocGeneratorRFC8040(schemaService));
     }
 
+    public ApiDocServiceImpl(final DOMSchemaService schemaService,
+                             final DOMMountPointService mountPointService,
+                             final String basePath) {
+        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, basePath),
+            new ApiDocGeneratorRFC8040(schemaService, basePath));
+    }
+
     @VisibleForTesting
     ApiDocServiceImpl(final MountPointSwaggerGeneratorRFC8040 mountPointSwaggerGeneratorRFC8040,
                       final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040) {
