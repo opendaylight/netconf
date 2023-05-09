@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
-import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildDelete;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildGet;
@@ -17,6 +15,8 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.b
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPostOperation;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPut;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.getTypeParentNode;
+import static org.opendaylight.restconf.openapi.util.JsonUtil.addFields;
+import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,7 +47,7 @@ import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.netconf.sal.rest.doc.openapi.SecuritySchemes;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Server;
-import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
+import org.opendaylight.restconf.openapi.util.JsonUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
