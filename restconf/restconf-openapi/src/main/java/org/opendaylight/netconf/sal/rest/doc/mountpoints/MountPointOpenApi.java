@@ -9,8 +9,6 @@ package org.opendaylight.netconf.sal.rest.doc.mountpoints;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator.BASE_PATH;
-import static org.opendaylight.netconf.sal.rest.doc.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.DESCRIPTION_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.RESPONSES_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_KEY;
@@ -18,6 +16,8 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TAGS_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildTagsValue;
 import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASE_PATH;
+import static org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,9 +34,9 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangOpenApiGenerator;
-import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
+import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
+import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;

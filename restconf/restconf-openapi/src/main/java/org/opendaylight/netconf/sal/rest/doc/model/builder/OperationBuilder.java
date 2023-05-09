@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2023 PANTHEON.tech s.r.o. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -8,9 +8,9 @@
 
 package org.opendaylight.netconf.sal.rest.doc.model.builder;
 
-import static org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator.INPUT;
-import static org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator.INPUT_SUFFIX;
-import static org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator.OUTPUT_SUFFIX;
+import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.INPUT;
+import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.INPUT_SUFFIX;
+import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.OUTPUT_SUFFIX;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -21,8 +21,8 @@ import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
+import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
