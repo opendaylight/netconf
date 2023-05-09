@@ -17,9 +17,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.rest.doc.api.AbstractOpenApiTest;
 import org.opendaylight.netconf.sal.rest.doc.helper.DocGenTestHelper;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
+import org.opendaylight.restconf.openapi.api.AbstractOpenApiTest;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
