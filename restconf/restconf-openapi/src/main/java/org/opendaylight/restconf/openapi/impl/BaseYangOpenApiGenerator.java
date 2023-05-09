@@ -240,29 +240,22 @@ public abstract class BaseYangOpenApiGenerator {
                 final String localName = module.getName() + ":" + node.getQName().getLocalName();
                 final String resourcePath  = getResourcePath("data", context);
 
-                if (node.isConfiguration()) {
-                    final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
-                    /*
-                     * When there are two or more top container or list nodes
-                     * whose config statement is true in module, make sure that
-                     * only one root post link is added for this module.
-                     */
-                    if (isForSingleModule && !hasAddRootPostLink) {
-                        LOG.debug("Has added root post link for module {}", module.getName());
-                        addRootPostLink(module, deviceName, pathParams, resourcePath, paths);
+                final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
+                /*
+                 * When there are two or more top container or list nodes
+                 * whose config statement is true in module, make sure that
+                 * only one root post link is added for this module.
+                 */
+                if (isForSingleModule && !hasAddRootPostLink) {
+                    LOG.debug("Has added root post link for module {}", module.getName());
+                    addRootPostLink(module, deviceName, pathParams, resourcePath, paths);
 
-                        hasAddRootPostLink = true;
-                    }
-
-                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName);
-                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, true, module.getName(),
-                        definitionNames, resolvedPath);
-                } else  {
-                    final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
-                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName);
-                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, false, moduleName,
-                        definitionNames, resolvedPath);
+                    hasAddRootPostLink = true;
                 }
+
+                final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName);
+                addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, node.isConfiguration(),
+                    module.getName(), definitionNames, resolvedPath);
             }
         }
 
