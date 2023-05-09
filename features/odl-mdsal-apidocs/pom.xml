@@ -35,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>sal-rest-docgen</artifactId>
+            <artifactId>restconf-openapi</artifactId>
         </dependency>
     </dependencies>
 </project>
