@@ -601,7 +601,7 @@ public class DefinitionGenerator {
             jsonType = processStringType(leafTypeDef, property, node.getQName().getLocalName());
 
         } else if (leafTypeDef instanceof UnionTypeDefinition) {
-            jsonType = processUnionType((UnionTypeDefinition) leafTypeDef);
+            jsonType = processUnionType((UnionTypeDefinition) leafTypeDef, property);
 
         } else if (leafTypeDef instanceof EmptyTypeDefinition) {
             jsonType = OBJECT_TYPE;
@@ -826,7 +826,7 @@ public class DefinitionGenerator {
         return STRING_TYPE;
     }
 
-    private static String processUnionType(final UnionTypeDefinition unionType) {
+    private static String processUnionType(final UnionTypeDefinition unionType, final ObjectNode property) {
         boolean isStringTakePlace = false;
         boolean isNumberTakePlace = false;
         boolean isBooleanTakePlace = false;
@@ -848,14 +848,22 @@ public class DefinitionGenerator {
             }
         }
         if (isStringTakePlace) {
+            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
+            setExampleValue(property, STRING_TYPE);
             return STRING_TYPE;
         }
         if (isBooleanTakePlace) {
             if (isNumberTakePlace) {
+                unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, v.toString()));
+                setExampleValue(property, STRING_TYPE);
                 return STRING_TYPE;
             }
+            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (Boolean) v));
+            setExampleValue(property, BOOLEAN_TYPE);
             return BOOLEAN_TYPE;
         }
+        unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, v.toString()));
+        setExampleValue(property, NUMBER_TYPE);
         return NUMBER_TYPE;
     }
 
