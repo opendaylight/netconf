@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -228,5 +229,26 @@ public final class MountPointOpenApiTest {
         var pathToList5 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
         assertTrue(mountPointApi.paths().containsKey(pathToList5));
         assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList5));
+    }
+
+    /**
+     * Test that request for actions is correct and has parameters.
+     */
+    @Test
+    public void testActionPathsParamsForMountPointApi() throws Exception {
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+
+        var pathWithParameters = "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action";
+        assertTrue(mountPointApi.paths().containsKey(pathWithParameters));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathWithParameters));
+
+        var pathWithoutParameters = "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container"
+            + "/inner-container/action";
+        assertTrue(mountPointApi.paths().containsKey(pathWithoutParameters));
+        assertEquals(Collections.emptyList(), getPathParameters(mountPointApi.paths(), pathWithoutParameters));
     }
 }

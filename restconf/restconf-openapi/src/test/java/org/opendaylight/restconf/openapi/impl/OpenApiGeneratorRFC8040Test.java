@@ -18,6 +18,7 @@ import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParamete
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -307,6 +308,21 @@ public final class OpenApiGeneratorRFC8040Test {
         var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
         assertTrue(doc.paths().containsKey(pathToList4));
         assertEquals(List.of("name"), getPathParameters(doc.paths(), pathToList5));
+    }
+
+    @Test
+    public void testActionPathsParams() {
+        final var module = context.findModule("action-types").orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+
+        var pathWithParameters = "/rests/operations/action-types:list={name}/list-action";
+        assertTrue(doc.paths().containsKey(pathWithParameters));
+        assertEquals(List.of("name"), getPathParameters(doc.paths(), pathWithParameters));
+
+        var pathWithoutParameters = "/rests/operations/action-types:multi-container/inner-container/action";
+        assertTrue(doc.paths().containsKey(pathWithoutParameters));
+        assertEquals(Collections.emptyList(), getPathParameters(doc.paths(), pathWithoutParameters));
+
     }
 
     @Test
