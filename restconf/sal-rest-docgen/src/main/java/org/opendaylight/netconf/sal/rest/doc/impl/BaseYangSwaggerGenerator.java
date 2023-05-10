@@ -360,11 +360,12 @@ public abstract class BaseYangSwaggerGenerator {
             }
         }
 
+        final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
         for (final RpcDefinition rpcDefinition : module.getRpcs()) {
             final String resolvedPath = getResourcePath("operations", context) + "/" + moduleName + ":"
                     + rpcDefinition.getQName().getLocalName();
             addOperations(rpcDefinition, moduleName, deviceName, paths, module.getName(), definitionNames, oaversion,
-                    resolvedPath);
+                    resolvedPath, pathParams);
         }
 
         LOG.debug("Number of Paths found [{}]", paths.size());
@@ -461,7 +462,7 @@ public abstract class BaseYangSwaggerGenerator {
                 final String resolvedPath = "/rests/operations" + resourcePath.substring(11)
                         + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
                 addOperations(actionDef, moduleName, deviceName, paths, parentName, definitionNames, oaversion,
-                        resolvedPath);
+                        resolvedPath, pathParams);
             });
         }
 
@@ -600,10 +601,11 @@ public abstract class BaseYangSwaggerGenerator {
 
     private static void addOperations(final OperationDefinition operDef, final String moduleName,
             final Optional<String> deviceName, final ObjectNode paths, final String parentName,
-            final DefinitionNames definitionNames, final OAversion oaversion, final String resourcePath) {
+            final DefinitionNames definitionNames, final OAversion oaversion, final String resourcePath,
+            final ArrayNode parentPathParams) {
         final ObjectNode operations = JsonNodeFactory.instance.objectNode();
         operations.set("post", buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames,
-                oaversion));
+                oaversion, parentPathParams));
         paths.set(resourcePath, operations);
     }
 
