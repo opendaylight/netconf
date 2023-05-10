@@ -750,6 +750,9 @@ public class DefinitionGenerator {
         }
         property.set(ENUM_KEY, enumNames);
         property.put(DEFAULT_KEY, enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1));
+        bitsType.getDefaultValue()
+                .ifPresent(v -> setDefaultValue(property, (String) v));
+        setExampleValue(property, "01101");
         return STRING_TYPE;
     }
 
