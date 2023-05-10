@@ -766,9 +766,11 @@ public class DefinitionGenerator {
             } catch (IllegalArgumentException ex) {
                 LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
             }
-            setDefaultValue(property, defaultValue);
+            stringType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
+            setExampleValue(property, defaultValue);
         } else {
-            setDefaultValue(property, "Some " + nodeName);
+            stringType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
+            setExampleValue(property, "Some " + nodeName);
         }
         return STRING_TYPE;
     }
