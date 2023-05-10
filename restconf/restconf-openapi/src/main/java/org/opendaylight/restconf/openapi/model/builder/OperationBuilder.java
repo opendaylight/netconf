@@ -206,8 +206,9 @@ public final class OperationBuilder {
     }
 
     public static Operation buildPostOperation(final OperationDefinition operDef, final String moduleName,
-            final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames) {
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode();
+            final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames,
+            final ArrayNode parentPathParameters) {
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(parentPathParameters);
         final String operationName = operDef.getQName().getLocalName();
         final String inputName = operationName + INPUT_SUFFIX;
         final String summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, operationName);
