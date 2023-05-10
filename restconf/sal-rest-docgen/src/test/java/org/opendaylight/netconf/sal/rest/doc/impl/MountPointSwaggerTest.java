@@ -141,4 +141,27 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         assertTrue(mountPointApi.getPaths().has(pathToList5));
         assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList5));
     }
+
+    /**
+     * Test that request for actions is correct and has parameters.
+     */
+    @Test
+    public void testActionPathsParamsForMountPointApi() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        swagger.onMountPointCreated(INSTANCE_ID);
+
+        final var mountPointApi = (OpenApiObject) swagger.getMountPointApi(mockInfo, 1L, Optional.empty(),
+            OAversion.V3_0);
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+
+        final var pathWithParameters =
+            "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action";
+        assertTrue(mountPointApi.getPaths().has(pathWithParameters));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathWithParameters));
+
+        final var pathWithoutParameters =
+            "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action";
+        assertTrue(mountPointApi.getPaths().has(pathWithoutParameters));
+        assertEquals(List.of(), getPathParameters(mountPointApi.getPaths(), pathWithoutParameters));
+    }
 }

@@ -85,7 +85,7 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
-        final ArrayNode parameters = JsonUtil.copy(pathParams);
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + CONFIG + "_" + nodeName + POST_SUFFIX;
         final String defName = cleanDefName + discriminator;
@@ -193,9 +193,10 @@ public final class OperationBuilder {
 
     public static ObjectNode buildPostOperation(final OperationDefinition operDef, final String moduleName,
                                                 final Optional<String> deviceName, final String parentName,
-                                                final DefinitionNames definitionNames, final OAversion oaversion) {
+                                                final DefinitionNames definitionNames, final OAversion oaversion,
+                                                final ArrayNode parentPathParameters) {
         final ObjectNode postOperation = JsonNodeFactory.instance.objectNode();
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode();
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(parentPathParameters);
         final String operName = operDef.getQName().getLocalName();
         final String inputName = operName + INPUT_SUFFIX;
 
