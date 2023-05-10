@@ -171,4 +171,14 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         assertTrue(secondContainer.getProperties().has("leaf-first-case"));
         assertFalse(secondContainer.getProperties().has("leaf-second-case"));
     }
+
+    @Test
+    public void testActionPathsParams() {
+        final var module = CONTEXT.findModule("action-types").orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+
+        var path = "rests/operations/action-types:list={name}/list-action";
+        assertTrue(doc.getPaths().containsKey(path));
+        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), path));
+    }
 }
