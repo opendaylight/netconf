@@ -239,4 +239,22 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertTrue(requiredNode.isArray());
         assertEquals(expected, requiredNode.toString());
     }
+
+    /**
+     * Test that request for actions is correct and has parameters.
+     */
+    @Test
+    public void testActionPathsParams() {
+        final var module = CONTEXT.findModule("action-types").orElseThrow();
+        final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+            ApiDocServiceImpl.OAversion.V3_0);
+
+        final var pathWithParameters = "/rests/operations/action-types:list={name}/list-action";
+        assertTrue(doc.getPaths().has(pathWithParameters));
+        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathWithParameters));
+
+        final var pathWithoutParameters = "/rests/operations/action-types:multi-container/inner-container/action";
+        assertTrue(doc.getPaths().has(pathWithoutParameters));
+        assertEquals(List.of(), getPathParameters(doc.getPaths(), pathWithoutParameters));
+    }
 }
