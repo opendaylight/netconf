@@ -619,8 +619,8 @@ public class DefinitionGenerator {
         } else if (leafTypeDef instanceof StringTypeDefinition) {
             jsonType = processStringType(leafTypeDef, property, node.getQName().getLocalName());
 
-        } else if (leafTypeDef instanceof UnionTypeDefinition) {
-            jsonType = processUnionType((UnionTypeDefinition) leafTypeDef);
+        } else if (leafTypeDef instanceof UnionTypeDefinition unionType) {
+            jsonType = processUnionType(unionType, property, node.getQName().getLocalName());
 
         } else if (leafTypeDef instanceof EmptyTypeDefinition) {
             jsonType = OBJECT_TYPE;
@@ -843,7 +843,8 @@ public class DefinitionGenerator {
         return STRING_TYPE;
     }
 
-    private static String processUnionType(final UnionTypeDefinition unionType) {
+    private static String processUnionType(final UnionTypeDefinition unionType, final ObjectNode property,
+            final String nodeName) {
         boolean isStringTakePlace = false;
         boolean isNumberTakePlace = false;
         boolean isBooleanTakePlace = false;
@@ -865,14 +866,24 @@ public class DefinitionGenerator {
             }
         }
         if (isStringTakePlace) {
+            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
+            setExampleValue(property, "Some " + nodeName);
             return STRING_TYPE;
         }
         if (isBooleanTakePlace) {
             if (isNumberTakePlace) {
-                return STRING_TYPE;
+                // FIXME deal with other number formats
+                unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Long.valueOf((String) v)));
+                setExampleValue(property, 0);
+                return NUMBER_TYPE;
             }
+            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Boolean.valueOf((String) v)));
+            setExampleValue(property, true);
             return BOOLEAN_TYPE;
         }
+        // FIXME deal with other number formats
+        unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Long.valueOf((String) v)));
+        setExampleValue(property, 0);
         return NUMBER_TYPE;
     }
 
