@@ -7,13 +7,6 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.MODULE_NAME_SUFFIX;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.COMPONENTS_PREFIX;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.CONFIG;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.NAME_KEY;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TOP;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.XML_KEY;
-
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -21,67 +14,25 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import dk.brics.automaton.RegExp;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.regex.Pattern;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
-import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.AnydataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ContainerLike;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.ElementCountConstraint;
-import org.opendaylight.yangtools.yang.model.api.IdentitySchemaNode;
-import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.MandatoryAware;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.*;
+import org.opendaylight.yangtools.yang.model.api.type.*;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
-import org.opendaylight.yangtools.yang.model.api.type.BooleanTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.DecimalTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.EmptyTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition.EnumPair;
-import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.Int16TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.Int32TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.Int64TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.Int8TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.LengthConstraint;
-import org.opendaylight.yangtools.yang.model.api.type.PatternConstraint;
-import org.opendaylight.yangtools.yang.model.api.type.RangeConstraint;
-import org.opendaylight.yangtools.yang.model.api.type.RangeRestrictedTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.StringTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.Uint16TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.Uint32TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.Uint64TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.Uint8TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.UnionTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.regex.Pattern;
+
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.MODULE_NAME_SUFFIX;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.*;
 
 /**
  * Generates JSON Schema for data defined in YANG. This class is not thread-safe.
@@ -585,7 +536,7 @@ public class DefinitionGenerator {
             final DefinitionNames definitionNames) {
         final String jsonType;
         if (leafTypeDef instanceof BinaryTypeDefinition) {
-            jsonType = processBinaryType(property);
+            jsonType = processBinaryType(property, (BinaryTypeDefinition) leafTypeDef);
 
         } else if (leafTypeDef instanceof BitsTypeDefinition) {
             jsonType = processBitsType((BitsTypeDefinition) leafTypeDef, property);
@@ -647,7 +598,8 @@ public class DefinitionGenerator {
         return jsonType;
     }
 
-    private static String processBinaryType(final ObjectNode property) {
+    private static String processBinaryType(final ObjectNode property, final BinaryTypeDefinition definition) {
+        definition.getDefaultValue().ifPresent(v -> setDefaultValue(property, ((String) v)));
         property.put(FORMAT_KEY, "byte");
         return STRING_TYPE;
     }
