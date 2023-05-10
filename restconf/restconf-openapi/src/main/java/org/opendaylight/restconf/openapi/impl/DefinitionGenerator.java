@@ -606,7 +606,7 @@ public class DefinitionGenerator {
             final DefinitionNames definitionNames) {
         final String jsonType;
         if (leafTypeDef instanceof BinaryTypeDefinition) {
-            jsonType = processBinaryType(property);
+            jsonType = processBinaryType(property, (BinaryTypeDefinition) leafTypeDef);
 
         } else if (leafTypeDef instanceof BitsTypeDefinition) {
             jsonType = processBitsType((BitsTypeDefinition) leafTypeDef, property);
@@ -668,7 +668,9 @@ public class DefinitionGenerator {
         return jsonType;
     }
 
-    private static String processBinaryType(final ObjectNode property) {
+    private static String processBinaryType(final ObjectNode property, final BinaryTypeDefinition definition) {
+        definition.getDefaultValue().ifPresent(v -> setDefaultValue(property, ((String) v)));
+        setExampleValue(property, "SGVsbG8sIHdvcmxkIQ==");
         property.put(FORMAT_KEY, "byte");
         return STRING_TYPE;
     }
