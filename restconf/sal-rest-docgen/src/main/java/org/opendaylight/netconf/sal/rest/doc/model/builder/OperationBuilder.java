@@ -203,9 +203,10 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildPostOperation(final OperationDefinition operDef, final String moduleName,
-            final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames) {
+            final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames,
+            ArrayNode parentPathParams) {
         final ObjectNode postOperation = JsonNodeFactory.instance.objectNode();
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode();
+        final ArrayNode parameters = JsonUtil.copy(parentPathParams);
         final String operName = operDef.getQName().getLocalName();
         final String inputName = operName + INPUT_SUFFIX;
 
