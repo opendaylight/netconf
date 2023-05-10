@@ -611,8 +611,9 @@ public final class DefinitionGenerator {
             setExampleValue(property, true);
         } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) {
             jsonType = processNumberType(rangeRestrictedType, property);
-        } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition) {
-            jsonType = processInstanceIdentifierType(node, property, stack.getEffectiveModelContext());
+        } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition instanceIdentifierType) {
+            jsonType = processInstanceIdentifierType(instanceIdentifierType, node, property,
+                stack.getEffectiveModelContext());
         } else {
             jsonType = STRING_TYPE;
         }
@@ -818,8 +819,8 @@ public final class DefinitionGenerator {
         return false;
     }
 
-    private static String processInstanceIdentifierType(final DataSchemaNode node, final ObjectNode property,
-            final EffectiveModelContext schemaContext) {
+    private static String processInstanceIdentifierType(final InstanceIdentifierTypeDefinition iidType,
+            final DataSchemaNode node, final ObjectNode property, final EffectiveModelContext schemaContext) {
         // create example instance-identifier to the first container of node's module if exists or leave it empty
         final var module = schemaContext.findModule(node.getQName().getModule());
         if (module.isPresent()) {
@@ -829,7 +830,8 @@ public final class DefinitionGenerator {
             container.ifPresent(c -> setExampleValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
                     c.getQName().getLocalName())));
         }
-
+        // set default value
+        iidType.getDefaultValue().ifPresent(c -> setDefaultValue(property, (String) c));
         return STRING_TYPE;
     }
 
