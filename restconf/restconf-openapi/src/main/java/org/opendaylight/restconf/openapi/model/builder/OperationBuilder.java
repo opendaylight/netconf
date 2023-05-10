@@ -22,7 +22,6 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
-import org.opendaylight.restconf.openapi.util.JsonUtil;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
@@ -79,7 +78,7 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
-        final ArrayNode parameters = JsonUtil.copy(pathParams);
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + CONFIG + "_" + nodeName + POST_SUFFIX;
         final String defName = cleanDefName + discriminator;
@@ -104,7 +103,7 @@ public final class OperationBuilder {
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName()));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
-        final ArrayNode parameters = JsonUtil.copy(pathParams);
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
 
         addQueryParameters(parameters, isConfig);
 
@@ -146,7 +145,7 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
-        final ArrayNode parameters = JsonUtil.copy(pathParams);
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
         insertRequestBodyParameter(value, defName, xmlDefName, nodeName + CONFIG);
@@ -168,7 +167,7 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
-        final ArrayNode parameters = JsonUtil.copy(pathParams);
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
         insertRequestBodyParameter(value, defName, xmlDefName, nodeName + CONFIG);
@@ -191,7 +190,7 @@ public final class OperationBuilder {
                 node.getQName().getLocalName()));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
         value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
-        final ArrayNode parameters = JsonUtil.copy(pathParams);
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         value.set(PARAMETERS_KEY, parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
