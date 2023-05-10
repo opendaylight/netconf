@@ -47,7 +47,6 @@ import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.netconf.sal.rest.doc.openapi.SecuritySchemes;
 import org.opendaylight.netconf.sal.rest.doc.openapi.Server;
-import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -324,7 +323,8 @@ public abstract class BaseYangOpenApiGenerator {
             final String resourcePath) {
         LOG.debug("Adding path: [{}]", resourcePath);
 
-        final ArrayNode pathParams = JsonUtil.copy(parentPathParams);
+        // make a copy of parameters for this iteration in order to not extend array for already completed iterations
+        final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode().addAll(parentPathParams);
         Iterable<? extends DataSchemaNode> childSchemaNodes = Collections.emptySet();
         if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
