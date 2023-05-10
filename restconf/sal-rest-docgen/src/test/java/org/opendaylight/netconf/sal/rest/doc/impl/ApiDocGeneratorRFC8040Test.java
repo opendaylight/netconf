@@ -167,4 +167,24 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
     }
+
+    @Test
+    public void testActionPathsParams() {
+        final var module = CONTEXT.findModule("action-param-test").orElseThrow();
+        final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+
+        var parameterNamesList = getListParametersNames(doc.getPaths(), "rests/operations/action-param-test:"
+                + "cont/list1={name}/action");
+        assertEquals(List.of("name"), parameterNamesList);
+    }
+
+    private static List<String> getListParametersNames(final ObjectNode paths, final String path) {
+        final var jsonNode = paths.get(path)
+                .get("post")
+                .get("parameters")
+                .elements();
+        return ImmutableList.copyOf(jsonNode).stream()
+                .map(parameter -> parameter.get("name").asText())
+                .toList();
+    }
 }

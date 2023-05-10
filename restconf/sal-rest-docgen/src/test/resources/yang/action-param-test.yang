@@ -1,0 +1,26 @@
+module action-param-test {
+  yang-version 1.1;
+  namespace "urn:opendaylight:action-test";
+  prefix "act";
+
+  container cont {
+    list list1 {
+      key name;
+      leaf name {
+        type string;
+        }
+      action action {
+        input {
+          leaf input {
+            type string;
+          }
+        }
+        output {
+          leaf output {
+            type string;
+          }
+        }
+      }
+    }
+  }
+}
