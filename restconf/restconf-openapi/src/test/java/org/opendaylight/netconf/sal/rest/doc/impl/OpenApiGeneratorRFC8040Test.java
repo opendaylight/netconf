@@ -14,7 +14,9 @@ import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.AbstractOpenApiTest;
@@ -169,5 +171,24 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         JsonNode secondContainer = schemas.get("choice-test_second-container");
         assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
+    }
+
+    @Test
+    public void testActionPathsParams() {
+        final var module = CONTEXT.findModule("action-types").orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+
+        var path = "rests/operations/action-types:list={name}/list-action";
+        assertEquals(List.of("name"), getParametersNamesList(doc.getPaths(), path));
+    }
+
+    private static List<String> getParametersNamesList(final Map<String, Path> paths, final String path) {
+        var parameters = paths.get(path)
+                .getPost()
+                .get("parameters")
+                .elements();
+        var parametersList = new ArrayList<JsonNode>();
+        parameters.forEachRemaining(parametersList::add);
+        return parametersList.stream().map(item -> item.get("name").asText()).toList();
     }
 }
