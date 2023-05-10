@@ -9,8 +9,6 @@
 package org.opendaylight.netconf.sal.rest.doc.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,14 +16,6 @@ import java.util.Map;
 public final class JsonUtil {
     private JsonUtil() {
 
-    }
-
-    public static ArrayNode copy(ArrayNode source) {
-        ArrayNode result = JsonNodeFactory.instance.arrayNode();
-        for (JsonNode jsonNode : source) {
-            result.add(jsonNode);
-        }
-        return result;
     }
 
     public static void addFields(final ObjectNode node, final Iterator<Map.Entry<String, JsonNode>> fields) {
