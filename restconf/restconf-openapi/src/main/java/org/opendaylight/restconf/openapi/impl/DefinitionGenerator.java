@@ -842,7 +842,10 @@ public class DefinitionGenerator {
         }
 
         if (leafTypeDef instanceof DecimalTypeDefinition) {
-            maybeLower.ifPresent(number -> setDefaultValue(property, ((Decimal64) number).decimalValue()));
+            leafTypeDef.getDefaultValue().ifPresent(number ->
+                    setDefaultValue(property, number.toString()));
+            maybeLower.ifPresent(number -> setExampleValue(property,
+                    ((Decimal64) number).decimalValue()));
             return NUMBER_TYPE;
         }
         if (leafTypeDef instanceof Uint8TypeDefinition
@@ -852,15 +855,21 @@ public class DefinitionGenerator {
                 || leafTypeDef instanceof Int32TypeDefinition) {
 
             property.put(FORMAT_KEY, INT32_FORMAT);
-            maybeLower.ifPresent(number -> setDefaultValue(property, Integer.valueOf(number.toString())));
+            leafTypeDef.getDefaultValue().ifPresent(number ->
+                    setDefaultValue(property, number.toString()));
+            maybeLower.ifPresent(number -> setExampleValue(property, Integer.valueOf(number.toString())));
         } else if (leafTypeDef instanceof Uint32TypeDefinition
                 || leafTypeDef instanceof Int64TypeDefinition) {
 
             property.put(FORMAT_KEY, INT64_FORMAT);
-            maybeLower.ifPresent(number -> setDefaultValue(property, Long.valueOf(number.toString())));
+            leafTypeDef.getDefaultValue().ifPresent(number ->
+                    setDefaultValue(property, number.toString()));
+            maybeLower.ifPresent(number -> setExampleValue(property, Long.valueOf(number.toString())));
         } else {
             //uint64
-            setDefaultValue(property, 0);
+            leafTypeDef.getDefaultValue().ifPresent(number ->
+                    setDefaultValue(property, number.toString()));
+            setExampleValue(property, 0);
         }
         return INTEGER_TYPE;
     }
@@ -974,11 +983,19 @@ public class DefinitionGenerator {
         property.put(EXAMPLE_KEY, value);
     }
 
-    private static void setDefaultValue(final ObjectNode property, final String value) {
-        property.put(DEFAULT_KEY, value);
+    private static void setExampleValue(final ObjectNode property, final Integer value) {
+        property.put(EXAMPLE_KEY, String.valueOf(value));
     }
 
-    private static void setDefaultValue(final ObjectNode property, final Integer value) {
+    private static void setExampleValue(final ObjectNode property, final BigDecimal value) {
+        property.put(EXAMPLE_KEY, value.toString());
+    }
+
+    private static void setExampleValue(final ObjectNode property, final Long value) {
+        property.put(EXAMPLE_KEY, value);
+    }
+
+    private static void setDefaultValue(final ObjectNode property, final String value) {
         property.put(DEFAULT_KEY, value);
     }
 
