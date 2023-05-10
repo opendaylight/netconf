@@ -893,6 +893,8 @@ public class DefinitionGenerator {
                     .findFirst();
             container.ifPresent(c -> setDefaultValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
                     c.getQName().getLocalName())));
+            setExampleValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
+                    module.orElseThrow().getName()));
         }
 
         return STRING_TYPE;
