@@ -610,7 +610,8 @@ public class DefinitionGenerator {
                 stack, definitions, definitionNames);
         } else if (leafTypeDef instanceof BooleanTypeDefinition) {
             jsonType = BOOLEAN_TYPE;
-            setDefaultValue(property, true);
+            leafTypeDef.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
+            setExampleValue(property, true);
         } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition) {
             jsonType = processNumberType((RangeRestrictedTypeDefinition<?, ?>) leafTypeDef, property);
         } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition) {
@@ -905,6 +906,10 @@ public class DefinitionGenerator {
     }
 
     private static void setExampleValue(final ObjectNode property, final String value) {
+        property.put(EXAMPLE_KEY, value);
+    }
+
+    private static void setExampleValue(final ObjectNode property, final boolean value) {
         property.put(EXAMPLE_KEY, value);
     }
 
