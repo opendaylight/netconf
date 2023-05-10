@@ -804,6 +804,8 @@ public class DefinitionGenerator {
         }
 
         if (leafTypeDef instanceof DecimalTypeDefinition) {
+            leafTypeDef.getDefaultValue().ifPresent(number ->
+                    setDefaultValue(property, Decimal64.valueOf(number.toString()).decimalValue()));
             maybeLower.ifPresent(number -> setExampleValue(property, ((Decimal64) number).decimalValue()));
             return NUMBER_TYPE;
         }
@@ -814,14 +816,19 @@ public class DefinitionGenerator {
                 || leafTypeDef instanceof Int32TypeDefinition) {
 
             property.put(FORMAT_KEY, INT32_FORMAT);
+            leafTypeDef.getDefaultValue().ifPresent(number -> setDefaultValue(property,
+                Integer.valueOf(number.toString())));
             maybeLower.ifPresent(number -> setExampleValue(property, Integer.valueOf(number.toString())));
         } else if (leafTypeDef instanceof Uint32TypeDefinition
                 || leafTypeDef instanceof Int64TypeDefinition) {
 
             property.put(FORMAT_KEY, INT64_FORMAT);
+            leafTypeDef.getDefaultValue().ifPresent(number -> setDefaultValue(property,
+                Long.valueOf(number.toString())));
             maybeLower.ifPresent(number -> setExampleValue(property, Long.valueOf(number.toString())));
         } else {
             //uint64
+            leafTypeDef.getDefaultValue().ifPresent(number -> setDefaultValue(property, number.toString()));
             setExampleValue(property, 0);
         }
         return INTEGER_TYPE;
@@ -943,6 +950,10 @@ public class DefinitionGenerator {
     }
 
     private static void setDefaultValue(final ObjectNode property, final String value) {
+        property.put(DEFAULT_KEY, value);
+    }
+
+    private static void setDefaultValue(final ObjectNode property, final Integer value) {
         property.put(DEFAULT_KEY, value);
     }
 
