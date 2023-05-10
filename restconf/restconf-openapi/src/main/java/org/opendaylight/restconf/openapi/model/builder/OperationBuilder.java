@@ -202,9 +202,10 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildPostOperation(final OperationDefinition operDef, final String moduleName,
-            final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames) {
+            final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames,
+            final ArrayNode parentPathParameters) {
         final ObjectNode postOperation = JsonNodeFactory.instance.objectNode();
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode();
+        final ArrayNode pathParameters = JsonNodeFactory.instance.arrayNode().addAll(parentPathParameters);
         final String operName = operDef.getQName().getLocalName();
         final String inputName = operName + INPUT_SUFFIX;
 
@@ -243,7 +244,7 @@ public final class OperationBuilder {
             payload.put(DESCRIPTION_KEY, inputName);
             postOperation.set(REQUEST_BODY_KEY, payload);
         }
-        postOperation.set(PARAMETERS_KEY, parameters);
+        postOperation.set(PARAMETERS_KEY, pathParameters);
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final String description = String.format("RPC %s success", operName);
 

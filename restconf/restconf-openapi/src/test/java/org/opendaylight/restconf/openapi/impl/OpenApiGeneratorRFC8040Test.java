@@ -250,4 +250,14 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         assertTrue(doc.getPaths().containsKey(pathToList4));
         assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList5));
     }
+
+    @Test
+    public void testActionPathsParams() {
+        final var module = CONTEXT.findModule("action-types").orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+
+        var path = "/rests/operations/action-types:list={name}/list-action";
+        assertTrue(doc.getPaths().containsKey(path));
+        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), path));
+    }
 }
