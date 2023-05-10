@@ -734,6 +734,8 @@ public class DefinitionGenerator {
             final SchemaNode node = leafTypeDef.getIdentities().iterator().next();
             definitionName = node.getQName().getLocalName() + definitionNames.getDiscriminator(node);
         }
+        leafTypeDef.getDefaultValue().ifPresent(v -> setDefaultValue(property,(String) v));
+        setExampleValue(property, definitionName);
         property.put(REF_KEY, COMPONENTS_PREFIX + definitionName);
         return STRING_TYPE;
     }
