@@ -271,11 +271,12 @@ public abstract class BaseYangOpenApiGenerator {
             }
         }
 
+        final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
         for (final RpcDefinition rpcDefinition : module.getRpcs()) {
             final String resolvedPath = getResourcePath("operations", context) + "/" + moduleName + ":"
                     + rpcDefinition.getQName().getLocalName();
             addOperations(rpcDefinition, moduleName, deviceName, paths, module.getName(), definitionNames,
-                resolvedPath);
+                resolvedPath, pathParams);
         }
 
         LOG.debug("Number of Paths found [{}]", paths.size());
@@ -337,9 +338,13 @@ public abstract class BaseYangOpenApiGenerator {
 
         if (node instanceof ActionNodeContainer) {
             ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
-                final String resolvedPath = "rests/operations" + resourcePath.substring(11)
-                        + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
-                addOperations(actionDef, moduleName, deviceName, paths, parentName, definitionNames, resolvedPath);
+                final String resolvedPathArgumentsName = resolvePathArgumentsName(actionDef.getQName(), node.getQName(),
+                        schemaContext);
+                final String resolvedPath = resourcePath.contains(resolvedPathArgumentsName)
+                        ? "rests/operations" + resourcePath.substring(11)
+                        : "rests/operations" + resourcePath.substring(11) + "/" + resolvedPathArgumentsName;
+                addOperations(actionDef, moduleName, deviceName, paths, parentName, definitionNames, resolvedPath,
+                        parentPathParams);
             });
         }
 
@@ -476,9 +481,10 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static void addOperations(final OperationDefinition operDef, final String moduleName,
             final Optional<String> deviceName, final ObjectNode paths, final String parentName,
-            final DefinitionNames definitionNames, final String resourcePath) {
+            final DefinitionNames definitionNames, final String resourcePath, ArrayNode parentPathParams) {
         final ObjectNode operations = JsonNodeFactory.instance.objectNode();
-        operations.set("post", buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames));
+        operations.set("post", buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames,
+                parentPathParams));
         paths.set(resourcePath, operations);
     }
 
