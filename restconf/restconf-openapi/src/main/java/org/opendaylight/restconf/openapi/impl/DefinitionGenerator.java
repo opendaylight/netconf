@@ -828,10 +828,10 @@ public final class DefinitionGenerator {
             final var container = module.orElseThrow().getChildNodes().stream()
                     .filter(n -> n instanceof ContainerSchemaNode)
                     .findFirst();
-            container.ifPresent(c -> setExampleValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
-                    c.getQName().getLocalName())));
+            container.ifPresent(c -> setDefaultValue(property, c.getQName().getLocalName()));
+            setExampleValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
+                module.orElseThrow().getName()));
         }
-
         return STRING_TYPE;
     }
 
