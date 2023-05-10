@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7428a090_70997a45",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-10T07:44:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ae440f6_ace8e4d4",
+      "revId": "c9fcd3e5db469a23d212454ac037152300f366f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "41aaadc9_1b4e29ad",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-05-09T12:44:02Z",
       "side": 1,
       "message": "Extract this to separate method:\n```\n    private static List\u003cString\u003e getPatchParametersNames(final ObjectNode paths, final String path) {\n        final var jsonNode \u003d paths.get(path)\n                .get(\"patch\")\n                .get(\"parameters\")\n                .elements();\n        return ImmutableList.copyOf(jsonNode).stream()\n                .map(parameter -\u003e parameter.get(\"name\").asText())\n                .toList();\n    }\n```",
+      "revId": "c9fcd3e5db469a23d212454ac037152300f366f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1824006f_30c69902",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-10T07:44:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "41aaadc9_1b4e29ad",
       "revId": "c9fcd3e5db469a23d212454ac037152300f366f8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
