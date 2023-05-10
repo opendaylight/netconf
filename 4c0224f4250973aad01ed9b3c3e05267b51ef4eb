@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8613697d_1f1d34f1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-10T07:29:13Z",
+      "side": 1,
+      "message": "We cannot just remove copy method because we face the issue that parameters are modified after they are used.\n\nInstead we have to change a logic a bit.",
+      "revId": "4c0224f4250973aad01ed9b3c3e05267b51ef4eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
