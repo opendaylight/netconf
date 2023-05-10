@@ -621,7 +621,7 @@ public class DefinitionGenerator {
         } else if (leafTypeDef instanceof StringTypeDefinition stringType) {
             jsonType = processStringType(stringType, property, node.getQName().getLocalName());
         } else if (leafTypeDef instanceof UnionTypeDefinition unionType) {
-            jsonType = processUnionType(unionType);
+            jsonType = processUnionType(unionType, property, node.getQName().getLocalName());
         } else if (leafTypeDef instanceof EmptyTypeDefinition) {
             jsonType = OBJECT_TYPE;
         } else if (leafTypeDef instanceof LeafrefTypeDefinition leafrefType) {
@@ -843,7 +843,8 @@ public class DefinitionGenerator {
         return STRING_TYPE;
     }
 
-    private static String processUnionType(final UnionTypeDefinition unionType) {
+    private static String processUnionType(final UnionTypeDefinition unionType, final ObjectNode property,
+            final String nodeName) {
         boolean isStringTakePlace = false;
         boolean isNumberTakePlace = false;
         boolean isBooleanTakePlace = false;
@@ -865,14 +866,22 @@ public class DefinitionGenerator {
             }
         }
         if (isStringTakePlace) {
+            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
+            setExampleValue(property, "Some " + nodeName);
             return STRING_TYPE;
         }
         if (isBooleanTakePlace) {
             if (isNumberTakePlace) {
-                return STRING_TYPE;
+                unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, v.toString()));
+                setExampleValue(property, 0);
+                return NUMBER_TYPE;
             }
+            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (Boolean) v));
+            setExampleValue(property, true);
             return BOOLEAN_TYPE;
         }
+        unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, v.toString()));
+        setExampleValue(property, 0);
         return NUMBER_TYPE;
     }
 
