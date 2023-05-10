@@ -842,7 +842,10 @@ public class DefinitionGenerator {
         }
 
         if (leafTypeDef instanceof DecimalTypeDefinition) {
-            maybeLower.ifPresent(number -> setDefaultValue(property, ((Decimal64) number).decimalValue()));
+            leafTypeDef.getDefaultValue().ifPresent(number ->
+                    setDefaultValue(property, ((String) number)));
+            maybeLower.ifPresent(number -> setExampleValue(property,
+                    ((Decimal64) number).decimalValue().toPlainString()));
             return NUMBER_TYPE;
         }
         if (leafTypeDef instanceof Uint8TypeDefinition
@@ -853,14 +856,16 @@ public class DefinitionGenerator {
 
             property.put(FORMAT_KEY, INT32_FORMAT);
             maybeLower.ifPresent(number -> setDefaultValue(property, Integer.valueOf(number.toString())));
+            setExampleValue(property, maybeLower.orElseThrow().toString());
         } else if (leafTypeDef instanceof Uint32TypeDefinition
                 || leafTypeDef instanceof Int64TypeDefinition) {
 
             property.put(FORMAT_KEY, INT64_FORMAT);
             maybeLower.ifPresent(number -> setDefaultValue(property, Long.valueOf(number.toString())));
+            setExampleValue(property, maybeLower.orElseThrow().toString());
         } else {
             //uint64
-            setDefaultValue(property, 0);
+            setExampleValue(property, "0");
         }
         return INTEGER_TYPE;
     }
