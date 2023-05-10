@@ -78,13 +78,14 @@ public final class OperationBuilder {
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + CONFIG + "_" + nodeName + POST_SUFFIX;
         final String defName = cleanDefName + discriminator;
         final String xmlDefName = cleanDefName + XML_SUFFIX + discriminator;
         ref.put(REF_KEY, COMPONENTS_PREFIX + defName);
         insertRequestBodyParameter(value, defName, xmlDefName, nodeName + CONFIG);
-        value.set(PARAMETERS_KEY, pathParams);
+        value.set(PARAMETERS_KEY, parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
@@ -102,10 +103,11 @@ public final class OperationBuilder {
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName()));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
 
-        addQueryParameters(pathParams, isConfig);
+        addQueryParameters(parameters, isConfig);
 
-        value.set(PARAMETERS_KEY, pathParams);
+        value.set(PARAMETERS_KEY, parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
@@ -146,7 +148,8 @@ public final class OperationBuilder {
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
         insertRequestBodyParameter(value, defName, xmlDefName, nodeName + CONFIG);
-        value.set(PARAMETERS_KEY, pathParams);
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
+        value.set(PARAMETERS_KEY, parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
@@ -167,7 +170,8 @@ public final class OperationBuilder {
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
         insertRequestBodyParameter(value, defName, xmlDefName, nodeName + CONFIG);
-        value.set(PARAMETERS_KEY, pathParams);
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
+        value.set(PARAMETERS_KEY, parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
@@ -186,7 +190,8 @@ public final class OperationBuilder {
                 node.getQName().getLocalName()));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
         value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
-        value.set(PARAMETERS_KEY, pathParams);
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
+        value.set(PARAMETERS_KEY, parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
