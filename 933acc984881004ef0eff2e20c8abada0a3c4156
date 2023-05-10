@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75a235c6_8fc767e7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-10T10:07:34Z",
+      "side": 1,
+      "message": "You have forget on https://git.opendaylight.org/gerrit/c/netconf/+/105652.\n\nFrom that patch we can take adding example keyword into very first patch and build all patches on top of it.",
+      "revId": "933acc984881004ef0eff2e20c8abada0a3c4156",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
