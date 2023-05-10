@@ -786,6 +786,8 @@ public class DefinitionGenerator {
         } else {
             setExampleValue(property, "Some " + nodeName);
         }
+
+        stringType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
         return STRING_TYPE;
     }
 
