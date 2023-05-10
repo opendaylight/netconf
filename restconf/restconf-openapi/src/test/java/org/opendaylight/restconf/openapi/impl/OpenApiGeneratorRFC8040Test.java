@@ -309,6 +309,23 @@ public final class OpenApiGeneratorRFC8040Test {
         assertEquals(List.of("name"), getPathParameters(doc.paths(), pathToList5));
     }
 
+    /**
+     * Test that request for actions is correct and has parameters.
+     */
+    @Test
+    public void testActionPathsParams() {
+        final var module = context.findModule("action-types").orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+
+        final var pathWithParameters = "/rests/operations/action-types:list={name}/list-action";
+        assertTrue(doc.paths().containsKey(pathWithParameters));
+        assertEquals(List.of("name"), getPathParameters(doc.paths(), pathWithParameters));
+
+        final var pathWithoutParameters = "/rests/operations/action-types:multi-container/inner-container/action";
+        assertTrue(doc.paths().containsKey(pathWithoutParameters));
+        assertEquals(List.of(), getPathParameters(doc.paths(), pathWithoutParameters));
+    }
+
     @Test
     public void testSimpleOpenApiObjects() {
         final var module = context.findModule("my-yang", Revision.of("2022-10-06")).orElseThrow();
