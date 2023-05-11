@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "202f79dd_02467d0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-11T06:54:15Z",
+      "side": 1,
+      "message": "1. Missing unit test\n2. Introduces heavy code style violation",
+      "revId": "53c3e2f8b24cc989a2a013de5cbf854b5b1def37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
