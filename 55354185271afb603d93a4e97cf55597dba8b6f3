@@ -16,6 +16,24 @@
       "message": "I would like to rewrite this somehow.",
       "revId": "55354185271afb603d93a4e97cf55597dba8b6f3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d0e9039_a38a7952",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 968,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-11T11:17:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46ba5dff_28723d04",
+      "revId": "55354185271afb603d93a4e97cf55597dba8b6f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
