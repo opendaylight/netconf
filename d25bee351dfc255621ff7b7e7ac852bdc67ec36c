@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf881bf5_5a9e7cfb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-11T10:46:54Z",
+      "side": 1,
+      "message": "By using HashSet we can potentially miss case when we have one path multiple times. This can be a bug, for example.",
+      "revId": "d25bee351dfc255621ff7b7e7ac852bdc67ec36c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
