@@ -16,6 +16,24 @@
       "message": "We do not need this commented lines.",
       "revId": "a551be55216ff7042c4732e78c8314748be71760",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c78151cb_41839220",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/openapi/Path.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-11T09:11:24Z",
+      "side": 1,
+      "message": "But on the other hand they are part of `Path Item` according to https://swagger.io/specification/. So I have uncommented them.",
+      "parentUuid": "38d3de15_09c98c60",
+      "revId": "a551be55216ff7042c4732e78c8314748be71760",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
