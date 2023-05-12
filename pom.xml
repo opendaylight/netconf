@@ -47,6 +47,7 @@
 
         <module>keystore</module>
         <module>truststore</module>
+        <module>features/features-netconf-experimental</module>
     </modules>
 
     <profiles>

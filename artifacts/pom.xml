@@ -637,6 +637,22 @@
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
+
+            <!-- Experimental features -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>features-netconf-experimental</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>odl-yanglib</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>
