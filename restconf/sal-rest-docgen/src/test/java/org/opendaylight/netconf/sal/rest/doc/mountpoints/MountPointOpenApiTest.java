@@ -9,19 +9,27 @@ package org.opendaylight.netconf.sal.rest.doc.mountpoints;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -33,7 +41,38 @@ import org.opendaylight.netconf.sal.rest.doc.openapi.Path;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
+@RunWith(Parameterized.class)
 public final class MountPointOpenApiTest extends AbstractApiDocTest {
+
+    private static final String DEFAULT_BASE_PATH = "rests";
+    private static final String CUSTOM_BASE_PATH = "restconf";
+
+    @Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        return Arrays.asList(new Object[][]{
+            {
+                createMountPointGenerator((service) ->
+                        new MountPointOpenApiGeneratorRFC8040(SCHEMA_SERVICE, service)),
+                DEFAULT_BASE_PATH
+            },
+            {
+                createMountPointGenerator((service) ->
+                        new MountPointOpenApiGeneratorRFC8040(SCHEMA_SERVICE, service, CUSTOM_BASE_PATH)),
+                CUSTOM_BASE_PATH
+            }
+        });
+    }
+
+    private static Function<DOMMountPointService, MountPointOpenApiGeneratorRFC8040> createMountPointGenerator(
+            final Function<DOMMountPointService, MountPointOpenApiGeneratorRFC8040> generatorFactory) {
+        return generatorFactory;
+    }
+
+    @Parameter(0)
+    public Function<DOMMountPointService, MountPointOpenApiGeneratorRFC8040> mountPointConstructor;
+    @Parameter(1)
+    public String basePath;
+
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
@@ -54,7 +93,7 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
 
-        openApi = new MountPointOpenApiGeneratorRFC8040(SCHEMA_SERVICE, service).getMountPointOpenApi();
+        openApi = mountPointConstructor.apply(service).getMountPointOpenApi();
     }
 
     @Test()
@@ -92,8 +131,8 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
             assertNotNull("Expected non-null desc on " + path, getOperation.get("description"));
         }
 
-        assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
-            "/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
+        assertEquals(Set.of("/" + basePath + "/data" + INSTANCE_URL + "yang-ext:mount",
+            "/" + basePath + "/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
     }
 
     /**
@@ -110,7 +149,7 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
         final Map<String, Path> paths = mountPointApi.getPaths();
         assertNotNull(paths);
 
-        assertEquals("Unexpected api list size", 26, paths.size());
+        assertEquals("Unexpected api list size", 36, paths.size());
 
         final List<JsonNode> getOperations = new ArrayList<>();
         final List<JsonNode> postOperations = new ArrayList<>();
@@ -126,10 +165,37 @@ public final class MountPointOpenApiTest extends AbstractApiDocTest {
             Optional.ofNullable(path.getValue().getDelete()).ifPresent(deleteOperations::add);
         }
 
-        assertEquals("Unexpected GET paths size", 18, getOperations.size());
-        assertEquals("Unexpected POST paths size", 24, postOperations.size());
-        assertEquals("Unexpected PUT paths size", 16, putOperations.size());
-        assertEquals("Unexpected PATCH paths size", 16, patchOperations.size());
-        assertEquals("Unexpected DELETE paths size", 16, deleteOperations.size());
+        assertEquals("Unexpected GET paths size", 24, getOperations.size());
+        assertEquals("Unexpected POST paths size", 34, postOperations.size());
+        assertEquals("Unexpected PUT paths size", 22, putOperations.size());
+        assertEquals("Unexpected PATCH paths size", 22, patchOperations.size());
+        assertEquals("Unexpected DELETE paths size", 22, deleteOperations.size());
+    }
+
+    @Test
+    public void testOperationPathsWithDefaultBasePath() throws Exception {
+        // default base path -> basePath = "rests"
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+
+        final Map<String, Path> paths = mountPointApi.getPaths();
+        assertNotNull(paths);
+
+        assertEquals("Unexpected api list size", 36, paths.size());
+
+        Set<String> actionPaths = Set.of(
+            "/" + basePath + "/operations/nodes/node=123/yang-ext:mount/action-types:container/container-action",
+            "/" + basePath
+                    + "/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action",
+            "/" + basePath + "/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action",
+            "/" + basePath + "/operations/nodes/node=123/yang-ext:mount/action-path-test:top/top-action",
+            "/" + basePath + "/operations/nodes/node=123/yang-ext:mount/action-path-test:top/mid/mid-action",
+            "/" + basePath + "/operations/nodes/node=123/yang-ext:mount/action-path-test:top/mid/bottom/bottom-action"
+        );
+
+        actionPaths.forEach(path -> assertTrue(paths.containsKey(path)));
     }
 }
