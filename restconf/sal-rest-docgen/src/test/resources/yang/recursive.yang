@@ -1,0 +1,25 @@
+module recursive {
+  namespace "urn:opendaylight:test:recursive";
+  prefix "rec";
+
+  container container-root {
+    list root-list {
+      key name;
+      leaf name {
+        type string;
+      }
+      list nested-list {
+        key name;
+        leaf name {
+          type string;
+        }
+        list super-nested-list {
+          key name;
+          leaf name {
+            type string;
+          }
+        }
+      }
+    }
+  }
+}
