@@ -7,8 +7,10 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.openapi;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Components {
     private ObjectNode schemas;
     private SecuritySchemes securitySchemes;
