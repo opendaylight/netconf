@@ -7,8 +7,10 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SecuritySchemes {
     private ObjectNode basicAuth;
 

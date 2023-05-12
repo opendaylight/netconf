@@ -7,10 +7,12 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.List;
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OpenApiObject {
     private String openapi;
     private Info info;
