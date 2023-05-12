@@ -16,6 +16,24 @@
       "message": "`@JsonRoot` is a remnant of previous tryings to make this patch to work.",
       "revId": "fbc65018249efec8435771c012347e64e9861b55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8033e49_5a384535",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/openapi/Path.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-12T06:20:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c107ea0c_038557b4",
+      "revId": "fbc65018249efec8435771c012347e64e9861b55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
