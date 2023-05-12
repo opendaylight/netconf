@@ -18,6 +18,7 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
