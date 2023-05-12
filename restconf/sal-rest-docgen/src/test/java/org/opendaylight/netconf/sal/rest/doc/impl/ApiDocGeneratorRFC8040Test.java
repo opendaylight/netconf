@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -30,6 +31,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String REVISION_DATE_2 = "2009-11-20";
     private static final String CHOICE_TEST_MODULE = "choice-test";
     private static final String PROPERTIES = "properties";
+    private static final String ACTION_TEST_MODULE = "action-path-test";
+    private static final String CUSTOM_BASE_PATH = "restconf";
     private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
 
     /**
@@ -169,5 +172,30 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         JsonNode secondContainer = schemas.get("choice-test_second-container");
         assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
+    }
+
+    @Test
+    public void testPathsForCustomBasePath() {
+        final var customGenerator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE, CUSTOM_BASE_PATH);
+        final var module = CONTEXT.findModule(ACTION_TEST_MODULE).orElseThrow();
+        final var doc = customGenerator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        assertNotNull(doc);
+
+        // FIXME: NETCONF-1021 remove assumption after fixing the hardcoded path issue
+        assumeTrue(false);
+
+        assertEquals(doc.getPaths().keySet(), Set.of(
+                "/" + CUSTOM_BASE_PATH + "/data",
+                "/" + CUSTOM_BASE_PATH + "/data/action-path-test:top",
+                "/" + CUSTOM_BASE_PATH + "/data/action-path-test:top/top-list={topListKey}",
+                "/" + CUSTOM_BASE_PATH + "/data/action-path-test:top/mid",
+                "/" + CUSTOM_BASE_PATH + "/data/action-path-test:top/mid/mid-list={midListKey}",
+                "/" + CUSTOM_BASE_PATH + "/data/action-path-test:top/mid/bottom",
+                "/" + CUSTOM_BASE_PATH + "/data/action-path-test:top/mid/bottom/bottom-list={bottomListKey}",
+                "/" + CUSTOM_BASE_PATH + "/operations/action-path-test:rpc-call",
+                "/" + CUSTOM_BASE_PATH + "/operations/action-path-test:top/top-action",
+                "/" + CUSTOM_BASE_PATH + "/operations/action-path-test:top/mid/mid-action",
+                "/" + CUSTOM_BASE_PATH + "/operations/action-path-test:top/mid/bottom/bottom-action"
+        ));
     }
 }
