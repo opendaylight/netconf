@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.Map;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.openapi.OpenApiObject;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -26,6 +27,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
     private static final String CHOICE_TEST_MODULE = "choice-test";
+    private static final String RECURSIVE_TEST_MODULE = "recursive";
     private static final String PROPERTIES = "properties";
     private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
 
@@ -166,5 +168,38 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         JsonNode secondContainer = schemas.get("choice-test_second-container");
         assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
+    }
+
+    /**
+     * Test that checks for correct amount of parameters in requests.
+     */
+    @Test
+    public void testRecursiveParameters() {
+        Map<Integer, String> configPaths = Map.of(0, "/rests/data/recursive:container-root",
+            1, "/rests/data/recursive:container-root/root-list={name}",
+            2, "/rests/data/recursive:container-root/root-list={name}/nested-list={name1}",
+            3, "/rests/data/recursive:container-root/root-list={name}/nested-list={name1}/super-nested-list={name2}");
+
+        final var module = CONTEXT.findModule(RECURSIVE_TEST_MODULE).orElseThrow();
+        final var doc = generator.getOpenApiDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        assertNotNull(doc);
+
+        final ObjectNode paths = doc.getPaths();
+        assertEquals(5, paths.size());
+
+        for (Map.Entry<Integer, String> path : configPaths.entrySet()) {
+            final JsonNode node = paths.get(path.getValue());
+            int expectedSize = path.getKey();
+            assertFalse(node.path("get").isMissingNode());
+            assertEquals(expectedSize + 1, node.path("get").get("parameters").size());
+            assertFalse(node.path("put").isMissingNode());
+            assertEquals(expectedSize, node.path("put").get("parameters").size());
+            assertFalse(node.path("delete").isMissingNode());
+            assertEquals(expectedSize, node.path("delete").get("parameters").size());
+            assertFalse(node.path("post").isMissingNode());
+            assertEquals(expectedSize, node.path("post").get("parameters").size());
+            assertFalse(node.path("patch").isMissingNode());
+            assertEquals(expectedSize, node.path("patch").get("parameters").size());
+        }
     }
 }
