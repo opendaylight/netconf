@@ -27,7 +27,7 @@ public final class DefinitionGeneratorTest {
     @BeforeClass
     public static void beforeClass() {
         schemaService = mock(DOMSchemaService.class);
-        context = YangParserTestUtils.parseYangResourceDirectory("/yang");
+        context = YangParserTestUtils.parseYangResourceDirectory("/yang/base");
         when(schemaService.getGlobalContext()).thenReturn(context);
     }
 
