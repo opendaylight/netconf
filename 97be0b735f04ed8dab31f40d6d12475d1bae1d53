@@ -16,6 +16,24 @@
       "message": "final @Nullable DOMSchemaService schemaService",
       "revId": "97be0b735f04ed8dab31f40d6d12475d1bae1d53",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0df3522_ec391ace",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-12T12:25:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2be5d255_c13d8cbf",
+      "revId": "97be0b735f04ed8dab31f40d6d12475d1bae1d53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

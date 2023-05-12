@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ec39d8b_bdc63a37",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-12T12:25:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfb9e134_0d0b26af",
+      "revId": "be31a8f58d4aad1f9f219d6f3032ba582830acd4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7f376362_f8dd4081",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3458258_911fd1ae",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-12T12:25:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f376362_f8dd4081",
+      "revId": "be31a8f58d4aad1f9f219d6f3032ba582830acd4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "add817bf_8d632691",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-05-12T11:28:24Z",
       "side": 1,
       "message": "Use `stringPagenum` as parameter and parse Long inside method.",
+      "revId": "be31a8f58d4aad1f9f219d6f3032ba582830acd4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccd28636_8e543d3b",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-12T12:25:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "add817bf_8d632691",
       "revId": "be31a8f58d4aad1f9f219d6f3032ba582830acd4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
