@@ -515,15 +515,6 @@
                 <classifier>features</classifier>
             </dependency>
 
-            <!-- yanglib features -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>odl-yanglib</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
-
             <!-- RESTCONF -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -633,6 +624,22 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-netconf-test-tools</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+
+            <!-- Experimental features -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>features-netconf-experimental</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-yanglib</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>
