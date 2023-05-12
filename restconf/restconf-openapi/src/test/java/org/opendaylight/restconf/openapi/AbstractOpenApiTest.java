@@ -25,7 +25,7 @@ public abstract class AbstractOpenApiTest {
 
     @BeforeClass
     public static void beforeClass() {
-        CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/yang");
+        CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/yang/base");
         SCHEMA_SERVICE = mock(DOMSchemaService.class);
         when(SCHEMA_SERVICE.getGlobalContext()).thenReturn(CONTEXT);
     }
