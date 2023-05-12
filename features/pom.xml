@@ -29,6 +29,7 @@
         <module>parent</module>
         <module>features-netconf</module>
         <module>features-netconf-testing</module>
+        <module>features-netconf-experimental</module>
 
         <module>odl-netconf-model-rfc5277</module>
         <module>odl-netconf-model-rfc6022</module>
