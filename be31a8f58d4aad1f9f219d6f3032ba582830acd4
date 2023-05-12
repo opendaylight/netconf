@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cfb9e134_0d0b26af",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-12T11:35:36Z",
+      "side": 1,
+      "message": "final @Nulllable DOMSchemaService schemaService",
+      "revId": "be31a8f58d4aad1f9f219d6f3032ba582830acd4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f376362_f8dd4081",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-12T11:35:36Z",
+      "side": 1,
+      "message": "final @Nulllable DOMSchemaService schemaService",
+      "revId": "be31a8f58d4aad1f9f219d6f3032ba582830acd4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "add817bf_8d632691",
         "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
         "patchSetId": 5
