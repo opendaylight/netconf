@@ -7,8 +7,10 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.openapi;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MountPointInstance {
     private final String instance;
     private final Long id;

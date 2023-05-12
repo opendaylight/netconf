@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.openapi;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Server {
     private String url;
 
