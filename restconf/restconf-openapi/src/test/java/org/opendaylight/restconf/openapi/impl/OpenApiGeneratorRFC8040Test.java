@@ -30,6 +30,7 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
     private static final String CHOICE_TEST_MODULE = "choice-test";
+    private static final String RECURSIVE_TEST_MODULE = "recursive";
 
     private final OpenApiGeneratorRFC8040 generator = new OpenApiGeneratorRFC8040(SCHEMA_SERVICE);
 
@@ -170,5 +171,38 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         final Schema secondContainer = schemas.get("choice-test_second-container");
         assertTrue(secondContainer.getProperties().has("leaf-first-case"));
         assertFalse(secondContainer.getProperties().has("leaf-second-case"));
+    }
+
+    /**
+     * Test that checks for correct amount of parameters in requests.
+     */
+    @Test
+    public void testRecursiveParameters() {
+        Map<Integer, String> configPaths = Map.of(0, "/rests/data/recursive:container-root",
+            1, "/rests/data/recursive:container-root/root-list={name}",
+            2, "/rests/data/recursive:container-root/root-list={name}/nested-list={name1}",
+            3, "/rests/data/recursive:container-root/root-list={name}/nested-list={name1}/super-nested-list={name2}");
+
+        final var module = CONTEXT.findModule(RECURSIVE_TEST_MODULE).orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
+        assertNotNull(doc);
+
+        final Map<String, Path> paths = doc.getPaths();
+        assertEquals(5, paths.size());
+
+        for (Map.Entry<Integer, String> path : configPaths.entrySet()) {
+            final Path node = paths.get(path.getValue());
+            int expectedSize = path.getKey();
+            assertFalse(node.getGet().isMissingNode());
+            assertEquals(expectedSize + 1, node.getGet().get("parameters").size());
+            assertFalse(node.getPut().isMissingNode());
+            assertEquals(expectedSize, node.getPut().get("parameters").size());
+            assertFalse(node.getDelete().isMissingNode());
+            assertEquals(expectedSize, node.getDelete().get("parameters").size());
+            assertFalse(node.getPost().isMissingNode());
+            assertEquals(expectedSize, node.getPost().get("parameters").size());
+            assertFalse(node.getPatch().isMissingNode());
+            assertEquals(expectedSize, node.getPatch().get("parameters").size());
+        }
     }
 }
