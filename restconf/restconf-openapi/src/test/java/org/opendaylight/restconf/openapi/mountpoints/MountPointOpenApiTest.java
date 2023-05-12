@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.openapi.mountpoints;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -110,7 +111,7 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         final Map<String, Path> paths = mountPointApi.getPaths();
         assertNotNull(paths);
 
-        assertEquals("Unexpected api list size", 27, paths.size());
+        assertEquals("Unexpected api list size", 31, paths.size());
 
         final List<JsonNode> getOperations = new ArrayList<>();
         final List<JsonNode> postOperations = new ArrayList<>();
@@ -126,10 +127,53 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
             Optional.ofNullable(path.getValue().getDelete()).ifPresent(deleteOperations::add);
         }
 
-        assertEquals("Unexpected GET paths size", 19, getOperations.size());
-        assertEquals("Unexpected POST paths size", 25, postOperations.size());
-        assertEquals("Unexpected PUT paths size", 17, putOperations.size());
-        assertEquals("Unexpected PATCH paths size", 17, patchOperations.size());
-        assertEquals("Unexpected DELETE paths size", 17, deleteOperations.size());
+        assertEquals("Unexpected GET paths size", 23, getOperations.size());
+        assertEquals("Unexpected POST paths size", 29, postOperations.size());
+        assertEquals("Unexpected PUT paths size", 21, putOperations.size());
+        assertEquals("Unexpected PATCH paths size", 21, patchOperations.size());
+        assertEquals("Unexpected DELETE paths size", 21, deleteOperations.size());
+    }
+
+    /**
+     * Test that checks for correct amount of parameters in requests.
+     */
+    @Test
+    public void testGetMountPointParameters() throws Exception {
+        final var configPaths = Map.of("/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root", 0,
+                "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}", 1,
+                "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}/nested-list="
+                        + "{name1}", 2,
+                "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}/nested-list="
+                        + "{name1}/super-nested-list={name2}", 3);
+
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+
+        final var paths = mountPointApi.getPaths();
+        assertNotNull(paths);
+
+        for (final var path : configPaths.entrySet()) {
+            final var node = paths.get(path.getKey());
+            assertNotNull(node);
+            final int expectedSize = path.getValue();
+            final var get = node.getGet();
+            assertFalse(get.isMissingNode());
+            assertEquals(expectedSize + 1, get.get("parameters").size());
+            final var put = node.getPut();
+            assertFalse(put.isMissingNode());
+            assertEquals(expectedSize, put.get("parameters").size());
+            final var delete = node.getDelete();
+            assertFalse(delete.isMissingNode());
+            assertEquals(expectedSize, delete.get("parameters").size());
+            final var post = node.getPost();
+            assertFalse(post.isMissingNode());
+            assertEquals(expectedSize, post.get("parameters").size());
+            final var patch = node.getPatch();
+            assertFalse(patch.isMissingNode());
+            assertEquals(expectedSize, patch.get("parameters").size());
+        }
     }
 }
