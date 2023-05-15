@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b83ccd76_3deab556",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-15T11:17:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50b5eb86_af2ed305",
+      "revId": "c18d6b78f07264a5306e05f7979ee282884dd3f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38fbd4df_1f3df8e7",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-05-12T13:01:45Z",
       "side": 1,
       "message": "This way we will produce NPE somewhere... when you go down the call stack you will see.",
+      "revId": "c18d6b78f07264a5306e05f7979ee282884dd3f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09b1a406_a0d4d85b",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-15T11:17:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38fbd4df_1f3df8e7",
       "revId": "c18d6b78f07264a5306e05f7979ee282884dd3f4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
