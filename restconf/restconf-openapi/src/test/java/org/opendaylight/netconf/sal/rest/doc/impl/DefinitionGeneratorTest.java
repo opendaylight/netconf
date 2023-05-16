@@ -9,10 +9,11 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.junit.Assert.assertNotNull;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
+import java.util.Map;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.AbstractOpenApiTest;
+import org.opendaylight.netconf.sal.rest.doc.openapi.Schema;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
@@ -20,7 +21,8 @@ public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
     public void testConvertToJsonSchema() throws IOException {
         final var module = CONTEXT.findModule("opflex", Revision.of("2014-05-28")).orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final ObjectNode jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(), true);
+        final Map<String, Schema> jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
+                true);
         assertNotNull(jsonObject);
     }
 
@@ -28,7 +30,8 @@ public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
     public void testActionTypes() throws IOException {
         final var module = CONTEXT.findModule("action-types").orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final ObjectNode jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(), true);
+        final Map<String, Schema> jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
+                true);
         assertNotNull(jsonObject);
     }
 
@@ -36,7 +39,8 @@ public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
     public void testStringTypes() throws IOException {
         final var module = CONTEXT.findModule("string-types").orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final ObjectNode jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(), true);
+        final Map<String, Schema> jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
+                true);
         assertNotNull(jsonObject);
     }
 }
