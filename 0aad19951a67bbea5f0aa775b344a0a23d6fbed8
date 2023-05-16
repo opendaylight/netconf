@@ -16,6 +16,74 @@
       "message": "You have to complete rebase because some methods have changed 😊",
       "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d36281db_49f10b9a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-16T08:11:27Z",
+      "side": 1,
+      "message": "final",
+      "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8db985fd_f00a27fb",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-16T08:11:27Z",
+      "side": 1,
+      "message": "pathParams.removeAll();",
+      "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6365abd6_6e370914",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-16T08:11:27Z",
+      "side": 1,
+      "message": "I would prefer to make a variable from \"/rests/data/path-params-test:cont/list1\u003d{name}\" and then use:\nassertEquals(List.of(\"name\"), getPatchParametersNames(x, y, z));",
+      "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "468ac77f_935e7938",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-16T08:11:27Z",
+      "side": 1,
+      "message": "Use java.util.Lits instead of ImmutableList.",
+      "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
