@@ -15,7 +15,6 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.b
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPostOperation;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPut;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.getTypeParentNode;
-import static org.opendaylight.restconf.openapi.util.JsonUtil.addFields;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -45,6 +44,7 @@ import org.opendaylight.restconf.openapi.model.Components;
 import org.opendaylight.restconf.openapi.model.Info;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Path;
+import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.restconf.openapi.model.SecuritySchemes;
 import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.restconf.openapi.util.JsonUtil;
@@ -218,13 +218,9 @@ public abstract class BaseYangOpenApiGenerator {
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
         try {
-            final ObjectNode schema;
-            if (isForSingleModule) {
-                schema = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, true);
-            } else {
-                schema = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, false);
-            }
-            addFields(doc.getComponents().getSchemas(), schema.fields());
+            final Map<String, Schema> schemas = jsonConverter.convertToJsonSchema(module, schemaContext,
+                definitionNames, isForSingleModule);
+            doc.getComponents().getSchemas().putAll(schemas);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Document: {}", MAPPER.writeValueAsString(doc));
             }
@@ -310,8 +306,7 @@ public abstract class BaseYangOpenApiGenerator {
         info.setVersion(API_VERSION);
         doc.setInfo(info);
         doc.setServers(List.of(new Server(schema + "://" + host + basePath)));
-        doc.setComponents(new Components(JsonNodeFactory.instance.objectNode(),
-                new SecuritySchemes(OPEN_API_BASIC_AUTH)));
+        doc.setComponents(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
         doc.setSecurity(SECURITY);
         return doc;
     }
@@ -331,7 +326,7 @@ public abstract class BaseYangOpenApiGenerator {
             childSchemaNodes = dataNodeContainer.getChildNodes();
         }
 
-        paths.put(resourcePath, operations(resourcePath, node, moduleName, deviceName, pathParams, isConfig, parentName,
+        paths.put(resourcePath, operations(node, moduleName, deviceName, pathParams, isConfig, parentName,
                 definitionNames));
 
         if (node instanceof ActionNodeContainer) {
@@ -363,7 +358,7 @@ public abstract class BaseYangOpenApiGenerator {
         return false;
     }
 
-    private static Path operations(final String resourcePath, final DataSchemaNode node, final String moduleName,
+    private static Path operations(final DataSchemaNode node, final String moduleName,
             final Optional<String> deviceName, final ArrayNode pathParams, final boolean isConfig,
             final String parentName, final DefinitionNames definitionNames) {
         final Path operations = new Path();
