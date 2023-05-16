@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fad2a7c_7bdefac7",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-16T12:31:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d36281db_49f10b9a",
+      "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8db985fd_f00a27fb",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-05-16T08:11:27Z",
       "side": 1,
       "message": "pathParams.removeAll();",
+      "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f34205cd_30567ef3",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-16T12:31:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8db985fd_f00a27fb",
       "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35491aff_2a2ce14e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-16T12:31:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6365abd6_6e370914",
+      "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "468ac77f_935e7938",
@@ -82,6 +136,24 @@
       "writtenOn": "2023-05-16T08:11:27Z",
       "side": 1,
       "message": "Use java.util.Lits instead of ImmutableList.",
+      "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73b789f3_bb347607",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-16T12:31:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "468ac77f_935e7938",
       "revId": "0aad19951a67bbea5f0aa775b344a0a23d6fbed8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
