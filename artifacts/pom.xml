@@ -588,7 +588,7 @@
             <!-- restconf features -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>odl-mdsal-apidocs</artifactId>
+                <artifactId>odl-restconf-openapi</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>

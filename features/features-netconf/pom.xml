@@ -138,7 +138,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-mdsal-apidocs</artifactId>
+            <artifactId>odl-restconf-openapi</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
