@@ -13,14 +13,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.restconf.openapi.AbstractOpenApiTest;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Path;
+import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
@@ -29,7 +30,7 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
     private static final String CHOICE_TEST_MODULE = "choice-test";
-    private static final String PROPERTIES = "properties";
+
     private final OpenApiGeneratorRFC8040 generator = new OpenApiGeneratorRFC8040(SCHEMA_SERVICE);
 
     /**
@@ -87,50 +88,50 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
 
-        final ObjectNode schemas = doc.getComponents().getSchemas();
+        final Map<String, Schema> schemas = doc.getComponents().getSchemas();
         assertNotNull(schemas);
 
-        final JsonNode configLstTop = schemas.get("toaster2_config_lst_TOP");
+        final Schema configLstTop = schemas.get("toaster2_config_lst_TOP");
         assertNotNull(configLstTop);
         DocGenTestHelper.containsReferences(configLstTop, "lst", "#/components/schemas/toaster2_config_lst");
 
-        final JsonNode configLst = schemas.get("toaster2_config_lst");
+        final Schema configLst = schemas.get("toaster2_config_lst");
         assertNotNull(configLst);
         DocGenTestHelper.containsReferences(configLst, "lst1", "#/components/schemas/toaster2_lst_config_lst1");
         DocGenTestHelper.containsReferences(configLst, "cont1", "#/components/schemas/toaster2_lst_config_cont1");
 
-        final JsonNode configLst1Top = schemas.get("toaster2_lst_config_lst1_TOP");
+        final Schema configLst1Top = schemas.get("toaster2_lst_config_lst1_TOP");
         assertNotNull(configLst1Top);
         DocGenTestHelper.containsReferences(configLst1Top, "lst1", "#/components/schemas/toaster2_lst_config_lst1");
 
-        final JsonNode configLst1 = schemas.get("toaster2_lst_config_lst1");
+        final Schema configLst1 = schemas.get("toaster2_lst_config_lst1");
         assertNotNull(configLst1);
 
-        final JsonNode configCont1Top = schemas.get("toaster2_lst_config_cont1_TOP");
+        final Schema configCont1Top = schemas.get("toaster2_lst_config_cont1_TOP");
         assertNotNull(configCont1Top);
         DocGenTestHelper.containsReferences(configCont1Top, "cont1", "#/components/schemas/toaster2_lst_config_cont1");
 
-        final JsonNode configCont1 = schemas.get("toaster2_lst_config_cont1");
+        final Schema configCont1 = schemas.get("toaster2_lst_config_cont1");
         assertNotNull(configCont1);
         DocGenTestHelper.containsReferences(configCont1, "cont11",
                 "#/components/schemas/toaster2_lst_cont1_config_cont11");
         DocGenTestHelper.containsReferences(configCont1, "lst11",
                 "#/components/schemas/toaster2_lst_cont1_config_lst11");
 
-        final JsonNode configCont11Top = schemas.get("toaster2_lst_cont1_config_cont11_TOP");
+        final Schema configCont11Top = schemas.get("toaster2_lst_cont1_config_cont11_TOP");
         assertNotNull(configCont11Top);
         DocGenTestHelper.containsReferences(configCont11Top,
                 "cont11", "#/components/schemas/toaster2_lst_cont1_config_cont11");
 
-        final JsonNode configCont11 = schemas.get("toaster2_lst_cont1_config_cont11");
+        final Schema configCont11 = schemas.get("toaster2_lst_cont1_config_cont11");
         assertNotNull(configCont11);
 
-        final JsonNode configLst11Top = schemas.get("toaster2_lst_cont1_config_lst11_TOP");
+        final Schema configLst11Top = schemas.get("toaster2_lst_cont1_config_lst11_TOP");
         assertNotNull(configLst11Top);
         DocGenTestHelper.containsReferences(configLst11Top, "lst11",
                 "#/components/schemas/toaster2_lst_cont1_config_lst11");
 
-        final JsonNode configLst11 = schemas.get("toaster2_lst_cont1_config_lst11");
+        final Schema configLst11 = schemas.get("toaster2_lst_cont1_config_lst11");
         assertNotNull(configLst11);
     }
 
@@ -143,13 +144,13 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", CONTEXT);
         assertNotNull(doc);
 
-        final ObjectNode schemas = doc.getComponents().getSchemas();
-        final JsonNode inputTop = schemas.get("toaster_make-toast_input_TOP");
+        final Map<String, Schema> schemas = doc.getComponents().getSchemas();
+        final Schema inputTop = schemas.get("toaster_make-toast_input_TOP");
         assertNotNull(inputTop);
         final String testString = "{\"input\":{\"$ref\":\"#/components/schemas/toaster_make-toast_input\"}}";
-        assertEquals(testString, inputTop.get("properties").toString());
-        final JsonNode input = schemas.get("toaster_make-toast_input");
-        final JsonNode properties = input.get("properties");
+        assertEquals(testString, inputTop.getProperties().toString());
+        final Schema input = schemas.get("toaster_make-toast_input");
+        final JsonNode properties = input.getProperties();
         assertTrue(properties.has("toasterDoneness"));
         assertTrue(properties.has("toasterToastType"));
     }
@@ -161,13 +162,13 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         assertNotNull(doc);
 
         final var schemas = doc.getComponents().getSchemas();
-        JsonNode firstContainer = schemas.get("choice-test_first-container");
+        Schema firstContainer = schemas.get("choice-test_first-container");
         assertEquals("default-value",
-                firstContainer.get(PROPERTIES).get("leaf-default").get("default").asText());
-        assertFalse(firstContainer.get(PROPERTIES).has("leaf-non-default"));
+                firstContainer.getProperties().get("leaf-default").get("default").asText());
+        assertFalse(firstContainer.getProperties().has("leaf-non-default"));
 
-        JsonNode secondContainer = schemas.get("choice-test_second-container");
-        assertTrue(secondContainer.get(PROPERTIES).has("leaf-first-case"));
-        assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
+        Schema secondContainer = schemas.get("choice-test_second-container");
+        assertTrue(secondContainer.getProperties().has("leaf-first-case"));
+        assertFalse(secondContainer.getProperties().has("leaf-second-case"));
     }
 }
