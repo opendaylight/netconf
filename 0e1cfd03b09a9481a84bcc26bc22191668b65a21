@@ -1,0 +1,193 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc4de079_b1f86176",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:51:02Z",
+      "side": 1,
+      "message": "Rebase pls + see comments. Few of them more of a question because of inconsistency of this change: somewhere used @Nullable somewhere not, somewhere you switched parameters and so on.\n ",
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "363b6fde_9f256655",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:51:02Z",
+      "side": 1,
+      "message": "@Nullable?",
+      "range": {
+        "startLine": 93,
+        "startChar": 62,
+        "endLine": 93,
+        "endChar": 75
+      },
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "099b69f7_dfb2a5bd",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:51:02Z",
+      "side": 1,
+      "message": "I think previously, with .orElse(null) there was possibility that schemaService is set null. Now there is strict requireNonNull. I think this part can be changed just to \n this.schemaService \u003d schemaService",
+      "range": {
+        "startLine": 94,
+        "startChar": 29,
+        "endLine": 94,
+        "endChar": 43
+      },
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d3f7f45_f5d56eb8",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:51:02Z",
+      "side": 1,
+      "message": "@Nullable?",
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66719466_0129a68c",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:51:02Z",
+      "side": 1,
+      "message": "@Nullable?",
+      "range": {
+        "startLine": 104,
+        "startChar": 68,
+        "endLine": 104,
+        "endChar": 78
+      },
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1664bed_895565d7",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:51:02Z",
+      "side": 1,
+      "message": "switching places?",
+      "range": {
+        "startLine": 106,
+        "startChar": 43,
+        "endLine": 106,
+        "endChar": 53
+      },
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "762c5f98_18eabbdf",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:51:02Z",
+      "side": 1,
+      "message": "What\u0027s the purpose of switching places here?",
+      "range": {
+        "startLine": 314,
+        "startChar": 12,
+        "endLine": 314,
+        "endChar": 68
+      },
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0f522de_b7cfbeab",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:51:02Z",
+      "side": 1,
+      "message": "@Nullable?",
+      "range": {
+        "startLine": 323,
+        "startChar": 25,
+        "endLine": 323,
+        "endChar": 33
+      },
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10c2b460_5b134f01",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:51:02Z",
+      "side": 1,
+      "message": "Remove it pls",
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
