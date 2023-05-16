@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cf77451_8918623a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T16:28:21Z",
+      "side": 1,
+      "message": "I think it is pointless to ask for rebase because soon after it will throw conflicts again.",
+      "revId": "6dfdf009bd03bcf1ca0a78adae33c5f746384f21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dc7acb5_94377fb2",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T16:28:21Z",
+      "side": 1,
+      "message": "This part is so funny because I\u0027m seeing it for the third time. And when one of that patches is merged - this one will throw conflict.",
+      "range": {
+        "startLine": 168,
+        "startChar": 50,
+        "endLine": 172,
+        "endChar": 58
+      },
+      "revId": "6dfdf009bd03bcf1ca0a78adae33c5f746384f21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
