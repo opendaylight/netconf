@@ -41,7 +41,7 @@
         <module>odl-netconf-model-rfc8639</module>
 
         <module>odl-aaa-netconf-plugin</module>
-        <module>odl-mdsal-apidocs</module>
+        <module>odl-restconf-openapi</module>
         <module>odl-netconf-all</module>
         <module>odl-netconf-api</module>
         <module>odl-netconf-callhome-ssh</module>
