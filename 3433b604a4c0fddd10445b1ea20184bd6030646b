@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5fb1f4e_8d131397",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/netconf/sal/rest/doc/openapi/Schema.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-16T10:46:30Z",
+      "side": 1,
+      "message": "No, we are not extending ObjectNode. Pure Java please.",
+      "revId": "3433b604a4c0fddd10445b1ea20184bd6030646b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f4f94c6_2f599708",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/netconf/sal/rest/doc/openapi/Schema.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-16T10:46:30Z",
+      "side": 1,
+      "message": "Sure private.",
+      "revId": "3433b604a4c0fddd10445b1ea20184bd6030646b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
