@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f93369a_0e4c245a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:14:12Z",
+      "side": 1,
+      "message": "Re-base and move into final review",
+      "revId": "66abb9a01a4cee9929773fb262e594a4aac4d9a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b391c569_95f1a11d",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T15:14:12Z",
+      "side": 1,
+      "message": "Automaton",
+      "range": {
+        "startLine": 125,
+        "startChar": 34,
+        "endLine": 125,
+        "endChar": 35
+      },
+      "revId": "66abb9a01a4cee9929773fb262e594a4aac4d9a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
