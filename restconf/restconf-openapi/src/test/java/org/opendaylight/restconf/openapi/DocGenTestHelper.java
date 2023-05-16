@@ -18,6 +18,7 @@ import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
+import org.opendaylight.restconf.openapi.model.Schema;
 
 public final class DocGenTestHelper {
 
@@ -44,9 +45,9 @@ public final class DocGenTestHelper {
     /**
      * Checks whether object {@code mainObject} contains in properties/items key $ref with concrete value.
      */
-    public static void containsReferences(final JsonNode mainObject, final String childObject,
+    public static void containsReferences(final Schema mainObject, final String childObject,
             final String expectedRef) {
-        final JsonNode properties = mainObject.get("properties");
+        final JsonNode properties = mainObject.getProperties();
         assertNotNull(properties);
 
         final JsonNode childNode = properties.get(childObject);
