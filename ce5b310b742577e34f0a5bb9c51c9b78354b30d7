@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3abcbba8_3a178575",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T11:38:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5edc34f_90a857fc",
+      "revId": "ce5b310b742577e34f0a5bb9c51c9b78354b30d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "171ac6a4_33e28d8e",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-05-16T07:05:01Z",
       "side": 1,
       "message": "Renamed package org.opendaylight.netconf.sal.rest.doc.impl to\norg.opendaylight.restconf.openapi.impl.",
+      "revId": "ce5b310b742577e34f0a5bb9c51c9b78354b30d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edbf428b_067b76e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-16T11:38:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "171ac6a4_33e28d8e",
       "revId": "ce5b310b742577e34f0a5bb9c51c9b78354b30d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
