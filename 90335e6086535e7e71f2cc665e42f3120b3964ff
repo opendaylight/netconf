@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02a997ed_a030bf4d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-17T14:27:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4c609cb_1722b63a",
+      "revId": "90335e6086535e7e71f2cc665e42f3120b3964ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da7c1b08_ef467614",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08c10d54_b6588dd5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-17T14:27:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da7c1b08_ef467614",
+      "revId": "90335e6086535e7e71f2cc665e42f3120b3964ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "214cac28_044dc639",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-05-17T13:38:26Z",
       "side": 1,
       "message": "This is not legacy layout.",
+      "revId": "90335e6086535e7e71f2cc665e42f3120b3964ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c92ec9a_f3f15cee",
+        "filename": "pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-17T14:27:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "214cac28_044dc639",
       "revId": "90335e6086535e7e71f2cc665e42f3120b3964ff",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
