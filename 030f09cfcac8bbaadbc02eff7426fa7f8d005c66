@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6788e835_65f70598",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-17T09:14:35Z",
+      "side": 1,
+      "message": "Needs rebase.\nDelete \"WIP\" as it is in review",
+      "revId": "030f09cfcac8bbaadbc02eff7426fa7f8d005c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
