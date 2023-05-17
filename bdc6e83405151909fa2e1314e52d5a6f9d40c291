@@ -16,6 +16,24 @@
       "message": "Needs rebase.\nDelete \"WIP\" as the patch is in review",
       "revId": "bdc6e83405151909fa2e1314e52d5a6f9d40c291",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfc4c846_d4100e4d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-17T15:44:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49dd33e2_4acfcbcb",
+      "revId": "bdc6e83405151909fa2e1314e52d5a6f9d40c291",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
