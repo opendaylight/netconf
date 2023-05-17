@@ -105,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "749d54c5_9eb6cfcb",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-17T10:16:23Z",
+      "side": 1,
+      "message": "We do not expect range to be null here. The method was divided into two .. one with range that sorts and *filters* the modules, other without range that just sorts the modules",
+      "parentUuid": "9d3f7f45_f5d56eb8",
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66719466_0129a68c",
@@ -118,6 +136,30 @@
       "writtenOn": "2023-05-16T15:51:02Z",
       "side": 1,
       "message": "@Nullable?",
+      "range": {
+        "startLine": 104,
+        "startChar": 68,
+        "endLine": 104,
+        "endChar": 78
+      },
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49b195eb_de6bf6a7",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-17T10:16:23Z",
+      "side": 1,
+      "message": "The deviceName is not expected to be null.\nThe caller is MountPointOpenApi.getMountPointApi(), where device name is extracted from InstanceIdentifier.NodeIdentifierWithPredicates.Singleton value, which is never null (by performing explicit check requireNonNull(value))",
+      "parentUuid": "66719466_0129a68c",
       "range": {
         "startLine": 104,
         "startChar": 68,
@@ -151,6 +193,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffacb222_ae542dba",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-17T10:16:23Z",
+      "side": 1,
+      "message": "initially switched for a more logical structure (having 2 methods, one with extra String argument \u003d deviceName).\nReturned to previous state of having deviceName first and moduleName second in the method with 2 arguments\n(also switched back to original order in buildSummaryValue() )",
+      "parentUuid": "f1664bed_895565d7",
+      "range": {
+        "startLine": 106,
+        "startChar": 43,
+        "endLine": 106,
+        "endChar": 53
+      },
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "762c5f98_18eabbdf",
@@ -164,6 +230,30 @@
       "writtenOn": "2023-05-16T15:51:02Z",
       "side": 1,
       "message": "What\u0027s the purpose of switching places here?",
+      "range": {
+        "startLine": 314,
+        "startChar": 12,
+        "endLine": 314,
+        "endChar": 68
+      },
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3608fe3c_702eebfe",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-17T10:16:23Z",
+      "side": 1,
+      "message": "to make it logical (having 2 methods one with 3 string arguments, other with 4 arguments) - make it clear to the caller that the extra string is deviceName\nWent back to the original order",
+      "parentUuid": "762c5f98_18eabbdf",
       "range": {
         "startLine": 314,
         "startChar": 12,
@@ -197,6 +287,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de0ef358_e5d2ff44",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-17T10:16:23Z",
+      "side": 1,
+      "message": "not expecting nodeName to be null",
+      "parentUuid": "e0f522de_b7cfbeab",
+      "range": {
+        "startLine": 323,
+        "startChar": 25,
+        "endLine": 323,
+        "endChar": 33
+      },
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "10c2b460_5b134f01",
@@ -210,6 +324,24 @@
       "writtenOn": "2023-05-16T15:51:02Z",
       "side": 1,
       "message": "Remove it pls",
+      "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "723f490d_9f17831e",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-17T10:16:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10c2b460_5b134f01",
       "revId": "0e1cfd03b09a9481a84bcc26bc22191668b65a21",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
