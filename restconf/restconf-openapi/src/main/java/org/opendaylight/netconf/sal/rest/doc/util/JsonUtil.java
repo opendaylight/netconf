@@ -27,11 +27,4 @@ public final class JsonUtil {
         }
         return result;
     }
-
-    public static void addFields(final ObjectNode node, final Iterator<Map.Entry<String, JsonNode>> fields) {
-        while (fields.hasNext()) {
-            final Map.Entry<String, JsonNode> field = fields.next();
-            node.set(field.getKey(), field.getValue());
-        }
-    }
 }
