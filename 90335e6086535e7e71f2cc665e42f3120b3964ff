@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4c609cb_1722b63a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-17T13:38:26Z",
+      "side": 1,
+      "message": "Add odl-yanglib dependency feature",
+      "revId": "90335e6086535e7e71f2cc665e42f3120b3964ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da7c1b08_ef467614",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-17T13:38:26Z",
+      "side": 1,
+      "message": "JIRA: NETCONF-1028",
+      "revId": "90335e6086535e7e71f2cc665e42f3120b3964ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "214cac28_044dc639",
+        "filename": "pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-17T13:38:26Z",
+      "side": 1,
+      "message": "This is not legacy layout.",
+      "revId": "90335e6086535e7e71f2cc665e42f3120b3964ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
