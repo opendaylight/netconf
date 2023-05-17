@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c4d6fa7_5772601b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-17T13:26:46Z",
+      "side": 1,
+      "message": "In addition try to add \"mountpoint\" test, too.",
+      "revId": "a5d7b4e68531bf052fa408ccb16360bfa56d518c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd6ca72e_93d13a34",
