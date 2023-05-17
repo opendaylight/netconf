@@ -16,6 +16,24 @@
       "message": "Revert this back as it is an master - revert the whole file.",
       "revId": "eabdd4a76ea87a5235f7380a02aeb736f1c3d49d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "155b1ce1_95676b84",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MountPointEndToEndTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-17T09:27:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74885f3e_dafb3ce2",
+      "revId": "eabdd4a76ea87a5235f7380a02aeb736f1c3d49d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
