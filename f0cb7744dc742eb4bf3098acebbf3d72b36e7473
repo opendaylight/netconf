@@ -16,6 +16,24 @@
       "message": "In NETCONF-1027 we are trying to avoid null values.\nAdd annotation:\n@JsonInclude(JsonInclude.Include.NON_NULL)",
       "revId": "f0cb7744dc742eb4bf3098acebbf3d72b36e7473",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d87149e_ee93008d",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/netconf/sal/rest/doc/openapi/Schema.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-17T15:32:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd2df1ef_a9cae93a",
+      "revId": "f0cb7744dc742eb4bf3098acebbf3d72b36e7473",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
