@@ -51,6 +51,24 @@
       "message": "We do not need this method - it useless because it already asserts that path exists.\n\nInstead we have to verify that we have the following paths:\n/rests/data\n/rests/data/path-params-test:cont/list1\u003d{name}\n/rests/data/path-params-test:cont/list3\u003d{name}\n/rests/data/path-params-test:cont/list1\u003d{name}/list2\u003d{name1}\n/rests/data/path-params-test:cont",
       "revId": "a5d7b4e68531bf052fa408ccb16360bfa56d518c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "788fda57_d1917d13",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-17T14:52:15Z",
+      "side": 1,
+      "message": "Originally target for testing was verifying if the Parameters array has the precisely same parameters (amount and names) as is declared in the request",
+      "parentUuid": "fd6ca72e_93d13a34",
+      "revId": "a5d7b4e68531bf052fa408ccb16360bfa56d518c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
