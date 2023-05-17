@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7b36b375_b7434e6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-17T13:27:24Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "1c4d6fa7_5772601b",
+      "revId": "a5d7b4e68531bf052fa408ccb16360bfa56d518c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fd6ca72e_93d13a34",
         "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
         "patchSetId": 12
