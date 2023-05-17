@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd6a61aa_ba135bec",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologySingletonImpl.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-17T08:53:31Z",
+      "side": 1,
+      "message": "and others",
+      "revId": "25aae5da34b57aeeb45cbd827c3f70f10e701af8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
