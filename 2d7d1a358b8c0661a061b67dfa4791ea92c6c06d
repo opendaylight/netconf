@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90fd824a_15d78d1e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-17T08:21:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3ed724d_6522d7f0",
+      "revId": "2d7d1a358b8c0661a061b67dfa4791ea92c6c06d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff5630e0_aa5204ca",
@@ -31,6 +49,30 @@
       "writtenOn": "2023-05-16T16:04:53Z",
       "side": 1,
       "message": "In NETCONF-1023 we are trying to get rid of JsonUtil#copy.\nInstead use:\n JsonNodeFactory.instance.arrayNode().addAll(parentPathParams);",
+      "range": {
+        "startLine": 209,
+        "startChar": 37,
+        "endLine": 209,
+        "endChar": 50
+      },
+      "revId": "2d7d1a358b8c0661a061b67dfa4791ea92c6c06d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "586d6bfb_492455c2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-17T08:21:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff5630e0_aa5204ca",
       "range": {
         "startLine": 209,
         "startChar": 37,
