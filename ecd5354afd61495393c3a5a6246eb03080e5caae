@@ -34,6 +34,24 @@
       "parentUuid": "f2dc8ecb_7d2464a5",
       "revId": "ecd5354afd61495393c3a5a6246eb03080e5caae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbadb9c7_1fe432ec",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-18T13:38:45Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "aeacdc85_fcfc05b4",
+      "revId": "ecd5354afd61495393c3a5a6246eb03080e5caae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
