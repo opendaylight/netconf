@@ -1,0 +1,31 @@
+module odl-netconf-server-transport-config {
+    namespace "urn:opendaylight:netconf:server:transport:config";
+    prefix "odlnstc";
+
+    revision "2023-05-12" {
+        description "Initial revision.";
+    }
+
+    import ietf-tcp-server {
+        prefix tcps;
+    }
+    import ietf-tls-server {
+        prefix tlss;
+    }
+    import ietf-ssh-server {
+        prefix sshs;
+    }
+
+    grouping server-transport-config-grouping {
+
+        container server-tcp-config {
+            uses tcps:tcp-server-grouping;
+        }
+        container server-tls-config {
+            uses tlss:tls-server-grouping;
+        }
+        container server-ssh-config {
+            uses sshs:ssh-server-grouping;
+        }
+    }
+}
