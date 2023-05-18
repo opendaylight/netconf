@@ -90,6 +90,22 @@
       <artifactId>netconf-netty-util</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-tcp</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-tls</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-ssh</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>shaded-sshd</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.guicedee.services</groupId>
       <artifactId>javax.inject</artifactId>
       <optional>true</optional>
@@ -112,15 +128,6 @@
     </dependency>
     <!-- Test dependencies -->
     <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-buffer</artifactId>
-	  <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>mockito-configuration</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-client</artifactId>
       <scope>test</scope>
@@ -136,13 +143,29 @@
       <artifactId>netconf-test-util</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-legacy</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>shaded-sshd</artifactId>
+      <artifactId>transport-tls</artifactId>
+      <type>test-jar</type>
+      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xmlunit</groupId>
-      <artifactId>xmlunit-legacy</artifactId>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-ssh</artifactId>
+      <type>test-jar</type>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport-native-epoll</artifactId>
+      <classifier>linux-x86_64</classifier>
       <scope>test</scope>
     </dependency>
   </dependencies>

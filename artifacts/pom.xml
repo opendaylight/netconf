@@ -129,6 +129,22 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- NETCONF Transport test utils -->
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-ssh</artifactId>
+                <version>${project.version}</version>
+                <classifier>tests</classifier>
+                <type>test-jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-tls</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <classifier>tests</classifier>
+            </dependency>
+
             <!-- NETCONF Transport features -->
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
