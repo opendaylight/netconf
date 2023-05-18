@@ -36,11 +36,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.apache.commons.codec.digest.Crypt;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -51,6 +54,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
+import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
+import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
+import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -227,6 +233,48 @@ public class SshClientServerTest {
                         .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
                 verify(clientListener, timeout(10_000))
                         .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
+                // validate channels are in expected state
+                var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
+                var clientChannel = assertChannel(clientTransportChannelCaptor.getAllValues());
+                // validate channels are connecting same sockets
+                assertEquals(serverChannel.remoteAddress(), clientChannel.localAddress());
+                assertEquals(serverChannel.localAddress(), clientChannel.remoteAddress());
+                // validate sessions are authenticated
+                assertSession(ServerSession.class, server.getSessions());
+                assertSession(ClientSession.class, client.getSessions());
+
+            } finally {
+                client.shutdown().get(2, TimeUnit.SECONDS);
+            }
+        } finally {
+            server.shutdown().get(2, TimeUnit.SECONDS);
+        }
+    }
+
+    @Test
+    @DisplayName("SSH server with external initializer")
+    void externalServerInitializer() throws Exception {
+        final var username = getUsernameAndUpdate();
+        // external ssh server initializer
+        final Consumer<ServerFactoryManager> serverInitializer = factory -> {
+            factory.setUserAuthFactories(List.of(new UserAuthPasswordFactory())); // auth user by credentials
+            factory.setPasswordAuthenticator((usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
+            factory.setKeyPairProvider(new SimpleGeneratorHostKeyProvider()); // generate host key
+        };
+        when(sshClientConfig.getClientIdentity()).thenReturn(buildClientIdentityWithPassword(username, PASSWORD));
+        when(sshClientConfig.getServerAuthentication()).thenReturn(null); // Accept all keys
+
+        final var server = SSHServer.listen(serverListener,
+            NettyTransportSupport.newServerBootstrap().group(group),
+            tcpServerConfig, null, serverInitializer).get(2, TimeUnit.SECONDS);
+        try {
+            final var client = SSHClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
+                tcpClientConfig, sshClientConfig).get(2, TimeUnit.SECONDS);
+            try {
+                verify(serverListener, timeout(10_000))
+                    .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
+                verify(clientListener, timeout(10_000))
+                    .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
                 // validate channels are in expected state
                 var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
                 var clientChannel = assertChannel(clientTransportChannelCaptor.getAllValues());
