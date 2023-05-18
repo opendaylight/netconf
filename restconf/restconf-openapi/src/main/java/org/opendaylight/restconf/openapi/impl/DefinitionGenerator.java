@@ -132,17 +132,15 @@ public class DefinitionGenerator {
     }
 
     /**
-     * Creates Json definitions from provided module according to swagger spec.
+     * Creates Json definitions from provided module according to openapi spec.
      *
      * @param module          - Yang module to be converted
      * @param schemaContext   - SchemaContext of all Yang files used by Api Doc
      * @param definitionNames - Store for definition names
-     * @return ObjectNode containing data used for creating examples and definitions in Api Doc
+     * @return {@link Map} containing data used for creating examples and definitions in OpenAPI documentation
      * @throws IOException if I/O operation fails
      */
-
-
-    public Map<String, Schema> convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
+    public Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
             final boolean isForSingleModule) throws IOException {
         topLevelModule = module;
@@ -158,14 +156,14 @@ public class DefinitionGenerator {
         return definitions;
     }
 
-    public Map<String, Schema> convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
+    public Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
             final DefinitionNames definitionNames, final boolean isForSingleModule)
             throws IOException {
         final Map<String, Schema> definitions = new HashMap<>();
         if (isForSingleModule) {
             definitionNames.addUnlinkedName(module.getName() + MODULE_NAME_SUFFIX);
         }
-        return convertToJsonSchema(module, schemaContext, definitions, definitionNames, isForSingleModule);
+        return convertToSchemas(module, schemaContext, definitions, definitionNames, isForSingleModule);
     }
 
     private void processModule(final Module module, final Map<String, Schema> definitions,

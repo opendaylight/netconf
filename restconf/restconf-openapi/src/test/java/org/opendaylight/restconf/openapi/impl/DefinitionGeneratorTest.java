@@ -10,37 +10,32 @@ package org.opendaylight.restconf.openapi.impl;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.util.Map;
 import org.junit.Test;
 import org.opendaylight.restconf.openapi.AbstractOpenApiTest;
-import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
     @Test
-    public void testConvertToJsonSchema() throws IOException {
+    public void testConvertToSchemas() throws IOException {
         final var module = CONTEXT.findModule("opflex", Revision.of("2014-05-28")).orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final Map<String, Schema> jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
-                true);
-        assertNotNull(jsonObject);
+        final var schemas = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(), true);
+        assertNotNull(schemas);
     }
 
     @Test
     public void testActionTypes() throws IOException {
         final var module = CONTEXT.findModule("action-types").orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final Map<String, Schema> jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
-                true);
-        assertNotNull(jsonObject);
+        final var schemas = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(), true);
+        assertNotNull(schemas);
     }
 
     @Test
     public void testStringTypes() throws IOException {
         final var module = CONTEXT.findModule("string-types").orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final Map<String, Schema> jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
-                true);
-        assertNotNull(jsonObject);
+        final var schemas = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(), true);
+        assertNotNull(schemas);
     }
 }
