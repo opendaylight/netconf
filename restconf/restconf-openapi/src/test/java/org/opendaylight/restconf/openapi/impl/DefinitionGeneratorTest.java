@@ -21,7 +21,7 @@ public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
     public void testConvertToJsonSchema() throws IOException {
         final var module = CONTEXT.findModule("opflex", Revision.of("2014-05-28")).orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final Map<String, Schema> jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
+        final Map<String, Schema> jsonObject = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(),
                 true);
         assertNotNull(jsonObject);
     }
@@ -30,7 +30,7 @@ public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
     public void testActionTypes() throws IOException {
         final var module = CONTEXT.findModule("action-types").orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final Map<String, Schema> jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
+        final Map<String, Schema> jsonObject = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(),
                 true);
         assertNotNull(jsonObject);
     }
@@ -39,7 +39,7 @@ public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
     public void testStringTypes() throws IOException {
         final var module = CONTEXT.findModule("string-types").orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final Map<String, Schema> jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
+        final Map<String, Schema> jsonObject = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(),
                 true);
         assertNotNull(jsonObject);
     }
