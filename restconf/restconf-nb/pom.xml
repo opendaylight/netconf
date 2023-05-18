@@ -320,7 +320,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-Name>MD SAL Restconf Connector</Bundle-Name>
+            <Bundle-Name>Restconf Connector</Bundle-Name>
             <Import-Package>org.eclipse.jetty.websocket.server, *</Import-Package>
           </instructions>
         </configuration>
