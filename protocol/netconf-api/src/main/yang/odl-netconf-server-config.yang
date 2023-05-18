@@ -1,0 +1,31 @@
+module odl-netconf-server-config {
+    namespace "urn:opendaylight:params:netconf:server";
+    prefix "odlncsc";
+
+    revision "2023-05-12" {
+        description "Initial revision.";
+    }
+
+    import ietf-tcp-server {
+        prefix tcps;
+    }
+    import ietf-tls-server {
+        prefix tlss;
+    }
+    import ietf-ssh-server {
+        prefix sshs;
+    }
+
+    container netconf-server-config {
+
+        container tcp-server-config {
+            uses tcps:tcp-server-grouping;
+        }
+        container tls-server-config {
+            uses tlss:tls-server-grouping;
+        }
+        container ssh-server-config {
+            uses sshs:ssh-server-grouping;
+        }
+    }
+}

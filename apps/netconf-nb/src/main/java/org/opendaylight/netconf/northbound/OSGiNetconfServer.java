@@ -43,14 +43,14 @@ public final class OSGiNetconfServer {
 
     private final AggregatedNetconfOperationServiceFactory mappers = new AggregatedNetconfOperationServiceFactory();
     private final ComponentInstance<DefaultNetconfMonitoringService> monitoring;
-    private final ComponentInstance<DefaultNetconfServerDispatcher> dispatcher;
+    private final ComponentInstance<DefaultNetconfServerFactory> dispatcher;
 
     @Activate
     public OSGiNetconfServer(
             @Reference(target = "(component.factory=" + DefaultNetconfMonitoringService.FACTORY_NAME + ")")
             final ComponentFactory<DefaultNetconfMonitoringService> monitoringFactory,
-            @Reference(target = "(component.factory=" + DefaultNetconfServerDispatcher.FACTORY_NAME + ")")
-            final ComponentFactory<DefaultNetconfServerDispatcher> dispatcherFactory,
+            @Reference(target = "(component.factory=" + DefaultNetconfServerFactory.FACTORY_NAME + ")")
+            final ComponentFactory<DefaultNetconfServerFactory> serverFactory,
             @Reference(target = "(type=mapper-aggregator-registry)")
             final NetconfOperationServiceFactory mapperAggregatorRegistry,
             @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
@@ -63,7 +63,7 @@ public final class OSGiNetconfServer {
         mappers.onAddNetconfOperationServiceFactory(mapperAggregatorRegistry);
         monitoring = monitoringFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfMonitoringService.props(
             mapperAggregatorRegistry, sshScheduledExecutor, configuration.monitoring$_$update$_$interval())));
-        dispatcher = dispatcherFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfServerDispatcher.props(
+        dispatcher = serverFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfServerFactory.props(
             bossGroup, workerGroup, new ServerChannelInitializer(new NetconfServerSessionNegotiatorFactory(timer,
                 mappers, sessionIdProvider, configuration.connection$_$timeout$_$millis(),
                 monitoring.getInstance())))));

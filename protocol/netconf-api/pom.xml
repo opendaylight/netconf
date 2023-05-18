@@ -50,5 +50,22 @@
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-core</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-tcp</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-tls</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-ssh</artifactId>
+    </dependency>
   </dependencies>
 </project>

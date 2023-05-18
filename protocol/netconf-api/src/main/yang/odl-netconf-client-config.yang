@@ -1,0 +1,30 @@
+module odl-netconf-client-config {
+    namespace "urn:opendaylight:params:netconf:client";
+    prefix "odlnccc";
+
+    revision "2023-05-12" {
+        description "Initial revision.";
+    }
+
+    import ietf-tcp-client {
+        prefix tcpc;
+    }
+    import ietf-tls-client {
+        prefix tlsc;
+    }
+    import ietf-ssh-client {
+        prefix sshc;
+    }
+
+    container netconf-client-config {
+        container tcp-client-config {
+            uses tcpc:tcp-client-grouping;
+        }
+        container tls-client-config {
+            uses tlsc:tls-client-grouping;
+        }
+        container ssh-client-config {
+            uses sshc:ssh-client-grouping;
+        }
+    }
+}
