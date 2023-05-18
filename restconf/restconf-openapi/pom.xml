@@ -135,7 +135,7 @@
         <configuration>
 
           <instructions>
-            <Bundle-Name>MD SAL Rest Api Doc Generator</Bundle-Name>
+            <Bundle-Name>Restconf OpenAPI Generator</Bundle-Name>
             <Embed-Dependency>generex, automaton</Embed-Dependency>
             <Export-Package>
               com.fasterxml.jackson.datatype.*
