@@ -218,7 +218,7 @@ public abstract class BaseYangOpenApiGenerator {
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
         try {
-            final Map<String, Schema> schemas = jsonConverter.convertToJsonSchema(module, schemaContext,
+            final Map<String, Schema> schemas = jsonConverter.convertToSchemas(module, schemaContext,
                 definitionNames, isForSingleModule);
             doc.getComponents().getSchemas().putAll(schemas);
             if (LOG.isDebugEnabled()) {

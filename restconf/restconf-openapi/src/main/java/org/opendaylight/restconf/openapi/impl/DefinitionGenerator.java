@@ -142,7 +142,7 @@ public class DefinitionGenerator {
      */
 
 
-    public Map<String, Schema> convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
+    public Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
             final boolean isForSingleModule) throws IOException {
         topLevelModule = module;
@@ -158,14 +158,14 @@ public class DefinitionGenerator {
         return definitions;
     }
 
-    public Map<String, Schema> convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
+    public Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
             final DefinitionNames definitionNames, final boolean isForSingleModule)
             throws IOException {
         final Map<String, Schema> definitions = new HashMap<>();
         if (isForSingleModule) {
             definitionNames.addUnlinkedName(module.getName() + MODULE_NAME_SUFFIX);
         }
-        return convertToJsonSchema(module, schemaContext, definitions, definitionNames, isForSingleModule);
+        return convertToSchemas(module, schemaContext, definitions, definitionNames, isForSingleModule);
     }
 
     private void processModule(final Module module, final Map<String, Schema> definitions,
