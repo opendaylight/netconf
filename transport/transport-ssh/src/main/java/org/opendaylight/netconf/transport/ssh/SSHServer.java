@@ -18,6 +18,7 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.security.PublicKey;
 import java.util.List;
+import java.util.function.Consumer;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
@@ -67,28 +68,36 @@ public final class SSHServer extends SSHTransportStack {
     public static @NonNull ListenableFuture<SSHServer> connect(final TransportChannelListener listener,
             final Bootstrap bootstrap, final TcpClientGrouping connectParams, final SshServerGrouping serverParams)
             throws UnsupportedConfigurationException {
-        final var server = new SSHServer(listener, newFactoryManager(serverParams));
+        final var server = new SSHServer(listener, newFactoryManager(requireNonNull(serverParams)));
         return transformUnderlay(server, TCPClient.connect(server.asListener(), bootstrap, connectParams));
+    }
+
+    public static  @NonNull ListenableFuture<SSHServer> listen(final TransportChannelListener listener,
+            final ServerBootstrap bootstrap, final TcpServerGrouping connectParams,
+            final Consumer<ServerFactoryManager> factoryInitializer) throws UnsupportedConfigurationException {
+        final var factoryMgr = newFactoryManager(null);
+        requireNonNull(factoryInitializer).accept(factoryMgr);
+        final var server = new SSHServer(listener, factoryMgr);
+        return transformUnderlay(server, TCPServer.listen(server.asListener(), bootstrap, connectParams));
     }
 
     public static @NonNull ListenableFuture<SSHServer> listen(final TransportChannelListener listener,
             final ServerBootstrap bootstrap, final TcpServerGrouping connectParams,
             final SshServerGrouping serverParams)
             throws UnsupportedConfigurationException {
-        final var server = new SSHServer(listener, newFactoryManager(serverParams));
+        final var server = new SSHServer(listener, newFactoryManager(requireNonNull(serverParams)));
         return transformUnderlay(server, TCPServer.listen(server.asListener(), bootstrap, connectParams));
     }
 
     private static ServerFactoryManager newFactoryManager(
-            final SshServerGrouping serverParams)
-            throws UnsupportedConfigurationException {
-        var factoryMgr = SshServer.setUpDefaultServer();
-
-        ConfigUtils.setTransportParams(factoryMgr, serverParams.getTransportParams());
-        ConfigUtils.setKeepAlives(factoryMgr, serverParams.getKeepalives());
-        setServerIdentity(factoryMgr, serverParams.getServerIdentity());
-        setClientAuthentication(factoryMgr, serverParams.getClientAuthentication());
-
+            @Nullable final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
+        final var factoryMgr = SshServer.setUpDefaultServer();
+        if (serverParams != null) {
+            ConfigUtils.setTransportParams(factoryMgr, serverParams.getTransportParams());
+            ConfigUtils.setKeepAlives(factoryMgr, serverParams.getKeepalives());
+            setServerIdentity(factoryMgr, serverParams.getServerIdentity());
+            setClientAuthentication(factoryMgr, serverParams.getClientAuthentication());
+        }
         factoryMgr.setServiceFactories(SshServer.DEFAULT_SERVICE_FACTORIES);
         factoryMgr.setScheduledExecutorService(ThreadUtils.newSingleThreadScheduledExecutor(""));
         return factoryMgr;

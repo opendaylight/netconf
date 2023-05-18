@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-netty-util</artifactId>
+            <artifactId>odl-netconf-truststore</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -39,13 +39,11 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
+
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-truststore</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
+            <artifactId>transport-config</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-ssh</artifactId>

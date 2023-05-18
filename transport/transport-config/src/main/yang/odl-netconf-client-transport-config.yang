@@ -1,0 +1,31 @@
+module odl-netconf-client-transport-config {
+    namespace "urn:opendaylight:netconf:client:transport:config";
+    prefix "odlnctc";
+
+    revision "2023-05-12" {
+        description "Initial revision.";
+    }
+
+    import ietf-tcp-client {
+        prefix tcpc;
+    }
+    import ietf-tls-client {
+        prefix tlsc;
+    }
+    import ietf-ssh-client {
+        prefix sshc;
+    }
+
+    grouping client-transport-config-grouping {
+
+        container client-tcp-config {
+            uses tcpc:tcp-client-grouping;
+        }
+        container client-tls-config {
+            uses tlsc:tls-client-grouping;
+        }
+        container client-ssh-config {
+            uses sshc:ssh-client-grouping;
+        }
+    }
+}
