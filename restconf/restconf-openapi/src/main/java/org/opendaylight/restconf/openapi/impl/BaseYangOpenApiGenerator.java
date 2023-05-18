@@ -331,7 +331,7 @@ public abstract class BaseYangOpenApiGenerator {
             childSchemaNodes = dataNodeContainer.getChildNodes();
         }
 
-        paths.put(resourcePath, operations(resourcePath, node, moduleName, deviceName, pathParams, isConfig, parentName,
+        paths.put(resourcePath, operations(node, moduleName, deviceName, pathParams, isConfig, parentName,
                 definitionNames));
 
         if (node instanceof ActionNodeContainer) {
@@ -363,7 +363,7 @@ public abstract class BaseYangOpenApiGenerator {
         return false;
     }
 
-    private static Path operations(final String resourcePath, final DataSchemaNode node, final String moduleName,
+    private static Path operations(final DataSchemaNode node, final String moduleName,
             final Optional<String> deviceName, final ArrayNode pathParams, final boolean isConfig,
             final String parentName, final DefinitionNames definitionNames) {
         final Path operations = new Path();
