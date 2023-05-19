@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "345791f0_86a5d0b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-19T12:22:26Z",
+      "side": 1,
+      "message": "This generates:\n```\n{\n  \"mac-address\": \"^?:00:00:00:00:00:00$\",\n  \"login-date-time\": \"^?:0000-00-00T00:00:00Z$\",\n  \"ipv4-adress\": \"^?:0.0.0.0$\"\n}\n```\n\nWe have to get rid of ^?: from beginning and $ from the end.",
+      "revId": "0bbefd2cdf3a1c4cf8368acd5e3663f93e4a7e62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
