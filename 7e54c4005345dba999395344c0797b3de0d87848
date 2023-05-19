@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d333c32c_b69f6c96",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-19T14:59:11Z",
+      "side": 1,
+      "message": "Commit header should have only 50 characters.\nPlease make this shorter. It\u0027s better to describe it in commit message, header should be simple and short.",
+      "revId": "7e54c4005345dba999395344c0797b3de0d87848",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d0217b4_d4ba2b5a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-19T14:59:11Z",
+      "side": 1,
+      "message": "Please remove this \"parameters\" variable.\n\nFor this purpose, it\u0027s better to rename \"final ArrayNode parentPathParams\" -\u003e \"final ArrayNode parameters\" and use this parameter instead.",
+      "revId": "7e54c4005345dba999395344c0797b3de0d87848",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f1c6cfa_bf158c76",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-19T14:59:11Z",
+      "side": 1,
+      "message": "Please move this method to the bottom of the \"OpenApiGeneratorRFC8040Test.java\" class.\n\nIn my opinion, it would be better placed there, since it is only used once within the method OpenApiGeneratorRFC8040Test.java. \nEven if someone wanted to use it in another test that extends this class, they would probably need to modify the method, since it can only be used with a single parameter.",
+      "revId": "7e54c4005345dba999395344c0797b3de0d87848",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
