@@ -109,7 +109,7 @@ public class DefinitionGenerator {
     private static final String ENUM_KEY = "enum";
     private static final String TITLE_KEY = "title";
     private static final String DEFAULT_KEY = "default";
-    private static final String EXAMPLE_KEY = "example";
+    private static final String EXAMPLES_KEY = "examples";
     private static final String FORMAT_KEY = "format";
     private static final String NAMESPACE_KEY = "namespace";
     public static final String INPUT = "input";
@@ -975,7 +975,8 @@ public class DefinitionGenerator {
     }
 
     private static void setExampleValue(final ObjectNode property, final String value) {
-        property.put(EXAMPLE_KEY, value);
+        ObjectNode example = JsonNodeFactory.instance.objectNode().put("value", value);
+        property.put(EXAMPLES_KEY, JsonNodeFactory.instance.arrayNode().add(example));
     }
 
     private static void setDefaultValue(final ObjectNode property, final String value) {
