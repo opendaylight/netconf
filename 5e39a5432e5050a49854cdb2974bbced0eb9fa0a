@@ -16,6 +16,24 @@
       "message": "Is this means to be constant?",
       "revId": "5e39a5432e5050a49854cdb2974bbced0eb9fa0a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0aa5fdb9_a5fd2372",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriterFieldsTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-05-22T10:42:40Z",
+      "side": 1,
+      "message": "of course -- and actually inlined, but I don\u0027t think we need to do that now -- the mocking stuff blocks the second patch.\n\nwe can make a constatization pass when we migrate to JUnit5...",
+      "parentUuid": "59d1526b_c074d1a8",
+      "revId": "5e39a5432e5050a49854cdb2974bbced0eb9fa0a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
