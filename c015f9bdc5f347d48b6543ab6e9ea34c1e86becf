@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbc5447b_92be2b01",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T14:27:39Z",
+      "side": 1,
+      "message": "Default value should be `(boolean) v`",
+      "revId": "c015f9bdc5f347d48b6543ab6e9ea34c1e86becf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
