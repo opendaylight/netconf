@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5631ee7_12af8f21",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriterFieldsTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-05-22T07:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63df815b_00bbb6fe",
+      "revId": "f706815e591c3009696cad0d80885581b6b01e0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "301eb041_ab3de4f1",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d73a06f_fe082b48",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriterFieldsTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-05-22T07:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "301eb041_ab3de4f1",
+      "revId": "f706815e591c3009696cad0d80885581b6b01e0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "920139fe_5c990fd5",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-05-22T07:27:20Z",
       "side": 1,
       "message": "Explicit type arguments can be inferred.",
+      "revId": "f706815e591c3009696cad0d80885581b6b01e0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c29a084a_22724411",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriterFieldsTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-05-22T07:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "920139fe_5c990fd5",
       "revId": "f706815e591c3009696cad0d80885581b6b01e0e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
