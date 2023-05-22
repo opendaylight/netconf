@@ -16,6 +16,23 @@
       "message": "If I am correct, there is a missing fix for default values in this patch, right?\n`leafTypeDef.getDefaultValue().ifPresent(defValue -\u003e setDefaultValue(property, ((Decimal64) defValue).decimalValue()));`",
       "revId": "5926aa9c20e9d71f24c412bd70b2df600f13356e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a1b4ff7_b8216a07",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 849,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T15:33:53Z",
+      "side": 1,
+      "message": "Fix all example to correct type. This creates the wrong example:\nexamples: List [ OrderedMap { \"value\": \"0\" } ]",
+      "revId": "5926aa9c20e9d71f24c412bd70b2df600f13356e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
