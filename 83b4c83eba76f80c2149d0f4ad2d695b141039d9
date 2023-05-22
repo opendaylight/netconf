@@ -33,6 +33,24 @@
       "message": "This will not compile - check style.",
       "revId": "83b4c83eba76f80c2149d0f4ad2d695b141039d9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5311b85_71f6a526",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-22T11:22:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5bcceef_083b5400",
+      "revId": "83b4c83eba76f80c2149d0f4ad2d695b141039d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
