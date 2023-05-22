@@ -16,6 +16,24 @@
       "message": "We are missing some stuff here.",
       "revId": "4318cb3944e82d382d1a127b5dbfcc10565ef573",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a9700c7_e9c2d20e",
+        "filename": "apps/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-22T14:49:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53956b33_aa5a7844",
+      "revId": "4318cb3944e82d382d1a127b5dbfcc10565ef573",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
