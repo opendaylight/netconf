@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8438a5f3_ef02f653",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T14:19:53Z",
+      "side": 1,
+      "message": "This ignores default value. Fix this to use `v` in the `setDefaultValue()` in all method in this patch.\n\nThis method also needs to have its logic reworked. If the default value is set to int32, it cannot return STRING_TYPE.",
+      "revId": "ce341769f24d45d9c8d4b773fa97bc44da8e8adb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "978c495f_8c1a3875",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 914,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T14:19:53Z",
+      "side": 1,
+      "message": "Prepare test for these changes with similar models:\n```\n leaf testUnion {\n    type union {\n     type int32;\n     type string;\n    }\n    default 5;\n }\n```\nand\n```\n leaf testUnion {\n    type union {\n     type string;\n     type boolean;\n    }\n    default false;\n }\n```",
+      "revId": "ce341769f24d45d9c8d4b773fa97bc44da8e8adb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
