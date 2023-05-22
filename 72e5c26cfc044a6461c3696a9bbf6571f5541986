@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfd15078_07f8c942",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 706,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T14:12:41Z",
+      "side": 1,
+      "message": "Missing final keyword",
+      "revId": "72e5c26cfc044a6461c3696a9bbf6571f5541986",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02aecf8e_8d984c33",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 707,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T14:12:41Z",
+      "side": 1,
+      "message": "This part is never tested. Please create a test for a similar model within the test model requested in the previous patch\n```\n  leaf binary-data {\n    type binary;\n    default \"SGVsbG8gdGVzdCE\u003d\";\n  }\n```",
+      "revId": "72e5c26cfc044a6461c3696a9bbf6571f5541986",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
