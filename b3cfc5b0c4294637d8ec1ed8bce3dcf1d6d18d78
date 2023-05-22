@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "379531fa_81f19e72",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T14:03:01Z",
+      "side": 1,
+      "message": "Missing test. Add some new model with similar leaf\n```\n  leaf toasterStatus {\n    type enumeration {\n      enum \"up\" {\n        value 1;\n      }\n      enum \"down\" {\n        value 2;\n      }\n    }\n    default \"up\";\n  }\n```\nAnd expect correct default value.",
+      "revId": "b3cfc5b0c4294637d8ec1ed8bce3dcf1d6d18d78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
