@@ -15,6 +15,14 @@ module path-params-test {
           type string;
         }
       }
+      container cont2 {
+      }
+      list list4 {
+        key name;
+        leaf name {
+          type string;
+        }
+      }
     }
     list list3 {
       key name;
