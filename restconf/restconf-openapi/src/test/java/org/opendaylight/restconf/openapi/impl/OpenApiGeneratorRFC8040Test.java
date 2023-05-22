@@ -241,5 +241,13 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
         var pathToList3 = "/rests/data/path-params-test:cont/list3={name}";
         assertTrue(doc.getPaths().containsKey(pathToList3));
         assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList3));
+
+        var pathToList4 = "/rests/data/path-params-test:cont/list1={name}/list4={name1}";
+        assertTrue(doc.getPaths().containsKey(pathToList4));
+        assertEquals(List.of("name", "name1"), getPathParameters(doc.getPaths(), pathToList4));
+
+        var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
+        assertTrue(doc.getPaths().containsKey(pathToList4));
+        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList5));
     }
 }
