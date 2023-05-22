@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53956b33_aa5a7844",
+        "filename": "apps/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-22T14:48:15Z",
+      "side": 1,
+      "message": "We are missing some stuff here.",
+      "revId": "4318cb3944e82d382d1a127b5dbfcc10565ef573",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
