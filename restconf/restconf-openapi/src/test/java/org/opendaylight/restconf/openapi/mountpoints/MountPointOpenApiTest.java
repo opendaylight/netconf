@@ -112,7 +112,7 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         final Map<String, Path> paths = mountPointApi.getPaths();
         assertNotNull(paths);
 
-        assertEquals("Unexpected api list size", 35, paths.size());
+        assertEquals("Unexpected api list size", 37, paths.size());
 
         final List<JsonNode> getOperations = new ArrayList<>();
         final List<JsonNode> postOperations = new ArrayList<>();
@@ -128,11 +128,11 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
             Optional.ofNullable(path.getValue().getDelete()).ifPresent(deleteOperations::add);
         }
 
-        assertEquals("Unexpected GET paths size", 27, getOperations.size());
-        assertEquals("Unexpected POST paths size", 33, postOperations.size());
-        assertEquals("Unexpected PUT paths size", 25, putOperations.size());
-        assertEquals("Unexpected PATCH paths size", 25, patchOperations.size());
-        assertEquals("Unexpected DELETE paths size", 25, deleteOperations.size());
+        assertEquals("Unexpected GET paths size", 29, getOperations.size());
+        assertEquals("Unexpected POST paths size", 35, postOperations.size());
+        assertEquals("Unexpected PUT paths size", 27, putOperations.size());
+        assertEquals("Unexpected PATCH paths size", 27, patchOperations.size());
+        assertEquals("Unexpected DELETE paths size", 27, deleteOperations.size());
     }
 
     /**
@@ -208,5 +208,9 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         var pathToList3 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
         assertTrue(mountPointApi.getPaths().containsKey(pathToList3));
         assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList3));
+
+        var pathToList4 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name1}";
+        assertTrue(mountPointApi.getPaths().containsKey(pathToList4));
+        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.getPaths(), pathToList4));
     }
 }
