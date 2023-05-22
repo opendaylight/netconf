@@ -1,10 +1,11 @@
 # NETCONF applications
 
-This directory hosts the various applications built with NETCONF/RESTCONF [high-level](../plugins/README.rst) integrations.
+This directory hosts the various applications built with NETCONF/RESTCONF [high-level](../plugins) integrations.
 
 This includes:
-* [NETCONF Events on top of MD-SAL](netconf-events-mdsal/README.rst)
-* [CLI client](netconf-console/README.rst) for NETCONF servers
-* [NETCONF ietf-topology.yang](netconf-topology/README.rst) implementations
-  * for [single-node](netconf-topology-impl/README.rst) deployments
-  * for [clustenered](netconf-topology-singleton/README.rst) deployments
+* [NETCONF Call Home and RESTCONF Call Home](callhome-provider) implementations
+* [CLI client](netconf-console) for NETCONF servers
+* [NETCONF northbound](netconf-nb) implementation
+* [NETCONF ietf-topology.yang](netconf-topology) implementations
+  * for [single-node](netconf-topology-impl) deployments
+  * for [clustenered](netconf-topology-singleton) deployments
