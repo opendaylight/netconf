@@ -16,6 +16,23 @@
       "message": "Default value should be `(boolean) v`",
       "revId": "c015f9bdc5f347d48b6543ab6e9ea34c1e86becf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40857e89_df73fe40",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T15:27:18Z",
+      "side": 1,
+      "message": "Example value should be \"true\" not \"String.valueOf(true)\"\nIMO this creates the wrong example:\n```\n\"abc\": {\n    \"description\": \"\",\n    \"examples\": [\n        {\n            \"value\": \"true\"\n        }\n    ],\n    \"type\": \"boolean\"\n}\n```",
+      "revId": "c015f9bdc5f347d48b6543ab6e9ea34c1e86becf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
