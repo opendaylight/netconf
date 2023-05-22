@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04c2a8a3_226f4844",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T15:05:46Z",
+      "side": 1,
+      "message": "This is wrong and probably should be removed..\nFor model:\n```\n leaf format {\n   type identityref {\n     base schema-format;\n   }\n   description\n     \"The data modeling language of the schema.  If this\n     parameter is not present, and more than one formats of\n     the schema exists on the server, a \u0027data-not-unique\u0027 error\n     is returned, as described above.\";\n }\n```\n\nYou provide:\n```\n\"format\": {\n    \"examples\": [\n        {\n            \"value\": \"schema-format\"\n        }\n    ],\n    \"$ref\": \"#/components/schemas/schema-format\",\n    \"xml\": {\n        \"name\": \"format\",\n        \"namespace\": \"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\"\n    }\n}\n```\n\nProbably, `example` is not suitable for this component. Or maybe should be one of these:\n```\nformat (identifyref, schema-format)\n      The data modeling language the schema is written in.  The data\n      modeling language is represented as a YANG identity.  This\n      document defines the identities \"xsd\", \"yang\", \"yin\", \"rng\", and\n      \"rnc\"\n```\nhttps://www.rfc-editor.org/rfc/rfc6022.html#section-2.1.3",
+      "revId": "ec159fba1703210e567442d7a26932ce0024f852",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
