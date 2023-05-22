@@ -208,5 +208,9 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         var pathToList3 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
         assertTrue(mountPointApi.getPaths().containsKey(pathToList3));
         assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList3));
+
+        var pathToList4 = "/rests/data/path-params-test:cont/list1={name}/list4={name1}";
+        assertTrue(mountPointApi.getPaths().containsKey(pathToList4));
+        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.getPaths(), pathToList4));
     }
 }
