@@ -409,6 +409,7 @@ public abstract class BaseYangSwaggerGenerator {
                 addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
                     newIsConfig, newParent, definitionNames, oaversion, newResourcePath);
                 pathParams.removeAll();
+                pathParams.addAll(parentPathParams);
             }
         }
     }
