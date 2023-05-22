@@ -16,6 +16,23 @@
       "message": "Missing test. Add some new model with similar leaf\n```\n  leaf toasterStatus {\n    type enumeration {\n      enum \"up\" {\n        value 1;\n      }\n      enum \"down\" {\n        value 2;\n      }\n    }\n    default \"up\";\n  }\n```\nAnd expect correct default value.",
       "revId": "b3cfc5b0c4294637d8ec1ed8bce3dcf1d6d18d78",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c88c7e8_4cc1f3b9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 720,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T15:40:19Z",
+      "side": 1,
+      "message": "Shouldn\u0027t be \"example\" set only when \"default\" value is not set?\nhttps://jira.opendaylight.org/browse/NETCONF-999",
+      "revId": "b3cfc5b0c4294637d8ec1ed8bce3dcf1d6d18d78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
