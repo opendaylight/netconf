@@ -174,5 +174,13 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         var pathToList3 = "/rests/data/path-params-test:cont/list3={name}";
         assertTrue(doc.getPaths().has(pathToList3));
         assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList3));
+
+        var pathToList4 = "/rests/data/path-params-test:cont/list1={name}/list4={name1}";
+        assertTrue(doc.getPaths().has(pathToList4));
+        assertEquals(List.of("name", "name1"), getPathParameters(doc.getPaths(), pathToList4));
+
+        var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
+        assertTrue(doc.getPaths().has(pathToList4));
+        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList5));
     }
 }
