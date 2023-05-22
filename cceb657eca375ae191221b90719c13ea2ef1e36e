@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7d0c80a_ec6976f2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 978,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-22T15:52:01Z",
+      "side": 1,
+      "message": "If you want to set only one value in this method, you need to use it as follows:\n```\nproperty.put(\"example\", example)\n```\nBased on Swagger documentation:\nhttps://swagger.io/docs/specification/adding-examples/#parameters\n\nIf you want to set an array of values:\n```\n        ObjectNode examples \u003d JsonNodeFactory.instance.objectNode();\n        ObjectNode example \u003d JsonNodeFactory.instance.objectNode().put(\"value\", value);\n        examples.set(\"Example1\", example);\n        ObjectNode example2 \u003d JsonNodeFactory.instance.objectNode().put(\"value\", value2);\n        examples.set(\"Example2\", example2);\n        \n        property.set(EXAMPLES_KEY, examples);\n```",
+      "revId": "cceb657eca375ae191221b90719c13ea2ef1e36e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
