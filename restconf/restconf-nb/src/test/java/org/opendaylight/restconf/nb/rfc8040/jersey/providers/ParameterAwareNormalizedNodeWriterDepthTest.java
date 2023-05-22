@@ -11,16 +11,10 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.api.query.DepthParam;
@@ -29,7 +23,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
@@ -38,95 +31,57 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
 /**
  * Unit test for {@link ParameterAwareNormalizedNodeWriter} used with depth parameter.
  */
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ParameterAwareNormalizedNodeWriterDepthTest {
+    private final String leafSetEntryNodeValue = "leaf-set-value";
+    private final String keyLeafNodeValue = "key-value";
+    private final String anotherLeafNodeValue = "another-value";
+
+    private final NodeIdentifier containerNodeIdentifier =
+        NodeIdentifier.create(QName.create("namespace", "container"));
+    private final NodeIdentifier mapNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "list"));
+    private final NodeIdentifier keyLeafNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "key-field"));
+    private final NodeWithValue<String> leafSetEntryNodeIdentifier =
+        new NodeWithValue<>(QName.create("namespace", "leaf-set-entry"), leafSetEntryNodeValue);
+    private final NodeIdentifier leafSetNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "leaf-set"));
+    private final NodeIdentifierWithPredicates mapEntryNodeIdentifier = NodeIdentifierWithPredicates.of(
+        QName.create("namespace", "list-entry"), keyLeafNodeIdentifier.getNodeType(), keyLeafNodeValue);
+    private final NodeIdentifier anotherLeafNodeIdentifier =
+        NodeIdentifier.create(QName.create("namespace", "another-field"));
+
+    private final LeafNode<String> keyLeafNodeData = ImmutableNodes.leafNode(keyLeafNodeIdentifier, keyLeafNodeValue);
+    private final LeafNode<String> anotherLeafNodeData =
+        ImmutableNodes.leafNode(anotherLeafNodeIdentifier, anotherLeafNodeValue);
+    private final LeafSetEntryNode<String> leafSetEntryNodeData = Builders.<String>leafSetEntryBuilder()
+        .withNodeIdentifier(leafSetEntryNodeIdentifier)
+        .withValue(leafSetEntryNodeValue)
+        .build();
+    private final SystemLeafSetNode<String> leafSetNodeData = Builders.<String>leafSetBuilder()
+        .withNodeIdentifier(leafSetNodeIdentifier)
+        .withChild(leafSetEntryNodeData)
+        .build();
+    private final MapEntryNode mapEntryNodeData = Builders.mapEntryBuilder()
+        .withNodeIdentifier(mapEntryNodeIdentifier)
+        .withChild(keyLeafNodeData)
+        .withChild(anotherLeafNodeData)
+        .build();
+    private final SystemMapNode mapNodeData = Builders.mapBuilder()
+        .withNodeIdentifier(mapNodeIdentifier)
+        .withChild(mapEntryNodeData)
+        .build();
+    private final ContainerNode containerNodeData = Builders.containerBuilder()
+        .withNodeIdentifier(containerNodeIdentifier)
+        .withChild(leafSetNodeData)
+        .build();
+
     @Mock
     private NormalizedNodeStreamWriter writer;
-    @Mock
-    private ContainerNode containerNodeData;
-    @Mock
-    private SystemMapNode mapNodeData;
-    @Mock
-    private MapEntryNode mapEntryNodeData;
-    @Mock
-    private SystemLeafSetNode<String> leafSetNodeData;
-    @Mock
-    private LeafSetEntryNode<String> leafSetEntryNodeData;
-    @Mock
-    private LeafNode<String> keyLeafNodeData;
-    @Mock
-    private LeafNode<String> anotherLeafNodeData;
-
-    private NodeIdentifier containerNodeIdentifier;
-    private NodeIdentifier mapNodeIdentifier;
-    private NodeIdentifierWithPredicates mapEntryNodeIdentifier;
-    private NodeIdentifier leafSetNodeIdentifier;
-    private NodeWithValue<String> leafSetEntryNodeIdentifier;
-    private NodeIdentifier keyLeafNodeIdentifier;
-    private NodeIdentifier anotherLeafNodeIdentifier;
-
-    private Collection<DataContainerChild> containerNodeValue;
-    private Collection<MapEntryNode> mapNodeValue;
-    private Collection<DataContainerChild> mapEntryNodeValue;
-    private Collection<LeafSetEntryNode<String>> leafSetNodeValue;
-    private String leafSetEntryNodeValue;
-    private String keyLeafNodeValue;
-    private String anotherLeafNodeValue;
-
-    @Before
-    public void setUp() {
-        // identifiers
-        containerNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "container"));
-        when(containerNodeData.getIdentifier()).thenReturn(containerNodeIdentifier);
-
-        mapNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "list"));
-        when(mapNodeData.getIdentifier()).thenReturn(mapNodeIdentifier);
-
-        final QName leafSetEntryNodeQName = QName.create("namespace", "leaf-set-entry");
-        leafSetEntryNodeValue = "leaf-set-value";
-        leafSetEntryNodeIdentifier = new NodeWithValue<>(leafSetEntryNodeQName, leafSetEntryNodeValue);
-        when(leafSetEntryNodeData.getIdentifier()).thenReturn(leafSetEntryNodeIdentifier);
-
-        leafSetNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "leaf-set"));
-        when(leafSetNodeData.getIdentifier()).thenReturn(leafSetNodeIdentifier);
-
-        final QName mapEntryNodeKey = QName.create("namespace", "key-field");
-        keyLeafNodeIdentifier = NodeIdentifier.create(mapEntryNodeKey);
-        keyLeafNodeValue = "key-value";
-
-        mapEntryNodeIdentifier = NodeIdentifierWithPredicates.of(
-                QName.create("namespace", "list-entry"), mapEntryNodeKey, keyLeafNodeValue);
-        when(mapEntryNodeData.getIdentifier()).thenReturn(mapEntryNodeIdentifier);
-        when(mapEntryNodeData.childByArg(keyLeafNodeIdentifier)).thenReturn(keyLeafNodeData);
-
-        when(keyLeafNodeData.body()).thenReturn(keyLeafNodeValue);
-        when(keyLeafNodeData.getIdentifier()).thenReturn(keyLeafNodeIdentifier);
-
-        anotherLeafNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "another-field"));
-        anotherLeafNodeValue = "another-value";
-
-        when(anotherLeafNodeData.body()).thenReturn(anotherLeafNodeValue);
-        when(anotherLeafNodeData.getIdentifier()).thenReturn(anotherLeafNodeIdentifier);
-
-        // values
-        when(leafSetEntryNodeData.body()).thenReturn(leafSetEntryNodeValue);
-
-        leafSetNodeValue = List.of(leafSetEntryNodeData);
-        when(leafSetNodeData.body()).thenReturn(leafSetNodeValue);
-
-        containerNodeValue = Set.of(leafSetNodeData);
-        when(containerNodeData.body()).thenReturn(containerNodeValue);
-
-        mapEntryNodeValue = Set.of(keyLeafNodeData, anotherLeafNodeData);
-        when(mapEntryNodeData.body()).thenReturn(mapEntryNodeValue);
-
-        mapNodeValue = Set.of(mapEntryNodeData);
-        when(mapNodeData.body()).thenReturn(mapNodeValue);
-    }
 
     /**
      * Test write {@link ContainerNode} with children but write data only to depth 1 (children will not be written).
@@ -134,13 +89,12 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeContainerWithoutChildrenDepthTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParam.min(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min(), null);
 
         parameterWriter.write(containerNodeData);
 
-        final InOrder inOrder = inOrder(writer);
-        inOrder.verify(writer, times(1)).startContainerNode(containerNodeIdentifier, containerNodeValue.size());
+        final var inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startContainerNode(containerNodeIdentifier, 1);
         inOrder.verify(writer, times(1)).endNode();
         verifyNoMoreInteractions(writer);
     }
@@ -151,14 +105,13 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeContainerWithChildrenDepthTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParam.max(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max(), null);
 
         parameterWriter.write(containerNodeData);
 
-        final InOrder inOrder = inOrder(writer);
-        inOrder.verify(writer, times(1)).startContainerNode(containerNodeIdentifier, containerNodeValue.size());
-        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
+        final var inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startContainerNode(containerNodeIdentifier, 1);
+        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, 1);
         inOrder.verify(writer, times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
         inOrder.verify(writer, times(1)).scalarValue(leafSetEntryNodeValue);
         inOrder.verify(writer, times(3)).endNode();
@@ -171,14 +124,13 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeMapNodeWithoutChildrenDepthTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParam.min(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min(), null);
 
         parameterWriter.write(mapNodeData);
 
-        final InOrder inOrder = inOrder(writer);
-        inOrder.verify(writer, times(1)).startMapNode(mapNodeIdentifier, mapNodeValue.size());
-        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        final var inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startMapNode(mapNodeIdentifier, 1);
+        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, 2);
         inOrder.verify(writer, times(2)).endNode();
         verifyNoMoreInteractions(writer);
     }
@@ -193,14 +145,13 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Ignore
     @Test
     public void writeMapNodeWithChildrenDepthTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParam.max(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max(), null);
 
         parameterWriter.write(mapNodeData);
 
-        final InOrder inOrder = inOrder(writer);
-        inOrder.verify(writer, times(1)).startMapNode(mapNodeIdentifier, mapNodeValue.size());
-        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        final var inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startMapNode(mapNodeIdentifier, 1);
+        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, 2);
         inOrder.verify(writer, times(2)).startLeafNode(keyLeafNodeIdentifier);
         inOrder.verify(writer, times(1)).scalarValue(keyLeafNodeValue);
         inOrder.verify(writer, times(1)).endNode();
@@ -220,13 +171,12 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeLeafSetNodeWithoutChildrenDepthTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParam.min(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min(), null);
 
         parameterWriter.write(leafSetNodeData);
 
-        final InOrder inOrder = inOrder(writer);
-        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
+        final var inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, 1);
         inOrder.verify(writer, times(1)).endNode();
         verifyNoMoreInteractions(writer);
     }
@@ -237,13 +187,12 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeLeafSetNodeWithChildrenDepthTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParam.max(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max(), null);
 
         parameterWriter.write(leafSetNodeData);
 
-        final InOrder inOrder = inOrder(writer);
-        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
+        final var inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, 1);
         inOrder.verify(writer, times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
         inOrder.verify(writer, times(1)).scalarValue(leafSetEntryNodeValue);
         inOrder.verify(writer, times(2)).endNode();
@@ -256,12 +205,11 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeLeafSetEntryNodeDepthTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParam.max(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max(), null);
 
         parameterWriter.write(leafSetEntryNodeData);
 
-        final InOrder inOrder = inOrder(writer);
+        final var inOrder = inOrder(writer);
         inOrder.verify(writer, times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
         inOrder.verify(writer, times(1)).scalarValue(leafSetEntryNodeValue);
         inOrder.verify(writer, times(1)).endNode();
@@ -274,13 +222,13 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeMapEntryNodeUnorderedOnlyKeysDepthTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, false, DepthParam.min(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, false, DepthParam.min(),
+            null);
 
         parameterWriter.write(mapEntryNodeData);
 
-        final InOrder inOrder = inOrder(writer);
-        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        final var inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, 2);
         // write only the key
         inOrder.verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
         inOrder.verify(writer, times(1)).scalarValue(keyLeafNodeValue);
@@ -294,13 +242,13 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeMapEntryNodeUnorderedDepthTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, false, DepthParam.max(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, false, DepthParam.max(),
+            null);
 
         parameterWriter.write(mapEntryNodeData);
 
         // unordered
-        verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, 2);
         verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
         verify(writer, times(1)).scalarValue(keyLeafNodeValue);
         verify(writer, times(1)).startLeafNode(anotherLeafNodeIdentifier);
@@ -315,13 +263,13 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeMapEntryNodeOrderedWithoutChildrenTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, true, DepthParam.min(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, true, DepthParam.min(),
+            null);
 
         parameterWriter.write(mapEntryNodeData);
 
-        final InOrder inOrder = inOrder(writer);
-        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        final var inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, 2);
         inOrder.verify(writer, times(1)).endNode();
         verifyNoMoreInteractions(writer);
     }
@@ -336,13 +284,13 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Ignore
     @Test
     public void writeMapEntryNodeOrderedTest() throws Exception {
-        final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, true, DepthParam.max(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, true, DepthParam.max(),
+            null);
 
         parameterWriter.write(mapEntryNodeData);
 
-        final InOrder inOrder = inOrder(writer);
-        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        final var inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, 2);
         inOrder.verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
         inOrder.verify(writer, times(1)).scalarValue(keyLeafNodeValue);
         inOrder.verify(writer, times(1)).endNode();
