@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d089e230_b0549154",
+        "filename": "apps/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-22T13:59:21Z",
+      "side": 0,
+      "message": "Removed this line because of: https://git.opendaylight.org/gerrit/c/netconf/+/105790",
+      "revId": "5099c229429df3e077da5cae2c21cd57200e3ff0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
