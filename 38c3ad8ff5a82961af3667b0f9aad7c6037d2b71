@@ -16,6 +16,24 @@
       "message": "Missing JIRA: NETCONF-1037",
       "revId": "38c3ad8ff5a82961af3667b0f9aad7c6037d2b71",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c7d0944_9447d735",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-23T10:51:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f5f9e94_3c51faf1",
+      "revId": "38c3ad8ff5a82961af3667b0f9aad7c6037d2b71",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
