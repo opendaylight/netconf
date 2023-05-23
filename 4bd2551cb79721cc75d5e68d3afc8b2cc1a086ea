@@ -16,6 +16,24 @@
       "message": "Default value should be `(string) v`",
       "revId": "4bd2551cb79721cc75d5e68d3afc8b2cc1a086ea",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03ad4948_9c93de06",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 793,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-23T12:39:53Z",
+      "side": 1,
+      "message": "Resolved",
+      "parentUuid": "c867d766_355ff428",
+      "revId": "4bd2551cb79721cc75d5e68d3afc8b2cc1a086ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
