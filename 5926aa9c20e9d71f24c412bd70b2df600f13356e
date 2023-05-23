@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2387d6e1_ce586513",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 848,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-23T12:35:09Z",
+      "side": 1,
+      "message": "resolved",
+      "parentUuid": "fc3b7784_c1807ddf",
+      "revId": "5926aa9c20e9d71f24c412bd70b2df600f13356e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a1b4ff7_b8216a07",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-05-22T15:33:53Z",
       "side": 1,
       "message": "Fix all example to correct type. This creates the wrong example:\nexamples: List [ OrderedMap { \"value\": \"0\" } ]",
+      "revId": "5926aa9c20e9d71f24c412bd70b2df600f13356e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5a72202_39862e17",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 849,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-23T12:35:09Z",
+      "side": 1,
+      "message": "Number type was changed and should be resolved.",
+      "parentUuid": "1a1b4ff7_b8216a07",
       "revId": "5926aa9c20e9d71f24c412bd70b2df600f13356e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
