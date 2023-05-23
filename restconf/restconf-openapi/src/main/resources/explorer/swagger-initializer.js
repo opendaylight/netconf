@@ -46,7 +46,7 @@ window.onload = function() {
           }
         }
         document.getElementsByClassName("select-label")[0].style = "max-width: max-content; padding-left: 20px";
-        document.getElementById("select").style = "flex: 0"
+        document.getElementById("select").style = "flex: auto"
       },
       presets: [
         SwaggerUIBundle.presets.apis,
