@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "55009e96_9d689375",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-23T12:44:10Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/106131/3",
+      "parentUuid": "379531fa_81f19e72",
+      "revId": "b3cfc5b0c4294637d8ec1ed8bce3dcf1d6d18d78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c88c7e8_4cc1f3b9",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-05-22T15:40:19Z",
       "side": 1,
       "message": "Shouldn\u0027t be \"example\" set only when \"default\" value is not set?\nhttps://jira.opendaylight.org/browse/NETCONF-999",
+      "revId": "b3cfc5b0c4294637d8ec1ed8bce3dcf1d6d18d78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "258d7ffa_ca24a164",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 720,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-23T12:44:10Z",
+      "side": 1,
+      "message": "no 😄",
+      "parentUuid": "1c88c7e8_4cc1f3b9",
       "revId": "b3cfc5b0c4294637d8ec1ed8bce3dcf1d6d18d78",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
