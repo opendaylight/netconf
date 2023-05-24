@@ -46,6 +46,8 @@ public final class OpenApiGeneratorRFC8040Test {
     private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_config_mandatory-list";
     private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
     private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
+    private static final String TEST_AUGMENTATION_NAMESPACE = "urn:ietf:params:xml:ns:yang:test:augmentation";
+    private static final String TEST_MODULE_NAMESPACE = "urn:ietf:params:xml:ns:yang:test:module";
 
     private static EffectiveModelContext context;
     private static DOMSchemaService schemaService;
@@ -417,6 +419,52 @@ public final class OpenApiGeneratorRFC8040Test {
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
         assertEquals(44, definitions.size());
+    }
+
+    /**
+     * Test if "xml" nodes are added with correct namespace.
+     * We only want to see namespace when it's different from parent's namespace and with container/list node.
+     * The container and list nodes have namespaces because they often refer to other schema objects that can be invoked
+     * independently.
+     */
+    @Test
+    public void testXmlNodes() {
+        final var context1036 = YangParserTestUtils.parseYangResourceDirectory("/NETCONF-1036");
+        final var module = context1036.findModule("module").orElseThrow();
+        final var mockSchemaService = mock(DOMSchemaService.class);
+        when(mockSchemaService.getGlobalContext()).thenReturn(context1036);
+        final var generatorRFC8040 = new OpenApiGeneratorRFC8040(mockSchemaService);
+        final var doc = generatorRFC8040.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context1036);
+        assertNotNull(doc);
+
+        final var schemas = doc.components().schemas();
+        final var simpleList1 = schemas.get("module_root_simple-root_list-1");
+        assertEquals(TEST_AUGMENTATION_NAMESPACE, simpleList1.xml().path("namespace").asText());
+        assertTrue(simpleList1.properties().path("leaf-x").path("xml").isMissingNode());
+
+        final var simpleAbc = schemas.get("module_root_simple-root_abc");
+        assertEquals(TEST_AUGMENTATION_NAMESPACE, simpleAbc.xml().path("namespace").asText());
+        assertTrue(simpleAbc.properties().path("leaf-abc").path("xml").isMissingNode());
+
+        final var simple = schemas.get("module_root_simple-root");
+        assertEquals(TEST_MODULE_NAMESPACE, simple.xml().path("namespace").asText());
+        assertEquals(TEST_AUGMENTATION_NAMESPACE, simple.properties().path("leaf-y").path("xml")
+            .path("namespace").asText());
+        assertTrue(simple.properties().path("leaf-a").path("xml").isMissingNode());
+
+        final var topList1 = schemas.get("module_root_top-list_list-1");
+        assertEquals(TEST_AUGMENTATION_NAMESPACE, topList1.xml().path("namespace").asText());
+        assertTrue(topList1.properties().path("leaf-x").path("xml").isMissingNode());
+
+        final var topAbc = schemas.get("module_root_top-list_abc");
+        assertEquals(TEST_AUGMENTATION_NAMESPACE, topAbc.xml().path("namespace").asText());
+        assertTrue(topAbc.properties().path("leaf-abc").path("xml").isMissingNode());
+
+        final var top = schemas.get("module_root_top-list");
+        assertEquals(TEST_MODULE_NAMESPACE, top.xml().path("namespace").asText());
+        assertEquals(TEST_AUGMENTATION_NAMESPACE, top.properties().path("leaf-y").path("xml")
+            .path("namespace").asText());
+        assertTrue(top.properties().path("key-1").path("xml").isMissingNode());
     }
 
     /**
