@@ -375,4 +375,45 @@ public final class OpenApiGeneratorRFC8040Test {
         assertNotNull(postXmlRef);
         assertEquals(expectedXmlRef, postXmlRef.textValue());
     }
+
+    /**
+     * Test if "xml" nodes are added with correct namespace.
+     */
+    @Test
+    public void testXmlNodes() {
+        final var context1036 = YangParserTestUtils.parseYangResourceDirectory("/NETCONF-1036");
+        final var module = context1036.findModule("module").orElseThrow();
+        final var mockSchemaService = mock(DOMSchemaService.class);
+        when(mockSchemaService.getGlobalContext()).thenReturn(context1036);
+        final var generatorRFC8040 = new OpenApiGeneratorRFC8040(mockSchemaService);
+        final var doc = generatorRFC8040.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context1036);
+        assertNotNull(doc);
+
+        final var schemas = doc.getComponents().getSchemas();
+        final var simpleList1 = schemas.get("module_root_simple-root_list-1");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", simpleList1.getXml().get("namespace").asText());
+        assertNull(simpleList1.getProperties().get("leaf-x").get("xml"));
+
+        final var simpleAbc = schemas.get("module_root_simple-root_abc");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", simpleAbc.getXml().get("namespace").asText());
+        assertNull(simpleAbc.getProperties().get("leaf-abc").get("xml"));
+
+        final var simple = schemas.get("module_root_simple-root");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", simple.getProperties().get("leaf-y")
+                .get("xml").get("namespace").asText());
+        assertNull(simple.getProperties().get("leaf-a").get("xml"));
+
+        final var topList1 = schemas.get("module_root_top-list_list-1");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", topList1.getXml().get("namespace").asText());
+        assertNull(topList1.getProperties().get("leaf-x").get("xml"));
+
+        final var topAbc = schemas.get("module_root_top-list_abc");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", topAbc.getXml().get("namespace").asText());
+        assertNull(topAbc.getProperties().get("leaf-abc").get("xml"));
+
+        final var top = schemas.get("module_root_top-list");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", top.getProperties().get("leaf-y")
+                .get("xml").get("namespace").asText());
+        assertNull(top.getProperties().get("key-1").get("xml"));
+    }
 }

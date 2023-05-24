@@ -54,6 +54,7 @@ import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
@@ -444,10 +445,10 @@ public class DefinitionGenerator {
                     definitionNames);
 
         } else if (node instanceof AnyxmlSchemaNode anyxml) {
-            processAnyXMLNode(anyxml, name, properties, JsonNodeFactory.instance.arrayNode());
+            processAnyXMLNode(anyxml, name, properties, JsonNodeFactory.instance.arrayNode(), stack);
 
         } else if (node instanceof AnydataSchemaNode anydata) {
-            processAnydataNode(anydata, name, properties, JsonNodeFactory.instance.arrayNode());
+            processAnydataNode(anydata, name, properties, JsonNodeFactory.instance.arrayNode(), stack);
 
         } else {
 
@@ -539,14 +540,16 @@ public class DefinitionGenerator {
 
         processTypeDef(leafNode.getType(), leafNode, property, stack, definitions, definitionNames);
         properties.set(jsonLeafName, property);
-        property.set(XML_KEY, buildXmlParameter(leafNode));
+        if (isCurrentLeafAugmentedAndParentNot(stack.toSchemaNodeIdentifier())) {
+            property.set(XML_KEY, buildXmlParameter(leafNode));
+        }
         processMandatory(leafNode, jsonLeafName, required);
 
         return property;
     }
 
-    private static ObjectNode processAnydataNode(final AnydataSchemaNode leafNode, final String name,
-            final ObjectNode properties, final ArrayNode required) {
+    private ObjectNode processAnydataNode(final AnydataSchemaNode leafNode, final String name,
+            final ObjectNode properties, final ArrayNode required, final SchemaInferenceStack stack) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -555,15 +558,17 @@ public class DefinitionGenerator {
         final String localName = leafNode.getQName().getLocalName();
         setDefaultValue(property, String.format("<%s> ... </%s>", localName, localName));
         property.put(TYPE_KEY, STRING_TYPE);
-        property.set(XML_KEY, buildXmlParameter(leafNode));
+        if (isCurrentLeafAugmentedAndParentNot(stack.toSchemaNodeIdentifier())) {
+            property.set(XML_KEY, buildXmlParameter(leafNode));
+        }
         processMandatory(leafNode, name, required);
         properties.set(name, property);
 
         return property;
     }
 
-    private static ObjectNode processAnyXMLNode(final AnyxmlSchemaNode leafNode, final String name,
-            final ObjectNode properties, final ArrayNode required) {
+    private ObjectNode processAnyXMLNode(final AnyxmlSchemaNode leafNode, final String name,
+            final ObjectNode properties, final ArrayNode required, final SchemaInferenceStack stack) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -572,11 +577,28 @@ public class DefinitionGenerator {
         final String localName = leafNode.getQName().getLocalName();
         setDefaultValue(property, String.format("<%s> ... </%s>", localName, localName));
         property.put(TYPE_KEY, STRING_TYPE);
-        property.set(XML_KEY, buildXmlParameter(leafNode));
+        if (isCurrentLeafAugmentedAndParentNot(stack.toSchemaNodeIdentifier())) {
+            property.set(XML_KEY, buildXmlParameter(leafNode));
+        }
         processMandatory(leafNode, name, required);
         properties.set(name, property);
 
         return property;
+    }
+
+    private boolean isCurrentLeafAugmentedAndParentNot(final Absolute absolute) {
+        final var nodeIdentifiers = absolute.getNodeIdentifiers();
+        int identifierSize = nodeIdentifiers.size();
+        if (identifierSize > 2) {
+            final var parentNamespace = nodeIdentifiers.get(identifierSize - 2).getNamespace();
+            final var leafNamespace = nodeIdentifiers.get(identifierSize - 1).getNamespace();
+            return !leafNamespace.equals(parentNamespace);
+        } else if (identifierSize > 0) {
+            final var leafNamespace = nodeIdentifiers.get(identifierSize - 1).getNamespace();
+            return !topLevelModule.getQNameModule().getNamespace().equals(leafNamespace);
+        } else {
+            return true;
+        }
     }
 
     private String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
