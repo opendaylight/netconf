@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fb6bc10_ed31a10d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-24T15:08:24Z",
+      "side": 1,
+      "message": "Switch order for \"Signed-off-by\" and \"Change-Id\".\nPlease fix this in all commits",
+      "revId": "0df0564145820d6c698d409dec932e2907345e7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b5cfa072_e28cd19c",
@@ -14,6 +31,41 @@
       "writtenOn": "2023-05-24T12:05:32Z",
       "side": 1,
       "message": "failing build resolved here:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106131",
+      "revId": "0df0564145820d6c698d409dec932e2907345e7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ce66a65_4cd58683",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-24T15:08:24Z",
+      "side": 1,
+      "message": "Please cherry-pick the following changes from the testStringFromRegex() method into this commit.\nThey are not related to improving test but to \"Set example for string type\"",
+      "parentUuid": "b5cfa072_e28cd19c",
+      "revId": "0df0564145820d6c698d409dec932e2907345e7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ee4d82c_ae50a8a2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 829,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-24T15:08:24Z",
+      "side": 1,
+      "message": "Remove \"Some \" from default",
       "revId": "0df0564145820d6c698d409dec932e2907345e7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
