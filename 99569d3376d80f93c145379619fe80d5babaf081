@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "232f50ca_dc993470",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-24T20:58:21Z",
+      "side": 1,
+      "message": "I tried make it without changing .css but failed. Seems like styles for two elements that I tried edit applied after initialization by swagger-ui.css. Therefore my changes didn\u0027t go through.",
+      "revId": "99569d3376d80f93c145379619fe80d5babaf081",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
