@@ -1,0 +1,49 @@
+module augmentation {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:test:augmentation";
+  prefix "aug";
+  import module {
+    prefix mod;
+  }
+
+  grouping data-1 {
+    list list-1 {
+      key "leaf-x";
+      leaf leaf-x {
+        type string;
+      }
+    }
+  }
+
+  grouping data-2 {
+    container abc {
+      leaf leaf-abc {
+        type boolean;
+      }
+    }
+  }
+
+  augment "/mod:root/mod:simple-root" {
+    uses data-1;
+  }
+  augment "/mod:root/mod:simple-root" {
+    uses data-2;
+  }
+  augment "/mod:root/mod:simple-root" {
+    leaf leaf-y {
+      type string;
+    }
+  }
+
+  augment "/mod:root/mod:top-list" {
+    uses data-1;
+  }
+  augment "/mod:root/mod:top-list" {
+    uses data-2;
+  }
+  augment "/mod:root/mod:top-list" {
+    leaf leaf-y {
+      type string;
+    }
+  }
+}
