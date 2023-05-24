@@ -7,15 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.jaxrs;
 
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.ServletException;
-import org.opendaylight.aaa.web.ResourceDetails;
-import org.opendaylight.aaa.web.ServletDetails;
-import org.opendaylight.aaa.web.WebContext;
-import org.opendaylight.aaa.web.WebContextSecurer;
-import org.opendaylight.aaa.web.WebServer;
+import org.opendaylight.aaa.web.*;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -23,6 +15,13 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.servlet.ServletException;
+import javax.ws.rs.core.Application;
+import java.util.Set;
 
 /**
  * Initializes the wep app.
@@ -44,8 +43,13 @@ public final class WebInitializer implements AutoCloseable {
             .contextPath("/openapi")
             .supportsSessions(true)
             .addServlet(ServletDetails.builder()
-                .servlet(servletSupport.createHttpServletBuilder(new OpenApiApplication(openApiService)).build())
-                .addUrlPattern("/api/v3/*")
+                .servlet(servletSupport.createHttpServletBuilder(new Application() {
+                    @Override
+                    public Set<Object> getSingletons() {
+                        return Set.of(openApiService);
+                    }
+                }).build())
+            .addUrlPattern("/api/v3/*")
                 .build())
             .addResource(ResourceDetails.builder().name("/explorer").build());
 
