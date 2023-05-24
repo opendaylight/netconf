@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.AnydataSchemaNode;
@@ -213,7 +214,7 @@ public class DefinitionGenerator {
                         of processLeafNode).
                      */
                     processLeafNode((LeafSchemaNode) node, localName, properties, required, stack,
-                            definitions, definitionNames);
+                            definitions, definitionNames, module.getNamespace());
                 }
             }
             stack.exit();
@@ -447,7 +448,7 @@ public class DefinitionGenerator {
             final Map<String, Schema> definitions, final DefinitionNames definitionNames, final boolean isConfig,
             final SchemaInferenceStack stack, final ObjectNode properties, final ArrayNode required)
             throws IOException {
-
+        final XMLNamespace parentNamespace = stack.toSchemaNodeIdentifier().lastNodeIdentifier().getNamespace();
         stack.enterSchemaTree(node.getQName());
 
         /*
@@ -457,13 +458,13 @@ public class DefinitionGenerator {
         final String name = node.getQName().getLocalName();
 
         if (node instanceof LeafSchemaNode leaf) {
-            processLeafNode(leaf, name, properties, required, stack, definitions, definitionNames);
+            processLeafNode(leaf, name, properties, required, stack, definitions, definitionNames, parentNamespace);
 
         } else if (node instanceof AnyxmlSchemaNode anyxml) {
-            processAnyXMLNode(anyxml, name, properties, required);
+            processAnyXMLNode(anyxml, name, properties, required, parentNamespace);
 
         } else if (node instanceof AnydataSchemaNode anydata) {
-            processAnydataNode(anydata, name, properties, required);
+            processAnydataNode(anydata, name, properties, required, parentNamespace);
 
         } else {
 
@@ -547,7 +548,8 @@ public class DefinitionGenerator {
 
     private ObjectNode processLeafNode(final LeafSchemaNode leafNode, final String jsonLeafName,
             final ObjectNode properties, final ArrayNode required, final SchemaInferenceStack stack,
-            final Map<String, Schema> definitions, final DefinitionNames definitionNames) {
+            final Map<String, Schema> definitions, final DefinitionNames definitionNames,
+            final XMLNamespace parentNamespace) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -561,14 +563,17 @@ public class DefinitionGenerator {
 
         processTypeDef(leafNode.getType(), leafNode, property, stack, definitions, definitionNames);
         properties.set(jsonLeafName, property);
-        property.set(XML_KEY, buildXmlParameter(leafNode));
+        if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
+            // If the parent is not from the same model, define the child XML namespace.
+            property.set(XML_KEY, buildXmlParameter(leafNode));
+        }
         processMandatory(leafNode, jsonLeafName, required);
 
         return property;
     }
 
-    private static ObjectNode processAnydataNode(final AnydataSchemaNode leafNode, final String name,
-            final ObjectNode properties, final ArrayNode required) {
+    private ObjectNode processAnydataNode(final AnydataSchemaNode leafNode, final String name,
+            final ObjectNode properties, final ArrayNode required, final XMLNamespace parentNamespace) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -577,15 +582,18 @@ public class DefinitionGenerator {
         final String localName = leafNode.getQName().getLocalName();
         setDefaultValue(property, String.format("<%s> ... </%s>", localName, localName));
         property.put(TYPE_KEY, STRING_TYPE);
-        property.set(XML_KEY, buildXmlParameter(leafNode));
+        if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
+            // If the parent is not from the same model, define the child XML namespace.
+            property.set(XML_KEY, buildXmlParameter(leafNode));
+        }
         processMandatory(leafNode, name, required);
         properties.set(name, property);
 
         return property;
     }
 
-    private static ObjectNode processAnyXMLNode(final AnyxmlSchemaNode leafNode, final String name,
-            final ObjectNode properties, final ArrayNode required) {
+    private ObjectNode processAnyXMLNode(final AnyxmlSchemaNode leafNode, final String name,
+            final ObjectNode properties, final ArrayNode required, final XMLNamespace parentNamespace) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -594,7 +602,10 @@ public class DefinitionGenerator {
         final String localName = leafNode.getQName().getLocalName();
         setDefaultValue(property, String.format("<%s> ... </%s>", localName, localName));
         property.put(TYPE_KEY, STRING_TYPE);
-        property.set(XML_KEY, buildXmlParameter(leafNode));
+        if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
+            // If the parent is not from the same model, define the child XML namespace.
+            property.set(XML_KEY, buildXmlParameter(leafNode));
+        }
         processMandatory(leafNode, name, required);
         properties.set(name, property);
 
