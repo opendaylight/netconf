@@ -28,14 +28,22 @@ window.onload = function() {
         var topbar = document.getElementsByClassName('topbar-wrapper');
         var node2 = document.createElement("H2");
         var node = document.createElement("IMG");
+        var container = document.createElement("DIV");
+        var textNode = document.createElement("DIV");
         node.height = 40;
         node.src = 'logo_small.png';
-        node2.innerText = "OpenDaylight RestConf API Documentation";
+        textNode.innerText = "OpenDaylight RestConf API Documentation";
+        textNode.style="padding-top: 5px";
         node2.prepend(node);
+        node2.append(textNode);
         topbar[0].children[0].remove();
-        topbar[0].prepend(node2);
-        node.style = "padding-right: 18px;";
+        container.prepend(node2);
+        topbar[0].prepend(container);
+        node.style = "padding-right: 18px; float: left";
         topbar[0].children[0].style="color:white; display: contents;";
+        topbar.style="display: flex; flex-direction: column !important";
+        var formWrapper = document.getElementByClass('download-url-wrapper');
+        formWrapper.style="display:flex;flex:3;justify-content:flex-start !important";
 
         var modules = document.getElementsByClassName('opblock-tag-section')
         for(var i = 0; i < modules.length; i++) {
