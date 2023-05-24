@@ -1,0 +1,11 @@
+.swagger-ui .topbar .topbar-wrapper {
+    align-items: initial;
+    display: flex;
+    flex-direction: column !important;
+}
+
+.swagger-ui .topbar .download-url-wrapper {
+    display: flex;
+    flex: 3;
+    justify-content: flex-start !important;
+}
