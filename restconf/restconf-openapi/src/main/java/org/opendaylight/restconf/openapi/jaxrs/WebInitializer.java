@@ -41,7 +41,7 @@ public final class WebInitializer implements AutoCloseable {
                 throws ServletException {
         final var webContextBuilder = WebContext.builder()
             .name("OpenAPI")
-            .contextPath("/apidoc")
+            .contextPath("/openapi")
             .supportsSessions(true)
             .addServlet(ServletDetails.builder()
                 .servlet(servletSupport.createHttpServletBuilder(new OpenApiApplication(openApiService)).build())

@@ -1,10 +1,10 @@
 window.onload = function() {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", document.URL.split('/apidoc')[0] + "/apidoc/openapi3/apis/mounts", false);
+    xmlHttp.open("GET", document.URL.split('/openapi')[0] + "/openapi/openapi3/apis/mounts", false);
     xmlHttp.send( null );
 
-    var base_url_rfc = document.URL.split('/apidoc')[0] + '/apidoc/openapi3/apis/mounts/';
-    var swagger_urls = [{url: document.URL.split('/apidoc')[0] + "/apidoc/openapi3/apis/single", name: "Controller resources - RestConf RFC 8040"}];
+    var base_url_rfc = document.URL.split('/openapi')[0] + '/openapi/openapi3/apis/mounts/';
+    var swagger_urls = [{url: document.URL.split('/openapi')[0] + "/openapi/openapi3/apis/single", name: "Controller resources - RestConf RFC 8040"}];
     var devices = JSON.parse(xmlHttp.responseText);
     for (var i =0; i < devices.length; i++) {
       var device_name = devices[i]['instance'].split('=')[2].replace('/', '');
