@@ -35,7 +35,7 @@ window.onload = function() {
         topbar[0].children[0].remove();
         topbar[0].prepend(node2);
         node.style = "padding-right: 18px;";
-        topbar[0].children[0].style="color:white; display: contents;";
+        topbar[0].children[0].style="color:white;";
 
         var modules = document.getElementsByClassName('opblock-tag-section')
         for(var i = 0; i < modules.length; i++) {
