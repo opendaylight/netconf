@@ -16,6 +16,74 @@
       "message": "failing build resolved here:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106131",
       "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fecd04b8_ef549bda",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-24T15:08:37Z",
+      "side": 1,
+      "message": "Default is not  \"maybeLower\" value. Please Fix default values in this method.",
+      "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28f9e39e_021a9343",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 865,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-24T15:08:37Z",
+      "side": 1,
+      "message": "Long.valueOf(maybeLower.orElseThrow()). Fix it in all places in this method.",
+      "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "244c1a14_945af860",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-24T15:08:37Z",
+      "side": 1,
+      "message": "Please remove `0` and instead of use `\"0\"`",
+      "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19a53925_c7d3185b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-24T15:08:37Z",
+      "side": 1,
+      "message": "Missing default value.",
+      "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
