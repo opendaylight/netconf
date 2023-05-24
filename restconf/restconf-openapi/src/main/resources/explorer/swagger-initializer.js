@@ -27,8 +27,9 @@ window.onload = function() {
         var wrappers = document.getElementsByClassName('wrapper');
         var topbar = document.getElementsByClassName('topbar-wrapper');
         var node2 = document.createElement("H2");
-        var node = document.createElement("IMG");
+        var node = document.createElement("IMG")
         node.height = 40;
+        node.width = 58;
         node.src = 'logo_small.png';
         node2.innerText = "OpenDaylight RestConf API Documentation";
         node2.prepend(node);
