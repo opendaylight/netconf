@@ -7,10 +7,12 @@
  */
 package org.opendaylight.restconf.openapi.jaxrs;
 
+import java.util.Set;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
+import javax.ws.rs.core.Application;
 import org.opendaylight.aaa.web.ResourceDetails;
 import org.opendaylight.aaa.web.ServletDetails;
 import org.opendaylight.aaa.web.WebContext;
@@ -44,8 +46,13 @@ public final class WebInitializer implements AutoCloseable {
             .contextPath("/openapi")
             .supportsSessions(true)
             .addServlet(ServletDetails.builder()
-                .servlet(servletSupport.createHttpServletBuilder(new OpenApiApplication(openApiService)).build())
-                .addUrlPattern("/api/v3/*")
+                .servlet(servletSupport.createHttpServletBuilder(new Application() {
+                    @Override
+                    public Set<Object> getSingletons() {
+                        return Set.of(openApiService);
+                    }
+                }).build())
+            .addUrlPattern("/api/v3/*")
                 .build())
             .addResource(ResourceDetails.builder().name("/explorer").build());
 
