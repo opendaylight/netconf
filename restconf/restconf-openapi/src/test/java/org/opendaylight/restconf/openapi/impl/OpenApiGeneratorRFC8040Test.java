@@ -10,19 +10,24 @@ package org.opendaylight.restconf.openapi.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.Test;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.AbstractOpenApiTest;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
     private static final String NAME = "toaster2";
@@ -216,5 +221,47 @@ public final class OpenApiGeneratorRFC8040Test extends AbstractOpenApiTest {
             assertFalse(patch.isMissingNode());
             assertEquals(expectedSize, patch.get("parameters").size());
         }
+    }
+
+    /**
+     * Test if "xml" nodes are added with correct namespace.
+     */
+    @Test
+    public void testXmlNodes() {
+        final var context = YangParserTestUtils.parseYangResourceDirectory("/NETCONF-1036");
+        final var module = context.findModule("module").orElseThrow();
+        final var mockSchemaService = mock(DOMSchemaService.class);
+        when(mockSchemaService.getGlobalContext()).thenReturn(context);
+        final var generatorRFC8040 = new OpenApiGeneratorRFC8040(mockSchemaService);
+        final var doc = generatorRFC8040.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        assertNotNull(doc);
+
+        final Map<String, Schema> schemas = doc.getComponents().getSchemas();
+        final var simpleList1 = schemas.get("module_root_simple-root_list-1");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", simpleList1.getXml().get("namespace").asText());
+        assertNull(simpleList1.getProperties().get("leaf-x").get("xml"));
+
+        final var simpleAbc = schemas.get("module_root_simple-root_abc");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", simpleAbc.getXml().get("namespace").asText());
+        assertNull(simpleAbc.getProperties().get("leaf-abc").get("xml"));
+
+        final var simple = schemas.get("module_root_simple-root");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", simple.getProperties().get("leaf-y")
+                .get("xml").get("namespace").asText());
+        assertNull(simple.getProperties().get("leaf-a").get("xml"));
+
+
+        final var topList1 = schemas.get("module_root_top-list_list-1");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", topList1.getXml().get("namespace").asText());
+        assertNull(topList1.getProperties().get("leaf-x").get("xml"));
+
+        final var topAbc = schemas.get("module_root_top-list_abc");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", topAbc.getXml().get("namespace").asText());
+        assertNull(topAbc.getProperties().get("leaf-abc").get("xml"));
+
+        final var top = schemas.get("module_root_top-list");
+        assertEquals("urn:ietf:params:xml:ns:yang:test:augmentation", top.getProperties().get("leaf-y")
+                .get("xml").get("namespace").asText());
+        assertNull(top.getProperties().get("key-1").get("xml"));
     }
 }
