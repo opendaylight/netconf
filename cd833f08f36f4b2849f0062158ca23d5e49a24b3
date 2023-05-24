@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1052a177_dd8d5695",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-24T12:05:45Z",
+      "side": 1,
+      "message": "failing build resolved here:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106131",
+      "revId": "cd833f08f36f4b2849f0062158ca23d5e49a24b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
