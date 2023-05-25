@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60bb1606_d8f0fb79",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MountPointEndToEndTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T06:45:34Z",
+      "side": 1,
+      "message": "Usually we do not need to mock Future(s).",
+      "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
