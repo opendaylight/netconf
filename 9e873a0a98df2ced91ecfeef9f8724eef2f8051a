@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1bdbb98d_a28fce49",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T12:42:50Z",
+      "side": 1,
+      "message": "No, its not 😄",
+      "parentUuid": "fce234ab_667e6734",
+      "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5cdacc45_79628dc2",
         "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologySingletonImpl.java",
         "patchSetId": 27
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a0945c9a_762059fd",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologySingletonImpl.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T12:42:50Z",
+      "side": 1,
+      "message": "The `setMaster(fasle)` part is no more valid.",
+      "parentUuid": "5cdacc45_79628dc2",
+      "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "60bb1606_d8f0fb79",
         "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MountPointEndToEndTest.java",
         "patchSetId": 27
@@ -48,6 +84,24 @@
       "writtenOn": "2023-05-25T06:45:34Z",
       "side": 1,
       "message": "Usually we do not need to mock Future(s).",
+      "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb56ceb2_b6d87d77",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MountPointEndToEndTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T12:42:50Z",
+      "side": 1,
+      "message": "OK, in this case we have no other option.",
+      "parentUuid": "60bb1606_d8f0fb79",
       "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
