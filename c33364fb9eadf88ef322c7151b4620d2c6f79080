@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd3b9eab_1248422f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-25T14:09:16Z",
+      "side": 1,
+      "message": "Rebase pls",
+      "revId": "c33364fb9eadf88ef322c7151b4620d2c6f79080",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc860e79_89d35114",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-25T14:09:16Z",
+      "side": 1,
+      "message": "missing space before \" should...\"",
+      "range": {
+        "startLine": 285,
+        "startChar": 48,
+        "endLine": 285,
+        "endChar": 52
+      },
+      "revId": "c33364fb9eadf88ef322c7151b4620d2c6f79080",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
