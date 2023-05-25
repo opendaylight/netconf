@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab3d1044_4df9095d",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/my-yang@2022-10-06.yang",
+        "patchSetId": 19
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-25T16:41:26Z",
+      "side": 1,
+      "message": "Use either tab(4 spaces) or just 2 spaces - don\u0027t mix them",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 1
+      },
+      "revId": "e8059782bdd9ac84eb42bcd8a0e49a0925ddeae3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
