@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "154c9992_c7d2ba5d",
+        "filename": "docs/conf.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T06:12:19Z",
+      "side": 1,
+      "message": "Probably we can use netconf versions here.",
+      "revId": "6f8422efaa983353b815b4ea2dd4abd3045f64d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
