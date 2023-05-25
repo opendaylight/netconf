@@ -16,6 +16,24 @@
       "message": "Where we have path for cont2?",
       "revId": "86b976ce643b5dce528567f9f825007e65e67042",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13c0db83_5974e669",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-25T07:53:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f0909fe_723ce707",
+      "revId": "86b976ce643b5dce528567f9f825007e65e67042",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
