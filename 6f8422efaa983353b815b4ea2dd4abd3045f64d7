@@ -16,6 +16,24 @@
       "message": "Probably we can use netconf versions here.",
       "revId": "6f8422efaa983353b815b4ea2dd4abd3045f64d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10cb4884_05223542",
+        "filename": "docs/conf.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T11:37:40Z",
+      "side": 1,
+      "message": "Lets align versions wit distro for now.",
+      "parentUuid": "154c9992_c7d2ba5d",
+      "revId": "6f8422efaa983353b815b4ea2dd4abd3045f64d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
