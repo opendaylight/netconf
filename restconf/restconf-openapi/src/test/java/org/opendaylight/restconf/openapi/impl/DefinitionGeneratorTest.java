@@ -56,6 +56,67 @@ public final class DefinitionGeneratorTest {
     }
 
     @Test
+    public void testEnumType() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final DefinitionGenerator generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(jsonObject);
+
+        var properties = jsonObject.get("definition-test_enum-container").properties();
+        assertEquals("up", properties.get("status").get("default").asText());
+    }
+
+    @Test
+    public void testUnionTypes() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final DefinitionGenerator generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(jsonObject);
+
+        var properties = jsonObject.get("definition-test_union-container").properties();
+        assertEquals("5", properties.get("testUnion1").get("default").asText());
+        assertEquals("false", properties.get("testUnion2").get("default").asText());
+    }
+
+    @Test
+    public void testBinaryType() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final DefinitionGenerator generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(jsonObject);
+
+        var properties = jsonObject.get("definition-test_binary-container").properties();
+        assertEquals("SGVsbG8gdGVzdCE=", properties.get("binary-data").get("default").asText());
+    }
+
+    @Test
+    public void testBooleanType() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final DefinitionGenerator generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(jsonObject);
+
+        var properties = jsonObject.get("definition-test_union-container").properties();
+        assertEquals("true", properties.get("testBoolean").get("default").asText());
+    }
+
+    @Test
+    public void testNumberType() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final DefinitionGenerator generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(jsonObject);
+
+        var properties = jsonObject.get("definition-test_number-container").properties();
+        assertEquals("42", properties.get("testInteger").get("default").asText());
+        assertEquals("42", properties.get("testInt64").get("default").asText());
+        assertEquals("42", properties.get("testUint64").get("default").asText());
+        assertEquals("100", properties.get("testUnsignedInteger").get("default").asText());
+        assertEquals("3.14", properties.get("testDecimal").get("default").asText());
+        assertEquals("3.14159265359", properties.get("testDouble").get("default").asText());
+    }
+
+    @Test
     public void testStringFromRegex() throws IOException {
         final var module = context.findModule("strings-from-regex").orElseThrow();
         final var generator = new DefinitionGenerator();
@@ -66,5 +127,7 @@ public final class DefinitionGeneratorTest {
         assertEquals("00:00:00:00:00:00", properties.get("mac-address").get("example").asText());
         assertEquals("0000-00-00T00:00:00Z", properties.get("login-date-time").get("example").asText());
         assertEquals("0.0.0.0", properties.get("ipv4-address").get("example").asText());
+
+        assertEquals("ab:cd:ef:12:34:56", properties.get("mac-address").get("default").asText());
     }
 }
