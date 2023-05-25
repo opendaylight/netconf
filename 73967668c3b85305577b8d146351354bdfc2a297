@@ -16,6 +16,24 @@
       "message": "What is the change here? I would prefer manipulation done in javascript and leave this intact.",
       "revId": "73967668c3b85305577b8d146351354bdfc2a297",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c03d8d9_0d8398e3",
+        "filename": "restconf/restconf-openapi/src/main/resources/explorer/swagger-ui.css",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-25T09:12:18Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "80b8720e_f7f6600f",
+      "revId": "73967668c3b85305577b8d146351354bdfc2a297",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
