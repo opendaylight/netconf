@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80b8720e_f7f6600f",
+        "filename": "restconf/restconf-openapi/src/main/resources/explorer/swagger-ui.css",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T07:46:31Z",
+      "side": 0,
+      "message": "What is the change here? I would prefer manipulation done in javascript and leave this intact.",
+      "revId": "73967668c3b85305577b8d146351354bdfc2a297",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
