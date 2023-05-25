@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37dbc443_04310e68",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T13:22:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1bdbb98d_a28fce49",
+      "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cdacc45_79628dc2",
@@ -71,6 +89,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ab82d5b_1d7f0336",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologySingletonImpl.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T13:22:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0945c9a_762059fd",
+      "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "60bb1606_d8f0fb79",
@@ -102,6 +138,24 @@
       "side": 1,
       "message": "OK, in this case we have no other option.",
       "parentUuid": "60bb1606_d8f0fb79",
+      "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "190fd1de_0281e719",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MountPointEndToEndTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T13:22:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb56ceb2_b6d87d77",
       "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
