@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -53,6 +54,79 @@ public final class DefinitionGeneratorTest {
         final DefinitionGenerator generator = new DefinitionGenerator();
         final var schemas = generator.convertToSchemas(module, context, new DefinitionNames(), true);
         assertNotNull(schemas);
+    }
+
+    @Test
+    public void testEnumType() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final var schemas = new DefinitionGenerator().convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(schemas);
+
+        final var properties = schemas.get("definition-test_enum-container").properties();
+        assertEquals("up", properties.get("status").get("default").asText());
+    }
+
+    @Test
+    public void testUnionTypes() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final var schemas = new DefinitionGenerator().convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(schemas);
+
+        final var properties = schemas.get("definition-test_union-container").properties();
+        assertEquals("5", properties.get("testUnion1").get("default").asText());
+        assertEquals("false", properties.get("testUnion2").get("default").asText());
+    }
+
+    @Test
+    public void testBinaryType() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final var schemas = new DefinitionGenerator().convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(schemas);
+
+        final var properties = schemas.get("definition-test_binary-container").properties();
+        assertEquals("SGVsbG8gdGVzdCE=", properties.get("binary-data").get("default").asText());
+    }
+
+    @Test
+    public void testBooleanType() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final var schemas = new DefinitionGenerator().convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(schemas);
+
+        final var properties = schemas.get("definition-test_union-container").properties();
+        assertEquals(true, properties.get("testBoolean").get("default").asBoolean());
+        assertEquals(true, properties.get("testBoolean").get("example").asBoolean());
+    }
+
+    @Test
+    public void testNumberType() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final var schemas = new DefinitionGenerator().convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(schemas);
+
+        final var properties = schemas.get("definition-test_number-container").properties();
+        assertEquals(42L, properties.get("testInteger").get("default").asInt());
+        assertEquals(42L, properties.get("testInt64").get("default").asInt());
+        assertEquals(BigDecimal.valueOf(42), properties.get("testUint64").get("default").decimalValue());
+        assertEquals(100L, properties.get("testUnsignedInteger").get("default").asInt());
+        assertEquals(BigDecimal.valueOf(3.14), properties.get("testDecimal").get("default").decimalValue());
+        assertEquals(BigDecimal.valueOf(3.14159265359), properties.get("testDouble").get("default").decimalValue());
+    }
+
+    @Test
+    public void testInstanceIdentifierType() throws IOException {
+        final var module = context.findModule("definition-test").orElseThrow();
+        final var schemas = new DefinitionGenerator().convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(schemas);
+
+        final var properties = schemas.get("definition-test_network-container").properties();
+        final var networkRef = properties.get("network-ref");
+
+        assertNotNull(networkRef);
+        assertEquals("string", networkRef.get("type").asText());
+
+        assertEquals("/network/nodes[node-id='node1']", networkRef.get("default").asText());
+        assertEquals("/sample:binary-container", networkRef.get("example").asText());
     }
 
     @Test
