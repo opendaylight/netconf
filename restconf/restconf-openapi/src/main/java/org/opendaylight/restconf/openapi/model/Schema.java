@@ -9,6 +9,7 @@ package org.opendaylight.restconf.openapi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -22,6 +23,7 @@ public class Schema {
     private ObjectNode properties;
     private ObjectNode xml;
     private String description;
+    @JsonProperty("$ref")
     private String ref;
     private String title;
     private String type;
