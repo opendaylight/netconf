@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd655ff7_5d1dc224",
+        "filename": "restconf/restconf-openapi/src/main/resources/explorer/swagger-initializer.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T07:42:45Z",
+      "side": 1,
+      "message": "http://localhost:8181/apidoc/openapi3/apis/mounts/1 becomes http://localhost:8181/openapi/api/v3/mounts/1",
+      "revId": "98c8130cc5f49d6839b1856146d99b667b4d8fb5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
