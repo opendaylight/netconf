@@ -1,0 +1,84 @@
+module definition-test {
+  namespace "urn:definition-test";
+  prefix sample;
+
+  container binary-container {
+    leaf binary-data {
+      type binary;
+      default "SGVsbG8gdGVzdCE=";
+    }
+  }
+
+  container union-container {
+    leaf testUnion1 {
+      type union {
+        type int32;
+        type string;
+      }
+      default 5;
+    }
+
+    leaf testUnion2 {
+      type union {
+        type string;
+        type boolean;
+      }
+      default false;
+    }
+
+    leaf testBoolean {
+      type boolean;
+      default true;
+    }
+  }
+
+  container number-container {
+    leaf testInteger {
+      type int32;
+      default 42;
+    }
+
+    leaf testUnsignedInteger {
+      type uint16;
+      default 100;
+    }
+
+    leaf testDecimal {
+      type decimal64 {
+        fraction-digits 2;
+      }
+      default 3.14;
+    }
+
+    leaf testDouble {
+      type decimal64 {
+        fraction-digits 11;
+      }
+      default 3.14159265359;
+    }
+
+    leaf testInt64 {
+      type int64;
+      default 42;
+    }
+
+    leaf testUint64 {
+      type uint64;
+      default 42;
+    }
+  }
+
+  container enum-container {
+    leaf status {
+      type enumeration {
+        enum up {
+          value 1;
+        }
+        enum down {
+          value 2;
+        }
+      }
+      default "up";
+    }
+  }
+}
