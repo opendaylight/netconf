@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fce234ab_667e6734",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T07:20:12Z",
+      "side": 1,
+      "message": "This is juts one line method.",
+      "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cdacc45_79628dc2",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologySingletonImpl.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-25T07:20:12Z",
+      "side": 1,
+      "message": "if (masterSalFacade !\u003d null) {\n            // was leader before\n            masterSalFacade.setMaster(false);\n        }\n        if (masterActorRef !\u003d null) {\n            // was leader before\n            setup.getActorSystem().stop(masterActorRef);\n        }\n        disconnectNode(setup.getNode().getNodeId());\n        registerNodeManager();",
+      "revId": "9e873a0a98df2ced91ecfeef9f8724eef2f8051a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "60bb1606_d8f0fb79",
         "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MountPointEndToEndTest.java",
         "patchSetId": 27
