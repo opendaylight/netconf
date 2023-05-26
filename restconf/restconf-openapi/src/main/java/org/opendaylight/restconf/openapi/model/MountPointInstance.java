@@ -12,21 +12,33 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.Map;
 
 @JsonInclude(Include.NON_NULL)
-public class MountPointInstance {
-    private final String instance;
-    private final Long id;
+public record MountPointInstance(String instance, Long id) {
 
-    public MountPointInstance(Map.Entry<String, Long> entry) {
-        this.instance = entry.getKey();
-        this.id = entry.getValue();
+    private MountPointInstance(final Builder builder) {
+        this(builder.instance, builder.id);
     }
 
-    public String getInstance() {
-        return instance;
-    }
+    public static class Builder {
+        private String instance;
+        private Long id;
 
-    public Long getId() {
-        return id;
-    }
+        public Builder(Map.Entry<String, Long> entry) {
+            this.instance = entry.getKey();
+            this.id = entry.getValue();
+        }
 
+        public Builder setInstance(String instance) {
+            this.instance = instance;
+            return this;
+        }
+
+        public Builder setId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public MountPointInstance build() {
+            return new MountPointInstance(this);
+        }
+    }
 }

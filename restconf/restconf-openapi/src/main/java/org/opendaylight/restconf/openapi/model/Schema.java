@@ -14,105 +14,85 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @JsonInclude(value = Include.NON_NULL)
-public class Schema {
-    private ArrayNode schemaEnum;
-    private ArrayNode required;
-    private ObjectNode discriminator;
-    private ObjectNode examples;
-    private ObjectNode externalDocs;
-    private ObjectNode properties;
-    private ObjectNode xml;
-    private String description;
-    @JsonProperty("$ref")
-    private String ref;
-    private String title;
-    private String type;
+public record Schema(ArrayNode schemaEnum, ArrayNode required, ObjectNode discriminator, ObjectNode examples,
+    ObjectNode externalDocs, ObjectNode properties, ObjectNode xml, String description,
+    @JsonProperty("$ref") String ref, String title, String type) {
 
-    public ObjectNode getDiscriminator() {
-        return discriminator;
+    private Schema(final Builder builder) {
+        this(builder.schemaEnum, builder.required, builder.discriminator, builder.examples, builder.externalDocs,
+                builder.properties, builder.xml, builder.description, builder.ref, builder.title, builder.type);
     }
 
-    public void setDiscriminator(ObjectNode discriminator) {
-        this.discriminator = discriminator;
-    }
+    public static class Builder {
+        private ArrayNode schemaEnum;
+        private ArrayNode required;
+        private ObjectNode discriminator;
+        private ObjectNode examples;
+        private ObjectNode externalDocs;
+        private ObjectNode properties;
+        private ObjectNode xml;
+        private String description;
+        private String ref;
+        private String title;
+        private String type;
 
-    public ObjectNode getXml() {
-        return xml;
-    }
+        public Builder setSchemaEnum(final ArrayNode schemaEnum) {
+            this.schemaEnum = schemaEnum;
+            return this;
+        }
 
-    public void setXml(ObjectNode xml) {
-        this.xml = xml;
-    }
+        public Builder setRequired(final ArrayNode required) {
+            this.required = required;
+            return this;
+        }
 
-    public ObjectNode getExternalDocs() {
-        return externalDocs;
-    }
+        public Builder setDiscriminator(final ObjectNode discriminator) {
+            this.discriminator = discriminator;
+            return this;
+        }
 
-    public void setExternalDocs(ObjectNode externalDocs) {
-        this.externalDocs = externalDocs;
-    }
+        public Builder setExamples(final ObjectNode examples) {
+            this.examples = examples;
+            return this;
+        }
 
-    public ObjectNode getExamples() {
-        return examples;
-    }
+        public Builder setExternalDocs(final ObjectNode externalDocs) {
+            this.externalDocs = externalDocs;
+            return this;
+        }
 
-    public void setExamples(ObjectNode examples) {
-        this.examples = examples;
-    }
+        public Builder setProperties(final ObjectNode properties) {
+            this.properties = properties;
+            return this;
+        }
 
-    public ObjectNode getProperties() {
-        return properties;
-    }
+        public Builder setXml(final ObjectNode xml) {
+            this.xml = xml;
+            return this;
+        }
 
-    public void setProperties(ObjectNode properties) {
-        this.properties = properties;
-    }
+        public Builder setDescription(final String description) {
+            this.description = description;
+            return this;
+        }
 
-    public String getTitle() {
-        return title;
-    }
+        public Builder setRef(final String ref) {
+            this.ref = ref;
+            return this;
+        }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+        public Builder setTitle(final String title) {
+            this.title = title;
+            return this;
+        }
 
-    public String getType() {
-        return type;
-    }
+        public Builder setType(final String type) {
+            this.type = type;
+            return this;
+        }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public ArrayNode getRequired() {
-        return required;
-    }
-
-    public void setRequired(ArrayNode required) {
-        this.required = required;
-    }
-
-    public String getRef() {
-        return ref;
-    }
-
-    public void setRef(String ref) {
-        this.ref = ref;
-    }
-
-    public ArrayNode getEnum() {
-        return schemaEnum;
-    }
-
-    public void setEnum(ArrayNode enumKey) {
-        this.schemaEnum = enumKey;
+        public Schema build() {
+            return new Schema(this);
+        }
     }
 }
