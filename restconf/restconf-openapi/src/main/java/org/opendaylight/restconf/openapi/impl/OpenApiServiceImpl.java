@@ -104,7 +104,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public synchronized Response getListOfMounts(final UriInfo uriInfo) {
         final List<MountPointInstance> entity = mountPointOpenApiRFC8040
                 .getInstanceIdentifiers().entrySet().stream()
-                .map(MountPointInstance::new).collect(Collectors.toList());
+                .map(entry -> new MountPointInstance(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
         return Response.ok(entity).build();
     }
 
