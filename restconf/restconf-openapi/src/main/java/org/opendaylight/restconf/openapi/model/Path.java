@@ -13,118 +13,92 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @JsonInclude(Include.NON_NULL)
-public class Path {
-    @JsonProperty("$ref")
-    private String ref;
-    private String summary;
-    private String description;
-    private ObjectNode get;
-    private ObjectNode put;
-    private ObjectNode post;
-    private ObjectNode delete;
-    private ObjectNode options;
-    private ObjectNode head;
-    private ObjectNode patch;
-    private ObjectNode trace;
-    private ObjectNode servers;
+public record Path(@JsonProperty("$ref") String ref, String summary, String description, ObjectNode get,
+        ObjectNode put, ObjectNode post, ObjectNode delete, ObjectNode options, ObjectNode head, ObjectNode patch,
+        ObjectNode trace, ObjectNode servers) {
 
-    public Path() {
-        // just for fasterxml
+    private Path(final Builder builder) {
+        this(builder.ref, builder.summary, builder.description, builder.get, builder.put, builder.post,
+            builder.delete, builder.options, builder.head, builder.patch, builder.trace, builder.servers);
     }
 
-    public String getRef() {
-        return ref;
-    }
+    @SuppressWarnings("checkstyle:hiddenField")
+    public static class Builder {
+        private String ref;
+        private String summary;
+        private String description;
+        private ObjectNode get;
+        private ObjectNode put;
+        private ObjectNode post;
+        private ObjectNode delete;
+        private ObjectNode options;
+        private ObjectNode head;
+        private ObjectNode patch;
+        private ObjectNode trace;
+        private ObjectNode servers;
 
-    public void setRef(String ref) {
-        this.ref = ref;
-    }
+        public Builder ref(final String ref) {
+            this.ref = ref;
+            return this;
+        }
 
-    public String getSummary() {
-        return summary;
-    }
+        public Builder summary(final String summary) {
+            this.summary = summary;
+            return this;
+        }
 
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
+        public Builder description(final String description) {
+            this.description = description;
+            return this;
+        }
 
-    public String getDescription() {
-        return description;
-    }
+        public Builder get(final ObjectNode get) {
+            this.get = get;
+            return this;
+        }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+        public Builder put(final ObjectNode put) {
+            this.put = put;
+            return this;
+        }
 
-    public ObjectNode getGet() {
-        return get;
-    }
+        public Builder post(final ObjectNode post) {
+            this.post = post;
+            return this;
+        }
 
-    public void setGet(ObjectNode get) {
-        this.get = get;
-    }
+        public Builder delete(final ObjectNode delete) {
+            this.delete = delete;
+            return this;
+        }
 
-    public ObjectNode getPut() {
-        return put;
-    }
+        public Builder options(final ObjectNode options) {
+            this.options = options;
+            return this;
+        }
 
-    public void setPut(ObjectNode put) {
-        this.put = put;
-    }
+        public Builder head(final ObjectNode head) {
+            this.head = head;
+            return this;
+        }
 
-    public ObjectNode getPost() {
-        return post;
-    }
+        public Builder patch(final ObjectNode patch) {
+            this.patch = patch;
+            return this;
+        }
 
-    public void setPost(ObjectNode post) {
-        this.post = post;
-    }
+        public Builder trace(final ObjectNode trace) {
+            this.trace = trace;
+            return this;
+        }
 
-    public ObjectNode getDelete() {
-        return delete;
-    }
+        public Builder servers(final ObjectNode servers) {
+            this.servers = servers;
+            return this;
+        }
 
-    public void setDelete(ObjectNode delete) {
-        this.delete = delete;
-    }
-
-    public ObjectNode getOptions() {
-        return options;
-    }
-
-    public void setOptions(ObjectNode options) {
-        this.options = options;
-    }
-
-    public ObjectNode getHead() {
-        return head;
-    }
-
-    public void setHead(ObjectNode head) {
-        this.head = head;
-    }
-
-    public ObjectNode getPatch() {
-        return patch;
-    }
-
-    public void setPatch(ObjectNode patch) {
-        this.patch = patch;
-    }
-
-    public ObjectNode getTrace() {
-        return trace;
-    }
-
-    public void setTrace(ObjectNode trace) {
-        this.trace = trace;
-    }
-
-    public ObjectNode getServers() {
-        return servers;
-    }
-
-    public void setServers(ObjectNode servers) {
-        this.servers = servers;
+        public Path build() {
+            return new Path(this);
+        }
     }
 }
