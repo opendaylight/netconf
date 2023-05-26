@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a03f7e8_70e48505",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-26T15:06:52Z",
+      "side": 1,
+      "message": "These overloaded \"getAllModulesDoc\" methods have a lot of duplicated code. Could you please replace them with:\n```\n    public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final Range\u003cInteger\u003e range,\n            final EffectiveModelContext schemaContext, final String deviceName, final String context,\n            final DefinitionNames definitionNames) {\n        final SortedSet\u003cModule\u003e sortedModules \u003d getSortedModules(schemaContext);\n        final Set\u003cModule\u003e filteredModules \u003d filterByRange(sortedModules, range);\n        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, filteredModules);\n    }\n\n    public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,\n            final String deviceName, final String context, final DefinitionNames definitionNames) {\n        final SortedSet\u003cModule\u003e sortedModules \u003d getSortedModules(schemaContext);\n        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, sortedModules);\n    }\n\n    private OpenApiObject getFilledDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,\n            final String deviceName, final String context, final DefinitionNames definitionNames,\n            final Set\u003cModule\u003e sortedModules) {\n        final OpenApiObject doc \u003d createOpenApiObject(createSchemaFromUriInfo(uriInfo), createHostFromUriInfo(uriInfo),\n                BASE_PATH, deviceName + \" modules of RESTCONF\");\n        doc.setPaths(new HashMap\u003c\u003e());\n        fillDoc(doc, sortedModules, schemaContext, context, deviceName, definitionNames);\n        return doc;\n    }\n```\n\nPlease remember to move the private method below the public methods.",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a15fe74a_28dfcdec",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-26T15:06:52Z",
+      "side": 1,
+      "message": "Missing @Nullable for deviceName parameter.",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "baee8170_0d46b6af",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-26T15:06:52Z",
+      "side": 1,
+      "message": "Missing @Nullable for deviceName parameter.",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8094a1e4_8a572d7b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorRFC8040.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-26T15:06:52Z",
+      "side": 1,
+      "message": "The inherited methods have the @NonNull annotation on this parameter. It is likely that it should be added here as well.",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f901cddb_3ff48f05",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorRFC8040.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-26T15:06:52Z",
+      "side": 1,
+      "message": "The inherited method have the @NonNull annotation on parameters. It is likely that it should be added here as well.",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c91b8848_4e58add4",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-26T15:06:52Z",
+      "side": 1,
+      "message": "Revert this unnecessary change.",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6149d6c0_a7012e02",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-26T15:06:52Z",
+      "side": 1,
+      "message": "Revert this unnecessary change.",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "357b72bd_b5fe5193",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-26T15:06:52Z",
+      "side": 1,
+      "message": "This method is only used once. Please remove it and replace this line with:\n`return httpMethod + SUMMARY_SEPARATOR + moduleName + SUMMARY_SEPARATOR + nodeName;`",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faf73a2c_3e82c29f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-05-26T15:06:52Z",
+      "side": 1,
+      "message": "This method is only used once. Please remove it and replace this line with:\n`JsonNodeFactory.instance.arrayNode().add(\"controller\" + \" \" + moduleName);`",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
