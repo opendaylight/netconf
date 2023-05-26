@@ -71,7 +71,7 @@ public final class OpenApiGeneratorRFC8040Test {
             "/rests/operations/toaster2:make-toast",
             "/rests/operations/toaster2:cancel-toast",
             "/rests/operations/toaster2:restock-toaster"),
-            doc.getPaths().keySet());
+            doc.paths().keySet());
     }
 
     /**
@@ -89,12 +89,12 @@ public final class OpenApiGeneratorRFC8040Test {
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
         for (final String path : configPaths) {
-            final Path node = doc.getPaths().get(path);
-            assertNotNull(node.getGet());
-            assertNotNull(node.getPut());
-            assertNotNull(node.getDelete());
-            assertNotNull(node.getPost());
-            assertNotNull(node.getPatch());
+            final Path node = doc.paths().get(path);
+            assertNotNull(node.get());
+            assertNotNull(node.put());
+            assertNotNull(node.delete());
+            assertNotNull(node.post());
+            assertNotNull(node.patch());
         }
     }
 
@@ -106,7 +106,7 @@ public final class OpenApiGeneratorRFC8040Test {
         final var module = context.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
-        final Map<String, Schema> schemas = doc.getComponents().getSchemas();
+        final Map<String, Schema> schemas = doc.components().schemas();
         assertNotNull(schemas);
 
         final Schema configLstTop = schemas.get("toaster2_config_lst_TOP");
@@ -162,13 +162,13 @@ public final class OpenApiGeneratorRFC8040Test {
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
         assertNotNull(doc);
 
-        final Map<String, Schema> schemas = doc.getComponents().getSchemas();
+        final Map<String, Schema> schemas = doc.components().schemas();
         final Schema inputTop = schemas.get("toaster_make-toast_input_TOP");
         assertNotNull(inputTop);
         final String testString = "{\"input\":{\"$ref\":\"#/components/schemas/toaster_make-toast_input\"}}";
-        assertEquals(testString, inputTop.getProperties().toString());
+        assertEquals(testString, inputTop.properties().toString());
         final Schema input = schemas.get("toaster_make-toast_input");
-        final JsonNode properties = input.getProperties();
+        final JsonNode properties = input.properties();
         assertTrue(properties.has("toasterDoneness"));
         assertTrue(properties.has("toasterToastType"));
     }
@@ -179,15 +179,15 @@ public final class OpenApiGeneratorRFC8040Test {
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
         assertNotNull(doc);
 
-        final var schemas = doc.getComponents().getSchemas();
+        final var schemas = doc.components().schemas();
         final Schema firstContainer = schemas.get("choice-test_first-container");
         assertEquals("default-value",
-                firstContainer.getProperties().get("leaf-default").get("default").asText());
-        assertFalse(firstContainer.getProperties().has("leaf-non-default"));
+                firstContainer.properties().get("leaf-default").get("default").asText());
+        assertFalse(firstContainer.properties().has("leaf-non-default"));
 
         final Schema secondContainer = schemas.get("choice-test_second-container");
-        assertTrue(secondContainer.getProperties().has("leaf-first-case"));
-        assertFalse(secondContainer.getProperties().has("leaf-second-case"));
+        assertTrue(secondContainer.properties().has("leaf-first-case"));
+        assertFalse(secondContainer.properties().has("leaf-second-case"));
     }
 
     /**
@@ -204,7 +204,7 @@ public final class OpenApiGeneratorRFC8040Test {
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
         assertNotNull(doc);
 
-        final var paths = doc.getPaths();
+        final var paths = doc.paths();
         assertEquals(5, paths.size());
 
         for (final var expectedPath : configPaths.entrySet()) {
@@ -213,23 +213,23 @@ public final class OpenApiGeneratorRFC8040Test {
 
             final var path = paths.get(expectedPath.getKey());
 
-            final var get = path.getGet();
+            final var get = path.get();
             assertFalse(get.isMissingNode());
             assertEquals(expectedSize + 1, get.get("parameters").size());
 
-            final var put = path.getPut();
+            final var put = path.put();
             assertFalse(put.isMissingNode());
             assertEquals(expectedSize, put.get("parameters").size());
 
-            final var delete = path.getDelete();
+            final var delete = path.delete();
             assertFalse(delete.isMissingNode());
             assertEquals(expectedSize, delete.get("parameters").size());
 
-            final var post = path.getPost();
+            final var post = path.post();
             assertFalse(post.isMissingNode());
             assertEquals(expectedSize, post.get("parameters").size());
 
-            final var patch = path.getPatch();
+            final var patch = path.patch();
             assertFalse(patch.isMissingNode());
             assertEquals(expectedSize, patch.get("parameters").size());
         }
@@ -247,23 +247,23 @@ public final class OpenApiGeneratorRFC8040Test {
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
         var pathToList1 = "/rests/data/path-params-test:cont/list1={name}";
-        assertTrue(doc.getPaths().containsKey(pathToList1));
-        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList1));
+        assertTrue(doc.paths().containsKey(pathToList1));
+        assertEquals(List.of("name"), getPathParameters(doc.paths(), pathToList1));
 
         var pathToList2 = "/rests/data/path-params-test:cont/list1={name}/list2={name1}";
-        assertTrue(doc.getPaths().containsKey(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathParameters(doc.getPaths(), pathToList2));
+        assertTrue(doc.paths().containsKey(pathToList2));
+        assertEquals(List.of("name", "name1"), getPathParameters(doc.paths(), pathToList2));
 
         var pathToList3 = "/rests/data/path-params-test:cont/list3={name}";
-        assertTrue(doc.getPaths().containsKey(pathToList3));
-        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList3));
+        assertTrue(doc.paths().containsKey(pathToList3));
+        assertEquals(List.of("name"), getPathParameters(doc.paths(), pathToList3));
 
         var pathToList4 = "/rests/data/path-params-test:cont/list1={name}/list4={name1}";
-        assertTrue(doc.getPaths().containsKey(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(doc.getPaths(), pathToList4));
+        assertTrue(doc.paths().containsKey(pathToList4));
+        assertEquals(List.of("name", "name1"), getPathParameters(doc.paths(), pathToList4));
 
         var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
-        assertTrue(doc.getPaths().containsKey(pathToList4));
-        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList5));
+        assertTrue(doc.paths().containsKey(pathToList4));
+        assertEquals(List.of("name"), getPathParameters(doc.paths(), pathToList5));
     }
 }
