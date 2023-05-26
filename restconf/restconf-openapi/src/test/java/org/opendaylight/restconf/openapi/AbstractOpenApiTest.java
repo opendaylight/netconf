@@ -32,7 +32,7 @@ public abstract class AbstractOpenApiTest {
 
     protected static List<String> getPathParameters(final Map<String, Path> paths, final String path) {
         final var params = new ArrayList<String>();
-        paths.get(path).getPost().get("parameters").elements()
+        paths.get(path).post().get("parameters").elements()
             .forEachRemaining(p -> params.add(p.get("name").asText()));
         return params;
     }

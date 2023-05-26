@@ -80,7 +80,7 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, "Datastores", "-");
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
-        final Map<String, Path> paths = mountPointApi.getPaths();
+        final Map<String, Path> paths = mountPointApi.paths();
         assertNotNull(paths);
 
         assertEquals("Unexpected api list size", 2, paths.size());
@@ -89,7 +89,7 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
 
         for (final Map.Entry<String, Path> path : paths.entrySet()) {
             actualUrls.add(path.getKey());
-            final JsonNode getOperation = path.getValue().getGet();
+            final JsonNode getOperation = path.getValue().get();
             assertNotNull("Unexpected operation method on " + path, getOperation);
             assertNotNull("Expected non-null desc on " + path, getOperation.get("description"));
         }
@@ -109,7 +109,7 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
-        final Map<String, Path> paths = mountPointApi.getPaths();
+        final Map<String, Path> paths = mountPointApi.paths();
         assertNotNull(paths);
 
         assertEquals("Unexpected api list size", 37, paths.size());
@@ -121,11 +121,11 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         final List<JsonNode> deleteOperations = new ArrayList<>();
 
         for (final Map.Entry<String, Path> path : paths.entrySet()) {
-            Optional.ofNullable(path.getValue().getGet()).ifPresent(getOperations::add);
-            Optional.ofNullable(path.getValue().getPost()).ifPresent(postOperations::add);
-            Optional.ofNullable(path.getValue().getPut()).ifPresent(putOperations::add);
-            Optional.ofNullable(path.getValue().getPatch()).ifPresent(patchOperations::add);
-            Optional.ofNullable(path.getValue().getDelete()).ifPresent(deleteOperations::add);
+            Optional.ofNullable(path.getValue().get()).ifPresent(getOperations::add);
+            Optional.ofNullable(path.getValue().post()).ifPresent(postOperations::add);
+            Optional.ofNullable(path.getValue().put()).ifPresent(putOperations::add);
+            Optional.ofNullable(path.getValue().patch()).ifPresent(patchOperations::add);
+            Optional.ofNullable(path.getValue().delete()).ifPresent(deleteOperations::add);
         }
 
         assertEquals("Unexpected GET paths size", 29, getOperations.size());
@@ -152,7 +152,7 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, "recursive", "2023-05-22");
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
-        final var paths = mountPointApi.getPaths();
+        final var paths = mountPointApi.paths();
         assertEquals(5, paths.size());
 
         for (final var expectedPath : configPaths.entrySet()) {
@@ -161,23 +161,23 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
 
             final var path = paths.get(expectedPath.getKey());
 
-            final var get = path.getGet();
+            final var get = path.get();
             assertFalse(get.isMissingNode());
             assertEquals(expectedSize + 1, get.get("parameters").size());
 
-            final var put = path.getPut();
+            final var put = path.put();
             assertFalse(put.isMissingNode());
             assertEquals(expectedSize, put.get("parameters").size());
 
-            final var delete = path.getDelete();
+            final var delete = path.delete();
             assertFalse(delete.isMissingNode());
             assertEquals(expectedSize, delete.get("parameters").size());
 
-            final var post = path.getPost();
+            final var post = path.post();
             assertFalse(post.isMissingNode());
             assertEquals(expectedSize, post.get("parameters").size());
 
-            final var patch = path.getPatch();
+            final var patch = path.patch();
             assertFalse(patch.isMissingNode());
             assertEquals(expectedSize, patch.get("parameters").size());
         }
@@ -198,23 +198,23 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
         var pathToList1 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}";
-        assertTrue(mountPointApi.getPaths().containsKey(pathToList1));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList1));
+        assertTrue(mountPointApi.paths().containsKey(pathToList1));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList1));
 
         var pathToList2 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list2={name1}";
-        assertTrue(mountPointApi.getPaths().containsKey(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.getPaths(), pathToList2));
+        assertTrue(mountPointApi.paths().containsKey(pathToList2));
+        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList2));
 
         var pathToList3 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
-        assertTrue(mountPointApi.getPaths().containsKey(pathToList3));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList3));
+        assertTrue(mountPointApi.paths().containsKey(pathToList3));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList3));
 
         var pathToList4 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name1}";
-        assertTrue(mountPointApi.getPaths().containsKey(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.getPaths(), pathToList4));
+        assertTrue(mountPointApi.paths().containsKey(pathToList4));
+        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList4));
 
         var pathToList5 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
-        assertTrue(mountPointApi.getPaths().containsKey(pathToList5));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList5));
+        assertTrue(mountPointApi.paths().containsKey(pathToList5));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList5));
     }
 }
