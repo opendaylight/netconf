@@ -12,28 +12,5 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.Map;
 
 @JsonInclude(Include.NON_NULL)
-public class Components {
-    private Map<String, Schema> schemas;
-    private SecuritySchemes securitySchemes;
-
-    public Components(Map<String, Schema> schemas, SecuritySchemes securitySchemes) {
-        this.schemas = schemas;
-        this.securitySchemes = securitySchemes;
-    }
-
-    public Map<String, Schema> getSchemas() {
-        return schemas;
-    }
-
-    public void setSchemas(Map<String, Schema> schemas) {
-        this.schemas = schemas;
-    }
-
-    public SecuritySchemes getSecuritySchemes() {
-        return securitySchemes;
-    }
-
-    public void setSecuritySchemes(SecuritySchemes securitySchemes) {
-        this.securitySchemes = securitySchemes;
-    }
+public record Components(Map<String, Schema> schemas, SecuritySchemes securitySchemes) {
 }
