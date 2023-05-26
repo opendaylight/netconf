@@ -167,7 +167,7 @@ public class DefinitionGenerator {
 
     private void processModule(final Module module, final Map<String, Schema> definitions,
             final DefinitionNames definitionNames, final EffectiveModelContext schemaContext) {
-        final Schema definition = new Schema();
+        final Schema.Builder definitionBuilder = new Schema.Builder();
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         final String moduleName = module.getName();
@@ -214,13 +214,13 @@ public class DefinitionGenerator {
             }
             stack.exit();
         }
-        definition.setTitle(definitionName);
-        definition.setType(OBJECT_TYPE);
-        definition.setProperties(properties);
-        definition.setDescription(module.getDescription().orElse(""));
-        setRequiredIfNotEmpty(definition, required);
+        definitionBuilder.title(definitionName);
+        definitionBuilder.type(OBJECT_TYPE);
+        definitionBuilder.properties(properties);
+        definitionBuilder.description(module.getDescription().orElse(""));
+        setRequiredIfNotEmpty(definitionBuilder, required);
 
-        definitions.put(definitionName, definition);
+        definitions.put(definitionName, definitionBuilder.build());
     }
 
     private void processContainersAndLists(final Module module, final Map<String, Schema> definitions,
@@ -281,18 +281,18 @@ public class DefinitionGenerator {
         stack.enterSchemaTree(container.getQName());
         if (!container.getChildNodes().isEmpty()) {
             final String filename = parentName + "_" + operationName + (isInput ? INPUT_SUFFIX : OUTPUT_SUFFIX);
-            final Schema childSchema = new Schema();
-            processChildren(childSchema, container.getChildNodes(), parentName, definitions, definitionNames,
+            final Schema.Builder childSchemaBuilder = new Schema.Builder();
+            processChildren(childSchemaBuilder, container.getChildNodes(), parentName, definitions, definitionNames,
                     false, stack);
 
-            childSchema.setType(OBJECT_TYPE);
+            childSchemaBuilder.type(OBJECT_TYPE);
             final ObjectNode xml = JsonNodeFactory.instance.objectNode();
             xml.put(NAME_KEY, isInput ? INPUT : OUTPUT);
-            childSchema.setXml(xml);
-            childSchema.setTitle(filename);
+            childSchemaBuilder.xml(xml);
+            childSchemaBuilder.title(filename);
             final String discriminator =
                     definitionNames.pickDiscriminator(container, List.of(filename, filename + TOP));
-            definitions.put(filename + discriminator, childSchema);
+            definitions.put(filename + discriminator, childSchemaBuilder.build());
 
             processTopData(filename, discriminator, definitions, container);
         }
@@ -326,13 +326,12 @@ public class DefinitionGenerator {
             use RestDocGenUtil#resolveNodesName for creating property name
          */
         properties.set(schemaNode.getQName().getLocalName(), dataNodeProperties);
-        final Schema finalChildSchema = new Schema();
-        finalChildSchema.setType(OBJECT_TYPE);
-        finalChildSchema.setProperties(properties);
-        finalChildSchema.setTitle(topName);
+        final Schema.Builder finalChildSchemaBuilder = new Schema.Builder();
+        finalChildSchemaBuilder.type(OBJECT_TYPE);
+        finalChildSchemaBuilder.properties(properties);
+        finalChildSchemaBuilder.title(topName);
 
-
-        definitions.put(topName + discriminator, finalChildSchema);
+        definitions.put(topName + discriminator, finalChildSchemaBuilder.build());
 
         return dataNodeProperties;
     }
@@ -373,10 +372,10 @@ public class DefinitionGenerator {
             final Collection<? extends DataSchemaNode> containerChildren = dataNode.getChildNodes();
             final SchemaNode schemaNode = (SchemaNode) dataNode;
             final String localName = schemaNode.getQName().getLocalName();
-            final Schema childSchema = new Schema();
+            final Schema.Builder childSchemaBuilder = new Schema.Builder();
             final String nameAsParent = parentName + "_" + localName;
             final ObjectNode properties =
-                    processChildren(childSchema, containerChildren, parentName + "_" + localName, definitions,
+                    processChildren(childSchemaBuilder, containerChildren, parentName + "_" + localName, definitions,
                             definitionNames, isConfig, stack);
 
             final String nodeName = parentName + (isConfig ? CONFIG : "") + "_" + localName;
@@ -395,14 +394,14 @@ public class DefinitionGenerator {
                 discriminator = definitionNames.getDiscriminator(schemaNode);
             }
 
-            childSchema.setType(OBJECT_TYPE);
-            childSchema.setProperties(properties);
-            childSchema.setTitle(nodeName);
-            childSchema.setDescription(description);
+            childSchemaBuilder.type(OBJECT_TYPE);
+            childSchemaBuilder.properties(properties);
+            childSchemaBuilder.title(nodeName);
+            childSchemaBuilder.description(description);
 
             final String defName = nodeName + discriminator;
-            childSchema.setXml(buildXmlParameter(schemaNode));
-            definitions.put(defName, childSchema);
+            childSchemaBuilder.xml(buildXmlParameter(schemaNode));
+            definitions.put(defName, childSchemaBuilder.build());
 
             return processTopData(nodeName, discriminator, definitions, schemaNode);
         }
@@ -412,9 +411,10 @@ public class DefinitionGenerator {
     /**
      * Processes the nodes.
      */
-    private ObjectNode processChildren(final Schema parentNode, final Collection<? extends DataSchemaNode> nodes,
-            final String parentName, final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final boolean isConfig, final SchemaInferenceStack stack) throws IOException {
+    private ObjectNode processChildren(final Schema.Builder parentNodeBuilder,
+            final Collection<? extends DataSchemaNode> nodes, final String parentName,
+            final Map<String, Schema> definitions, final DefinitionNames definitionNames, final boolean isConfig,
+            final SchemaInferenceStack stack) throws IOException {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         for (final DataSchemaNode node : nodes) {
@@ -422,8 +422,8 @@ public class DefinitionGenerator {
                 processChildNode(node, parentName, definitions, definitionNames, isConfig, stack, properties);
             }
         }
-        parentNode.setProperties(properties);
-        setRequiredIfNotEmpty(parentNode, required);
+        parentNodeBuilder.properties(properties);
+        setRequiredIfNotEmpty(parentNodeBuilder, required);
         return properties;
     }
 
@@ -695,21 +695,21 @@ public class DefinitionGenerator {
 
     private static Schema buildIdentityObject(final IdentitySchemaNode idNode,
             final EffectiveModelContext context) {
-        final Schema identityObj = new Schema();
+        final Schema.Builder identityObjBuilder = new Schema.Builder();
         final String identityName = idNode.getQName().getLocalName();
         LOG.debug("Processing Identity: {}", identityName);
 
-        identityObj.setTitle(identityName);
-        identityObj.setDescription(idNode.getDescription().orElse(""));
+        identityObjBuilder.title(identityName);
+        identityObjBuilder.description(idNode.getDescription().orElse(""));
 
         final Collection<? extends IdentitySchemaNode> derivedIds = context.getDerivedIdentities(idNode);
 
         final ArrayNode enumPayload = JsonNodeFactory.instance.arrayNode();
         enumPayload.add(identityName);
         populateEnumWithDerived(derivedIds, enumPayload, context);
-        identityObj.setEnum(enumPayload);
-        identityObj.setType(STRING_TYPE);
-        return identityObj;
+        identityObjBuilder.schemaEnum(enumPayload);
+        identityObjBuilder.type(STRING_TYPE);
+        return identityObjBuilder.build();
     }
 
     private boolean isImported(final IdentityrefTypeDefinition leafTypeDef) {
@@ -886,9 +886,9 @@ public class DefinitionGenerator {
         }
     }
 
-    private static void setRequiredIfNotEmpty(final Schema node, final ArrayNode required) {
+    private static void setRequiredIfNotEmpty(final Schema.Builder nodeBuilder, final ArrayNode required) {
         if (required.size() > 0) {
-            node.setRequired(required);
+            nodeBuilder.required(required);
         }
     }
 

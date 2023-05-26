@@ -11,23 +11,28 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class Info {
-    private String version;
-    private String title;
+public record Info(String version, String title) {
 
-    public String getVersion() {
-        return version;
+    private Info(final Builder builder) {
+        this(builder.version, builder.title);
     }
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
+    public static class Builder {
+        private String version;
+        private String title;
 
-    public String getTitle() {
-        return title;
-    }
+        public Builder version(final String version) {
+            this.version = version;
+            return this;
+        }
 
-    public void setTitle(String title) {
-        this.title = title;
+        public Builder title(final String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Info build() {
+            return new Info(this);
+        }
     }
 }
