@@ -9,24 +9,7 @@ package org.opendaylight.restconf.openapi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import java.util.Map;
 
 @JsonInclude(Include.NON_NULL)
-public class MountPointInstance {
-    private final String instance;
-    private final Long id;
-
-    public MountPointInstance(Map.Entry<String, Long> entry) {
-        this.instance = entry.getKey();
-        this.id = entry.getValue();
-    }
-
-    public String getInstance() {
-        return instance;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
+public record MountPointInstance(String instance, Long id) {
 }

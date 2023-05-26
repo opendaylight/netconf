@@ -14,59 +14,64 @@ import java.util.List;
 import java.util.Map;
 
 @JsonInclude(Include.NON_NULL)
-public class OpenApiObject {
-    private String openapi;
-    private Info info;
-    private List<Server> servers;
-    private Map<String, Path> paths;
-    private Components components;
-    private ArrayNode security;
+public record OpenApiObject(String openapi, Info info, List<Server> servers, Map<String, Path> paths,
+        Components components, ArrayNode security) {
 
-    public String getOpenapi() {
-        return openapi;
+    private OpenApiObject(final Builder builder) {
+        this(builder.openapi, builder.info, builder.servers, builder.paths, builder.components, builder.security);
     }
 
-    public void setOpenapi(String openapi) {
-        this.openapi = openapi;
-    }
 
-    public Info getInfo() {
-        return info;
-    }
+    public static class Builder {
+        private String openapi;
+        private Info info;
+        private List<Server> servers;
+        private Map<String, Path> paths;
+        private Components components;
+        private ArrayNode security;
 
-    public void setInfo(Info info) {
-        this.info = info;
-    }
+        public Builder openapi(final String openapi) {
+            this.openapi = openapi;
+            return this;
+        }
 
-    public List<Server> getServers() {
-        return servers;
-    }
+        public Builder info(final Info info) {
+            this.info = info;
+            return this;
+        }
 
-    public void setServers(List<Server> servers) {
-        this.servers = servers;
-    }
+        public Builder servers(final List<Server> servers) {
+            this.servers = servers;
+            return this;
+        }
 
-    public Map<String, Path> getPaths() {
-        return paths;
-    }
+        public Builder paths(final Map<String, Path> paths) {
+            this.paths = paths;
+            return this;
+        }
 
-    public void setPaths(Map<String, Path> paths) {
-        this.paths = paths;
-    }
+        public Builder components(final Components components) {
+            this.components = components;
+            return this;
+        }
 
-    public Components getComponents() {
-        return components;
-    }
+        public Builder security(final ArrayNode security) {
+            this.security = security;
+            return this;
+        }
 
-    public void setComponents(Components components) {
-        this.components = components;
-    }
+        public OpenApiObject build() {
+            return new OpenApiObject(this);
+        }
 
-    public ArrayNode getSecurity() {
-        return security;
-    }
+        // FIXME remove this getter
+        public Components getComponents() {
+            return this.components;
+        }
 
-    public void setSecurity(ArrayNode security) {
-        this.security = security;
+        // FIXME remove this getter
+        public Map<String, Path> getPaths() {
+            return this.paths;
+        }
     }
 }
