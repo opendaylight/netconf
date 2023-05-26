@@ -47,7 +47,7 @@ public final class DocGenTestHelper {
      */
     public static void containsReferences(final Schema mainObject, final String childObject,
             final String expectedRef) {
-        final JsonNode properties = mainObject.getProperties();
+        final JsonNode properties = mainObject.properties();
         assertNotNull(properties);
 
         final JsonNode childNode = properties.get(childObject);
