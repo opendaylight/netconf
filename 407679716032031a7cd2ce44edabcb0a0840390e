@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f9c9fb7_d8f8581a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-26T18:09:15Z",
+      "side": 1,
+      "message": "should be resolved",
+      "parentUuid": "fecd04b8_ef549bda",
+      "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "28f9e39e_021a9343",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-05-24T15:08:37Z",
       "side": 1,
       "message": "Long.valueOf(maybeLower.orElseThrow()). Fix it in all places in this method.",
+      "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54a8a1e5_07587dc0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 865,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-26T18:09:15Z",
+      "side": 1,
+      "message": "resolved for all example values",
+      "parentUuid": "28f9e39e_021a9343",
       "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -82,6 +118,42 @@
       "writtenOn": "2023-05-24T15:08:37Z",
       "side": 1,
       "message": "Missing default value.",
+      "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c105e39_5df7e5e9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-26T18:09:15Z",
+      "side": 1,
+      "message": "added",
+      "parentUuid": "19a53925_c7d3185b",
+      "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56556da1_46e079b8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-05-26T18:09:15Z",
+      "side": 1,
+      "message": "i decided to use integer 0 instead",
+      "parentUuid": "244c1a14_945af860",
       "revId": "407679716032031a7cd2ce44edabcb0a0840390e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
