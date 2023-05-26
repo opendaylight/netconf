@@ -12,18 +12,5 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @JsonInclude(Include.NON_NULL)
-public class SecuritySchemes {
-    private ObjectNode basicAuth;
-
-    public SecuritySchemes(ObjectNode basicAuth) {
-        this.basicAuth = basicAuth;
-    }
-
-    public ObjectNode getBasicAuth() {
-        return basicAuth;
-    }
-
-    public void setBasicAuth(ObjectNode basicAuth) {
-        this.basicAuth = basicAuth;
-    }
+public record SecuritySchemes(ObjectNode basicAuth) {
 }

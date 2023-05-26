@@ -177,14 +177,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             range = Optional.of(Range.closed(start, end));
         }
 
-        final OpenApiObject openApiObject = openApiGenerator.getAllModulesDoc(uriInfo, range, context,
-                Optional.of(deviceName), urlPrefix, definitionNames);
+        final OpenApiObject.Builder openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, range, context,
+            Optional.of(deviceName), urlPrefix, definitionNames);
         if (includeDataStore) {
-            final var paths = new HashMap<>(openApiObject.getPaths());
+            final var paths = new HashMap<>(openApiObjectBuilder.getPaths());
             paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
-            openApiObject.setPaths(paths);
+            openApiObjectBuilder.paths(paths);
         }
-        return openApiObject;
+        return openApiObjectBuilder.build();
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -193,23 +193,24 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     private OpenApiObject generateDataStoreOpenApi(final UriInfo info, final String context, final String deviceName) {
-        final var openApiObject = openApiGenerator.createOpenApiObject(openApiGenerator.createSchemaFromUriInfo(info),
+        final var openApiObjectBuilder = openApiGenerator.createOpenApiObjectBuilder(openApiGenerator
+                        .createSchemaFromUriInfo(info),
                 openApiGenerator.createHostFromUriInfo(info), BASE_PATH, context);
-        openApiObject.setPaths(getDataStoreApiPaths(context, deviceName));
-        return openApiObject;
+        openApiObjectBuilder.paths(getDataStoreApiPaths(context, deviceName));
+        return openApiObjectBuilder.build();
     }
 
     private Map<String, Path> getDataStoreApiPaths(final String context, final String deviceName) {
-        final var data = new Path();
-        data.setGet(createGetPathItem("data",
+        final var dataBuilder = new Path.Builder();
+        dataBuilder.get(createGetPathItem("data",
                 "Queries the config (startup) datastore on the mounted hosted.", deviceName));
 
-        final var operations = new Path();
-        operations.setGet(createGetPathItem("operations",
+        final var operationsBuilder = new Path.Builder();
+        operationsBuilder.get(createGetPathItem("operations",
                 "Queries the available operations (RPC calls) on the mounted hosted.", deviceName));
 
-        return Map.of(openApiGenerator.getResourcePath("data", context), data,
-            openApiGenerator.getResourcePath("operations", context), operations);
+        return Map.of(openApiGenerator.getResourcePath("data", context), dataBuilder.build(),
+            openApiGenerator.getResourcePath("operations", context), operationsBuilder.build());
     }
 
     private static ObjectNode createGetPathItem(final String resourceType, final String description,
