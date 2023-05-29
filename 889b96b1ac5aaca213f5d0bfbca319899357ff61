@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d51bc2b0_4e290a0b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-29T06:50:31Z",
+      "side": 1,
+      "message": "The patch contains multiple intentions. I would welcome to split it.",
+      "revId": "889b96b1ac5aaca213f5d0bfbca319899357ff61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
