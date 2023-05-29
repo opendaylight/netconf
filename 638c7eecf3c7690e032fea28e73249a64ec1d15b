@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71ac4fce_df75965e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-29T14:49:43Z",
+      "side": 1,
+      "message": "elements",
+      "revId": "638c7eecf3c7690e032fea28e73249a64ec1d15b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64d95246_1e97f952",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-29T14:49:43Z",
+      "side": 1,
+      "message": "Use assertEquals(collection1, collection2) instead.",
+      "revId": "638c7eecf3c7690e032fea28e73249a64ec1d15b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
