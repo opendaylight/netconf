@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1409286e_38275939",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-29T05:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a03f7e8_70e48505",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a15fe74a_28dfcdec",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-05-26T15:06:52Z",
       "side": 1,
       "message": "Missing @Nullable for deviceName parameter.",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e76508b_2dacfd82",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-29T05:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a15fe74a_28dfcdec",
       "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef178db4_43446345",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-29T05:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "baee8170_0d46b6af",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8094a1e4_8a572d7b",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-05-26T15:06:52Z",
       "side": 1,
       "message": "The inherited methods have the @NonNull annotation on this parameter. It is likely that it should be added here as well.",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a4efdaf_0b8ae0d2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorRFC8040.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-29T05:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8094a1e4_8a572d7b",
       "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c61467e9_777f5c80",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorRFC8040.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-29T05:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f901cddb_3ff48f05",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c91b8848_4e58add4",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-05-26T15:06:52Z",
       "side": 1,
       "message": "Revert this unnecessary change.",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "efeb5b95_31608b83",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-29T05:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c91b8848_4e58add4",
       "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5e4829a_1f8135c7",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-29T05:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6149d6c0_a7012e02",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "357b72bd_b5fe5193",
@@ -137,6 +263,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6c7e347_1acd1500",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-29T05:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "357b72bd_b5fe5193",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "faf73a2c_3e82c29f",
@@ -150,6 +294,24 @@
       "writtenOn": "2023-05-26T15:06:52Z",
       "side": 1,
       "message": "This method is only used once. Please remove it and replace this line with:\n`JsonNodeFactory.instance.arrayNode().add(\"controller\" + \" \" + moduleName);`",
+      "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3ad48e8_4deb290d",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-29T05:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "faf73a2c_3e82c29f",
       "revId": "f3a40388e932c0f4870851c7bdb75818a9b43c57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
