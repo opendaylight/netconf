@@ -49,7 +49,7 @@ public final class WebInitializer implements AutoCloseable {
                 .build())
             .addResource(ResourceDetails.builder().name("/explorer").build());
 
-        webContextSecurer.requireAuthentication(webContextBuilder, "/openapi3/*");
+        webContextSecurer.requireAuthentication(webContextBuilder, "/*");
 
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
