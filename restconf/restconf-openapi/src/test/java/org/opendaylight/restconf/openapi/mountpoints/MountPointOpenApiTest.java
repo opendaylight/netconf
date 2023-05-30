@@ -106,7 +106,7 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         openApi.onMountPointCreated(INSTANCE_ID);
 
-        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, null);
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
         final Map<String, Path> paths = mountPointApi.getPaths();
@@ -194,7 +194,7 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         openApi.onMountPointCreated(INSTANCE_ID);
 
-        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, null);
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
         var pathToList1 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}";

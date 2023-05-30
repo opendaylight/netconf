@@ -119,10 +119,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public synchronized Response getMountDoc(final String instanceNum, final UriInfo uriInfo) {
         final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
-        final Optional<Integer> pageNum = stringPageNum != null ? Optional.of(Integer.valueOf(stringPageNum))
-                : Optional.empty();
         final OpenApiObject api = mountPointOpenApiRFC8040.getMountPointApi(uriInfo,
-                Long.parseLong(instanceNum), pageNum);
+                Long.parseLong(instanceNum), stringPageNum);
         return Response.ok(api).build();
     }
 }
