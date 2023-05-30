@@ -34,6 +34,24 @@
       "parentUuid": "32417f99_6e228f62",
       "revId": "393ee78017f3f3e2e2f7d7fd9f87b76e0c8a7fed",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92d8a53a_1bf07aeb",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-05-30T10:58:20Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "60ca9f41_917fa817",
+      "revId": "393ee78017f3f3e2e2f7d7fd9f87b76e0c8a7fed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
