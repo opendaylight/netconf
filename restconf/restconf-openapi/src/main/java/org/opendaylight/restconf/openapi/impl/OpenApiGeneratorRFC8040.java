@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 
 /**
@@ -17,11 +17,11 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
  * @author Thomas Pantelis
  */
 public class OpenApiGeneratorRFC8040 extends BaseYangOpenApiGeneratorRFC8040 {
-    public OpenApiGeneratorRFC8040(final DOMSchemaService schemaService) {
-        super(Optional.of(schemaService));
+    public OpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService) {
+        super(schemaService);
     }
 
-    public OpenApiGeneratorRFC8040(final DOMSchemaService schemaService, final String basePath) {
-        super(Optional.of(schemaService), basePath);
+    public OpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService, final @NonNull String basePath) {
+        super(schemaService, basePath);
     }
 }

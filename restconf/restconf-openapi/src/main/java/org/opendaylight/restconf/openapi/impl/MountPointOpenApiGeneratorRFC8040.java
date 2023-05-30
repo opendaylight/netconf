@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
@@ -20,16 +20,16 @@ import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
 public class MountPointOpenApiGeneratorRFC8040 extends BaseYangOpenApiGeneratorRFC8040 implements AutoCloseable {
     private final MountPointOpenApi mountPointOpenApi;
 
-    public MountPointOpenApiGeneratorRFC8040(final DOMSchemaService schemaService,
-            final DOMMountPointService mountService) {
-        super(Optional.of(schemaService));
+    public MountPointOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
+            final @NonNull DOMMountPointService mountService) {
+        super(schemaService);
         mountPointOpenApi = new MountPointOpenApi(schemaService, mountService, this);
         mountPointOpenApi.init();
     }
 
-    public MountPointOpenApiGeneratorRFC8040(final DOMSchemaService schemaService,
-            final DOMMountPointService mountService, final String basePath) {
-        super(Optional.of(schemaService), basePath);
+    public MountPointOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
+            final @NonNull DOMMountPointService mountService, final @NonNull String basePath) {
+        super(schemaService, basePath);
         mountPointOpenApi = new MountPointOpenApi(schemaService, mountService, this);
         mountPointOpenApi.init();
     }
