@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
@@ -23,19 +24,21 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.openapi.AbstractOpenApiTest;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public final class MountPointOpenApiTest extends AbstractOpenApiTest {
+public final class MountPointOpenApiTest {
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
@@ -43,7 +46,17 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
             .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
     private static final String INSTANCE_URL = "/nodes/node=123/";
 
+    private static EffectiveModelContext context;
+    private static DOMSchemaService schemaService;
+
     private MountPointOpenApi openApi;
+
+    @BeforeClass
+    public static void beforeClass() {
+        schemaService = mock(DOMSchemaService.class);
+        context = YangParserTestUtils.parseYangResourceDirectory("/yang");
+        when(schemaService.getGlobalContext()).thenReturn(context);
+    }
 
     @Before
     public void before() {
@@ -51,12 +64,12 @@ public final class MountPointOpenApiTest extends AbstractOpenApiTest {
         // in our test.
         // OK for testing - real thing would have separate instances.
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(SCHEMA_SERVICE));
+        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
 
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
 
-        openApi = new MountPointOpenApiGeneratorRFC8040(SCHEMA_SERVICE, service).getMountPointOpenApi();
+        openApi = new MountPointOpenApiGeneratorRFC8040(schemaService, service).getMountPointOpenApi();
     }
 
     @Test()
