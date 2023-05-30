@@ -90,11 +90,29 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getAllModulesDoc(uriInfo, Optional.empty(), schemaContext, Optional.empty(), "", definitionNames)
-            .build();
+        return getAllModulesDoc(uriInfo, schemaContext, Optional.empty(), "", definitionNames).build();
     }
 
-    public OpenApiObject.Builder getAllModulesDoc(final UriInfo uriInfo, final Optional<Range<Integer>> range,
+    public OpenApiObject.Builder getAllModulesDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
+            final Optional<String> deviceName, final String context, final DefinitionNames definitionNames) {
+        final String schema = createSchemaFromUriInfo(uriInfo);
+        final String host = createHostFromUriInfo(uriInfo);
+        String name = "Controller";
+        if (deviceName.isPresent()) {
+            name = deviceName.orElseThrow();
+        }
+
+        final String title = name + " modules of RESTCONF";
+        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, BASE_PATH, title);
+        docBuilder.paths(new HashMap<>());
+        final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
+        fillDoc(docBuilder, sortedModules, schemaContext, context, deviceName, definitionNames);
+
+        // FIXME rework callers logic to make possible to return OpenApiObject from here
+        return docBuilder;
+    }
+
+    public OpenApiObject.Builder getRangedModulesDoc(final UriInfo uriInfo, final Range<Integer> range,
             final EffectiveModelContext schemaContext, final Optional<String> deviceName, final String context,
             final DefinitionNames definitionNames) {
         final String schema = createSchemaFromUriInfo(uriInfo);
@@ -108,24 +126,18 @@ public abstract class BaseYangOpenApiGenerator {
         final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, BASE_PATH, title);
         docBuilder.paths(new HashMap<>());
 
-        fillDoc(docBuilder, range, schemaContext, context, deviceName, definitionNames);
+        final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
+        final Set<Module> filteredModules = filterByRange(sortedModules, range);
+        fillDoc(docBuilder, filteredModules, schemaContext, context, deviceName, definitionNames);
 
         // FIXME rework callers logic to make possible to return OpenApiObject from here
         return docBuilder;
     }
 
-    public void fillDoc(final OpenApiObject.Builder docBuilder, final Optional<Range<Integer>> range,
+    public void fillDoc(final OpenApiObject.Builder docBuilder, final Set<Module> modules,
             final EffectiveModelContext schemaContext, final String context, final Optional<String> deviceName,
             final DefinitionNames definitionNames) {
-        final SortedSet<Module> modules = getSortedModules(schemaContext);
-        final Set<Module> filteredModules;
-        if (range.isPresent()) {
-            filteredModules = filterByRange(modules, range.orElseThrow());
-        } else {
-            filteredModules = modules;
-        }
-
-        for (final Module module : filteredModules) {
+        for (final Module module : modules) {
             final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
