@@ -102,28 +102,16 @@ public abstract class BaseYangOpenApiGenerator {
 
     public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
             final String deviceName, final String context, final DefinitionNames definitionNames) {
-        final String schema = createSchemaFromUriInfo(uriInfo);
-        final String host = createHostFromUriInfo(uriInfo);
-        final String title = deviceName + " modules of RESTCONF";
-        final OpenApiObject doc = createOpenApiObject(schema, host, BASE_PATH, title);
-        doc.setPaths(new HashMap<>());
         final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
-        fillDoc(doc, sortedModules, schemaContext, context, deviceName, definitionNames);
-        return doc;
+        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, sortedModules);
     }
 
     public OpenApiObject getRangedModulesDoc(final UriInfo uriInfo, final Range<Integer> range,
             final EffectiveModelContext schemaContext, final String deviceName, final String context,
             final DefinitionNames definitionNames) {
-        final String schema = createSchemaFromUriInfo(uriInfo);
-        final String host = createHostFromUriInfo(uriInfo);
-        final String title = deviceName + " modules of RESTCONF";
-        final OpenApiObject doc = createOpenApiObject(schema, host, BASE_PATH, title);
-        doc.setPaths(new HashMap<>());
         final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
         final Set<Module> filteredModules = filterByRange(sortedModules, range);
-        fillDoc(doc, filteredModules, schemaContext, context, deviceName, definitionNames);
-        return doc;
+        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, filteredModules);
     }
 
     public void fillDoc(final OpenApiObject doc, final Set<Module> modules, final EffectiveModelContext schemaContext,
@@ -165,8 +153,7 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        final OpenApiObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "");
-        return doc;
+        return getApiDeclaration(module, revision, uriInfo, schemaContext, "");
     }
 
     public OpenApiObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
@@ -306,6 +293,16 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public abstract String getResourcePath(String resourceType, String context);
+
+    private OpenApiObject getFilledDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
+            final String deviceName, final String context, final DefinitionNames definitionNames,
+            final Set<Module> sortedModules) {
+        final OpenApiObject doc = createOpenApiObject(createSchemaFromUriInfo(uriInfo), createHostFromUriInfo(uriInfo),
+                BASE_PATH, deviceName + " modules of RESTCONF");
+        doc.setPaths(new HashMap<>());
+        fillDoc(doc, sortedModules, schemaContext, context, deviceName, definitionNames);
+        return doc;
+    }
 
     private void addPaths(final DataSchemaNode node, final @Nullable String deviceName, final String moduleName,
             final Map<String, Path> paths, final ArrayNode parentPathParams, final EffectiveModelContext schemaContext,
