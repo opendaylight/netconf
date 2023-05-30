@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -148,11 +149,11 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         return openApiGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix);
     }
 
-    public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum) {
+    public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final @Nullable String strPageNum) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
-        final String deviceName  = extractDeviceName(iid);
+        final String deviceName = extractDeviceName(iid);
 
         if (context == null) {
             return null;
@@ -160,22 +161,24 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final DefinitionNames definitionNames = new DefinitionNames();
 
         boolean includeDataStore = true;
-        Optional<Range<Integer>> range = Optional.empty();
 
-        if (pageNum.isPresent()) {
-            final int pageNumValue = pageNum.orElseThrow();
-            final int end = DEFAULT_PAGESIZE * pageNumValue - 1;
+        final OpenApiObject.Builder openApiObjectBuilder;
+        if (strPageNum != null) {
+            final int pageNum = Integer.parseInt(strPageNum);
+            final int end = DEFAULT_PAGESIZE * pageNum - 1;
             int start = end - DEFAULT_PAGESIZE;
-            if (pageNumValue == 1) {
+            if (pageNum == 1) {
                 start++;
             } else {
                 includeDataStore = false;
             }
-            range = Optional.of(Range.closed(start, end));
+            openApiObjectBuilder = openApiGenerator.getRangedModulesDoc(uriInfo, Range.closed(start, end), context,
+                    Optional.of(deviceName), urlPrefix, definitionNames);
+        } else {
+            openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, context, Optional.of(deviceName),
+                    urlPrefix, definitionNames);
         }
 
-        final OpenApiObject.Builder openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, range, context,
-            Optional.of(deviceName), urlPrefix, definitionNames);
         if (includeDataStore) {
             final var paths = new HashMap<>(openApiObjectBuilder.getPaths());
             paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
