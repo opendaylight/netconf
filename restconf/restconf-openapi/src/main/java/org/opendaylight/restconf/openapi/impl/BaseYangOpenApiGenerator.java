@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildDelete;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildGet;
@@ -37,6 +38,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.model.Components;
 import org.opendaylight.restconf.openapi.model.Info;
@@ -81,8 +83,8 @@ public abstract class BaseYangOpenApiGenerator {
     private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
             .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
-    protected BaseYangOpenApiGenerator(final Optional<DOMSchemaService> schemaService) {
-        this.schemaService = schemaService.orElse(null);
+    protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService) {
+        this.schemaService = requireNonNull(schemaService);
     }
 
     public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
