@@ -326,6 +326,7 @@ public final class OperationBuilder {
         return JsonNodeFactory.instance.arrayNode().add("mounted " + deviceName + " " + moduleName);
     }
 
+
     public static ObjectNode getTypeParentNode(final ObjectNode parameter) {
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         parameter.set(SCHEMA_KEY, schema);
