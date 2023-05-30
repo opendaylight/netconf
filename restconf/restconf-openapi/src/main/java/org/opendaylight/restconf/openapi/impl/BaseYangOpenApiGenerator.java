@@ -41,6 +41,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.model.Components;
 import org.opendaylight.restconf.openapi.model.Info;
@@ -96,19 +97,14 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getAllModulesDoc(uriInfo, schemaContext, Optional.empty(), "", definitionNames);
+        return getAllModulesDoc(uriInfo, schemaContext, "Controller", "", definitionNames);
     }
 
     public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
-            final Optional<String> deviceName, final String context, final DefinitionNames definitionNames) {
+            final String deviceName, final String context, final DefinitionNames definitionNames) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
-        String name = "Controller";
-        if (deviceName.isPresent()) {
-            name = deviceName.orElseThrow();
-        }
-
-        final String title = name + " modules of RESTCONF";
+        final String title = deviceName + " modules of RESTCONF";
         final OpenApiObject doc = createOpenApiObject(schema, host, BASE_PATH, title);
         doc.setPaths(new HashMap<>());
         final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
@@ -117,16 +113,11 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public OpenApiObject getRangedModulesDoc(final UriInfo uriInfo, final Range<Integer> range,
-            final EffectiveModelContext schemaContext, final Optional<String> deviceName, final String context,
+            final EffectiveModelContext schemaContext, final String deviceName, final String context,
             final DefinitionNames definitionNames) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
-        String name = "Controller";
-        if (deviceName.isPresent()) {
-            name = deviceName.orElseThrow();
-        }
-
-        final String title = name + " modules of RESTCONF";
+        final String title = deviceName + " modules of RESTCONF";
         final OpenApiObject doc = createOpenApiObject(schema, host, BASE_PATH, title);
         doc.setPaths(new HashMap<>());
         final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
@@ -136,7 +127,7 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public void fillDoc(final OpenApiObject doc, final Set<Module> modules, final EffectiveModelContext schemaContext,
-            final String context, final Optional<String> deviceName, final DefinitionNames definitionNames) {
+            final String context, final String deviceName, final DefinitionNames definitionNames) {
         for (final Module module : modules) {
             final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
 
@@ -220,10 +211,10 @@ public abstract class BaseYangOpenApiGenerator {
             final String basePath, final String context, final EffectiveModelContext schemaContext) {
         final OpenApiObject doc = createOpenApiObject(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getOpenApiSpec(module, context, Optional.empty(), schemaContext, definitionNames, doc, true);
+        return getOpenApiSpec(module, context, null, schemaContext, definitionNames, doc, true);
     }
 
-    public OpenApiObject getOpenApiSpec(final Module module, final String context, final Optional<String> deviceName,
+    public OpenApiObject getOpenApiSpec(final Module module, final String context, final @Nullable String deviceName,
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames, final OpenApiObject doc,
             final boolean isForSingleModule) {
         try {
@@ -288,7 +279,7 @@ public abstract class BaseYangOpenApiGenerator {
         return doc;
     }
 
-    private static void addRootPostLink(final Module module, final Optional<String> deviceName,
+    private static void addRootPostLink(final Module module, final @Nullable String deviceName,
             final ArrayNode pathParams, final String resourcePath, final Map<String, Path> paths) {
         if (containsListOrContainer(module.getChildNodes())) {
             final String moduleName = module.getName();
@@ -316,7 +307,7 @@ public abstract class BaseYangOpenApiGenerator {
 
     public abstract String getResourcePath(String resourceType, String context);
 
-    private void addPaths(final DataSchemaNode node, final Optional<String> deviceName, final String moduleName,
+    private void addPaths(final DataSchemaNode node, final @Nullable String deviceName, final String moduleName,
             final Map<String, Path> paths, final ArrayNode parentPathParams, final EffectiveModelContext schemaContext,
             final boolean isConfig, final String parentName, final DefinitionNames definitionNames,
             final String resourcePath) {
@@ -364,7 +355,7 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     private static Path operations(final DataSchemaNode node, final String moduleName,
-            final Optional<String> deviceName, final ArrayNode pathParams, final boolean isConfig,
+            final @Nullable String deviceName, final ArrayNode pathParams, final boolean isConfig,
             final String parentName, final DefinitionNames definitionNames) {
         final Path operations = new Path();
 
@@ -474,7 +465,7 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     private static void addOperations(final OperationDefinition operDef, final String moduleName,
-            final Optional<String> deviceName, final Map<String, Path> paths, final String parentName,
+            final @Nullable String deviceName, final Map<String, Path> paths, final String parentName,
             final DefinitionNames definitionNames, final String resourcePath) {
         final var path = new Path();
         path.setPost(buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames));
