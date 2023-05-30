@@ -13,6 +13,8 @@ import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
@@ -180,7 +182,18 @@ public class NetconfTopologyManager
 
     private void refreshNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier) {
         final NetconfTopologyContext context = contexts.get(instanceIdentifier);
-        context.closeServiceInstance().addListener(context::instantiateServiceInstance, MoreExecutors.directExecutor());
+        final ListenableFuture<?> listenableFuture = context.closeServiceInstance();
+        Futures.addCallback(listenableFuture, new FutureCallback<Object>() {
+            @Override
+            public void onSuccess(final Object ignoreResult) {
+                context.instantiateServiceInstance();
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                LOG.warn("refreshNetconfDeviceContext fails", throwable);
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     // ClusterSingletonServiceRegistration registerClusterSingletonService method throws a Runtime exception if there
