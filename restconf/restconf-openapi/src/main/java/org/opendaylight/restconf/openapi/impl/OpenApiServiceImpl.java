@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -120,10 +119,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public synchronized Response getMountDoc(final String instanceNum, final UriInfo uriInfo) {
         final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
-        final Optional<Integer> pageNum = stringPageNum != null ? Optional.of(Integer.valueOf(stringPageNum))
-                : Optional.empty();
         final OpenApiObject api = mountPointOpenApiRFC8040.getMountPointApi(uriInfo,
-                Long.parseLong(instanceNum), pageNum);
+                Long.parseLong(instanceNum), stringPageNum);
         return Response.ok(api).build();
     }
 }
