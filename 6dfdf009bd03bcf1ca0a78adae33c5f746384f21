@@ -39,6 +39,30 @@
       },
       "revId": "6dfdf009bd03bcf1ca0a78adae33c5f746384f21",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f92b2fea_07541e23",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-30T11:56:56Z",
+      "side": 1,
+      "message": "I moved the original files (present in master) to a separate directory, and created method that allows for a MountPointOpenApi construction with custom DOMSchemaService, so when a new patch needs extra yangs for tests, they can be put in a separate directory and this count won\u0027t need to be changed every time",
+      "parentUuid": "5dc7acb5_94377fb2",
+      "range": {
+        "startLine": 168,
+        "startChar": 50,
+        "endLine": 172,
+        "endChar": 58
+      },
+      "revId": "6dfdf009bd03bcf1ca0a78adae33c5f746384f21",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

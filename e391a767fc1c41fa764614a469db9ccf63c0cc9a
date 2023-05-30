@@ -22,6 +22,30 @@
       },
       "revId": "e391a767fc1c41fa764614a469db9ccf63c0cc9a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c0cdfd6_8a17ed98",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-05-30T11:56:56Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "d6ad2756_976cc2dd",
+      "range": {
+        "startLine": 248,
+        "startChar": 15,
+        "endLine": 248,
+        "endChar": 45
+      },
+      "revId": "e391a767fc1c41fa764614a469db9ccf63c0cc9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
