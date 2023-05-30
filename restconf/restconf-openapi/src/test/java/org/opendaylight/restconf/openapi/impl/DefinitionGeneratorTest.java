@@ -9,42 +9,58 @@ package org.opendaylight.restconf.openapi.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.restconf.openapi.AbstractOpenApiTest;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public final class DefinitionGeneratorTest extends AbstractOpenApiTest {
+public final class DefinitionGeneratorTest {
+
+    private static EffectiveModelContext context;
+    private static DOMSchemaService schemaService;
+
+    @BeforeClass
+    public static void beforeClass() {
+        schemaService = mock(DOMSchemaService.class);
+        context = YangParserTestUtils.parseYangResourceDirectory("/yang");
+        when(schemaService.getGlobalContext()).thenReturn(context);
+    }
+
     @Test
     public void testConvertToSchemas() throws IOException {
-        final var module = CONTEXT.findModule("opflex", Revision.of("2014-05-28")).orElseThrow();
+        final var module = context.findModule("opflex", Revision.of("2014-05-28")).orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final var schemas = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(), true);
+        final var schemas = generator.convertToSchemas(module, context, new DefinitionNames(), true);
         assertNotNull(schemas);
     }
 
     @Test
     public void testActionTypes() throws IOException {
-        final var module = CONTEXT.findModule("action-types").orElseThrow();
+        final var module = context.findModule("action-types").orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final var schemas = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(), true);
+        final var schemas = generator.convertToSchemas(module, context, new DefinitionNames(), true);
         assertNotNull(schemas);
     }
 
     @Test
     public void testStringTypes() throws IOException {
-        final var module = CONTEXT.findModule("string-types").orElseThrow();
+        final var module = context.findModule("string-types").orElseThrow();
         final DefinitionGenerator generator = new DefinitionGenerator();
-        final var schemas = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(), true);
+        final var schemas = generator.convertToSchemas(module, context, new DefinitionNames(), true);
         assertNotNull(schemas);
     }
 
     @Test
     public void testStringFromRegex() throws IOException {
-        final var module = CONTEXT.findModule("strings-from-regex").orElseThrow();
+        final var module = context.findModule("strings-from-regex").orElseThrow();
         final var generator = new DefinitionGenerator();
-        final var jsonObject = generator.convertToSchemas(module, CONTEXT, new DefinitionNames(), true);
+        final var jsonObject = generator.convertToSchemas(module, context, new DefinitionNames(), true);
         assertNotNull(jsonObject);
 
         var properties = jsonObject.get("strings-from-regex_test").getProperties();

@@ -15,17 +15,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.openapi.AbstractOpenApiTest;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public final class OpenApiServiceImplTest extends AbstractOpenApiTest {
+public final class OpenApiServiceImplTest {
+    private static EffectiveModelContext context;
+    private static DOMSchemaService schemaService;
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
@@ -35,16 +39,23 @@ public final class OpenApiServiceImplTest extends AbstractOpenApiTest {
 
     private OpenApiService openApiService;
 
+    @BeforeClass
+    public static void beforeClass() {
+        schemaService = mock(DOMSchemaService.class);
+        context = YangParserTestUtils.parseYangResourceDirectory("/yang");
+        when(schemaService.getGlobalContext()).thenReturn(context);
+    }
+
     @Before
     public void before() {
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(SCHEMA_SERVICE));
+        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
 
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
         final MountPointOpenApiGeneratorRFC8040 mountPointRFC8040 =
-                new MountPointOpenApiGeneratorRFC8040(SCHEMA_SERVICE, service);
-        final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(SCHEMA_SERVICE);
+                new MountPointOpenApiGeneratorRFC8040(schemaService, service);
+        final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(schemaService);
         mountPointRFC8040.getMountPointOpenApi().onMountPointCreated(INSTANCE_ID);
         openApiService = new OpenApiServiceImpl(mountPointRFC8040, openApiGeneratorRFC8040);
     }
