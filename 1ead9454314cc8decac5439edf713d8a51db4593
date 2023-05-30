@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a86d2e5_524a9809",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-05-30T10:49:26Z",
+      "side": 1,
+      "message": "Please clean your commit msg. No need to have additional stuff at the bottom.",
+      "revId": "1ead9454314cc8decac5439edf713d8a51db4593",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
