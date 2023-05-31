@@ -196,13 +196,16 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         try {
             final var yangTextSchemaSource = yangTextSchemaFuture.get();
             return yangTextSchemaSource.asCharSource(StandardCharsets.UTF_8).read();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException e) {
             if (e.getCause() instanceof MissingSchemaSourceException) {
                 throw new NotFoundException("Schema source " + sourceId + " not found", e);
             }
-            throw new WebApplicationException("Unable to get schema " + sourceId, e);
+            throw new WebApplicationException("Unable to retrieve schema source " + sourceId, e);
         } catch (IOException e) {
             throw new WebApplicationException("Unable to read schema " + sourceId, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new WebApplicationException("Retrieving schema source " + sourceId + " has been interrupted", e);
         }
     }
 
