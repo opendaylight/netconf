@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67a34f11_ef286c71",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-05-31T15:56:49Z",
+      "side": 1,
+      "message": "Add description pls",
+      "revId": "e6f802a6818e2a45c9f184591e4f43be7cccc4cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
