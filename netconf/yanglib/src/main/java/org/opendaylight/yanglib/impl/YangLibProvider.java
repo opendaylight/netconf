@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -197,6 +198,9 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
             final var yangTextSchemaSource = yangTextSchemaFuture.get();
             return yangTextSchemaSource.asCharSource(StandardCharsets.UTF_8).read();
         } catch (InterruptedException | ExecutionException e) {
+            if (e.getCause() instanceof MissingSchemaSourceException mss) {
+                throw new NotFoundException("Schema source " + sourceId + " not found", mss);
+            }
             throw new WebApplicationException("Unable to get schema " + sourceId, e);
         } catch (IOException e) {
             throw new WebApplicationException("Unable to read schema " + sourceId, e);
