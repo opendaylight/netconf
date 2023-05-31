@@ -172,7 +172,7 @@ public final class QueryParams {
             }
         }
 
-        return ReadDataParams.of(content, depth, fields, withDefaults, prettyPrint);
+        return new ReadDataParams(content, depth, fields, withDefaults, prettyPrint);
     }
 
     public static @NonNull WriteDataParams newWriteDataParams(final UriInfo uriInfo) {
