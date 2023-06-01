@@ -397,11 +397,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     @Test
     public void test() throws Exception {
-        testMaster();
+        final var masterSalFacade = testMaster();
 
         testSlave();
-
-        final MasterSalFacade masterSalFacade = testMasterNodeUpdated();
 
         testMasterDisconnected(masterSalFacade);
 
