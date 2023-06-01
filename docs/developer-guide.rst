@@ -171,7 +171,7 @@ the MountPointService:
         Preconditions.checkArgument(xrNodeOptional.isPresent(),
                 "Unable to locate mountpoint: %s, not mounted yet or not configured",
                 input.getNodeName());
-        final MountPoint xrNode = xrNodeOptional.get();
+        final MountPoint xrNode = xrNodeOptional.orElseThrow();
 
         ....
     }
@@ -194,7 +194,7 @@ the mount point and start a read transaction:
         ...
 
         // Get the DataBroker for the mounted node
-        final DataBroker xrNodeBroker = xrNode.getService(DataBroker.class).get();
+        final DataBroker xrNodeBroker = xrNode.getService(DataBroker.class).orElseThrow();
         // Start a new read only transaction that we will use to read data
         // from the device
         final ReadOnlyTransaction xrNodeReadTx = xrNodeBroker.newReadOnlyTransaction();
@@ -304,7 +304,7 @@ contain only keys of list elements and selected fields.
 .. code-block:: java
 
     public void readData(final DOMMountPoint mountPoint) {
-        final NetconfDataTreeService dataTreeService = mountPoint.getService(NetconfDataTreeService.class).get();
+        final NetconfDataTreeService dataTreeService = mountPoint.getService(NetconfDataTreeService.class).orElseThrow();
 
         final YangInstanceIdentifier parentPath = YangInstanceIdentifier.builder()
                 .node(CONTAINER_C1_NI)   // container 'c1' (root element)
@@ -369,7 +369,7 @@ nodes (if they are present) of type LeafSetNode and MapNode.
 .. code-block:: java
 
     public void readData(final DOMMountPoint mountPoint) {
-        final DOMDataBroker domDataBroker = mountPoint.getService(DOMDataBroker.class).get();
+        final DOMDataBroker domDataBroker = mountPoint.getService(DOMDataBroker.class).orElseThrow();
         final NetconfDOMDataBrokerFieldsExtension domFieldsDataBroker = domDataBroker.getExtensions().getInstance(
                 NetconfDOMDataBrokerFieldsExtension.class);
 
