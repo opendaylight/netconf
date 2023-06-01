@@ -58,7 +58,7 @@ public final class StartApplication {
                     .map(streamName -> getWebSocketClientHandler(applicationSettings, sslContextFactory,
                             scheduledExecutorService, streamName))
                     .filter(Optional::isPresent)
-                    .map(Optional::get)
+                    .map(Optional::orElseThrow)
                     .collect(Collectors.toList());
             printHandledStreamsOverview(applicationSettings.getStreams(), clientHandlers);
             startAndLockOnClientHandlers(scheduledExecutorService, clientHandlers);
