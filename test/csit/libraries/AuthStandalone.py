@@ -11,7 +11,7 @@ which should include "json" and "requests" Python modules.
 
 *_Using_Session keywords take the same kwargs as requests.Session.request,
 but instead of method and URL, they take "session" created by
-Init_Session keyword and URI (without "/restconf/").
+Init_Session keyword and URI (without "/rests/").
 
 Due to performance of TCP on some systems, two session strategies are available.
 reuse=True reuses the same requests.Session, which possibly means
@@ -23,7 +23,7 @@ causing the new session to take another TCP port.
 This has good performance, but may perhaps lead to port starvation in some cases.
 
 TODO: Put "RESTCONF" to more places,
-as URIs not starting with /restconf/ are not supported yet.
+as URIs not starting with /rests/ are not supported yet.
 """
 
 # Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
@@ -161,7 +161,7 @@ class _TokenReusingSession(object):
         # We keep self.session to use for the following restconf requests.
 
     def oneshot_method(self, method, uri, **kwargs):
-        """Return response of request of given method to given uri (without restconf/)."""
+        """Return response of request of given method to given uri (without rests/)."""
         # Token needs to be merged into headers.
         authed_headers = kwargs.get("headers", {})
         authed_headers["Authorization"] = "Bearer " + self.token
@@ -210,7 +210,7 @@ class _TokenClosingSession(object):
         # We keep self.session to use for the following restconf requests.
 
     def oneshot_method(self, method, uri, **kwargs):
-        """Reset session, return response of request of given method to given uri (without restconf/)."""
+        """Reset session, return response of request of given method to given uri (without rests/)."""
         # This assumes self.session was already initialized.
         self.session.close()
         self.session = requests.Session()
