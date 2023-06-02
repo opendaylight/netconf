@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2899a1c_0615bc0c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Schema.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-02T13:44:06Z",
+      "side": 1,
+      "message": "We are no more aligning parameters, use just 4 spaces, please.",
+      "revId": "aec56f96238afa3786f78db64e6941b929e3e166",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
