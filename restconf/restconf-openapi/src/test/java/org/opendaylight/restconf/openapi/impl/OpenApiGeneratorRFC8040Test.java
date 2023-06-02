@@ -32,15 +32,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public final class OpenApiGeneratorRFC8040Test {
-    private static final String NAME = "toaster2";
-    private static final String MY_YANG = "my-yang";
-    private static final String MY_YANG_REVISION = "2022-10-06";
+    private static final String TOASTER_2 = "toaster2";
     private static final String REVISION_DATE = "2009-11-20";
-    private static final String NAME_2 = "toaster";
-    private static final String REVISION_DATE_2 = "2009-11-20";
-    private static final String CHOICE_TEST_MODULE = "choice-test";
-    private static final String PATH_PARAMS_TEST_MODULE = "path-params-test";
-    private static final String RECURSIVE_TEST_MODULE = "recursive";
 
     private static EffectiveModelContext context;
     private static DOMSchemaService schemaService;
@@ -59,7 +52,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testPaths() {
-        final var module = context.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
         assertEquals(Set.of("/rests/data",
@@ -88,7 +81,7 @@ public final class OpenApiGeneratorRFC8040Test {
                 "/rests/data/toaster2:lst/cont1/lst11",
                 "/rests/data/toaster2:lst/lst1={key1},{key2}");
 
-        final var module = context.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
         for (final String path : configPaths) {
@@ -106,7 +99,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testSchemas() {
-        final var module = context.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
         final Map<String, Schema> schemas = doc.getComponents().getSchemas();
@@ -161,7 +154,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testRPC() {
-        final var module = context.findModule(NAME_2, Revision.of(REVISION_DATE_2)).orElseThrow();
+        final var module = context.findModule("toaster", Revision.of("2009-11-20")).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
         assertNotNull(doc);
 
@@ -178,7 +171,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
     @Test
     public void testChoice() {
-        final var module = context.findModule(CHOICE_TEST_MODULE).orElseThrow();
+        final var module = context.findModule("choice-test").orElseThrow();
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
         assertNotNull(doc);
 
@@ -203,7 +196,7 @@ public final class OpenApiGeneratorRFC8040Test {
             "/rests/data/recursive:container-root/root-list={name}/nested-list={name1}", 2,
             "/rests/data/recursive:container-root/root-list={name}/nested-list={name1}/super-nested-list={name2}", 3);
 
-        final var module = context.findModule(RECURSIVE_TEST_MODULE, Revision.of("2023-05-22")).orElseThrow();
+        final var module = context.findModule("recursive", Revision.of("2023-05-22")).orElseThrow();
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
         assertNotNull(doc);
 
@@ -246,7 +239,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testParametersNumbering() {
-        final var module = context.findModule(PATH_PARAMS_TEST_MODULE).orElseThrow();
+        final var module = context.findModule("path-params-test").orElseThrow();
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
         var pathToList1 = "/rests/data/path-params-test:cont/list1={name}";
@@ -272,7 +265,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
     @Test
     public void testSimpleOpenApiObjects() {
-        final var module = context.findModule(MY_YANG, Revision.of(MY_YANG_REVISION)).orElseThrow();
+        final var module = context.findModule("my-yang", Revision.of("2022-10-06")).orElseThrow();
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
         assertEquals(Set.of("/rests/data", "/rests/data/my-yang:data"), doc.getPaths().keySet());
@@ -298,7 +291,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
     @Test
     public void testToaster2OpenApiObjects() {
-        final var module = context.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
         final var jsonNodeToaster = doc.getPaths().get("/rests/data/toaster2:toaster");
