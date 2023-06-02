@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7d30867_a4f0af97",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-02T14:00:12Z",
+      "side": 1,
+      "message": "Then do we need CONFIG in the schema name? Do we need to use isConfig() method?",
+      "revId": "c32169cc1f35b2a2ca22c6b9100ef7f736427e5c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
