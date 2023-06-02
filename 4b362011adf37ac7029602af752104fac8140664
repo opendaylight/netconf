@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a17af7a_3dacb36f",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-02T11:28:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77feb679_cb11e433",
+      "revId": "4b362011adf37ac7029602af752104fac8140664",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25540e4a_fa96227b",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9acef4cb_efebca78",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-02T11:28:55Z",
+      "side": 1,
+      "message": "That would make test too complex.",
+      "parentUuid": "25540e4a_fa96227b",
+      "revId": "4b362011adf37ac7029602af752104fac8140664",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a24a025_c2f94409",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-06-02T10:43:11Z",
       "side": 1,
       "message": "patch, delete",
+      "revId": "4b362011adf37ac7029602af752104fac8140664",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7457161f_069754fb",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-02T11:28:55Z",
+      "side": 1,
+      "message": "That would make test too complex.",
+      "parentUuid": "2a24a025_c2f94409",
       "revId": "4b362011adf37ac7029602af752104fac8140664",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
