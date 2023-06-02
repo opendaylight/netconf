@@ -16,6 +16,24 @@
       "message": "IMHO we should override toString() in record as it was before",
       "revId": "8162ad6d348acc72c0772fc4b6446bc977e03b5c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08e0906b_e7464206",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/ReadDataParams.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-02T13:28:14Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "9981c27b_1aec62f3",
+      "revId": "8162ad6d348acc72c0772fc4b6446bc977e03b5c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
