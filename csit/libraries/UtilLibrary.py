@@ -133,7 +133,7 @@ def wait_for_controller_up(ip, port="8181"):
         + ip
         + ":"
         + str(port)
-        + "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules"
+        + "/rests/data/ietf-restconf-monitoring:restconf-state/capabilities"
     )
 
     print("Waiting for controller " + ip + " up.")
