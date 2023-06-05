@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5fc03e06_d45dc70a",
+        "filename": "restconf/restconf-openapi/src/main/resources/explorer/styles.css",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-05T16:47:02Z",
+      "side": 1,
+      "message": "In CSS \"!important\" should be used like this. Otherwise it will not work.\n`justify-content: flex-start !important;`",
+      "revId": "26e2447776fe2b2659e5bea9ce46c257956f986f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bcc333bf_1e8bcf71",
         "filename": "restconf/restconf-openapi/src/main/resources/explorer/swagger-initializer.js",
         "patchSetId": 4
@@ -49,6 +66,24 @@
       "side": 1,
       "message": "Is this a problem? I used as a container for logo and title because they both should always be together. I applied column orientation for topbar elements to make it two lines and if I remove this div - we will have 3 lines: 1)logo 2)title 3)select definitions.",
       "parentUuid": "bcc333bf_1e8bcf71",
+      "revId": "26e2447776fe2b2659e5bea9ce46c257956f986f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6ee3314_3aeafa98",
+        "filename": "restconf/restconf-openapi/src/main/resources/explorer/swagger-initializer.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-05T16:47:02Z",
+      "side": 1,
+      "message": "No, it is not a valid solution. The \u003cheader\u003e tag should not be used as a wrapper for a \u003cdiv\u003e element.\n```\n\u003ch2\u003e\u003cimg height\u003d\"40\" src\u003d\"logo_small.png\" style\u003d\"padding-right: 18px; float: left;\"\u003e\u003cdiv style\u003d\"padding-top: 5px;\"\u003eOpenDaylight RestConf API Documentation\u003c/div\u003e\u003c/h2\u003e\n```\n\nAll changes in this class are unnecessary. Please revert them.\n\nAfter reverting these changes, the ODL image size can be fixed in the \"style.css\" file.",
+      "parentUuid": "d17e43ce_0c413c3e",
       "revId": "26e2447776fe2b2659e5bea9ce46c257956f986f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
