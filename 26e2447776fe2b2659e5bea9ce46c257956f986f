@@ -16,6 +16,23 @@
       "message": "It works and looks okay",
       "revId": "26e2447776fe2b2659e5bea9ce46c257956f986f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcc333bf_1e8bcf71",
+        "filename": "restconf/restconf-openapi/src/main/resources/explorer/swagger-initializer.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-05T13:46:24Z",
+      "side": 1,
+      "message": "Do we really need this additional container?",
+      "revId": "26e2447776fe2b2659e5bea9ce46c257956f986f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
