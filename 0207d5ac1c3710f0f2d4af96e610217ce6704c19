@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1320593_99e575d7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-06T12:19:23Z",
+      "side": 1,
+      "message": "We can use line up to 72 chars.",
+      "revId": "0207d5ac1c3710f0f2d4af96e610217ce6704c19",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "172eab10_695bcaac",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Operation.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-06T12:19:23Z",
+      "side": 1,
+      "message": "Not needed line.",
+      "revId": "0207d5ac1c3710f0f2d4af96e610217ce6704c19",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68c3cb0e_f4bb99de",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Operation.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-06T12:19:23Z",
+      "side": 1,
+      "message": "Make this a record with nested builder.",
+      "revId": "0207d5ac1c3710f0f2d4af96e610217ce6704c19",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
