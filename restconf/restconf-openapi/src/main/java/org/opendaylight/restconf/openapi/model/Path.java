@@ -18,14 +18,14 @@ public class Path {
     private String ref;
     private String summary;
     private String description;
-    private ObjectNode get;
-    private ObjectNode put;
-    private ObjectNode post;
-    private ObjectNode delete;
-    private ObjectNode options;
-    private ObjectNode head;
-    private ObjectNode patch;
-    private ObjectNode trace;
+    private Operation get;
+    private Operation put;
+    private Operation post;
+    private Operation delete;
+    private Operation options;
+    private Operation head;
+    private Operation patch;
+    private Operation trace;
     private ObjectNode servers;
 
     public Path() {
@@ -56,67 +56,67 @@ public class Path {
         this.description = description;
     }
 
-    public ObjectNode getGet() {
+    public Operation getGet() {
         return get;
     }
 
-    public void setGet(ObjectNode get) {
+    public void setGet(Operation get) {
         this.get = get;
     }
 
-    public ObjectNode getPut() {
+    public Operation getPut() {
         return put;
     }
 
-    public void setPut(ObjectNode put) {
+    public void setPut(Operation put) {
         this.put = put;
     }
 
-    public ObjectNode getPost() {
+    public Operation getPost() {
         return post;
     }
 
-    public void setPost(ObjectNode post) {
+    public void setPost(Operation post) {
         this.post = post;
     }
 
-    public ObjectNode getDelete() {
+    public Operation getDelete() {
         return delete;
     }
 
-    public void setDelete(ObjectNode delete) {
+    public void setDelete(Operation delete) {
         this.delete = delete;
     }
 
-    public ObjectNode getOptions() {
+    public Operation getOptions() {
         return options;
     }
 
-    public void setOptions(ObjectNode options) {
+    public void setOptions(Operation options) {
         this.options = options;
     }
 
-    public ObjectNode getHead() {
+    public Operation getHead() {
         return head;
     }
 
-    public void setHead(ObjectNode head) {
+    public void setHead(Operation head) {
         this.head = head;
     }
 
-    public ObjectNode getPatch() {
+    public Operation getPatch() {
         return patch;
     }
 
-    public void setPatch(ObjectNode patch) {
+    public void setPatch(Operation patch) {
         this.patch = patch;
     }
 
-    public ObjectNode getTrace() {
+    public Operation getTrace() {
         return trace;
     }
 
-    public void setTrace(ObjectNode trace) {
+    public void setTrace(Operation trace) {
         this.trace = trace;
     }
 
