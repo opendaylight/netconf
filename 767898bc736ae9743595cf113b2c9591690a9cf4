@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "183b0405_d67ae3d7",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/explorer/index.html",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-06T13:37:50Z",
+      "side": 1,
+      "message": "Missing `css` in path 😄",
+      "revId": "767898bc736ae9743595cf113b2c9591690a9cf4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
