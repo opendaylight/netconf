@@ -43,6 +43,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.model.Components;
 import org.opendaylight.restconf.openapi.model.Info;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
+import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.restconf.openapi.model.SecuritySchemes;
@@ -362,22 +363,22 @@ public abstract class BaseYangOpenApiGenerator {
         final String nodeName = node.getQName().getLocalName();
 
         final String defName = parentName + "_" + nodeName + TOP + discriminator;
-        final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig);
+        final Operation get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig);
         operations.setGet(get);
 
         if (isConfig) {
-            final ObjectNode put = buildPut(parentName, nodeName, discriminator, moduleName, deviceName,
+            final Operation put = buildPut(parentName, nodeName, discriminator, moduleName, deviceName,
                     node.getDescription().orElse(""), pathParams);
             operations.setPut(put);
 
-            final ObjectNode patch = buildPatch(parentName, nodeName, moduleName, deviceName,
+            final Operation patch = buildPatch(parentName, nodeName, moduleName, deviceName,
                     node.getDescription().orElse(""), pathParams);
             operations.setPatch(patch);
 
-            final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams);
+            final Operation delete = buildDelete(node, moduleName, deviceName, pathParams);
             operations.setDelete(delete);
 
-            final ObjectNode post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
+            final Operation post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
                     node.getDescription().orElse(""), pathParams);
             operations.setPost(post);
         }
