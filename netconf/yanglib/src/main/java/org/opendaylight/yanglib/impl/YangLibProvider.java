@@ -10,7 +10,6 @@ package org.opendaylight.yanglib.impl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.FutureCallback;
@@ -22,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -116,7 +116,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     public void schemaSourceRegistered(final Iterable<PotentialSchemaSource<?>> sources) {
         final Map<ModuleKey, Module> newModules = new HashMap<>();
 
-        for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
+        for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE::test)) {
             final YangIdentifier moduleName =
                 new YangIdentifier(potentialYangSource.getSourceIdentifier().name().getLocalName());
 
@@ -154,7 +154,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
 
     @Override
     public void schemaSourceUnregistered(final PotentialSchemaSource<?> source) {
-        if (!YANG_SCHEMA_SOURCE.apply(source)) {
+        if (!YANG_SCHEMA_SOURCE.test(source)) {
             // if representation of potential schema source is not yang text schema source do nothing
             // we do not want to delete this module entry from module list
             return;
