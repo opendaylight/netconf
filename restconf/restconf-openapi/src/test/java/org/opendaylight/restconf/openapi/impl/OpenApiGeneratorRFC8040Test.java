@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
+import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -210,24 +211,24 @@ public final class OpenApiGeneratorRFC8040Test {
             final var path = paths.get(expectedPath.getKey());
 
             final var get = path.getGet();
-            assertFalse(get.isMissingNode());
-            assertEquals(expectedSize + 1, get.get("parameters").size());
+            assertNotNull(get);
+            assertEquals(expectedSize + 1, get.parameters().size());
 
             final var put = path.getPut();
-            assertFalse(put.isMissingNode());
-            assertEquals(expectedSize, put.get("parameters").size());
+            assertNotNull(put);
+            assertEquals(expectedSize, put.parameters().size());
 
             final var delete = path.getDelete();
-            assertFalse(delete.isMissingNode());
-            assertEquals(expectedSize, delete.get("parameters").size());
+            assertNotNull(delete);
+            assertEquals(expectedSize, delete.parameters().size());
 
             final var post = path.getPost();
-            assertFalse(post.isMissingNode());
-            assertEquals(expectedSize, post.get("parameters").size());
+            assertNotNull(post);
+            assertEquals(expectedSize, post.parameters().size());
 
             final var patch = path.getPatch();
-            assertFalse(patch.isMissingNode());
-            assertEquals(expectedSize, patch.get("parameters").size());
+            assertNotNull(patch);
+            assertEquals(expectedSize, patch.parameters().size());
         }
     }
 
@@ -343,7 +344,7 @@ public final class OpenApiGeneratorRFC8040Test {
         final var jsonNodeCancelToast = doc.getPaths().get("/rests/operations/toaster2:cancel-toast");
         assertNull(jsonNodeCancelToast.getGet());
         // Test RPC with empty input
-        final var postContent = jsonNodeCancelToast.getPost().get("requestBody").get("content");
+        final var postContent = jsonNodeCancelToast.getPost().requestBody().get("content");
         final var jsonSchema = postContent.get("application/json").get("schema");
         assertNull(jsonSchema.get("$ref"));
         assertEquals(2, jsonSchema.size());
@@ -359,13 +360,13 @@ public final class OpenApiGeneratorRFC8040Test {
     /**
      *  Test JSON and XML references for request operation.
      */
-    private static void verifyRequestRef(final JsonNode path, final String expectedJsonRef,
+    private static void verifyRequestRef(final Operation operation, final String expectedJsonRef,
             final String expectedXmlRef) {
         final JsonNode postContent;
-        if (path.get("requestBody") != null) {
-            postContent = path.get("requestBody").get("content");
+        if (operation.requestBody() != null) {
+            postContent = operation.requestBody().get("content");
         } else {
-            postContent = path.get("responses").get("200").get("content");
+            postContent = operation.responses().get("200").get("content");
         }
         assertNotNull(postContent);
         final var postJsonRef = postContent.get("application/json").get("schema").get("$ref");
