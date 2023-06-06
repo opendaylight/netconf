@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b92125c_275650fc",
+        "filename": "restconf/restconf-openapi/src/main/resources/explorer/styles.css",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-06T08:05:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc03e06_d45dc70a",
+      "revId": "26e2447776fe2b2659e5bea9ce46c257956f986f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bcc333bf_1e8bcf71",
