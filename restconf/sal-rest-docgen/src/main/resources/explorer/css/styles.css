@@ -1,0 +1,24 @@
+@media (max-width: 1200px) {
+    .swagger-ui .topbar .topbar-wrapper {
+        align-items: initial;
+        display: flex;
+        flex-direction: column !important;
+    }
+
+    .swagger-ui .topbar .download-url-wrapper {
+        display: flex;
+        flex: 3;
+        justify-content: flex-start !important;
+    }
+
+    .swagger-ui .topbar .download-url-wrapper .select-label #select {
+        flex: auto !important;
+        display: 100%;
+        width: 100% !important;
+    }
+}
+
+.swagger-ui .topbar .topbar-wrapper h2 {
+    align-items: center;
+    display: flex;
+}
