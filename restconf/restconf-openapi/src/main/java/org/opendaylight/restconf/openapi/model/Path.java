@@ -13,9 +13,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @JsonInclude(Include.NON_NULL)
-public record Path(@JsonProperty("$ref") String ref, String summary, String description, ObjectNode get,
-        ObjectNode put, ObjectNode post, ObjectNode delete, ObjectNode options, ObjectNode head, ObjectNode patch,
-        ObjectNode trace, ObjectNode servers) {
+public record Path(@JsonProperty("$ref") String ref, String summary, String description, Operation get,
+        Operation put, Operation post, Operation delete, Operation options, Operation head, Operation patch,
+        Operation trace, ObjectNode servers) {
 
     private Path(final Builder builder) {
         this(builder.ref, builder.summary, builder.description, builder.get, builder.put, builder.post,
@@ -27,14 +27,14 @@ public record Path(@JsonProperty("$ref") String ref, String summary, String desc
         private String ref;
         private String summary;
         private String description;
-        private ObjectNode get;
-        private ObjectNode put;
-        private ObjectNode post;
-        private ObjectNode delete;
-        private ObjectNode options;
-        private ObjectNode head;
-        private ObjectNode patch;
-        private ObjectNode trace;
+        private Operation get;
+        private Operation put;
+        private Operation post;
+        private Operation delete;
+        private Operation options;
+        private Operation head;
+        private Operation patch;
+        private Operation trace;
         private ObjectNode servers;
 
         public Builder ref(final String ref) {
@@ -52,42 +52,42 @@ public record Path(@JsonProperty("$ref") String ref, String summary, String desc
             return this;
         }
 
-        public Builder get(final ObjectNode get) {
+        public Builder get(final Operation get) {
             this.get = get;
             return this;
         }
 
-        public Builder put(final ObjectNode put) {
+        public Builder put(final Operation put) {
             this.put = put;
             return this;
         }
 
-        public Builder post(final ObjectNode post) {
+        public Builder post(final Operation post) {
             this.post = post;
             return this;
         }
 
-        public Builder delete(final ObjectNode delete) {
+        public Builder delete(final Operation delete) {
             this.delete = delete;
             return this;
         }
 
-        public Builder options(final ObjectNode options) {
+        public Builder options(final Operation options) {
             this.options = options;
             return this;
         }
 
-        public Builder head(final ObjectNode head) {
+        public Builder head(final Operation head) {
             this.head = head;
             return this;
         }
 
-        public Builder patch(final ObjectNode patch) {
+        public Builder patch(final Operation patch) {
             this.patch = patch;
             return this;
         }
 
-        public Builder trace(final ObjectNode trace) {
+        public Builder trace(final Operation trace) {
             this.trace = trace;
             return this;
         }

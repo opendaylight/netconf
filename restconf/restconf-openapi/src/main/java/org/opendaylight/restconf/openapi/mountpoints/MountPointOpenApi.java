@@ -12,12 +12,10 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASE_PATH;
 import static org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.DESCRIPTION_KEY;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.RESPONSES_KEY;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_KEY;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TAGS_KEY;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildTagsValue;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Range;
@@ -36,6 +34,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
+import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -213,19 +212,16 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             openApiGenerator.getResourcePath("operations", context), operationsBuilder.build());
     }
 
-    private static ObjectNode createGetPathItem(final String resourceType, final String description,
+    private static Operation createGetPathItem(final String resourceType, final String description,
             final String deviceName) {
-        final ObjectNode operationObject = JsonNodeFactory.instance.objectNode();
-        operationObject.put(DESCRIPTION_KEY, description);
-        operationObject.put(SUMMARY_KEY, HttpMethod.GET + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR
-                + resourceType);
-        operationObject.set(TAGS_KEY, buildTagsValue(Optional.of(deviceName), "GET root"));
+        final String summary = HttpMethod.GET + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR + resourceType;
+        final ArrayNode tags = buildTagsValue(Optional.of(deviceName), "GET root");
         final ObjectNode okResponse = JsonNodeFactory.instance.objectNode();
         okResponse.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()), okResponse);
-        operationObject.set(RESPONSES_KEY, responses);
-        return operationObject;
+        return new Operation(false, tags, null, null, null, null, null, null, responses, description, "",
+                summary);
     }
 
     @Override

@@ -8,14 +8,12 @@
 package org.opendaylight.restconf.openapi.mountpoints;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +30,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
+import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -102,9 +101,9 @@ public final class MountPointOpenApiTest {
 
         for (final Map.Entry<String, Path> path : paths.entrySet()) {
             actualUrls.add(path.getKey());
-            final JsonNode getOperation = path.getValue().get();
+            final Operation getOperation = path.getValue().get();
             assertNotNull("Unexpected operation method on " + path, getOperation);
-            assertNotNull("Expected non-null desc on " + path, getOperation.get("description"));
+            assertNotNull("Expected non-null desc on " + path, getOperation.description());
         }
 
         assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
@@ -127,11 +126,11 @@ public final class MountPointOpenApiTest {
 
         assertEquals("Unexpected api list size", 38, paths.size());
 
-        final List<JsonNode> getOperations = new ArrayList<>();
-        final List<JsonNode> postOperations = new ArrayList<>();
-        final List<JsonNode> putOperations = new ArrayList<>();
-        final List<JsonNode> patchOperations = new ArrayList<>();
-        final List<JsonNode> deleteOperations = new ArrayList<>();
+        final List<Operation> getOperations = new ArrayList<>();
+        final List<Operation> postOperations = new ArrayList<>();
+        final List<Operation> putOperations = new ArrayList<>();
+        final List<Operation> patchOperations = new ArrayList<>();
+        final List<Operation> deleteOperations = new ArrayList<>();
 
         for (final Map.Entry<String, Path> path : paths.entrySet()) {
             Optional.ofNullable(path.getValue().get()).ifPresent(getOperations::add);
@@ -175,24 +174,24 @@ public final class MountPointOpenApiTest {
             final var path = paths.get(expectedPath.getKey());
 
             final var get = path.get();
-            assertFalse(get.isMissingNode());
-            assertEquals(expectedSize + 1, get.get("parameters").size());
+            assertNotNull(get);
+            assertEquals(expectedSize + 1, get.parameters().size());
 
             final var put = path.put();
-            assertFalse(put.isMissingNode());
-            assertEquals(expectedSize, put.get("parameters").size());
+            assertNotNull(put);
+            assertEquals(expectedSize, put.parameters().size());
 
             final var delete = path.delete();
-            assertFalse(delete.isMissingNode());
-            assertEquals(expectedSize, delete.get("parameters").size());
+            assertNotNull(delete);
+            assertEquals(expectedSize, delete.parameters().size());
 
             final var post = path.post();
-            assertFalse(post.isMissingNode());
-            assertEquals(expectedSize, post.get("parameters").size());
+            assertNotNull(post);
+            assertEquals(expectedSize, post.parameters().size());
 
             final var patch = path.patch();
-            assertFalse(patch.isMissingNode());
-            assertEquals(expectedSize, patch.get("parameters").size());
+            assertNotNull(patch);
+            assertEquals(expectedSize, patch.parameters().size());
         }
     }
 
