@@ -12,7 +12,6 @@ import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.INPUT;
 import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.INPUT_SUFFIX;
 import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.OUTPUT_SUFFIX;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,6 +21,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
+import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
@@ -37,15 +37,10 @@ public final class OperationBuilder {
     public static final String INPUT_KEY = "input";
     public static final String NAME_KEY = "name";
     public static final String NONCONFIG_QUERY_PARAM = "nonconfig";
-    public static final String PARAMETERS_KEY = "parameters";
     public static final String PROPERTIES_KEY = "properties";
     public static final String REF_KEY = "$ref";
-    public static final String REQUEST_BODY_KEY = "requestBody";
-    public static final String RESPONSES_KEY = "responses";
     public static final String SCHEMA_KEY = "schema";
-    public static final String SUMMARY_KEY = "summary";
     public static final String SUMMARY_SEPARATOR = " - ";
-    public static final String TAGS_KEY = "tags";
     public static final String TOP = "_TOP";
     public static final String XML_KEY = "xml";
     private static final String CONTENT = "content";
@@ -69,43 +64,43 @@ public final class OperationBuilder {
 
     }
 
-    public static ObjectNode buildPost(final String parentName, final String nodeName, final String discriminator,
+    public static Operation buildPost(final String parentName, final String nodeName, final String discriminator,
             final String moduleName, final Optional<String> deviceName, final String description,
             final ArrayNode pathParams) {
-        final ObjectNode value = JsonNodeFactory.instance.objectNode();
-        value.put(DESCRIPTION_KEY, description);
-        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
-        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        final Operation postOperation = new Operation();
+        postOperation.setDescription(description);
+        postOperation.setSummary(buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
+        postOperation.setTags(buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + CONFIG + "_" + nodeName;
         final String defName = cleanDefName + discriminator;
         final String xmlDefName = cleanDefName + discriminator;
         ref.put(REF_KEY, COMPONENTS_PREFIX + defName);
-        insertRequestBodyParameter(value, defName, xmlDefName, nodeName + CONFIG);
-        value.set(PARAMETERS_KEY, parameters);
+        insertRequestBodyParameter(postOperation, defName, xmlDefName, nodeName + CONFIG);
+        postOperation.setParameters(parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
                 buildResponse(Response.Status.CREATED.getReasonPhrase(), Optional.empty()));
 
-        value.set(RESPONSES_KEY, responses);
-        return value;
+        postOperation.setResponses(responses);
+        return postOperation;
     }
 
-    public static ObjectNode buildGet(final DataSchemaNode node, final String moduleName,
+    public static Operation buildGet(final DataSchemaNode node, final String moduleName,
             final Optional<String> deviceName, final ArrayNode pathParams, final String defName,
             final boolean isConfig) {
-        final ObjectNode value = JsonNodeFactory.instance.objectNode();
-        value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
-        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
+        final Operation getOperation = new Operation();
+        getOperation.setDescription(node.getDescription().orElse(""));
+        getOperation.setSummary(buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName()));
-        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        getOperation.setTags(buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
 
         addQueryParameters(parameters, isConfig);
 
-        value.set(PARAMETERS_KEY, parameters);
+        getOperation.setParameters(parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
@@ -113,8 +108,8 @@ public final class OperationBuilder {
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
                 buildResponse(Response.Status.OK.getReasonPhrase(), Optional.of(schema)));
 
-        value.set(RESPONSES_KEY, responses);
-        return value;
+        getOperation.setResponses(responses);
+        return getOperation;
     }
 
     private static void addQueryParameters(final ArrayNode parameters, final boolean isConfig) {
@@ -136,18 +131,18 @@ public final class OperationBuilder {
         parameters.add(contentParam);
     }
 
-    public static ObjectNode buildPut(final String parentName, final String nodeName, final String discriminator,
+    public static Operation buildPut(final String parentName, final String nodeName, final String discriminator,
             final String moduleName, final Optional<String> deviceName, final String description,
             final ArrayNode pathParams) {
-        final ObjectNode value = JsonNodeFactory.instance.objectNode();
-        value.put(DESCRIPTION_KEY, description);
-        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName));
-        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        final Operation putOperation = new Operation();
+        putOperation.setDescription(description);
+        putOperation.setSummary(buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName));
+        putOperation.setTags(buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
-        insertRequestBodyParameter(value, defName, xmlDefName, nodeName + CONFIG);
-        value.set(PARAMETERS_KEY, parameters);
+        insertRequestBodyParameter(putOperation, defName, xmlDefName, nodeName + CONFIG);
+        putOperation.setParameters(parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
@@ -155,21 +150,21 @@ public final class OperationBuilder {
         responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
                 buildResponse("Updated", Optional.empty()));
 
-        value.set(RESPONSES_KEY, responses);
-        return value;
+        putOperation.setResponses(responses);
+        return putOperation;
     }
 
-    public static ObjectNode buildPatch(final String parentName, final String nodeName, final String moduleName,
+    public static Operation buildPatch(final String parentName, final String nodeName, final String moduleName,
             final Optional<String> deviceName, final String description, final ArrayNode pathParams) {
-        final ObjectNode value = JsonNodeFactory.instance.objectNode();
-        value.put(DESCRIPTION_KEY, description);
-        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName));
-        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        final Operation patchOperation = new Operation();
+        patchOperation.setDescription(description);
+        patchOperation.setSummary(buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName));
+        patchOperation.setTags(buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
-        insertRequestBodyParameter(value, defName, xmlDefName, nodeName + CONFIG);
-        value.set(PARAMETERS_KEY, parameters);
+        insertRequestBodyParameter(patchOperation, defName, xmlDefName, nodeName + CONFIG);
+        patchOperation.setParameters(parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
@@ -177,31 +172,31 @@ public final class OperationBuilder {
         responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
                 buildResponse("Updated", Optional.empty()));
 
-        value.set(RESPONSES_KEY, responses);
-        return value;
+        patchOperation.setResponses(responses);
+        return patchOperation;
     }
 
-    public static ObjectNode buildDelete(final DataSchemaNode node, final String moduleName,
+    public static Operation buildDelete(final DataSchemaNode node, final String moduleName,
             final Optional<String> deviceName, final ArrayNode pathParams) {
-        final ObjectNode value = JsonNodeFactory.instance.objectNode();
-        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
+        final Operation value = new Operation();
+        value.setSummary(buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
                 node.getQName().getLocalName()));
-        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
-        value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
+        value.setTags(buildTagsValue(deviceName, moduleName));
+        value.setDescription(node.getDescription().orElse(""));
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
-        value.set(PARAMETERS_KEY, parameters);
+        value.setParameters(parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
                 buildResponse("Deleted", Optional.empty()));
 
-        value.set(RESPONSES_KEY, responses);
+        value.setResponses(responses);
         return value;
     }
 
-    public static ObjectNode buildPostOperation(final OperationDefinition operDef, final String moduleName,
+    public static Operation buildPostOperation(final OperationDefinition operDef, final String moduleName,
             final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames) {
-        final ObjectNode postOperation = JsonNodeFactory.instance.objectNode();
+        final Operation postOperation = new Operation();
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode();
         final String operName = operDef.getQName().getLocalName();
         final String inputName = operName + INPUT_SUFFIX;
@@ -239,9 +234,9 @@ public final class OperationBuilder {
 
             payload.set(CONTENT_KEY, content);
             payload.put(DESCRIPTION_KEY, inputName);
-            postOperation.set(REQUEST_BODY_KEY, payload);
+            postOperation.setRequestBody(payload);
         }
-        postOperation.set(PARAMETERS_KEY, parameters);
+        postOperation.setParameters(parameters);
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final String description = String.format("RPC %s success", operName);
 
@@ -256,19 +251,19 @@ public final class OperationBuilder {
             responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse(description,
                     Optional.empty()));
         }
-        postOperation.set(RESPONSES_KEY, responses);
-        postOperation.put(DESCRIPTION_KEY, operDef.getDescription().orElse(""));
-        postOperation.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, operName));
-        postOperation.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        postOperation.setResponses(responses);
+        postOperation.setDescription(operDef.getDescription().orElse(""));
+        postOperation.setSummary(buildSummaryValue(HttpMethod.POST, moduleName, deviceName, operName));
+        postOperation.setTags(buildTagsValue(deviceName, moduleName));
         return postOperation;
     }
 
-    private static void insertRequestBodyParameter(final ObjectNode operation, final String defName,
+    private static void insertRequestBodyParameter(final Operation operation, final String defName,
             final String xmlDefName, final String name) {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         final ObjectNode content = JsonNodeFactory.instance.objectNode();
-        final JsonNode node = operation.get(SUMMARY_KEY);
-        if (node != null && node.asText().contains(HttpMethod.PATCH)) {
+        final String node = operation.getSummary();
+        if (node != null && node.contains(HttpMethod.PATCH)) {
             content.set("application/yang-data+json", buildMimeTypeValue(defName));
             content.set("application/yang-data+xml", buildMimeTypeValue(xmlDefName));
         } else {
@@ -277,7 +272,7 @@ public final class OperationBuilder {
         }
         payload.set(CONTENT_KEY, content);
         payload.put(DESCRIPTION_KEY, name);
-        operation.set(REQUEST_BODY_KEY, payload);
+        operation.setRequestBody(payload);
     }
 
     private static ObjectNode buildRefSchema(final String defName) {
