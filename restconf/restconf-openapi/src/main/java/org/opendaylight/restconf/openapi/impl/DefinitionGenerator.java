@@ -218,8 +218,8 @@ public class DefinitionGenerator {
         definitionBuilder.title(definitionName)
             .type(OBJECT_TYPE)
             .properties(properties)
-            .description(module.getDescription().orElse(""));
-        setRequiredIfNotEmpty(definitionBuilder, required);
+            .description(module.getDescription().orElse(""))
+            .required(required.size() > 0 ? required : null);
 
         definitions.put(definitionName, definitionBuilder.build());
     }
@@ -421,8 +421,9 @@ public class DefinitionGenerator {
                 processChildNode(node, parentName, definitions, definitionNames, isConfig, stack, properties);
             }
         }
-        parentNodeBuilder.properties(properties);
-        setRequiredIfNotEmpty(parentNodeBuilder, required);
+        parentNodeBuilder.properties(properties)
+            .required(required.size() > 0 ? required : null);
+
         return properties;
     }
 
@@ -880,12 +881,6 @@ public class DefinitionGenerator {
     private static void putIfNonNull(final ObjectNode property, final String key, final String value) {
         if (key != null && value != null) {
             property.put(key, value);
-        }
-    }
-
-    private static void setRequiredIfNotEmpty(final Schema.Builder nodeBuilder, final ArrayNode required) {
-        if (required.size() > 0) {
-            nodeBuilder.required(required);
         }
     }
 
