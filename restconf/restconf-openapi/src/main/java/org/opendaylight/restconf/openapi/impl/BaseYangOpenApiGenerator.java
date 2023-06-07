@@ -393,8 +393,18 @@ public abstract class BaseYangOpenApiGenerator {
 
         if (schemaNode instanceof ListSchemaNode) {
             final ListPathBuilder keyBuilder = newListPathBuilder();
+            int discriminator = 1;
             for (final QName listKey : ((ListSchemaNode) schemaNode).getKeyDefinition()) {
-                final String paramName = createUniquePathParamName(listKey.getLocalName(), pathParams);
+                final String clearName = listKey.getLocalName();
+                String paramName = clearName;
+
+                for (final JsonNode pathParam : pathParams) {
+                    if (isNamePicked(paramName, pathParam)) {
+                        paramName = clearName + discriminator;
+                        discriminator++;
+                    }
+                }
+
                 final String pathParamIdentifier = keyBuilder.nextParamIdentifier(paramName);
 
                 path.append(pathParamIdentifier);
@@ -415,26 +425,6 @@ public abstract class BaseYangOpenApiGenerator {
             }
         }
         return path.toString();
-    }
-
-    private String createUniquePathParamName(final String clearName, final ArrayNode pathParams) {
-        for (final JsonNode pathParam : pathParams) {
-            if (isNamePicked(clearName, pathParam)) {
-                return createUniquePathParamName(clearName, pathParams, 1);
-            }
-        }
-        return clearName;
-    }
-
-    private String createUniquePathParamName(final String clearName, final ArrayNode pathParams,
-            final int discriminator) {
-        final String newName = clearName + discriminator;
-        for (final JsonNode pathParam : pathParams) {
-            if (isNamePicked(newName, pathParam)) {
-                return createUniquePathParamName(clearName, pathParams, discriminator + 1);
-            }
-        }
-        return newName;
     }
 
     private static boolean isNamePicked(final String name, final JsonNode pathParam) {
