@@ -302,6 +302,7 @@ public abstract class BaseYangOpenApiGenerator {
         docBuilder.info(infoBuilder.build());
         docBuilder.servers(List.of(new Server(schema + "://" + host + basePath)));
         docBuilder.components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
+        docBuilder.security(SECURITY);
         return docBuilder;
     }
 
