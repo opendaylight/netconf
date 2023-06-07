@@ -17,15 +17,25 @@ import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParamete
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -38,7 +48,39 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@RunWith(Parameterized.class)
 public final class MountPointOpenApiTest {
+
+    private static final String DEFAULT_BASE_PATH = "rests";
+    private static final String CUSTOM_BASE_PATH = "restconf";
+
+    @Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        return Arrays.asList(new Object[][]{
+                {
+                        createMountPointGenerator((schemaService, service) ->
+                                new MountPointOpenApiGeneratorRFC8040(schemaService, service)),
+                        DEFAULT_BASE_PATH
+                },
+                {
+                        createMountPointGenerator((schemaService, service) ->
+                                new MountPointOpenApiGeneratorRFC8040(schemaService, service, CUSTOM_BASE_PATH)),
+                        CUSTOM_BASE_PATH
+                }
+        });
+    }
+
+    private static BiFunction<DOMSchemaService, DOMMountPointService, MountPointOpenApiGeneratorRFC8040>
+    createMountPointGenerator(
+            final BiFunction<DOMSchemaService, DOMMountPointService, MountPointOpenApiGeneratorRFC8040>
+                    generatorFactory) {
+        return generatorFactory;
+    }
+    @Parameter(0)
+    public BiFunction<DOMSchemaService, DOMMountPointService, MountPointOpenApiGeneratorRFC8040> mountPointConstructor;
+    @Parameter(1)
+    public String basePath;
+
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
@@ -47,29 +89,17 @@ public final class MountPointOpenApiTest {
     private static final String INSTANCE_URL = "/nodes/node=123/";
 
     private static EffectiveModelContext context;
-    private static DOMSchemaService schemaService;
 
     private MountPointOpenApi openApi;
 
     @BeforeClass
     public static void beforeClass() {
-        schemaService = mock(DOMSchemaService.class);
-        context = YangParserTestUtils.parseYangResourceDirectory("/yang");
-        when(schemaService.getGlobalContext()).thenReturn(context);
+        context = YangParserTestUtils.parseYangResourceDirectory("/yang/base");
     }
 
     @Before
     public void before() {
-        // We are sharing the global schema service and the mount schema service
-        // in our test.
-        // OK for testing - real thing would have separate instances.
-        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
-
-        final DOMMountPointService service = mock(DOMMountPointService.class);
-        when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
-
-        openApi = new MountPointOpenApiGeneratorRFC8040(schemaService, service).getMountPointOpenApi();
+        openApi = constructMountPointGenerator(context);
     }
 
     @Test()
@@ -107,8 +137,8 @@ public final class MountPointOpenApiTest {
             assertNotNull("Expected non-null desc on " + path, getOperation.get("description"));
         }
 
-        assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
-            "/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
+        assertEquals(Set.of("/" + basePath + "/data" + INSTANCE_URL + "yang-ext:mount",
+            "/" + basePath + "/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
     }
 
     /**
@@ -154,10 +184,15 @@ public final class MountPointOpenApiTest {
     @Test
     @SuppressWarnings("checkstyle:lineLength")
     public void testMountPointRecursiveParameters() throws Exception {
-        final var configPaths = Map.of("/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root", 0,
-            "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}", 1,
-            "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}/nested-list={name1}", 2,
-            "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}/nested-list={name1}/super-nested-list={name2}", 3);
+        final var configPaths = Map.of(
+                "/" + basePath + "/data/nodes/node=123/yang-ext:mount/recursive:container-root", 0,
+                "/" + basePath + "/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}", 1,
+                "/" + basePath
+                        + "/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}/nested-list={name1}",
+                2,
+                "/" + basePath
+                        + "/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}/nested-list={name1}/super-nested-list={name2}",
+                3);
 
         final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         openApi.onMountPointCreated(INSTANCE_ID);
@@ -210,24 +245,73 @@ public final class MountPointOpenApiTest {
         final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
-        var pathToList1 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}";
+        var pathToList1 = "/" + basePath + "/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}";
         assertTrue(mountPointApi.paths().containsKey(pathToList1));
         assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList1));
 
-        var pathToList2 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list2={name1}";
+        var pathToList2 = "/" + basePath
+                + "/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list2={name1}";
         assertTrue(mountPointApi.paths().containsKey(pathToList2));
         assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList2));
 
-        var pathToList3 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
+        var pathToList3 = "/" + basePath + "/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
         assertTrue(mountPointApi.paths().containsKey(pathToList3));
         assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList3));
 
-        var pathToList4 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name1}";
+        var pathToList4 = "/" + basePath
+                + "/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name1}";
         assertTrue(mountPointApi.paths().containsKey(pathToList4));
         assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList4));
 
-        var pathToList5 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
+        var pathToList5 = "/" + basePath
+                + "/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
         assertTrue(mountPointApi.paths().containsKey(pathToList5));
         assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList5));
+    }
+
+    @Test
+    public void testOperationPathsWithBasePath() throws Exception {
+        final EffectiveModelContext actionCtx = YangParserTestUtils.parseYangResourceDirectory(
+                "/yang/action-path-test");
+        openApi = constructMountPointGenerator(actionCtx);
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, "action-path-test", "2023-05-30");
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+        final Pattern pattern = Pattern.compile("/([^/]*)/([^/]*)");
+        final Set<String> actionPaths = mountPointApi.paths()
+                .keySet()
+                .stream()
+                .filter(path -> {
+                    final Matcher m = pattern.matcher(path);
+                    return m.find() && m.group(2).equals("operations");
+                })
+                .collect(Collectors.toSet());
+        assertNotNull(actionPaths);
+        assertEquals("Unexpected api list size", 4, actionPaths.size());
+        Set<String> expectedActionPaths = Set.of(
+                "/" + basePath + "/operations/nodes/node=123/yang-ext:mount/action-path-test:rpc-call",
+                "/" + basePath + "/operations/nodes/node=123/yang-ext:mount/action-path-test:top/top-action",
+                "/" + basePath + "/operations/nodes/node=123/yang-ext:mount/action-path-test:top/mid/mid-action",
+                "/" + basePath
+                        + "/operations/nodes/node=123/yang-ext:mount/action-path-test:top/mid/bottom/bottom-action"
+        );
+        assertEquals("Unexpected operations paths", actionPaths, expectedActionPaths);
+    }
+
+    private MountPointOpenApi constructMountPointGenerator(final EffectiveModelContext customContext) {
+        final DOMSchemaService schemaService = mock(DOMSchemaService.class);
+        when(schemaService.getGlobalContext()).thenReturn(customContext);
+
+        // We are sharing the global schema service and the mount schema service
+        // in our test.
+        // OK for testing - real thing would have separate instances.
+        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
+        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
+
+        final DOMMountPointService service = mock(DOMMountPointService.class);
+        when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
+
+        return mountPointConstructor.apply(schemaService, service).getMountPointOpenApi();
     }
 }
