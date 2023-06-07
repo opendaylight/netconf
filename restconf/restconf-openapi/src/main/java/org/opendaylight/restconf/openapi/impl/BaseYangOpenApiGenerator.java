@@ -166,8 +166,7 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        final OpenApiObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "");
-        return doc;
+        return getApiDeclaration(module, revision, uriInfo, schemaContext, "");
     }
 
     public OpenApiObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
