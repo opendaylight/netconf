@@ -1,0 +1,84 @@
+module custom-base-path-test {
+  yang-version 1.1;
+  namespace urn:opendaylight:action-path-test;
+  prefix "path-test";
+
+  revision "2023-05-30" {
+    description
+    "Creation";
+  }
+
+  rpc rpc-call {
+    input {
+      leaf rpc-call-input {
+        type string;
+      }
+    }
+    output {
+      leaf rpc-call-output {
+        type string;
+      }
+    }
+  }
+
+  container top {
+    list top-list {
+      key "topListKey";
+      leaf topListKey {
+        type string;
+      }
+    }
+    action top-action {
+      input {
+        leaf top-action-input {
+          type string;
+        }
+      }
+      output {
+        leaf top-action-output {
+          type string;
+        }
+      }
+    }
+    container mid {
+      list mid-list {
+        key "midListKey";
+        leaf midListKey {
+          type string;
+        }
+      }
+      action mid-action {
+        input {
+          leaf mid-action-input {
+            type string;
+          }
+        }
+        output {
+          leaf mid-action-output {
+            type string;
+          }
+        }
+      }
+      container bottom {
+        list bottom-list {
+          key "bottomListKey";
+          leaf bottomListKey {
+            type string;
+          }
+        }
+        action bottom-action {
+          input {
+            leaf bottom-action-input {
+              type string;
+            }
+          }
+          output {
+            leaf bottom-action-output {
+              type string;
+            }
+          }
+        }
+      }
+    }
+  }
+}
