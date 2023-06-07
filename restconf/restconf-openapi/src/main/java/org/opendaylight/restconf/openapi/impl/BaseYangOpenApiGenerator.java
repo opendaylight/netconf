@@ -115,6 +115,8 @@ public abstract class BaseYangOpenApiGenerator {
         fillDoc(docBuilder, range, schemaContext, context, deviceName, definitionNames);
 
         // FIXME rework callers logic to make possible to return OpenApiObject from here
+        // it means eliminating createOpenApiObjectBuilder and splitting fillDoc to return paths and schemas
+        // in fact we are going to rework getOpenApiSpec method
         return docBuilder;
     }
 
@@ -217,6 +219,7 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getOpenApiSpec(final Module module, final String context, final Optional<String> deviceName,
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames,
             final OpenApiObject.Builder docBuilder, final boolean isForSingleModule) {
+        // return components/schemas from this part - create new method
         try {
             final Map<String, Schema> schemas = jsonConverter.convertToSchemas(module, schemaContext,
                 definitionNames, isForSingleModule);
@@ -227,6 +230,8 @@ public abstract class BaseYangOpenApiGenerator {
         } catch (final IOException e) {
             LOG.error("Exception occurred in DefinitionGenerator", e);
         }
+
+        // return paths from this part - create new method
         final Map<String, Path> paths = new HashMap<>();
         final String moduleName = module.getName();
 
@@ -293,6 +298,7 @@ public abstract class BaseYangOpenApiGenerator {
 
     public OpenApiObject.Builder createOpenApiObjectBuilder(final String schema, final String host,
             final String basePath, final String title) {
+        // remove this method - in the end we will just create record
         final OpenApiObject.Builder docBuilder = new OpenApiObject.Builder();
         docBuilder.openapi(OPEN_API_VERSION);
         final Info.Builder infoBuilder = new Info.Builder();

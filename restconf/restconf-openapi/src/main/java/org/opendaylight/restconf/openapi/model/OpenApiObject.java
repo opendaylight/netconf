@@ -23,6 +23,7 @@ public record OpenApiObject(String openapi, Info info, List<Server> servers, Map
 
     @SuppressWarnings("checkstyle:hiddenField")
     public static class Builder {
+        // (ideally) remove this builder - we should prepare everything and then create one record instance
         private String openapi;
         private Info info;
         private List<Server> servers;
