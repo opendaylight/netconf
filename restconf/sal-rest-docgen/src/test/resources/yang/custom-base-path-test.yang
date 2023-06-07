@@ -1,0 +1,41 @@
+module custom-base-path-test {
+  yang-version 1.1;
+  namespace urn:opendaylight:action-path-test;
+  prefix "path-test";
+  revision "2023-05-30" {
+    description
+    "Initial revision.";
+  }
+  rpc rpc-call {
+    input {
+      leaf rpc-call-input {
+        type string;
+      }
+    }
+    output {
+      leaf rpc-call-output {
+        type string;
+      }
+    }
+  }
+  container foo {
+    list foo-list {
+      key "fooListKey";
+      leaf fooListKey {
+        type string;
+      }
+    }
+    action foo-action {
+      input {
+        leaf foo-action-input {
+          type string;
+        }
+      }
+      output {
+        leaf foo-action-output {
+          type string;
+        }
+      }
+    }
+  }
+}
