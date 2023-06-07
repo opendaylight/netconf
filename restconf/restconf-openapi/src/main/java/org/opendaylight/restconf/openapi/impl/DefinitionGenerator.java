@@ -215,10 +215,10 @@ public class DefinitionGenerator {
             }
             stack.exit();
         }
-        definitionBuilder.title(definitionName);
-        definitionBuilder.type(OBJECT_TYPE);
-        definitionBuilder.properties(properties);
-        definitionBuilder.description(module.getDescription().orElse(""));
+        definitionBuilder.title(definitionName)
+            .type(OBJECT_TYPE)
+            .properties(properties)
+            .description(module.getDescription().orElse(""));
         setRequiredIfNotEmpty(definitionBuilder, required);
 
         definitions.put(definitionName, definitionBuilder.build());
@@ -282,15 +282,13 @@ public class DefinitionGenerator {
         stack.enterSchemaTree(container.getQName());
         if (!container.getChildNodes().isEmpty()) {
             final String filename = parentName + "_" + operationName + (isInput ? INPUT_SUFFIX : OUTPUT_SUFFIX);
-            final Schema.Builder childSchemaBuilder = new Schema.Builder();
+            final Schema.Builder childSchemaBuilder = new Schema.Builder().title(filename);
             processChildren(childSchemaBuilder, container.getChildNodes(), parentName, definitions, definitionNames,
                     false, stack);
-
             childSchemaBuilder.type(OBJECT_TYPE);
             final ObjectNode xml = JsonNodeFactory.instance.objectNode();
             xml.put(NAME_KEY, isInput ? INPUT : OUTPUT);
             childSchemaBuilder.xml(xml);
-            childSchemaBuilder.title(filename);
             final String discriminator =
                     definitionNames.pickDiscriminator(container, List.of(filename, filename + TOP));
             definitions.put(filename + discriminator, childSchemaBuilder.build());
@@ -327,10 +325,10 @@ public class DefinitionGenerator {
             use RestDocGenUtil#resolveNodesName for creating property name
          */
         properties.set(schemaNode.getQName().getLocalName(), dataNodeProperties);
-        final Schema.Builder finalChildSchemaBuilder = new Schema.Builder();
-        finalChildSchemaBuilder.type(OBJECT_TYPE);
-        finalChildSchemaBuilder.properties(properties);
-        finalChildSchemaBuilder.title(topName);
+        final Schema.Builder finalChildSchemaBuilder = new Schema.Builder()
+            .type(OBJECT_TYPE)
+            .properties(properties)
+            .title(topName);
 
         definitions.put(topName + discriminator, finalChildSchemaBuilder.build());
 
@@ -395,10 +393,10 @@ public class DefinitionGenerator {
                 discriminator = definitionNames.getDiscriminator(schemaNode);
             }
 
-            childSchemaBuilder.type(OBJECT_TYPE);
-            childSchemaBuilder.properties(properties);
-            childSchemaBuilder.title(nodeName);
-            childSchemaBuilder.description(description);
+            childSchemaBuilder.type(OBJECT_TYPE)
+                .properties(properties)
+                .title(nodeName)
+                .description(description);
 
             final String defName = nodeName + discriminator;
             childSchemaBuilder.xml(buildXmlParameter(schemaNode));
@@ -695,23 +693,20 @@ public class DefinitionGenerator {
         }
     }
 
-    private static Schema buildIdentityObject(final IdentitySchemaNode idNode,
-            final EffectiveModelContext context) {
-        final Schema.Builder schemaBuilder = new Schema.Builder();
+    private static Schema buildIdentityObject(final IdentitySchemaNode idNode, final EffectiveModelContext context) {
         final String identityName = idNode.getQName().getLocalName();
         LOG.debug("Processing Identity: {}", identityName);
 
-        schemaBuilder.title(identityName);
-        schemaBuilder.description(idNode.getDescription().orElse(""));
-
         final Collection<? extends IdentitySchemaNode> derivedIds = context.getDerivedIdentities(idNode);
-
         final ArrayNode enumPayload = JsonNodeFactory.instance.arrayNode();
         enumPayload.add(identityName);
         populateEnumWithDerived(derivedIds, enumPayload, context);
-        schemaBuilder.schemaEnum(enumPayload);
-        schemaBuilder.type(STRING_TYPE);
-        return schemaBuilder.build();
+
+        return new Schema.Builder()
+            .title(identityName).description(idNode.getDescription().orElse(""))
+            .schemaEnum(enumPayload)
+            .type(STRING_TYPE)
+            .build();
     }
 
     private boolean isImported(final IdentityrefTypeDefinition leafTypeDef) {
