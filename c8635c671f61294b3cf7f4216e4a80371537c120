@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "317b1448_96ffbfca",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/ReadDataParams.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-07T09:04:59Z",
+      "side": 1,
+      "message": "Improve formatting, please.",
+      "revId": "c8635c671f61294b3cf7f4216e4a80371537c120",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c30f3c2c_139170d2",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/ReadDataParams.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-07T09:04:59Z",
+      "side": 1,
+      "message": "IMO record does not need toString().",
+      "revId": "c8635c671f61294b3cf7f4216e4a80371537c120",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
