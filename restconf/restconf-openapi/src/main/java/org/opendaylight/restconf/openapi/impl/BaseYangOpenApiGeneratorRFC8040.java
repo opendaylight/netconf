@@ -38,20 +38,6 @@ public abstract class BaseYangOpenApiGeneratorRFC8040 extends BaseYangOpenApiGen
     }
 
     @Override
-    protected ListPathBuilder newListPathBuilder() {
-        return new ListPathBuilder() {
-            private String prefix = "=";
-
-            @Override
-            public String nextParamIdentifier(final String key) {
-                final String str = prefix + "{" + key + "}";
-                prefix = ",";
-                return str;
-            }
-        };
-    }
-
-    @Override
     protected void appendPathKeyValue(final StringBuilder builder, final Object value) {
         builder.deleteCharAt(builder.length() - 1).append("=").append(value).append('/');
     }

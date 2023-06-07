@@ -385,17 +385,16 @@ public abstract class BaseYangOpenApiGenerator {
         return operationsBuilder.build();
     }
 
-    protected abstract ListPathBuilder newListPathBuilder();
-
     private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams, final String localName) {
         final StringBuilder path = new StringBuilder();
         path.append(localName);
 
         if (schemaNode instanceof ListSchemaNode) {
-            final ListPathBuilder keyBuilder = newListPathBuilder();
+            String prefix = "=";
             for (final QName listKey : ((ListSchemaNode) schemaNode).getKeyDefinition()) {
                 final String paramName = createUniquePathParamName(listKey.getLocalName(), pathParams);
-                final String pathParamIdentifier = keyBuilder.nextParamIdentifier(paramName);
+                final String pathParamIdentifier = prefix + "{" + paramName + "}";
+                prefix = ",";
 
                 path.append(pathParamIdentifier);
 
@@ -491,9 +490,5 @@ public abstract class BaseYangOpenApiGenerator {
             }
         }
         return builder.toString();
-    }
-
-    protected interface ListPathBuilder {
-        String nextParamIdentifier(String key);
     }
 }
