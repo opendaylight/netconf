@@ -280,13 +280,13 @@ public abstract class BaseYangSwaggerGenerator {
                         hasAddRootPostLink = true;
                     }
 
-                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
+                    final String resourcePathPart = createPath(node, pathParams, oaversion, localName);
                     addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, true, module.getName(),
-                        definitionNames, oaversion, resolvedPath);
+                        definitionNames, oaversion, resourcePathPart, context);
                 } else  {
-                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
+                    final String resourcePathPart = createPath(node, pathParams, oaversion, localName);
                     addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, false, moduleName,
-                        definitionNames, oaversion, resolvedPath);
+                        definitionNames, oaversion, resourcePathPart, context);
                 }
             }
         }
@@ -367,9 +367,9 @@ public abstract class BaseYangSwaggerGenerator {
     private void addPaths(final DataSchemaNode node, final Optional<String> deviceName, final String moduleName,
             final ObjectNode paths, final ArrayNode parentPathParams, final EffectiveModelContext schemaContext,
             final boolean isConfig, final String parentName, final DefinitionNames definitionNames,
-            final OAversion oaversion, final String resourcePath) {
-        LOG.debug("Adding path: [{}]", resourcePath);
-
+            final OAversion oaversion, final String resourcePathPart, final String context) {
+        final String dataPath = getResourcePath("data", context) + "/" + resourcePathPart;
+        LOG.debug("Adding path: [{}]", dataPath);
         final ArrayNode pathParams = JsonUtil.copy(parentPathParams);
         Iterable<? extends DataSchemaNode> childSchemaNodes = Collections.emptySet();
         if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
@@ -380,14 +380,15 @@ public abstract class BaseYangSwaggerGenerator {
         final ObjectNode path = JsonNodeFactory.instance.objectNode();
         path.setAll(operations(node, moduleName, deviceName, pathParams, isConfig, parentName, definitionNames,
                 oaversion));
-        paths.set(resourcePath, path);
+        paths.set(dataPath, path);
 
         if (node instanceof ActionNodeContainer) {
             ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
-                final String resolvedPath = "/rests/operations" + resourcePath.substring(11)
+                final String operationsPath = getResourcePath("operations", context)
+                        + "/" + resourcePathPart
                         + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
                 addOperations(actionDef, moduleName, deviceName, paths, parentName, definitionNames, oaversion,
-                        resolvedPath, pathParams);
+                        operationsPath, pathParams);
             });
         }
 
@@ -395,11 +396,11 @@ public abstract class BaseYangSwaggerGenerator {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 final String newParent = parentName + "_" + node.getQName().getLocalName();
                 final String localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
-                final String newResourcePath = resourcePath + "/" + createPath(childNode, pathParams, oaversion,
+                final String newPathPart = resourcePathPart + "/" + createPath(childNode, pathParams, oaversion,
                         localName);
                 final boolean newIsConfig = isConfig && childNode.isConfiguration();
                 addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
-                    newIsConfig, newParent, definitionNames, oaversion, newResourcePath);
+                    newIsConfig, newParent, definitionNames, oaversion, newPathPart, context);
                 pathParams.removeAll();
                 pathParams.addAll(parentPathParams);
             }
