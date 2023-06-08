@@ -330,15 +330,15 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 final var context = super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime,
                     deviceActionFact);
                 final var spiedContext = spy(context);
-                final var spiedTopology = spy(context.getTopologySingleton());
+                final var spiedSingleton = spy(context.getTopologySingleton());
                 doAnswer(invocation -> {
                     final var spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
                     doReturn(deviceDOMDataBroker).when(spiedFacade)
                         .newDeviceDataBroker(any(MountPointContext.class), any(NetconfSessionPreferences.class));
                     masterSalFacadeFuture.set(spiedFacade);
                     return spiedFacade;
-                }).when(spiedTopology).createSalFacade(any(RemoteDeviceId.class), any(boolean.class));
-                doReturn(spiedTopology).when(spiedContext).getTopologySingleton();
+                }).when(spiedSingleton).createSalFacade(any(RemoteDeviceId.class), any(boolean.class));
+                doReturn(spiedSingleton).when(spiedContext).getTopologySingleton();
                 return spiedContext;
             }
         };
@@ -395,14 +395,13 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     @Test
     public void test() throws Exception {
-        var masterSalFacade = testMaster();
+        testMaster();
 
         testSlave();
 
-        testMasterDisconnected(masterSalFacade);
+        final MasterSalFacade masterSalFacade = testMasterNodeUpdated();
 
-        // FIXME NETCONF-1046
-        // masterSalFacade = testMasterNodeUpdated();
+        testMasterDisconnected(masterSalFacade);
 
         testCleanup();
     }
