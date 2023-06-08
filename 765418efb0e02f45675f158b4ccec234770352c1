@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2770ba45_984fece4",
+        "filename": "transport/transport-config/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-08T18:45:31Z",
+      "side": 1,
+      "message": "nope, we do not want a server\u0026client hotspot artifact",
+      "range": {
+        "startLine": 20,
+        "startChar": 16,
+        "endLine": 20,
+        "endChar": 32
+      },
+      "revId": "765418efb0e02f45675f158b4ccec234770352c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55a22cd6_e3517d0e",
+        "filename": "transport/transport-config/src/main/yang/odl-netconf-client-transport-config.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-08T18:45:31Z",
+      "side": 1,
+      "message": "why not\nhttps://github.com/YangModels/yang/blob/main/experimental/ietf-extracted-YANG-modules/ietf-netconf-client%402023-04-17.yang\n?",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 42
+      },
+      "revId": "765418efb0e02f45675f158b4ccec234770352c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43eb29f2_ae79ff31",
+        "filename": "transport/transport-config/src/main/yang/odl-netconf-client-transport-config.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-08T18:45:31Z",
+      "side": 1,
+      "message": "this modeling is completely insufficient -- all of these are mutually exclusive, at the very least.",
+      "range": {
+        "startLine": 21,
+        "startChar": 18,
+        "endLine": 21,
+        "endChar": 35
+      },
+      "revId": "765418efb0e02f45675f158b4ccec234770352c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65a612df_b2d86361",
+        "filename": "transport/transport-config/src/main/yang/odl-netconf-server-transport-config.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-08T18:45:31Z",
+      "side": 1,
+      "message": "why not https://github.com/YangModels/yang/blob/main/experimental/ietf-extracted-YANG-modules/ietf-netconf-server%402023-04-17.yang ?",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 42
+      },
+      "revId": "765418efb0e02f45675f158b4ccec234770352c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
