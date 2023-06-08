@@ -21,6 +21,8 @@ import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
@@ -70,7 +72,7 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildPost(final String parentName, final String nodeName, final String discriminator,
-            final String moduleName, final Optional<String> deviceName, final String description,
+            final String moduleName, final @Nullable String deviceName, final String description,
             final ArrayNode pathParams) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, description);
@@ -94,7 +96,7 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildGet(final DataSchemaNode node, final String moduleName,
-            final Optional<String> deviceName, final ArrayNode pathParams, final String defName,
+            final @Nullable String deviceName, final ArrayNode pathParams, final String defName,
             final boolean isConfig) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
@@ -137,7 +139,7 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildPut(final String parentName, final String nodeName, final String discriminator,
-            final String moduleName, final Optional<String> deviceName, final String description,
+            final String moduleName, final @Nullable String deviceName, final String description,
             final ArrayNode pathParams) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, description);
@@ -160,7 +162,7 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildPatch(final String parentName, final String nodeName, final String moduleName,
-            final Optional<String> deviceName, final String description, final ArrayNode pathParams) {
+            final @Nullable String deviceName, final String description, final ArrayNode pathParams) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName));
@@ -182,7 +184,7 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildDelete(final DataSchemaNode node, final String moduleName,
-            final Optional<String> deviceName, final ArrayNode pathParams) {
+            final @Nullable String deviceName, final ArrayNode pathParams) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
                 node.getQName().getLocalName()));
@@ -200,7 +202,7 @@ public final class OperationBuilder {
     }
 
     public static ObjectNode buildPostOperation(final OperationDefinition operDef, final String moduleName,
-            final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames) {
+            final @Nullable String deviceName, final String parentName, final DefinitionNames definitionNames) {
         final ObjectNode postOperation = JsonNodeFactory.instance.objectNode();
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode();
         final String operName = operDef.getQName().getLocalName();
@@ -310,15 +312,18 @@ public final class OperationBuilder {
     }
 
     private static String buildSummaryValue(final String httpMethod, final String moduleName,
-            final Optional<String> deviceName, final String nodeName) {
-        return httpMethod + SUMMARY_SEPARATOR + deviceName.map(s -> s + SUMMARY_SEPARATOR).orElse("")
+            final @Nullable String deviceName, final String nodeName) {
+        if (deviceName == null) {
+            return httpMethod + SUMMARY_SEPARATOR + moduleName + SUMMARY_SEPARATOR + nodeName;
+        }
+        return httpMethod + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR
                 + moduleName + SUMMARY_SEPARATOR + nodeName;
     }
-
-    public static ArrayNode buildTagsValue(final Optional<String> deviceName, final String moduleName) {
-        final ArrayNode tagsValue = JsonNodeFactory.instance.arrayNode();
-        tagsValue.add(deviceName.map(s -> "mounted " + s).orElse("controller") + " " + moduleName);
-        return tagsValue;
+    public static ArrayNode buildTagsValue(final @Nullable String deviceName, final String moduleName) {
+        if (deviceName == null) {
+            return JsonNodeFactory.instance.arrayNode().add("controller" + " " + moduleName);
+        }
+        return JsonNodeFactory.instance.arrayNode().add("mounted " + deviceName + " " + moduleName);
     }
 
     public static ObjectNode getTypeParentNode(final ObjectNode parameter) {
