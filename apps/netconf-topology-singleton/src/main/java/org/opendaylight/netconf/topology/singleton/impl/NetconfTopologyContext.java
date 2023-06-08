@@ -40,9 +40,12 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     private final @NonNull ServiceGroupIdentifier serviceGroupIdent;
     private final NetconfTopologySingletonImpl topologySingleton;
-    private final RemoteDeviceId remoteDeviceId;
 
     private volatile boolean closed;
+    private volatile boolean isMaster;
+
+    private RemoteDeviceId remoteDeviceId;
+    private NetconfTopologySetup netconfTopologyDeviceSetup;
 
     NetconfTopologyContext(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
@@ -74,6 +77,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             LOG.warn("Instance is already closed.");
             return;
         }
+        isMaster = true;
         getTopologySingleton().becomeTopologyLeader();
     }
 
@@ -88,6 +92,19 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         }
         getTopologySingleton().becomeTopologyFollower();
         return FluentFutures.immediateNullFluentFuture();
+    }
+
+    void refresh(final @NonNull NetconfTopologySetup setup) {
+        netconfTopologyDeviceSetup = requireNonNull(setup);
+        final var node = netconfTopologyDeviceSetup.getNode();
+        remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), node.augmentation(NetconfNode.class));
+
+        if (isMaster) {
+            getTopologySingleton().disconnectNode(setup.getNode().getNodeId());
+            getTopologySingleton().refreshSetupConnection(netconfTopologyDeviceSetup, remoteDeviceId);
+        } else {
+            getTopologySingleton().refreshDevice(netconfTopologyDeviceSetup, remoteDeviceId);
+        }
     }
 
     @Override

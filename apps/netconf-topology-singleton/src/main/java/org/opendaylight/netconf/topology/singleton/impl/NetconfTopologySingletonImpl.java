@@ -9,6 +9,8 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
 import akka.cluster.Cluster;
+import akka.dispatch.OnComplete;
+import akka.pattern.Patterns;
 import akka.util.Timeout;
 import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -27,9 +29,14 @@ import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 final class NetconfTopologySingletonImpl extends AbstractNetconfTopology implements AutoCloseable {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologySingletonImpl.class);
+
     private final RemoteDeviceId remoteDeviceId;
     private final NetconfTopologySetup setup;
     private final Timeout actorResponseWaitTime;
@@ -70,13 +77,34 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
     }
 
     void becomeTopologyFollower() {
+        registerNodeManager();
+        // disconnect device from this node and listen for changes from leader
+        disconnectNode(setup.getNode().getNodeId());
         if (masterActorRef != null) {
             // was leader before
             setup.getActorSystem().stop(masterActorRef);
         }
-        // disconnect device from this node and listen for changes from leader
-        disconnectNode(setup.getNode().getNodeId());
-        registerNodeManager();
+    }
+
+    void refreshSetupConnection(final NetconfTopologySetup netconfTopologyDeviceSetup, final RemoteDeviceId device) {
+        Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(netconfTopologyDeviceSetup, device),
+                actorResponseWaitTime).onComplete(
+                        new OnComplete<>() {
+                            @Override
+                            public void onComplete(final Throwable failure, final Object success) {
+                                if (failure != null) {
+                                    LOG.error("Failed to refresh master actor data", failure);
+                                    return;
+                                }
+                                LOG.debug("Succeed to refresh Master Action data. Creating Connector...");
+                                setupConnection(setup.getNode().getNodeId(), setup.getNode());
+                            }
+                        },
+                netconfTopologyDeviceSetup.getActorSystem().dispatcher());
+    }
+
+    void refreshDevice(final NetconfTopologySetup netconfTopologyDeviceSetup, final RemoteDeviceId deviceId) {
+        netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, deviceId);
     }
 
     private void registerNodeManager() {
