@@ -96,35 +96,16 @@ public abstract class BaseYangOpenApiGenerator {
 
     public OpenApiObject.Builder getAllModulesDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
             final String deviceName, final String context, final DefinitionNames definitionNames) {
-        final String schema = createSchemaFromUriInfo(uriInfo);
-        final String host = createHostFromUriInfo(uriInfo);
-        final String title = deviceName + " modules of RESTCONF";
-
-        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, BASE_PATH, title);
-        docBuilder.paths(new HashMap<>());
         final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
-        fillDoc(docBuilder, sortedModules, schemaContext, context, deviceName, definitionNames);
-
-        // FIXME rework callers logic to make possible to return OpenApiObject from here
-        return docBuilder;
+        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, sortedModules);
     }
 
     public OpenApiObject.Builder getRangedModulesDoc(final UriInfo uriInfo, final Range<Integer> range,
             final EffectiveModelContext schemaContext, final String deviceName, final String context,
             final DefinitionNames definitionNames) {
-        final String schema = createSchemaFromUriInfo(uriInfo);
-        final String host = createHostFromUriInfo(uriInfo);
-        final String title = deviceName + " modules of RESTCONF";
-
-        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, BASE_PATH, title);
-        docBuilder.paths(new HashMap<>());
-
         final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
         final Set<Module> filteredModules = filterByRange(sortedModules, range);
-        fillDoc(docBuilder, filteredModules, schemaContext, context, deviceName, definitionNames);
-
-        // FIXME rework callers logic to make possible to return OpenApiObject from here
-        return docBuilder;
+        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, filteredModules);
     }
 
     public void fillDoc(final OpenApiObject.Builder docBuilder, final Set<Module> modules,
@@ -380,6 +361,18 @@ public abstract class BaseYangOpenApiGenerator {
             operationsBuilder.post(post);
         }
         return operationsBuilder.build();
+    }
+
+    private OpenApiObject.Builder getFilledDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
+            final String deviceName, final String context, final DefinitionNames definitionNames,
+            final Set<Module> sortedModules) {
+        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(createSchemaFromUriInfo(uriInfo),
+                createHostFromUriInfo(uriInfo), BASE_PATH, deviceName + " modules of RESTCONF");
+        docBuilder.paths(new HashMap<>());
+        fillDoc(docBuilder, sortedModules, schemaContext, context, deviceName, definitionNames);
+
+        // FIXME rework callers logic to make possible to return OpenApiObject from here
+        return docBuilder;
     }
 
     private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams, final String localName) {
