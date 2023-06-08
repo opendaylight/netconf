@@ -24,6 +24,6 @@ public final class OpenApiApplication extends Application {
 
     @Override
     public Set<Object> getSingletons() {
-        return Set.of(openApiService, new JaxbContextResolver(), new JacksonJaxbJsonProvider());
+        return Set.of(openApiService, new JacksonJaxbJsonProvider());
     }
 }
