@@ -173,10 +173,10 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 includeDataStore = false;
             }
             openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, Range.closed(start, end), context,
-                    Optional.of(deviceName), urlPrefix, definitionNames);
+                    deviceName, urlPrefix, definitionNames);
         } else {
-            openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, context, Optional.of(deviceName),
-                    urlPrefix, definitionNames);
+            openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, context, deviceName, urlPrefix,
+                    definitionNames);
         }
 
         if (includeDataStore) {
@@ -216,7 +216,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     private static Operation createGetPathItem(final String resourceType, final String description,
             final String deviceName) {
         final String summary = HttpMethod.GET + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR + resourceType;
-        final ArrayNode tags = buildTagsValue(Optional.of(deviceName), "GET root");
+        final ArrayNode tags = buildTagsValue(deviceName, "GET root");
         final ObjectNode okResponse = JsonNodeFactory.instance.objectNode();
         okResponse.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
