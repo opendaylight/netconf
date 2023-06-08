@@ -18,7 +18,6 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.g
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -71,7 +70,6 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static final String API_VERSION = "1.0.0";
     private static final String OPEN_API_VERSION = "3.0.3";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
     private final DOMSchemaService schemaService;
@@ -83,10 +81,6 @@ public abstract class BaseYangOpenApiGenerator {
             .put("scheme", "basic");
     private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
             .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
-
-    static {
-        MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
-    }
 
     protected BaseYangOpenApiGenerator(final Optional<DOMSchemaService> schemaService) {
         this.schemaService = schemaService.orElse(null);
@@ -222,9 +216,6 @@ public abstract class BaseYangOpenApiGenerator {
             final Map<String, Schema> schemas = jsonConverter.convertToSchemas(module, schemaContext,
                 definitionNames, isForSingleModule);
             docBuilder.getComponents().schemas().putAll(schemas);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Document: {}", MAPPER.writeValueAsString(docBuilder.build()));
-            }
         } catch (final IOException e) {
             LOG.error("Exception occurred in DefinitionGenerator", e);
         }
