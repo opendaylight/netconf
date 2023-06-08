@@ -62,6 +62,29 @@
       "message": "final",
       "revId": "a603128f934a3ad9b66c08ff2bbb1ce7867149b3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb8dbcbe_a32864cb",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-06-08T07:00:55Z",
+      "side": 1,
+      "message": "Maybe this will be more readable:\n        final var summary \u003d buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);\n        postOperation.description(description)\n            .summary(summary)\n            .tags(buildTagsValue(deviceName, moduleName));",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 67
+      },
+      "revId": "a603128f934a3ad9b66c08ff2bbb1ce7867149b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
