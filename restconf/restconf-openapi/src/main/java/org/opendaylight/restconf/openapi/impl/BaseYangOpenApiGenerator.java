@@ -103,25 +103,24 @@ public abstract class BaseYangOpenApiGenerator {
         docBuilder.paths(new HashMap<>());
 
         final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
-        fillDoc(docBuilder, sortedModules, schemaContext, context, deviceName, definitionNames);
-
-        // FIXME rework callers logic to make possible to return OpenApiObject from here
-        return docBuilder;
+        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, sortedModules);
     }
 
     public OpenApiObject.Builder getAllModulesDoc(final UriInfo uriInfo, final Range<Integer> range,
             final EffectiveModelContext schemaContext, final @NonNull String deviceName, final String context,
             final DefinitionNames definitionNames) {
-        final String schema = createSchemaFromUriInfo(uriInfo);
-        final String host = createHostFromUriInfo(uriInfo);
-        final String title = deviceName + " modules of RESTCONF";
-
-        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, BASE_PATH, title);
-        docBuilder.paths(new HashMap<>());
-
         final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
         final Set<Module> filteredModules = filterByRange(sortedModules, range);
-        fillDoc(docBuilder, filteredModules, schemaContext, context, deviceName, definitionNames);
+        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, filteredModules);
+    }
+
+    private OpenApiObject.Builder getFilledDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
+        final String deviceName, final String context, final DefinitionNames definitionNames,
+        final Set<Module> modules) {
+        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(createSchemaFromUriInfo(uriInfo),
+            createHostFromUriInfo(uriInfo), BASE_PATH, deviceName + " modules of RESTCONF");
+        docBuilder.paths(new HashMap<>());
+        fillDoc(docBuilder, modules, schemaContext, context, deviceName, definitionNames);
 
         // FIXME rework callers logic to make possible to return OpenApiObject from here
         return docBuilder;
