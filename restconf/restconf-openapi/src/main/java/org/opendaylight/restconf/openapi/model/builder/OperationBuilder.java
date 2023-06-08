@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
-import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -88,7 +87,7 @@ public final class OperationBuilder {
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
-                buildResponse(Response.Status.CREATED.getReasonPhrase(), Optional.empty()));
+                buildResponse(Response.Status.CREATED.getReasonPhrase()));
 
         value.set(RESPONSES_KEY, responses);
         return value;
@@ -112,7 +111,7 @@ public final class OperationBuilder {
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         schema.put(REF_KEY, COMPONENTS_PREFIX + defName);
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
-                buildResponse(Response.Status.OK.getReasonPhrase(), Optional.of(schema)));
+                buildResponse(Response.Status.OK.getReasonPhrase(), schema));
 
         value.set(RESPONSES_KEY, responses);
         return value;
@@ -152,9 +151,8 @@ public final class OperationBuilder {
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
-                buildResponse(Response.Status.CREATED.getReasonPhrase(), Optional.empty()));
-        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
-                buildResponse("Updated", Optional.empty()));
+                buildResponse(Response.Status.CREATED.getReasonPhrase()));
+        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Updated"));
 
         value.set(RESPONSES_KEY, responses);
         return value;
@@ -174,9 +172,8 @@ public final class OperationBuilder {
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
-                buildResponse(Response.Status.OK.getReasonPhrase(), Optional.empty()));
-        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
-                buildResponse("Updated", Optional.empty()));
+                buildResponse(Response.Status.OK.getReasonPhrase()));
+        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Updated"));
 
         value.set(RESPONSES_KEY, responses);
         return value;
@@ -193,8 +190,7 @@ public final class OperationBuilder {
         value.set(PARAMETERS_KEY, parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
-        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
-                buildResponse("Deleted", Optional.empty()));
+        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Deleted"));
 
         value.set(RESPONSES_KEY, responses);
         return value;
@@ -251,11 +247,9 @@ public final class OperationBuilder {
             final String defName = parentName + "_" + operName + OUTPUT_SUFFIX + TOP
                     + definitionNames.getDiscriminator(output);
             schema.put(REF_KEY, COMPONENTS_PREFIX + defName);
-            responses.set(String.valueOf(Response.Status.OK.getStatusCode()), buildResponse(description,
-                    Optional.of(schema)));
+            responses.set(String.valueOf(Response.Status.OK.getStatusCode()), buildResponse(description));
         } else {
-            responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse(description,
-                    Optional.empty()));
+            responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse(description));
         }
         postOperation.set(RESPONSES_KEY, responses);
         postOperation.put(DESCRIPTION_KEY, operDef.getDescription().orElse(""));
@@ -293,19 +287,21 @@ public final class OperationBuilder {
         return mimeTypeValue;
     }
 
-    public static ObjectNode buildResponse(final String description, final Optional<ObjectNode> schema) {
+    public static ObjectNode buildResponse(final String description) {
         final ObjectNode response = JsonNodeFactory.instance.objectNode();
+        response.put(DESCRIPTION_KEY, description);
+        return response;
+    }
 
-        if (schema.isPresent()) {
-            final ObjectNode schemaValue = schema.orElseThrow();
-            final ObjectNode content = JsonNodeFactory.instance.objectNode();
-            final ObjectNode body = JsonNodeFactory.instance.objectNode();
-            for (final String mimeType : MIME_TYPES) {
-                content.set(mimeType, body);
-            }
-            body.set(SCHEMA_KEY, schemaValue);
-            response.set(CONTENT_KEY, content);
+    public static ObjectNode buildResponse(final String description, final ObjectNode schema) {
+        final ObjectNode response = JsonNodeFactory.instance.objectNode();
+        final ObjectNode content = JsonNodeFactory.instance.objectNode();
+        final ObjectNode body = JsonNodeFactory.instance.objectNode();
+        for (final String mimeType : MIME_TYPES) {
+            content.set(mimeType, body);
         }
+        body.set(SCHEMA_KEY, schema);
+        response.set(CONTENT_KEY, content);
         response.put(DESCRIPTION_KEY, description);
         return response;
     }
