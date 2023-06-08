@@ -157,12 +157,12 @@ public class NetconfTopologyManager
             switch (rootNode.getModificationType()) {
                 case SUBTREE_MODIFIED:
                     LOG.debug("Config for node {} updated", nodeId);
-                    refreshNetconfDeviceContext(dataModifIdent);
+                    refreshNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
                     break;
                 case WRITE:
                     if (contexts.containsKey(dataModifIdent)) {
                         LOG.debug("RemoteDevice{{}} was already configured, reconfiguring node...", nodeId);
-                        refreshNetconfDeviceContext(dataModifIdent);
+                        refreshNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
                     } else {
                         LOG.debug("Config for node {} created", nodeId);
                         startNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
@@ -178,9 +178,9 @@ public class NetconfTopologyManager
         }
     }
 
-    private void refreshNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier) {
+    private void refreshNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
         final NetconfTopologyContext context = contexts.get(instanceIdentifier);
-        context.closeServiceInstance().addListener(context::instantiateServiceInstance, MoreExecutors.directExecutor());
+        context.refresh(createSetup(instanceIdentifier, node));
     }
 
     // ClusterSingletonServiceRegistration registerClusterSingletonService method throws a Runtime exception if there
