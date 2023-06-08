@@ -395,14 +395,13 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     @Test
     public void test() throws Exception {
-        var masterSalFacade = testMaster();
+        testMaster();
 
         testSlave();
 
-        testMasterDisconnected(masterSalFacade);
+        final MasterSalFacade masterSalFacade = testMasterNodeUpdated();
 
-        // FIXME NETCONF-1046
-        // masterSalFacade = testMasterNodeUpdated();
+        testMasterDisconnected(masterSalFacade);
 
         testCleanup();
     }
