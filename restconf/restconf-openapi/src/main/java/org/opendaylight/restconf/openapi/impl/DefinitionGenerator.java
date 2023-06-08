@@ -515,7 +515,7 @@ public class DefinitionGenerator {
 
         final ObjectNode itemsVal = JsonNodeFactory.instance.objectNode();
         final Optional<ElementCountConstraint> optConstraint = listNode.getElementCountConstraint();
-        processElementCount(optConstraint, props);
+        optConstraint.ifPresent(elementCountConstraint -> processElementCount(elementCountConstraint, props));
 
         processTypeDef(listNode.getType(), listNode, itemsVal, stack, definitions, definitionNames);
         props.set(ITEMS_KEY, itemsVal);
@@ -525,17 +525,14 @@ public class DefinitionGenerator {
         return props;
     }
 
-    private static void processElementCount(final Optional<ElementCountConstraint> constraint, final ObjectNode props) {
-        if (constraint.isPresent()) {
-            final ElementCountConstraint constr = constraint.orElseThrow();
-            final Integer minElements = constr.getMinElements();
-            if (minElements != null) {
-                props.put(MIN_ITEMS, minElements);
-            }
-            final Integer maxElements = constr.getMaxElements();
-            if (maxElements != null) {
-                props.put(MAX_ITEMS, maxElements);
-            }
+    private static void processElementCount(final ElementCountConstraint constraint, final ObjectNode props) {
+        final Integer minElements = constraint.getMinElements();
+        if (minElements != null) {
+            props.put(MIN_ITEMS, minElements);
+        }
+        final Integer maxElements = constraint.getMaxElements();
+        if (maxElements != null) {
+            props.put(MAX_ITEMS, maxElements);
         }
     }
 
