@@ -176,10 +176,10 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 includeDataStore = false;
             }
             openApiObjectBuilder = openApiGenerator.getRangedModulesDoc(uriInfo, Range.closed(start, end), context,
-                    Optional.of(deviceName), urlPrefix, definitionNames);
+                    deviceName, urlPrefix, definitionNames);
         } else {
-            openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, context, Optional.of(deviceName),
-                    urlPrefix, definitionNames);
+            openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, context, deviceName, urlPrefix,
+                    definitionNames);
         }
 
         if (includeDataStore) {
