@@ -36,6 +36,7 @@ import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -78,7 +79,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -248,11 +248,18 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         // Notify of Node 1 replaced and Node 2 subtree modified.
         mockContextMap.clear();
 
-        doReturn(WRITE).when(dataObjectModification1).getModificationType();
-        doReturn(SUBTREE_MODIFIED).when(dataObjectModification2).getModificationType();
+        final NetconfNode updatedNetconfNode1 = new NetconfNodeBuilder(netconfNode1)
+                .setPort(new PortNumber(Uint16.valueOf(33333))).build();
+        final Node updatedNode1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(updatedNetconfNode1).build();
 
-        doReturn(FluentFutures.immediateNullFluentFuture()).when(mockContext1).closeServiceInstance();
-        doReturn(FluentFutures.immediateNullFluentFuture()).when(mockContext2).closeServiceInstance();
+        doReturn(WRITE).when(dataObjectModification1).getModificationType();
+        doReturn(updatedNode1).when(dataObjectModification1).getDataAfter();
+
+        doReturn(SUBTREE_MODIFIED).when(dataObjectModification2).getModificationType();
+        doReturn(node2).when(dataObjectModification2).getDataAfter();
+
+        doNothing().when(mockContext1).refresh(any());
+        doNothing().when(mockContext2).refresh(any());
 
         netconfTopologyManager.onDataTreeChanged(Arrays.asList(
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
@@ -260,8 +267,12 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId2), dataObjectModification2)));
 
-        verify(mockContext1).instantiateServiceInstance();
-        verify(mockContext2).instantiateServiceInstance();
+        ArgumentCaptor<NetconfTopologySetup> mockContext1Setup = ArgumentCaptor.forClass(NetconfTopologySetup.class);
+        verify(mockContext1).refresh(mockContext1Setup.capture());
+        assertEquals(updatedNode1, mockContext1Setup.getValue().getNode());
+
+        verify(mockContext2).refresh(any());
+
         verifyNoMoreInteractions(clusterSingletonServiceProvider);
 
         // Notify of Node 1 deleted.

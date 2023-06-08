@@ -11,7 +11,10 @@ import static java.util.Objects.requireNonNull;
 
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -32,6 +35,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySet
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +44,12 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     private final @NonNull ServiceGroupIdentifier serviceGroupIdent;
     private final NetconfTopologySingletonImpl topologySingleton;
-    private final RemoteDeviceId remoteDeviceId;
 
     private volatile boolean closed;
+    private volatile boolean isMaster;
+
+    private RemoteDeviceId remoteDeviceId;
+    private NetconfTopologySetup netconfTopologyDeviceSetup;
 
     NetconfTopologyContext(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
@@ -74,6 +81,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             LOG.warn("Instance is already closed.");
             return;
         }
+        isMaster = true;
         getTopologySingleton().becomeTopologyLeader();
     }
 
@@ -88,6 +96,30 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         }
         getTopologySingleton().becomeTopologyFollower();
         return FluentFutures.immediateNullFluentFuture();
+    }
+
+    void refresh(final @NonNull NetconfTopologySetup setup) {
+        netconfTopologyDeviceSetup = requireNonNull(setup);
+        final var node = netconfTopologyDeviceSetup.getNode();
+        remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), node.augmentation(NetconfNode.class));
+
+        if (isMaster) {
+            final var disconnectNodeFuture = getTopologySingleton().disconnectNode(setup.getNode().getNodeId());
+            Futures.addCallback(disconnectNodeFuture, new FutureCallback<>() {
+                @Override
+                public void onSuccess(final Empty result) {
+                    LOG.debug("Succeed to disconnect node. Refreshing Master actor data... ");
+                    getTopologySingleton().refreshSetupConnection(netconfTopologyDeviceSetup, remoteDeviceId);
+                }
+
+                @Override
+                public void onFailure(final Throwable throwable) {
+                    LOG.error("Failed to disconnect node {}", remoteDeviceId, throwable);
+                }
+            }, MoreExecutors.directExecutor());
+        } else {
+            getTopologySingleton().refreshDevice(netconfTopologyDeviceSetup, remoteDeviceId);
+        }
     }
 
     @Override
