@@ -11,9 +11,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import java.util.Optional;
-import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,6 +21,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
+import org.opendaylight.restconf.openapi.model.MountPointInstance;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -33,7 +33,6 @@ public final class OpenApiServiceImplTest {
             .node(QName.create("", "nodes"))
             .node(QName.create("", "node"))
             .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static EffectiveModelContext context;
     private static DOMSchemaService schemaService;
@@ -63,9 +62,10 @@ public final class OpenApiServiceImplTest {
 
     @Test
     public void getListOfMounts() throws Exception {
-        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
-        // simulate the behavior of JacksonJaxbJsonProvider
-        final String result = MAPPER.writer().writeValueAsString(openApiService.getListOfMounts(mockInfo).getEntity());
-        assertEquals("[{\"instance\":\"/nodes/node=123/\",\"id\":1}]", result);
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        final var entity = ((List<MountPointInstance>) openApiService.getListOfMounts(mockInfo).getEntity());
+        final var instance = entity.get(0);
+        assertEquals("/nodes/node=123/", instance.instance());
+        assertEquals(Long.valueOf(1), instance.id());
     }
 }
