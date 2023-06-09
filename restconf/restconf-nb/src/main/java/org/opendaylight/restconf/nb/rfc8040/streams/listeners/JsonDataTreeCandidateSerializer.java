@@ -42,7 +42,7 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
         serializePath(dataPath);
 
         if (!skipData) {
-            final var dataAfter = candidate.dataAfter();
+            final var dataAfter = getDataAfter(candidate);
             if (dataAfter != null) {
                 jsonWriter.name("data").beginObject();
                 NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(nestedWriter);
