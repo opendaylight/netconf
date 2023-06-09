@@ -1,0 +1,13 @@
+{
+    "urn-ietf-params-xml-ns-netconf-notification-1.0:notification":{
+        "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification":{
+            "data-change-event":[
+                {
+                    "path":"/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']",
+                    "operation":"deleted"
+                }
+            ]
+        },
+        "event-time":"2020-10-14T12:34:59.085525+02:00"
+    }
+}

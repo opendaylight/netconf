@@ -1,0 +1,9 @@
+<notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+    <eventTime>2020-10-19T12:21:02.876756+02:00</eventTime>
+    <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
+        <data-change-event>
+            <path>/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']</path>
+            <operation>deleted</operation>
+        </data-change-event>
+    </data-changed-notification>
+</notification>
