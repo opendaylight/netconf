@@ -37,7 +37,7 @@ final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<E
         serializePath(nodePath);
 
         if (!skipData) {
-            final var dataAfter = candidate.dataAfter();
+            final var dataAfter = getDataAfter(candidate);
             if (dataAfter != null) {
                 xmlWriter.writeStartElement("data");
                 NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(nodeStreamWriter);
