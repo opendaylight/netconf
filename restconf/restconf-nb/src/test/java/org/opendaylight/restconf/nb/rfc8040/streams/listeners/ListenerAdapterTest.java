@@ -50,6 +50,7 @@ import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.p
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -63,45 +64,69 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     private static final String JSON_NOTIF_LEAVES_CREATE = "/listener-adapter-test/notif-leaves-create.json";
     private static final String JSON_NOTIF_LEAVES_UPDATE =  "/listener-adapter-test/notif-leaves-update.json";
-    private static final String JSON_NOTIF_LEAVES_DEL =  "/listener-adapter-test/notif-leaves-del.json";
+    private static final String JSON_NOTIF_LEAVES_DELETE = "/listener-adapter-test/notif-leaves-delete.json";
     private static final String JSON_NOTIF_CHANGED_LEAVES_CREATE =
             "/listener-adapter-test/notif-changed-leaves-create.json";
     private static final String JSON_NOTIF_CHANGED_LEAVES_UPDATE =
             "/listener-adapter-test/notif-changed-leaves-update.json";
-    private static final String JSON_NOTIF_CHANGED_LEAVES_DEL =
-            "/listener-adapter-test/notif-changed-leaves-del.json";
-    private static final String JSON_NOTIF_CREATE = "/listener-adapter-test/notif-create.json";
-    private static final String JSON_NOTIF_UPDATE = "/listener-adapter-test/notif-update.json";
-    private static final String JSON_NOTIF_DEL = "/listener-adapter-test/notif-del.json";
-    private static final String JSON_NOTIF_WITHOUT_DATA_CREATE =
-            "/listener-adapter-test/notif-without-data-create.json";
-    private static final String JSON_NOTIF_WITHOUT_DATA_UPDATE =
-            "/listener-adapter-test/notif-without-data-update.json";
-    private static final String JSON_NOTIF_WITHOUT_DATA_DELETE =
-            "/listener-adapter-test/notif-without-data-del.json";
-
-    private static final String XML_NOTIF_CREATE = "/listener-adapter-test/notif-create.xml";
-    private static final String XML_NOTIF_UPDATE =  "/listener-adapter-test/notif-update.xml";
-    private static final String XML_NOTIF_DEL =  "/listener-adapter-test/notif-delete.xml";
+    private static final String JSON_NOTIF_CHANGED_LEAVES_DELETE =
+            "/listener-adapter-test/notif-changed-leaves-delete.json";
 
     private static final String XML_NOTIF_LEAVES_CREATE = "/listener-adapter-test/notif-leaves-create.xml";
     private static final String XML_NOTIF_LEAVES_UPDATE =  "/listener-adapter-test/notif-leaves-update.xml";
-    private static final String XML_NOTIF_LEAVES_DEL =  "/listener-adapter-test/notif-leaves-delete.xml";
+    private static final String XML_NOTIF_LEAVES_DELETE =  "/listener-adapter-test/notif-leaves-delete.xml";
     private static final String XML_NOTIF_CHANGED_LEAVES_CREATE =
             "/listener-adapter-test/notif-changed-leaves-create.xml";
     private static final String XML_NOTIF_CHANGED_LEAVES_UPDATE =
             "/listener-adapter-test/notif-changed-leaves-update.xml";
-    private static final String XML_NOTIF_CHANGED_LEAVES_DEL =
+    private static final String XML_NOTIF_CHANGED_LEAVES_DELETE =
             "/listener-adapter-test/notif-changed-leaves-delete.xml";
 
-    private static final String XML_NOTIF_WITHOUT_DATA_CREATE =
-            "/listener-adapter-test/notif-without-data-create.xml";
-    private static final String XML_NOTIF_WITHOUT_DATA_UPDATE =
-            "/listener-adapter-test/notif-without-data-update.xml";
-    private static final String XML_NOTIF_WITHOUT_DATA_DELETE =
-            "/listener-adapter-test/notif-without-data-delete.xml";
+    private static final String JSON_NOTIF_CONT_CREATE = "/listener-adapter-test/notif-cont-create.json";
+    private static final String JSON_NOTIF_CONT_UPDATE = "/listener-adapter-test/notif-cont-update.json";
+    private static final String JSON_NOTIF_CONT_DELETE = "/listener-adapter-test/notif-cont-delete.json";
+    private static final String JSON_NOTIF_LIST_CREATE = "/listener-adapter-test/notif-list-create.json";
+    private static final String JSON_NOTIF_LIST_UPDATE = "/listener-adapter-test/notif-list-update.json";
+    private static final String JSON_NOTIF_LIST_DELETE = "/listener-adapter-test/notif-list-delete.json";
+    private static final String JSON_NOTIF_WITHOUT_DATA_CONT_CREATE =
+            "/listener-adapter-test/notif-without-data-cont-create.json";
+    private static final String JSON_NOTIF_WITHOUT_DATA_CONT_UPDATE =
+            "/listener-adapter-test/notif-without-data-cont-update.json";
+    private static final String JSON_NOTIF_WITHOUT_DATA_CONT_DELETE =
+            "/listener-adapter-test/notif-without-data-cont-delete.json";
+    private static final String JSON_NOTIF_WITHOUT_DATA_LIST_CREATE =
+            "/listener-adapter-test/notif-without-data-list-create.json";
+    private static final String JSON_NOTIF_WITHOUT_DATA_LIST_UPDATE =
+            "/listener-adapter-test/notif-without-data-list-update.json";
+    private static final String JSON_NOTIF_WITHOUT_DATA_LIST_DELETE =
+            "/listener-adapter-test/notif-without-data-list-delete.json";
+
+    private static final String XML_NOTIF_CONT_CREATE = "/listener-adapter-test/notif-cont-create.xml";
+    private static final String XML_NOTIF_CONT_UPDATE = "/listener-adapter-test/notif-cont-update.xml";
+    private static final String XML_NOTIF_CONT_DELETE = "/listener-adapter-test/notif-cont-delete.xml";
+    private static final String XML_NOTIF_LIST_CREATE = "/listener-adapter-test/notif-list-create.xml";
+    private static final String XML_NOTIF_LIST_UPDATE = "/listener-adapter-test/notif-list-update.xml";
+    private static final String XML_NOTIF_LIST_DELETE = "/listener-adapter-test/notif-list-delete.xml";
+    private static final String XML_NOTIF_WITHOUT_DATA_CONT_CREATE =
+            "/listener-adapter-test/notif-without-data-cont-create.xml";
+    private static final String XML_NOTIF_WITHOUT_DATA_CONT_UPDATE =
+            "/listener-adapter-test/notif-without-data-cont-update.xml";
+    private static final String XML_NOTIF_WITHOUT_DATA_CONT_DELETE =
+            "/listener-adapter-test/notif-without-data-cont-delete.xml";
+    private static final String XML_NOTIF_WITHOUT_DATA_LIST_CREATE =
+            "/listener-adapter-test/notif-without-data-list-create.xml";
+    private static final String XML_NOTIF_WITHOUT_DATA_LIST_UPDATE =
+            "/listener-adapter-test/notif-without-data-list-update.xml";
+    private static final String XML_NOTIF_WITHOUT_DATA_LIST_DELETE =
+            "/listener-adapter-test/notif-without-data-list-delete.xml";
 
     private static final YangInstanceIdentifier PATCH_CONT_YIID = YangInstanceIdentifier.of(PatchCont.QNAME);
+
+    private static final YangInstanceIdentifier MY_LIST1_YIID = YangInstanceIdentifier.builder()
+            .node(PatchCont.QNAME)
+            .node(MyList1.QNAME)
+            .nodeWithKey(MyList1.QNAME, QName.create(PatchCont.QNAME.getModule(), "name"), "Althea")
+            .build();
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
@@ -193,29 +218,6 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         }
     }
 
-    static String withFakeDate(final String in) throws JSONException {
-        final JSONObject doc = new JSONObject(in);
-        final JSONObject notification =
-                doc.getJSONObject("urn-ietf-params-xml-ns-netconf-notification-1.0:notification");
-        if (notification == null) {
-            return in;
-        }
-        notification.put("event-time", "someDate");
-        return doc.toString();
-    }
-
-    static String withFakeXmlDate(final String in) {
-        return in.replaceAll("<eventTime>.*</eventTime>", "<eventTime>someDate</eventTime>");
-    }
-
-    private String getNotifJson(final String path) throws IOException, URISyntaxException, JSONException {
-        return withFakeDate(Files.readString(Paths.get(getClass().getResource(path).toURI())));
-    }
-
-    private String getResultXml(final String path) throws IOException, URISyntaxException, JSONException {
-        return withFakeXmlDate(Files.readString(Paths.get(getClass().getResource(path).toURI())));
-    }
-
     @Test
     public void testJsonNotifsLeaves() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
@@ -254,7 +256,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
         writeTransaction.commit();
-        adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_DEL));
+        adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_DELETE));
     }
 
     @Test
@@ -303,129 +305,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
         writeTransaction.commit();
-        adapter.assertGot(getNotifJson(JSON_NOTIF_CHANGED_LEAVES_DEL));
-    }
-
-    @Test
-    public void testJsonNotifs() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
-            false, false);
-        adapter.setCloseVars(domDataBroker, databindProvider);
-
-        final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
-                .getInstance(DOMDataTreeChangeService.class);
-        final DOMDataTreeIdentifier root =
-                new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
-
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        final InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
-                .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertGot(getNotifJson(JSON_NOTIF_CREATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertGot(getNotifJson(JSON_NOTIF_UPDATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
-        writeTransaction.commit();
-        adapter.assertGot(getNotifJson(JSON_NOTIF_DEL));
-    }
-
-    @Test
-    public void testJsonNotifsWithoutData() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
-            false, true);
-        adapter.setCloseVars(domDataBroker, databindProvider);
-
-        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
-                .getInstance(DOMDataTreeChangeService.class);
-        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
-                .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertGot(getNotifJson(JSON_NOTIF_WITHOUT_DATA_CREATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertGot(getNotifJson(JSON_NOTIF_WITHOUT_DATA_UPDATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
-        writeTransaction.commit();
-        adapter.assertGot(getNotifJson(JSON_NOTIF_WITHOUT_DATA_DELETE));
-    }
-
-    @Test
-    public void testXmlNotifications() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
-            false, false);
-        adapter.setCloseVars(domDataBroker, databindProvider);
-
-        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
-                .getInstance(DOMDataTreeChangeService.class);
-        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
-                .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_CREATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_UPDATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_DEL));
-    }
-
-    @Test
-    public void testXmlSkipData() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
-            false, true);
-        adapter.setCloseVars(domDataBroker, databindProvider);
-
-        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
-                .getInstance(DOMDataTreeChangeService.class);
-        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
-                .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_WITHOUT_DATA_CREATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_WITHOUT_DATA_UPDATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_WITHOUT_DATA_DELETE));
+        adapter.assertGot(getNotifJson(JSON_NOTIF_CHANGED_LEAVES_DELETE));
     }
 
     @Test
@@ -529,5 +409,138 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         assertTrue(notification.contains("augment-instance-identifier-patch-module:patch-sub-choice11"));
         assertTrue(notification.contains("augment-instance-identifier-patch-module:patch-sub-sub-choice11"));
         assertTrue(notification.contains("augment-instance-identifier-patch-module:leaf1"));
+    }
+
+    @Test
+    public void testJsonContNotifications() throws Exception {
+        jsonNotifications(PATCH_CONT_YIID, false, JSON_NOTIF_CONT_CREATE,
+                JSON_NOTIF_CONT_UPDATE, JSON_NOTIF_CONT_DELETE);
+    }
+
+    @Test
+    public void testJsonListNotifications() throws Exception {
+        jsonNotifications(MY_LIST1_YIID, false, JSON_NOTIF_LIST_CREATE,
+                JSON_NOTIF_LIST_UPDATE, JSON_NOTIF_LIST_DELETE);
+    }
+
+    @Test
+    public void testJsonContNotificationsWithoutData() throws Exception {
+        jsonNotifications(PATCH_CONT_YIID, true, JSON_NOTIF_WITHOUT_DATA_CONT_CREATE,
+                JSON_NOTIF_WITHOUT_DATA_CONT_UPDATE, JSON_NOTIF_WITHOUT_DATA_CONT_DELETE);
+    }
+
+    @Test
+    public void testJsonListNotificationsWithoutData() throws Exception {
+        jsonNotifications(MY_LIST1_YIID, true, JSON_NOTIF_WITHOUT_DATA_LIST_CREATE,
+                JSON_NOTIF_WITHOUT_DATA_LIST_UPDATE, JSON_NOTIF_WITHOUT_DATA_LIST_DELETE);
+    }
+
+    @Test
+    public void testXmlContNotifications() throws Exception {
+        xmlNotifications(PATCH_CONT_YIID, false, XML_NOTIF_CONT_CREATE,
+                XML_NOTIF_CONT_UPDATE, XML_NOTIF_CONT_DELETE);
+    }
+
+    @Test
+    public void testXmlListNotifications() throws Exception {
+        xmlNotifications(MY_LIST1_YIID, false, XML_NOTIF_LIST_CREATE,
+                XML_NOTIF_LIST_UPDATE, XML_NOTIF_LIST_DELETE);
+    }
+
+    @Test
+    public void testXmlContNotificationsWithoutData() throws Exception {
+        xmlNotifications(PATCH_CONT_YIID, true, XML_NOTIF_WITHOUT_DATA_CONT_CREATE,
+                XML_NOTIF_WITHOUT_DATA_CONT_UPDATE, XML_NOTIF_WITHOUT_DATA_CONT_DELETE);
+    }
+
+    @Test
+    public void testXmlListNotificationsWithoutData() throws Exception {
+        xmlNotifications(MY_LIST1_YIID, true, XML_NOTIF_WITHOUT_DATA_LIST_CREATE,
+                XML_NOTIF_WITHOUT_DATA_LIST_UPDATE, XML_NOTIF_WITHOUT_DATA_LIST_DELETE);
+    }
+
+    static String withFakeDate(final String in) throws JSONException {
+        final JSONObject doc = new JSONObject(in);
+        final JSONObject notification =
+                doc.getJSONObject("urn-ietf-params-xml-ns-netconf-notification-1.0:notification");
+        if (notification == null) {
+            return in;
+        }
+        notification.put("event-time", "someDate");
+        return doc.toString();
+    }
+
+    static String withFakeXmlDate(final String in) {
+        return in.replaceAll("<eventTime>.*</eventTime>", "<eventTime>someDate</eventTime>");
+    }
+
+    private String getNotifJson(final String path) throws IOException, URISyntaxException, JSONException {
+        return withFakeDate(Files.readString(Paths.get(getClass().getResource(path).toURI())));
+    }
+
+    private String getResultXml(final String path) throws IOException, URISyntaxException, JSONException {
+        return withFakeXmlDate(Files.readString(Paths.get(getClass().getResource(path).toURI())));
+    }
+
+    private void jsonNotifications(final YangInstanceIdentifier pathYiid, final boolean skipData,
+            final String jsonNotifCreate, final String jsonNotifUpdate, final String jsonNotifDelete) throws Exception {
+        final var adapter = new ListenerAdapterTester(pathYiid, "Casey",
+                NotificationOutputType.JSON, false, skipData);
+        adapter.setCloseVars(domDataBroker, databindProvider);
+
+        final var changeService = domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
+        final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, pathYiid);
+        changeService.registerDataTreeChangeListener(root, adapter);
+
+        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
+        final var iid = InstanceIdentifier.create(PatchCont.class)
+                .child(MyList1.class, new MyList1Key("Althea"));
+        writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
+        writeTransaction.commit();
+        adapter.assertGot(getNotifJson(jsonNotifCreate));
+
+        writeTransaction = dataBroker.newWriteOnlyTransaction();
+        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
+        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
+        writeTransaction.commit();
+        adapter.assertGot(getNotifJson(jsonNotifUpdate));
+
+        writeTransaction = dataBroker.newWriteOnlyTransaction();
+        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
+        writeTransaction.commit();
+        adapter.assertGot(getNotifJson(jsonNotifDelete));
+    }
+
+    private void xmlNotifications(final YangInstanceIdentifier pathYiid, final boolean skipData,
+            final String xmlNotifCreate, final String xmlNotifUpdate, final String xmlNotifDelete) throws Exception {
+        final var adapter = new ListenerAdapterTester(pathYiid, "Casey", NotificationOutputType.XML,
+                false, skipData);
+        adapter.setCloseVars(domDataBroker, databindProvider);
+
+        final var changeService = domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
+        final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, pathYiid);
+        changeService.registerDataTreeChangeListener(root, adapter);
+
+        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
+        final var iid = InstanceIdentifier.create(PatchCont.class)
+                .child(MyList1.class, new MyList1Key("Althea"));
+        writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
+        writeTransaction.commit();
+        adapter.assertXmlSimilar(getResultXml(xmlNotifCreate));
+
+        writeTransaction = dataBroker.newWriteOnlyTransaction();
+        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
+        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
+        writeTransaction.commit();
+        adapter.assertXmlSimilar(getResultXml(xmlNotifUpdate));
+
+        writeTransaction = dataBroker.newWriteOnlyTransaction();
+        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
+        writeTransaction.commit();
+        adapter.assertXmlSimilar(getResultXml(xmlNotifDelete));
     }
 }
