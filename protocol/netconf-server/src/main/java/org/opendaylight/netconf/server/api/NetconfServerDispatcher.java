@@ -11,6 +11,11 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 
+/**
+ * Basic interface for Netconf server dispatcher.
+ * @deprecated Due to design change. Use {@link NetconfServerFactory} to instantiate Netconf server.
+ */
+@Deprecated(since = "6.0.0", forRemoval = true)
 public interface NetconfServerDispatcher {
 
     ChannelFuture createServer(InetSocketAddress address);
