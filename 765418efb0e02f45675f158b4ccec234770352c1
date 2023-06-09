@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9626ed65_ed27ed96",
+        "filename": "transport/transport-config/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-09T13:53:22Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2770ba45_984fece4",
+      "range": {
+        "startLine": 20,
+        "startChar": 16,
+        "endLine": 20,
+        "endChar": 32
+      },
+      "revId": "765418efb0e02f45675f158b4ccec234770352c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "55a22cd6_e3517d0e",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-06-08T18:45:31Z",
       "side": 1,
       "message": "why not\nhttps://github.com/YangModels/yang/blob/main/experimental/ietf-extracted-YANG-modules/ietf-netconf-client%402023-04-17.yang\n?",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 42
+      },
+      "revId": "765418efb0e02f45675f158b4ccec234770352c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86ad2f2c_bac72fb8",
+        "filename": "transport/transport-config/src/main/yang/odl-netconf-client-transport-config.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-09T13:53:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55a22cd6_e3517d0e",
       "range": {
         "startLine": 1,
         "startChar": 7,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9b56620_4b7f6f7b",
+        "filename": "transport/transport-config/src/main/yang/odl-netconf-client-transport-config.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-09T13:53:22Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "43eb29f2_ae79ff31",
+      "range": {
+        "startLine": 21,
+        "startChar": 18,
+        "endLine": 21,
+        "endChar": 35
+      },
+      "revId": "765418efb0e02f45675f158b4ccec234770352c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "65a612df_b2d86361",
@@ -83,6 +155,30 @@
       "writtenOn": "2023-06-08T18:45:31Z",
       "side": 1,
       "message": "why not https://github.com/YangModels/yang/blob/main/experimental/ietf-extracted-YANG-modules/ietf-netconf-server%402023-04-17.yang ?",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 42
+      },
+      "revId": "765418efb0e02f45675f158b4ccec234770352c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c7948d4_ffac5a30",
+        "filename": "transport/transport-config/src/main/yang/odl-netconf-server-transport-config.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-09T13:53:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65a612df_b2d86361",
       "range": {
         "startLine": 1,
         "startChar": 7,
