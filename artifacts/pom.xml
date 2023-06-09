@@ -145,6 +145,22 @@
                 <classifier>features</classifier>
             </dependency>
 
+            <!-- NETCONF Transport test utils -->
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-ssh</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-tls</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
             <!-- YANG models -->
             <!-- RFC5277 NETCONF Event Notifications -->
             <dependency>

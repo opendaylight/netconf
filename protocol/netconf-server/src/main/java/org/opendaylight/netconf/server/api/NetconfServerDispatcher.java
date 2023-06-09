@@ -11,6 +11,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 
+@Deprecated(forRemoval = true)
 public interface NetconfServerDispatcher {
 
     ChannelFuture createServer(InetSocketAddress address);
