@@ -13,11 +13,15 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
@@ -113,6 +117,13 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     abstract void serializePath(Collection<PathArgument> pathArguments) throws T;
 
     abstract void serializeOperation(DataTreeCandidateNode candidate) throws T;
+
+    static final @Nullable NormalizedNode getDataAfter(final DataTreeCandidateNode candidate) {
+        return candidate.getDataAfter()
+            .map(data -> data instanceof MapEntryNode mapEntry
+                ? ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType()).withChild(mapEntry).build() : data)
+            .orElse(null);
+    }
 
     static final String convertPath(final Collection<PathArgument> path) {
         final StringBuilder pathBuilder = new StringBuilder();
