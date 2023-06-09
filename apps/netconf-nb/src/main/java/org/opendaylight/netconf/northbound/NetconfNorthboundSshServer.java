@@ -7,19 +7,23 @@
  */
 package org.opendaylight.netconf.northbound;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.local.LocalAddress;
-import io.netty.util.concurrent.EventExecutor;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import org.opendaylight.netconf.auth.AuthProvider;
-import org.opendaylight.netconf.northbound.ssh.SshProxyServer;
-import org.opendaylight.netconf.northbound.ssh.SshProxyServerConfigurationBuilder;
-import org.opendaylight.netconf.server.api.NetconfServerDispatcher;
+import org.opendaylight.netconf.server.api.NetconfServerFactory;
+import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
+import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.ssh.SSHServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev230417.netconf.server.listen.stack.grouping.transport.ssh.ssh.TcpServerParameters;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev230417.netconf.server.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -45,65 +49,48 @@ public final class NetconfNorthboundSshServer implements AutoCloseable {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNorthboundSshServer.class);
+    private static final Path SSH_HOST_KEY_PATH = Path.of("etc", "odl-netconf-ssh-host.key");
 
-    private final ChannelFuture localServer;
-    private final SshProxyServer sshProxyServer;
+    private final SSHServer sshServer;
 
     @Activate
     public NetconfNorthboundSshServer(
-            @Reference final NetconfServerDispatcher netconfServerDispatcher,
-            @Reference(target = "(type=global-worker-group)") final EventLoopGroup workerGroup,
-            @Reference(target = "(type=global-event-executor)") final EventExecutor eventExecutor,
+            @Reference final NetconfServerFactory netconfServerFactory,
             @Reference(target = "(type=netconf-auth-provider)") final AuthProvider authProvider,
             final Configuration configuration) {
-        this(netconfServerDispatcher, workerGroup, eventExecutor, authProvider, configuration.bindingAddress(),
-            configuration.portNumber());
+        this(netconfServerFactory, authProvider, configuration.bindingAddress(), configuration.portNumber());
     }
 
-    public NetconfNorthboundSshServer(final NetconfServerDispatcher netconfServerDispatcher,
-            final EventLoopGroup workerGroup, final EventExecutor eventExecutor, final AuthProvider authProvider,
-            final String bindingAddress, final int portNumber) {
-        final LocalAddress localAddress = new LocalAddress(String.valueOf(portNumber));
-        final var sshProxyServerConfiguration = new SshProxyServerConfigurationBuilder()
-            .setBindingAddress(getInetAddress(bindingAddress, portNumber))
-            .setLocalAddress(localAddress)
-            .setAuthenticator(authProvider)
-            .setIdleTimeout(Integer.MAX_VALUE)
-            .setKeyPairProvider(new SimpleGeneratorHostKeyProvider())
-            .createSshProxyServerConfiguration();
+    public NetconfNorthboundSshServer(final NetconfServerFactory netconfServerFactory,
+            final AuthProvider authProvider, final String bindingAddress, final int portNumber) {
 
-        localServer = netconfServerDispatcher.createLocalServer(localAddress);
-        sshProxyServer = new SshProxyServer(Executors.newScheduledThreadPool(1), workerGroup, eventExecutor);
+        final TcpServerParameters tcpConfig = new TcpServerParametersBuilder()
+            .setLocalAddress(IetfInetUtil.ipAddressFor(bindingAddress))
+            .setLocalPort(new PortNumber(Uint16.valueOf(portNumber))).build();
 
-        localServer.addListener(future -> {
-            if (future.isDone() && !future.isCancelled()) {
-                try {
-                    sshProxyServer.bind(sshProxyServerConfiguration);
-                } catch (final IOException e) {
-                    throw new IllegalStateException("Unable to start SSH netconf server", e);
-                }
-                LOG.info("Netconf SSH endpoint started successfully at {}", bindingAddress);
-            } else {
-                LOG.warn("Unable to start SSH netconf server at {}", bindingAddress, future.cause());
-                throw new IllegalStateException("Unable to start SSH netconf server", future.cause());
-            }
-        });
+        final Consumer<ServerFactoryManager> serverInitializer = factoryMgr -> {
+            factoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+            factoryMgr.setPasswordAuthenticator(
+                (username, password, session) -> authProvider.authenticated(username, password));
+            // using path to persist generated server key, this prevents key changing each karaf restart
+            factoryMgr.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(SSH_HOST_KEY_PATH));
+        };
+
+        try {
+            sshServer = netconfServerFactory.createSshServer(tcpConfig, null, serverInitializer).get();
+        } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
+            LOG.warn("Could not start SSH netconf server at {}", bindingAddress, e);
+            throw new IllegalStateException("Unable to start SSH netconf server", e);
+        }
     }
 
     @Deactivate
     @Override
     public void close() throws IOException {
-        sshProxyServer.close();
-
-        if (localServer.isDone()) {
-            localServer.channel().close();
-        } else {
-            localServer.cancel(true);
+        try {
+            sshServer.shutdown().get();
+        } catch (ExecutionException | InterruptedException e) {
+            LOG.warn("Could not stop SSH netconf server", e);
         }
-    }
-
-    private static InetSocketAddress getInetAddress(final String bindingAddress, final int portNumber) {
-        final var ipAddress = IetfInetUtil.ipAddressFor(bindingAddress);
-        return new InetSocketAddress(IetfInetUtil.inetAddressFor(ipAddress), portNumber);
     }
 }
