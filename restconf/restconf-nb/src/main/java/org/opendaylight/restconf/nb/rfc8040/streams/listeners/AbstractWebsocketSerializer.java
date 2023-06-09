@@ -18,6 +18,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
@@ -113,6 +116,16 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     abstract void serializePath(Collection<PathArgument> pathArguments) throws T;
 
     abstract void serializeOperation(DataTreeCandidateNode candidate) throws T;
+
+    static final NormalizedNode getDataAfter(final DataTreeCandidateNode candidate) {
+        final var data = candidate.getDataAfter().orElseThrow();
+        if (data instanceof MapEntryNode mapEntry) {
+            return ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
+                    .withChild(mapEntry)
+                    .build();
+        }
+        return data;
+    }
 
     static final String convertPath(final Collection<PathArgument> path) {
         final StringBuilder pathBuilder = new StringBuilder();

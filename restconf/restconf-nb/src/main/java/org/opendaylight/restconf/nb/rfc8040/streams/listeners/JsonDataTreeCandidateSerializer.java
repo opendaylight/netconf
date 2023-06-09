@@ -44,7 +44,7 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
         if (!skipData && candidate.getDataAfter().isPresent()) {
             jsonWriter.name("data").beginObject();
             NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(nestedWriter);
-            nodeWriter.write(candidate.getDataAfter().orElseThrow());
+            nodeWriter.write(getDataAfter(candidate));
             nodeWriter.flush();
 
             // end data
