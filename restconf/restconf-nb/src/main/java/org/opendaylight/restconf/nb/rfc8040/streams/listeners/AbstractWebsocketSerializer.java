@@ -18,6 +18,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
@@ -114,7 +117,17 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     abstract void serializeOperation(DataTreeCandidateNode candidate) throws T;
 
-    static final String convertPath(final Collection<PathArgument> path) {
+    static NormalizedNode getDataAfter(final DataTreeCandidateNode candidate) {
+        final var data = candidate.getDataAfter().orElseThrow();
+        if (data instanceof MapEntryNode mapEntry) {
+            return ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
+                    .withChild(mapEntry)
+                    .build();
+        }
+        return data;
+    }
+
+    static String convertPath(final Collection<PathArgument> path) {
         final StringBuilder pathBuilder = new StringBuilder();
 
         for (var pathArgument : path) {
@@ -143,7 +156,7 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         return pathBuilder.toString();
     }
 
-    static final String modificationTypeToOperation(final DataTreeCandidateNode candidate,
+    static String modificationTypeToOperation(final DataTreeCandidateNode candidate,
             final ModificationType modificationType) {
         return switch (modificationType) {
             case APPEARED, SUBTREE_MODIFIED, WRITE -> candidate.getDataBefore().isPresent() ? "updated" : "created";
