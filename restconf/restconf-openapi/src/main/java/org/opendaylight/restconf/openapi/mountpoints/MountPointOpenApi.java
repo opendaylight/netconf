@@ -218,8 +218,12 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         okResponse.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()), okResponse);
-        return new Operation(false, tags, null, null, null, null, null, null, responses, description,
-            null, summary);
+        return new Operation.Builder()
+                .tags(tags)
+                .responses(responses)
+                .description(description)
+                .summary(summary)
+                .build();
     }
 
     @Override

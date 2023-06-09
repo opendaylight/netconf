@@ -80,8 +80,14 @@ public final class OperationBuilder {
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
                 buildResponse(Response.Status.CREATED.getReasonPhrase(), Optional.empty()));
 
-        return new Operation(false, tags, parameters, null, null, null, null, requestBody, responses, description,
-            null, summary);
+        return new Operation.Builder()
+                .tags(tags)
+                .parameters(parameters)
+                .requestBody(requestBody)
+                .responses(responses)
+                .description(description)
+                .summary(summary)
+                .build();
     }
 
     public static Operation buildGet(final DataSchemaNode node, final String moduleName,
@@ -99,8 +105,13 @@ public final class OperationBuilder {
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
                 buildResponse(Response.Status.OK.getReasonPhrase(), Optional.of(schema)));
 
-        return new Operation(false, tags, parameters, null, null, null, null, null, responses, description,
-            null, summary);
+        return new Operation.Builder()
+                .tags(tags)
+                .parameters(parameters)
+                .responses(responses)
+                .description(description)
+                .summary(summary)
+                .build();
     }
 
     private static void addQueryParameters(final ArrayNode parameters, final boolean isConfig) {
@@ -138,8 +149,14 @@ public final class OperationBuilder {
         responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
                 buildResponse("Updated", Optional.empty()));
 
-        return new Operation(false, tags, parameters, null, null, null, null, requestBody, responses, description,
-            null, summary);
+        return new Operation.Builder()
+                .tags(tags)
+                .parameters(parameters)
+                .requestBody(requestBody)
+                .responses(responses)
+                .description(description)
+                .summary(summary)
+                .build();
     }
 
     public static Operation buildPatch(final String parentName, final String nodeName, final String moduleName,
@@ -157,8 +174,14 @@ public final class OperationBuilder {
         responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
                 buildResponse("Updated", Optional.empty()));
 
-        return new Operation(false, tags, parameters, null, null, null, null, requestBody, responses, description,
-            null, summary);
+        return new Operation.Builder()
+                .tags(tags)
+                .parameters(parameters)
+                .requestBody(requestBody)
+                .responses(responses)
+                .description(description)
+                .summary(summary)
+                .build();
     }
 
     public static Operation buildDelete(final DataSchemaNode node, final String moduleName,
@@ -173,8 +196,13 @@ public final class OperationBuilder {
         responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
                 buildResponse("Deleted", Optional.empty()));
 
-        return new Operation(false, tags, parameters, null, null, null, null, null, responses, description,
-            null, summary);
+        return new Operation.Builder()
+                .tags(tags)
+                .parameters(parameters)
+                .responses(responses)
+                .description(description)
+                .summary(summary)
+                .build();
     }
 
     public static Operation buildPostOperation(final OperationDefinition operDef, final String moduleName,
@@ -236,8 +264,14 @@ public final class OperationBuilder {
         }
         final String desc = operDef.getDescription().orElse("");
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
-        return new Operation(false, tags, parameters, null, null, null, null, requestBody, responses, desc,
-            null, summary);
+        return new Operation.Builder()
+                .tags(tags)
+                .parameters(parameters)
+                .requestBody(requestBody)
+                .responses(responses)
+                .description(desc)
+                .summary(summary)
+                .build();
     }
 
     private static ObjectNode createRequestBodyParameter(final String defName, final String xmlDefName,
