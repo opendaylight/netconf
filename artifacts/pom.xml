@@ -201,6 +201,12 @@
                 <artifactId>rfc8639</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- RFC7407 A YANG Data Model for SNMP Configuration -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>rfc7407-ietf-x509-cert-to-name</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- draft-ietf-netconf-crypto-types -->
             <dependency>

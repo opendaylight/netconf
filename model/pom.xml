@@ -34,6 +34,7 @@
         <module>rfc6241</module>
         <module>rfc6243</module>
         <module>rfc6470</module>
+        <module>rfc7407-ietf-x509-cert-to-name</module>
         <module>rfc8040-ietf-restconf-monitoring</module>
         <module>rfc8341</module>
         <module>rfc8526</module>

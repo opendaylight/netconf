@@ -82,6 +82,10 @@
       <artifactId>rfc6470</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.netconf.model</groupId>
+      <artifactId>rfc7407-ietf-x509-cert-to-name</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-api</artifactId>
     </dependency>
@@ -98,7 +102,18 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-tcp</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-tls</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-ssh</artifactId>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>io.netty</groupId>
