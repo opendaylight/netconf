@@ -126,7 +126,8 @@ public abstract class BaseYangOpenApiGenerator {
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
 
-            getOpenApiSpec(module, context, deviceName, schemaContext, definitionNames, docBuilder, false);
+            docBuilder.getComponents().schemas().putAll(getSchemas(module, schemaContext, definitionNames, false));
+            docBuilder.getPaths().putAll(getPaths(module, context, deviceName, schemaContext, definitionNames, false));
         }
 
         // FIXME rework callers logic to make possible to return OpenApiObject from here
@@ -204,21 +205,18 @@ public abstract class BaseYangOpenApiGenerator {
 
     public OpenApiObject getOpenApiSpec(final Module module, final String schema, final String host,
             final String basePath, final String context, final EffectiveModelContext schemaContext) {
-        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, basePath, module.getName());
-        final DefinitionNames definitionNames = new DefinitionNames();
-        return getOpenApiSpec(module, context, null, schemaContext, definitionNames, docBuilder, true);
+        final var docBuilder = createOpenApiObjectBuilder(schema, host, basePath, module.getName());
+        final var definitionNames = new DefinitionNames();
+        final var schemas = getSchemas(module, schemaContext, definitionNames, true);
+        final var paths = getPaths(module, context, null, schemaContext, definitionNames, true);
+        docBuilder.getComponents().schemas().putAll(schemas);
+        docBuilder.paths(paths);
+        return docBuilder.build();
     }
 
-    private OpenApiObject getOpenApiSpec(final Module module, final String context, final String deviceName,
+    private Map<String, Path> getPaths(final Module module, final String context, final String deviceName,
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames,
-            final OpenApiObject.Builder docBuilder, final boolean isForSingleModule) {
-        try {
-            final Map<String, Schema> schemas = jsonConverter.convertToSchemas(module, schemaContext,
-                definitionNames, isForSingleModule);
-            docBuilder.getComponents().schemas().putAll(schemas);
-        } catch (final IOException e) {
-            LOG.error("Exception occurred in DefinitionGenerator", e);
-        }
+            final boolean isForSingleModule) {
         final Map<String, Path> paths = new HashMap<>();
         final String moduleName = module.getName();
 
@@ -260,13 +258,19 @@ public abstract class BaseYangOpenApiGenerator {
 
         LOG.debug("Number of Paths found [{}]", paths.size());
 
-        if (isForSingleModule) {
-            docBuilder.paths(paths);
-        } else {
-            docBuilder.getPaths().putAll(paths);
+        return paths;
+    }
+
+    private Map<String, Schema> getSchemas(final Module module, final EffectiveModelContext schemaContext,
+            final DefinitionNames definitionNames, final boolean isForSingleModule) {
+        Map<String, Schema> schemas = new HashMap<>();
+        try {
+            schemas = jsonConverter.convertToSchemas(module, schemaContext, definitionNames, isForSingleModule);
+        } catch (final IOException e) {
+            LOG.error("Exception occurred in DefinitionGenerator", e); // FIXME propagate exception
         }
 
-        return docBuilder.build();
+        return schemas;
     }
 
     private static void addRootPostLink(final Module module, final String deviceName,
