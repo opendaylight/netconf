@@ -9,7 +9,11 @@ package org.opendaylight.restconf.openapi.mountpoints;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.API_VERSION;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASE_PATH;
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.OPEN_API_BASIC_AUTH;
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.OPEN_API_VERSION;
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
 import static org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.DESCRIPTION_KEY;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
@@ -20,6 +24,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Range;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -33,9 +38,13 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
+import org.opendaylight.restconf.openapi.model.Components;
+import org.opendaylight.restconf.openapi.model.Info;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
+import org.opendaylight.restconf.openapi.model.SecuritySchemes;
+import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -189,10 +198,17 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private OpenApiObject generateDataStoreOpenApi(final UriInfo info, final String context, final String deviceName) {
-        final var openApiObjectBuilder = openApiGenerator.createOpenApiObjectBuilder(openApiGenerator
-                        .createSchemaFromUriInfo(info),
-                openApiGenerator.createHostFromUriInfo(info), BASE_PATH, context);
+    private OpenApiObject generateDataStoreOpenApi(final UriInfo uriInfo, final String context,
+            final String deviceName) {
+        final OpenApiObject.Builder openApiObjectBuilder = new OpenApiObject.Builder();
+        openApiObjectBuilder.openapi(OPEN_API_VERSION);
+        final Info info = new Info(context, API_VERSION);
+        openApiObjectBuilder.info(info);
+        String schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
+        String host = openApiGenerator.createHostFromUriInfo(uriInfo);
+        openApiObjectBuilder.servers(List.of(new Server(schema + "://" + host + BASE_PATH)));
+        openApiObjectBuilder.components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
+        openApiObjectBuilder.security(SECURITY);
         openApiObjectBuilder.paths(getDataStoreApiPaths(context, deviceName));
         return openApiObjectBuilder.build();
     }
