@@ -121,15 +121,6 @@ public abstract class BaseYangOpenApiGenerator {
         final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(createSchemaFromUriInfo(uriInfo),
             createHostFromUriInfo(uriInfo), BASE_PATH, deviceName + " modules of RESTCONF");
         docBuilder.paths(new HashMap<>());
-        fillDoc(docBuilder, modules, schemaContext, context, deviceName, definitionNames);
-
-        // FIXME rework callers logic to make possible to return OpenApiObject from here
-        return docBuilder;
-    }
-
-    private void fillDoc(final OpenApiObject.Builder docBuilder, final Set<Module> modules,
-            final EffectiveModelContext schemaContext, final String context, final String deviceName,
-            final DefinitionNames definitionNames) {
         for (final Module module : modules) {
             final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
 
@@ -137,6 +128,9 @@ public abstract class BaseYangOpenApiGenerator {
 
             getOpenApiSpec(module, context, deviceName, schemaContext, definitionNames, docBuilder, false);
         }
+
+        // FIXME rework callers logic to make possible to return OpenApiObject from here
+        return docBuilder;
     }
 
     private static Set<Module> filterByRange(final SortedSet<Module> modules, final Range<Integer> range) {
