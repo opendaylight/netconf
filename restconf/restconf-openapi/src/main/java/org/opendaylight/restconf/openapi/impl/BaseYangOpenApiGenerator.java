@@ -68,8 +68,8 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseYangOpenApiGenerator.class);
 
-    private static final String API_VERSION = "1.0.0";
-    private static final String OPEN_API_VERSION = "3.0.3";
+    public static final String API_VERSION = "1.0.0";
+    public static final String OPEN_API_VERSION = "3.0.3";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
@@ -77,10 +77,10 @@ public abstract class BaseYangOpenApiGenerator {
 
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
-    private static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
+    public static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
             .put("type", "http")
             .put("scheme", "basic");
-    private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
+    public static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
             .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
     static {
@@ -109,7 +109,13 @@ public abstract class BaseYangOpenApiGenerator {
         }
 
         final String title = name + " modules of RESTCONF";
-        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, BASE_PATH, title);
+        final OpenApiObject.Builder docBuilder = new OpenApiObject.Builder();
+        docBuilder.openapi(OPEN_API_VERSION);
+        final Info info = new Info(title, API_VERSION);
+        docBuilder.info(info);
+        docBuilder.servers(List.of(new Server(schema + "://" + host + BASE_PATH)));
+        docBuilder.components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
+        docBuilder.security(SECURITY);
         docBuilder.paths(new HashMap<>());
 
         final SortedSet<Module> modules = getSortedModules(schemaContext);
@@ -207,7 +213,13 @@ public abstract class BaseYangOpenApiGenerator {
 
     public OpenApiObject getOpenApiSpec(final Module module, final String schema, final String host,
             final String basePath, final String context, final EffectiveModelContext schemaContext) {
-        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, basePath, module.getName());
+        final OpenApiObject.Builder docBuilder = new OpenApiObject.Builder();
+        docBuilder.openapi(OPEN_API_VERSION);
+        final Info info = new Info(module.getName(), API_VERSION);
+        docBuilder.info(info);
+        docBuilder.servers(List.of(new Server(schema + "://" + host + basePath)));
+        docBuilder.components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
+        docBuilder.security(SECURITY);
         final DefinitionNames definitionNames = new DefinitionNames();
         try {
             final Map<String, Schema> schemas = getSchemas(module, schemaContext, definitionNames, true);
