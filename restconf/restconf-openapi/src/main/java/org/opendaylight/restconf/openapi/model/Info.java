@@ -9,31 +9,10 @@ package org.opendaylight.restconf.openapi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.eclipse.jdt.annotation.NonNull;
 
 @JsonInclude(Include.NON_NULL)
-public record Info(String version, String title) {
-
-    private Info(final Builder builder) {
-        this(builder.version, builder.title);
-    }
-
-    @SuppressWarnings("checkstyle:hiddenField")
-    public static class Builder {
-        private String version;
-        private String title;
-
-        public Builder version(final String version) {
-            this.version = version;
-            return this;
-        }
-
-        public Builder title(final String title) {
-            this.title = title;
-            return this;
-        }
-
-        public Info build() {
-            return new Info(this);
-        }
-    }
+public record Info(
+        @NonNull String version,
+        @NonNull String title) {
 }
