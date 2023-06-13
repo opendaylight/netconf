@@ -289,7 +289,7 @@ public abstract class BaseYangOpenApiGenerator {
             final String basePath, final String title) {
         final OpenApiObject.Builder docBuilder = new OpenApiObject.Builder();
         docBuilder.openapi(OPEN_API_VERSION);
-        docBuilder.info(new Info.Builder().title(title).version(API_VERSION).build())
+        docBuilder.info(new Info(API_VERSION, title))
             .servers(List.of(new Server(schema + "://" + host + basePath)))
             .components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)))
             .security(SECURITY);
