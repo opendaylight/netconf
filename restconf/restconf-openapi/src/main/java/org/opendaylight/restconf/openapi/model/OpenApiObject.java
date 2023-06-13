@@ -15,7 +15,7 @@ import java.util.Map;
 
 @JsonInclude(Include.NON_NULL)
 public record OpenApiObject(String openapi, Info info, List<Server> servers, Map<String, Path> paths,
-        Components components, ArrayNode security) {
+                            Components components, ArrayNode security) {
 
     private OpenApiObject(final Builder builder) {
         this(builder.openapi, builder.info, builder.servers, builder.paths, builder.components, builder.security);
