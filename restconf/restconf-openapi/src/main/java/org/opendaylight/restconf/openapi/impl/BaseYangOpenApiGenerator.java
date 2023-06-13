@@ -125,7 +125,9 @@ public abstract class BaseYangOpenApiGenerator {
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
 
-            getOpenApiSpec(module, context, deviceName, schemaContext, definitionNames, docBuilder, false);
+            docBuilder.getComponents().schemas().putAll(getSchemas(module, schemaContext, definitionNames, false));
+            docBuilder.getPaths().putAll(getPath(module, context, deviceName, schemaContext, definitionNames,
+                    false));
         }
 
         // FIXME rework callers logic to make possible to return OpenApiObject from here
@@ -187,7 +189,7 @@ public abstract class BaseYangOpenApiGenerator {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
 
-        return getOpenApiSpec(module, schema, host, BASE_PATH, context, schemaContext);
+        return getPath(module, schema, host, BASE_PATH, context, schemaContext);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -203,20 +205,12 @@ public abstract class BaseYangOpenApiGenerator {
         return uriInfo.getBaseUri().getScheme();
     }
 
-    public OpenApiObject getOpenApiSpec(final Module module, final String schema, final String host,
+    public OpenApiObject getPath(final Module module, final String schema, final String host,
             final String basePath, final String context, final EffectiveModelContext schemaContext) {
         final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getOpenApiSpec(module, context, Optional.empty(), schemaContext, definitionNames, docBuilder, true);
-    }
-
-    public OpenApiObject getOpenApiSpec(final Module module, final String context, final Optional<String> deviceName,
-            final EffectiveModelContext schemaContext, final DefinitionNames definitionNames,
-            final OpenApiObject.Builder docBuilder, final boolean isForSingleModule) {
-        // return components/schemas from this part - create new method
         try {
-            final Map<String, Schema> schemas = jsonConverter.convertToSchemas(module, schemaContext,
-                definitionNames, isForSingleModule);
+            final Map<String, Schema> schemas = getSchemas(module, schemaContext, definitionNames, true);
             docBuilder.getComponents().schemas().putAll(schemas);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Document: {}", MAPPER.writeValueAsString(docBuilder.build()));
@@ -224,8 +218,15 @@ public abstract class BaseYangOpenApiGenerator {
         } catch (final IOException e) {
             LOG.error("Exception occurred in DefinitionGenerator", e);
         }
+        final Map<String, Path> paths = getPath(module, context, Optional.empty(), schemaContext,
+                definitionNames, true);
+        docBuilder.paths(paths);
+        return docBuilder.build();
+    }
 
-        // return paths from this part - create new method
+    public Map<String, Path> getPath(final Module module, final String context,
+            final Optional<String> deviceName, final EffectiveModelContext schemaContext,
+            final DefinitionNames definitionNames, final boolean isForSingleModule) {
         final Map<String, Path> paths = new HashMap<>();
         final String moduleName = module.getName();
 
@@ -269,13 +270,20 @@ public abstract class BaseYangOpenApiGenerator {
 
         LOG.debug("Number of Paths found [{}]", paths.size());
 
-        if (isForSingleModule) {
-            docBuilder.paths(paths);
-        } else {
-            docBuilder.getPaths().putAll(paths);
+        return paths;
+    }
+
+    private Map<String, Schema> getSchemas(final Module module, final EffectiveModelContext schemaContext,
+            final DefinitionNames definitionNames, final boolean isForSingleModule) {
+        Map<String, Schema> schemas = new HashMap<>();
+        try {
+            schemas = jsonConverter.convertToSchemas(module, schemaContext,
+                    definitionNames, isForSingleModule);
+        } catch (final IOException e) {
+            LOG.error("Exception occurred in DefinitionGenerator", e);
         }
 
-        return docBuilder.build();
+        return schemas;
     }
 
     private static void addRootPostLink(final Module module, final Optional<String> deviceName,
