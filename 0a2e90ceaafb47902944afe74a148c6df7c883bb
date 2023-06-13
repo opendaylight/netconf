@@ -16,6 +16,24 @@
       "message": "I would rather not hard code the base path, you can get the base path from\nbasePath variable in getOpenApiSpec and move it in here.\ngetOpenApiSpec -\u003e getOpenApiSpec -\u003e addPaths",
       "revId": "0a2e90ceaafb47902944afe74a148c6df7c883bb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b6832ce_9b4882e0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-06-13T08:58:20Z",
+      "side": 1,
+      "message": "okay my bad, this will be resolved in\nhttps://jira.opendaylight.org/browse/NETCONF-1021",
+      "parentUuid": "0794f399_944aa447",
+      "revId": "0a2e90ceaafb47902944afe74a148c6df7c883bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
