@@ -106,15 +106,6 @@ public abstract class BaseYangOpenApiGenerator {
         final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, BASE_PATH, title);
         docBuilder.paths(new HashMap<>());
 
-        fillDoc(docBuilder, range, schemaContext, context, deviceName, definitionNames);
-
-        // FIXME rework callers logic to make possible to return OpenApiObject from here
-        return docBuilder;
-    }
-
-    public void fillDoc(final OpenApiObject.Builder docBuilder, final Optional<Range<Integer>> range,
-            final EffectiveModelContext schemaContext, final String context, final Optional<String> deviceName,
-            final DefinitionNames definitionNames) {
         final SortedSet<Module> modules = getSortedModules(schemaContext);
         final Set<Module> filteredModules;
         if (range.isPresent()) {
@@ -130,6 +121,11 @@ public abstract class BaseYangOpenApiGenerator {
 
             getOpenApiSpec(module, context, deviceName, schemaContext, definitionNames, docBuilder, false);
         }
+
+        // FIXME rework callers logic to make possible to return OpenApiObject from here
+        // it means eliminating createOpenApiObjectBuilder and splitting fillDoc to return paths and schemas
+        // in fact we are going to rework getOpenApiSpec method
+        return docBuilder;
     }
 
     private static Set<Module> filterByRange(final SortedSet<Module> modules, final Range<Integer> range) {
