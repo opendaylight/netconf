@@ -70,19 +70,18 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseYangOpenApiGenerator.class);
 
-    private static final String API_VERSION = "1.0.0";
-    private static final String OPEN_API_VERSION = "3.0.3";
+    public static final String API_VERSION = "1.0.0";
+    public static final String OPEN_API_VERSION = "3.0.3";
+    public static final String BASE_PATH = "/";
+    public static final String MODULE_NAME_SUFFIX = "_module";
+    public static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
+        .put("type", "http")
+        .put("scheme", "basic");
+    public static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
+        .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
     private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
     private final DOMSchemaService schemaService;
-
-    public static final String BASE_PATH = "/";
-    public static final String MODULE_NAME_SUFFIX = "_module";
-    private static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
-            .put("type", "http")
-            .put("scheme", "basic");
-    private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
-            .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
     protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService) {
         this.schemaService = requireNonNull(schemaService);
@@ -96,15 +95,8 @@ public abstract class BaseYangOpenApiGenerator {
 
     public OpenApiObject.Builder getAllModulesDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
             final @NonNull String deviceName, final String context, final DefinitionNames definitionNames) {
-        final String schema = createSchemaFromUriInfo(uriInfo);
-        final String host = createHostFromUriInfo(uriInfo);
-        final String title = deviceName + " modules of RESTCONF";
-
-        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, BASE_PATH, title);
-        docBuilder.paths(new HashMap<>());
-
-        final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
-        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, sortedModules);
+        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames,
+            getSortedModules(schemaContext));
     }
 
     public OpenApiObject.Builder getAllModulesDoc(final UriInfo uriInfo, final Range<Integer> range,
@@ -116,13 +108,20 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     private OpenApiObject.Builder getFilledDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
-        final String deviceName, final String context, final DefinitionNames definitionNames,
-        final Set<Module> modules) {
-        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(createSchemaFromUriInfo(uriInfo),
-            createHostFromUriInfo(uriInfo), BASE_PATH, deviceName + " modules of RESTCONF");
+            final String deviceName, final String context, final DefinitionNames definitionNames,
+            final Set<Module> modules) {
+        final var schema = createSchemaFromUriInfo(uriInfo);
+        final var host = createHostFromUriInfo(uriInfo);
+        final var title = deviceName + " modules of RESTCONF";
+        final var docBuilder = new OpenApiObject.Builder();
+        docBuilder.openapi(OPEN_API_VERSION);
+        docBuilder.info(new Info(API_VERSION, title));
+        docBuilder.servers(List.of(new Server(schema + "://" + host + BASE_PATH)));
+        docBuilder.components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
+        docBuilder.security(SECURITY);
         docBuilder.paths(new HashMap<>());
-        for (final Module module : modules) {
-            final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
+        for (final var module : modules) {
+            final var revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
 
@@ -205,7 +204,12 @@ public abstract class BaseYangOpenApiGenerator {
 
     public OpenApiObject getOpenApiSpec(final Module module, final String schema, final String host,
             final String basePath, final String context, final EffectiveModelContext schemaContext) {
-        final var docBuilder = createOpenApiObjectBuilder(schema, host, basePath, module.getName());
+        final var docBuilder = new OpenApiObject.Builder();
+        docBuilder.openapi(OPEN_API_VERSION);
+        docBuilder.info(new Info(API_VERSION, module.getName()));
+        docBuilder.servers(List.of(new Server(schema + "://" + host + basePath)));
+        docBuilder.components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
+        docBuilder.security(SECURITY);
         final var definitionNames = new DefinitionNames();
         final var schemas = getSchemas(module, schemaContext, definitionNames, true);
         final var paths = getPaths(module, context, null, schemaContext, definitionNames, true);
@@ -282,17 +286,6 @@ public abstract class BaseYangOpenApiGenerator {
                 .post(buildPost("", name, "", moduleName, deviceName, module.getDescription().orElse(""), pathParams))
                 .build());
         }
-    }
-
-    public OpenApiObject.Builder createOpenApiObjectBuilder(final String schema, final String host,
-            final String basePath, final String title) {
-        final OpenApiObject.Builder docBuilder = new OpenApiObject.Builder();
-        docBuilder.openapi(OPEN_API_VERSION);
-        docBuilder.info(new Info(API_VERSION, title))
-            .servers(List.of(new Server(schema + "://" + host + basePath)))
-            .components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)))
-            .security(SECURITY);
-        return docBuilder;
     }
 
     public abstract String getResourcePath(String resourceType, String context);
