@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62d742a7_6bff02a3",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/errors/RestconfDocumentedException.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-06-14T12:48:31Z",
+      "side": 1,
+      "message": "if we want to keep immutability for list better use directly .toList(), or .collect(Collectors.toUnmodifiableList())",
+      "range": {
+        "startLine": 248,
+        "startChar": 36,
+        "endLine": 248,
+        "endChar": 42
+      },
+      "revId": "4becb8b5240f4951238b419c47be83ad2b99285f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
