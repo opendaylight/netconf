@@ -183,14 +183,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             range = Optional.of(Range.closed(start, end));
         }
 
-        final OpenApiObject.Builder openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, range, context,
+        final OpenApiObject openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, range, context,
             Optional.of(deviceName), urlPrefix, definitionNames);
         if (includeDataStore) {
-            final var paths = new HashMap<>(openApiObjectBuilder.getPaths());
+            final var paths = new HashMap<>(openApiObjectBuilder.paths());
             paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
             openApiObjectBuilder.paths(paths);
         }
-        return openApiObjectBuilder.build();
+        return openApiObjectBuilder;
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -200,17 +200,13 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     private OpenApiObject generateDataStoreOpenApi(final UriInfo uriInfo, final String context,
             final String deviceName) {
-        final OpenApiObject.Builder openApiObjectBuilder = new OpenApiObject.Builder();
-        openApiObjectBuilder.openapi(OPEN_API_VERSION);
         final Info info = new Info(context, API_VERSION);
-        openApiObjectBuilder.info(info);
         String schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         String host = openApiGenerator.createHostFromUriInfo(uriInfo);
-        openApiObjectBuilder.servers(List.of(new Server(schema + "://" + host + BASE_PATH)));
-        openApiObjectBuilder.components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
-        openApiObjectBuilder.security(SECURITY);
-        openApiObjectBuilder.paths(getDataStoreApiPaths(context, deviceName));
-        return openApiObjectBuilder.build();
+        final List<Server> servers = List.of(new Server(schema + "://" + host + BASE_PATH));
+        final Components components = new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH));
+        final Map<String, Path> paths = getDataStoreApiPaths(context, deviceName);
+        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
 
     private Map<String, Path> getDataStoreApiPaths(final String context, final String deviceName) {
