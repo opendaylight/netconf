@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "a39142b65480e80f0df0de156de061414922cb8a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb7db312_0a708523",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/errors/RestconfDocumentedException.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-14T15:14:17Z",
+      "side": 1,
+      "message": "this changes seriial form -- so serialVersionUID has to change as well.",
+      "range": {
+        "startLine": 41,
+        "startChar": 18,
+        "endLine": 41,
+        "endChar": 22
+      },
+      "revId": "a39142b65480e80f0df0de156de061414922cb8a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
