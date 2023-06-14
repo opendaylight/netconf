@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.HttpMethod;
@@ -44,9 +46,11 @@ import org.opendaylight.restconf.openapi.model.Info;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
+import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.restconf.openapi.model.SecuritySchemes;
 import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -170,8 +174,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final DefinitionNames definitionNames = new DefinitionNames();
 
         boolean includeDataStore = true;
+        Optional<Range<Integer>> range = Optional.empty();
 
-        final OpenApiObject.Builder openApiObjectBuilder;
         if (strPageNum != null) {
             final int pageNum = Integer.parseInt(strPageNum);
             final int end = DEFAULT_PAGESIZE * pageNum - 1;
@@ -181,19 +185,41 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             } else {
                 includeDataStore = false;
             }
-            openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, Range.closed(start, end), context,
-                deviceName, urlPrefix, definitionNames);
+            range = Optional.of(Range.closed(start, end));
+        }
+        final String schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
+        final String host = openApiGenerator.createHostFromUriInfo(uriInfo);
+
+        final String title = deviceName + " modules of RESTCONF";
+        final Info info = new Info(API_VERSION, title);
+        final List<Server> servers = List.of(new Server(schema + "://" + host + BASE_PATH));
+        final Map<String, Path> paths = new HashMap<>();
+        final Map<String, Schema> schemas = new HashMap<>();
+
+        final SortedSet<Module> modules = openApiGenerator.getSortedModules(context);
+        final Set<Module> filteredModules;
+        if (range.isPresent()) {
+            filteredModules = openApiGenerator.filterByRange(modules, range.orElseThrow());
         } else {
-            openApiObjectBuilder = openApiGenerator.getAllModulesDoc(uriInfo, context, deviceName, urlPrefix,
-                definitionNames);
+            filteredModules = modules;
         }
 
-        if (includeDataStore) {
-            final var paths = new HashMap<>(openApiObjectBuilder.getPaths());
-            paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
-            openApiObjectBuilder.paths(paths);
+        for (final Module module : filteredModules) {
+            if (LOG.isDebugEnabled()) {
+                final String revisionString = module.getQNameModule().getRevision().map(Revision::toString)
+                    .orElse(null);
+                LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
+            }
+
+            schemas.putAll(openApiGenerator.getSchemas(module, context, definitionNames, false));
+            paths.putAll(openApiGenerator.getPath(module, urlPrefix, deviceName, context, definitionNames,
+                false));
         }
-        return openApiObjectBuilder.build();
+        final Components components = new Components(schemas, new SecuritySchemes(OPEN_API_BASIC_AUTH));
+        if (includeDataStore) {
+            paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
+        }
+        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -203,16 +229,13 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     private OpenApiObject generateDataStoreOpenApi(final UriInfo uriInfo, final String context,
             final String deviceName) {
-        final OpenApiObject.Builder openApiObjectBuilder = new OpenApiObject.Builder();
-        openApiObjectBuilder.openapi(OPEN_API_VERSION);
-        openApiObjectBuilder.info(new Info(API_VERSION, context));
+        final Info info = new Info(API_VERSION, context);
         String schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         String host = openApiGenerator.createHostFromUriInfo(uriInfo);
-        openApiObjectBuilder.servers(List.of(new Server(schema + "://" + host + BASE_PATH)));
-        openApiObjectBuilder.components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
-        openApiObjectBuilder.security(SECURITY);
-        openApiObjectBuilder.paths(getDataStoreApiPaths(context, deviceName));
-        return openApiObjectBuilder.build();
+        final List<Server> servers = List.of(new Server(schema + "://" + host + BASE_PATH));
+        final Components components = new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH));
+        final Map<String, Path> paths = getDataStoreApiPaths(context, deviceName);
+        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
 
     private Map<String, Path> getDataStoreApiPaths(final String context, final String deviceName) {
