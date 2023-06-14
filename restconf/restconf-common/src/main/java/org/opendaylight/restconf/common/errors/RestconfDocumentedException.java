@@ -9,7 +9,6 @@ package org.opendaylight.restconf.common.errors;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,7 +38,7 @@ import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
 public class RestconfDocumentedException extends WebApplicationException {
     private static final long serialVersionUID = 1L;
 
-    private final ImmutableList<RestconfError> errors;
+    private final List<RestconfError> errors;
     private final Status status;
 
     /**
@@ -130,10 +129,9 @@ public class RestconfDocumentedException extends WebApplicationException {
         // this was lost also in original code.
         super(cause);
         if (!errors.isEmpty()) {
-            this.errors = ImmutableList.copyOf(errors);
+            this.errors = List.copyOf(errors);
         } else {
-            this.errors = ImmutableList.of(
-                new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message));
+            this.errors = List.of(new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message));
         }
 
         status = null;
@@ -154,19 +152,19 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            the HTTP status.
      */
     public RestconfDocumentedException(final Status status) {
-        errors = ImmutableList.of();
+        errors = List.of();
         this.status = requireNonNull(status, "Status can't be null");
     }
 
     public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
         super(cause, ErrorTags.statusOf(error.getErrorTag()));
-        errors = ImmutableList.of(error);
+        errors = List.of(error);
         status = null;
     }
 
     public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
         super(cause, ErrorTags.statusOf(errors.get(0).getErrorTag()));
-        this.errors = ImmutableList.copyOf(errors);
+        this.errors = List.copyOf(errors);
         status = null;
     }
 
@@ -246,7 +244,7 @@ public class RestconfDocumentedException extends WebApplicationException {
                 .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),
                     // FIXME: pass down error info
                     null, error.path()))
-                .collect(ImmutableList.toImmutableList()));
+                .toList());
         }
     }
 
