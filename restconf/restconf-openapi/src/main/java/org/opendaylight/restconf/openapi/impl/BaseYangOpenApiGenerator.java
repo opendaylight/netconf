@@ -86,53 +86,34 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
+    public OpenApiObject getControllerModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getAllModulesDoc(uriInfo, schemaContext, "Controller", "", definitionNames).build();
-    }
-
-    public OpenApiObject.Builder getAllModulesDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
-            final @NonNull String deviceName, final String context, final DefinitionNames definitionNames) {
-        final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
-        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, sortedModules);
-    }
-
-    public OpenApiObject.Builder getAllModulesDoc(final UriInfo uriInfo, final Range<Integer> range,
-            final EffectiveModelContext schemaContext, final @NonNull String deviceName, final String context,
-            final DefinitionNames definitionNames) {
-        final SortedSet<Module> sortedModules = getSortedModules(schemaContext);
-        final Set<Module> filteredModules = filterByRange(sortedModules, range);
-        return getFilledDoc(uriInfo, schemaContext, deviceName, context, definitionNames, filteredModules);
-    }
-
-    private OpenApiObject.Builder getFilledDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
-            final String deviceName, final String context, final DefinitionNames definitionNames,
-            final Set<Module> modules) {
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
-        final var title = deviceName + " modules of RESTCONF";
-        final OpenApiObject.Builder docBuilder = new OpenApiObject.Builder();
-        docBuilder.openapi(OPEN_API_VERSION);
-        docBuilder.info(new Info(API_VERSION, title));
-        docBuilder.servers(List.of(new Server(schema + "://" + host + BASE_PATH)));
-        docBuilder.components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
-        docBuilder.security(SECURITY);
-        docBuilder.paths(new HashMap<>());
+        final var title = "Controller modules of RESTCONF";
+        final var info = new Info(API_VERSION, title);
+        final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
+        final Map<String, Path> paths = new HashMap<>();
+        final Map<String, Schema> schemas = new HashMap<>();
+        final var modules = getSortedModules(schemaContext);
+
         for (final Module module : modules) {
-            final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
+            if (LOG.isDebugEnabled()) {
+                final String revisionString = module.getQNameModule().getRevision().map(Revision::toString)
+                    .orElse(null);
+                LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
+            }
 
-            LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
-
-            docBuilder.getComponents().schemas().putAll(getSchemas(module, schemaContext, definitionNames, false));
-            docBuilder.getPaths().putAll(getPaths(module, context, deviceName, schemaContext, definitionNames, false));
+            schemas.putAll(getSchemas(module, schemaContext, definitionNames, false));
+            paths.putAll(getPaths(module, "", "", schemaContext, definitionNames, false));
         }
+        final Components components = new Components(schemas, new SecuritySchemes(OPEN_API_BASIC_AUTH));
 
-        // FIXME rework callers logic to make possible to return OpenApiObject from here
-        return docBuilder;
+        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
 
-    private static Set<Module> filterByRange(final SortedSet<Module> modules, final Range<Integer> range) {
+    public static Set<Module> filterByRange(final SortedSet<Module> modules, final Range<Integer> range) {
         final int begin = range.lowerEndpoint();
         final int end = range.upperEndpoint();
 
@@ -203,18 +184,15 @@ public abstract class BaseYangOpenApiGenerator {
 
     public OpenApiObject getOpenApiSpec(final Module module, final String schema, final String host,
             final String basePath, final String context, final EffectiveModelContext schemaContext) {
-        final var docBuilder = new OpenApiObject.Builder();
-        docBuilder.openapi(OPEN_API_VERSION);
-        docBuilder.info(new Info(API_VERSION, module.getName()));
-        docBuilder.servers(List.of(new Server(schema + "://" + host + basePath)));
-        docBuilder.components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)));
-        docBuilder.security(SECURITY);
+        final var info = new Info(API_VERSION, module.getName());
+        final var servers = List.of(new Server(schema + "://" + host + basePath));
         final var definitionNames = new DefinitionNames();
         final var schemas = getSchemas(module, schemaContext, definitionNames, true);
-        docBuilder.getComponents().schemas().putAll(schemas);
-        final var paths = getPaths(module, context, "", schemaContext, definitionNames,true);
-        docBuilder.paths(paths);
-        return docBuilder.build();
+        final var components = new Components(schemas, new SecuritySchemes(OPEN_API_BASIC_AUTH));
+        final var paths = getPaths(module, context, "", schemaContext,
+            definitionNames, true);
+
+        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
 
     public Map<String, Path> getPaths(final Module module, final String context, final String deviceName,
@@ -265,7 +243,7 @@ public abstract class BaseYangOpenApiGenerator {
         return paths;
     }
 
-    private Map<String, Schema> getSchemas(final Module module, final EffectiveModelContext schemaContext,
+    public Map<String, Schema> getSchemas(final Module module, final EffectiveModelContext schemaContext,
             final DefinitionNames definitionNames, final boolean isForSingleModule) {
         Map<String, Schema> schemas = new HashMap<>();
         try {
@@ -408,7 +386,7 @@ public abstract class BaseYangOpenApiGenerator {
         return path.toString();
     }
 
-    private static SortedSet<Module> getSortedModules(final EffectiveModelContext schemaContext) {
+    public static SortedSet<Module> getSortedModules(final EffectiveModelContext schemaContext) {
         if (schemaContext == null) {
             return Collections.emptySortedSet();
         }
