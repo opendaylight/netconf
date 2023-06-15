@@ -180,6 +180,7 @@ public class NetconfTopologyManager
 
     private void refreshNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
         final NetconfTopologyContext context = contexts.get(instanceIdentifier);
+
         context.refresh(createSetup(instanceIdentifier, node));
     }
 
