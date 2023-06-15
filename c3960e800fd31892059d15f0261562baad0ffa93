@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6eb8eabb_1ac1c2f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T15:09:07Z",
+      "side": 1,
+      "message": "I am unsure if its safe to remove `implements org.opendaylight.yangtools.concepts.Immutable`. Lets add it for now.",
+      "revId": "c3960e800fd31892059d15f0261562baad0ffa93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
