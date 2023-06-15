@@ -77,7 +77,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             return;
         }
         isMaster = true;
-        getTopologySingleton().becomeTopologyLeader();
+        topologySingleton.becomeTopologyLeader();
     }
 
     // called when master is down/changed to slave
@@ -89,7 +89,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             LOG.warn("Instance is already closed.");
             return FluentFutures.immediateNullFluentFuture();
         }
-        getTopologySingleton().becomeTopologyFollower();
+        topologySingleton.becomeTopologyFollower();
         return FluentFutures.immediateNullFluentFuture();
     }
 
@@ -98,10 +98,10 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), node.augmentation(NetconfNode.class));
 
         if (isMaster) {
-            getTopologySingleton().disconnectNode(setup.getNode().getNodeId());
-            getTopologySingleton().refreshSetupConnection(setup, remoteDeviceId);
+            topologySingleton.disconnectNode(setup.getNode().getNodeId());
+            topologySingleton.refreshSetupConnection(setup, remoteDeviceId);
         } else {
-            getTopologySingleton().refreshDevice(setup, remoteDeviceId);
+            topologySingleton.refreshDevice(setup, remoteDeviceId);
         }
     }
 
@@ -116,7 +116,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             LOG.warn("Instance is already closed.");
             return;
         }
-        getTopologySingleton().close();
+        topologySingleton.close();
         closed = true;
     }
 }
