@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80af8c55_96b9717a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Operation.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T16:34:35Z",
+      "side": 1,
+      "message": "4 spaces only.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f895e45_93a31e8f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T16:34:35Z",
+      "side": 1,
+      "message": "Use just 4 spaces please.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5baaa3b_87b60086",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T16:34:35Z",
+      "side": 1,
+      "message": "4 space only.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d9474d2_d1dd648e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T16:34:35Z",
+      "side": 1,
+      "message": "4 spaces only.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "114fda4f_deaddac6",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T16:34:35Z",
+      "side": 1,
+      "message": "4 spaces only.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a657155c_8089027e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T16:34:35Z",
+      "side": 1,
+      "message": "4 spaces only.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "398c9933_50b2ae6f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T16:34:35Z",
+      "side": 1,
+      "message": "4 spaces only.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0d3448a_9c82a486",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T16:34:35Z",
+      "side": 1,
+      "message": "4 spaces only.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
