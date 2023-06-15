@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6a43e9f_dcfa0117",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T14:59:51Z",
+      "side": 1,
+      "message": "We have to access topology singleton via this method because of mocking in MountPointEndToEndTest.",
+      "revId": "c7f4e50d14eba70f9a71a6f738d38a16c9427d4f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
