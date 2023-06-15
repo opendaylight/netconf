@@ -39,6 +39,30 @@
       },
       "revId": "a39142b65480e80f0df0de156de061414922cb8a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94c4f7f3_4d6b028b",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/errors/RestconfDocumentedException.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-15T08:05:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb7db312_0a708523",
+      "range": {
+        "startLine": 41,
+        "startChar": 18,
+        "endLine": 41,
+        "endChar": 22
+      },
+      "revId": "a39142b65480e80f0df0de156de061414922cb8a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
