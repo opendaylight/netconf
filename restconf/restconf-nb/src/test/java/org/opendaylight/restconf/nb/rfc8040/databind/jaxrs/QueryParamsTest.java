@@ -8,11 +8,9 @@
 package org.opendaylight.restconf.nb.rfc8040.databind.jaxrs;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
@@ -118,7 +116,6 @@ public class QueryParamsTest {
     public void parseUriParametersWithDefaultAndTaggedTest() {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "report-all-tagged");
         assertNull(params.withDefaults());
-        assertTrue(params.tagged());
     }
 
     /**
@@ -129,7 +126,6 @@ public class QueryParamsTest {
     public void parseUriParametersWithDefaultAndReportAllTest() {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "report-all");
         assertNull(params.withDefaults());
-        assertFalse(params.tagged());
     }
 
     /**
@@ -140,7 +136,6 @@ public class QueryParamsTest {
     public void parseUriParametersWithDefaultAndNonTaggedTest() {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "explicit");
         assertEquals(WithDefaultsParam.EXPLICIT, params.withDefaults());
-        assertFalse(params.tagged());
     }
 
     /**
