@@ -134,7 +134,6 @@ public final class QueryParams {
         FieldsParam fields = null;
         WithDefaultsParam withDefaults = null;
         PrettyPrintParam prettyPrint = null;
-        boolean tagged = false;
 
         for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             final String paramName = entry.getKey();
@@ -161,19 +160,9 @@ public final class QueryParams {
                     case WithDefaultsParam.uriName:
                         final var defaultsVal = optionalParam(WithDefaultsParam::forUriValue, paramName, paramValues);
                         if (defaultsVal != null) {
-                            tagged = switch (defaultsVal) {
-                                case REPORT_ALL -> {
-                                    withDefaults = null;
-                                    yield false;
-                                }
-                                case REPORT_ALL_TAGGED -> {
-                                    withDefaults = null;
-                                    yield true;
-                                }
-                                default -> {
-                                    withDefaults = defaultsVal;
-                                    yield false;
-                                }
+                            withDefaults = switch (defaultsVal) {
+                                case REPORT_ALL, REPORT_ALL_TAGGED -> null;
+                                default -> defaultsVal;
                             };
                         }
                         break;
@@ -189,7 +178,7 @@ public final class QueryParams {
             }
         }
 
-        return ReadDataParams.of(content, depth, fields, withDefaults, tagged, prettyPrint);
+        return ReadDataParams.of(content, depth, fields, withDefaults, prettyPrint);
     }
 
     public static @NonNull WriteDataParams newWriteDataParams(final UriInfo uriInfo) {

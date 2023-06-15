@@ -118,7 +118,6 @@ public class QueryParamsTest {
     public void parseUriParametersWithDefaultAndTaggedTest() {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "report-all-tagged");
         assertNull(params.withDefaults());
-        assertTrue(params.tagged());
     }
 
     /**
@@ -129,7 +128,6 @@ public class QueryParamsTest {
     public void parseUriParametersWithDefaultAndReportAllTest() {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "report-all");
         assertNull(params.withDefaults());
-        assertFalse(params.tagged());
     }
 
     /**
@@ -140,7 +138,6 @@ public class QueryParamsTest {
     public void parseUriParametersWithDefaultAndNonTaggedTest() {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "explicit");
         assertEquals(WithDefaultsParam.EXPLICIT, params.withDefaults());
-        assertFalse(params.tagged());
     }
 
     /**
