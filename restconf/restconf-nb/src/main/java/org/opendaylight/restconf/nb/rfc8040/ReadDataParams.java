@@ -27,22 +27,20 @@ import org.opendaylight.yangtools.concepts.Immutable;
 // FIXME: this should be a record once we have JDK17+
 public final class ReadDataParams implements Immutable {
     private static final @NonNull ReadDataParams EMPTY =
-        new ReadDataParams(ContentParam.ALL, null, null, null, false, null);
+        new ReadDataParams(ContentParam.ALL, null, null, null, null);
 
     private final @NonNull ContentParam content;
     private final WithDefaultsParam withDefaults;
     private final PrettyPrintParam prettyPrint;
     private final FieldsParam fields;
     private final DepthParam depth;
-    private final boolean tagged;
 
     private ReadDataParams(final ContentParam content,  final DepthParam depth, final FieldsParam fields,
-            final WithDefaultsParam withDefaults, final boolean tagged, final PrettyPrintParam prettyPrint) {
+            final WithDefaultsParam withDefaults, final PrettyPrintParam prettyPrint) {
         this.content = requireNonNull(content);
         this.depth = depth;
         this.fields = fields;
         this.withDefaults = withDefaults;
-        this.tagged = tagged;
         this.prettyPrint = prettyPrint;
     }
 
@@ -51,9 +49,8 @@ public final class ReadDataParams implements Immutable {
     }
 
     public static @NonNull ReadDataParams of(final ContentParam content,  final DepthParam depth,
-            final FieldsParam fields, final WithDefaultsParam withDefaults, final boolean tagged,
-            final PrettyPrintParam prettyPrint) {
-        return new ReadDataParams(content, depth, fields, withDefaults, tagged, prettyPrint);
+            final FieldsParam fields, final WithDefaultsParam withDefaults, final PrettyPrintParam prettyPrint) {
+        return new ReadDataParams(content, depth, fields, withDefaults, prettyPrint);
     }
 
     public @NonNull ContentParam content() {
@@ -76,11 +73,6 @@ public final class ReadDataParams implements Immutable {
         return prettyPrint;
     }
 
-    // FIXME: for migration only
-    public boolean tagged() {
-        return tagged;
-    }
-
     @Override
     public String toString() {
         final var helper = MoreObjects.toStringHelper(this).add("content", content.paramValue());
@@ -93,7 +85,6 @@ public final class ReadDataParams implements Immutable {
         if (withDefaults != null) {
             helper.add("withDefaults", withDefaults.paramValue());
         }
-        helper.add("tagged", tagged);
         if (prettyPrint != null) {
             helper.add("prettyPrint", prettyPrint.value());
         }

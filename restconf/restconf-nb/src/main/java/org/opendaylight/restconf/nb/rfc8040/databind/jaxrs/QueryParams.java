@@ -134,7 +134,6 @@ public final class QueryParams {
         FieldsParam fields = null;
         WithDefaultsParam withDefaults = null;
         PrettyPrintParam prettyPrint = null;
-        boolean tagged = false;
 
         for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             final String paramName = entry.getKey();
@@ -159,23 +158,7 @@ public final class QueryParams {
                         fields = optionalParam(FieldsParam::forUriValue, paramName, paramValues);
                         break;
                     case WithDefaultsParam.uriName:
-                        final var defaultsVal = optionalParam(WithDefaultsParam::forUriValue, paramName, paramValues);
-                        if (defaultsVal != null) {
-                            tagged = switch (defaultsVal) {
-                                case REPORT_ALL -> {
-                                    withDefaults = null;
-                                    yield false;
-                                }
-                                case REPORT_ALL_TAGGED -> {
-                                    withDefaults = null;
-                                    yield true;
-                                }
-                                default -> {
-                                    withDefaults = defaultsVal;
-                                    yield false;
-                                }
-                            };
-                        }
+                        withDefaults = optionalParam(WithDefaultsParam::forUriValue, paramName, paramValues);
                         break;
                     case PrettyPrintParam.uriName:
                         prettyPrint = optionalParam(PrettyPrintParam::forUriValue, paramName, paramValues);
@@ -189,7 +172,7 @@ public final class QueryParams {
             }
         }
 
-        return ReadDataParams.of(content, depth, fields, withDefaults, tagged, prettyPrint);
+        return ReadDataParams.of(content, depth, fields, withDefaults, prettyPrint);
     }
 
     public static @NonNull WriteDataParams newWriteDataParams(final UriInfo uriInfo) {

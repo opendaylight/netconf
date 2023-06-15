@@ -8,11 +8,9 @@
 package org.opendaylight.restconf.nb.rfc8040.databind.jaxrs;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
@@ -92,7 +90,7 @@ public class QueryParamsTest {
     @Test
     public void parseUriParametersDefaultTest() {
         // no parameters, default values should be used
-        final var params = assertParams(QueryParams::newReadDataParams, new MultivaluedHashMap<String, String>());
+        final var params = assertParams(QueryParams::newReadDataParams, new MultivaluedHashMap<>());
         assertEquals(ContentParam.ALL, params.content());
         assertNull(params.depth());
         assertNull(params.fields());
@@ -111,25 +109,21 @@ public class QueryParamsTest {
     }
 
     /**
-     * Testing parsing of with-defaults parameter which value matches 'report-all-tagged' setting - default value should
-     * be set to {@code null} and tagged flag should be set to {@code true}.
+     * Testing parsing of with-defaults parameter which value matches 'report-all-tagged' setting.
      */
     @Test
     public void parseUriParametersWithDefaultAndTaggedTest() {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "report-all-tagged");
-        assertNull(params.withDefaults());
-        assertTrue(params.tagged());
+        assertEquals(WithDefaultsParam.REPORT_ALL_TAGGED, params.withDefaults());
     }
 
     /**
-     * Testing parsing of with-defaults parameter which value matches 'report-all' setting - default value should
-     * be set to {@code null} and tagged flag should be set to {@code false}.
+     * Testing parsing of with-defaults parameter which value matches 'report-all' setting.
      */
     @Test
     public void parseUriParametersWithDefaultAndReportAllTest() {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "report-all");
-        assertNull(params.withDefaults());
-        assertFalse(params.tagged());
+        assertEquals(WithDefaultsParam.REPORT_ALL, params.withDefaults());
     }
 
     /**
@@ -140,7 +134,6 @@ public class QueryParamsTest {
     public void parseUriParametersWithDefaultAndNonTaggedTest() {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "explicit");
         assertEquals(WithDefaultsParam.EXPLICIT, params.withDefaults());
-        assertFalse(params.tagged());
     }
 
     /**
