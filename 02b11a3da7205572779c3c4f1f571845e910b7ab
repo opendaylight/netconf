@@ -16,6 +16,24 @@
       "message": "We are not taking into account the length restriction for \"SGVsbG8sIHdvcmxkIQ\u003d\u003d.",
       "revId": "02b11a3da7205572779c3c4f1f571845e910b7ab",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b2eaddc_046ab194",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 652,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-16T12:53:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f653a237_50741c7d",
+      "revId": "02b11a3da7205572779c3c4f1f571845e910b7ab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
