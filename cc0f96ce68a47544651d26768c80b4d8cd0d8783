@@ -34,6 +34,24 @@
       "parentUuid": "cf3be4a7_e28c8287",
       "revId": "cc0f96ce68a47544651d26768c80b4d8cd0d8783",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40c3a768_89a34998",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T17:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8be0df4_0eb32e29",
+      "revId": "cc0f96ce68a47544651d26768c80b4d8cd0d8783",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
