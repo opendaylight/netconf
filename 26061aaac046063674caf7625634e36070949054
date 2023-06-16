@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef9333bb_f6cc4e7f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T16:39:29Z",
+      "side": 1,
+      "message": "We need it for openApiGenerator.filterByRange",
+      "parentUuid": "450510d8_47566ce5",
+      "revId": "26061aaac046063674caf7625634e36070949054",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "42fbad48_c4c991f3",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
         "patchSetId": 7
