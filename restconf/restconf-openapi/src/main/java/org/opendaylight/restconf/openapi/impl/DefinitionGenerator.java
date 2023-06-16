@@ -848,6 +848,7 @@ public class DefinitionGenerator {
         boolean isStringTakePlace = false;
         boolean isNumberTakePlace = false;
         boolean isBooleanTakePlace = false;
+        String finalType = null;
         for (final TypeDefinition<?> typeDef : unionType.getTypes()) {
             if (!isStringTakePlace) {
                 if (typeDef instanceof StringTypeDefinition
@@ -865,6 +866,22 @@ public class DefinitionGenerator {
                 }
             }
         }
+
+        if (unionType.getDefaultValue().isPresent()) {
+            final String value = unionType.getDefaultValue().orElseThrow().toString();
+            if (isNumberTakePlace && value.matches("-?[0-9]+(\\.[0-9]+)?")) {
+                isStringTakePlace = false;
+                isBooleanTakePlace = false;
+            } else if (isBooleanTakePlace && (value.equalsIgnoreCase("true")
+                    || value.equalsIgnoreCase("false"))) {
+                isStringTakePlace = false;
+                isNumberTakePlace = false;
+            } else {
+                isNumberTakePlace = false;
+                isBooleanTakePlace = false;
+            }
+        }
+
         if (isStringTakePlace) {
             unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
             setExampleValue(property, STRING_TYPE);
@@ -873,8 +890,8 @@ public class DefinitionGenerator {
         if (isBooleanTakePlace) {
             if (isNumberTakePlace) {
                 unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, v.toString()));
-                setExampleValue(property, STRING_TYPE);
-                return STRING_TYPE;
+                setExampleValue(property, NUMBER_TYPE);
+                return NUMBER_TYPE;
             }
             unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (Boolean) v));
             setExampleValue(property, BOOLEAN_TYPE);
