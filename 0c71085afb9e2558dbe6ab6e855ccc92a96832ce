@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bcb1153_fefcdb1c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Operation.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T17:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80af8c55_96b9717a",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f895e45_93a31e8f",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-06-15T16:34:35Z",
       "side": 1,
       "message": "Use just 4 spaces please.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0af543e_8c0e7457",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T17:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f895e45_93a31e8f",
       "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb773ccc_8915ba38",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T17:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5baaa3b_87b60086",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d9474d2_d1dd648e",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-06-15T16:34:35Z",
       "side": 1,
       "message": "4 spaces only.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9654e47c_a5f7a29b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T17:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d9474d2_d1dd648e",
       "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "056626da_60d8e0b5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T17:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "114fda4f_deaddac6",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a657155c_8089027e",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-06-15T16:34:35Z",
       "side": 1,
       "message": "4 spaces only.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31c3588b_02c91be4",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T17:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a657155c_8089027e",
       "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd5abbde_784a8a2c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T17:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "398c9933_50b2ae6f",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f0d3448a_9c82a486",
@@ -133,6 +259,24 @@
       "writtenOn": "2023-06-15T16:34:35Z",
       "side": 1,
       "message": "4 spaces only.",
+      "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aef0aa2c_fe06ecc2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T17:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0d3448a_9c82a486",
       "revId": "0c71085afb9e2558dbe6ab6e855ccc92a96832ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
