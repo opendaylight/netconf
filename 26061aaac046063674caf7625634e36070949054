@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9adadcbd_cfd78163",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T14:54:13Z",
+      "side": 1,
+      "message": "will be addressed in next patch",
+      "parentUuid": "e7907b17_d517c331",
+      "revId": "26061aaac046063674caf7625634e36070949054",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9c2bf2db_f38c503b",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
         "patchSetId": 7
@@ -31,6 +49,24 @@
       "writtenOn": "2023-06-16T07:59:57Z",
       "side": 1,
       "message": "4 spaces is enough.",
+      "revId": "26061aaac046063674caf7625634e36070949054",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97da4803_07010fed",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T14:54:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c2bf2db_f38c503b",
       "revId": "26061aaac046063674caf7625634e36070949054",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "450510d8_47566ce5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T14:54:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73f49146_bda4a636",
+      "revId": "26061aaac046063674caf7625634e36070949054",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42fbad48_c4c991f3",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-06-16T07:59:57Z",
       "side": 1,
       "message": "We would like to avoid components.schemas().putAll",
+      "revId": "26061aaac046063674caf7625634e36070949054",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f264d9d5_f1987c12",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-16T14:54:13Z",
+      "side": 1,
+      "message": "will be addressed in next patch",
+      "parentUuid": "42fbad48_c4c991f3",
       "revId": "26061aaac046063674caf7625634e36070949054",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
