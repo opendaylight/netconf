@@ -848,6 +848,7 @@ public class DefinitionGenerator {
         boolean isStringTakePlace = false;
         boolean isNumberTakePlace = false;
         boolean isBooleanTakePlace = false;
+        String finalType = null;
         for (final TypeDefinition<?> typeDef : unionType.getTypes()) {
             if (!isStringTakePlace) {
                 if (typeDef instanceof StringTypeDefinition
@@ -865,24 +866,36 @@ public class DefinitionGenerator {
                 }
             }
         }
+
+        if (unionType.getDefaultValue().isPresent()) {
+            final String value = unionType.getDefaultValue().orElseThrow().toString();
+            if (value.matches("[0-9]+")) {
+                finalType = NUMBER_TYPE;
+            } else if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                finalType = BOOLEAN_TYPE;
+            } else {
+                finalType = STRING_TYPE;
+            }
+        }
+
         if (isStringTakePlace) {
             unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
             setExampleValue(property, STRING_TYPE);
-            return STRING_TYPE;
+            return finalType != null ? finalType : STRING_TYPE;
         }
         if (isBooleanTakePlace) {
             if (isNumberTakePlace) {
                 unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, v.toString()));
-                setExampleValue(property, STRING_TYPE);
-                return STRING_TYPE;
+                setExampleValue(property, NUMBER_TYPE);
+                return finalType != null ? finalType : NUMBER_TYPE;
             }
             unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (Boolean) v));
             setExampleValue(property, BOOLEAN_TYPE);
-            return BOOLEAN_TYPE;
+            return finalType != null ? finalType : BOOLEAN_TYPE;
         }
         unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, v.toString()));
         setExampleValue(property, NUMBER_TYPE);
-        return NUMBER_TYPE;
+        return finalType != null ? finalType : NUMBER_TYPE;
     }
 
     private static ObjectNode buildXmlParameter(final SchemaNode node) {
