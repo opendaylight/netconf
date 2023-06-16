@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d96c8732_74974071",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-06-16T12:08:34Z",
+      "side": 1,
+      "message": "Matchers are used here because unionType.getDefaultValue().isPresent().get only returns string.",
+      "revId": "aaaed8bf6a34cbaa6858187c56b16ade534cf418",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
