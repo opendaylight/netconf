@@ -71,7 +71,15 @@ public final class DefinitionGeneratorTest {
 
         final var properties = schemas.get("definition-test_union-container").properties();
         assertEquals("5", properties.get("testUnion1").defaultValue());
+        assertEquals("integer", properties.get("testUnion1").type());
+        assertEquals(-2147483648, properties.get("testUnion1").example());
         assertEquals("false", properties.get("testUnion2").defaultValue());
+        assertEquals("string", properties.get("testUnion2").type());
+        assertEquals("Some testUnion2", properties.get("testUnion2").example());
+        assertEquals("integer", properties.get("testUnion3").type());
+        assertEquals(-2147483648, properties.get("testUnion3").example());
+        assertEquals("false", properties.get("testUnion3").defaultValue());
+
     }
 
     @Test
