@@ -75,7 +75,11 @@ public final class DefinitionGeneratorTest {
 
         var properties = jsonObject.get("definition-test_union-container").properties();
         assertEquals("5", properties.get("testUnion1").get("default").asText());
+        assertEquals("number", properties.get("testUnion1").get("type").asText());
+        assertEquals("string", properties.get("testUnion1").get("example").asText());
         assertEquals("false", properties.get("testUnion2").get("default").asText());
+        assertEquals("boolean", properties.get("testUnion2").get("type").asText());
+        assertEquals("string", properties.get("testUnion2").get("example").asText());
     }
 
     @Test
