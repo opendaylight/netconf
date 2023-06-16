@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a65349c_1c5bc8fb",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 840,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-16T13:17:49Z",
+      "side": 1,
+      "message": "Default value is: ((InstanceIdentifierTypeDefinition) leafTypeDef).getDefaultValue().",
+      "revId": "80efa8ab0b57d79dacafd48fa396c24be54508fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
