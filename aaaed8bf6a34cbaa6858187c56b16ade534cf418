@@ -16,6 +16,24 @@
       "message": "Matchers are used here because unionType.getDefaultValue().isPresent().get only returns string.",
       "revId": "aaaed8bf6a34cbaa6858187c56b16ade534cf418",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7389583_af89cc15",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-06-16T12:09:42Z",
+      "side": 1,
+      "message": "edit: *unionType.getDefaultValue().get",
+      "parentUuid": "d96c8732_74974071",
+      "revId": "aaaed8bf6a34cbaa6858187c56b16ade534cf418",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
