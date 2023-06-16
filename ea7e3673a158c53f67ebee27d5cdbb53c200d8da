@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b7a9fde_5fe5275d",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-16T12:04:59Z",
+      "side": 1,
+      "message": "I would consider creating separate test class for base path test. Starting all tests here twice is probably not necessary.",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82e8fa60_8ecaa6b2",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-16T12:04:59Z",
+      "side": 1,
+      "message": "Methods should not be placed within the class attribute section.",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29763599_4e9e1ca4",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-16T12:04:59Z",
+      "side": 1,
+      "message": "Please remove redundant \"createMountPointGenerator\" method. You can use it like this:\n```\n    @Parameters(name \u003d \"{0}\")\n    public static Collection\u003cObject[]\u003e parameters() {\n        return Arrays.asList(\n            new Object[]{\n                (BiFunction\u003cDOMSchemaService, DOMMountPointService, MountPointOpenApiGeneratorRFC8040\u003e)\n                    MountPointOpenApiGeneratorRFC8040::new, DEFAULT_BASE_PATH\n            },\n            new Object[]{\n                (BiFunction\u003cDOMSchemaService, DOMMountPointService, MountPointOpenApiGeneratorRFC8040\u003e)\n                    (schemaService, service) -\u003e\n                        new MountPointOpenApiGeneratorRFC8040(schemaService, service, CUSTOM_BASE_PATH),\n                CUSTOM_BASE_PATH\n            }\n        );\n    }\n```",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a95a715_5508e2c6",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-16T12:04:59Z",
+      "side": 1,
+      "message": "please keep order in attributes:\n```\nprivate static final ...\nprivate static final ...\n\nprivate static ...\nprivate static ...\n\nprivate ...\nprivate ...\n\npublic ...\npublic ...\n```",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "841449e5_52062e70",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-16T12:04:59Z",
+      "side": 1,
+      "message": "This is unnecessary change. You can create your own resource folder instead of being restricted to the mixed \"yang\" folder. For example, you can create a folder with the name of the task, such as \"NETCONF-1021\", and place your yang files there.",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdae2ab9_58159407",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-16T12:04:59Z",
+      "side": 1,
+      "message": "Wrong formatting, simplified it like this:\n```\nfinal var containerRoot \u003d \"/\" + basePath + \"/data/nodes/node\u003d123/yang-ext:mount/recursive:container-root\";\nfinal var configPaths \u003d Map.of(containerRoot, 0,\n    containerRoot + \"/root-list\u003d{name}\", 1,\n    containerRoot + \"/root-list\u003d{name}/nested-list\u003d{name1}\", 2,\n    containerRoot + \"/root-list\u003d{name}/nested-list\u003d{name1}/super-nested-list\u003d{name2}\", 3);\n```\n\nand then you can also remove \"@SuppressWarnings(\"checkstyle:lineLength\")\"",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54a69565_f000f440",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-16T12:04:59Z",
+      "side": 1,
+      "message": "The logic implemented here seems overly complex for a simple task. Instead of using a pattern matcher to find the paths, you have a fixed set of 11 paths that can be easily compared using a simple assertion. For example:\n```\nfinal Map\u003cString, Path\u003e paths \u003d mountPointApi.paths();\nassertTrue(paths.containsKey(\"/\" + basePath + \"/operations/nodes/node\u003d123/yang-ext:mount/action-path-test:rpc-call\"));\n```\n\n- by directly comparing the paths using assertions, you can verify not only the \"operations\" path but also all the other relevant paths.\n- `assertEquals(\"Unexpected operations paths\", actionPaths, expectedActionPaths);` expect that order of paths is important. So if paths order change test will fail.",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
