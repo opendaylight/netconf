@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "7b211f8e4f482bbd2559dad5f48df155e1ae167c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c304d5b_a7eec1f1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 874,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-16T13:35:34Z",
+      "side": 1,
+      "message": "I can write \"true\" or number to string type. This will produce wrong results.",
+      "revId": "7b211f8e4f482bbd2559dad5f48df155e1ae167c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6a9f9e4_8c0fbbaf",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 884,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-16T13:35:34Z",
+      "side": 1,
+      "message": "Type could be save as for example BOOLEAN_TYPE. But default value would be string and example also. Could be this problem?",
+      "revId": "7b211f8e4f482bbd2559dad5f48df155e1ae167c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
