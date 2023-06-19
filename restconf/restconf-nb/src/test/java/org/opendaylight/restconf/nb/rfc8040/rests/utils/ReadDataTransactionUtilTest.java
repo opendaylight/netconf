@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
@@ -36,14 +35,13 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -153,12 +151,9 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readLeafWithDefaultParameters() {
-        final LeafNode leafNode = Builders.leafBuilder().withNodeIdentifier(
-                new NodeIdentifier(QName.create(DATA.base, "exampleLeaf"))).withValue("i am leaf").build();
-
         final ContainerNode content = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create(DATA.base, "cont")))
-                .withChild(leafNode)
+                .withChild(ImmutableNodes.leafNode(QName.create(DATA.base, "exampleLeaf"), "i am leaf"))
                 .build();
 
         final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(content.getIdentifier()).build();
@@ -182,28 +177,23 @@ public class ReadDataTransactionUtilTest {
         final QName exampleList = QName.create(DATA.base, "exampleList");
         final QName cont = QName.create(DATA.base, "cont");
 
-        final LeafNode leafNode = Builders.leafBuilder().withNodeIdentifier(
-                NodeIdentifier.create(leafBool))
-                .withValue(true).build();
-        final ContainerNode containerNode = Builders.containerBuilder().withNodeIdentifier(
-                NodeIdentifier.create(containerBool))
-                .withChild(leafNode).build();
-        final LeafNode leafNode1 = Builders.leafBuilder().withNodeIdentifier(
-                NodeIdentifier.create(leafInt))
-                .withValue(12).build();
-        final ContainerNode containerNode1 = Builders.containerBuilder().withNodeIdentifier(
-                NodeIdentifier.create(containerInt))
-                .withChild(leafNode1).build();
-        final MapEntryNode entryNode = Builders.mapEntryBuilder()
-                .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(exampleList))
-                .withChild(containerNode)
-                .addChild(containerNode1).build();
-        final MapNode mapNode = Builders.mapBuilder().withNodeIdentifier(
-                NodeIdentifier.create(exampleList))
-                .withChild(entryNode).build();
         final ContainerNode content = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(cont))
-                .withChild(mapNode).build();
+                .withChild(Builders.unkeyedListBuilder()
+                    .withNodeIdentifier(NodeIdentifier.create(exampleList))
+                    .withChild(Builders.unkeyedListEntryBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(exampleList))
+                        .withChild(Builders.containerBuilder()
+                            .withNodeIdentifier(NodeIdentifier.create(containerBool))
+                            .withChild(ImmutableNodes.leafNode(leafBool, true))
+                            .build())
+                        .addChild(Builders.containerBuilder()
+                            .withNodeIdentifier(NodeIdentifier.create(containerInt))
+                            .withChild(ImmutableNodes.leafNode(leafInt, 12))
+                            .build())
+                        .build())
+                    .build())
+                .build();
 
         final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(cont).build();
 
@@ -215,14 +205,7 @@ public class ReadDataTransactionUtilTest {
         final NormalizedNode normalizedNode = ReadDataTransactionUtil.readData(
                 ContentParam.ALL, path, mdsalStrategy, WithDefaultsParam.TRIM, schemaContext);
 
-//assertEquals(content, normalizedNode); is not used because two duplicated child nodes are created in mapEntryNode
-        assertTrue(normalizedNode instanceof ContainerNode);
-        assertEquals(((MapNode) ((ContainerNode) normalizedNode).getChildByArg(
-                        NodeIdentifier.create(exampleList))).getChildByArg(
-                        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(exampleList)),
-                ((MapNode) content.getChildByArg(
-                        NodeIdentifier.create(exampleList))).childByArg(
-                        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(exampleList)));
+        assertEquals(content, normalizedNode);
     }
 
     @Test
@@ -231,22 +214,16 @@ public class ReadDataTransactionUtilTest {
         final QName exampleList = QName.create(DATA.base, "exampleList");
         final QName container = QName.create(DATA.base, "cont");
 
-        final LeafNode leafNode = Builders.leafBuilder().withNodeIdentifier(
-                NodeIdentifier.create(leafInList))
-                .withValue("I am leaf in list").build();
-
-        final MapEntryNode entryNode = Builders.mapEntryBuilder()
-                .withNodeIdentifier(
-                        YangInstanceIdentifier.NodeIdentifierWithPredicates.of(exampleList))
-                .addChild(leafNode).build();
-
-        final MapNode mapNode = Builders.mapBuilder().withNodeIdentifier(
-                NodeIdentifier.create(QName.create(DATA.base, "exampleList")))
-                .withChild(entryNode).build();
-
         final ContainerNode content = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(container))
-                .withChild(mapNode).build();
+                .withChild(Builders.unkeyedListBuilder()
+                    .withNodeIdentifier(NodeIdentifier.create(QName.create(DATA.base, "exampleList")))
+                    .withChild(Builders.unkeyedListEntryBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(exampleList))
+                        .addChild(ImmutableNodes.leafNode(leafInList, "I am leaf in list"))
+                        .build())
+                    .build())
+                .build();
 
         final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(container).build();
 
