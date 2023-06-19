@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e506375b_9b1c8237",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-19T16:35:07Z",
+      "side": 1,
+      "message": "may be better use constant for this string?",
+      "range": {
+        "startLine": 395,
+        "startChar": 21,
+        "endLine": 395,
+        "endChar": 68
+      },
+      "revId": "83bd2ccc58dd2c90c909502885351ab4d706e35f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eda7f051_92f09c65",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-19T16:35:07Z",
+      "side": 1,
+      "message": "check your continuation indent: should be 4",
+      "range": {
+        "startLine": 417,
+        "startChar": 8,
+        "endLine": 417,
+        "endChar": 16
+      },
+      "revId": "83bd2ccc58dd2c90c909502885351ab4d706e35f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f95e6ae_657b7f41",
+        "filename": "restconf/restconf-openapi/src/test/resources/NETCONF-1036/augmentation.yang",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-19T16:35:07Z",
+      "side": 1,
+      "message": "2 spaces",
+      "range": {
+        "startLine": 6,
+        "startChar": 4,
+        "endLine": 6,
+        "endChar": 5
+      },
+      "revId": "83bd2ccc58dd2c90c909502885351ab4d706e35f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33910905_8ada1564",
+        "filename": "restconf/restconf-openapi/src/test/resources/NETCONF-1036/module.yang",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-06-19T16:35:07Z",
+      "side": 1,
+      "message": "2 spaces",
+      "range": {
+        "startLine": 6,
+        "startChar": 4,
+        "endLine": 6,
+        "endChar": 8
+      },
+      "revId": "83bd2ccc58dd2c90c909502885351ab4d706e35f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
