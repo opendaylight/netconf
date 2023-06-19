@@ -36,6 +36,6 @@ public abstract sealed class TCPTransportStack extends AbstractTransportStack<TC
         if (addr == null) {
             return port == null ? null : new InetSocketAddress(portNum);
         }
-        return new InetSocketAddress(IetfInetUtil.INSTANCE.inetAddressFor(addr), portNum);
+        return new InetSocketAddress(IetfInetUtil.inetAddressFor(addr), portNum);
     }
 }

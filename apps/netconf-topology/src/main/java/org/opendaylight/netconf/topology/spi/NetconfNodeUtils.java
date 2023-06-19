@@ -67,7 +67,7 @@ public final class NetconfNodeUtils {
         final var host = node.requireHost();
         final int port = node.requirePort().getValue().toJava();
         final var ipAddress = host.getIpAddress();
-        return ipAddress != null ? new InetSocketAddress(IetfInetUtil.INSTANCE.inetAddressFor(ipAddress), port)
+        return ipAddress != null ? new InetSocketAddress(IetfInetUtil.inetAddressFor(ipAddress), port)
             : new InetSocketAddress(host.getDomainName().getValue(), port);
     }
 

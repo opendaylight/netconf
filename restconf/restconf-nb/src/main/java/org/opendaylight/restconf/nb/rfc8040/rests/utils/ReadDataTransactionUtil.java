@@ -26,11 +26,9 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -52,7 +50,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -143,7 +141,7 @@ public final class ReadDataTransactionUtil {
             buildCont(builder, container.body(), ctxNode, trim);
             return builder.build();
         } else if (readData instanceof MapEntryNode mapEntry) {
-            if (!(ctxNode.getDataSchemaNode() instanceof ListSchemaNode listSchema)) {
+            if (!(ctxNode.dataSchemaNode() instanceof ListSchemaNode listSchema)) {
                 throw new IllegalStateException("Input " + mapEntry + " does not match " + ctxNode);
             }
 
@@ -157,7 +155,7 @@ public final class ReadDataTransactionUtil {
 
     private static void buildMapEntryBuilder(
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
-            final Collection<@NonNull DataContainerChild> children, final DataSchemaContextNode<?> ctxNode,
+            final Collection<@NonNull DataContainerChild> children, final DataSchemaContext ctxNode,
             final boolean trim, final List<QName> keys) {
         for (var child : children) {
             final var childCtx = getChildContext(ctxNode, child);
@@ -176,15 +174,15 @@ public final class ReadDataTransactionUtil {
     }
 
     private static void appendContainer(final DataContainerNodeBuilder<?, ?> builder, final ContainerNode container,
-            final DataSchemaContextNode<?> ctxNode, final boolean trim) {
+            final DataSchemaContext ctxNode, final boolean trim) {
         final var childBuilder = Builders.containerBuilder().withNodeIdentifier(container.getIdentifier());
         buildCont(childBuilder, container.body(), ctxNode, trim);
         builder.withChild(childBuilder.build());
     }
 
     private static void appendLeaf(final DataContainerNodeBuilder<?, ?> builder, final LeafNode<?> leaf,
-            final DataSchemaContextNode<?> ctxNode, final boolean trim, final List<QName> keys) {
-        if (!(ctxNode.getDataSchemaNode() instanceof LeafSchemaNode leafSchema)) {
+            final DataSchemaContext ctxNode, final boolean trim, final List<QName> keys) {
+        if (!(ctxNode.dataSchemaNode() instanceof LeafSchemaNode leafSchema)) {
             throw new IllegalStateException("Input " + leaf + " does not match " + ctxNode);
         }
 
@@ -235,8 +233,8 @@ public final class ReadDataTransactionUtil {
     }
 
     private static void appendMap(final DataContainerNodeBuilder<?, ?> builder, final MapNode map,
-            final DataSchemaContextNode<?> childCtx, final boolean trim) {
-        if (!(childCtx.getDataSchemaNode() instanceof ListSchemaNode listSchema)) {
+            final DataSchemaContext childCtx, final boolean trim) {
+        if (!(childCtx.dataSchemaNode() instanceof ListSchemaNode listSchema)) {
             throw new IllegalStateException("Input " + map + " does not match " + childCtx);
         }
 
@@ -250,7 +248,7 @@ public final class ReadDataTransactionUtil {
     }
 
     private static void buildList(final CollectionNodeBuilder<MapEntryNode, ? extends MapNode> builder,
-            final Collection<@NonNull MapEntryNode> entries, final DataSchemaContextNode<?> ctxNode, final boolean trim,
+            final Collection<@NonNull MapEntryNode> entries, final DataSchemaContext ctxNode, final boolean trim,
             final List<@NonNull QName> keys) {
         for (var entry : entries) {
             final var childCtx = getChildContext(ctxNode, entry);
@@ -261,7 +259,7 @@ public final class ReadDataTransactionUtil {
     }
 
     private static void buildCont(final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder,
-            final Collection<DataContainerChild> children, final DataSchemaContextNode<?> ctxNode, final boolean trim) {
+            final Collection<DataContainerChild> children, final DataSchemaContext ctxNode, final boolean trim) {
         for (var child : children) {
             final var childCtx = getChildContext(ctxNode, child);
             if (child instanceof ContainerNode container) {
@@ -274,10 +272,11 @@ public final class ReadDataTransactionUtil {
         }
     }
 
-    private static @NonNull DataSchemaContextNode<?> getChildContext(final DataSchemaContextNode<?> ctxNode,
+    private static @NonNull DataSchemaContext getChildContext(final DataSchemaContext ctxNode,
             final NormalizedNode child) {
-        final var childId = child.getIdentifier();
-        final var childCtx = ctxNode.getChild(childId);
+        final var childId = child.name();
+        final var childCtx = ctxNode instanceof DataSchemaContext.Composite composite ? composite.childByArg(childId)
+            : null;
         if (childCtx == null) {
             throw new NoSuchElementException("Cannot resolve child " + childId + " in " + ctxNode);
         }
@@ -496,14 +495,6 @@ public final class ReadDataTransactionUtil {
 
             mapValueToBuilder(
                     ((ContainerNode) configDataNode).body(), ((ContainerNode) stateDataNode).body(), builder);
-
-            return builder.build();
-        } else if (configDataNode instanceof AugmentationNode) {
-            final DataContainerNodeBuilder<AugmentationIdentifier, AugmentationNode> builder = Builders
-                    .augmentationBuilder().withNodeIdentifier(((AugmentationNode) configDataNode).getIdentifier());
-
-            mapValueToBuilder(((AugmentationNode) configDataNode).body(),
-                    ((AugmentationNode) stateDataNode).body(), builder);
 
             return builder.build();
         } else if (configDataNode instanceof ChoiceNode) {

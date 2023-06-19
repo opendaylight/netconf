@@ -73,10 +73,10 @@ class ContextKey {
 
         final IpAddress yangIp;
         if (ipAddress instanceof Inet4Address) {
-            yangIp = new IpAddress(IetfInetUtil.INSTANCE.ipv4AddressFor(ipAddress));
+            yangIp = new IpAddress(IetfInetUtil.ipv4AddressFor(ipAddress));
         } else {
             checkArgument(ipAddress instanceof Inet6Address);
-            yangIp = new IpAddress(IetfInetUtil.INSTANCE.ipv6AddressFor(ipAddress));
+            yangIp = new IpAddress(IetfInetUtil.ipv6AddressFor(ipAddress));
         }
         return new ContextKey(yangIp, new PortNumber(Uint16.valueOf(inetSocketAddr.getPort())));
     }

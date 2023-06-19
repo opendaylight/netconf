@@ -110,15 +110,15 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         Futures.addCallback(future, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult response) {
-                final var errors = response.getErrors();
+                final var errors = response.errors();
                 if (!errors.isEmpty()) {
-                    LOG.debug("RpcError message {}", response.getErrors());
-                    ar.resume(new RestconfDocumentedException("RPCerror message ", null, response.getErrors()));
+                    LOG.debug("RpcError message {}", response.errors());
+                    ar.resume(new RestconfDocumentedException("RPCerror message ", null, response.errors()));
                     return;
                 }
 
-                final NormalizedNode resultData = response.getResult();
-                if (resultData == null || ((ContainerNode) resultData).isEmpty()) {
+                final ContainerNode resultData = response.value();
+                if (resultData == null || resultData.isEmpty()) {
                     ar.resume(new WebApplicationException(Status.NO_CONTENT));
                 } else {
                     ar.resume(NormalizedNodePayload.of(context, resultData));

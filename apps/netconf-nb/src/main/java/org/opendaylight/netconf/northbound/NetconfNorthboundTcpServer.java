@@ -69,7 +69,7 @@ public final class NetconfNorthboundTcpServer implements AutoCloseable {
     }
 
     private static InetSocketAddress getInetAddress(final String bindingAddress, final int portNumber) {
-        final var inetAd = IetfInetUtil.INSTANCE.inetAddressFor(IetfInetUtil.ipAddressFor(bindingAddress));
+        final var inetAd = IetfInetUtil.inetAddressFor(IetfInetUtil.ipAddressFor(bindingAddress));
         return new InetSocketAddress(inetAd, portNumber);
     }
 }

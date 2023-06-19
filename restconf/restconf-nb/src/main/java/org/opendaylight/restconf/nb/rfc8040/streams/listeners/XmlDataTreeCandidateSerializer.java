@@ -59,7 +59,7 @@ final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<E
     @Override
     public void serializeOperation(final DataTreeCandidateNode candidate) throws XMLStreamException {
         xmlWriter.writeStartElement("operation");
-        xmlWriter.writeCharacters(modificationTypeToOperation(candidate, candidate.getModificationType()));
+        xmlWriter.writeCharacters(modificationTypeToOperation(candidate, candidate.modificationType()));
         xmlWriter.writeEndElement();
     }
 }
