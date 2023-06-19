@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.after;
@@ -30,7 +29,7 @@ import akka.testkit.TestActorRef;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import com.google.common.collect.Iterables;
-import com.google.common.io.ByteSource;
+import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.Futures;
 import com.typesafe.config.ConfigFactory;
 import java.net.InetSocketAddress;
@@ -160,8 +159,8 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         SOURCE_IDENTIFIERS.stream().map(
             sourceId -> masterSchemaRepository.registerSchemaSource(
-                id -> Futures.immediateFuture(YangTextSchemaSource.delegateForByteSource(id,
-                        ByteSource.wrap(yangTemplate.replaceAll("ID", id.name().getLocalName()).getBytes(UTF_8)))),
+                id -> Futures.immediateFuture(YangTextSchemaSource.delegateForCharSource(id,
+                        CharSource.wrap(yangTemplate.replaceAll("ID", id.name().getLocalName())))),
                 PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class, 1)))
         .collect(Collectors.toList());
 

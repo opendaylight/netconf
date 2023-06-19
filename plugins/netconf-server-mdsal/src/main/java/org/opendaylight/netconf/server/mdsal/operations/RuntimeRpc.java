@@ -41,7 +41,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -247,7 +247,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
      */
     private @Nullable ContainerNode rpcToNNode(final XmlElement element,
             final RpcDefinition rpcDefinition) throws DocumentedException {
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.of(
             schemaContext.getCurrentContext(),
@@ -260,6 +260,6 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }
 
-        return (ContainerNode) resultHolder.getResult();
+        return (ContainerNode) resultHolder.getResult().data();
     }
 }
