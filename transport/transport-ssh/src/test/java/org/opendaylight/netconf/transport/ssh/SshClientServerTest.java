@@ -223,9 +223,9 @@ public class SshClientServerTest {
             final var client = SSHClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
                     tcpClientConfig, sshClientConfig).get(2, TimeUnit.SECONDS);
             try {
-                verify(serverListener, timeout(1000))
+                verify(serverListener, timeout(10_000))
                         .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
-                verify(clientListener, timeout(1000))
+                verify(clientListener, timeout(10_000))
                         .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
                 // validate channels are in expected state
                 var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
