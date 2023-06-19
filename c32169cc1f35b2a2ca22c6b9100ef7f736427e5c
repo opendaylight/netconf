@@ -16,6 +16,24 @@
       "message": "Then do we need CONFIG in the schema name? Do we need to use isConfig() method?",
       "revId": "c32169cc1f35b2a2ca22c6b9100ef7f736427e5c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b16e92fd_762b98ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-19T12:57:16Z",
+      "side": 1,
+      "message": "In this patch we keep only config nodes and they have before CONFIG in the name. So I have keep this, but I can remove it in next patch.",
+      "parentUuid": "b7d30867_a4f0af97",
+      "revId": "c32169cc1f35b2a2ca22c6b9100ef7f736427e5c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
