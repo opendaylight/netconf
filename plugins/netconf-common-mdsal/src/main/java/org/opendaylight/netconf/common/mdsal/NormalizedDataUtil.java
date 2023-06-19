@@ -21,24 +21,23 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
-import org.opendaylight.yangtools.rfc7952.data.api.StreamWriterMetadataExtension;
-import org.opendaylight.yangtools.rfc7952.data.util.NormalizedMetadataWriter;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedMetadata;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedMetadataWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter.MetadataExtension;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -216,7 +215,7 @@ public final class NormalizedDataUtil {
         XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
         try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path);
              var writer = new EmptyListXmlMetadataWriter(streamWriter, xmlWriter,
-                 streamWriter.getExtensions().getInstance(StreamWriterMetadataExtension.class), metadata)) {
+                 streamWriter.extension(MetadataExtension.class), metadata)) {
             final Iterator<PathArgument> it = query.getPathArguments().iterator();
             final PathArgument first = it.next();
             StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first, it);
@@ -383,9 +382,9 @@ public final class NormalizedDataUtil {
         return rootTreeNode;
     }
 
-    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final MountPointContext mount,
+    public static NormalizationResultHolder transformDOMSourceToNormalizedNode(final MountPointContext mount,
             final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, new ProxyMountPointContext(mount))) {
             xmlParserStream.traverse(value);
@@ -394,8 +393,9 @@ public final class NormalizedDataUtil {
     }
 
     // FIXME: document this interface contract. Does it support RFC8528/RFC8542? How?
-    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final EffectiveModelContext schemaContext,
-            final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
-        return transformDOMSourceToNormalizedNode(new EmptyMountPointContext(schemaContext), value);
+    public static NormalizationResultHolder transformDOMSourceToNormalizedNode(
+            final EffectiveModelContext schemaContext, final DOMSource value)
+                throws XMLStreamException, URISyntaxException, IOException, SAXException {
+        return transformDOMSourceToNormalizedNode(MountPointContext.of(schemaContext), value);
     }
 }

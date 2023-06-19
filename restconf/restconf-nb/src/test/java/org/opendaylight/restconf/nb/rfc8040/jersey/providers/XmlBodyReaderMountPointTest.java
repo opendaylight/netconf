@@ -32,6 +32,7 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
@@ -122,12 +123,10 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
             XmlBodyReaderMountPointTest.class.getResourceAsStream("/invoke-rpc/xml/rpc-input.xml"));
         checkNormalizedNodePayload(payload);
         final ContainerNode contNode = (ContainerNode) payload.getData();
-        final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(
-            QName.create(contNode.getIdentifier().getNodeType(), "cont"));
-        final ContainerNode contDataNode = (ContainerNode) contNode.getChildByArg(yangCont.getLastPathArgument());
-        final YangInstanceIdentifier yangLeaf = YangInstanceIdentifier.of(
-            QName.create(contDataNode.getIdentifier().getNodeType(), "lf"));
-        final DataContainerChild leafDataNode = contDataNode.getChildByArg(yangLeaf.getLastPathArgument());
+        final ContainerNode contDataNode = (ContainerNode) contNode.getChildByArg(
+            new NodeIdentifier(QName.create(contNode.name().getNodeType(), "cont")));
+        final DataContainerChild leafDataNode = contDataNode.getChildByArg(
+            new NodeIdentifier(QName.create(contDataNode.name().getNodeType(), "lf")));
         assertTrue("lf-test".equalsIgnoreCase(leafDataNode.body().toString()));
     }
 

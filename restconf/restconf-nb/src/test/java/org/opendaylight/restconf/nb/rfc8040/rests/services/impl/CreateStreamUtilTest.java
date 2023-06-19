@@ -56,8 +56,8 @@ public class CreateStreamUtilTest {
         final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(
             prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster", "path"),
             SCHEMA_CTX);
-        assertEquals(List.of(), result.getErrors());
-        final NormalizedNode testedNn = result.getResult();
+        assertEquals(List.of(), result.errors());
+        final NormalizedNode testedNn = result.value();
         assertNotNull(testedNn);
         final NormalizedNodePayload contextRef = prepareDomPayload("create-data-change-event-subscription",
             RpcDefinition::getOutput,
