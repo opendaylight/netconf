@@ -8,8 +8,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -21,7 +19,6 @@ import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 
@@ -45,7 +42,7 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
     }
 
     @Override
-    protected void assertKeyedList(List<YangInstanceIdentifier> result) {
+    protected void assertKeyedList(final List<YangInstanceIdentifier> result) {
         assertEquals(1, result.size());
     }
 
@@ -90,7 +87,7 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
     protected void assertNamespace(final List<YangInstanceIdentifier> result) {
         assertEquals(1, result.size());
         final var augmentedLibraryPath = assertPath(result, AUGMENTED_LIBRARY_Q_NAME);
-        assertEquals(2, augmentedLibraryPath.getPathArguments().size());
+        assertEquals(1, augmentedLibraryPath.getPathArguments().size());
     }
 
     @Override
@@ -174,10 +171,9 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
         assertEquals(1, result.size());
         final var pathArguments = result.get(0).getPathArguments();
 
-        assertEquals(3, pathArguments.size());
+        assertEquals(2, pathArguments.size());
         assertEquals(PLAYER_Q_NAME, pathArguments.get(0).getNodeType());
-        assertThat(pathArguments.get(1), instanceOf(AugmentationIdentifier.class));
-        assertEquals(SPEED_Q_NAME, pathArguments.get(2).getNodeType());
+        assertEquals(SPEED_Q_NAME, pathArguments.get(1).getNodeType());
     }
 
     @Override

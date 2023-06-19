@@ -61,7 +61,6 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.client.mdsal.api.ActionTransformer;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -69,12 +68,13 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
@@ -140,7 +140,7 @@ public class NetconfMessageTransformer
     @VisibleForTesting
     static ImmutableMap<Absolute, ActionDefinition> getActions(final EffectiveModelContext schemaContext) {
         final var builder = ImmutableMap.<Absolute, ActionDefinition>builder();
-        findAction(schemaContext, new ArrayDeque<QName>(), builder);
+        findAction(schemaContext, new ArrayDeque<>(), builder);
         return builder.build();
     }
 
@@ -199,7 +199,7 @@ public class NetconfMessageTransformer
 
     @GuardedBy("this")
     private ContainerNode toNotification(final Absolute notificationPath, final Element element) {
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         try {
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
@@ -210,7 +210,7 @@ public class NetconfMessageTransformer
                 | UnsupportedOperationException e) {
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
         }
-        return (ContainerNode) resultHolder.getResult();
+        return (ContainerNode) resultHolder.getResult().data();
     }
 
     private Optional<NestedNotificationInfo> findNestedNotification(final NetconfMessage message,
@@ -476,7 +476,7 @@ public class NetconfMessageTransformer
         final var inference = SchemaInferenceStack.of(mountContext.getEffectiveModelContext(), outputPath)
             .toInference();
 
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         final Element element = message.getDocument().getDocumentElement();
         try {
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
@@ -485,7 +485,7 @@ public class NetconfMessageTransformer
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
         }
-        return (ContainerNode) resultHolder.getResult();
+        return (ContainerNode) resultHolder.getResult().data();
     }
 
     @Beta

@@ -8,11 +8,11 @@
   -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-${project.version}">
     <feature name="odl-restconf-common" version="${project.version}">
-        <feature version="[12,13)">odl-karaf-feat-jetty</feature>
-        <feature version="[10,11)">odl-yangtools-export</feature>
-        <feature version="[11,12)">odl-mdsal-model-rfc8040</feature>
-        <feature version="[11,12)">odl-mdsal-model-rfc8525</feature>
-        <feature version="[7,8)">odl-mdsal-broker</feature>
-        <feature version="[0.17,1)">odl-aaa-shiro</feature>
+        <feature version="[13,14)">odl-karaf-feat-jetty</feature>
+        <feature version="[11,12)">odl-yangtools-export</feature>
+        <feature version="[12,13)">odl-mdsal-model-rfc8040</feature>
+        <feature version="[12,13)">odl-mdsal-model-rfc8525</feature>
+        <feature version="[8,9)">odl-mdsal-broker</feature>
+        <feature version="[0.18,1)">odl-aaa-shiro</feature>
     </feature>
 </features>

@@ -23,7 +23,8 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -53,8 +54,7 @@ public final class WriterFieldsTranslator {
      */
     public static @NonNull List<Set<QName>> translate(final @NonNull InstanceIdentifierContext identifier,
             final @NonNull FieldsParam input) {
-        final DataSchemaContextNode<?> startNode = DataSchemaContextNode.fromDataSchemaNode(
-                (DataSchemaNode) identifier.getSchemaNode());
+        final DataSchemaContext startNode = DataSchemaContext.of((DataSchemaNode) identifier.getSchemaNode());
         if (startNode == null) {
             throw new RestconfDocumentedException(
                     "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -67,8 +67,8 @@ public final class WriterFieldsTranslator {
     }
 
     private static void processSelectors(final List<Set<QName>> parsed, final EffectiveModelContext context,
-            final QNameModule startNamespace, final DataSchemaContextNode<?> startNode,
-            final List<NodeSelector> selectors, final int index) {
+            final QNameModule startNamespace, final DataSchemaContext startNode, final List<NodeSelector> selectors,
+            final int index) {
         final Set<QName> startLevel;
         if (parsed.size() <= index) {
             startLevel = new HashSet<>();
@@ -154,30 +154,32 @@ public final class WriterFieldsTranslator {
      * @param level current nodes level
      * @return {@link DataSchemaContextNode}
      */
-    private static DataSchemaContextNode<?> addChildToResult(final DataSchemaContextNode<?> currentNode,
-            final QName childQName, final Set<QName> level) {
+    private static DataSchemaContext addChildToResult(final DataSchemaContext currentNode, final QName childQName,
+            final Set<QName> level) {
         // resolve parent node
-        final DataSchemaContextNode<?> parentNode = resolveMixinNode(
-                currentNode, level, currentNode.getIdentifier().getNodeType());
+        final var parentNode = resolveMixinNode(currentNode, level, currentNode.dataSchemaNode().getQName());
         if (parentNode == null) {
             throw new RestconfDocumentedException(
-                    "Not-mixin node missing in " + currentNode.getIdentifier().getNodeType().getLocalName(),
+                    "Not-mixin node missing in " + currentNode.getPathStep().getNodeType().getLocalName(),
                     ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
         // resolve child node
-        final DataSchemaContextNode<?> childNode = resolveMixinNode(
-                parentNode.getChild(childQName), level, childQName);
+        final DataSchemaContext childNode = resolveMixinNode(childByQName(parentNode, childQName), level, childQName);
         if (childNode == null) {
             throw new RestconfDocumentedException(
                     "Child " + childQName.getLocalName() + " node missing in "
-                            + currentNode.getIdentifier().getNodeType().getLocalName(),
+                            + currentNode.getPathStep().getNodeType().getLocalName(),
                     ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
         // add final childNode node to level nodes
-        level.add(childNode.getIdentifier().getNodeType());
+        level.add(childNode.dataSchemaNode().getQName());
         return childNode;
+    }
+
+    private static @Nullable DataSchemaContext childByQName(final DataSchemaContext parent, final QName qname) {
+        return parent instanceof DataSchemaContext.Composite composite ? composite.childByQName(qname) : null;
     }
 
     /**
@@ -189,12 +191,12 @@ public final class WriterFieldsTranslator {
      * @param qualifiedName qname of initial node
      * @return {@link DataSchemaContextNode}
      */
-    private static @Nullable DataSchemaContextNode<?> resolveMixinNode(final @Nullable DataSchemaContextNode<?> node,
+    private static @Nullable DataSchemaContext resolveMixinNode(final @Nullable DataSchemaContext node,
             final @NonNull Set<QName> level, final @NonNull QName qualifiedName) {
-        DataSchemaContextNode<?> currentNode = node;
-        while (currentNode != null && currentNode.isMixin()) {
+        DataSchemaContext currentNode = node;
+        while (currentNode instanceof PathMixin currentMixin) {
             level.add(qualifiedName);
-            currentNode = currentNode.getChild(qualifiedName);
+            currentNode = currentMixin.childByQName(qualifiedName);
         }
 
         return currentNode;
