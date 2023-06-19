@@ -58,7 +58,7 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     @Override
     void serializeOperation(final DataTreeCandidateNode candidate)
             throws IOException {
-        jsonWriter.name("operation").value(modificationTypeToOperation(candidate, candidate.getModificationType()));
+        jsonWriter.name("operation").value(modificationTypeToOperation(candidate, candidate.modificationType()));
     }
 
     @Override

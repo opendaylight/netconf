@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -136,14 +136,14 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
 
         NormalizedNode parsed;
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
                 || schemaNode instanceof LeafSchemaNode) {
             final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
-            parsed = resultHolder.getResult();
+            parsed = resultHolder.getResult().data();
 
             // When parsing an XML source with a list root node
             // the new XML parser always returns a MapNode with one MapEntryNode inside.

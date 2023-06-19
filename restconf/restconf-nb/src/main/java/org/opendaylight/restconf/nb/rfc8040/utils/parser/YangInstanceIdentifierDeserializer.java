@@ -196,7 +196,7 @@ public final class YangInstanceIdentifierDeserializer {
             final PathArgument pathArg;
             if (step instanceof ListInstance) {
                 final var values = ((ListInstance) step).keyValues();
-                final var schema = childNode.getDataSchemaNode();
+                final var schema = childNode.dataSchemaNode();
                 pathArg = schema instanceof ListSchemaNode
                     ? prepareNodeWithPredicates(stack, qname, (ListSchemaNode) schema, values)
                         : prepareNodeWithValue(stack, qname, schema, values);
@@ -210,7 +210,7 @@ public final class YangInstanceIdentifierDeserializer {
             path.add(pathArg);
 
             if (!it.hasNext()) {
-                node = childNode.getDataSchemaNode();
+                node = childNode.dataSchemaNode();
                 break;
             }
 

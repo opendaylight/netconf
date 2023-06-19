@@ -19,7 +19,7 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.ParameterAwareNorma
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 
 /**
  * Fields parser that stores set of {@link QName}s in each level. Because of this fact, from the output
@@ -53,11 +53,11 @@ public final class WriterFieldsTranslator extends AbstractFieldsTranslator<QName
     }
 
     @Override
-    protected DataSchemaContextNode<?> addChildToResult(final DataSchemaContextNode<?> currentNode,
-            final QName childQName, final Set<QName> level) {
+    protected DataSchemaContext addChildToResult(final DataSchemaContext currentNode, final QName childQName,
+            final Set<QName> level) {
         // resolve parent node
-        final DataSchemaContextNode<?> parentNode = resolveMixinNode(
-                currentNode, level, currentNode.getIdentifier().getNodeType());
+        final DataSchemaContext parentNode = resolveMixinNode(currentNode, level,
+            currentNode.getIdentifier().getNodeType());
         if (parentNode == null) {
             throw new RestconfDocumentedException(
                     "Not-mixin node missing in " + currentNode.getIdentifier().getNodeType().getLocalName(),
@@ -65,7 +65,7 @@ public final class WriterFieldsTranslator extends AbstractFieldsTranslator<QName
         }
 
         // resolve child node
-        final DataSchemaContextNode<?> childNode = resolveMixinNode(
+        final DataSchemaContext childNode = resolveMixinNode(
                 parentNode.getChild(childQName), level, childQName);
         if (childNode == null) {
             throw new RestconfDocumentedException(
@@ -88,10 +88,9 @@ public final class WriterFieldsTranslator extends AbstractFieldsTranslator<QName
      * @param qualifiedName qname of initial node
      * @return {@link DataSchemaContextNode}
      */
-    private static @Nullable DataSchemaContextNode<?> resolveMixinNode(
-            final @Nullable DataSchemaContextNode<?> node, final @NonNull Set<QName> level,
-            final @NonNull QName qualifiedName) {
-        DataSchemaContextNode<?> currentNode = node;
+    private static @Nullable DataSchemaContext resolveMixinNode(final @Nullable DataSchemaContext node,
+            final @NonNull Set<QName> level, final @NonNull QName qualifiedName) {
+        DataSchemaContext currentNode = node;
         while (currentNode != null && currentNode.isMixin()) {
             level.add(qualifiedName);
             currentNode = currentNode.getChild(qualifiedName);

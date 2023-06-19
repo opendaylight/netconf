@@ -13,7 +13,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.google.common.collect.Sets;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -128,10 +127,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final Module augmentModule = schemaContext.findModules(XMLNamespace.of("augment:module")).iterator().next();
         final QName contAugmentQName = QName.create(augmentModule.getQNameModule(), "cont-augment");
-        final YangInstanceIdentifier.AugmentationIdentifier augII = new YangInstanceIdentifier.AugmentationIdentifier(
-                Sets.newHashSet(contAugmentQName));
-        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(augII)
-                .node(contAugmentQName);
+        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName(), contAugmentQName);
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, jsonBodyReader, true);
         final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, mediaType, null,
@@ -148,12 +144,8 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
         final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
         final QName containerQName = QName.create(augmentChoice1QName, "case-choice-case-container1");
-        final YangInstanceIdentifier.AugmentationIdentifier augChoice1II =
-                new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(augmentChoice1QName));
-        final YangInstanceIdentifier.AugmentationIdentifier augChoice2II =
-                new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(augmentChoice2QName));
-        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(augChoice1II)
-                .node(augmentChoice1QName).node(augChoice2II).node(augmentChoice2QName).node(containerQName);
+        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
+                .node(augmentChoice1QName).node(augmentChoice2QName).node(containerQName);
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, jsonBodyReader, true);
         final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, mediaType, null,

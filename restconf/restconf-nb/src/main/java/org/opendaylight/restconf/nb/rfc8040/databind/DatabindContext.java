@@ -10,8 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
@@ -31,7 +30,7 @@ public record DatabindContext(
     }
 
     public static @NonNull DatabindContext ofModel(final EffectiveModelContext modelContext) {
-        return ofMountPoint(new EmptyMountPointContext(modelContext));
+        return ofMountPoint(MountPointContext.of(modelContext));
     }
 
     public static @NonNull DatabindContext ofMountPoint(final MountPointContext mountContext) {
