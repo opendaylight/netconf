@@ -27,9 +27,9 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class FieldsAwareReadOnlyTxTest {
@@ -46,11 +46,11 @@ public class FieldsAwareReadOnlyTxTest {
         try (var readOnlyTx = new FieldsAwareReadOnlyTx(netconfOps,
                 new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)))) {
 
-            readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty(),
-                List.of(YangInstanceIdentifier.empty()));
+            readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(),
+                List.of(YangInstanceIdentifier.of()));
             verify(rpc).invokeNetconf(eq(NETCONF_GET_CONFIG_QNAME), any());
 
-            readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty());
+            readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
             verify(rpc).invokeNetconf(eq(NETCONF_GET_QNAME), any());
         }
     }
