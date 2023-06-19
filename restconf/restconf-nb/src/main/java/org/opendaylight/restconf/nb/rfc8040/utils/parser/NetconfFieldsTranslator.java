@@ -27,8 +27,10 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
@@ -75,13 +77,13 @@ public final class NetconfFieldsTranslator {
     }
 
     private @NonNull Set<LinkedPathElement> parseFields(final @NonNull InstanceIdentifierContext identifier,
-        final @NonNull FieldsParam input) {
-        final var startNode = DataSchemaContextNode.fromDataSchemaNode(
-            (DataSchemaNode) identifier.getSchemaNode());
-
-        if (startNode == null) {
+            final @NonNull FieldsParam input) {
+        final DataSchemaContext startNode;
+        try {
+            startNode = DataSchemaContext.of((DataSchemaNode) identifier.getSchemaNode());
+        } catch (IllegalStateException e) {
             throw new RestconfDocumentedException(
-                "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+                "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
         }
 
         final var parsed = new HashSet<LinkedPathElement>();
@@ -125,35 +127,39 @@ public final class NetconfFieldsTranslator {
         final QName childQName) {
         final List<PathArgument> collectedMixinNodes = new ArrayList<>();
 
-        DataSchemaContextNode<?> currentNode = currentElement.targetNode;
-        DataSchemaContextNode<?> actualContextNode = currentNode.getChild(childQName);
+        DataSchemaContext currentNode = currentElement.targetNode;
+        DataSchemaContext actualContextNode = childByQName(currentNode, childQName);
         if (actualContextNode == null) {
-            actualContextNode = resolveMixinNode(currentNode, currentNode.getIdentifier().getNodeType());
-            actualContextNode = actualContextNode.getChild(childQName);
+            actualContextNode = resolveMixinNode(currentNode, currentNode.getPathStep().getNodeType());
+            actualContextNode = childByQName(actualContextNode, childQName);
         }
 
-        while (actualContextNode != null && actualContextNode.isMixin()) {
-            final var actualDataSchemaNode = actualContextNode.getDataSchemaNode();
+        while (actualContextNode != null && actualContextNode instanceof PathMixin) {
+            final var actualDataSchemaNode = actualContextNode.dataSchemaNode();
             if (actualDataSchemaNode instanceof ListSchemaNode listSchema && listSchema.getKeyDefinition().isEmpty()) {
                 // we need just a single node identifier from list in the path IFF it is an unkeyed list, otherwise
                 // we need both (which is the default case)
-                actualContextNode = actualContextNode.getChild(childQName);
+                actualContextNode = childByQName(actualContextNode, childQName);
             } else if (actualDataSchemaNode instanceof LeafListSchemaNode) {
                 // NodeWithValue is unusable - stop parsing
                 break;
             } else {
-                collectedMixinNodes.add(actualContextNode.getIdentifier());
-                actualContextNode = actualContextNode.getChild(childQName);
+                collectedMixinNodes.add(actualContextNode.getPathStep());
+                actualContextNode = childByQName(actualContextNode, childQName);
             }
         }
 
         if (actualContextNode == null) {
             throw new RestconfDocumentedException("Child " + childQName.getLocalName() + " node missing in "
-                + currentNode.getIdentifier().getNodeType().getLocalName(),
+                + currentNode.getPathStep().getNodeType().getLocalName(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
         return new LinkedPathElement(currentElement, collectedMixinNodes, actualContextNode);
+    }
+
+    private static @Nullable DataSchemaContext childByQName(final DataSchemaContext parent, final QName qname) {
+        return parent instanceof DataSchemaContext.Composite composite ? composite.childByQName(qname) : null;
     }
 
     private static YangInstanceIdentifier buildPath(final LinkedPathElement lastPathElement) {
@@ -165,14 +171,14 @@ public final class NetconfFieldsTranslator {
             pathElement = pathElement.parentPathElement;
         } while (pathElement.parentPathElement != null);
 
-        return YangInstanceIdentifier.create(path);
+        return YangInstanceIdentifier.of(path);
     }
 
-    private static DataSchemaContextNode<?> resolveMixinNode(
-        final DataSchemaContextNode<?> node, final @NonNull QName qualifiedName) {
-        DataSchemaContextNode<?> currentNode = node;
-        while (currentNode != null && currentNode.isMixin()) {
-            currentNode = currentNode.getChild(qualifiedName);
+    private static DataSchemaContext resolveMixinNode(final DataSchemaContext node,
+            final @NonNull QName qualifiedName) {
+        DataSchemaContext currentNode = node;
+        while (currentNode != null && currentNode instanceof PathMixin currentMixin) {
+            currentNode = currentMixin.childByQName(qualifiedName);
         }
         return currentNode;
     }
@@ -188,9 +194,9 @@ public final class NetconfFieldsTranslator {
     static final class LinkedPathElement {
         private @Nullable final LinkedPathElement parentPathElement;
         private @NonNull final List<PathArgument> mixinNodesToTarget;
-        private @NonNull final DataSchemaContextNode<?> targetNode;
+        private @NonNull final DataSchemaContext targetNode;
 
-        private LinkedPathElement(final DataSchemaContextNode<?> targetNode) {
+        private LinkedPathElement(final DataSchemaContext targetNode) {
             this(null, List.of(), targetNode);
         }
 
@@ -202,14 +208,23 @@ public final class NetconfFieldsTranslator {
          * @param targetNode            target non-mixin node
          */
         private LinkedPathElement(@Nullable final LinkedPathElement parentPathElement,
-                final List<PathArgument> mixinNodesToTarget, final DataSchemaContextNode<?> targetNode) {
+                final List<PathArgument> mixinNodesToTarget, final DataSchemaContext targetNode) {
             this.parentPathElement = parentPathElement;
             this.mixinNodesToTarget = requireNonNull(mixinNodesToTarget);
             this.targetNode = requireNonNull(targetNode);
         }
 
         private PathArgument targetNodeIdentifier() {
-            return targetNode.getIdentifier();
+            final var arg = targetNode.pathStep();
+            if (arg != null) {
+                return arg;
+            }
+
+            final var schema = targetNode.dataSchemaNode();
+            if (schema instanceof ListSchemaNode listSchema && !listSchema.getKeyDefinition().isEmpty()) {
+                return NodeIdentifierWithPredicates.of(listSchema.getQName());
+            }
+            throw new UnsupportedOperationException("Unsupported schema " + schema);
         }
     }
 }

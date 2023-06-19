@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
@@ -112,16 +112,17 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             }
 
             if (oper.isWithValue()) {
-                final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+                final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                 final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
                 xmlParser.traverse(new DOMSource(firstValueElement));
 
+                final var result = resultHolder.getResult().data();
                 // for lists allow to manipulate with list items through their parent
                 if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                    resultCollection.add(new PatchEntity(editId, oper, targetII.getParent(), resultHolder.getResult()));
+                    resultCollection.add(new PatchEntity(editId, oper, targetII.getParent(), result));
                 } else {
-                    resultCollection.add(new PatchEntity(editId, oper, targetII, resultHolder.getResult()));
+                    resultCollection.add(new PatchEntity(editId, oper, targetII, result));
                 }
             } else {
                 resultCollection.add(new PatchEntity(editId, oper, targetII));

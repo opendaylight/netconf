@@ -22,8 +22,8 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -65,7 +65,7 @@ public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
     @Test
     public void testMostRecentWrongYangModel() throws Exception {
         final EffectiveModelContext schemaContext = getNotificationSchemaContext(getClass(), true);
-        messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(schemaContext), true,
+        messageTransformer = new NetconfMessageTransformer(MountPointContext.of(schemaContext), true,
             BASE_SCHEMAS.getBaseSchema());
         assertThrows(IllegalArgumentException.class, () -> messageTransformer.toNotification(userNotification));
     }
@@ -73,7 +73,7 @@ public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
     @Test
     public void testToNotificationFunction() throws Exception {
         final EffectiveModelContext schemaContext = getNotificationSchemaContext(getClass(), false);
-        messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(schemaContext), true,
+        messageTransformer = new NetconfMessageTransformer(MountPointContext.of(schemaContext), true,
             BASE_SCHEMAS.getBaseSchema());
         final DOMNotification domNotification = messageTransformer.toNotification(userNotification);
         final ContainerNode root = domNotification.getBody();

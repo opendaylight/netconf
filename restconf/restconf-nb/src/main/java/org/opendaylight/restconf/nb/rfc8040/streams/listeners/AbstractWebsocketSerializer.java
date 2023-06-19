@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -21,6 +20,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -51,7 +51,7 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     final boolean serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
             final boolean skipData, final boolean changedLeafNodesOnly) throws T {
-        final var node = switch (candidate.getModificationType()) {
+        final var node = switch (candidate.modificationType()) {
             case SUBTREE_MODIFIED, APPEARED -> candidate.getDataAfter().orElseThrow();
             case DELETE, DISAPPEARED -> candidate.getDataBefore().orElseThrow();
             case WRITE -> changedLeafNodesOnly && isNotUpdate(candidate) ? null
@@ -73,8 +73,8 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         }
 
         boolean ret = false;
-        for (var childNode : candidate.getChildNodes()) {
-            path.add(childNode.getIdentifier());
+        for (var childNode : candidate.childNodes()) {
+            path.add(childNode.name());
             ret |= serializeLeafNodesOnly(path, childNode, skipData, changedLeafNodesOnly);
             path.removeLast();
         }
@@ -84,11 +84,11 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     private void serializeData(final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate,
             final boolean skipData) throws T {
         var stack = SchemaInferenceStack.of(context);
-        var current = DataSchemaContextTree.from(context).getRoot();
+        DataSchemaContext current = DataSchemaContextTree.from(context).getRoot();
         for (var arg : dataPath) {
-            final var next = verifyNotNull(current.enterChild(stack, arg),
-                "Failed to resolve %s: cannot find %s in %s", dataPath, arg, current);
-            current = next;
+            final var next = current instanceof DataSchemaContext.Composite composite ? composite.enterChild(stack, arg)
+                : null;
+            current = verifyNotNull(next,  "Failed to resolve %s: cannot find %s in %s", dataPath, arg, current);
         }
 
         // Exit to parent if needed
@@ -118,9 +118,6 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         final StringBuilder pathBuilder = new StringBuilder();
 
         for (var pathArgument : path) {
-            if (pathArgument instanceof AugmentationIdentifier) {
-                continue;
-            }
             pathBuilder.append('/');
             pathBuilder.append(pathArgument.getNodeType().getNamespace().toString().replace(':', '-'));
             pathBuilder.append(':');
