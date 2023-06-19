@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab5b1829_44a50925",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-19T10:06:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b7a9fde_5fe5275d",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "82e8fa60_8ecaa6b2",
@@ -52,6 +70,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b4a23f9_d8d9ab9a",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-19T10:06:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29763599_4e9e1ca4",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8aa92c39_5a294820",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-19T10:06:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82e8fa60_8ecaa6b2",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a95a715_5508e2c6",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-06-16T12:04:59Z",
       "side": 1,
       "message": "please keep order in attributes:\n```\nprivate static final ...\nprivate static final ...\n\nprivate static ...\nprivate static ...\n\nprivate ...\nprivate ...\n\npublic ...\npublic ...\n```",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "307ed428_678dbb22",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-19T10:06:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a95a715_5508e2c6",
       "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "564545d7_38733226",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-19T10:06:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "841449e5_52062e70",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bdae2ab9_58159407",
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1496a07_369c067a",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-19T10:06:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bdae2ab9_58159407",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54a69565_f000f440",
@@ -116,6 +224,24 @@
       "writtenOn": "2023-06-16T12:04:59Z",
       "side": 1,
       "message": "The logic implemented here seems overly complex for a simple task. Instead of using a pattern matcher to find the paths, you have a fixed set of 11 paths that can be easily compared using a simple assertion. For example:\n```\nfinal Map\u003cString, Path\u003e paths \u003d mountPointApi.paths();\nassertTrue(paths.containsKey(\"/\" + basePath + \"/operations/nodes/node\u003d123/yang-ext:mount/action-path-test:rpc-call\"));\n```\n\n- by directly comparing the paths using assertions, you can verify not only the \"operations\" path but also all the other relevant paths.\n- `assertEquals(\"Unexpected operations paths\", actionPaths, expectedActionPaths);` expect that order of paths is important. So if paths order change test will fail.",
+      "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "575642e9_2edfd3d5",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-19T10:06:28Z",
+      "side": 1,
+      "message": "1st point: Addressed in new test CustomBasePathOpenApiTest. All 11 paths are verified\n2nd point: Set is not an ordered collection, the assertion does not fail if order changes. Set kept in the new test",
+      "parentUuid": "54a69565_f000f440",
       "revId": "ea7e3673a158c53f67ebee27d5cdbb53c200d8da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
