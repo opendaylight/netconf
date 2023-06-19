@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b38ea9e5_4da63b41",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-06-19T18:50:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c7abc8e_af16d00c",
+      "revId": "f2fd052e2d403c16a9e4d2fd322bc5b2f73fd929",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbe8b6f7_9e3e540f",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-06-19T13:00:38Z",
       "side": 1,
       "message": "Add UT for mountpoint too.",
+      "revId": "f2fd052e2d403c16a9e4d2fd322bc5b2f73fd929",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7774f706_b159b0da",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-06-19T18:50:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fbe8b6f7_9e3e540f",
       "revId": "f2fd052e2d403c16a9e4d2fd322bc5b2f73fd929",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
