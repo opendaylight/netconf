@@ -44,8 +44,8 @@ import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
@@ -62,7 +62,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpcService).invokeNetconf(any(), any());
         netconService = getNetconService();
         final var model = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class, NetconfState.class);
-        netconfMessageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(model), true,
+        netconfMessageTransformer = new NetconfMessageTransformer(MountPointContext.of(model), true,
                 BASE_SCHEMAS.getBaseSchema());
     }
 
@@ -161,7 +161,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
         NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
-        return AbstractNetconfDataTreeService.of(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs,
+        return AbstractNetconfDataTreeService.of(id, MountPointContext.of(SCHEMA_CONTEXT), rpcService, prefs,
             true);
     }
 }

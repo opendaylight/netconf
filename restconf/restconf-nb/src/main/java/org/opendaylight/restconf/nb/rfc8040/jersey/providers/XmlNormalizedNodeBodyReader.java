@@ -37,7 +37,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -45,7 +47,6 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.stmt.ListEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,19 +109,22 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                 final var stack = nodeAndStack.stack();
                 var current = nodeAndStack.node();
                 do {
-                    final var next = current.enterChild(stack, qname);
-                    checkState(next != null, "Child \"%s\" was not found in parent schema node \"%s\"", qname,
-                        schemaNode);
-                    iiToDataList.add(next.getIdentifier());
-                    schemaNode = next.getDataSchemaNode();
-                    current = next;
-                } while (current.isMixin());
+                    final var next = current instanceof DataSchemaContext.Composite compositeCurrent
+                        ? compositeCurrent.enterChild(stack, qname) : null;
+                    if (next == null) {
+                        throw new IllegalStateException(
+                            "Child \"" + qname + "\" was not found in parent schema node \"" + schemaNode + "\"");
+                    }
 
-                // We need to unwind the last identifier if it a NodeIdentifierWithPredicates, as it does not have
-                // any predicates at all. The real identifier is then added below
-                if (stack.currentStatement() instanceof ListEffectiveStatement) {
-                    iiToDataList.remove(iiToDataList.size() - 1);
-                }
+                    // Careful about steps: for keyed list items the individual item does not have a PathArgument step,
+                    // as we do not know the key values -- we supply that later
+                    final var step = next.pathStep();
+                    if (step != null) {
+                        iiToDataList.add(step);
+                    }
+                    schemaNode = next.dataSchemaNode();
+                    current = next;
+                } while (current instanceof PathMixin);
 
                 inference = stack.toInference();
             } else {
@@ -134,16 +138,15 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             throw new IllegalStateException("Unknown SchemaNode " + schemaNodeContext);
         }
 
-
         NormalizedNode parsed;
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
                 || schemaNode instanceof LeafSchemaNode) {
             final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
-            parsed = resultHolder.getResult();
+            parsed = resultHolder.getResult().data();
 
             // When parsing an XML source with a list root node
             // the new XML parser always returns a MapNode with one MapEntryNode inside.
@@ -155,7 +158,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             }
 
             if (schemaNode instanceof ListSchemaNode && isPost()) {
-                iiToDataList.add(parsed.getIdentifier());
+                // Supply the last item
+                iiToDataList.add(parsed.name());
             }
         } else {
             LOG.warn("Unknown schema node extension {} was not parsed", schemaNode.getClass());

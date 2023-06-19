@@ -73,8 +73,7 @@ public class ParserIdentifierTest {
             "/(parser:identifier:included?revision=2016-06-02)list-1/list-1"
             + "[{(parser:identifier:included?revision=2016-06-02)name=name, "
             + "(parser:identifier:included?revision=2016-06-02)revision=2016-06-02}]"
-            + "/AugmentationIdentifier{childNames=[(parser:identifier?revision=2016-06-02)augment-leaf]}/"
-            + "(parser:identifier?revision=2016-06-02)augment-leaf";
+            + "/(parser:identifier?revision=2016-06-02)augment-leaf";
 
     // invalid test identifier
     private static final String INVALID_TEST_IDENT =
