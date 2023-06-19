@@ -53,8 +53,6 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
  * </pre>
  */
 public final class NetconfFieldsTranslator {
-    private static final NetconfFieldsTranslator INSTANCE = new NetconfFieldsTranslator();
-
     private NetconfFieldsTranslator() {
         // Hidden on purpose
     }
@@ -70,12 +68,12 @@ public final class NetconfFieldsTranslator {
      */
     public static @NonNull List<YangInstanceIdentifier> translate(
             final @NonNull InstanceIdentifierContext identifier, final @NonNull FieldsParam input) {
-        final var parsed = INSTANCE.parseFields(identifier, input);
+        final var parsed = parseFields(identifier, input);
         return parsed.stream().map(NetconfFieldsTranslator::buildPath).toList();
     }
 
-    private @NonNull Set<LinkedPathElement> parseFields(final @NonNull InstanceIdentifierContext identifier,
-        final @NonNull FieldsParam input) {
+    private static @NonNull Set<LinkedPathElement> parseFields(final @NonNull InstanceIdentifierContext identifier,
+            final @NonNull FieldsParam input) {
         final var startNode = DataSchemaContextNode.fromDataSchemaNode(
             (DataSchemaNode) identifier.getSchemaNode());
 
@@ -91,7 +89,7 @@ public final class NetconfFieldsTranslator {
         return parsed;
     }
 
-    private void processSelectors(final Set<LinkedPathElement> parsed, final EffectiveModelContext context,
+    private static void processSelectors(final Set<LinkedPathElement> parsed, final EffectiveModelContext context,
             final QNameModule startNamespace, final LinkedPathElement startPathElement,
             final List<NodeSelector> selectors) {
         for (var selector : selectors) {
@@ -121,9 +119,9 @@ public final class NetconfFieldsTranslator {
         }
     }
 
-    private LinkedPathElement addChildPathElement(final LinkedPathElement currentElement,
-        final QName childQName) {
-        final List<PathArgument> collectedMixinNodes = new ArrayList<>();
+    private static LinkedPathElement addChildPathElement(final LinkedPathElement currentElement,
+            final QName childQName) {
+        final var collectedMixinNodes = new ArrayList<PathArgument>();
 
         DataSchemaContextNode<?> currentNode = currentElement.targetNode;
         DataSchemaContextNode<?> actualContextNode = currentNode.getChild(childQName);
@@ -158,7 +156,7 @@ public final class NetconfFieldsTranslator {
 
     private static YangInstanceIdentifier buildPath(final LinkedPathElement lastPathElement) {
         LinkedPathElement pathElement = lastPathElement;
-        final LinkedList<PathArgument> path = new LinkedList<>();
+        final var path = new LinkedList<PathArgument>();
         do {
             path.addFirst(pathElement.targetNodeIdentifier());
             path.addAll(0, pathElement.mixinNodesToTarget);
@@ -185,12 +183,12 @@ public final class NetconfFieldsTranslator {
      *  - {@link LinkedPathElement} of the previous non-mixin node - required to successfully create a chain
      *    of {@link PathArgument}s
      */
-    static final class LinkedPathElement {
-        private @Nullable final LinkedPathElement parentPathElement;
-        private @NonNull final List<PathArgument> mixinNodesToTarget;
-        private @NonNull final DataSchemaContextNode<?> targetNode;
+    private static final class LinkedPathElement {
+        private final @Nullable LinkedPathElement parentPathElement;
+        private final @NonNull List<PathArgument> mixinNodesToTarget;
+        private final @NonNull DataSchemaContextNode<?> targetNode;
 
-        private LinkedPathElement(final DataSchemaContextNode<?> targetNode) {
+        LinkedPathElement(final DataSchemaContextNode<?> targetNode) {
             this(null, List.of(), targetNode);
         }
 
@@ -201,14 +199,14 @@ public final class NetconfFieldsTranslator {
          * @param mixinNodesToTarget    identifiers of mixin nodes on the path to the target node
          * @param targetNode            target non-mixin node
          */
-        private LinkedPathElement(@Nullable final LinkedPathElement parentPathElement,
+        LinkedPathElement(@Nullable final LinkedPathElement parentPathElement,
                 final List<PathArgument> mixinNodesToTarget, final DataSchemaContextNode<?> targetNode) {
             this.parentPathElement = parentPathElement;
             this.mixinNodesToTarget = requireNonNull(mixinNodesToTarget);
             this.targetNode = requireNonNull(targetNode);
         }
 
-        private PathArgument targetNodeIdentifier() {
+        PathArgument targetNodeIdentifier() {
             return targetNode.getIdentifier();
         }
     }
