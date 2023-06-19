@@ -10,8 +10,8 @@ package org.opendaylight.netconf.client.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Optional;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -22,15 +22,15 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
  */
 public final class CachedYangTextSchemaSource extends YangTextSchemaSource {
     private final RemoteDeviceId id;
-    private final byte[] schemaBytes;
+    private final String schemaString;
     private final String symbolicName;
 
     public CachedYangTextSchemaSource(final RemoteDeviceId id, final SourceIdentifier sourceIdentifier,
-            final String symbolicName, final byte[] schemaBytes) {
+            final String symbolicName, final String schemaString) {
         super(sourceIdentifier);
         this.symbolicName = requireNonNull(symbolicName);
         this.id = requireNonNull(id);
-        this.schemaBytes = schemaBytes.clone();
+        this.schemaString = requireNonNull(schemaString);
     }
 
     @Override
@@ -39,8 +39,8 @@ public final class CachedYangTextSchemaSource extends YangTextSchemaSource {
     }
 
     @Override
-    public InputStream openStream() {
-        return new ByteArrayInputStream(schemaBytes);
+    public Reader openStream() {
+        return new StringReader(schemaString);
     }
 
     @Override

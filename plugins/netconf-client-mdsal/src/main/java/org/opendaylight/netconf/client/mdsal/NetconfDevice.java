@@ -58,12 +58,11 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.oper.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.oper.unavailable.capabilities.UnavailableCapability.FailureReason;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc8528.model.api.SchemaMountConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
@@ -272,7 +271,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private ListenableFuture<@NonNull MountPointContext> createMountPointContext(
             final EffectiveModelContext schemaContext, final BaseSchema baseSchema,
             final NetconfDeviceCommunicator listener) {
-        final MountPointContext emptyContext = new EmptyMountPointContext(schemaContext);
+        final MountPointContext emptyContext = MountPointContext.of(schemaContext);
         if (schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isEmpty()) {
             return Futures.immediateFuture(emptyContext);
         }

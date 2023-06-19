@@ -115,7 +115,7 @@ public class SshClientServerTest {
 
         // create temp socket to get available port for test
         socket = new ServerSocket(0);
-        final var localAddress = IetfInetUtil.INSTANCE.ipAddressFor(InetAddress.getLoopbackAddress());
+        final var localAddress = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
         final var localPort = new PortNumber(Uint16.valueOf(socket.getLocalPort()));
         socket.close();
 

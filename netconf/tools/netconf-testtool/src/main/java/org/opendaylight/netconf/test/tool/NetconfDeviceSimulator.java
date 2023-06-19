@@ -24,7 +24,6 @@ import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.AsynchronousChannelGroup;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -355,8 +354,7 @@ public class NetconfDeviceSimulator implements Closeable {
 
         final String moduleContent;
         try {
-            moduleContent = consumer.getSchemaSource(sourceId, YangTextSchemaSource.class).get()
-                .asCharSource(StandardCharsets.UTF_8).read();
+            moduleContent = consumer.getSchemaSource(sourceId, YangTextSchemaSource.class).get().read();
         } catch (ExecutionException | InterruptedException | IOException e) {
             throw new IllegalStateException(
                 "Cannot retrieve schema source for module " + sourceId + " from schema repository", e);

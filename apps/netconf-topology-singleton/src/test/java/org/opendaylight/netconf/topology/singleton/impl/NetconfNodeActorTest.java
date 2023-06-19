@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.startsWith;
@@ -44,19 +43,17 @@ import akka.testkit.TestActorRef;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.ByteSource;
+import com.google.common.io.CharSource;
 import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
@@ -457,8 +454,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final ProxyYangTextSourceProvider proxyYangProvider =
                 new ProxyYangTextSourceProvider(masterRef, system.dispatcher(), TIMEOUT);
 
-        final YangTextSchemaSource yangTextSchemaSource = YangTextSchemaSource.delegateForByteSource(sourceIdentifier,
-                ByteSource.wrap("YANG".getBytes(UTF_8)));
+        final YangTextSchemaSource yangTextSchemaSource = YangTextSchemaSource.delegateForCharSource(sourceIdentifier,
+                CharSource.wrap("YANG"));
 
         // Test success.
 
@@ -472,7 +469,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final YangTextSchemaSourceSerializationProxy success = Await.result(resolvedSchemaFuture, TIMEOUT.duration());
 
         assertEquals(sourceIdentifier, success.getRepresentation().getIdentifier());
-        assertEquals("YANG", convertStreamToString(success.getRepresentation().openStream()));
+        assertEquals("YANG", success.getRepresentation().read());
 
         // Test missing source failure.
 
@@ -723,11 +720,5 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     private static PotentialSchemaSource<?> withSourceId(final SourceIdentifier identifier) {
         return argThat(argument -> identifier.equals(argument.getSourceIdentifier()));
-    }
-
-    private static String convertStreamToString(final InputStream is) {
-        try (Scanner scanner = new Scanner(is)) {
-            return scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
-        }
     }
 }

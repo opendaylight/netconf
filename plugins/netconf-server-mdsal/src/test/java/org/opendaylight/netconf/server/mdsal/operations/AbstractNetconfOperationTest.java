@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYangResources;
 
-import com.google.common.io.ByteSource;
+import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
@@ -91,13 +91,11 @@ public abstract class AbstractNetconfOperationTest {
         final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
         final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
 
-        currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceIdentifier -> {
-            final YangTextSchemaSource yangTextSchemaSource =
-                YangTextSchemaSource.delegateForByteSource(sourceIdentifier, ByteSource.wrap("module test".getBytes()));
-            return Futures.immediateFuture(yangTextSchemaSource);
-        });
+        currentSchemaContext = CurrentSchemaContext.create(schemaService,
+            sourceIdentifier -> Futures.immediateFuture(YangTextSchemaSource.delegateForCharSource(sourceIdentifier,
+                CharSource.wrap("module test"))));
 
-        final EnumMap<LogicalDatastoreType, DOMStore> datastores = new EnumMap<>(LogicalDatastoreType.class);
+        final var datastores = new EnumMap<LogicalDatastoreType, DOMStore>(LogicalDatastoreType.class);
         datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
         datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
 

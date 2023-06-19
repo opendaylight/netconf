@@ -12,9 +12,9 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.concepts.Delegator;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContextFactory;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointIdentifier;
+import org.opendaylight.yangtools.yang.common.MountPointLabel;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContextFactory;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -38,7 +38,7 @@ final class ProxyMountPointContext implements Delegator<MountPointContext>, Moun
     }
 
     @Override
-    public Optional<MountPointContextFactory> findMountPoint(final MountPointIdentifier label) {
+    public Optional<MountPointContextFactory> findMountPoint(final MountPointLabel label) {
         return delegate.findMountPoint(label);
     }
 }

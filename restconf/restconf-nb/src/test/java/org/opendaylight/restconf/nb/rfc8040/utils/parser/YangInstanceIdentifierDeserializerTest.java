@@ -32,7 +32,6 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
@@ -621,7 +620,7 @@ public class YangInstanceIdentifierDeserializerTest {
         final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
             "deserializer-test-included:augmented-list=100/deserializer-test:augmented-leaf")
             .path.getPathArguments();
-        assertEquals(4, result.size());
+        assertEquals(3, result.size());
 
         // list
         final QName list = QName.create("deserializer:test:included", "2016-06-06", "augmented-list");
@@ -630,10 +629,8 @@ public class YangInstanceIdentifierDeserializerTest {
             result.get(1));
 
         // augmented leaf
-        final QName augLeaf = QName.create("deserializer:test", "2016-06-06", "augmented-leaf");
-        final QName augList = QName.create("deserializer:test", "2016-06-06", "augmenting-list");
-        assertEquals(new AugmentationIdentifier(Set.of(augLeaf, augList)), result.get(2));
-        assertEquals(NodeIdentifier.create(augLeaf), result.get(3));
+        assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "augmented-leaf")),
+            result.get(2));
     }
 
     @Test
@@ -641,7 +638,7 @@ public class YangInstanceIdentifierDeserializerTest {
         final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
             "deserializer-test-included:augmented-list=100/deserializer-test:augmenting-list=0")
             .path.getPathArguments();
-        assertEquals(5, result.size());
+        assertEquals(4, result.size());
 
         // list
         final QName list = QName.create("deserializer:test:included", "2016-06-06", "augmented-list");
@@ -650,11 +647,9 @@ public class YangInstanceIdentifierDeserializerTest {
             result.get(1));
 
         // augmented list
-        final QName augLeaf = QName.create("deserializer:test", "2016-06-06", "augmented-leaf");
         final QName augList = QName.create("deserializer:test", "2016-06-06", "augmenting-list");
-        assertEquals(new AugmentationIdentifier(Set.of(augLeaf, augList)), result.get(2));
-        assertEquals(NodeIdentifier.create(augList), result.get(3));
-        assertEquals(NodeIdentifierWithPredicates.of(augList, QName.create(augList, "id"), 0), result.get(4));
+        assertEquals(NodeIdentifier.create(augList), result.get(2));
+        assertEquals(NodeIdentifierWithPredicates.of(augList, QName.create(augList, "id"), 0), result.get(3));
     }
 
     /**

@@ -140,8 +140,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -159,6 +157,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -311,8 +310,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         final var resources =  resourceManager.getSchemaResources(TEST_DEFAULT_SUBDIR, "test");
         resources.getSchemaRegistry().registerSchemaSource(
-            id -> Futures.immediateFuture(YangTextSchemaSource.delegateForByteSource(id,
-                    topModuleInfo.getYangTextByteSource())),
+            id -> Futures.immediateFuture(YangTextSchemaSource.delegateForCharSource(id,
+                    topModuleInfo.getYangTextCharSource())),
             PotentialSchemaSource.create(new SourceIdentifier(TOP_MODULE_NAME,
                     topModuleInfo.getName().getRevision().map(Revision::toString).orElse(null)),
                 YangTextSchemaSource.class, 1));
@@ -413,7 +412,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
-            new EmptyMountPointContext(deviceSchemaContext)),
+            MountPointContext.of(deviceSchemaContext)),
             NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE)),
             new RemoteDeviceServices(deviceRpcService, null));
 
@@ -485,7 +484,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(
-            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), new EmptyMountPointContext(deviceSchemaContext)),
+            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), MountPointContext.of(deviceSchemaContext)),
             NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE)),
             new RemoteDeviceServices(deviceRpcService, null));
 

@@ -10,13 +10,12 @@ package org.opendaylight.netconf.server.mdsal.operations;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import javax.xml.transform.dom.DOMSource;
@@ -24,28 +23,25 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
-import org.opendaylight.yangtools.rfc7952.data.api.StreamWriterMetadataExtension;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriterExtension;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter.MetadataExtension;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeMetadataResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNodeStreamWriter,
-        StreamWriterMetadataExtension {
+final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNodeStreamWriter, MetadataExtension {
     private static final Logger LOG = LoggerFactory.getLogger(SplittingNormalizedNodeMetadataStreamWriter.class);
     private static final QName OPERATION_ATTRIBUTE = QName.create(EditConfigInput.QNAME.getNamespace(),
         XmlNetconfConstants.OPERATION_ATTR_KEY);
 
     // Top-level result node
-    private final NormalizedNodeMetadataResult result = new NormalizedNodeMetadataResult();
+    private final NormalizationResultHolder result = new NormalizationResultHolder();
     // Split-out changes
     private final List<DataTreeChange> dataTreeChanges = new ArrayList<>();
     // Path of the node we are currently in
@@ -73,8 +69,8 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
     }
 
     @Override
-    public ClassToInstanceMap<NormalizedNodeStreamWriterExtension> getExtensions() {
-        return ImmutableClassToInstanceMap.of(StreamWriterMetadataExtension.class, this);
+    public Collection<? extends Extension> supportedExtensions() {
+        return List.of(this);
     }
 
     @Override
@@ -162,13 +158,6 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
     }
 
     @Override
-    public void startAugmentationNode(final AugmentationIdentifier identifier) throws IOException {
-        writer.startAugmentationNode(identifier);
-        pushPath(identifier);
-    }
-
-
-    @Override
     public boolean startAnydataNode(final NodeIdentifier name, final Class<?> objectModel) throws IOException {
         // FIXME: add anydata support
         return false;
@@ -199,7 +188,7 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
             // All done, special-cased
             LOG.debug("All done ... writer {}", writer);
             writer.endNode();
-            dataTreeChanges.add(new DataTreeChange(result.getResult(), currentAction, currentPath));
+            dataTreeChanges.add(new DataTreeChange(result.getResult().data(), currentAction, currentPath));
         }
     }
 

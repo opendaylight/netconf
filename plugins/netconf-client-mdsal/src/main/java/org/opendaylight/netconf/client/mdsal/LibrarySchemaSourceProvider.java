@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
@@ -53,7 +54,8 @@ public final class LibrarySchemaSourceProvider implements SchemaSourceProvider<Y
                 "Unable to download remote schema for " + sourceIdentifier + " from " + url, e));
         }
 
-        final var yangSource = new CachedYangTextSchemaSource(id, sourceIdentifier, url.toString(), schemaContent);
+        final var yangSource = new CachedYangTextSchemaSource(id, sourceIdentifier, url.toString(),
+            new String(schemaContent, StandardCharsets.UTF_8));
         LOG.debug("Source {} downloaded from a yang library's url {}", sourceIdentifier, url);
         return Futures.immediateFuture(yangSource);
     }

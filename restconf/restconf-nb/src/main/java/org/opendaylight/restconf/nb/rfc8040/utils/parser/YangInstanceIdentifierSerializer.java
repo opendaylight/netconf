@@ -21,7 +21,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -51,22 +52,27 @@ public final class YangInstanceIdentifierSerializer {
      * @return {@link String}
      */
     public static String create(final EffectiveModelContext schemaContext, final YangInstanceIdentifier data) {
-        final DataSchemaContextNode<?> current = DataSchemaContextTree.from(schemaContext).getRoot();
+        final DataSchemaContext current = DataSchemaContextTree.from(schemaContext).getRoot();
         final MainVarsWrapper variables = new MainVarsWrapper(current);
         final StringBuilder path = new StringBuilder();
 
         QNameModule parentModule = null;
         for (final PathArgument arg : data.getPathArguments()) {
             // get module of the parent
-            if (!variables.getCurrent().isMixin()) {
-                parentModule = variables.getCurrent().getDataSchemaNode().getQName().getModule();
+            final var currentContext = variables.getCurrent();
+
+            if (!(currentContext instanceof PathMixin)) {
+                parentModule = currentContext.dataSchemaNode().getQName().getModule();
             }
 
-            variables.setCurrent(variables.getCurrent().getChild(arg));
-            RestconfDocumentedException.throwIf(variables.getCurrent() == null, ErrorType.APPLICATION,
+            final var childContext = currentContext instanceof DataSchemaContext.Composite composite
+                ? composite.childByArg(arg) : null;
+
+            RestconfDocumentedException.throwIfNull(childContext, ErrorType.APPLICATION,
                     ErrorTag.UNKNOWN_ELEMENT, "Invalid input '%s': schema for argument '%s' (after '%s') not found",
                     data, arg, path);
-            if (variables.getCurrent().isMixin()) {
+            variables.setCurrent(childContext);
+            if (childContext instanceof PathMixin) {
                 continue;
             }
 
@@ -176,20 +182,18 @@ public final class YangInstanceIdentifierSerializer {
     }
 
     private static final class MainVarsWrapper {
+        private DataSchemaContext current;
 
-        private DataSchemaContextNode<?> current;
-
-        MainVarsWrapper(final DataSchemaContextNode<?> current) {
-            this.setCurrent(current);
+        MainVarsWrapper(final DataSchemaContext current) {
+            setCurrent(current);
         }
 
-        public DataSchemaContextNode<?> getCurrent() {
+        public DataSchemaContext getCurrent() {
             return current;
         }
 
-        public void setCurrent(final DataSchemaContextNode<?> current) {
+        public void setCurrent(final DataSchemaContext current) {
             this.current = current;
         }
-
     }
 }

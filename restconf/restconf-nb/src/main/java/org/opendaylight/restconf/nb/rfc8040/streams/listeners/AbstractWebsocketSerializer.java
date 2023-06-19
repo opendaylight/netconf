@@ -11,9 +11,10 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Deque;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -21,6 +22,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -51,7 +53,7 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     final boolean serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
             final boolean skipData, final boolean changedLeafNodesOnly) throws T {
-        final var node = switch (candidate.getModificationType()) {
+        final var node = switch (candidate.modificationType()) {
             case SUBTREE_MODIFIED, APPEARED -> candidate.getDataAfter().orElseThrow();
             case DELETE, DISAPPEARED -> candidate.getDataBefore().orElseThrow();
             case WRITE -> changedLeafNodesOnly && isNotUpdate(candidate) ? null
@@ -72,23 +74,48 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
             return true;
         }
 
+        // Retain a modicum of sanity here: children may come from different namespaces. Report children from the same
+        // namespace first, holding others back. Once that is done, sort the remaining children by their PathArgument
+        // and report them in that order.
+        final var myNamespace = node.name().getNodeType().getModule();
+        final var heldBack = new ArrayList<DataTreeCandidateNode>();
         boolean ret = false;
-        for (var childNode : candidate.getChildNodes()) {
-            path.add(childNode.getIdentifier());
-            ret |= serializeLeafNodesOnly(path, childNode, skipData, changedLeafNodesOnly);
-            path.removeLast();
+        for (var childNode : candidate.childNodes()) {
+            final var childName = childNode.name();
+            if (myNamespace.equals(childName.getNodeType().getModule())) {
+                ret |= serializeChild(path, childNode, skipData, changedLeafNodesOnly);
+            } else {
+                heldBack.add(childNode);
+            }
         }
+        if (!heldBack.isEmpty()) {
+            // This is not exactly nice, as we really should be using schema definition order, but we do not have it
+            // available here, so we fall back to the next best thing.
+            heldBack.sort(Comparator.comparing(DataTreeCandidateNode::name));
+            for (var childNode : heldBack) {
+                ret |= serializeChild(path, childNode, skipData, changedLeafNodesOnly);
+            }
+        }
+        return ret;
+    }
+
+    private boolean serializeChild(final Deque<PathArgument> path, final DataTreeCandidateNode childNode,
+            final boolean skipData, final boolean changedLeafNodesOnly) throws T {
+        final boolean ret;
+        path.add(childNode.name());
+        ret = serializeLeafNodesOnly(path, childNode, skipData, changedLeafNodesOnly);
+        path.removeLast();
         return ret;
     }
 
     private void serializeData(final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate,
             final boolean skipData) throws T {
         var stack = SchemaInferenceStack.of(context);
-        var current = DataSchemaContextTree.from(context).getRoot();
+        DataSchemaContext current = DataSchemaContextTree.from(context).getRoot();
         for (var arg : dataPath) {
-            final var next = verifyNotNull(current.enterChild(stack, arg),
-                "Failed to resolve %s: cannot find %s in %s", dataPath, arg, current);
-            current = next;
+            final var next = current instanceof DataSchemaContext.Composite composite ? composite.enterChild(stack, arg)
+                : null;
+            current = verifyNotNull(next,  "Failed to resolve %s: cannot find %s in %s", dataPath, arg, current);
         }
 
         // Exit to parent if needed
@@ -118,9 +145,6 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         final StringBuilder pathBuilder = new StringBuilder();
 
         for (var pathArgument : path) {
-            if (pathArgument instanceof AugmentationIdentifier) {
-                continue;
-            }
             pathBuilder.append('/');
             pathBuilder.append(pathArgument.getNodeType().getNamespace().toString().replace(':', '-'));
             pathBuilder.append(':');

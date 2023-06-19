@@ -16,13 +16,11 @@ import java.util.Deque;
 import java.util.Map;
 import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
-import org.opendaylight.yangtools.rfc7952.data.api.StreamWriterMetadataExtension;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedMetadata;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.ForwardingNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 
@@ -34,13 +32,13 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 final class EmptyListXmlMetadataWriter extends ForwardingNormalizedNodeStreamWriter {
     private final Deque<NormalizedMetadata> stack = new ArrayDeque<>();
     private final EmptyListXmlWriter dataWriterDelegate;
-    private final StreamWriterMetadataExtension metaWriter;
+    private final MetadataExtension metaWriter;
     private final NormalizedMetadata metadata;
 
     private int absentDepth = 0;
 
     EmptyListXmlMetadataWriter(final @NonNull NormalizedNodeStreamWriter writer,
-            final @NonNull XMLStreamWriter xmlStreamWriter, final @NonNull StreamWriterMetadataExtension metaWriter,
+            final @NonNull XMLStreamWriter xmlStreamWriter, final @NonNull MetadataExtension metaWriter,
             final @NonNull NormalizedMetadata metadata) {
         dataWriterDelegate = new EmptyListXmlWriter(requireNonNull(writer), requireNonNull(xmlStreamWriter));
         this.metaWriter = requireNonNull(metaWriter);
@@ -117,12 +115,6 @@ final class EmptyListXmlMetadataWriter extends ForwardingNormalizedNodeStreamWri
     public void startChoiceNode(final NodeIdentifier name, final int childSizeHint) throws IOException {
         dataWriterDelegate.startChoiceNode(name, childSizeHint);
         enterMetadataNode(name);
-    }
-
-    @Override
-    public void startAugmentationNode(final AugmentationIdentifier identifier) throws IOException {
-        dataWriterDelegate.startAugmentationNode(identifier);
-        enterMetadataNode(identifier);
     }
 
     @Override

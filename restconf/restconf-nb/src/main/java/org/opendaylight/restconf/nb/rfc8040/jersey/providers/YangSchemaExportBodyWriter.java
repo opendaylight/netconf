@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -40,6 +41,6 @@ public class YangSchemaExportBodyWriter extends AbstractSchemaExportBodyWriter {
         } catch (InterruptedException | ExecutionException e) {
             throw new WebApplicationException("Unable to retrieve source from SourceProvider.", e);
         }
-        yangTextSchemaSource.copyTo(entityStream);
+        yangTextSchemaSource.asByteSource(StandardCharsets.UTF_8).copyTo(entityStream);
     }
 }

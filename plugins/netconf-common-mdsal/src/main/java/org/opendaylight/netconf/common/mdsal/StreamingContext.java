@@ -25,17 +25,13 @@ import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.yangtools.concepts.Identifiable;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
 import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -44,7 +40,6 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.util.EffectiveAugmentationSchema;
 
 abstract class StreamingContext<T extends PathArgument> implements Identifiable<T> {
     private final T identifier;
@@ -58,17 +53,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         checkArgument(potential.isPresent(),
                 "Supplied QName %s is not valid according to schema %s, potential children nodes: %s", child, schema,
                 schema.getChildNodes());
-
-        final DataSchemaNode result = potential.orElseThrow();
-        // We try to look up if this node was added by augmentation
-        if (schema instanceof DataSchemaNode && result.isAugmenting()) {
-            for (final AugmentationSchemaNode aug : ((AugmentationTarget)schema).getAvailableAugmentations()) {
-                if (aug.dataChildByName(result.getQName()) != null) {
-                    return new Augmentation(aug, schema);
-                }
-            }
-        }
-        return fromDataSchemaNode(result);
+        return fromDataSchemaNode(potential.orElseThrow());
     }
 
     static StreamingContext<?> fromDataSchemaNode(final DataSchemaNode potential) {
@@ -236,9 +221,6 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         private StreamingContext<?> fromLocalSchema(final PathArgument child) {
-            if (child instanceof AugmentationIdentifier aid) {
-                return fromSchemaAndQNameChecked(schema, aid.getPossibleChildNames().iterator().next());
-            }
             return fromSchemaAndQNameChecked(schema, child.getNodeType());
         }
     }
@@ -483,24 +465,6 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
                               final int childSizeHint) throws IOException {
             writer.startLeafSet(getIdentifier(), childSizeHint);
-        }
-    }
-
-    private static final class Augmentation extends AbstractDataContainer<AugmentationIdentifier> {
-        Augmentation(final AugmentationSchemaNode augmentation, final DataNodeContainer schema) {
-            super(DataSchemaContextNode.augmentationIdentifierFrom(augmentation),
-                    new EffectiveAugmentationSchema(augmentation, schema));
-        }
-
-        @Override
-        boolean isMixin() {
-            return true;
-        }
-
-        @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
-                              final int childSizeHint) throws IOException {
-            writer.startAugmentationNode(getIdentifier());
         }
     }
 

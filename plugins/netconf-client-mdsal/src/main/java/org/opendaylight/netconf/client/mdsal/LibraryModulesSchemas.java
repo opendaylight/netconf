@@ -62,6 +62,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizationResult;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
@@ -69,7 +70,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -285,7 +286,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static Optional<NormalizedNode> readJson(final InputStream in) {
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer, JSON_CODECS);
@@ -293,7 +294,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         jsonParser.parse(reader);
 
-        return resultHolder.isFinished() ? Optional.of(resultHolder.getResult()) : Optional.empty();
+        final NormalizationResult result = resultHolder.result();
+        return result == null ? Optional.empty() : Optional.of(result.data());
     }
 
     private static Optional<NormalizedNode> readXml(final InputStream in) {
@@ -320,11 +322,11 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
                 }
             }
 
-            final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+            final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, MODULES_STATE_INFERENCE);
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
-            return Optional.of(resultHolder.getResult());
+            return Optional.of(resultHolder.getResult().data());
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             LOG.warn("Unable to parse yang library xml content", e);
         }

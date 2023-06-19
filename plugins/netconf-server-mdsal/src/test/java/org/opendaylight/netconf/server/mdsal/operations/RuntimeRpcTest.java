@@ -15,7 +15,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 
 import com.google.common.base.Preconditions;
-import com.google.common.io.ByteSource;
+import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
@@ -170,12 +170,9 @@ public class RuntimeRpcTest {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
 
-        doAnswer(invocationOnMock -> {
-            final SourceIdentifier sId = (SourceIdentifier) invocationOnMock.getArguments()[0];
-            final YangTextSchemaSource yangTextSchemaSource =
-                    YangTextSchemaSource.delegateForByteSource(sId, ByteSource.wrap("module test".getBytes()));
-            return Futures.immediateFuture(yangTextSchemaSource);
-        }).when(sourceProvider).getSource(any(SourceIdentifier.class));
+        doAnswer(invocationOnMock -> Futures.immediateFuture(YangTextSchemaSource.delegateForCharSource(
+            (SourceIdentifier) invocationOnMock.getArguments()[0], CharSource.wrap("module test"))))
+            .when(sourceProvider).getSource(any(SourceIdentifier.class));
 
         currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
     }

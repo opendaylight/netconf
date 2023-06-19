@@ -28,7 +28,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class WriteRunningTxTest extends AbstractTestModelTest {
@@ -42,7 +42,7 @@ public class WriteRunningTxTest extends AbstractTestModelTest {
     @Before
     public void setUp() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpc).invokeNetconf(any(), any());
-        netconfOps = new NetconfBaseOps(rpc, new EmptyMountPointContext(SCHEMA_CONTEXT));
+        netconfOps = new NetconfBaseOps(rpc, MountPointContext.of(SCHEMA_CONTEXT));
     }
 
     @Test

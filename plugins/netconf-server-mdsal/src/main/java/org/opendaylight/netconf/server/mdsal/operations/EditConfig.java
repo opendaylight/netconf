@@ -25,7 +25,6 @@ import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -138,7 +137,7 @@ public final class EditConfig extends AbstractEdit {
             final var dataSchemaNode = DataSchemaContextTree.from(schemaContext.getCurrentContext())
                 .findChild(parentNodeYid)
                 .orElseThrow(() -> new IllegalStateException("Cannot find schema for " + parentNodeYid))
-                .getDataSchemaNode();
+                .dataSchemaNode();
 
             // we should have the schema node that points to the parent list now, enforce it
             if (!(dataSchemaNode instanceof ListSchemaNode listSchemaNode)) {
@@ -150,11 +149,6 @@ public final class EditConfig extends AbstractEdit {
                 (listSchemaNode.isUserOrdered() ? Builders.orderedMapBuilder() : Builders.mapBuilder())
                     .withNodeIdentifier(new NodeIdentifier(parentNodeYid.getLastPathArgument().getNodeType()))
                     .build());
-        } else if (parentNodeYid.getLastPathArgument() instanceof AugmentationIdentifier augId) {
-            // merge empty augmentation node
-            rwtx.merge(LogicalDatastoreType.CONFIGURATION, parentNodeYid, Builders.augmentationBuilder()
-                .withNodeIdentifier(augId)
-                .build());
         }
     }
 

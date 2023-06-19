@@ -69,11 +69,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfConfigChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.netconf.config.change.Edit;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
@@ -84,11 +82,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -194,7 +192,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         XMLUnit.setIgnoreComments(true);
 
         netconfMessageTransformer = getTransformer(SCHEMA);
-        actionNetconfMessageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(ACTION_SCHEMA),
+        actionNetconfMessageTransformer = new NetconfMessageTransformer(MountPointContext.of(ACTION_SCHEMA),
             true, BASE_SCHEMAS.getBaseSchema());
     }
 
@@ -210,8 +208,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
-        final NetconfMessageTransformer transformer = new NetconfMessageTransformer(new EmptyMountPointContext(SCHEMA),
-            true, BASE_SCHEMAS.getBaseSchemaWithNotifications());
+        final NetconfMessageTransformer transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
+            BASE_SCHEMAS.getBaseSchemaWithNotifications());
         NetconfMessage netconfMessage = transformer.toRpcRequest(CREATE_SUBSCRIPTION_RPC_QNAME,
                 CREATE_SUBSCRIPTION_RPC_CONTENT);
         String documentString = XmlUtil.toString(netconfMessage.getDocument());
@@ -334,8 +332,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final DOMSourceAnyxmlNode data = (DOMSourceAnyxmlNode) compositeNodeRpcResult.value()
                 .findChildByArg(toId(NETCONF_DATA_QNAME)).orElseThrow();
 
-        NormalizedNodeResult nodeResult = NormalizedDataUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.body());
-        ContainerNode result = (ContainerNode) nodeResult.getResult();
+        var nodeResult = NormalizedDataUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.body());
+        ContainerNode result = (ContainerNode) nodeResult.getResult().data();
         final ContainerNode state = (ContainerNode) result.getChildByArg(toId(NetconfState.QNAME));
         final ContainerNode schemas = (ContainerNode) state.getChildByArg(toId(Schemas.QNAME));
         final MapNode schemaParent = (MapNode) schemas.getChildByArg(toId(Schema.QNAME));
@@ -524,7 +522,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
-        return new NetconfMessageTransformer(new EmptyMountPointContext(schema), true, BASE_SCHEMAS.getBaseSchema());
+        return new NetconfMessageTransformer(MountPointContext.of(schema), true, BASE_SCHEMAS.getBaseSchema());
     }
 
     @Test
@@ -672,7 +670,6 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(NodeIdentifier.create(SERVER_QNAME));
         nodeIdentifiers.add(NodeIdentifierWithPredicates.of(SERVER_QNAME, serverNameQname, "testServer"));
-        nodeIdentifiers.add(new AugmentationIdentifier(Set.of(APPLICATIONS_QNAME)));
         nodeIdentifiers.add(NodeIdentifier.create(APPLICATIONS_QNAME));
         nodeIdentifiers.add(NodeIdentifier.create(APPLICATION_QNAME));
         nodeIdentifiers.add(NodeIdentifierWithPredicates.of(APPLICATION_QNAME,

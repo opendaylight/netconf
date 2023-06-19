@@ -9,11 +9,7 @@ package org.opendaylight.netconf.server.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.io.CharStreams;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -118,22 +114,12 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
         final String revision = module.getRevision().map(Revision::toString).orElse(null);
         final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(moduleName, revision);
 
-        InputStream sourceStream = null;
         String source;
         try {
-            sourceStream = rootSchemaSourceProviderDependency.getSource(moduleSourceIdentifier).get().openStream();
-            source = CharStreams.toString(new InputStreamReader(sourceStream, StandardCharsets.UTF_8));
+            source = rootSchemaSourceProviderDependency.getSource(moduleSourceIdentifier).get().read();
         } catch (ExecutionException | InterruptedException | IOException e) {
             LOG.warn("Ignoring source for module {}. Unable to read content", moduleSourceIdentifier, e);
             source = null;
-        }
-
-        try {
-            if (sourceStream != null) {
-                sourceStream.close();
-            }
-        } catch (IOException e) {
-            LOG.warn("Error closing yang source stream {}. Ignoring", moduleSourceIdentifier, e);
         }
 
         if (source != null) {

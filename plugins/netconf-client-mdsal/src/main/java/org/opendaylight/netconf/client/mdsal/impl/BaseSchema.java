@@ -11,18 +11,18 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.concepts.Immutable;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextProvider;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
 public final class BaseSchema implements EffectiveModelContextProvider, Immutable {
     private final @NonNull ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
-    private final @NonNull EmptyMountPointContext mountContext;
+    private final @NonNull MountPointContext mountContext;
 
     BaseSchema(final EffectiveModelContext context) {
-        mountContext = new EmptyMountPointContext(context);
+        mountContext = MountPointContext.of(context);
         mappedRpcs = Maps.uniqueIndex(context.getOperations(), RpcDefinition::getQName);
     }
 
@@ -30,7 +30,7 @@ public final class BaseSchema implements EffectiveModelContextProvider, Immutabl
         return mappedRpcs;
     }
 
-    public @NonNull EmptyMountPointContext getMountPointContext() {
+    public @NonNull MountPointContext getMountPointContext() {
         return mountContext;
     }
 

@@ -14,13 +14,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
-import com.google.common.collect.Sets;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,7 +35,6 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -180,10 +177,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final Module augmentModule = schemaContext.findModules(XMLNamespace.of("augment:module")).iterator().next();
         final QName contAugmentQName = QName.create(augmentModule.getQNameModule(), "cont-augment");
-        final YangInstanceIdentifier.AugmentationIdentifier augII = new YangInstanceIdentifier.AugmentationIdentifier(
-                Sets.newHashSet(contAugmentQName));
-        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(augII)
-                .node(contAugmentQName);
+        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName(), contAugmentQName);
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, xmlBodyReader, true);
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, mediaType, null,
@@ -200,10 +194,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
         final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
-            .node(new AugmentationIdentifier(Set.of(augmentChoice1QName)))
             .node(augmentChoice1QName)
-            // FIXME: DataSchemaContextTree bug? case children seem to ignore augments
-            // .node(new AugmentationIdentifier(Set.of(augmentChoice2QName)))
             .node(augmentChoice2QName)
             .node(QName.create(augmentChoice1QName, "case-choice-case-container1"));
         final String uri = "instance-identifier-module:cont";

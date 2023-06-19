@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.Nullable;
@@ -37,10 +36,8 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -77,8 +74,6 @@ final class CreateStreamUtil {
     private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(OUTPUT_TYPE_QNAME);
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
         NodeIdentifier.create(DEVICE_NOTIFICATION_PATH_QNAME);
-    private static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER = new AugmentationIdentifier(
-        ImmutableSet.of(SCOPE_QNAME, DATASTORE_QNAME, OUTPUT_TYPE_QNAME));
 
     private CreateStreamUtil() {
         // Hidden on purpose
@@ -263,17 +258,8 @@ final class CreateStreamUtil {
     }
 
     private static @Nullable String extractStringLeaf(final ContainerNode data, final NodeIdentifier childName) {
-        final DataContainerChild augNode = data.childByArg(SAL_REMOTE_AUG_IDENTIFIER);
-        if (augNode instanceof AugmentationNode) {
-            final DataContainerChild enumNode = ((AugmentationNode) augNode).childByArg(childName);
-            if (enumNode instanceof LeafNode) {
-                final Object value = enumNode.body();
-                if (value instanceof String) {
-                    return (String) value;
-                }
-            }
-        }
-        return null;
+        return data.childByArg(childName) instanceof LeafNode<?> leafNode && leafNode.body() instanceof String str
+            ? str : null;
     }
 
     /**

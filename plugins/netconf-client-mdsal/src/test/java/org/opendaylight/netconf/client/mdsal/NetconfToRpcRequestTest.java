@@ -20,10 +20,10 @@ import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -60,7 +60,7 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
 
     @Before
     public void before() {
-        messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(cfgCtx), true,
+        messageTransformer = new NetconfMessageTransformer(MountPointContext.of(cfgCtx), true,
             BASE_SCHEMAS.getBaseSchema());
     }
 

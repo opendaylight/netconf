@@ -9,7 +9,7 @@ package org.opendaylight.netconf.server.mdsal.operations;
 
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableMetadataNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeMetadataResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 
 /**
  * This is a single component writer, which results in some amount.
@@ -19,7 +19,7 @@ final class ComponentNormalizedNodeStreamWriter extends ImmutableMetadataNormali
         super(state);
     }
 
-    ComponentNormalizedNodeStreamWriter(final NormalizedNodeMetadataResult result) {
+    ComponentNormalizedNodeStreamWriter(final NormalizationResultHolder result) {
         super(result);
     }
 

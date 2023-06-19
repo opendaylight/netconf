@@ -29,9 +29,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -39,7 +37,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
@@ -70,7 +68,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
 
     public static NormalizedNodePayload readFrom(
             final InstanceIdentifierContext path, final InputStream entityStream, final boolean isPost) {
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         final Inference parentSchema;
@@ -90,11 +88,11 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final JsonReader reader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
         jsonParser.parse(reader);
 
-        NormalizedNode result = resultHolder.getResult();
+        NormalizedNode result = resultHolder.getResult().data();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
 
-        while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
-            final var childNode = ((DataContainerNode) result).body().iterator().next();
+        while (result instanceof ChoiceNode choice) {
+            final var childNode = choice.body().iterator().next();
             if (isPost) {
                 iiToDataList.add(result.getIdentifier());
             }

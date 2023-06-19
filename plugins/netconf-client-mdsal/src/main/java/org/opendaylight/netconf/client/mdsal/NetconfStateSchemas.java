@@ -208,7 +208,8 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         final NormalizedNode dataNode;
         try {
-            dataNode = NormalizedDataUtil.transformDOMSourceToNormalizedNode(schemaContext, filteredBody).getResult();
+            dataNode = NormalizedDataUtil.transformDOMSourceToNormalizedNode(schemaContext, filteredBody).getResult()
+                .data();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             LOG.warn("Failed to transform {}", rpcResult, e);
             return Optional.empty();

@@ -68,7 +68,7 @@ public class TCPClientServerTest {
     @Test
     public void integrationTest() throws Exception {
         // localhost address, so we do not leak things around
-        final var loopbackAddr = IetfInetUtil.INSTANCE.ipAddressFor(InetAddress.getLoopbackAddress());
+        final var loopbackAddr = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
 
         // Server-side config
         doReturn(loopbackAddr).when(serverGrouping).getLocalAddress();

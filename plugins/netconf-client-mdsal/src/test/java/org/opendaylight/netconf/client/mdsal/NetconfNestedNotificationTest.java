@@ -22,9 +22,9 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
-import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -45,12 +45,12 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
                 getNotificationSchemaContext(Collections.singleton("/schemas/nested-notification.yang"));
         final NetconfMessage notificationMessage = prepareNotification("/nested-notification-payload.xml");
         NetconfMessageTransformer messageTransformer = new NetconfMessageTransformer(
-            new EmptyMountPointContext(schemaContext), true, BASE_SCHEMAS.getBaseSchema());
+            MountPointContext.of(schemaContext), true, BASE_SCHEMAS.getBaseSchema());
         final DOMNotification domNotification = messageTransformer.toNotification(notificationMessage);
         final ContainerNode root = domNotification.getBody();
         assertNotNull(root);
         assertEquals(1, root.body().size());
-        assertEquals("interface-enabled", root.getIdentifier().getNodeType().getLocalName());
+        assertEquals("interface-enabled", root.name().getNodeType().getLocalName());
         assertEquals(NotificationMessage.RFC3339_DATE_PARSER.apply("2008-07-08T00:01:00Z"),
                 ((DOMEvent) domNotification).getEventInstant());
         assertEquals(Absolute.of(INTERFACES_QNAME, INTERFACE_QNAME, INTERFACE_ENABLED_NOTIFICATION_QNAME),

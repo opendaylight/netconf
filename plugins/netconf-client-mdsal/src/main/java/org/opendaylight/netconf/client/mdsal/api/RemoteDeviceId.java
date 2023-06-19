@@ -23,7 +23,7 @@ public record RemoteDeviceId(@NonNull String name, @NonNull InetSocketAddress ad
 
     public @NonNull Host host() {
         final var addr = address.getAddress();
-        return addr != null ? new Host(IetfInetUtil.INSTANCE.ipAddressFor(addr))
+        return addr != null ? new Host(IetfInetUtil.ipAddressFor(addr))
             : new Host(new DomainName(address.getHostString()));
     }
 }

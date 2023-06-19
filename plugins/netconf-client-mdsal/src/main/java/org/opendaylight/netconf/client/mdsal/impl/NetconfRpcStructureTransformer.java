@@ -14,14 +14,14 @@ import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -42,11 +42,11 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     public Optional<NormalizedNode> selectFromDataStructure(final DataContainerChild data,
             final YangInstanceIdentifier path) {
         if (data instanceof DOMSourceAnyxmlNode) {
-            final NormalizedNodeResult node;
+            final NormalizationResultHolder node;
             try {
                 node = NormalizedDataUtil.transformDOMSourceToNormalizedNode(mountContext,
                     ((DOMSourceAnyxmlNode)data).body());
-                return NormalizedNodes.findNode(node.getResult(), path.getPathArguments());
+                return NormalizedNodes.findNode(node.getResult().data(), path.getPathArguments());
             } catch (final XMLStreamException | URISyntaxException | IOException | SAXException e) {
                 LOG.error("Cannot parse anyxml.", e);
                 return Optional.empty();
