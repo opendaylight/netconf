@@ -53,6 +53,28 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
  * </pre>
  */
 public final class NetconfFieldsTranslator {
+    /**
+     * {@link DataSchemaContextNode} of data element grouped with identifiers of leading mixin nodes and previous
+     * path element.<br>
+     *  - identifiers of mixin nodes on the path to the target node - required for construction of full valid
+     *    DOM paths,<br>
+     *  - {@link LinkedPathElement} of the previous non-mixin node - required to successfully create a chain
+     *    of {@link PathArgument}s
+     *
+     * @param parentPathElement     parent path element
+     * @param mixinNodesToTarget    identifiers of mixin nodes on the path to the target node
+     * @param targetNode            target non-mixin node
+     */
+    private record LinkedPathElement(
+            @Nullable LinkedPathElement parentPathElement,
+            @NonNull List<PathArgument> mixinNodesToTarget,
+            @NonNull DataSchemaContextNode<?> targetNode) {
+        LinkedPathElement {
+            requireNonNull(mixinNodesToTarget);
+            requireNonNull(targetNode);
+        }
+    }
+
     private NetconfFieldsTranslator() {
         // Hidden on purpose
     }
@@ -74,9 +96,7 @@ public final class NetconfFieldsTranslator {
 
     private static @NonNull Set<LinkedPathElement> parseFields(final @NonNull InstanceIdentifierContext identifier,
             final @NonNull FieldsParam input) {
-        final var startNode = DataSchemaContextNode.fromDataSchemaNode(
-            (DataSchemaNode) identifier.getSchemaNode());
-
+        final var startNode = DataSchemaContextNode.fromDataSchemaNode((DataSchemaNode) identifier.getSchemaNode());
         if (startNode == null) {
             throw new RestconfDocumentedException(
                 "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -84,7 +104,7 @@ public final class NetconfFieldsTranslator {
 
         final var parsed = new HashSet<LinkedPathElement>();
         processSelectors(parsed, identifier.getSchemaContext(), identifier.getSchemaNode().getQName().getModule(),
-            new LinkedPathElement(startNode), input.nodeSelectors());
+            new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
 
         return parsed;
     }
@@ -158,7 +178,7 @@ public final class NetconfFieldsTranslator {
         LinkedPathElement pathElement = lastPathElement;
         final var path = new LinkedList<PathArgument>();
         do {
-            path.addFirst(pathElement.targetNodeIdentifier());
+            path.addFirst(pathElement.targetNode.getIdentifier());
             path.addAll(0, pathElement.mixinNodesToTarget);
             pathElement = pathElement.parentPathElement;
         } while (pathElement.parentPathElement != null);
@@ -166,48 +186,12 @@ public final class NetconfFieldsTranslator {
         return YangInstanceIdentifier.create(path);
     }
 
-    private static DataSchemaContextNode<?> resolveMixinNode(
-        final DataSchemaContextNode<?> node, final @NonNull QName qualifiedName) {
+    private static DataSchemaContextNode<?> resolveMixinNode(final DataSchemaContextNode<?> node,
+            final @NonNull QName qualifiedName) {
         DataSchemaContextNode<?> currentNode = node;
         while (currentNode != null && currentNode.isMixin()) {
             currentNode = currentNode.getChild(qualifiedName);
         }
         return currentNode;
-    }
-
-    /**
-     * {@link DataSchemaContextNode} of data element grouped with identifiers of leading mixin nodes and previous
-     * path element.<br>
-     *  - identifiers of mixin nodes on the path to the target node - required for construction of full valid
-     *    DOM paths,<br>
-     *  - {@link LinkedPathElement} of the previous non-mixin node - required to successfully create a chain
-     *    of {@link PathArgument}s
-     */
-    private static final class LinkedPathElement {
-        private final @Nullable LinkedPathElement parentPathElement;
-        private final @NonNull List<PathArgument> mixinNodesToTarget;
-        private final @NonNull DataSchemaContextNode<?> targetNode;
-
-        LinkedPathElement(final DataSchemaContextNode<?> targetNode) {
-            this(null, List.of(), targetNode);
-        }
-
-        /**
-         * Creation of new {@link LinkedPathElement}.
-         *
-         * @param parentPathElement     parent path element
-         * @param mixinNodesToTarget    identifiers of mixin nodes on the path to the target node
-         * @param targetNode            target non-mixin node
-         */
-        LinkedPathElement(@Nullable final LinkedPathElement parentPathElement,
-                final List<PathArgument> mixinNodesToTarget, final DataSchemaContextNode<?> targetNode) {
-            this.parentPathElement = parentPathElement;
-            this.mixinNodesToTarget = requireNonNull(mixinNodesToTarget);
-            this.targetNode = requireNonNull(targetNode);
-        }
-
-        PathArgument targetNodeIdentifier() {
-            return targetNode.getIdentifier();
-        }
     }
 }
