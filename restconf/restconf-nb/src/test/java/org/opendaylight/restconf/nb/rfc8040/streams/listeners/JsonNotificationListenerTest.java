@@ -12,9 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,10 +24,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -156,8 +151,7 @@ public class JsonNotificationListenerTest {
         final DOMNotification notificationData = mock(DOMNotification.class);
 
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf-augm"));
-        final AugmentationNode augm = mockAugm(leaf);
-        final ContainerNode notifiBody = mockCont(schemaPathNotifi.lastNodeIdentifier(), augm);
+        final ContainerNode notifiBody = mockCont(schemaPathNotifi.lastNodeIdentifier(), leaf);
 
         when(notificationData.getType()).thenReturn(schemaPathNotifi);
         when(notificationData.getBody()).thenReturn(notifiBody);
@@ -169,22 +163,9 @@ public class JsonNotificationListenerTest {
         assertTrue(result.contains("lf-augm" + '"' + ":" + '"' + "value"));
     }
 
-    private static AugmentationNode mockAugm(final LeafNode<String> leaf) {
-        final AugmentationNode augm = mock(AugmentationNode.class);
-        final AugmentationIdentifier augmId = new AugmentationIdentifier(Set.of(leaf.getIdentifier().getNodeType()));
-        when(augm.getIdentifier()).thenReturn(augmId);
-
-        final Collection<DataContainerChild> childs = new ArrayList<>();
-        childs.add(leaf);
-
-        when(augm.body()).thenReturn(childs);
-        return augm;
-    }
-
     private static MapEntryNode mockMapEntry(final QName entryQName, final LeafNode<String> leaf) {
         return Builders.mapEntryBuilder()
-            .withNodeIdentifier(NodeIdentifierWithPredicates.of(entryQName, leaf.getIdentifier().getNodeType(),
-                leaf.body()))
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(entryQName, leaf.name().getNodeType(), leaf.body()))
             .withChild(leaf)
             .build();
     }

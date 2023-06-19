@@ -37,7 +37,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -108,13 +110,16 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                 final var stack = nodeAndStack.stack();
                 var current = nodeAndStack.node();
                 do {
-                    final var next = current.enterChild(stack, qname);
-                    checkState(next != null, "Child \"%s\" was not found in parent schema node \"%s\"", qname,
-                        schemaNode);
-                    iiToDataList.add(next.getIdentifier());
-                    schemaNode = next.getDataSchemaNode();
+                    final var next = current instanceof DataSchemaContext.Composite compositeCurrent
+                        ? compositeCurrent.enterChild(stack, qname) : null;
+                    if (next == null) {
+                        throw new IllegalStateException(
+                            "Child \"" + qname + "\" was not found in parent schema node \"" + schemaNode + "\"");
+                    }
+                    iiToDataList.add(next.getPathStep());
+                    schemaNode = next.dataSchemaNode();
                     current = next;
-                } while (current.isMixin());
+                } while (current instanceof PathMixin);
 
                 // We need to unwind the last identifier if it a NodeIdentifierWithPredicates, as it does not have
                 // any predicates at all. The real identifier is then added below
@@ -136,14 +141,14 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
 
         NormalizedNode parsed;
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
                 || schemaNode instanceof LeafSchemaNode) {
             final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
-            parsed = resultHolder.getResult();
+            parsed = resultHolder.getResult().data();
 
             // When parsing an XML source with a list root node
             // the new XML parser always returns a MapNode with one MapEntryNode inside.
