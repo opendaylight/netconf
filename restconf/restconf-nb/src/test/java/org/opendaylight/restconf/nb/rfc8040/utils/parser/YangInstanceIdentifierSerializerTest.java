@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.AfterClass;
@@ -108,7 +107,7 @@ public class YangInstanceIdentifierSerializerTest {
     public void serializeListWithNoKeysTest() {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "list-no-key"))
-                .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-no-key"), new HashMap<>())
+                .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-no-key"), Map.of())
                 .build();
 
         final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
