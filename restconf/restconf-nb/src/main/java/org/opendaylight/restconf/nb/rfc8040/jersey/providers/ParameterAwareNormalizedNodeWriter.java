@@ -23,7 +23,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
-import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -188,14 +187,9 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             return true;
         }
 
-        // always write augmentation nodes
-        if (node instanceof AugmentationNode) {
-            return true;
-        }
-
         // write only selected nodes
         if (currentDepth > 0 && currentDepth <= fields.size()) {
-            return fields.get(currentDepth - 1).contains(node.getIdentifier().getNodeType());
+            return fields.get(currentDepth - 1).contains(node.name().getNodeType());
         }
 
         // after this depth only depth parameter is used to determine when to write node
@@ -250,8 +244,8 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
     private boolean wasProcessedAsCompositeNode(final NormalizedNode node) throws IOException {
         boolean processedAsCompositeNode = false;
         if (node instanceof ContainerNode n) {
-            if (!n.getIdentifier().getNodeType().withoutRevision().equals(ROOT_DATA_QNAME)) {
-                writer.startContainerNode(n.getIdentifier(), n.size());
+            if (!n.name().getNodeType().withoutRevision().equals(ROOT_DATA_QNAME)) {
+                writer.startContainerNode(n.name(), n.size());
                 currentDepth++;
                 processedAsCompositeNode = writeChildren(n.body(), false);
                 currentDepth--;
@@ -269,30 +263,27 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
         } else if (node instanceof MapEntryNode n) {
             processedAsCompositeNode = writeMapEntryNode(n);
         } else if (node instanceof UnkeyedListEntryNode n) {
-            writer.startUnkeyedListItem(n.getIdentifier(), n.size());
+            writer.startUnkeyedListItem(n.name(), n.size());
             currentDepth++;
             processedAsCompositeNode = writeChildren(n.body(), false);
             currentDepth--;
         } else if (node instanceof ChoiceNode n) {
-            writer.startChoiceNode(n.getIdentifier(), n.size());
-            processedAsCompositeNode = writeChildren(n.body(), true);
-        } else if (node instanceof AugmentationNode n) {
-            writer.startAugmentationNode(n.getIdentifier());
+            writer.startChoiceNode(n.name(), n.size());
             processedAsCompositeNode = writeChildren(n.body(), true);
         } else if (node instanceof UnkeyedListNode n) {
-            writer.startUnkeyedList(n.getIdentifier(), n.size());
+            writer.startUnkeyedList(n.name(), n.size());
             processedAsCompositeNode = writeChildren(n.body(), false);
         } else if (node instanceof UserMapNode n) {
-            writer.startOrderedMapNode(n.getIdentifier(), n.size());
+            writer.startOrderedMapNode(n.name(), n.size());
             processedAsCompositeNode = writeChildren(n.body(), true);
         } else if (node instanceof SystemMapNode n) {
-            writer.startMapNode(n.getIdentifier(), n.size());
+            writer.startMapNode(n.name(), n.size());
             processedAsCompositeNode = writeChildren(n.body(), true);
         } else if (node instanceof LeafSetNode<?> n) {
             if (n.ordering() == Ordering.USER) {
-                writer.startOrderedLeafSet(n.getIdentifier(), n.size());
+                writer.startOrderedLeafSet(n.name(), n.size());
             } else {
-                writer.startLeafSet(n.getIdentifier(), n.size());
+                writer.startLeafSet(n.name(), n.size());
             }
             currentDepth++;
             processedAsCompositeNode = writeChildren(n.body(), true);
@@ -313,9 +304,9 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
         @Override
         protected boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
             final NormalizedNodeStreamWriter writer = getWriter();
-            writer.startMapEntryNode(node.getIdentifier(), node.size());
+            writer.startMapEntryNode(node.name(), node.size());
 
-            final Set<QName> qnames = node.getIdentifier().keySet();
+            final Set<QName> qnames = node.name().keySet();
             // Write out all the key children
             currentDepth++;
             for (final QName qname : qnames) {
@@ -334,10 +325,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             // Write all the rest
             final boolean result =
                     writeChildren(Iterables.filter(node.body(), input -> {
-                        if (input instanceof AugmentationNode) {
-                            return true;
-                        }
-                        if (!qnames.contains(input.getIdentifier().getNodeType())) {
+                        if (!qnames.contains(input.name().getNodeType())) {
                             return true;
                         }
 
