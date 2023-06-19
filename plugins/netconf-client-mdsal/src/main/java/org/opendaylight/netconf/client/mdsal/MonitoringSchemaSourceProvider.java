@@ -15,7 +15,6 @@ import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_D
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
@@ -110,8 +109,7 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
                             id + ": Unexpected response to get-schema, schema not present in message for: "
                                 + sourceIdentifier));
                     LOG.debug("{}: YANG Schema successfully retrieved for {}:{}", id, moduleName, revision);
-                    return new CachedYangTextSchemaSource(id, sourceIdentifier, moduleName,
-                        schemaString.getBytes(StandardCharsets.UTF_8));
+                    return new CachedYangTextSchemaSource(id, sourceIdentifier, moduleName, schemaString);
                 }
 
                 LOG.warn("{}: YANG schema was not successfully retrieved for {}. Errors: {}", id, sourceIdentifier,

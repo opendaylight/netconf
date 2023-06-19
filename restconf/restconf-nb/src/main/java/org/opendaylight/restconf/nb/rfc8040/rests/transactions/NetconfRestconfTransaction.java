@@ -127,7 +127,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         Futures.addCallback(resultErrors, new FutureCallback<>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
-                final Collection<? extends RpcError> errors = result.getErrors();
+                final Collection<? extends RpcError> errors = result.errors();
                 if (!allWarnings(errors)) {
                     Futures.whenAllComplete(discardAndUnlock()).run(
                         () -> commitResult.setException(toCommitFailedException(errors)),
@@ -139,7 +139,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                 Futures.addCallback(netconfService.commit(), new FutureCallback<DOMRpcResult>() {
                     @Override
                     public void onSuccess(final DOMRpcResult rpcResult) {
-                        final Collection<? extends RpcError> errors = rpcResult.getErrors();
+                        final Collection<? extends RpcError> errors = rpcResult.errors();
                         if (errors.isEmpty()) {
                             Futures.whenAllComplete(netconfService.unlock()).run(
                                 () -> commitResult.set(CommitInfo.empty()),
@@ -187,7 +187,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     private final FutureCallback<DOMRpcResult> lockOperationCallback = new FutureCallback<>() {
         @Override
         public void onSuccess(final DOMRpcResult rpcResult) {
-            if (rpcResult != null && allWarnings(rpcResult.getErrors())) {
+            if (rpcResult != null && allWarnings(rpcResult.errors())) {
                 isLocked = true;
             }
         }
@@ -206,7 +206,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                 operationFuture = Futures.transformAsync(resultsFutures.get(0),
                     result -> {
                         // ... then add new operation to the chain if lock was successful
-                        if (result != null && (result.getErrors().isEmpty() || allWarnings(result.getErrors()))) {
+                        if (result != null && (result.errors().isEmpty() || allWarnings(result.errors()))) {
                             return operation.get();
                         } else {
                             return Futures.immediateFailedFuture(new NetconfDocumentedException("Lock operation failed",
@@ -236,7 +236,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
             final var builder = ImmutableList.<RpcError>builder();
             for (ListenableFuture<? extends DOMRpcResult> future : futures) {
-                builder.addAll(Futures.getDone(future).getErrors());
+                builder.addAll(Futures.getDone(future).errors());
             }
             return new DefaultDOMRpcResult(null, builder.build());
         }, MoreExecutors.directExecutor());
@@ -266,9 +266,9 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         Futures.addCallback(operationResult, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult rpcResult) {
-                if (rpcResult != null && !rpcResult.getErrors().isEmpty()) {
+                if (rpcResult != null && !rpcResult.errors().isEmpty()) {
                     LOG.error("Errors occurred during processing of the RPC operation: {}",
-                        rpcResult.getErrors().stream().map(Object::toString).collect(Collectors.joining(",")));
+                        rpcResult.errors().stream().map(Object::toString).collect(Collectors.joining(",")));
                 }
             }
 

@@ -29,6 +29,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -159,7 +160,7 @@ public final class YangInstanceIdentifierDeserializer {
 
         var parentNode = DataSchemaContextTree.from(schemaContext).getRoot();
         while (true) {
-            final var parentSchema = parentNode.getDataSchemaNode();
+            final var parentSchema = parentNode.dataSchemaNode();
             if (parentSchema instanceof ActionNodeContainer) {
                 final var optAction = ((ActionNodeContainer) parentSchema).findAction(qname);
                 if (optAction.isPresent()) {
@@ -187,18 +188,18 @@ public final class YangInstanceIdentifierDeserializer {
 
             // Now add all mixins encountered to the path
             var childNode = found;
-            while (childNode.isMixin()) {
-                path.add(childNode.getIdentifier());
-                childNode = verifyNotNull(childNode.enterChild(stack, qname),
+            while (childNode instanceof PathMixin currentMixin) {
+                path.add(currentMixin.mixinPathStep());
+                childNode = verifyNotNull(currentMixin.enterChild(stack, qname),
                     "Mixin %s is missing child for %s while resolving %s", childNode, qname, found);
             }
 
             final PathArgument pathArg;
-            if (step instanceof ListInstance) {
-                final var values = ((ListInstance) step).keyValues();
-                final var schema = childNode.getDataSchemaNode();
-                pathArg = schema instanceof ListSchemaNode
-                    ? prepareNodeWithPredicates(stack, qname, (ListSchemaNode) schema, values)
+            if (step instanceof ListInstance listStep) {
+                final var values = listStep.keyValues();
+                final var schema = childNode.dataSchemaNode();
+                pathArg = schema instanceof ListSchemaNode listSchema
+                    ? prepareNodeWithPredicates(stack, qname, listSchema, values)
                         : prepareNodeWithValue(stack, qname, schema, values);
             } else {
                 RestconfDocumentedException.throwIf(childNode.isKeyedEntry(),
@@ -210,7 +211,7 @@ public final class YangInstanceIdentifierDeserializer {
             path.add(pathArg);
 
             if (!it.hasNext()) {
-                node = childNode.getDataSchemaNode();
+                node = childNode.dataSchemaNode();
                 break;
             }
 

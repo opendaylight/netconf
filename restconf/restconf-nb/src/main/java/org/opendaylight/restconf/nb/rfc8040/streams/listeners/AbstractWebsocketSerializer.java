@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -51,7 +50,7 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     final boolean serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
             final boolean skipData, final boolean changedLeafNodesOnly) throws T {
-        final var node = switch (candidate.getModificationType()) {
+        final var node = switch (candidate.modificationType()) {
             case SUBTREE_MODIFIED, APPEARED -> candidate.getDataAfter().orElseThrow();
             case DELETE, DISAPPEARED -> candidate.getDataBefore().orElseThrow();
             case WRITE -> changedLeafNodesOnly && isNotUpdate(candidate) ? null
@@ -73,8 +72,8 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         }
 
         boolean ret = false;
-        for (var childNode : candidate.getChildNodes()) {
-            path.add(childNode.getIdentifier());
+        for (var childNode : candidate.childNodes()) {
+            path.add(childNode.name());
             ret |= serializeLeafNodesOnly(path, childNode, skipData, changedLeafNodesOnly);
             path.removeLast();
         }
@@ -118,9 +117,6 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         final StringBuilder pathBuilder = new StringBuilder();
 
         for (var pathArgument : path) {
-            if (pathArgument instanceof AugmentationIdentifier) {
-                continue;
-            }
             pathBuilder.append('/');
             pathBuilder.append(pathArgument.getNodeType().getNamespace().toString().replace(':', '-'));
             pathBuilder.append(':');

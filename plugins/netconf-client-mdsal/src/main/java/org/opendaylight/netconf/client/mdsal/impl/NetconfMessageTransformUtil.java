@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -42,9 +41,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
-import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
-import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata;
-import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata.Builder;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -57,16 +53,19 @@ import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedMetadata;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.YangInstanceIdentifierWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedMetadata;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -318,14 +317,15 @@ public final class NetconfMessageTransformUtil {
                 // into xml
 
                 final var parentPath = dataPath.isEmpty() ? dataPath : dataPath.coerceParent();
-                var result = new NormalizedNodeResult();
+                var result = new NormalizationResultHolder();
                 try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(result)) {
                     try (var iidWriter = YangInstanceIdentifierWriter.open(streamWriter, ctx, parentPath);
                          var nnWriter = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
                         nnWriter.write(lastChildOverride.orElseThrow());
                     }
                 }
-                NormalizedDataUtil.writeNormalizedNode(result.getResult(), metadata, new DOMResult(element), ctx, null);
+                NormalizedDataUtil.writeNormalizedNode(result.getResult().data(), metadata, new DOMResult(element), ctx,
+                    null);
             } else {
                 NormalizedDataUtil.writeNormalizedNode(dataPath, metadata, new DOMResult(element), ctx, null);
             }
@@ -338,8 +338,8 @@ public final class NetconfMessageTransformUtil {
     }
 
     private static NormalizedMetadata leafMetadata(final YangInstanceIdentifier path, final EffectiveOperation oper) {
-        final List<PathArgument> args = path.getPathArguments();
-        final Deque<Builder> builders = new ArrayDeque<>(args.size());
+        final var args = path.getPathArguments();
+        final var builders = new ArrayDeque<ImmutableNormalizedMetadata.Builder>(args.size());
 
         // Step one: open builders
         for (PathArgument arg : args) {
@@ -351,8 +351,8 @@ public final class NetconfMessageTransformUtil {
 
         // Step three: build the tree
         while (true) {
-            final ImmutableNormalizedMetadata currentMeta = builders.pop().build();
-            final Builder parent = builders.peek();
+            final var currentMeta = builders.pop().build();
+            final var parent = builders.peek();
             if (parent != null) {
                 parent.withChild(currentMeta);
             } else {
@@ -427,7 +427,7 @@ public final class NetconfMessageTransformUtil {
         rpcNS.setAttribute(XmlNetconfConstants.MESSAGE_ID, counter.getNewMessageId(MESSAGE_ID_PREFIX));
 
         final Element actionNS = document.createElementNS(YangConstants.RFC6020_YANG_NAMESPACE_STRING, "action");
-        final DataSchemaContextNode<?> rootSchemaContextNode = dataSchemaContextTree.getRoot();
+        final DataSchemaContext rootSchemaContextNode = dataSchemaContextTree.getRoot();
         final Element actionData = prepareActionData(rootSchemaContextNode, actionNS,
                 domDataTreeIdentifier.getRootIdentifier().getPathArguments().iterator(), document);
 
@@ -439,15 +439,15 @@ public final class NetconfMessageTransformUtil {
         return new DOMResult(specificActionElement);
     }
 
-    private static Element prepareActionData(final DataSchemaContextNode<?> currentParentSchemaNode,
+    private static Element prepareActionData(final DataSchemaContext currentParentSchemaNode,
             final Element actionNS, final Iterator<PathArgument> iterator, final Document document) {
         if (iterator.hasNext()) {
             final PathArgument next = iterator.next();
 
-            final DataSchemaContextNode<?> current = currentParentSchemaNode.getChild(next);
+            final DataSchemaContext current = currentParentSchemaNode.getChild(next);
             Preconditions.checkArgument(current != null, "Invalid input: schema for argument %s not found", next);
 
-            if (current.isMixin()) {
+            if (current instanceof PathMixin) {
                 return prepareActionData(current, actionNS, iterator, document);
             }
 

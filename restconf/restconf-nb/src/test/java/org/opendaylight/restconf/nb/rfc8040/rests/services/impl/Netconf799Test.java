@@ -71,7 +71,7 @@ public class Netconf799Test {
             mock(RestconfStreamsSubscriptionService.class), actionService, new StreamsConfiguration(0, 1, 0, false));
 
         final var nodeAndStack = DataSchemaContextTree.from(contextRef).enterPath(ACTION_YII).orElseThrow();
-        final var node = nodeAndStack.node().getDataSchemaNode();
+        final var node = nodeAndStack.node().dataSchemaNode();
         assertThat(node, instanceOf(ActionNodeContainer.class));
         final var actionNode = ((ActionNodeContainer) node).findAction(RESET_QNAME).orElseThrow();
         final var stack = nodeAndStack.stack();
