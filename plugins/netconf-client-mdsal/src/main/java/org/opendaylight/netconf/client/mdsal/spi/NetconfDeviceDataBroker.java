@@ -26,7 +26,7 @@ import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsTransactionChain;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 
 public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
     private final NetconfDOMDataBrokerFieldsExtension fieldsExtension = new NetconfDOMDataBrokerFieldsExtensionImpl();

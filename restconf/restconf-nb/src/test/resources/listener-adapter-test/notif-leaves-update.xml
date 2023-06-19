@@ -20,18 +20,18 @@
             <operation>created</operation>
         </data-change-event>
         <data-change-event>
+            <path>/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:leaf1</path>
+            <data>
+                <leaf1 xmlns="augment:instance:identifier:patch:module">AugmentLeaf</leaf1>
+            </data>
+            <operation>updated</operation>
+        </data-change-event>
+        <data-change-event>
             <path>
                 /instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice1/augment-instance-identifier-patch-module:case-leaf1
             </path>
             <data>
                 <case-leaf1 xmlns="augment:instance:identifier:patch:module">ChoiceUpdate</case-leaf1>
-            </data>
-            <operation>updated</operation>
-        </data-change-event>
-        <data-change-event>
-            <path>/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:leaf1</path>
-            <data>
-                <leaf1 xmlns="augment:instance:identifier:patch:module">AugmentLeaf</leaf1>
             </data>
             <operation>updated</operation>
         </data-change-event>
