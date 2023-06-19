@@ -41,7 +41,7 @@ public abstract class InstanceIdentifierContext {
 
         @Override
         public YangInstanceIdentifier getInstanceIdentifier() {
-            return YangInstanceIdentifier.empty();
+            return YangInstanceIdentifier.of();
         }
 
         @Override
@@ -52,7 +52,7 @@ public abstract class InstanceIdentifierContext {
         @Override
         InstanceIdentifierContext createWithConcapt(final List<PathArgument> concatArgs) {
             return new DataPath(context, getMountPoint(), SchemaInferenceStack.of(context),
-                YangInstanceIdentifier.create(concatArgs));
+                YangInstanceIdentifier.of(concatArgs));
         }
     }
 
@@ -70,7 +70,7 @@ public abstract class InstanceIdentifierContext {
         static @NonNull DataPath of(final EffectiveModelContext context, final YangInstanceIdentifier path,
                 final DOMMountPoint mountPoint) {
             final var nodeAndStack = DataSchemaContextTree.from(context).enterPath(path).orElseThrow();
-            return new DataPath(nodeAndStack.node().getDataSchemaNode(), mountPoint, nodeAndStack.stack(), path);
+            return new DataPath(nodeAndStack.node().dataSchemaNode(), mountPoint, nodeAndStack.stack(), path);
         }
 
         @Override
@@ -86,7 +86,7 @@ public abstract class InstanceIdentifierContext {
         @Override
         @NonNull
         InstanceIdentifierContext createWithConcapt(final List<PathArgument> concatArgs) {
-            final var newInstanceIdentifier = YangInstanceIdentifier.create(
+            final var newInstanceIdentifier = YangInstanceIdentifier.of(
                 Iterables.concat(path.getPathArguments(), concatArgs));
             return new DataPath(getSchemaNode(), getMountPoint(), stack, newInstanceIdentifier);
         }

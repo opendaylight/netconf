@@ -16,7 +16,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -195,7 +194,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         final var yangTextSchemaFuture = schemaRepository.getSchemaSource(sourceId, YangTextSchemaSource.class);
         try {
             final var yangTextSchemaSource = yangTextSchemaFuture.get();
-            return yangTextSchemaSource.asCharSource(StandardCharsets.UTF_8).read();
+            return yangTextSchemaSource.read();
         } catch (ExecutionException e) {
             if (e.getCause() instanceof MissingSchemaSourceException) {
                 throw new NotFoundException("Schema source " + sourceId + " not found", e);
