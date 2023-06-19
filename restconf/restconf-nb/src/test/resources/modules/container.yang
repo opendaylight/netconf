@@ -1,31 +1,30 @@
 module base {
-namespace "ns";
-prefix "mod1";
-revision "2016-02-28";
+  namespace "ns";
+  prefix "mod1";
+  revision "2016-02-28";
 
-
-    container cont {
-        leaf exampleLeaf {
-            type string;
-            default "i am leaf";
-        }
-        list exampleList{
-              leaf leafInList{
-                type string;
-                default "I am leaf in list";
-              }
-              container containerBool{
-                  leaf leafBool{
-                     type boolean;
-                     default true;
-                  }
-              }
-              container containerInt{
-                  leaf leafInt{
-                     type int8;
-                     default 12;
-                  }
-              }
-        }
+  container cont {
+    leaf exampleLeaf {
+      type string;
+      default "i am leaf";
     }
+    list exampleList {
+      leaf leafInList {
+        type string;
+        default "I am leaf in list";
+      }
+      container containerBool {
+        leaf leafBool{
+          type boolean;
+          default true;
+        }
+      }
+      container containerInt {
+        leaf leafInt{
+          type int8;
+          default 12;
+        }
+      }
+    }
+  }
 }
