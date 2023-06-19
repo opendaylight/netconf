@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThrows;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import org.junit.Before;
@@ -39,7 +38,7 @@ public class LibrarySchemaYangSourceProviderTest {
     @Test
     public void testGetSource() throws Exception {
         var source = yangLibrarySchemaYangSourceProvider.getSource(workingSid);
-        final String x = source.get().asCharSource(StandardCharsets.UTF_8).read();
+        final String x = source.get().read();
         assertThat(x, containsString("module config-test-rpc"));
     }
 

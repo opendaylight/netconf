@@ -104,6 +104,6 @@ public final class NetconfNorthboundSshServer implements AutoCloseable {
 
     private static InetSocketAddress getInetAddress(final String bindingAddress, final int portNumber) {
         final var ipAddress = IetfInetUtil.ipAddressFor(bindingAddress);
-        return new InetSocketAddress(IetfInetUtil.INSTANCE.inetAddressFor(ipAddress), portNumber);
+        return new InetSocketAddress(IetfInetUtil.inetAddressFor(ipAddress), portNumber);
     }
 }
