@@ -70,7 +70,6 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
-import org.opendaylight.mdsal.binding.spec.reflect.BindingReflections;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
@@ -244,7 +243,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         resourceManager = new DefaultSchemaResourceManager(new DefaultYangParserFactory(), TEST_ROOT_DIRECTORY,
             TEST_DEFAULT_SUBDIR);
 
-        topModuleInfo = BindingReflections.getModuleInfo(Top.class);
+        topModuleInfo = BindingRuntimeHelpers.getYangModuleInfo(Top.class);
 
         deviceSchemaContext = BindingRuntimeHelpers.createEffectiveModel(Top.class);
 
@@ -685,10 +684,11 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         final var dataBrokerTest = new AbstractConcurrentDataBrokerTest(true) {
             @Override
             protected Set<YangModuleInfo> getModuleInfos() {
-                return Set.of(BindingReflections.getModuleInfo(NetconfNode.class),
-                        BindingReflections.getModuleInfo(NetworkTopology.class),
-                        BindingReflections.getModuleInfo(Keystore.class),
-                        topModuleInfo);
+                return Set.of(
+                    BindingRuntimeHelpers.getYangModuleInfo(NetconfNode.class),
+                    BindingRuntimeHelpers.getYangModuleInfo(NetworkTopology.class),
+                    BindingRuntimeHelpers.getYangModuleInfo(Keystore.class),
+                    topModuleInfo);
             }
         };
 

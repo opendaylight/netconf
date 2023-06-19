@@ -44,8 +44,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableItem;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -177,19 +178,16 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
      * @return     NodeId for the node
      */
     @VisibleForTesting
-    static NodeId getNodeId(final InstanceIdentifier.PathArgument pathArgument) {
-        if (pathArgument instanceof InstanceIdentifier.IdentifiableItem<?, ?>) {
-            final Identifier<?> key = ((InstanceIdentifier.IdentifiableItem<?, ?>) pathArgument).getKey();
-            if (key instanceof NodeKey) {
-                return ((NodeKey) key).getNodeId();
-            }
+    static NodeId getNodeId(final PathArgument pathArgument) {
+        if (pathArgument instanceof IdentifiableItem<?, ?> ident && ident.getKey() instanceof NodeKey nodeKey) {
+            return nodeKey.getNodeId();
         }
         throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);
     }
 
     @VisibleForTesting
     static KeyedInstanceIdentifier<Topology, TopologyKey> createTopologyListPath(final String topologyId) {
-        final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
-        return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+        return InstanceIdentifier.create(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
     }
 }

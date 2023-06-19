@@ -54,10 +54,9 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     final boolean serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
             final boolean skipData, final boolean changedLeafNodesOnly) throws T {
         final var node = switch (candidate.modificationType()) {
-            case SUBTREE_MODIFIED, APPEARED -> candidate.getDataAfter().orElseThrow();
-            case DELETE, DISAPPEARED -> candidate.getDataBefore().orElseThrow();
-            case WRITE -> changedLeafNodesOnly && isNotUpdate(candidate) ? null
-                : candidate.getDataAfter().orElseThrow();
+            case SUBTREE_MODIFIED, APPEARED -> candidate.getDataAfter();
+            case DELETE, DISAPPEARED -> candidate.getDataBefore();
+            case WRITE -> changedLeafNodesOnly && isNotUpdate(candidate) ? null : candidate.getDataAfter();
             case UNMODIFIED -> {
                 // no reason to do anything with an unmodified node
                 LOG.debug("DataTreeCandidate for a notification is unmodified, not serializing leaves. Candidate: {}",
@@ -130,11 +129,10 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         boolean skipData) throws T;
 
     private static boolean isNotUpdate(final DataTreeCandidateNode node) {
-        final var before = node.getDataBefore();
-        final var after = node.getDataAfter();
+        final var before = node.dataBefore();
+        final var after = node.dataAfter();
 
-        return before.isPresent() && after.isPresent()
-            && before.orElseThrow().body().equals(after.orElseThrow().body());
+        return before != null && after != null && before.body().equals(after.body());
     }
 
     abstract void serializePath(Collection<PathArgument> pathArguments) throws T;
@@ -170,7 +168,7 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     static final String modificationTypeToOperation(final DataTreeCandidateNode candidate,
             final ModificationType modificationType) {
         return switch (modificationType) {
-            case APPEARED, SUBTREE_MODIFIED, WRITE -> candidate.getDataBefore().isPresent() ? "updated" : "created";
+            case APPEARED, SUBTREE_MODIFIED, WRITE -> candidate.dataBefore() != null ? "updated" : "created";
             case DELETE, DISAPPEARED -> "deleted";
             case UNMODIFIED -> {
                 // shouldn't ever happen since the root of a modification is only triggered by some event

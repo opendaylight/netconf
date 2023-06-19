@@ -50,7 +50,7 @@ import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
-import org.opendaylight.mdsal.binding.spec.reflect.BindingReflections;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -107,7 +107,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         AbstractDataBrokerTest dataBrokerTest = new AbstractDataBrokerTest() {
             @Override
             protected Set<YangModuleInfo> getModuleInfos() throws Exception {
-                return Set.of(BindingReflections.getModuleInfo(NetworkTopology.class));
+                return Set.of(BindingRuntimeHelpers.getYangModuleInfo(NetworkTopology.class));
             }
         };
 
