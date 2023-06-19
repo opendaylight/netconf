@@ -17,10 +17,8 @@ import java.util.Map;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.concepts.Immutable;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContextFactory;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointIdentifier;
 import org.opendaylight.yangtools.rfc8528.model.api.SchemaMountConstants;
+import org.opendaylight.yangtools.yang.common.MountPointLabel;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -30,6 +28,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContextFactory;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.spi.AbstractEffectiveModelContextProvider;
@@ -57,10 +57,10 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
     private static final NodeIdentifier PARENT_REFERENCE = NodeIdentifier.create(
         QName.create(SchemaMountConstants.RFC8528_MODULE, "parent-reference").intern());
 
-    private final ImmutableMap<MountPointIdentifier, NetconfMountPointContextFactory> mountPoints;
+    private final ImmutableMap<MountPointLabel, NetconfMountPointContextFactory> mountPoints;
 
     private DeviceMountPointContext(final EffectiveModelContext schemaContext,
-            final Map<MountPointIdentifier, NetconfMountPointContextFactory> mountPoints) {
+            final Map<MountPointLabel, NetconfMountPointContextFactory> mountPoints) {
         super(schemaContext);
         this.mountPoints = ImmutableMap.copyOf(mountPoints);
     }
@@ -76,7 +76,7 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
         final DataContainerChild mountPoint = optMountPoint.orElseThrow();
         checkArgument(mountPoint instanceof MapNode, "mount-point list %s is not a MapNode", mountPoint);
 
-        final Map<MountPointIdentifier, NetconfMountPointContextFactory> mountPoints = new HashMap<>();
+        final Map<MountPointLabel, NetconfMountPointContextFactory> mountPoints = new HashMap<>();
         for (MapEntryNode entry : ((MapNode) mountPoint).body()) {
             final String moduleName = entry.findChildByArg(MODULE).map(mod -> {
                 checkArgument(mod instanceof LeafNode, "Unexpected module leaf %s", mod);
@@ -88,7 +88,7 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
             checkArgument(it.hasNext(), "Failed to find a module named %s", moduleName);
             final QNameModule module = it.next().getQNameModule();
 
-            final MountPointIdentifier mountId = MountPointIdentifier.of(QName.create(module,
+            final MountPointLabel mountId = new MountPointLabel(QName.create(module,
                 entry.findChildByArg(LABEL).map(lbl -> {
                     checkArgument(lbl instanceof LeafNode, "Unexpected label leaf %s", lbl);
                     final Object value = lbl.body();
@@ -114,7 +114,7 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
     }
 
     @Override
-    public Optional<MountPointContextFactory> findMountPoint(@NonNull final MountPointIdentifier label) {
+    public Optional<MountPointContextFactory> findMountPoint(@NonNull final MountPointLabel label) {
         return Optional.ofNullable(mountPoints.get(requireNonNull(label)));
     }
 }

@@ -29,6 +29,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -157,11 +159,11 @@ public final class YangInstanceIdentifierDeserializer {
         final var path = new ArrayList<PathArgument>();
         final SchemaNode node;
 
-        var parentNode = DataSchemaContextTree.from(schemaContext).getRoot();
+        DataSchemaContext parentNode = DataSchemaContextTree.from(schemaContext).getRoot();
         while (true) {
-            final var parentSchema = parentNode.getDataSchemaNode();
-            if (parentSchema instanceof ActionNodeContainer) {
-                final var optAction = ((ActionNodeContainer) parentSchema).findAction(qname);
+            final var parentSchema = parentNode.dataSchemaNode();
+            if (parentSchema instanceof ActionNodeContainer actionParent) {
+                final var optAction = actionParent.findAction(qname);
                 if (optAction.isPresent()) {
                     if (it.hasNext()) {
                         throw new RestconfDocumentedException("Request path resolves to action '" + qname + "' and "
@@ -182,35 +184,37 @@ public final class YangInstanceIdentifierDeserializer {
             }
 
             // Resolve the child step with respect to data schema tree
-            final var found = RestconfDocumentedException.throwIfNull(parentNode.enterChild(stack, qname),
-                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Schema for '%s' not found", qname);
+            final var found = RestconfDocumentedException.throwIfNull(
+                parentNode instanceof DataSchemaContext.Composite composite ? composite.enterChild(stack, qname) : null,
+                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Schema for '%s' not found", qname);
 
             // Now add all mixins encountered to the path
             var childNode = found;
-            while (childNode.isMixin()) {
-                path.add(childNode.getIdentifier());
-                childNode = verifyNotNull(childNode.enterChild(stack, qname),
+            while (childNode instanceof PathMixin currentMixin) {
+                path.add(currentMixin.mixinPathStep());
+                childNode = verifyNotNull(currentMixin.enterChild(stack, qname),
                     "Mixin %s is missing child for %s while resolving %s", childNode, qname, found);
             }
 
             final PathArgument pathArg;
-            if (step instanceof ListInstance) {
-                final var values = ((ListInstance) step).keyValues();
-                final var schema = childNode.getDataSchemaNode();
-                pathArg = schema instanceof ListSchemaNode
-                    ? prepareNodeWithPredicates(stack, qname, (ListSchemaNode) schema, values)
+            if (step instanceof ListInstance listStep) {
+                final var values = listStep.keyValues();
+                final var schema = childNode.dataSchemaNode();
+                pathArg = schema instanceof ListSchemaNode listSchema
+                    ? prepareNodeWithPredicates(stack, qname, listSchema, values)
                         : prepareNodeWithValue(stack, qname, schema, values);
             } else {
-                RestconfDocumentedException.throwIf(childNode.isKeyedEntry(),
+                RestconfDocumentedException.throwIf(childNode.dataSchemaNode() instanceof ListSchemaNode listChild
+                    && !listChild.getKeyDefinition().isEmpty(),
                     ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
                     "Entry '%s' requires key or value predicate to be present.", qname);
-                pathArg = childNode.getIdentifier();
+                pathArg = childNode.getPathStep();
             }
 
             path.add(pathArg);
 
             if (!it.hasNext()) {
-                node = childNode.getDataSchemaNode();
+                node = childNode.dataSchemaNode();
                 break;
             }
 

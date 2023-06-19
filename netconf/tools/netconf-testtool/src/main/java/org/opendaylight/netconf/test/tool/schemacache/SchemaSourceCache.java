@@ -98,8 +98,8 @@ public final class SchemaSourceCache<T extends SchemaSourceRepresentation> exten
     public synchronized ListenableFuture<? extends T> getSource(final SourceIdentifier sourceIdentifier) {
         final YangModuleInfo yangModuleInfo = cachedSchemas.get(sourceIdentifier);
         if (yangModuleInfo != null) {
-            final YangTextSchemaSource yangTextSchemaSource = YangTextSchemaSource.delegateForByteSource(
-                    sourceIdentifier, yangModuleInfo.getYangTextByteSource());
+            final YangTextSchemaSource yangTextSchemaSource = YangTextSchemaSource.delegateForCharSource(
+                    sourceIdentifier, yangModuleInfo.getYangTextCharSource());
             return Futures.immediateFuture(representation.cast(yangTextSchemaSource));
         }
 

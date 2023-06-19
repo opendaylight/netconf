@@ -21,7 +21,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -44,15 +44,15 @@ public abstract class AbstractFieldsTranslator<T> {
      */
     protected final @NonNull List<Set<T>> parseFields(final @NonNull InstanceIdentifierContext identifier,
                                                       final @NonNull FieldsParam input) {
-        final DataSchemaContextNode<?> startNode = DataSchemaContextNode.fromDataSchemaNode(
-                (DataSchemaNode) identifier.getSchemaNode());
-
-        if (startNode == null) {
+        final DataSchemaContext startNode;
+        try {
+            startNode = DataSchemaContext.of((DataSchemaNode) identifier.getSchemaNode());
+        } catch (IllegalStateException e) {
             throw new RestconfDocumentedException(
-                    "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+                    "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
         }
 
-        final List<Set<T>> parsed = new ArrayList<>();
+        final var parsed = new ArrayList<Set<T>>();
         processSelectors(parsed, identifier.getSchemaContext(), identifier.getSchemaNode().getQName().getModule(),
             startNode, input.nodeSelectors(), 0);
         return parsed;
@@ -66,11 +66,11 @@ public abstract class AbstractFieldsTranslator<T> {
      * @param level current nodes level
      * @return {@link DataSchemaContextNode}
      */
-    protected abstract @NonNull DataSchemaContextNode<?> addChildToResult(@NonNull DataSchemaContextNode<?> currentNode,
+    protected abstract @NonNull DataSchemaContext addChildToResult(@NonNull DataSchemaContext currentNode,
             @NonNull QName childQName, @NonNull Set<T> level);
 
     private void processSelectors(final List<Set<T>> parsed, final EffectiveModelContext context,
-                                  final QNameModule startNamespace, final DataSchemaContextNode<?> startNode,
+                                  final QNameModule startNamespace, final DataSchemaContext startNode,
                                   final List<NodeSelector> selectors, final int index) {
         final Set<T> startLevel;
         if (parsed.size() <= index) {

@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.ImmutableSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,7 +21,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -298,7 +296,6 @@ public class YangInstanceIdentifierSerializerTest {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(list)
                 .node(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), 100))
-                .node(new AugmentationIdentifier(ImmutableSet.of(child)))
                 .node(child)
                 .build();
 
@@ -323,7 +320,6 @@ public class YangInstanceIdentifierSerializerTest {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(list)
                 .node(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), 100))
-                .node(new AugmentationIdentifier(ImmutableSet.of(child)))
                 .node(child)
                 .build();
 
