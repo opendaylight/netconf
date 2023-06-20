@@ -575,7 +575,7 @@ public class DefinitionGenerator {
         property.put(DESCRIPTION_KEY, leafDescription);
 
         final String localName = leafNode.getQName().getLocalName();
-        setDefaultValue(property, String.format("<%s> ... </%s>", localName, localName));
+        setExampleValue(property, String.format("<%s> ... </%s>", localName, localName));
         property.put(TYPE_KEY, STRING_TYPE);
         property.set(XML_KEY, buildXmlParameter(leafNode));
         processMandatory(leafNode, name, required);
@@ -592,7 +592,7 @@ public class DefinitionGenerator {
         property.put(DESCRIPTION_KEY, leafDescription);
 
         final String localName = leafNode.getQName().getLocalName();
-        setDefaultValue(property, String.format("<%s> ... </%s>", localName, localName));
+        setExampleValue(property, String.format("<%s> ... </%s>", localName, localName));
         property.put(TYPE_KEY, STRING_TYPE);
         property.set(XML_KEY, buildXmlParameter(leafNode));
         processMandatory(leafNode, name, required);
@@ -631,7 +631,7 @@ public class DefinitionGenerator {
                 stack, definitions, definitionNames);
         } else if (leafTypeDef instanceof BooleanTypeDefinition) {
             jsonType = BOOLEAN_TYPE;
-            setDefaultValue(property, true);
+            setExampleValue(property, true);
         } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition) {
             jsonType = processNumberType((RangeRestrictedTypeDefinition<?, ?>) leafTypeDef, property);
         } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition) {
@@ -780,9 +780,9 @@ public class DefinitionGenerator {
             } catch (IllegalArgumentException ex) {
                 LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
             }
-            setDefaultValue(property, defaultValue);
+            setExampleValue(property, defaultValue);
         } else {
-            setDefaultValue(property, "Some " + nodeName);
+            setExampleValue(property, "Some " + nodeName);
         }
         return STRING_TYPE;
     }
@@ -797,7 +797,7 @@ public class DefinitionGenerator {
         }
 
         if (leafTypeDef instanceof DecimalTypeDefinition) {
-            maybeLower.ifPresent(number -> setDefaultValue(property, ((Decimal64) number).decimalValue()));
+            maybeLower.ifPresent(number -> setExampleValue(property, ((Decimal64) number).decimalValue()));
             return NUMBER_TYPE;
         }
         if (leafTypeDef instanceof Uint8TypeDefinition
@@ -807,15 +807,15 @@ public class DefinitionGenerator {
                 || leafTypeDef instanceof Int32TypeDefinition) {
 
             property.put(FORMAT_KEY, INT32_FORMAT);
-            maybeLower.ifPresent(number -> setDefaultValue(property, Integer.valueOf(number.toString())));
+            maybeLower.ifPresent(number -> setExampleValue(property, Integer.valueOf(number.toString())));
         } else if (leafTypeDef instanceof Uint32TypeDefinition
                 || leafTypeDef instanceof Int64TypeDefinition) {
 
             property.put(FORMAT_KEY, INT64_FORMAT);
-            maybeLower.ifPresent(number -> setDefaultValue(property, Long.valueOf(number.toString())));
+            maybeLower.ifPresent(number -> setExampleValue(property, Long.valueOf(number.toString())));
         } else {
             //uint64
-            setDefaultValue(property, 0);
+            setExampleValue(property, 0);
         }
         return INTEGER_TYPE;
     }
@@ -837,7 +837,7 @@ public class DefinitionGenerator {
             final var container = module.orElseThrow().getChildNodes().stream()
                     .filter(n -> n instanceof ContainerSchemaNode)
                     .findFirst();
-            container.ifPresent(c -> setDefaultValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
+            container.ifPresent(c -> setExampleValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
                     c.getQName().getLocalName())));
         }
 
@@ -911,11 +911,23 @@ public class DefinitionGenerator {
         property.put(EXAMPLE_KEY, value);
     }
 
-    private static void setDefaultValue(final ObjectNode property, final String value) {
-        property.put(DEFAULT_KEY, value);
+    private static void setExampleValue(final ObjectNode property, final Integer value) {
+        property.put(EXAMPLE_KEY, value);
     }
 
-    private static void setDefaultValue(final ObjectNode property, final Integer value) {
+    private static void setExampleValue(final ObjectNode property, final Long value) {
+        property.put(EXAMPLE_KEY, value);
+    }
+
+    private static void setExampleValue(final ObjectNode property, final BigDecimal value) {
+        property.put(EXAMPLE_KEY, value);
+    }
+
+    private static void setExampleValue(final ObjectNode property, final Boolean value) {
+        property.put(EXAMPLE_KEY, value);
+    }
+
+    private static void setDefaultValue(final ObjectNode property, final String value) {
         property.put(DEFAULT_KEY, value);
     }
 
