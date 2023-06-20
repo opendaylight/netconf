@@ -54,6 +54,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c55c232b_c9ce6d37",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-06-20T18:37:53Z",
+      "side": 1,
+      "message": "This split logic is redundant",
+      "parentUuid": "be8195ea_74fc08df",
+      "revId": "f2fd052e2d403c16a9e4d2fd322bc5b2f73fd929",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbe8b6f7_9e3e540f",
