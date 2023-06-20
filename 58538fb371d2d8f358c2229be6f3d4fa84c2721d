@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aee861a6_71bc421d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-20T23:54:36Z",
+      "side": 1,
+      "message": "I also do not like the special case. I suspect we should initialize inference from the Collection\u003cPathArgument\u003e, which would do the trick, I think.",
+      "revId": "58538fb371d2d8f358c2229be6f3d4fa84c2721d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
