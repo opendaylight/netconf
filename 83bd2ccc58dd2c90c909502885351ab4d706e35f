@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c5336a4_0501d7f0",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-20T06:33:17Z",
+      "side": 1,
+      "message": "If its used only once - then not.",
+      "parentUuid": "e506375b_9b1c8237",
+      "range": {
+        "startLine": 395,
+        "startChar": 21,
+        "endLine": 395,
+        "endChar": 68
+      },
+      "revId": "83bd2ccc58dd2c90c909502885351ab4d706e35f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eda7f051_92f09c65",
         "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
         "patchSetId": 6
@@ -72,6 +96,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f4ce2d9d_c943fafe",
+        "filename": "restconf/restconf-openapi/src/test/resources/NETCONF-1036/augmentation.yang",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-20T06:33:17Z",
+      "side": 1,
+      "message": "IDK IMO we have 4 in other YANG files, please check.",
+      "parentUuid": "1f95e6ae_657b7f41",
+      "range": {
+        "startLine": 6,
+        "startChar": 4,
+        "endLine": 6,
+        "endChar": 5
+      },
+      "revId": "83bd2ccc58dd2c90c909502885351ab4d706e35f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "33910905_8ada1564",
         "filename": "restconf/restconf-openapi/src/test/resources/NETCONF-1036/module.yang",
         "patchSetId": 6
@@ -83,6 +131,30 @@
       "writtenOn": "2023-06-19T16:35:07Z",
       "side": 1,
       "message": "2 spaces",
+      "range": {
+        "startLine": 6,
+        "startChar": 4,
+        "endLine": 6,
+        "endChar": 8
+      },
+      "revId": "83bd2ccc58dd2c90c909502885351ab4d706e35f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3473549_8bbb8816",
+        "filename": "restconf/restconf-openapi/src/test/resources/NETCONF-1036/module.yang",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-20T06:33:17Z",
+      "side": 1,
+      "message": "IDK IMO we have 4 in other YANG files, please check.",
+      "parentUuid": "33910905_8ada1564",
       "range": {
         "startLine": 6,
         "startChar": 4,
