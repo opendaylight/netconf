@@ -16,6 +16,24 @@
       "message": "Please examine if we can use/adapt/add into RestDocgenUtil methods?\nIN general, we should know QName(s) of both parent and child we are processing.",
       "revId": "d66f4a1d1d7b23fdad0f8e696ee26aa169988c9b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "476e8b9d_25fbe043",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-20T10:58:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e26b4a7_59cd0058",
+      "revId": "d66f4a1d1d7b23fdad0f8e696ee26aa169988c9b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
