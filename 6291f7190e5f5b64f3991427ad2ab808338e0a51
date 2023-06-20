@@ -16,6 +16,24 @@
       "message": "These example values are not correct: STRING_TYPE, BOOLEAN_TYPE, etc.\n\nSearch across the code to see what is used in other places.",
       "revId": "6291f7190e5f5b64f3991427ad2ab808338e0a51",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c600a1d0_87f4c8e6",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 852,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-06-20T08:15:35Z",
+      "side": 1,
+      "message": "I have added different examples, should be resolved",
+      "parentUuid": "682983c2_e3c2af93",
+      "revId": "6291f7190e5f5b64f3991427ad2ab808338e0a51",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
