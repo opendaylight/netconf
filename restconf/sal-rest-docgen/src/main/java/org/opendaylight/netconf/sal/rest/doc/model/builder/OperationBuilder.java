@@ -105,7 +105,8 @@ public final class OperationBuilder {
 
     public static ObjectNode buildGet(final DataSchemaNode node, final String moduleName,
                                       final Optional<String> deviceName, final ArrayNode pathParams,
-                                      final String defName, final boolean isConfig, final OAversion oaversion) {
+                                      final String defName, final String defNameTop, final boolean isConfig,
+                                      final OAversion oaversion) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
@@ -119,9 +120,11 @@ public final class OperationBuilder {
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
-        schema.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
+        final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
+        schema.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defNameTop);
+        xmlSchema.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
-                buildResponse(Response.Status.OK.getReasonPhrase(), Optional.of(schema), oaversion));
+            buildResponse(Response.Status.OK.getReasonPhrase(), schema, xmlSchema, oaversion));
 
         value.set(RESPONSES_KEY, responses);
         return value;
@@ -294,6 +297,28 @@ public final class OperationBuilder {
         final ObjectNode mimeTypeValue = JsonNodeFactory.instance.objectNode();
         mimeTypeValue.set(SCHEMA_KEY, buildRefSchema(defName, OAversion.V3_0));
         return mimeTypeValue;
+    }
+
+    public static ObjectNode buildResponse(final String description, final ObjectNode schema,
+            final ObjectNode xmlSchema, final OAversion oaversion) {
+        final ObjectNode response = JsonNodeFactory.instance.objectNode();
+
+        if (oaversion.equals(OAversion.V3_0)) {
+            final ObjectNode content = JsonNodeFactory.instance.objectNode();
+            final ObjectNode body = JsonNodeFactory.instance.objectNode();
+            final ObjectNode xmlBody = JsonNodeFactory.instance.objectNode();
+
+            body.set(SCHEMA_KEY, schema);
+            xmlBody.set(SCHEMA_KEY, xmlSchema);
+            content.set(MediaType.APPLICATION_JSON, body);
+            content.set(MediaType.APPLICATION_XML, xmlBody);
+
+            response.set(CONTENT_KEY, content);
+        } else {
+            response.set(SCHEMA_KEY, schema);
+        }
+        response.put(DESCRIPTION_KEY, description);
+        return response;
     }
 
     public static ObjectNode buildResponse(final String description, final Optional<ObjectNode> schema,

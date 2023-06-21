@@ -499,8 +499,10 @@ public abstract class BaseYangSwaggerGenerator {
 
         final String nodeName = node.getQName().getLocalName();
 
-        final String defName = parentName + "_" + nodeName + TOP + discriminator;
-        final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig, oaversion);
+        final String defName = parentName + "_" + nodeName + discriminator;
+        final String defNameTop = parentName + "_" + nodeName + TOP + discriminator;
+        final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, defNameTop,
+            isConfig, oaversion);
         operations.put("get", get);
 
 
