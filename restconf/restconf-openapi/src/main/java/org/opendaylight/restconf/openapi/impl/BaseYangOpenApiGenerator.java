@@ -28,6 +28,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -378,6 +379,10 @@ public abstract class BaseYangOpenApiGenerator {
     private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams, final String localName) {
         final StringBuilder path = new StringBuilder();
         path.append(localName);
+        Set<String> parameters = new HashSet<>();
+        for (final JsonNode pathParam : pathParams) {
+            parameters.add(pathParam.get("name").asText());
+        }
 
         if (schemaNode instanceof ListSchemaNode) {
             String prefix = "=";
@@ -385,18 +390,13 @@ public abstract class BaseYangOpenApiGenerator {
             for (final QName listKey : ((ListSchemaNode) schemaNode).getKeyDefinition()) {
                 final String keyName = listKey.getLocalName();
                 String paramName = keyName;
-                for (final JsonNode pathParam : pathParams) {
-                    if (paramName.equals(pathParam.get("name").asText())) {
-                        paramName = keyName + discriminator;
+                if (parameters.contains(paramName)) {
+                    while (parameters.contains(paramName + discriminator)) {
                         discriminator++;
-                        for (final JsonNode pathParameter : pathParams) {
-                            if (paramName.equals(pathParameter.get("name").asText())) {
-                                paramName = keyName + discriminator;
-                                discriminator++;
-                            }
-                        }
                     }
+                    paramName = paramName + discriminator;
                 }
+                parameters.add(paramName);
 
                 final String pathParamIdentifier = prefix + "{" + paramName + "}";
                 prefix = ",";
