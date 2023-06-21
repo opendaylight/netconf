@@ -25,7 +25,9 @@ import org.opendaylight.yangtools.concepts.Immutable;
 public sealed interface RestconfQueryParam<T extends RestconfQueryParam<T>> extends Immutable
         permits ContentParam, DepthParam, FieldsParam, FilterParam, InsertParam, PointParam, WithDefaultsParam,
                 AbstractReplayParam,
-                ChangedLeafNodesOnlyParam, LeafNodesOnlyParam, PrettyPrintParam, SkipNotificationDataParam {
+                // ODL extensions
+                ChangedLeafNodesOnlyParam, LeafNodesOnlyParam, PrettyPrintParam, SkipNotificationDataParam,
+                ChildNodesOnlyParam {
     /**
      * Return the Java representation class.
      *

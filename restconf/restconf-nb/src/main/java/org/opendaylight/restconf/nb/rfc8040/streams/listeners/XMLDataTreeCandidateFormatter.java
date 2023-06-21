@@ -46,8 +46,8 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
     @Override
     String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
-                      final Instant now, final boolean leafNodesOnly, final boolean skipData,
-                      final boolean changedLeafNodesOnly) throws Exception {
+            final Instant now, final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly,
+            final boolean childNodeOnly) throws Exception {
         final var writer = new StringWriter();
         boolean nonEmpty = false;
         try {
@@ -58,7 +58,8 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
             final var serializer = new XmlDataTreeCandidateSerializer(schemaContext, xmlStreamWriter);
             for (var candidate : input) {
-                nonEmpty |= serializer.serialize(candidate, leafNodesOnly, skipData, changedLeafNodesOnly);
+                nonEmpty |= serializer.serialize(candidate, leafNodesOnly, skipData, changedLeafNodesOnly,
+                    childNodeOnly);
             }
 
             // data-changed-notification
