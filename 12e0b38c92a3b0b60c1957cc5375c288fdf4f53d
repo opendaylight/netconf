@@ -16,6 +16,24 @@
       "message": "Can be in one line.",
       "revId": "12e0b38c92a3b0b60c1957cc5375c288fdf4f53d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a89d88d_3b5ddf53",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 814,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-06-21T08:14:02Z",
+      "side": 1,
+      "message": "Resolved",
+      "parentUuid": "5c45aa14_5aed1ebb",
+      "revId": "12e0b38c92a3b0b60c1957cc5375c288fdf4f53d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
