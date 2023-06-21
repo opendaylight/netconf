@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00923719_83116849",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-21T01:27:47Z",
+      "side": 1,
+      "message": "Needs a manual rebase on top of 1e644786035c36520da0e3edd4813bf62f770a02",
+      "revId": "d8750b41ee7709e3247de062f71a45c4f5c142f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
