@@ -14,6 +14,7 @@ import com.google.common.base.MoreObjects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
+import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.FilterParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
@@ -27,6 +28,7 @@ import org.opendaylight.yangtools.concepts.Immutable;
 public final class NotificationQueryParams implements Immutable {
     private final SkipNotificationDataParam skipNotificationData;
     private final LeafNodesOnlyParam leafNodesOnly;
+    private final ChildNodesOnlyParam childNodesOnly;
     private final StartTimeParam startTime;
     private final StopTimeParam stopTime;
     private final FilterParam filter;
@@ -34,26 +36,31 @@ public final class NotificationQueryParams implements Immutable {
 
     private NotificationQueryParams(final StartTimeParam startTime, final StopTimeParam stopTime,
             final FilterParam filter, final LeafNodesOnlyParam leafNodesOnly,
+            final ChildNodesOnlyParam childNodesOnly,
             final SkipNotificationDataParam skipNotificationData,
             final ChangedLeafNodesOnlyParam changedLeafNodesOnly) {
         this.startTime = startTime;
         this.stopTime = stopTime;
         this.filter = filter;
         this.leafNodesOnly = leafNodesOnly;
+        this.childNodesOnly = childNodesOnly;
         this.skipNotificationData = skipNotificationData;
         this.changedLeafNodesOnly = changedLeafNodesOnly;
     }
 
     public static @NonNull NotificationQueryParams of(final StartTimeParam startTime, final StopTimeParam stopTime,
             final FilterParam filter, final LeafNodesOnlyParam leafNodesOnly,
+            final ChildNodesOnlyParam childNodesOnly,
             final SkipNotificationDataParam skipNotificationData,
             final ChangedLeafNodesOnlyParam changedLeafNodesOnly) {
         checkArgument(stopTime == null || startTime != null,
             "Stop-time parameter has to be used with start-time parameter.");
-        checkArgument(changedLeafNodesOnly == null || leafNodesOnly == null,
-            "ChangedLeafNodesOnly parameter cannot be used with leafNodesOnlyParameter.");
-        return new NotificationQueryParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
-                changedLeafNodesOnly);
+        checkArgument(leafNodesOnly == null || childNodesOnly == null,
+                "LeafNodesOnly parameter cannot be used with childNodesOnlyParameters.");
+        checkArgument(changedLeafNodesOnly == null || leafNodesOnly == null || childNodesOnly == null,
+            "ChangedLeafNodesOnly parameter cannot be used with leafNodesOnlyParameter or childNodesOnlyParameters.");
+        return new NotificationQueryParams(startTime, stopTime, filter, leafNodesOnly, childNodesOnly,
+                skipNotificationData, changedLeafNodesOnly);
     }
 
     /**
@@ -93,6 +100,15 @@ public final class NotificationQueryParams implements Immutable {
     }
 
     /**
+     * Get odl-child-nodes-only query parameter.
+     *
+     * @return odl-child-nodes-only
+     */
+    public @Nullable ChildNodesOnlyParam childNodesOnly() {
+        return childNodesOnly;
+    }
+
+    /**
      * Get odl-skip-notification-data query parameter.
      *
      * @return odl-skip-notification-data
@@ -124,6 +140,9 @@ public final class NotificationQueryParams implements Immutable {
         }
         if (leafNodesOnly != null) {
             helper.add("leafNodesOnly", leafNodesOnly.value());
+        }
+        if (childNodesOnly != null) {
+            helper.add("childNodesOnly", childNodesOnly.value());
         }
         if (skipNotificationData != null) {
             helper.add("skipNotificationData", skipNotificationData.value());

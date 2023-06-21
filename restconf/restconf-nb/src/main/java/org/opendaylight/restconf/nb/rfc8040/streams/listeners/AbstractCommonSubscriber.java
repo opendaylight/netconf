@@ -65,6 +65,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
     private Instant start = null;
     private Instant stop = null;
     private boolean leafNodesOnly = false;
+    private boolean childNodesOnly = false;
     private boolean skipNotificationData = false;
     private boolean changedLeafNodesOnly = false;
     private EventFormatter<T> formatter;
@@ -146,6 +147,9 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
         final var leafNodes = params.leafNodesOnly();
         leafNodesOnly = leafNodes != null && leafNodes.value();
 
+        final var childNodes = params.childNodesOnly();
+        childNodesOnly = childNodes != null && childNodes.value();
+
         final var skipData = params.skipNotificationData();
         skipNotificationData = skipData != null && skipData.value();
 
@@ -172,6 +176,15 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
      */
     final boolean getLeafNodesOnly() {
         return leafNodesOnly;
+    }
+
+    /**
+     * Check whether this query should only notify about child node changes.
+     *
+     * @return true if this query should only notify about child node changes
+     */
+    final boolean getChildNodesOnly() {
+        return childNodesOnly;
     }
 
     /**
