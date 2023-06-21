@@ -28,6 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.api.query.AbstractReplayParam;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
+import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FilterParam;
@@ -188,6 +189,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
                     .withChildValue(WithDefaultsParam.capabilityUri().toString())
                     .withChildValue(PrettyPrintParam.capabilityUri().toString())
                     .withChildValue(LeafNodesOnlyParam.capabilityUri().toString())
+                    .withChildValue(ChildNodesOnlyParam.capabilityUri().toString())
                     .withChildValue(SkipNotificationDataParam.capabilityUri().toString())
                     .withChildValue(ChangedLeafNodesOnlyParam.capabilityUri().toString())
                     .build())

@@ -41,11 +41,18 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     }
 
     public final boolean serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly,
-            final boolean skipData, final boolean changedLeafNodesOnly) throws T {
+            final boolean childNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly) throws T {
+
+        final var path = new ArrayDeque<PathArgument>();
+        path.addAll(candidate.getRootPath().getPathArguments());
+
         if (leafNodesOnly || changedLeafNodesOnly) {
-            final var path = new ArrayDeque<PathArgument>();
-            path.addAll(candidate.getRootPath().getPathArguments());
             return serializeLeafNodesOnly(path, candidate.getRootNode(), skipData, changedLeafNodesOnly);
+        }
+
+        if (childNodesOnly) {
+            serializeChildNodesOnly(path, candidate.getRootNode(), skipData);
+            return true;
         }
 
         serializeData(candidate.getRootPath().getPathArguments(), candidate.getRootNode(), skipData);
@@ -82,6 +89,23 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
             path.removeLast();
         }
         return ret;
+    }
+
+    private void serializeChildNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode current,
+            final boolean skipData) throws T {
+
+        // Check if the modification concern a Subtree or not
+        if (current.getModificationType() == ModificationType.SUBTREE_MODIFIED) {
+            for (var child : current.getChildNodes()) {
+                path.add(child.getIdentifier());
+                serializeChildNodesOnly(path, child, skipData);
+                path.removeLast();
+            }
+            return;
+        }
+
+        // Got a Children Modification, serialize it
+        serializeData(path, current, skipData);
     }
 
     private void serializeData(final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate,
