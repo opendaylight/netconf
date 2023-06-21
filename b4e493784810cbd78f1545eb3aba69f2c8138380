@@ -16,6 +16,40 @@
       "message": "Just tested this PR. I confirmed that JIRA NETCONF-1051 is resolved on my testbed.\n\nThanks a lot\n\nOlivier",
       "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f54cc1b7_c3d109eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-21T11:13:37Z",
+      "side": 1,
+      "message": "Can you please check tests at https://github.com/search?q\u003drepo%3Aopendaylight%2Fnetconf%20notifi_list_Test\u0026type\u003dcode?\n\nI wonder why existing tests did not catch the issue, maybe this patch deserves one more additional.",
+      "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8026b5ec_7b376719",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-21T11:13:37Z",
+      "side": 1,
+      "message": "Have you tries to subscribe to unkeyed lists, too?\nIt means here we get UnkeyedListEntryNode.",
+      "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
