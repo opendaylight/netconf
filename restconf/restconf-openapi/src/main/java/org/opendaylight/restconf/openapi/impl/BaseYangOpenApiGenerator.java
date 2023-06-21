@@ -353,8 +353,9 @@ public abstract class BaseYangOpenApiGenerator {
         final String discriminator = definitionNames.getDiscriminator(node);
         final String nodeName = node.getQName().getLocalName();
 
-        final String defName = parentName + "_" + nodeName + TOP + discriminator;
-        final Operation get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig);
+        final String defName = parentName + "_" + nodeName + discriminator;
+        final String defNameTop = parentName + "_" + nodeName + TOP + discriminator;
+        final Operation get = buildGet(node, moduleName, deviceName, pathParams, defName, defNameTop, isConfig);
         operationsBuilder.get(get);
 
         if (isConfig) {
