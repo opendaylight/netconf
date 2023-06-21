@@ -16,6 +16,24 @@
       "message": "Default value is: ((InstanceIdentifierTypeDefinition) leafTypeDef).getDefaultValue().",
       "revId": "80efa8ab0b57d79dacafd48fa396c24be54508fd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f095b28_58979c93",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 840,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-06-21T08:14:32Z",
+      "side": 1,
+      "message": "Resolved",
+      "parentUuid": "1a65349c_1c5bc8fb",
+      "revId": "80efa8ab0b57d79dacafd48fa396c24be54508fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
