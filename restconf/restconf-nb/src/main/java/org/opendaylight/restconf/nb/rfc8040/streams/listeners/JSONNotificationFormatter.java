@@ -51,7 +51,8 @@ final class JSONNotificationFormatter extends NotificationFormatter {
 
     @Override
     String createText(final EffectiveModelContext schemaContext, final DOMNotification input, final Instant now,
-                      final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly)
+                      final boolean leafNodesOnly, final boolean childNodesOnly, final boolean skipData,
+                      final boolean changedLeafNodesOnly)
             throws IOException {
         final Writer writer = new StringWriter();
         final JsonWriter jsonWriter = new JsonWriter(writer).beginObject();
