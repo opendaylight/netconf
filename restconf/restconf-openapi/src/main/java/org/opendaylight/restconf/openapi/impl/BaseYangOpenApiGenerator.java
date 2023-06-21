@@ -18,7 +18,6 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.b
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.getTypeParentNode;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -37,6 +36,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -380,6 +381,9 @@ public abstract class BaseYangOpenApiGenerator {
     private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams, final String localName) {
         final StringBuilder path = new StringBuilder();
         path.append(localName);
+        final Set<String> parameters = StreamSupport.stream(pathParams.spliterator(), false)
+            .map(t -> t.get("name").asText())
+            .collect(Collectors.toSet());
 
         if (schemaNode instanceof ListSchemaNode) {
             String prefix = "=";
@@ -387,18 +391,11 @@ public abstract class BaseYangOpenApiGenerator {
             for (final QName listKey : ((ListSchemaNode) schemaNode).getKeyDefinition()) {
                 final String keyName = listKey.getLocalName();
                 String paramName = keyName;
-                for (final JsonNode pathParam : pathParams) {
-                    if (paramName.equals(pathParam.get("name").asText())) {
-                        paramName = keyName + discriminator;
-                        discriminator++;
-                        for (final JsonNode pathParameter : pathParams) {
-                            if (paramName.equals(pathParameter.get("name").asText())) {
-                                paramName = keyName + discriminator;
-                                discriminator++;
-                            }
-                        }
-                    }
+                while (parameters.contains(paramName)) {
+                    paramName = keyName + discriminator;
+                    discriminator++;
                 }
+                parameters.add(paramName);
 
                 final String pathParamIdentifier = prefix + "{" + paramName + "}";
                 prefix = ",";
