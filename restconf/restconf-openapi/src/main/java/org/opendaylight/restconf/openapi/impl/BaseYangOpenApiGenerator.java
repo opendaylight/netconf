@@ -316,7 +316,7 @@ public abstract class BaseYangOpenApiGenerator {
 
         if (node instanceof ActionNodeContainer) {
             ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
-                final String resolvedPath = "rests/operations" + resourcePath.substring(11)
+                final String resolvedPath = "/rests/operations" + resourcePath.substring(11)
                         + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
                 addOperations(actionDef, moduleName, deviceName, paths, parentName, definitionNames, resolvedPath);
             });
