@@ -458,4 +458,22 @@ public final class OpenApiGeneratorRFC8040Test {
             .collect(Collectors.toSet());
         assertEquals(expected, actualContainerArray);
     }
+
+    /**
+     * Test that request parameters for nested lists are correctly numbered.
+     *
+     * <p>
+     * It means we should have name and name1, etc. when we have the same parameter in path multiple times.
+     */
+    @Test
+    public void testKeysMapping() {
+        final var module = context.findModule("keys-mapping").orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+
+        var pathToList1 = "/rests/data/keys-mapping:multiple-key-list={name},{name2}/multiple-key-list2={name1},"
+            + "{name3}/multiple-key-list3={name31},{name4}/multiple-key-list4={name5}";
+        assertTrue(doc.paths().containsKey(pathToList1));
+        assertEquals(List.of("name","name2", "name1", "name3", "name31", "name4", "name5"),
+            getPathParameters(doc.paths(), pathToList1));
+    }
 }

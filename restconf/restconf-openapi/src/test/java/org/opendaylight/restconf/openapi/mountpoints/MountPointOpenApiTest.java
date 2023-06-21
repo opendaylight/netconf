@@ -124,7 +124,7 @@ public final class MountPointOpenApiTest {
         final Map<String, Path> paths = mountPointApi.paths();
         assertNotNull(paths);
 
-        assertEquals("Unexpected api list size", 45, paths.size());
+        assertEquals("Unexpected api list size", 49, paths.size());
 
         final List<Operation> getOperations = new ArrayList<>();
         final List<Operation> postOperations = new ArrayList<>();
@@ -140,11 +140,11 @@ public final class MountPointOpenApiTest {
             Optional.ofNullable(path.getValue().delete()).ifPresent(deleteOperations::add);
         }
 
-        assertEquals("Unexpected GET paths size", 37, getOperations.size());
-        assertEquals("Unexpected POST paths size", 43, postOperations.size());
-        assertEquals("Unexpected PUT paths size", 35, putOperations.size());
-        assertEquals("Unexpected PATCH paths size", 35, patchOperations.size());
-        assertEquals("Unexpected DELETE paths size", 35, deleteOperations.size());
+        assertEquals("Unexpected GET paths size", 41, getOperations.size());
+        assertEquals("Unexpected POST paths size", 47, postOperations.size());
+        assertEquals("Unexpected PUT paths size", 39, putOperations.size());
+        assertEquals("Unexpected PATCH paths size", 39, patchOperations.size());
+        assertEquals("Unexpected DELETE paths size", 39, deleteOperations.size());
     }
 
     /**
@@ -228,5 +228,26 @@ public final class MountPointOpenApiTest {
         var pathToList5 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
         assertTrue(mountPointApi.paths().containsKey(pathToList5));
         assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList5));
+    }
+
+    /**
+     * Test that request parameters for nested lists are correctly numbered.
+     *
+     * <p>
+     * It means we should have name and name1, etc. when we have the same parameter in path multiple times.
+     */
+    @Test
+    public void testKeysMappingForMountPointApi() throws Exception {
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+
+        var path = "/rests/data/nodes/node=123/yang-ext:mount/keys-mapping:multiple-key-list={name},{name2}"
+            + "/multiple-key-list2={name1},{name3}/multiple-key-list3={name31},{name4}/multiple-key-list4={name5}";
+        assertTrue(mountPointApi.paths().containsKey(path));
+        assertEquals(List.of("name","name2", "name1", "name3", "name31", "name4", "name5"),
+            getPathParameters(mountPointApi.paths(), path));
     }
 }

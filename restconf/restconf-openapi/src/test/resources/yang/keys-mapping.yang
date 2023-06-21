@@ -1,0 +1,38 @@
+module keys-mapping {
+namespace "mapping";
+prefix keys-mappin;
+
+  list multiple-key-list {
+    key "name name2";
+    leaf name {
+      type string;
+    }
+    leaf name2 {
+      type string;
+    }
+    list multiple-key-list2 {
+      key "name name3";
+      leaf name {
+        type string;
+      }
+      leaf name3 {
+        type string;
+      }
+      list multiple-key-list3 {
+        key "name3 name";
+        leaf name3 {
+          type string;
+        }
+        leaf name {
+          type string;
+        }
+        list multiple-key-list4 {
+          key name;
+          leaf name {
+            type string;
+          }
+        }
+      }
+    }
+  }
+}
