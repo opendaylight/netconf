@@ -16,6 +16,24 @@
       "message": "It would be nice to see some tests also for default values.",
       "revId": "8aea67594a35d8293853ee2dd668991f6696cd07",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07db8320_aa39f8a1",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-06-21T08:13:02Z",
+      "side": 1,
+      "message": "Added in \n https://git.opendaylight.org/gerrit/c/netconf/+/106131/15",
+      "parentUuid": "8e467eea_659c6f56",
+      "revId": "8aea67594a35d8293853ee2dd668991f6696cd07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
