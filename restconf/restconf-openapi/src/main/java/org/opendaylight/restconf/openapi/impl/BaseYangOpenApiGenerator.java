@@ -36,6 +36,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -384,6 +386,9 @@ public abstract class BaseYangOpenApiGenerator {
             final String localName) {
         final StringBuilder path = new StringBuilder();
         path.append(localName);
+        final Set<String> parameters = pathParams.stream()
+            .map(Parameter::name)
+            .collect(Collectors.toSet());
 
         if (schemaNode instanceof ListSchemaNode) {
             String prefix = "=";
@@ -391,18 +396,11 @@ public abstract class BaseYangOpenApiGenerator {
             for (final QName listKey : ((ListSchemaNode) schemaNode).getKeyDefinition()) {
                 final String keyName = listKey.getLocalName();
                 String paramName = keyName;
-                for (final Parameter pathParam : pathParams) {
-                    if (paramName.equals(pathParam.name())) {
-                        paramName = keyName + discriminator;
-                        discriminator++;
-                        for (final Parameter pathParameter : pathParams) {
-                            if (paramName.equals(pathParameter.name())) {
-                                paramName = keyName + discriminator;
-                                discriminator++;
-                            }
-                        }
-                    }
+                while (parameters.contains(paramName)) {
+                    paramName = keyName + discriminator;
+                    discriminator++;
                 }
+                parameters.add(paramName);
 
                 final String pathParamIdentifier = prefix + "{" + paramName + "}";
                 prefix = ",";
