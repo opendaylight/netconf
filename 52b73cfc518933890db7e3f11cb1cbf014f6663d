@@ -22,6 +22,30 @@
       },
       "revId": "52b73cfc518933890db7e3f11cb1cbf014f6663d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7966b94_6bb05e93",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-06-21T00:47:37Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "04e854e2_370aa262",
+      "range": {
+        "startLine": 117,
+        "startChar": 11,
+        "endLine": 117,
+        "endChar": 16
+      },
+      "revId": "52b73cfc518933890db7e3f11cb1cbf014f6663d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
