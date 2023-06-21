@@ -19,6 +19,7 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
+import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
@@ -53,7 +54,8 @@ public final class QueryParams {
         InsertParam.uriName, PointParam.uriName,
         // Notifications
         FilterParam.uriName, StartTimeParam.uriName, StopTimeParam.uriName,
-        LeafNodesOnlyParam.uriName, SkipNotificationDataParam.uriName, ChangedLeafNodesOnlyParam.uriName);
+        LeafNodesOnlyParam.uriName, ChildNodesOnlyParam.uriName,
+        SkipNotificationDataParam.uriName, ChangedLeafNodesOnlyParam.uriName);
 
     private QueryParams() {
         // Utility class
@@ -64,6 +66,7 @@ public final class QueryParams {
         StopTimeParam stopTime = null;
         FilterParam filter = null;
         LeafNodesOnlyParam leafNodesOnly = null;
+        ChildNodesOnlyParam childNodesOnly = null;
         SkipNotificationDataParam skipNotificationData = null;
         ChangedLeafNodesOnlyParam changedLeafNodesOnly = null;
 
@@ -85,6 +88,9 @@ public final class QueryParams {
                     case LeafNodesOnlyParam.uriName:
                         leafNodesOnly = optionalParam(LeafNodesOnlyParam::forUriValue, paramName, paramValues);
                         break;
+                    case ChildNodesOnlyParam.uriName:
+                        childNodesOnly = optionalParam(ChildNodesOnlyParam::forUriValue, paramName, paramValues);
+                        break;
                     case SkipNotificationDataParam.uriName:
                         skipNotificationData = optionalParam(SkipNotificationDataParam::forUriValue, paramName,
                             paramValues);
@@ -103,8 +109,8 @@ public final class QueryParams {
         }
 
         try {
-            return NotificationQueryParams.of(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
-                    changedLeafNodesOnly);
+            return NotificationQueryParams.of(startTime, stopTime, filter, leafNodesOnly, childNodesOnly,
+                    skipNotificationData, changedLeafNodesOnly);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);
         }
