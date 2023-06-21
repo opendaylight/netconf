@@ -28,6 +28,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String CHOICE_TEST_MODULE = "choice-test";
     private static final String PROPERTIES = "properties";
     private static final String PATH_PARAMS_TEST_MODULE = "path-params-test";
+    private static final String MANDATORY_TEST = "mandatory-test";
+
     private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
 
     /**
@@ -171,6 +173,32 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertFalse(secondContainer.get(PROPERTIES).has("leaf-second-case"));
     }
 
+    @Test
+    public void testMandatory() {
+        final var module = CONTEXT.findModule(MANDATORY_TEST).orElseThrow();
+        final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+                ApiDocServiceImpl.OAversion.V3_0);
+        assertNotNull(doc);
+        final var definitions = doc.getDefinitions();
+        //TODO: missing mandatory-container, mandatory-list
+        final var reqRootContainerElements = "[\"mandatory-root-leaf\",\"mandatory-first-choice\"]";
+        verifyRequiredField(definitions.get("mandatory-test_config_root-container"), reqRootContainerElements);
+        verifyRequiredField(definitions.get("mandatory-test_root-container"), reqRootContainerElements);
+
+        //TODO: missing leaf-list-with-min-elements
+        final var reqMandatoryContainerElements = "[\"mandatory-leaf\"]";
+        verifyRequiredField(definitions.get("mandatory-test_root-container_config_mandatory-container"),
+                reqMandatoryContainerElements);
+        verifyRequiredField(definitions.get("mandatory-test_root-container_mandatory-container"),
+                reqMandatoryContainerElements);
+
+        final var reqMandatoryListElements = "[\"mandatory-list-field\"]";
+        verifyRequiredField(definitions.get("mandatory-test_root-container_config_mandatory-list"),
+                reqMandatoryListElements);
+        verifyRequiredField(definitions.get("mandatory-test_root-container_mandatory-list"), reqMandatoryListElements);
+        //TODO: missing required field inside "mandatory-test_module" with ["root-container","root-mandatory-list"]
+    }
+
     /**
      * Test that request parameters are correctly numbered.
      *
@@ -202,5 +230,13 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
         assertTrue(doc.getPaths().has(pathToList4));
         assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList5));
+    }
+
+    private static void verifyRequiredField(final JsonNode rootContainer, final String expected) {
+        assertNotNull(rootContainer);
+        final var requiredNode = rootContainer.get("required");
+        assertNotNull(requiredNode);
+        assertTrue(requiredNode.isArray());
+        assertEquals(expected, requiredNode.toString());
     }
 }
