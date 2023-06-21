@@ -391,6 +391,12 @@ public abstract class BaseYangOpenApiGenerator {
                     if (paramName.equals(pathParam.get("name").asText())) {
                         paramName = keyName + discriminator;
                         discriminator++;
+                        for (final JsonNode pathParameter : pathParams) {
+                            if (paramName.equals(pathParameter.get("name").asText())) {
+                                paramName = keyName + discriminator;
+                                discriminator++;
+                            }
+                        }
                     }
                 }
 
