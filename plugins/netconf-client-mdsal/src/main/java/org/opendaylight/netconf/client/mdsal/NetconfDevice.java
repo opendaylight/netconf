@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -373,6 +374,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
      * A dedicated exception to indicate when we fail to setup an {@link EffectiveModelContext}.
      */
     public static final class EmptySchemaContextException extends Exception {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         public EmptySchemaContextException(final String message) {

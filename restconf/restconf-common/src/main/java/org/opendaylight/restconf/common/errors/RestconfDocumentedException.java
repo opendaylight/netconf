@@ -9,6 +9,7 @@ package org.opendaylight.restconf.common.errors;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
  * @author Thomas Pantelis
  */
 public class RestconfDocumentedException extends WebApplicationException {
+    @Serial
     private static final long serialVersionUID = 2L;
 
     private final List<RestconfError> errors;

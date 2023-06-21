@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.api.xml;
 
+import java.io.Serial;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -14,6 +15,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
 public class UnexpectedNamespaceException extends DocumentedException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public UnexpectedNamespaceException(final String format, final Object... args) {

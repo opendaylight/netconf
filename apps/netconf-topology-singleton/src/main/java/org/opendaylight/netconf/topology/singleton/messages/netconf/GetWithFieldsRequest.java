@@ -8,10 +8,12 @@
 package org.opendaylight.netconf.topology.singleton.messages.netconf;
 
 import com.google.common.collect.ImmutableList;
+import java.io.Serial;
 import java.util.List;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class GetWithFieldsRequest extends GetRequest {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final List<YangInstanceIdentifier> fields;

@@ -7,10 +7,12 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.netconf;
 
+import java.io.Serial;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 
 public class NetconfServiceFailedException extends OperationFailedException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public NetconfServiceFailedException(final String message, final RpcError... errors) {

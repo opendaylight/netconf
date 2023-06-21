@@ -7,11 +7,13 @@
  */
 package org.opendaylight.netconf.topology.singleton.messages.netconf;
 
+import java.io.Serial;
 import java.io.Serializable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class RemoveEditConfigRequest implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final LogicalDatastoreType store;

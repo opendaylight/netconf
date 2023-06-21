@@ -12,10 +12,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.util.Properties;
 
 public class Configuration {
     public abstract static class ConfigurationException extends RuntimeException {
+        @Serial
         private static final long serialVersionUID = -7759423506815697761L;
 
         ConfigurationException(final String msg) {
@@ -28,6 +30,7 @@ public class Configuration {
     }
 
     public static class ReadException extends ConfigurationException {
+        @Serial
         private static final long serialVersionUID = 1661483843463184121L;
 
         ReadException(final String msg, final Exception exc) {
@@ -36,6 +39,7 @@ public class Configuration {
     }
 
     public static class MissingException extends ConfigurationException {
+        @Serial
         private static final long serialVersionUID = 3406998256398889038L;
 
         private final String key;

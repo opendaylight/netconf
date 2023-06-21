@@ -14,12 +14,14 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 public class SchemaPathMessage implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @SuppressFBWarnings("SE_BAD_FIELD")
@@ -47,6 +49,7 @@ public class SchemaPathMessage implements Serializable {
     }
 
     private static class Proxy implements Externalizable {
+        @Serial
         private static final long serialVersionUID = 2L;
 
         private SchemaPathMessage schemaPathMessage;

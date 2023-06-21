@@ -8,9 +8,11 @@
 
 package org.opendaylight.netconf.topology.singleton.messages.transactions;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class NewReadTransactionRequest implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
 }

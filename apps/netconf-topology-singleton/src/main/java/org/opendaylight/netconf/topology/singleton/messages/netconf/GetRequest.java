@@ -7,10 +7,12 @@
  */
 package org.opendaylight.netconf.topology.singleton.messages.netconf;
 
+import java.io.Serial;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadActorMessage;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class GetRequest implements ReadActorMessage {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final YangInstanceIdentifier path;

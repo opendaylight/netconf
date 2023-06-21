@@ -9,6 +9,7 @@ package org.opendaylight.netconf.server.mdsal;
 
 import com.google.common.annotations.Beta;
 import com.google.common.util.concurrent.FluentFuture;
+import java.io.Serial;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -47,6 +48,7 @@ public interface DOMDataTransactionValidator extends DOMDataBrokerExtension {
      * failed.
      */
     class ValidationFailedException extends OperationFailedException {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         public ValidationFailedException(final String message, final Throwable cause) {

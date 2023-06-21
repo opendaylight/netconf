@@ -9,6 +9,7 @@ package org.opendaylight.netconf.api;
 
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.RPC_REPLY_KEY;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,6 +40,7 @@ public class DocumentedException extends Exception {
     public static final String ERROR_MESSAGE = "error-message";
     public static final String ERROR_INFO = "error-info";
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(DocumentedException.class);
     private static final DocumentBuilderFactory BUILDER_FACTORY;

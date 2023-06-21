@@ -9,6 +9,7 @@ package org.opendaylight.restconf.common.errors;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Locale;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -27,6 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  *     See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
  */
 public class RestconfError implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final ErrorType errorType;

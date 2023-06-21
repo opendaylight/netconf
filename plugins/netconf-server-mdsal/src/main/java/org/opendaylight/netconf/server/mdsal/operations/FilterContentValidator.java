@@ -11,6 +11,7 @@ import static org.opendaylight.yangtools.yang.data.util.ParserStreamUtils.findSc
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -297,6 +298,7 @@ public class FilterContentValidator {
     }
 
     private static class ValidationException extends Exception {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         ValidationException(final XmlElement parent, final XmlElement child) {

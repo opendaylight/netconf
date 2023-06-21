@@ -13,6 +13,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import java.io.Serializable;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
@@ -26,6 +27,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
  * invoked.
  */
 public class InvokeActionMessage implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final SchemaPathMessage schemaPathMessage;
@@ -73,6 +75,7 @@ public class InvokeActionMessage implements Serializable {
     }
 
     private static class Proxy implements Externalizable {
+        @Serial
         private static final long serialVersionUID = 2L;
 
         private InvokeActionMessage invokeActionMessage;

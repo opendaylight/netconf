@@ -7,9 +7,11 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
+import java.io.Serial;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 
 public class ClusteringRpcException extends DOMRpcException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ClusteringRpcException(final String message) {

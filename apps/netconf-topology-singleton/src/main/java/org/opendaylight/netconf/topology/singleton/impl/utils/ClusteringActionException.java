@@ -7,12 +7,14 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
+import java.io.Serial;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 
 /**
  * Exception thrown during remote action invocation in Odl-Cluster environment.
  */
 public class ClusteringActionException extends DOMActionException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

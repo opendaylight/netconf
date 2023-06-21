@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology.singleton.messages;
 
 import akka.actor.ActorRef;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -16,6 +17,7 @@ import java.io.Serializable;
  * with reply 'RegisterMountPoint' which includes needed parameters.
  */
 public class AskForMasterMountPoint implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final ActorRef slaveActorRef;
