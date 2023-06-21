@@ -16,6 +16,24 @@
       "message": "elements",
       "revId": "776e3d4ae79b0b602e864a4a68fb0d1848ccfb99",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21aa1136_cbf0b543",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/mandatory-test.yang",
+        "patchSetId": 24
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-21T07:37:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b569a9e_fbbc6f95",
+      "revId": "776e3d4ae79b0b602e864a4a68fb0d1848ccfb99",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
