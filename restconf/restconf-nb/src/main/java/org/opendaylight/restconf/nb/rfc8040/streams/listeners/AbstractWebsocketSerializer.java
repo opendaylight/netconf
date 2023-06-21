@@ -44,15 +44,24 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     }
 
     public final boolean serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly,
-            final boolean skipData, final boolean changedLeafNodesOnly) throws T {
+            final boolean skipData, final boolean changedLeafNodesOnly, final boolean childNodesOnly) throws T {
         if (leafNodesOnly || changedLeafNodesOnly) {
-            final var path = new ArrayDeque<PathArgument>();
-            path.addAll(candidate.getRootPath().getPathArguments());
-            return serializeLeafNodesOnly(path, candidate.getRootNode(), skipData, changedLeafNodesOnly);
+            return serializeLeafNodesOnly(mutableRootPath(candidate), candidate.getRootNode(), skipData,
+                changedLeafNodesOnly);
+        }
+        if (childNodesOnly) {
+            serializeChildNodesOnly(mutableRootPath(candidate), candidate.getRootNode(), skipData);
+            return true;
         }
 
         serializeData(candidate.getRootPath().getPathArguments(), candidate.getRootNode(), skipData);
         return true;
+    }
+
+    private static Deque<PathArgument> mutableRootPath(final DataTreeCandidate candidate) {
+        final var ret = new ArrayDeque<PathArgument>();
+        ret.addAll(candidate.getRootPath().getPathArguments());
+        return ret;
     }
 
     final boolean serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
@@ -109,6 +118,22 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         ret = serializeLeafNodesOnly(path, childNode, skipData, changedLeafNodesOnly);
         path.removeLast();
         return ret;
+    }
+
+    private void serializeChildNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode current,
+            final boolean skipData) throws T {
+        switch (current.modificationType()) {
+            // just a subtree modification, recurse
+            case SUBTREE_MODIFIED -> {
+                for (var child : current.childNodes()) {
+                    path.add(child.name());
+                    serializeChildNodesOnly(path, child, skipData);
+                    path.removeLast();
+                }
+            }
+            // other modification, serialize it
+            default -> serializeData(path, current, skipData);
+        }
     }
 
     private void serializeData(final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate,

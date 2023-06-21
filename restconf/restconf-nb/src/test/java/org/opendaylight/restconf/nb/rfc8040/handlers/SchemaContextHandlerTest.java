@@ -133,13 +133,13 @@ public class SchemaContextHandlerTest {
         @SuppressWarnings("unchecked")
         final LeafSetNode<String> capability = (LeafSetNode<String>) normNode.body().stream()
             // Find 'capabilities' container
-            .filter(child -> Capabilities.QNAME.equals(child.getIdentifier().getNodeType()))
+            .filter(child -> Capabilities.QNAME.equals(child.name().getNodeType()))
             .findFirst()
             .map(ContainerNode.class::cast)
             .orElseThrow()
             // Find 'capability' leaf-list
             .body().stream()
-            .filter(child -> SchemaContextHandler.CAPABILITY_QNAME.equals(child.getIdentifier().getNodeType()))
+            .filter(child -> SchemaContextHandler.CAPABILITY_QNAME.equals(child.name().getNodeType()))
             .findFirst()
             .orElseThrow();
 
@@ -154,7 +154,8 @@ public class SchemaContextHandlerTest {
                 equalTo("urn:opendaylight:params:restconf:capability:pretty-print:1.0"),
                 equalTo("urn:opendaylight:params:restconf:capability:leaf-nodes-only:1.0"),
                 equalTo("urn:opendaylight:params:restconf:capability:changed-leaf-nodes-only:1.0"),
-                equalTo("urn:opendaylight:params:restconf:capability:skip-notification-data:1.0")));
+                equalTo("urn:opendaylight:params:restconf:capability:skip-notification-data:1.0"),
+                equalTo("urn:opendaylight:params:restconf:capability:child-nodes-only:1.0")));
     }
 
 }
