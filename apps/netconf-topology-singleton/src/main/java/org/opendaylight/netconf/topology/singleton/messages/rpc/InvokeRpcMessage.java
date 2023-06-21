@@ -11,6 +11,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import java.io.Serializable;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -18,6 +19,7 @@ import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 public class InvokeRpcMessage implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final SchemaPathMessage schemaPathMessage;
@@ -52,6 +54,7 @@ public class InvokeRpcMessage implements Serializable {
     }
 
     private static class Proxy implements Externalizable {
+        @Serial
         private static final long serialVersionUID = 2L;
 
         private InvokeRpcMessage invokeRpcMessage;

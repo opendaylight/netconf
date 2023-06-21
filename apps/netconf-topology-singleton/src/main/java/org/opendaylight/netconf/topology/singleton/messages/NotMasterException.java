@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.topology.singleton.messages;
 
 import akka.actor.ActorRef;
+import java.io.Serial;
 
 /**
  * Exception reply indicating the recipient is not the master.
@@ -15,6 +16,7 @@ import akka.actor.ActorRef;
  * @author Thomas Pantelis
  */
 public class NotMasterException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public NotMasterException(final ActorRef recipient) {

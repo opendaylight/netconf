@@ -19,6 +19,7 @@ import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
@@ -103,6 +104,7 @@ public class RuntimeRpcTest {
         @Override
         public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
             return Futures.immediateFailedFuture(new DOMRpcException("rpc invocation not implemented yet") {
+                @Serial
                 private static final long serialVersionUID = 1L;
             });
         }

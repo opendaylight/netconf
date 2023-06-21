@@ -8,12 +8,14 @@
 
 package org.opendaylight.netconf.topology.singleton.messages.transactions;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * Message is sended when RPC result does not exist or is empty.
  */
 public class EmptyResultResponse implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 }
 

@@ -7,10 +7,12 @@
  */
 package org.opendaylight.netconf.topology.singleton.messages.transactions;
 
+import java.io.Serial;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 
 public class PutRequest implements WriteActorMessage {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final LogicalDatastoreType store;

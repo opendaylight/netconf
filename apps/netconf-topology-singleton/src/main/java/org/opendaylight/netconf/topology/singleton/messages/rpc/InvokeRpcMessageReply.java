@@ -14,6 +14,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -23,6 +24,7 @@ import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessag
 import org.opendaylight.yangtools.yang.common.RpcError;
 
 public class InvokeRpcMessageReply implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @SuppressFBWarnings("SE_BAD_FIELD")
@@ -48,6 +50,7 @@ public class InvokeRpcMessageReply implements Serializable {
     }
 
     private static class Proxy implements Externalizable {
+        @Serial
         private static final long serialVersionUID = 2L;
 
         private InvokeRpcMessageReply invokeRpcMessageReply;

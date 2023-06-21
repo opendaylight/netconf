@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serial;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 public final class WebSocketInitializer extends WebSocketServlet {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @SuppressFBWarnings(value = "SE_BAD_FIELD",

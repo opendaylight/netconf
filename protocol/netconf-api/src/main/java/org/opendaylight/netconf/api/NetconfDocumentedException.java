@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.api;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serial;
 import java.util.Map;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -18,6 +19,7 @@ import org.w3c.dom.Document;
  * Checked exception to communicate an error that needs to be sent to the netconf client.
  */
 public class NetconfDocumentedException extends DocumentedException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public NetconfDocumentedException(final String message) {

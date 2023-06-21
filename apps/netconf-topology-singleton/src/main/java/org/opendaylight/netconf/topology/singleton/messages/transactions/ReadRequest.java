@@ -7,10 +7,12 @@
  */
 package org.opendaylight.netconf.topology.singleton.messages.transactions;
 
+import java.io.Serial;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class ReadRequest implements ReadActorMessage {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final LogicalDatastoreType store;

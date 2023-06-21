@@ -8,12 +8,15 @@
 
 package org.opendaylight.netconf.api;
 
+import java.io.Serial;
+
 /**
  * This exception is thrown by
  * {@link NetconfSessionListener#onMessage} to indicate fatal
  * communication problem after which the session should be closed.
  */
 public class NetconfDeserializerException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public NetconfDeserializerException(final String message) {

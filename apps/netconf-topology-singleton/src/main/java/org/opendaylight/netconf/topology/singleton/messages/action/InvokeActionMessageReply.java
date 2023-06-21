@@ -14,6 +14,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
  * remote hosts with serialization when action operation is invoked.
  */
 public class InvokeActionMessageReply implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @SuppressFBWarnings("SE_BAD_FIELD")
@@ -58,6 +60,7 @@ public class InvokeActionMessageReply implements Serializable {
     }
 
     private static class Proxy implements Externalizable {
+        @Serial
         private static final long serialVersionUID = 2L;
 
         private InvokeActionMessageReply invokeActionMessageReply;

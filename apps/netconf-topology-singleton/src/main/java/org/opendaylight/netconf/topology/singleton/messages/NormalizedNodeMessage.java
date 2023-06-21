@@ -12,6 +12,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import org.opendaylight.controller.cluster.datastore.node.utils.stream.SerializationUtils;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -20,6 +21,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  * Message which holds node data, prepared to sending between remote hosts with serialization.
  */
 public class NormalizedNodeMessage implements Externalizable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private YangInstanceIdentifier identifier;
