@@ -281,17 +281,17 @@ public class DefinitionGenerator {
             throws IOException {
         stack.enterSchemaTree(container.getQName());
         if (!container.getChildNodes().isEmpty()) {
-            final String filename = parentName + "_" + operationName + (isInput ? INPUT_SUFFIX : OUTPUT_SUFFIX);
-            final Schema.Builder childSchemaBuilder = new Schema.Builder().title(filename);
-            processChildren(childSchemaBuilder, container.getChildNodes(), parentName, definitions, definitionNames,
-                    false, stack);
-            childSchemaBuilder.type(OBJECT_TYPE);
-            final ObjectNode xml = JsonNodeFactory.instance.objectNode();
-            xml.put(NAME_KEY, isInput ? INPUT : OUTPUT);
-            childSchemaBuilder.xml(xml);
-            final String discriminator =
-                    definitionNames.pickDiscriminator(container, List.of(filename, filename + TOP));
-            definitions.put(filename + discriminator, childSchemaBuilder.build());
+            final var filename = parentName + "_" + operationName + (isInput ? INPUT_SUFFIX : OUTPUT_SUFFIX);
+            final var properties = processChildren(container.getChildNodes(), parentName, definitions,
+                definitionNames, false, stack);
+            final var xml = JsonNodeFactory.instance.objectNode().put(NAME_KEY, isInput ? INPUT : OUTPUT);
+            final var schemaBuilder = new Schema.Builder()
+                .type(OBJECT_TYPE)
+                .xml(xml)
+                .properties(properties);
+                //.required(required.size() > 0 ? required : null);
+            final var discriminator = definitionNames.pickDiscriminator(container, List.of(filename, filename + TOP));
+            definitions.put(filename + discriminator, schemaBuilder.build());
 
             processTopData(filename, discriminator, definitions, container);
         }
@@ -371,11 +371,9 @@ public class DefinitionGenerator {
             final Collection<? extends DataSchemaNode> containerChildren = dataNode.getChildNodes();
             final SchemaNode schemaNode = (SchemaNode) dataNode;
             final String localName = schemaNode.getQName().getLocalName();
-            final Schema.Builder childSchemaBuilder = new Schema.Builder();
             final String nameAsParent = parentName + "_" + localName;
-            final ObjectNode properties =
-                    processChildren(childSchemaBuilder, containerChildren, parentName + "_" + localName, definitions,
-                            definitionNames, isConfig, stack);
+            final ObjectNode properties = processChildren(containerChildren, parentName + "_" + localName, definitions,
+                definitionNames, isConfig, stack);
 
             final String nodeName = parentName + (isConfig ? CONFIG : "") + "_" + localName;
             final String parentNameConfigLocalName = parentName + CONFIG + "_" + localName;
@@ -393,15 +391,15 @@ public class DefinitionGenerator {
                 discriminator = definitionNames.getDiscriminator(schemaNode);
             }
 
-            childSchemaBuilder.type(OBJECT_TYPE)
+            final Schema.Builder childSchemaBuilder = new Schema.Builder()
+                .type(OBJECT_TYPE)
                 .properties(properties)
                 .title(nodeName)
-                .description(description);
+                .description(description)
+                .xml(buildXmlParameter(schemaNode));
 
             final String defName = nodeName + discriminator;
-            childSchemaBuilder.xml(buildXmlParameter(schemaNode));
             definitions.put(defName, childSchemaBuilder.build());
-
             return processTopData(nodeName, discriminator, definitions, schemaNode);
         }
         return null;
@@ -410,8 +408,7 @@ public class DefinitionGenerator {
     /**
      * Processes the nodes.
      */
-    private ObjectNode processChildren(final Schema.Builder parentNodeBuilder,
-            final Collection<? extends DataSchemaNode> nodes, final String parentName,
+    private ObjectNode processChildren(final Collection<? extends DataSchemaNode> nodes, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames, final boolean isConfig,
             final SchemaInferenceStack stack) throws IOException {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
@@ -421,9 +418,6 @@ public class DefinitionGenerator {
                 processChildNode(node, parentName, definitions, definitionNames, isConfig, stack, properties);
             }
         }
-        parentNodeBuilder.properties(properties)
-            .required(required.size() > 0 ? required : null);
-
         return properties;
     }
 
