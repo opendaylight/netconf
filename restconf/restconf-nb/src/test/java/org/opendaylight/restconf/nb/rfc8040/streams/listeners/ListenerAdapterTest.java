@@ -138,7 +138,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                               final boolean leafNodesOnly, final boolean skipNotificationData) {
             super(path, streamName, outputType);
             setQueryParams(NotificationQueryParams.of(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
-                LeafNodesOnlyParam.of(leafNodesOnly), SkipNotificationDataParam.of(skipNotificationData), null));
+                LeafNodesOnlyParam.of(leafNodesOnly), null, SkipNotificationDataParam.of(skipNotificationData), null));
         }
 
         ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
@@ -146,7 +146,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                               final boolean changedLeafNodesOnly) {
             super(path, streamName, outputType);
             setQueryParams(NotificationQueryParams.of(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
-                    null, null, ChangedLeafNodesOnlyParam.of(changedLeafNodesOnly)));
+                    null, null, null, ChangedLeafNodesOnlyParam.of(changedLeafNodesOnly)));
         }
 
         @Override
