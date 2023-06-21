@@ -423,28 +423,13 @@ public final class OpenApiGeneratorRFC8040Test {
     }
 
     private static void verifyThatOthersNodeDoesNotHaveRequiredField(final List<String> expected,
-            final Map<String, Schema> definitions) {
-        for (final var value : definitions.values()) {
-            final var properties = value.properties();
-            if (properties != null) {
-                verifyRecursivelyThatPropertyDoesNotHaveRequired(expected, properties);
-            }
-        }
-    }
-
-    private static void verifyRecursivelyThatPropertyDoesNotHaveRequired(final List<String> expected,
-            final JsonNode definitions) {
-        final var fields = definitions.fields();
-        while (fields.hasNext()) {
-            final var next = fields.next();
-            final var nodeName = next.getKey();
-            final var jsonNode = next.getValue();
-            if (expected.contains(nodeName) || !jsonNode.isContainerNode()) {
+            final Map<String, Schema> schemas) {
+        for (final var schema : schemas.entrySet()) {
+            if (expected.contains(schema.getKey())) {
                 continue;
             }
-            assertNull("Json node " + nodeName + " should not have 'required' field in body",
-                jsonNode.get("required"));
-            verifyRecursivelyThatPropertyDoesNotHaveRequired(expected, jsonNode);
+            assertNull("Json node " + schema.getKey() + " should not have 'required' field in body",
+                schema.getValue().required());
         }
     }
 
