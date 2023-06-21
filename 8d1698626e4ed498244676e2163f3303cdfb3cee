@@ -16,6 +16,23 @@
       "message": "Here are some unresolved comments:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/105884/comments/9c7abc8e_af16d00c\nhttps://git.opendaylight.org/gerrit/c/netconf/+/105884/comments/fbe8b6f7_9e3e540f",
       "revId": "8d1698626e4ed498244676e2163f3303cdfb3cee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4827c4d_b120afd1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-21T13:22:41Z",
+      "side": 1,
+      "message": "This change \"rests/operations\" -\u003e \"/rests/operations\" resolves different bug in the master.\n\n```\t\nTypeError: Failed to execute \u0027fetch\u0027 on \u0027Window\u0027: Failed to parse URL from http://localhost:8181rests/operations/network-topology:network-topology/topology\u003dtopology-netconf/node\u003d36001-sim-device/yang-ext:mount/action-types:multi-container/inner-container/action\n```\n\nPlease move this change to separate commit before this commit.",
+      "revId": "8d1698626e4ed498244676e2163f3303cdfb3cee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
