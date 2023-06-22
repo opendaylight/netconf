@@ -18,7 +18,7 @@ import org.opendaylight.yangtools.yang.common.YangConstants;
  * Service provides YANG schema sources for modules from yang library.
  */
 @Path("/")
-@Produces({ MediaType.TEXT_PLAIN, YangConstants.RFC6020_YANG_MEDIA_TYPE })
+@Produces({ YangConstants.RFC6020_YANG_MEDIA_TYPE, MediaType.TEXT_PLAIN })
 public interface YangLibService {
 
     /**
