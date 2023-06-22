@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9c3e0b7_f9c152c5",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/databind/jaxrs/QueryParams.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-22T16:05:40Z",
+      "side": 1,
+      "message": "actually eliminate this switch and assign withDefaults directly -- just like fields above\n\nI think this will break some legacy tests, which need to be updated. The result will be accurate error reporting in ReadDataTransactionUtil.prepareDataByParamWithDef()",
+      "range": {
+        "startLine": 163,
+        "startChar": 43,
+        "endLine": 163,
+        "endChar": 63
+      },
+      "revId": "8a8dad0704a86816c269527110ed04fc33488493",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
