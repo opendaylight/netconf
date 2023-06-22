@@ -10,11 +10,12 @@ package org.opendaylight.restconf.openapi.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record Operation(boolean deprecated, ArrayNode tags, ArrayNode parameters, ArrayNode security, ArrayNode servers,
-        ObjectNode callbacks, ObjectNode externalDocs, ObjectNode requestBody, ObjectNode responses,
-        String description, String operationId, String summary) {
+public record Operation(boolean deprecated, ArrayNode tags, List<Parameter> parameters, ArrayNode security,
+    ArrayNode servers, ObjectNode callbacks, ObjectNode externalDocs, ObjectNode requestBody,
+    ObjectNode responses, String description, String operationId, String summary) {
 
     private Operation(final Builder builder) {
         this(builder.deprecated, builder.tags, builder.parameters, builder.security, builder.servers, builder.callbacks,
@@ -26,7 +27,7 @@ public record Operation(boolean deprecated, ArrayNode tags, ArrayNode parameters
     public static class Builder {
         private boolean deprecated;
         private ArrayNode tags;
-        private ArrayNode parameters;
+        private List<Parameter> parameters;
         private ArrayNode security;
         private ArrayNode servers;
         private ObjectNode callbacks;
@@ -47,7 +48,7 @@ public record Operation(boolean deprecated, ArrayNode tags, ArrayNode parameters
             return this;
         }
 
-        public Builder parameters(final ArrayNode parameters) {
+        public Builder parameters(final List<Parameter> parameters) {
             this.parameters = parameters;
             return this;
         }
