@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5d68cdd_04aff337",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-22T17:44:02Z",
+      "side": 1,
+      "message": "Let\u0027s split the packaging out first.",
+      "revId": "441b96ba5d3552209cd586211e5cfa6c068fb7ac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "241592dd_c2e345df",
+        "filename": "protocol/netconf-server/src/main/yang/ietf-netconf-server@2023-04-17.yang",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-22T17:44:02Z",
+      "side": 1,
+      "message": "ah, so this is something we should package in mdsal.",
+      "range": {
+        "startLine": 15,
+        "startChar": 7,
+        "endLine": 15,
+        "endChar": 15
+      },
+      "revId": "441b96ba5d3552209cd586211e5cfa6c068fb7ac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
