@@ -104,6 +104,24 @@
       "parentUuid": "134378b5_c516ebe0",
       "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b001d359_3cdf0b32",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-22T21:00:40Z",
+      "side": 1,
+      "message": "https://www.javadoc.io/doc/org.opendaylight.yangtools/yangtools-docs/latest/org/opendaylight/yangtools/yang/data/codec/xml/XMLStreamNormalizedNodeStreamWriter.html#create(javax.xml.stream.XMLStreamWriter,org.opendaylight.yangtools.yang.model.api.EffectiveModelContext,org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier)\n\nis the proper link. The thing with these methods: you really need to uses the closest thing to yang-data-api, but there are other (legacy or weird) avenues.",
+      "parentUuid": "61838cc8_a728f0d5",
+      "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
