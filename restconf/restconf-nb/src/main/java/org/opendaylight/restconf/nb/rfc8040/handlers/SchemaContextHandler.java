@@ -52,12 +52,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.ConflictingModificationAppliedException;
@@ -170,7 +167,6 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
     /**
      * Map capabilites by ietf-restconf-monitoring.
      *
-     * @param monitoringModule ietf-restconf-monitoring module
      * @return mapped capabilites
      */
     @VisibleForTesting
@@ -205,15 +201,16 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
     @VisibleForTesting
     public static ContainerNode mapModulesByIetfYangLibraryYang(final Collection<? extends Module> modules,
             final SchemaContext context, final String moduleSetId) {
-        final CollectionNodeBuilder<MapEntryNode, UserMapNode> mapBuilder = Builders.orderedMapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(IetfYangLibrary.MODULE_QNAME_LIST));
-        for (final Module module : context.getModules()) {
+        final var mapBuilder = Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(IetfYangLibrary.MODULE_QNAME_LIST));
+        for (var module : context.getModules()) {
             fillMapByModules(mapBuilder, IetfYangLibrary.MODULE_QNAME_LIST, false, module, context);
         }
         return Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(ModulesState.QNAME))
             .withChild(ImmutableNodes.leafNode(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, moduleSetId))
-            .withChild(mapBuilder.build()).build();
+            .withChild(mapBuilder.build())
+            .build();
     }
 
     /**
@@ -225,10 +222,9 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
      * @param module specific module or submodule
      * @param context schema context
      */
-    private static void fillMapByModules(final CollectionNodeBuilder<MapEntryNode, UserMapNode> mapBuilder,
+    private static void fillMapByModules(final CollectionNodeBuilder<MapEntryNode, SystemMapNode> mapBuilder,
             final QName mapQName, final boolean isSubmodule, final ModuleLike module, final SchemaContext context) {
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
-            newCommonLeafsMapEntryBuilder(mapQName, module);
+        final var mapEntryBuilder = newCommonLeafsMapEntryBuilder(mapQName, module);
 
         mapEntryBuilder.withChild(ImmutableNodes.leafNode(MODULE_SCHEMA_NODEID,
             "/modules/" + module.getName() + "/"
@@ -267,16 +263,15 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
      *
      * @param module module with submodules
      * @param mapEntryBuilder mapEntryBuilder of parent for mapping children
-     * @param ietfYangLibraryModule ietf-yang-library module
      * @param context schema context
      */
     private static void addSubmodules(final ModuleLike module,
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final SchemaContext context) {
-        final CollectionNodeBuilder<MapEntryNode, UserMapNode> mapBuilder = Builders.orderedMapBuilder()
+        final var mapBuilder = Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(Submodule.QNAME));
 
-        for (final var submodule : module.getSubmodules()) {
+        for (var submodule : module.getSubmodules()) {
             fillMapByModules(mapBuilder, Submodule.QNAME, true, submodule, context);
         }
         mapEntryBuilder.withChild(mapBuilder.build());
@@ -295,9 +290,9 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
     private static void addDeviationList(final ModuleLike module,
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final SchemaContext context) {
-        final CollectionNodeBuilder<MapEntryNode, SystemMapNode> deviations = Builders.mapBuilder()
+        final var deviations = Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(Deviation.QNAME));
-        for (final var deviation : module.getDeviations()) {
+        for (var deviation : module.getDeviations()) {
             final List<QName> ids = deviation.getTargetPath().getNodeIdentifiers();
             final QName lastComponent = ids.get(ids.size() - 1);
 
@@ -317,9 +312,9 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
     private static void addFeatureLeafList(
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Collection<? extends FeatureDefinition> features) {
-        final ListNodeBuilder<String, SystemLeafSetNode<String>> leafSetBuilder = Builders.<String>leafSetBuilder()
+        final var leafSetBuilder = Builders.<String>leafSetBuilder()
                 .withNodeIdentifier(MODULE_FEATURE_NODEID);
-        for (final FeatureDefinition feature : features) {
+        for (var feature : features) {
             leafSetBuilder.withChildValue(feature.getQName().getLocalName());
         }
         mapEntryBuilder.withChild(leafSetBuilder.build());
