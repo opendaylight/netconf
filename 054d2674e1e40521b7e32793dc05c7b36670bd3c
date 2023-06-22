@@ -16,6 +16,24 @@
       "message": "Cherry-picked from?",
       "revId": "054d2674e1e40521b7e32793dc05c7b36670bd3c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46d89f3c_41e4c4a9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-22T07:31:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6811ab0c_87d1ef93",
+      "revId": "054d2674e1e40521b7e32793dc05c7b36670bd3c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
