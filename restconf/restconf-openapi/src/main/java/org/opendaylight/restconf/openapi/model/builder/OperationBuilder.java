@@ -15,6 +15,7 @@ import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.OUTPUT_
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.HttpMethod;
@@ -22,6 +23,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.restconf.openapi.model.Operation;
+import org.opendaylight.restconf.openapi.model.Parameter;
+import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
@@ -66,10 +69,11 @@ public final class OperationBuilder {
 
     public static Operation buildPost(final String parentName, final String nodeName, final String discriminator,
             final String moduleName, final Optional<String> deviceName, final String description,
-            final ArrayNode pathParams) {
+            final List<Parameter> pathParams) {
         final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
+        final List<Parameter> parameters = new ArrayList<>();
+        parameters.addAll(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + CONFIG + "_" + nodeName;
         final String defName = cleanDefName + discriminator;
@@ -91,13 +95,14 @@ public final class OperationBuilder {
     }
 
     public static Operation buildGet(final DataSchemaNode node, final String moduleName,
-            final Optional<String> deviceName, final ArrayNode pathParams, final String defName,
+            final Optional<String> deviceName, final List<Parameter> pathParams, final String defName,
             final boolean isConfig) {
         final String description = node.getDescription().orElse("");
         final String summary = buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName());
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
+        final List<Parameter> parameters = new ArrayList<>();
+        parameters.addAll(pathParams);
         addQueryParameters(parameters, isConfig);
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
@@ -114,31 +119,32 @@ public final class OperationBuilder {
             .build();
     }
 
-    private static void addQueryParameters(final ArrayNode parameters, final boolean isConfig) {
-        final ObjectNode contentParam = JsonNodeFactory.instance.objectNode();
+    private static void addQueryParameters(final List<Parameter> parameters, final boolean isConfig) {
+        final Parameter.Builder contentParamBuilder = new Parameter.Builder();
         final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
         cases.add(NONCONFIG_QUERY_PARAM);
         if (isConfig) {
             cases.add(CONFIG_QUERY_PARAM);
         } else {
-            contentParam.put(REQUIRED_KEY, true);
+            contentParamBuilder.required(true);
         }
-        contentParam.put(IN_KEY, QUERY);
-        contentParam.put(NAME_KEY, CONTENT);
+        contentParamBuilder.in(QUERY);
+        contentParamBuilder.name(CONTENT);
+        contentParamBuilder.schema(new Schema.Builder()
+            .type(STRING)
+            .schemaEnum(cases)
+            .build());
 
-        final ObjectNode typeParent = getTypeParentNode(contentParam);
-        typeParent.put(TYPE_KEY, STRING);
-        typeParent.set(ENUM_KEY, cases);
-
-        parameters.add(contentParam);
+        parameters.add(contentParamBuilder.build());
     }
 
     public static Operation buildPut(final String parentName, final String nodeName, final String discriminator,
             final String moduleName, final Optional<String> deviceName, final String description,
-            final ArrayNode pathParams) {
+            final List<Parameter> pathParams) {
         final String summary = buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
+        final List<Parameter> parameters = new ArrayList<>();
+        parameters.addAll(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
         final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
@@ -160,10 +166,11 @@ public final class OperationBuilder {
     }
 
     public static Operation buildPatch(final String parentName, final String nodeName, final String moduleName,
-            final Optional<String> deviceName, final String description, final ArrayNode pathParams) {
+            final Optional<String> deviceName, final String description, final List<Parameter> pathParams) {
         final String summary = buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
+        final List<Parameter> parameters = new ArrayList<>();
+        parameters.addAll(pathParams);
         final String defName = parentName + CONFIG + "_" + nodeName + TOP;
         final String xmlDefName = parentName + CONFIG + "_" + nodeName;
         final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
@@ -185,12 +192,13 @@ public final class OperationBuilder {
     }
 
     public static Operation buildDelete(final DataSchemaNode node, final String moduleName,
-            final Optional<String> deviceName, final ArrayNode pathParams) {
+            final Optional<String> deviceName, final List<Parameter> pathParams) {
         final String summary = buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
                 node.getQName().getLocalName());
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final String description = node.getDescription().orElse("");
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
+        final List<Parameter> parameters = new ArrayList<>();
+        parameters.addAll(pathParams);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
@@ -207,7 +215,7 @@ public final class OperationBuilder {
 
     public static Operation buildPostOperation(final OperationDefinition operDef, final String moduleName,
             final Optional<String> deviceName, final String parentName, final DefinitionNames definitionNames) {
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode();
+        final List<Parameter> parameters = new ArrayList<>();
         final String operationName = operDef.getQName().getLocalName();
         final String inputName = operationName + INPUT_SUFFIX;
         final String summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, operationName);

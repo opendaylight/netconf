@@ -10,6 +10,7 @@ package org.opendaylight.restconf.openapi;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Path;
 
 public final class OpenApiTestUtils {
@@ -25,8 +26,8 @@ public final class OpenApiTestUtils {
      */
     public static List<String> getPathParameters(final Map<String, Path> paths, final String path) {
         final var params = new ArrayList<String>();
-        paths.get(path).post().parameters().elements()
-            .forEachRemaining(p -> params.add(p.get("name").asText()));
+        List<Parameter> parameters = paths.get(path).post().parameters();
+        parameters.forEach(parameter -> params.add(parameter.name()));
         return params;
     }
 }
