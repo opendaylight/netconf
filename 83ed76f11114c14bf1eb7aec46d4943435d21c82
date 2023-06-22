@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ac73cde_0e524a05",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-22T11:59:31Z",
+      "side": 1,
+      "message": "Now, we are interferencing with logic for RPCs (which do not have parameters). We will split this logic in later work.",
+      "revId": "83ed76f11114c14bf1eb7aec46d4943435d21c82",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
