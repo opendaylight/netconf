@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a75ceb2_6ca052e3",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-22T20:51:11Z",
+      "side": 1,
+      "message": "while we\u0027re here, we are on Java 17, let\u0027s convert obviously over-complicated  things to \u0027var\u0027",
+      "range": {
+        "startLine": 208,
+        "startChar": 14,
+        "endLine": 208,
+        "endChar": 64
+      },
+      "revId": "f66f2ee9117a39ac2d9a8e13c4d3b287421406cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
