@@ -16,6 +16,74 @@
       "message": "Needs a manual rebase on top of 1e644786035c36520da0e3edd4813bf62f770a02",
       "revId": "d8750b41ee7709e3247de062f71a45c4f5c142f2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f9162ce_8062f106",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/OSGiNetconfThreadGroups.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-22T07:16:14Z",
+      "side": 1,
+      "message": "Can this class be final? IN ODL we usually do it that way 😊.",
+      "revId": "d8750b41ee7709e3247de062f71a45c4f5c142f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d5769d3_6bdf69e6",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-22T07:16:14Z",
+      "side": 1,
+      "message": "final class",
+      "revId": "d8750b41ee7709e3247de062f71a45c4f5c142f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "780ee204_f28c754c",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfSubsystemFactory.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-22T07:16:14Z",
+      "side": 1,
+      "message": "final",
+      "revId": "d8750b41ee7709e3247de062f71a45c4f5c142f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36d59cb6_d91c225a",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/api/NetconfServerFactory.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-22T07:16:14Z",
+      "side": 1,
+      "message": "Maybe deserve some javadocs.",
+      "revId": "d8750b41ee7709e3247de062f71a45c4f5c142f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
