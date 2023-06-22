@@ -237,26 +237,13 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var fields = definitions.fields();
         while (fields.hasNext()) {
             final var next = fields.next();
-            final var properties = next.getValue().get("properties");
-            if (properties != null) {
-                verifyRecursivelyThatPropertyDoesNotHaveRequired(expected, properties);
-            }
-        }
-    }
-
-    private static void verifyRecursivelyThatPropertyDoesNotHaveRequired(final List<String> expected,
-        final JsonNode definitions) {
-        final var fields = definitions.fields();
-        while (fields.hasNext()) {
-            final var next = fields.next();
             final var nodeName = next.getKey();
             final var jsonNode = next.getValue();
-            if (expected.contains(nodeName) || !jsonNode.isContainerNode()) {
+            if (expected.contains(nodeName)) {
                 continue;
             }
             assertNull("Json node " + nodeName + " should not have 'required' field in body",
                 jsonNode.get("required"));
-            verifyRecursivelyThatPropertyDoesNotHaveRequired(expected, jsonNode);
         }
     }
 
