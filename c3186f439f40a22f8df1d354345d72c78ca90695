@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b11a7641_1761f6ee",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-22T13:23:37Z",
+      "side": 1,
+      "message": "wrap if (LOG.isDebugEnabled())",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 81
+      },
+      "revId": "c3186f439f40a22f8df1d354345d72c78ca90695",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efc32d54_f1cbf060",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-22T13:23:37Z",
+      "side": 1,
+      "message": "range.get();",
+      "range": {
+        "startLine": 202,
+        "startChar": 76,
+        "endLine": 202,
+        "endChar": 87
+      },
+      "revId": "c3186f439f40a22f8df1d354345d72c78ca90695",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da07e877_a27d3933",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-22T13:23:37Z",
+      "side": 1,
+      "message": "avoid pre-computing values for logging which is conditional\n\nif(LOG.isDebugEnabled()){\n    final String value \u003d ...\n    LOG.debug(\"Smth {}\", value);\n}",
+      "range": {
+        "startLine": 208,
+        "startChar": 0,
+        "endLine": 210,
+        "endChar": 81
+      },
+      "revId": "c3186f439f40a22f8df1d354345d72c78ca90695",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
