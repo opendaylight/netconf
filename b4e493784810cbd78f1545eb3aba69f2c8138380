@@ -86,6 +86,24 @@
       "parentUuid": "8026b5ec_7b376719",
       "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61838cc8_a728f0d5",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-22T20:57:55Z",
+      "side": 1,
+      "message": "Not exactly sure, but it should work via https://www.javadoc.io/doc/org.opendaylight.yangtools/yangtools-docs/latest/org/opendaylight/yangtools/yang/data/codec/xml/XMLStreamNormalizedNodeStreamWriter.html, which takes a YangInstanceIdentifier and hence should do The Right Thing(tm).\n\nThe way I would guess it should work is that either:\n- we specify parent list and then emit the entry, or\n- we specify the entry itself",
+      "parentUuid": "134378b5_c516ebe0",
+      "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
