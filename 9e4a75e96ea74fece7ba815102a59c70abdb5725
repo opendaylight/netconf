@@ -16,6 +16,24 @@
       "message": "Can we move NETCONF-1021 directory inside resources/yang?\nIMHO better to keep ordering top-level directories by type of files",
       "revId": "9e4a75e96ea74fece7ba815102a59c70abdb5725",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a488217f_ae8e6fd3",
+        "filename": "restconf/restconf-openapi/src/test/resources/NETCONF-1021/custom-base-path-test.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-22T12:24:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a16afa80_f561637c",
+      "revId": "9e4a75e96ea74fece7ba815102a59c70abdb5725",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
