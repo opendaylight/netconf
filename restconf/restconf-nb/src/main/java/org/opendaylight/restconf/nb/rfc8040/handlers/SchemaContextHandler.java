@@ -54,7 +54,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
@@ -206,7 +205,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
     @VisibleForTesting
     public static ContainerNode mapModulesByIetfYangLibraryYang(final Collection<? extends Module> modules,
             final SchemaContext context, final String moduleSetId) {
-        final CollectionNodeBuilder<MapEntryNode, UserMapNode> mapBuilder = Builders.orderedMapBuilder()
+        final CollectionNodeBuilder<MapEntryNode, SystemMapNode> mapBuilder = Builders.mapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(IetfYangLibrary.MODULE_QNAME_LIST));
         for (final Module module : context.getModules()) {
             fillMapByModules(mapBuilder, IetfYangLibrary.MODULE_QNAME_LIST, false, module, context);
@@ -226,7 +225,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
      * @param module specific module or submodule
      * @param context schema context
      */
-    private static void fillMapByModules(final CollectionNodeBuilder<MapEntryNode, UserMapNode> mapBuilder,
+    private static void fillMapByModules(final CollectionNodeBuilder<MapEntryNode, SystemMapNode> mapBuilder,
             final QName mapQName, final boolean isSubmodule, final ModuleLike module, final SchemaContext context) {
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
             newCommonLeafsMapEntryBuilder(mapQName, module);
@@ -274,7 +273,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
     private static void addSubmodules(final ModuleLike module,
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final SchemaContext context) {
-        final CollectionNodeBuilder<MapEntryNode, UserMapNode> mapBuilder = Builders.orderedMapBuilder()
+        final CollectionNodeBuilder<MapEntryNode, SystemMapNode> mapBuilder = Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(Submodule.QNAME));
 
         for (final var submodule : module.getSubmodules()) {
