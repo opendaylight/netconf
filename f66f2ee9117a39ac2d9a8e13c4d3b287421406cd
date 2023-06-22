@@ -22,6 +22,75 @@
       },
       "revId": "f66f2ee9117a39ac2d9a8e13c4d3b287421406cd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc060c9e_fc487128",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-22T20:53:01Z",
+      "side": 1,
+      "message": "also here, \u0027var module\u0027",
+      "range": {
+        "startLine": 210,
+        "startChar": 13,
+        "endLine": 210,
+        "endChar": 32
+      },
+      "revId": "f66f2ee9117a39ac2d9a8e13c4d3b287421406cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f88a398_58c3d4ea",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-22T20:53:01Z",
+      "side": 1,
+      "message": "and keep things organized: the last build() relates to containerBuild() and should be on a separate line",
+      "range": {
+        "startLine": 216,
+        "startChar": 42,
+        "endLine": 216,
+        "endChar": 50
+      },
+      "revId": "f66f2ee9117a39ac2d9a8e13c4d3b287421406cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df2d403a_2860216d",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-22T20:53:01Z",
+      "side": 1,
+      "message": "drop final here: it is very obvious",
+      "range": {
+        "startLine": 279,
+        "startChar": 13,
+        "endLine": 279,
+        "endChar": 18
+      },
+      "revId": "f66f2ee9117a39ac2d9a8e13c4d3b287421406cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
