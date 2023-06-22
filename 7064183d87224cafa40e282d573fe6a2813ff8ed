@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63a3727e_08ad6553",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/ReadDataParams.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-22T16:34:34Z",
+      "side": 1,
+      "message": "please keep these each on its own line:\n\nReadDataParams(\n    @NonNull ContentParam content,\n    DepthParam depth,\n\nThe reason is readability of the structure -- think of them as field declarations.\nAlso retain explicit @Nullable annotations",
+      "range": {
+        "startLine": 25,
+        "startChar": 29,
+        "endLine": 26,
+        "endChar": 68
+      },
+      "revId": "7064183d87224cafa40e282d573fe6a2813ff8ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
