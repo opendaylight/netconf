@@ -82,9 +82,9 @@ public class KeysMappingTest {
     @Test
     public void testKeysMapping() {
         final var pathToMultipleKeyList4 = "/rests/data/keys-mapping:multiple-key-list={name},{name2}"
-            + "/multiple-key-list2={name1},{name3}/multiple-key-list3={name31},{name4}/multiple-key-list4={name5}";
+            + "/multiple-key-list2={name1},{name3}/multiple-key-list3={name32},{name34}/multiple-key-list4={name5}";
         assertTrue(doc.paths().containsKey(pathToMultipleKeyList4));
-        assertEquals(List.of("name","name2", "name1", "name3", "name31", "name4", "name5"),
+        assertEquals(List.of("name","name2", "name1", "name3", "name32", "name34", "name5"),
             getPathParameters(doc.paths(), pathToMultipleKeyList4));
     }
 }

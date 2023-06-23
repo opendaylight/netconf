@@ -221,9 +221,9 @@ public final class MountPointOpenApiTest {
         assertTrue(mountPointApi.paths().containsKey(pathToList3));
         assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList3));
 
-        var pathToList4 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name1}";
+        var pathToList4 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name2}";
         assertTrue(mountPointApi.paths().containsKey(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList4));
+        assertEquals(List.of("name", "name2"), getPathParameters(mountPointApi.paths(), pathToList4));
 
         var pathToList5 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
         assertTrue(mountPointApi.paths().containsKey(pathToList5));
