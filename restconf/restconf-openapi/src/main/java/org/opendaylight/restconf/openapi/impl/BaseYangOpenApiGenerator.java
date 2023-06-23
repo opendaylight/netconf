@@ -34,7 +34,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.Stack;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.ws.rs.core.UriInfo;
@@ -226,6 +228,9 @@ public abstract class BaseYangOpenApiGenerator {
 
         final Collection<? extends DataSchemaNode> dataSchemaNodes = module.getChildNodes();
         LOG.debug("child nodes size [{}]", dataSchemaNodes.size());
+
+        final AtomicInteger discriminator = new AtomicInteger(1);
+
         for (final DataSchemaNode node : dataSchemaNodes) {
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                 final boolean isConfig = node.isConfiguration();
@@ -246,10 +251,10 @@ public abstract class BaseYangOpenApiGenerator {
 
                     hasAddRootPostLink = true;
                 }
-
-                final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName);
+                final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName,
+                    discriminator);
                 addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, isConfig,
-                    moduleName, definitionNames, resolvedPath);
+                    moduleName, definitionNames, resolvedPath, discriminator);
             }
         }
 
@@ -300,7 +305,7 @@ public abstract class BaseYangOpenApiGenerator {
     private void addPaths(final DataSchemaNode node, final Optional<String> deviceName, final String moduleName,
             final Map<String, Path> paths, final ArrayNode parentPathParams, final EffectiveModelContext schemaContext,
             final boolean isConfig, final String parentName, final DefinitionNames definitionNames,
-            final String resourcePath) {
+            final String resourcePath, AtomicInteger discriminator) {
         LOG.debug("Adding path: [{}]", resourcePath);
 
         final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode().addAll(parentPathParams);
@@ -326,10 +331,11 @@ public abstract class BaseYangOpenApiGenerator {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 final String newParent = parentName + "_" + node.getQName().getLocalName();
                 final String localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
-                final String newResourcePath = resourcePath + "/" + createPath(childNode, pathParams, localName);
+                final String newResourcePath = resourcePath + "/"
+                    + createPath(childNode, pathParams, localName, discriminator);
                 final boolean newIsConfig = isConfig && childNode.isConfiguration();
                 addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
-                    newIsConfig, newParent, definitionNames, newResourcePath);
+                    newIsConfig, newParent, definitionNames, newResourcePath, discriminator);
                 pathParams.removeAll();
                 pathParams.addAll(parentPathParams);
             }
@@ -377,7 +383,8 @@ public abstract class BaseYangOpenApiGenerator {
         return operationsBuilder.build();
     }
 
-    private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams, final String localName) {
+    private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams, final String localName,
+        AtomicInteger discriminator) {
         final StringBuilder path = new StringBuilder();
         path.append(localName);
         final Set<String> parameters = StreamSupport.stream(pathParams.spliterator(), false)
@@ -386,15 +393,11 @@ public abstract class BaseYangOpenApiGenerator {
 
         if (schemaNode instanceof ListSchemaNode) {
             String prefix = "=";
-            int discriminator = 1;
             for (final QName listKey : ((ListSchemaNode) schemaNode).getKeyDefinition()) {
                 final String keyName = listKey.getLocalName();
                 String paramName = keyName;
-                if (parameters.contains(paramName)) {
-                    while (parameters.contains(paramName + discriminator)) {
-                        discriminator++;
-                    }
-                    paramName = paramName + discriminator;
+                while (parameters.contains(paramName)) {
+                    paramName = paramName + discriminator.getAndIncrement();
                 }
                 parameters.add(paramName);
 
