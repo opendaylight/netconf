@@ -16,6 +16,24 @@
       "message": "This is not cherry-pick, we can use JsonNodeFactory.instance.arrayNode().addAll() the same way as on main branch.",
       "revId": "8fb005fcf6486a64272e1b4f5ff7d7656fa04a55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a2afda7_09859041",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-06-23T12:57:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "337e86bd_c1046891",
+      "revId": "8fb005fcf6486a64272e1b4f5ff7d7656fa04a55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
