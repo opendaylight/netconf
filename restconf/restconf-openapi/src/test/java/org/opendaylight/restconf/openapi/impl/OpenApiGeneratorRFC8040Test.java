@@ -473,9 +473,9 @@ public final class OpenApiGeneratorRFC8040Test {
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
         var pathToList1 = "/rests/data/keys-mapping:multiple-key-list={name},{name2}/multiple-key-list2={name1},"
-            + "{name3}/multiple-key-list3={name31},{name4}/multiple-key-list4={name5}";
+            + "{name3}/multiple-key-list3={name32},{name34}/multiple-key-list4={name5}";
         assertTrue(doc.paths().containsKey(pathToList1));
-        assertEquals(List.of("name","name2", "name1", "name3", "name31", "name4", "name5"),
+        assertEquals(List.of("name","name2", "name1", "name3", "name32", "name34", "name5"),
             getPathParameters(doc.paths(), pathToList1));
     }
 }
