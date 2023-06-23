@@ -122,6 +122,24 @@
       "parentUuid": "61838cc8_a728f0d5",
       "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9421a210_47c6a421",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-06-23T20:04:44Z",
+      "side": 1,
+      "message": "I added the following unkeyed list to netconf-node-topoloyg.yang as a hackish way to do some testing:\n```\n    list nokey {\n        ordered-by user;\n        leaf name {\n            type string;\n        }\n    }\n```\nAnd when the first entry of the list is targeted like this:\n```\n{\n    \"input\": {\n        \"path\": \"/network-topology:network-topology/topology[topology-id\u003d\u0027topology-netconf\u0027]/node[node-id\u003d\u0027ncserver\u0027]/netconf-node-topology:nokey[1]\",\n        \"sal-remote-augment:datastore\": \"CONFIGURATION\",\n        \"sal-remote-augment:scope\": \"SUBTREE\",\n        \"sal-remote-augment:notification-output-type\": \"JSON\"\n    }\n}\n```\nI get this error:\n```\n2023-06-23T17:22:21,454 | DEBUG | qtp1627992198-206 | JsonNormalizedNodeBodyReader     | 264 - org.opendaylight.netconf.restconf-nb - 6.0.0.SNAPSHOT | Error parsing json input\njava.lang.IllegalArgumentException: Could not parse Instance Identifier \u0027/network-topology:network-topology/topology[topology-id\u003d\u0027topology-netconf\u0027]/node[node-id\u003d\u0027ncserver\u0027]/netconf-node-topology:nokey[1]\u0027. Offset: 128 : Reason: Entry (urn:opendaylight:netconf-node-topology?revision\u003d2022-12-25)nokey does not allow specifying predicates.\n\tat org.opendaylight.yangtools.yang.data.util.XpathStringParsingPathArgumentBuilder.iae(XpathStringParsingPathArgumentBuilder.java:261) ~[bundleFile:?]\n\tat org.opendaylight.yangtools.yang.data.util.XpathStringParsingPathArgumentBuilder.computeIdentifierWithPredicate(XpathStringParsingPathArgumentBuilder.java:149) ~[bundleFile:?]\n\tat org.opendaylight.yangtools.yang.data.util.XpathStringParsingPathArgumentBuilder.computeNextArgument(XpathStringParsingPathArgumentBuilder.java:113) ~[bundleFile:?]\n\tat org.opendaylight.yangtools.yang.data.util.XpathStringParsingPathArgumentBuilder.build(XpathStringParsingPathArgumentBuilder.java:96) ~[bundleFile:?]\n\tat org.opendaylight.yangtools.yang.data.util.AbstractStringInstanceIdentifierCodec.deserializeImpl(AbstractStringInstanceIdentifierCodec.java:165) ~[bundleFile:?]\n\tat org.opendaylight.yangtools.yang.data.util.AbstractStringInstanceIdentifierCodec.deserializeImpl(AbstractStringInstanceIdentifierCodec.java:35) ~[bundleFile:?]\n\tat org.opendaylight.yangtools.yang.data.api.codec.AbstractIllegalArgumentCodec.deserialize(AbstractIllegalArgumentCodec.java:27) ~[?:?]\n\tat org.opendaylight.yangtools.yang.data.codec.gson.JSONInstanceIdentifierCodec.parseValue(JSONInstanceIdentifierCodec.java:102) ~[bundleFile:?]\n\tat org.opendaylight.yangtools.yang.data.codec.gson.JSONInstanceIdentifierCodec$RFC7951.parseValue(JSONInstanceIdentifierCodec.java:37) ~[bundleFile:?]\n```\nSo looks like it is not allowed/supported to specify an entry for a list without keys.\n\nWhen the list itself is targeted with the following path:\n```\n\"path\": \"/network-topology:network-topology/topology[topology-id\u003d\u0027topology-netconf\u0027]/node[node-id\u003d\u0027ncserver\u0027]/netconf-node-topology:nokey\"\n```\n\nthe subscription is successfully created and data change request is registered but no data change notification is received when the list is updated, either changing a leaf in a list entry or adding/removing an entry.\n\nSo it appears that there are multiple issues blocking support of unkeyed lists.",
+      "parentUuid": "b001d359_3cdf0b32",
+      "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

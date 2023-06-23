@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a55c343_461300b6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-06-23T20:04:44Z",
+      "side": 1,
+      "message": "For the path of an unkeyed list entry I follow the example in RFC 7950:\nhttps://datatracker.ietf.org/doc/html/rfc7950#section-9.13.4\n```\n/* instance-identifier for a list entry without keys */\n/ex:stats/ex:port[3]\n```",
+      "revId": "ea7b46d41004df18919fe18ee9751d6cbe26d7c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
