@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff6cf955_5c04a342",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-23T07:32:30Z",
+      "side": 1,
+      "message": "pls resolve compilation error\n\n09:33:47 [ERROR] /w/workspace/netconf-maven-verify-master-mvn38-openjdk17/restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java:[446,13] incompatible types: com.fasterxml.jackson.databind.node.ArrayNode cannot be converted to java.util.List\u003corg.opendaylight.restconf.openapi.model.Parameter\u003e",
+      "revId": "9dfc389cbb5e3fd1f1f9fa7b042e9a7b719961ac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d4049b2_054ce1b5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Operation.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-23T07:32:30Z",
+      "side": 1,
+      "message": "List\u003cParameter\u003e",
+      "range": {
+        "startLine": 51,
+        "startChar": 40,
+        "endLine": 51,
+        "endChar": 44
+      },
+      "revId": "9dfc389cbb5e3fd1f1f9fa7b042e9a7b719961ac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da5676ba_61104f84",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-23T07:32:30Z",
+      "side": 1,
+      "message": "simplify\nreturn paths.get(path).post().parameters()\n    .stream().map(Parameter::name).toList();",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 22
+      },
+      "revId": "9dfc389cbb5e3fd1f1f9fa7b042e9a7b719961ac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
