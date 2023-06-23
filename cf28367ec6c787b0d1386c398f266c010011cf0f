@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16f9c58b_d3152098",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-06-23T11:17:56Z",
+      "side": 1,
+      "message": "Set\u003cString\u003e for saving names of parameters will be eliminated once we apply NETCONF-1056",
+      "revId": "cf28367ec6c787b0d1386c398f266c010011cf0f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
