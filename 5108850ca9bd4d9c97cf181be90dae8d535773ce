@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b0e4ff48_ac332866",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/OSGiNetconfServer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-26T21:11:12Z",
+      "side": 1,
+      "message": "this should be separate as it changes a configuration",
+      "range": {
+        "startLine": 38,
+        "startChar": 53,
+        "endLine": 38,
+        "endChar": 59
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b4da1a93_90c5726b",
         "filename": "artifacts/pom.xml",
         "patchSetId": 11
@@ -95,6 +118,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "983c16c6_3c3a6d07",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-26T21:11:12Z",
+      "side": 1,
+      "message": "either \"new\" or \"create\" -- shared is not an option due to thread safety concerns. Also explicit @NonNull.",
+      "range": {
+        "startLine": 60,
+        "startChar": 30,
+        "endLine": 60,
+        "endChar": 33
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7a2552d8_d7e7c1ca",
         "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
         "patchSetId": 11
@@ -157,6 +203,52 @@
         "startChar": 0,
         "endLine": 14,
         "endChar": 30
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1da07e25_49ce3404",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/api/NetconfServerFactory.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-26T21:11:12Z",
+      "side": 1,
+      "message": "I can\u0027t say I like this interface: it just encapsulates the tie-in with dispatcher and configuration options and acts as an implementation hotspot (i.e. all the methods just routing to TCPServer/TLSServer/SSHServer methods.\n\nEach of those methods in turn seems to have exactly one caller -- i.e. we have N-\u003e1-\u003eN framework.\n\nThe \"1\" component has to implement all transports -- i.e. what should I do if my NetconfServerFactory implementation only supports TCP?",
+      "range": {
+        "startLine": 24,
+        "startChar": 17,
+        "endLine": 24,
+        "endChar": 37
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44c73025_b1e4a2ad",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/api/NetconfServerFactory.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-26T21:11:12Z",
+      "side": 1,
+      "message": "NPE for nulls",
+      "range": {
+        "startLine": 32,
+        "startChar": 15,
+        "endLine": 32,
+        "endChar": 39
       },
       "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
