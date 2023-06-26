@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ce18046_e4abba28",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-26T09:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a75ceb2_6ca052e3",
+      "range": {
+        "startLine": 208,
+        "startChar": 14,
+        "endLine": 208,
+        "endChar": 64
+      },
+      "revId": "f66f2ee9117a39ac2d9a8e13c4d3b287421406cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dc060c9e_fc487128",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-06-22T20:53:01Z",
       "side": 1,
       "message": "also here, \u0027var module\u0027",
+      "range": {
+        "startLine": 210,
+        "startChar": 13,
+        "endLine": 210,
+        "endChar": 32
+      },
+      "revId": "f66f2ee9117a39ac2d9a8e13c4d3b287421406cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89067ceb_f7602edc",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-26T09:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc060c9e_fc487128",
       "range": {
         "startLine": 210,
         "startChar": 13,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a54c53a_14341a53",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-26T09:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f88a398_58c3d4ea",
+      "range": {
+        "startLine": 216,
+        "startChar": 42,
+        "endLine": 216,
+        "endChar": 50
+      },
+      "revId": "f66f2ee9117a39ac2d9a8e13c4d3b287421406cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df2d403a_2860216d",
@@ -83,6 +155,30 @@
       "writtenOn": "2023-06-22T20:53:01Z",
       "side": 1,
       "message": "drop final here: it is very obvious",
+      "range": {
+        "startLine": 279,
+        "startChar": 13,
+        "endLine": 279,
+        "endChar": 18
+      },
+      "revId": "f66f2ee9117a39ac2d9a8e13c4d3b287421406cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7de33eaa_789aec42",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-26T09:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df2d403a_2860216d",
       "range": {
         "startLine": 279,
         "startChar": 13,
