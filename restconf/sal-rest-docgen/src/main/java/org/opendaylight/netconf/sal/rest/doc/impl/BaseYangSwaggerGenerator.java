@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.DEFAULT_PAGESIZE;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildDelete;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildGet;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPost;
@@ -499,7 +498,7 @@ public abstract class BaseYangSwaggerGenerator {
 
         final String nodeName = node.getQName().getLocalName();
 
-        final String defName = parentName + "_" + nodeName + TOP + discriminator;
+        final String defName = parentName + "_" + nodeName + discriminator;
         final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig, oaversion);
         operations.put("get", get);
 
