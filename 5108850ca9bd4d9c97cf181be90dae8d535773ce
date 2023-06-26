@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73c6a411_fc421a1c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-06-26T21:17:05Z",
+      "side": 1,
+      "message": "At the end of the day: the dispatcher thing (and a lot of the APIs implemented through netconf-netty-util) define a framework. That has not panned out so well and we want to define libraries.\n\nhttps://www.baeldung.com/cs/framework-vs-library for the difference (which has design-level implications)",
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b0e4ff48_ac332866",
