@@ -16,7 +16,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -417,6 +419,21 @@ public final class OpenApiGeneratorRFC8040Test {
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
         assertEquals(44, definitions.size());
+    }
+
+    /**
+     * Test that checks if securitySchemes and security elements are present.
+     */
+    @Test
+    public void testAuthenticationFeature() throws JsonProcessingException {
+        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
+        final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        assertEquals(doc.security(), objectMapper.readTree("[{\"basicAuth\":[]}]"));
+        assertEquals(doc.components().securitySchemes().basicAuth(),
+                objectMapper.readTree("{\"type\":\"http\",\"scheme\":\"basic\"}"));
     }
 
     /**
