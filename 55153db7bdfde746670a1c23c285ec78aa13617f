@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dad7220_8d709f0e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-27T10:16:29Z",
+      "side": 1,
+      "message": "Missing cherry-pick.\nhttps://git.opendaylight.org/gerrit/c/openflowplugin/+/105621/4//COMMIT_MSG#15",
+      "revId": "55153db7bdfde746670a1c23c285ec78aa13617f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "e0ec9ebe_3bfeb5c4",
@@ -14,6 +31,23 @@
       "writtenOn": "2023-06-27T09:52:36Z",
       "side": 1,
       "message": "JSON GET examples are not the same for list request.",
+      "revId": "55153db7bdfde746670a1c23c285ec78aa13617f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "765e8199_1914e8c6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-27T10:16:29Z",
+      "side": 1,
+      "message": "Missing OperationBuilder.java changes",
       "revId": "55153db7bdfde746670a1c23c285ec78aa13617f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
