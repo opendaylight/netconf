@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7efd11e4_1754fe62",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Parameter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-27T13:58:59Z",
+      "side": 1,
+      "message": "Please fix Record attributes like this:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106327/9..12/restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/ReadDataParams.java#b26",
+      "revId": "da68b6e11fa95ecac43498902e66c339ddac4e30",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
