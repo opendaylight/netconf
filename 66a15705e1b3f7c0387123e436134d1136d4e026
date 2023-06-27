@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56544fd0_ba88b004",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/CustomBasePathOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-27T13:57:56Z",
+      "side": 1,
+      "message": "List.of()",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25c9152c_8d4f9847",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/CustomBasePathOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-27T13:57:56Z",
+      "side": 1,
+      "message": "Different syntax here and below.",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aaa70442_f2a47291",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/CustomBasePathOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-27T13:57:56Z",
+      "side": 1,
+      "message": "final",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f3cfe2f_43412ef3",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/NETCONF-1021/custom-base-path-test.yang",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-27T13:57:56Z",
+      "side": 1,
+      "message": "Please create smaller model and use https://git.opendaylight.org/gerrit/c/yangtools/+/106033/10/codec/yang-data-codec-xml/src/test/java/org/opendaylight/yangtools/yang/data/codec/xml/AbstractAnydataTest.java approach.",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
