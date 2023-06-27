@@ -400,6 +400,19 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     }
 
     /**
+     * Test that checks if securitySchemes and security elements are present.
+     */
+    @Test
+    public void testAuthenticationFeature() {
+        final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+            ApiDocServiceImpl.OAversion.V3_0);
+
+        assertEquals("[{\"basicAuth\":[]}]", doc.getSecurity().toString());
+        assertEquals("{\"type\":\"basic\"}", doc.getSecurityDefinitions().getBasicAuth().toString());
+    }
+
+    /**
      *  Test JSON and XML references for request operation.
      */
     private static void verifyRequestRef(final JsonNode path, final String expectedJsonRef,

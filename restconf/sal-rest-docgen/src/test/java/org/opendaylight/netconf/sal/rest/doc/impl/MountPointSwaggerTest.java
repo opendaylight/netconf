@@ -164,4 +164,19 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         assertTrue(mountPointApi.getPaths().has(pathWithoutParameters));
         assertEquals(List.of(), getPathParameters(mountPointApi.getPaths(), pathWithoutParameters));
     }
+
+    /**
+     * Test that checks if securitySchemes and security elements are present.
+     */
+    @Test
+    public void testAuthenticationFeature() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        swagger.onMountPointCreated(INSTANCE_ID);
+        final var mountPointApi = (OpenApiObject) swagger.getMountPointApi(mockInfo, 1L, Optional.empty(),
+            OAversion.V3_0);
+
+        assertEquals("[{\"basicAuth\":[]}]", mountPointApi.getSecurity().toString());
+        assertEquals("{\"type\":\"http\",\"scheme\":\"basic\"}", mountPointApi.getComponents().getSecuritySchemes()
+            .getBasicAuth().toString());
+    }
 }
