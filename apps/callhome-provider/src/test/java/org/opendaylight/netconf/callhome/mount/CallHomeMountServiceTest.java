@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.Channel;
+import java.lang.annotation.Annotation;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +66,7 @@ public class CallHomeMountServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        service = new CallHomeMountService(topology);
+        service = new CallHomeMountService(topology, defaultConfig());
         /*
          * Reproduce behavior of org.opendaylight.netconf.topology.spi.AbstractNetconfTopology#ensureNode(Node)
          * for ID1 only.
@@ -73,7 +74,7 @@ public class CallHomeMountServiceTest {
         doAnswer(invocation -> {
             node1 = (Node) invocation.getArguments()[0];
             if (ID1.equals(node1.requireNodeId().getValue())) {
-                final var configBuilderFactory = CallHomeMountService.createClientConfigurationBuilderFactory();
+                final var configBuilderFactory = service.createClientConfigurationBuilderFactory();
                 final var config = configBuilderFactory
                     .createClientConfigurationBuilder(node1.requireNodeId(), node1.augmentation(NetconfNode.class))
                     .withSessionListener(sessionListener).build();
@@ -139,4 +140,47 @@ public class CallHomeMountServiceTest {
         verify(topology, times(1)).disableNode(eq(NODE_ID1));
     }
 
+    private static CallHomeMountService.Configuration defaultConfig() {
+        return new CallHomeMountService.Configuration() {
+            @Override
+            public String host() {
+                return "0.0.0.0";
+            }
+
+            @Override
+            public int ssh$_$Port() {
+                return 4334;
+            }
+
+            @Override
+            public int tls$_$Port() {
+                return 4335;
+            }
+
+            @Override
+            public int connection$_$Timeout$_$Millis() {
+                return 10_000;
+            }
+
+            @Override
+            public int max$_$Connections() {
+                return 64;
+            }
+
+            @Override
+            public int keep$_$Alive$_$Delay() {
+                return 120;
+            }
+
+            @Override
+            public int request$_$Timeout$_$Millis() {
+                return 60000;
+            }
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return null;
+            }
+        };
+    }
 }
