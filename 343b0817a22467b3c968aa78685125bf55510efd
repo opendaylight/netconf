@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "343b0817a22467b3c968aa78685125bf55510efd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d759f1b_66d5d71a",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-27T14:35:03Z",
+      "side": 1,
+      "message": "The same javadoc already exists in this class.",
+      "revId": "343b0817a22467b3c968aa78685125bf55510efd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f0eeccf_3c8351cf",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-27T14:35:03Z",
+      "side": 1,
+      "message": "IMO we need better description what we are testing.",
+      "revId": "343b0817a22467b3c968aa78685125bf55510efd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db8b11f1_58150aff",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/keys-mapping.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-27T14:35:03Z",
+      "side": 1,
+      "message": "WE can use the same facility as https://git.opendaylight.org/gerrit/c/yangtools/+/106033/10/codec/yang-data-codec-xml/src/test/java/org/opendaylight/yangtools/yang/data/codec/xml/AbstractAnydataTest.java.",
+      "revId": "343b0817a22467b3c968aa78685125bf55510efd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
