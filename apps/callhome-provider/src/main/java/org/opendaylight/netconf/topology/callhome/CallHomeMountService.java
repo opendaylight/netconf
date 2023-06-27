@@ -11,6 +11,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
+import java.math.RoundingMode;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map;
@@ -54,6 +55,9 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 /**
  * Service is responsible for call-home to topology integration.
@@ -101,14 +105,86 @@ import org.osgi.service.component.annotations.Reference;
  *     signal connection state to topology component</li>
  * </ul>
  */
-@Component(service = CallHomeMountService.class, immediate = true)
+@Component(service = CallHomeMountService.class, immediate = true,
+    configurationPid = "org.opendaylight.netconf.topology.callhome")
+@Designate(ocd = CallHomeMountService.Configuration.class)
 @Singleton
 public final class CallHomeMountService implements AutoCloseable {
+
+    @ObjectClassDefinition
+    public @interface Configuration {
+        @AttributeDefinition(description = "Host address used for Call-Home server.")
+        String host() default "0.0.0.0";
+
+        @AttributeDefinition(description = "Port used for Call-Home SSH server.", min = "1", max = "65535")
+        int ssh$_$port() default 4334;
+
+        @AttributeDefinition(description = "Port used for Call-Home TLS server.", min = "1", max = "65535")
+        int tls$_$port() default 4335;
+
+        @AttributeDefinition(description = "Connection timeout for Call-Home server.")
+        int connection$_$timeout$_$millis() default 10_000;
+
+        @AttributeDefinition(description = "Maximum number of connections for Call-Home server.")
+        int max$_$connections() default 64;
+
+        @AttributeDefinition(description = "Delay between keep alive messages in seconds.", min = "0")
+        int keep$_$alive$_$delay() default 120;
+
+        @AttributeDefinition(description = "Timeout for blocking operations within transactions.", min = "0")
+        int request$_$timeout$_$millis() default 60000;
+
+        @AttributeDefinition(description = "Initial timeout in milliseconds to wait between connection attempts.",
+            min = "0", max = "65535")
+        int min$_$backoff$_$millis() default 2000;
+
+        @AttributeDefinition(description = "Maximum timeout in milliseconds to wait between connection attempts.",
+            min = "0")
+        int max$_$backoff$_$millis() default 1800000;
+
+        @AttributeDefinition(description = """
+            Multiplier for backoff timeout. The backoff will be multiplied by this
+            value with every additional attempt.""", min = "0")
+        double backoff$_$multiplier() default 1.5;
+
+        @AttributeDefinition(description = """
+            Range of backoff randomization. The backoff will be multiplied by a
+            random number in the range (1 - backoff-jitter, 1 + backoff-jitter). Backoff-jitter must be
+            in the range (0, 0.5).""", min = "0", max = "0.5")
+        double backoff$_$jitter() default 0.1;
+
+        @AttributeDefinition(description = """
+            Limit of concurrent messages that can be send before reply messages
+            are received.""", min = "0", max = "65535")
+        int concurrent$_$rpc$_$limit() default 0;
+
+        @AttributeDefinition(description = "Maximum number of connection retries", min = "0")
+        int max$_$connection$_$attempts() default 0;
+
+        @AttributeDefinition(description =
+            "Enables connection of legacy NETCONF devices that are not schema-based and implement just RFC 4741.")
+        boolean schemaless() default false;
+
+        @AttributeDefinition(description = "Time that slave actor will wait for response from master.",
+            min = "1", max = "65535")
+        int actor$_$response$_$wait$_$time() default 5;
+
+        @AttributeDefinition(description =
+            "The operation allows the client to lock the entire configuration datastore system of a device.")
+        boolean lock$_$datastore() default true;
+
+        @AttributeDefinition(description = """
+            If true, the connector would auto disconnect/reconnect when schemas are
+            changed in the remote device.""")
+        boolean reconnect$_$on$_$changed$_$schema() default false;
+    }
+
     private static final Protocol SSH_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.SSH).build();
     private static final Protocol TLS_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.TLS).build();
 
     private final Map<String, NetconfLayer> netconfLayerMapping = new ConcurrentHashMap<>();
     private final CallHomeTopology topology;
+    private final Configuration config;
 
     @Activate
     @Inject
@@ -119,16 +195,17 @@ public final class CallHomeMountService implements AutoCloseable {
             final @Reference BaseNetconfSchemaProvider baseSchemaProvider,
             final @Reference DataBroker dataBroker,
             final @Reference DOMMountPointService mountService,
-            final @Reference DeviceActionFactory deviceActionFactory) {
+            final @Reference DeviceActionFactory deviceActionFactory, final Configuration config) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer, schemaAssembler, schemaRepositoryProvider,
-            baseSchemaProvider, dataBroker, mountService, deviceActionFactory);
+            baseSchemaProvider, dataBroker, mountService, deviceActionFactory, config);
     }
 
     public CallHomeMountService(final String topologyId, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
             final BaseNetconfSchemaProvider baseSchemaProvider, final DataBroker dataBroker,
-            final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory) {
-
+            final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory,
+            final Configuration config) {
+        this.config = config;
         final var clientConfBuilderFactory = createClientConfigurationBuilderFactory();
         final var clientFactory = createClientFactory();
         topology = new CallHomeTopology(topologyId, clientFactory, timer, schemaAssembler,
@@ -137,15 +214,17 @@ public final class CallHomeMountService implements AutoCloseable {
     }
 
     @VisibleForTesting
-    CallHomeMountService(final CallHomeTopology topology) {
+    CallHomeMountService(final CallHomeTopology topology, final Configuration config) {
         this.topology = topology;
+        this.config = config;
     }
 
     @VisibleForTesting
-    static NetconfClientConfigurationBuilderFactory createClientConfigurationBuilderFactory() {
+    NetconfClientConfigurationBuilderFactory createClientConfigurationBuilderFactory() {
         // use minimal configuration, only id and session listener are used
         return (nodeId, node) -> NetconfClientConfigurationBuilder.create()
             .withName(nodeId.getValue())
+            .withConnectionTimeoutMillis(config.connection$_$timeout$_$millis())
             // below parameters are only required to pass configuration validation
             // actual values play no role
             .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
@@ -172,7 +251,7 @@ public final class CallHomeMountService implements AutoCloseable {
         };
     }
 
-    private static Node asNode(final String id, final SocketAddress socketAddress, final Protocol protocol) {
+    private Node asNode(final String id, final SocketAddress socketAddress, final Protocol protocol) {
         final var nodeAddress = socketAddress instanceof InetSocketAddress inetSocketAddress
             ? inetSocketAddress : new InetSocketAddress("0.0.0.0", 0);
         // construct synthetic Node object with minimal required parameters
@@ -184,19 +263,19 @@ public final class CallHomeMountService implements AutoCloseable {
                 .setTcpOnly(false)
                 .setProtocol(protocol)
                 // below parameters are required for NetconfNodeHandler
-                .setSchemaless(false)
-                .setReconnectOnChangedSchema(false)
-                .setConnectionTimeoutMillis(Uint32.valueOf(20000))
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(60000))
-                .setMaxConnectionAttempts(Uint32.ZERO)
-                .setMinBackoffMillis(Uint16.valueOf(2000))
-                .setMaxBackoffMillis(Uint32.valueOf(1800000))
-                .setBackoffMultiplier(Decimal64.valueOf("1.5"))
-                .setBackoffJitter(Decimal64.valueOf("0.1"))
-                .setKeepaliveDelay(Uint32.valueOf(120))
-                .setConcurrentRpcLimit(Uint16.ZERO)
-                .setActorResponseWaitTime(Uint16.valueOf(5))
-                .setLockDatastore(true)
+                .setSchemaless(config.schemaless())
+                .setReconnectOnChangedSchema(config.reconnect$_$on$_$changed$_$schema())
+                .setConnectionTimeoutMillis(Uint32.valueOf(config.connection$_$timeout$_$millis()))
+                .setDefaultRequestTimeoutMillis(Uint32.valueOf(config.request$_$timeout$_$millis()))
+                .setMaxConnectionAttempts(Uint32.valueOf(config.max$_$connection$_$attempts()))
+                .setMinBackoffMillis(Uint16.valueOf(config.min$_$backoff$_$millis()))
+                .setMaxBackoffMillis(Uint32.valueOf(config.max$_$backoff$_$millis()))
+                .setBackoffMultiplier(Decimal64.valueOf(config.backoff$_$multiplier(), RoundingMode.HALF_DOWN))
+                .setBackoffJitter(Decimal64.valueOf(config.backoff$_$jitter(), RoundingMode.HALF_DOWN))
+                .setKeepaliveDelay(Uint32.valueOf(config.keep$_$alive$_$delay()))
+                .setConcurrentRpcLimit(Uint16.valueOf(config.concurrent$_$rpc$_$limit()))
+                .setActorResponseWaitTime(Uint16.valueOf(config.actor$_$response$_$wait$_$time()))
+                .setLockDatastore(config.lock$_$datastore())
                 .build())
             .build();
     }
