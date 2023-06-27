@@ -82,6 +82,7 @@ public final class CallHomeTlsServer implements AutoCloseable {
         }
 
         public @NonNull CallHomeTlsServer build() {
+            timeoutMillis = timeoutMillis == null ? DEFAULT_TIMEOUT_MILLIS : timeoutMillis;
             return new CallHomeTlsServer(
                 toServerParams(address, port),
                 bootstrapFactory == null ? defaultBootstrapFactory() : bootstrapFactory,
