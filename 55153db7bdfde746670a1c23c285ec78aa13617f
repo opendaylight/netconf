@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "cc7610e3_3cc394e0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-27T11:38:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8dad7220_8d709f0e",
+      "revId": "55153db7bdfde746670a1c23c285ec78aa13617f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e0ec9ebe_3bfeb5c4",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "The problem was generally for GET JSON examples (not only list requests). Although the XML example was fixed by NOT using the `_TOP` suffixed schema for GET, the JSON example was not correct\n\nexpected (example in swagger ui):\n`{\n  \"testToasterBits\": \"testbit2\",\n  \"testUnion\": \"string\",\n  \"allow-user\": [\n    \"string\"\n  ],\n  \"interval\": 0,\n  \"toasterManufacturer\": \"string\",\n  \"toasterModelNumber\": \"string\",\n  \"toasterStatus\": \"up\"\n}`\n\nactual (response):\n`{\n  \"toaster\": {\n    \"testToasterBits\": \"testbit2\",\n    \"testUnion\": \"string\",\n    \"allow-user\": [\n      \"string\"\n    ],\n    \"interval\": 0,\n    \"toasterManufacturer\": \"string\",\n    \"toasterModelNumber\": \"string\",\n    \"toasterStatus\": \"up\"\n  }\n}`",
       "parentUuid": "d84d762d_e62b0cc6",
+      "revId": "55153db7bdfde746670a1c23c285ec78aa13617f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbc533a0_dad06ddd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-27T11:38:01Z",
+      "side": 1,
+      "message": "Fixed by using logic from https://git.opendaylight.org/gerrit/c/netconf/+/106581 for OAversion.V3_0, but keeping wrong XML example (with the _TOP schema) for OAversion.V2_0, since it does not support individual schemas for different MIME types",
+      "parentUuid": "ef5f4dab_fb7daf63",
       "revId": "55153db7bdfde746670a1c23c285ec78aa13617f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
