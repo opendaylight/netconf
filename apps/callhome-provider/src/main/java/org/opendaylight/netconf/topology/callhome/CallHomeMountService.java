@@ -25,11 +25,13 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
@@ -52,24 +54,27 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 /**
  * Service is responsible for call-home to topology integration.
  *
  * <p>
  * To manage remote device as a topology node the topology component (based on
- * {@link org.opendaylight.netconf.topology.spi.AbstractNetconfTopology AbstractNetconfTopology}) creates an instance
- * of {@link org.opendaylight.netconf.topology.spi.NetconfNodeHandler NetconfNodeHandler} based on provided
+ * {@link AbstractNetconfTopology}) creates an instance
+ * of {@link NetconfNodeHandler} based on provided
  * {@link Node}.
  *
  * <p>
  * The mentioned NetconfNodeHandler initializes connection to remote device via sequence of following actions (see
- * {@link org.opendaylight.netconf.topology.spi.AbstractNetconfTopology#ensureNode(Node) ensureNode(Node)} and
+ * {@link AbstractNetconfTopology#ensureNode(Node)} and
  * {@link NetconfNodeHandler#lockedConnect() connect()}):
  *
  * <ul>
- *     <li>Builds an instance of {@link org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator
- *     NetconfDeviceCommunicator} implementation of {@link NetconfClientSessionListener} which is used to check the
+ *     <li>Builds an instance of {@link NetconfDeviceCommunicator}
+ *     implementation of {@link NetconfClientSessionListener} which is used to check the
  *     NETCONF session state and communicate with device using NETCONF protocol </li>
  *     <li>Builds Netconf client configuration using provided {@link NetconfClientConfigurationBuilderFactory}</li>
  *     <li>Builds Netconf client using configuration composed and triggers connection</li>
@@ -99,14 +104,42 @@ import org.osgi.service.component.annotations.Reference;
  *     signal connection state to topology component</li>
  * </ul>
  */
-@Component(service = CallHomeMountService.class, immediate = true)
+@Component(service = CallHomeMountService.class, immediate = true,
+    configurationPid = "org.opendaylight.netconf.topology.callhome")
+@Designate(ocd = CallHomeMountService.Configuration.class)
 @Singleton
 public final class CallHomeMountService implements AutoCloseable {
+
+    @ObjectClassDefinition
+    public @interface Configuration {
+        @AttributeDefinition
+        String host() default "0.0.0.0";
+
+        @AttributeDefinition(min = "1", max = "65535")
+        int ssh$_$Port() default 4334;
+
+        @AttributeDefinition(min = "1", max = "65535")
+        int tls$_$Port() default 4335;
+
+        @AttributeDefinition
+        int connection$_$Timeout$_$Millis() default 10_000;
+
+        @AttributeDefinition
+        int max$_$Connections() default 64;
+
+        @AttributeDefinition(min = "0")
+        int keep$_$Alive$_$Delay() default 120;
+
+        @AttributeDefinition(min = "0")
+        int request$_$Timeout$_$Millis() default 60000;
+    }
+
     private static final Protocol SSH_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.SSH).build();
     private static final Protocol TLS_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.TLS).build();
 
     private final Map<String, NetconfLayer> netconfLayerMapping = new ConcurrentHashMap<>();
     private final CallHomeTopology topology;
+    private final Configuration config;
 
     @Activate
     @Inject
@@ -117,16 +150,16 @@ public final class CallHomeMountService implements AutoCloseable {
             final @Reference BaseNetconfSchemas baseSchemas,
             final @Reference DataBroker dataBroker,
             final @Reference DOMMountPointService mountService,
-            final @Reference DeviceActionFactory deviceActionFactory) {
+            final @Reference DeviceActionFactory deviceActionFactory, final Configuration config) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer, schemaAssembler, schemaRepositoryProvider, baseSchemas,
-            dataBroker, mountService, deviceActionFactory);
+            dataBroker, mountService, deviceActionFactory, config);
     }
 
     public CallHomeMountService(final String topologyId, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
             final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker, final DOMMountPointService mountService,
-            final DeviceActionFactory deviceActionFactory) {
-
+            final DeviceActionFactory deviceActionFactory, final Configuration config) {
+        this.config = config;
         final var clientConfBuilderFactory = createClientConfigurationBuilderFactory();
         final var clientFactory = createClientFactory();
         topology = new CallHomeTopology(topologyId, clientFactory, timer, schemaAssembler,
@@ -135,15 +168,17 @@ public final class CallHomeMountService implements AutoCloseable {
     }
 
     @VisibleForTesting
-    CallHomeMountService(final CallHomeTopology topology) {
+    CallHomeMountService(final CallHomeTopology topology, final Configuration config) {
         this.topology = topology;
+        this.config = config;
     }
 
     @VisibleForTesting
-    static NetconfClientConfigurationBuilderFactory createClientConfigurationBuilderFactory() {
+    NetconfClientConfigurationBuilderFactory createClientConfigurationBuilderFactory() {
         // use minimal configuration, only id and session listener are used
         return (nodeId, node) -> NetconfClientConfigurationBuilder.create()
             .withName(nodeId.getValue())
+            .withConnectionTimeoutMillis(config.connection$_$Timeout$_$Millis())
             // below parameters are only required to pass configuration validation
             // actual values play no role
             .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
@@ -170,7 +205,7 @@ public final class CallHomeMountService implements AutoCloseable {
         };
     }
 
-    private static Node asNode(final String id, final SocketAddress socketAddress, final Protocol protocol) {
+    private Node asNode(final String id, final SocketAddress socketAddress, final Protocol protocol) {
         final var nodeAddress = socketAddress instanceof InetSocketAddress inetSocketAddress
             ? inetSocketAddress : new InetSocketAddress("0.0.0.0", 0);
         // construct synthetic Node object with minimal required parameters
@@ -184,14 +219,14 @@ public final class CallHomeMountService implements AutoCloseable {
                 // below parameters are required for NetconfNodeHandler
                 .setSchemaless(false)
                 .setReconnectOnChangedSchema(false)
-                .setConnectionTimeoutMillis(Uint32.valueOf(20000))
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(60000))
+                .setConnectionTimeoutMillis(Uint32.valueOf(config.connection$_$Timeout$_$Millis()))
+                .setDefaultRequestTimeoutMillis(Uint32.valueOf(config.request$_$Timeout$_$Millis()))
                 .setMaxConnectionAttempts(Uint32.ZERO)
                 .setMinBackoffMillis(Uint16.valueOf(2000))
                 .setMaxBackoffMillis(Uint32.valueOf(1800000))
                 .setBackoffMultiplier(Decimal64.valueOf("1.5"))
                 .setBackoffJitter(Decimal64.valueOf("0.1"))
-                .setKeepaliveDelay(Uint32.valueOf(120))
+                .setKeepaliveDelay(Uint32.valueOf(config.keep$_$Alive$_$Delay()))
                 .setConcurrentRpcLimit(Uint16.ZERO)
                 .setActorResponseWaitTime(Uint16.valueOf(5))
                 .setLockDatastore(true)
