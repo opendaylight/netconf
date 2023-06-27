@@ -22,6 +22,30 @@
       },
       "revId": "8a8dad0704a86816c269527110ed04fc33488493",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b413b59e_93a85dfc",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/databind/jaxrs/QueryParams.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-27T14:24:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9c3e0b7_f9c152c5",
+      "range": {
+        "startLine": 163,
+        "startChar": 43,
+        "endLine": 163,
+        "endChar": 63
+      },
+      "revId": "8a8dad0704a86816c269527110ed04fc33488493",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
