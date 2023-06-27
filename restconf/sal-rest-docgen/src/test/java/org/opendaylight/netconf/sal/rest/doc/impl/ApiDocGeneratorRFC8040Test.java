@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.junit.Test;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
+import org.opendaylight.netconf.sal.rest.doc.swagger.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.Revision;
 
@@ -54,7 +56,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testPaths() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-            ApiDocServiceImpl.OAversion.V2_0);
+            OAversion.V2_0);
 
         assertEquals(List.of("/rests/data",
             "/rests/data/toaster2:toaster",
@@ -84,7 +86,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-            ApiDocServiceImpl.OAversion.V2_0);
+            OAversion.V2_0);
 
         for (final String path : configPaths) {
             final JsonNode node = doc.getPaths().get(path);
@@ -103,7 +105,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testDefinitions() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-            ApiDocServiceImpl.OAversion.V2_0);
+            OAversion.V2_0);
 
         final ObjectNode definitions = doc.getDefinitions();
         assertNotNull(definitions);
@@ -156,7 +158,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testRPC() {
         final var module = CONTEXT.findModule(NAME_2, Revision.of(REVISION_DATE_2)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-            ApiDocServiceImpl.OAversion.V2_0);
+            OAversion.V2_0);
         assertNotNull(doc);
 
         final ObjectNode definitions = doc.getDefinitions();
@@ -174,7 +176,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testChoice() {
         final var module = CONTEXT.findModule(CHOICE_TEST_MODULE).orElseThrow();
         final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-                ApiDocServiceImpl.OAversion.V2_0);
+                OAversion.V2_0);
         assertNotNull(doc);
 
         final var definitions = doc.getDefinitions();
@@ -192,7 +194,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testMandatory() {
         final var module = CONTEXT.findModule(MANDATORY_TEST).orElseThrow();
         final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-                ApiDocServiceImpl.OAversion.V3_0);
+                OAversion.V3_0);
         assertNotNull(doc);
         final var definitions = doc.getDefinitions();
         final var containersWithRequired = new ArrayList<String>();
@@ -233,7 +235,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testParametersNumbering() {
         final var module = CONTEXT.findModule(PATH_PARAMS_TEST_MODULE).orElseThrow();
         final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-                ApiDocServiceImpl.OAversion.V3_0);
+                OAversion.V3_0);
 
         var pathToList1 = "/rests/data/path-params-test:cont/list1={name}";
         assertTrue(doc.getPaths().has(pathToList1));
@@ -289,7 +291,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testActionPathsParams() {
         final var module = CONTEXT.findModule("action-types").orElseThrow();
         final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-            ApiDocServiceImpl.OAversion.V3_0);
+            OAversion.V3_0);
 
         final var pathWithParameters = "/rests/operations/action-types:list={name}/list-action";
         assertTrue(doc.getPaths().has(pathWithParameters));
@@ -304,7 +306,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testSimpleOpenApiObjects() {
         final var module = CONTEXT.findModule(MY_YANG, Revision.of(MY_YANG_REVISION)).orElseThrow();
         final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "",
-                CONTEXT,ApiDocServiceImpl.OAversion.V3_0);
+                CONTEXT, OAversion.V3_0);
 
         assertEquals(List.of("/rests/data", "/rests/data/my-yang:data"),
                 Lists.newArrayList(doc.getPaths().fieldNames()));
@@ -333,7 +335,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testToaster2OpenApiObjects() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-                ApiDocServiceImpl.OAversion.V3_0);
+                OAversion.V3_0);
         final var jsonNodeToaster = doc.getPaths().get("/rests/data/toaster2:toaster");
         verifyRequestRef(jsonNodeToaster.path("post"), "#/components/schemas/toaster2_config_toaster_post",
                 "#/components/schemas/toaster2_config_toaster_post_xml");
@@ -397,6 +399,20 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         // Test `components/schemas` objects
         final var definitions = doc.getDefinitions();
         assertEquals(60, definitions.size());
+    }
+
+    /**
+     * Test that checks if securitySchemes and security elements are present.
+     */
+    @Test
+    public void testAuthenticationFeature() {
+        final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+            OAversion.V3_0);
+        final var openApiDoc = (OpenApiObject) BaseYangSwaggerGenerator.getAppropriateDoc(doc, OAversion.V3_0);
+        assertEquals("[{\"basicAuth\":[]}]", openApiDoc.getSecurity().toString());
+        assertEquals("{\"type\":\"http\",\"scheme\":\"basic\"}",
+            openApiDoc.getComponents().getSecuritySchemes().getBasicAuth().toString());
     }
 
     /**
