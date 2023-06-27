@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0ec9ebe_3bfeb5c4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-27T09:52:36Z",
+      "side": 1,
+      "message": "JSON GET examples are not the same for list request.",
+      "revId": "55153db7bdfde746670a1c23c285ec78aa13617f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
