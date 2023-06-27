@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3e38730c_246a641b",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/CustomBasePathOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-27T14:18:39Z",
+      "side": 1,
+      "message": "rests and restconf are the only parameters we have. IMO we ca get rid of BiFunction.",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "78a60828_9e49c8d9",
         "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/CustomBasePathOpenApiTest.java",
         "patchSetId": 12
