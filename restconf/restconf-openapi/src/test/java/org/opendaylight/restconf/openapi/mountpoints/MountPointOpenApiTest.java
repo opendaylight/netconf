@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -250,5 +251,20 @@ public final class MountPointOpenApiTest {
             "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action";
         assertTrue(mountPointApi.paths().containsKey(pathWithoutParameters));
         assertEquals(List.of(), getPathParameters(mountPointApi.paths(), pathWithoutParameters));
+    }
+
+
+    @Test
+    public void testAuthenticationFeature() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        assertEquals(mountPointApi.security(), objectMapper.readTree("[{\"basicAuth\":[]}]"));
+        assertEquals(mountPointApi.components().securitySchemes().basicAuth(),
+                objectMapper.readTree("{\"type\":\"http\",\"scheme\":\"basic\"}"));
     }
 }
