@@ -251,4 +251,29 @@ public final class MountPointOpenApiTest {
         assertTrue(mountPointApi.paths().containsKey(pathWithoutParameters));
         assertEquals(List.of(), getPathParameters(mountPointApi.paths(), pathWithoutParameters));
     }
+
+    /**
+     * Test that checks if securitySchemes and security elements are present.
+     */
+    @Test
+    public void testAuthenticationFeature() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+
+        assertEquals("""
+            [
+              {
+                "basicAuth":[]
+              }
+            ]
+            """, mountPointApi.security().toString());
+
+        assertEquals("""
+            {
+              "type":"http",
+              "scheme":"basic"
+            }
+            """, mountPointApi.components().securitySchemes().basicAuth().toString());
+    }
 }

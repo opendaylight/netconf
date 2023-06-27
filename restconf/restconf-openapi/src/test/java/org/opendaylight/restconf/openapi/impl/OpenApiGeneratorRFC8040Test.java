@@ -420,6 +420,30 @@ public final class OpenApiGeneratorRFC8040Test {
     }
 
     /**
+     * Test that checks if securitySchemes and security elements are present.
+     */
+    @Test
+    public void testAuthenticationFeature() {
+        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
+        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+
+        assertEquals("""
+            [
+              {
+                "basicAuth":[]
+              }
+            ]
+            """, doc.security().toString());
+
+        assertEquals("""
+            {
+              "type":"http",
+              "scheme":"basic"
+            }
+            """, doc.components().securitySchemes().basicAuth().toString());
+    }
+
+    /**
      *  Test JSON and XML references for request operation.
      */
     private static void verifyRequestRef(final Operation operation, final String expectedJsonRef,
