@@ -68,6 +68,24 @@
       "parentUuid": "e0ec9ebe_3bfeb5c4",
       "revId": "55153db7bdfde746670a1c23c285ec78aa13617f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef5f4dab_fb7daf63",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-27T11:35:59Z",
+      "side": 1,
+      "message": "The problem was generally for GET JSON examples (not only list requests). Although the XML example was fixed by NOT using the `_TOP` suffixed schema for GET, the JSON example was not correct\n\nexpected (example in swagger ui):\n`{\n  \"testToasterBits\": \"testbit2\",\n  \"testUnion\": \"string\",\n  \"allow-user\": [\n    \"string\"\n  ],\n  \"interval\": 0,\n  \"toasterManufacturer\": \"string\",\n  \"toasterModelNumber\": \"string\",\n  \"toasterStatus\": \"up\"\n}`\n\nactual (response):\n`{\n  \"toaster\": {\n    \"testToasterBits\": \"testbit2\",\n    \"testUnion\": \"string\",\n    \"allow-user\": [\n      \"string\"\n    ],\n    \"interval\": 0,\n    \"toasterManufacturer\": \"string\",\n    \"toasterModelNumber\": \"string\",\n    \"toasterStatus\": \"up\"\n  }\n}`",
+      "parentUuid": "d84d762d_e62b0cc6",
+      "revId": "55153db7bdfde746670a1c23c285ec78aa13617f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
