@@ -11,6 +11,20 @@ module operational {
       type string;
       config false;
     }
+    choice first-choice {
+      case first-case {
+        leaf leaf-first-case {
+          config false;
+          type string;
+        }
+      }
+      case second-case {
+        leaf leaf-second-case {
+          type string;
+        }
+      }
+      default first-case;
+    }
 
     container oper-container {
       config false;
@@ -30,6 +44,25 @@ module operational {
           type string;
         }
       }
+      leaf-list oper-container-config-leaf-list {
+        type string;
+      }
+      choice first-choice {
+        case first-case {
+          leaf leaf-first-case {
+            config false;
+            type string;
+          }
+          leaf oper-leaf-first-case {
+            type string;
+          }
+        }
+        case second-case {
+          leaf leaf-second-case {
+            type string;
+          }
+        }
+      }
     }
     container config-container {
       leaf config-container-oper-leaf {
@@ -45,6 +78,28 @@ module operational {
         leaf oper-container-list-leaf {
           type string;
         }
+      }
+      leaf-list config-container-oper-leaf-list {
+        config false;
+        type string;
+      }
+      choice first-choice {
+        case first-case {
+          leaf leaf-first-case {
+            config false;
+            type string;
+          }
+        }
+        case second-case {
+          leaf leaf-second-case {
+            type string;
+          }
+          leaf oper-leaf-second-case {
+            config false;
+            type string;
+          }
+        }
+        default second-case;
       }
     }
   }

@@ -14,8 +14,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -23,6 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
+import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -35,11 +41,15 @@ public class OperationalDataTest {
         "operational_config_root",
         "action-types_config_list",
         "action-types_container-action_input",
+        "operational_root_config-container_config_config-container-oper-list",
         "action-types_multi-container_config_inner-container",
         "action-types_list-action_input_TOP",
         "action-types_multi-container_config_inner-container_TOP",
         "action-types_config_list_TOP",
         "action-types_container-action_output",
+        "operational_root_oper-container_config_oper-container-list",
+        "operational_root_oper-container_config_oper-container-list_TOP",
+        "operational_root_oper-container_config_config-container",
         "operational_root_config_config-container",
         "action-types_list-action_input",
         "action-types_list-action_output_TOP",
@@ -47,9 +57,13 @@ public class OperationalDataTest {
         "operational_config_root_TOP",
         "action-types_list-action_output",
         "action-types_container-action_output_TOP",
+        "operational_root_config_oper-container",
+        "operational_root_config-container_config_config-container-oper-list_TOP",
         "action-types_config_multi-container_TOP",
+        "operational_root_config_oper-container_TOP",
         "action-types_config_container",
         "action-types_config_container_TOP",
+        "operational_root_oper-container_config_config-container_TOP",
         "action-types_config_multi-container");
     private static final Set<String> EXPECTED_PATHS = Set.of(
         OPERATIONS_MP_URI + "/action-types:list={name}/list-action",
@@ -74,6 +88,7 @@ public class OperationalDataTest {
         .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
 
     private OpenApiObject mountPointApi;
+    private Map<String, Schema> schemas;
 
     @Before
     public void before() throws Exception {
@@ -90,6 +105,7 @@ public class OperationalDataTest {
         final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
         assertNotNull("Failed to find Datastore API", mountPointApi);
+        schemas = mountPointApi.components().schemas();
     }
 
     @Test
@@ -130,8 +146,51 @@ public class OperationalDataTest {
 
     @Test
     public void testOperationalSchema() {
-        final var schemas = mountPointApi.components().schemas();
         assertEquals(EXPECTED_SCHEMAS, schemas.keySet());
+    }
+
+    @Test
+    public void testOperationalConfigRootSchemaProperties() {
+        final var configRoot = schemas.get("operational_config_root");
+        assertNotNull(configRoot);
+        verifyProperties(configRoot, Set.of("leaf-config", "config-container"));
+    }
+
+    @Test
+    public void testOperationalConfigContOperListSchemaProperties() {
+        final var configContOperList = schemas.get(
+            "operational_root_config-container_config_config-container-oper-list");
+        assertNotNull(configContOperList);
+        verifyProperties(configContOperList, Set.of("oper-container-list-leaf"));
+    }
+
+    @Test
+    public void testOperationalContListSchemaProperties() {
+        final var operContList = schemas.get("operational_root_oper-container_config_oper-container-list");
+        assertNotNull(operContList);
+        verifyProperties(operContList, Set.of("oper-container-list-leaf"));
+    }
+
+    @Test
+    public void testOperationalConConfigContSchemaProperties() {
+        final var operConConfigCont = schemas.get("operational_root_oper-container_config_config-container");
+        assertNotNull(operConConfigCont);
+        verifyProperties(operConConfigCont, Set.of("config-container-config-leaf", "opconfig-container-oper-leaf"));
+    }
+
+    @Test
+    public void testOperationalConfigContSchemaProperties() {
+        final var configCont = schemas.get("operational_root_config_config-container");
+        assertNotNull(configCont);
+        verifyProperties(configCont, Set.of("config-container-config-leaf", "leaf-second-case"));
+    }
+
+    @Test
+    public void testOperationalContSchemaProperties() {
+        final var operCont = schemas.get("operational_root_config_oper-container");
+        assertNotNull(operCont);
+        verifyProperties(operCont, Set.of("config-container", "oper-container-list", "leaf-first-case",
+            "oper-leaf-first-case", "oper-container-config-leaf-list"));
     }
 
     private void verifyOperationHaveCorrectReference(final JsonNode jsonNode) {
@@ -148,5 +207,13 @@ public class OperationalDataTest {
             assertNotNull(type);
             assertEquals("object", type.asText());
         }
+    }
+
+    private void verifyProperties(final Schema schema, final Set<String> expectedNodes) {
+        final var fieldNames = schema.properties().fieldNames();
+        final var fieldNamesSpliterator = Spliterators.spliteratorUnknownSize(fieldNames, Spliterator.ORDERED);
+        final var fieldNamesSet = StreamSupport.stream(fieldNamesSpliterator, false)
+            .collect(Collectors.toSet());
+        assertEquals(expectedNodes, fieldNamesSet);
     }
 }
