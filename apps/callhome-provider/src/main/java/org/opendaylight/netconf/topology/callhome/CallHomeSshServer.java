@@ -50,7 +50,7 @@ public final class CallHomeSshServer implements AutoCloseable {
     private final SSHClient client;
 
     @VisibleForTesting
-    CallHomeSshServer(final TcpServerGrouping tcpServerParams,
+    CallHomeSshServer(final TcpServerGrouping tcpServerParams, final long timeoutMillis,
             final SSHTransportStackFactory transportStackFactory,
             final NetconfClientSessionNegotiatorFactory negotiatorFactory,
             final CallHomeSshSessionContextManager contextManager,
@@ -76,7 +76,7 @@ public final class CallHomeSshServer implements AutoCloseable {
         };
         try {
             client = transportStackFactory.listenClient(TransportConstants.SSH_SUBSYSTEM, transportChannelListener,
-                tcpServerParams, sshClientParams, configurator).get(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+                tcpServerParams, sshClientParams, configurator).get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (UnsupportedConfigurationException | InterruptedException | ExecutionException | TimeoutException e) {
             throw new IllegalStateException("Could not start SSH Call-Home server", e);
         }
@@ -145,6 +145,7 @@ public final class CallHomeSshServer implements AutoCloseable {
     public static final class Builder {
         private InetAddress address;
         private int port = DEFAULT_PORT;
+        private long timeoutMillis = DEFAULT_TIMEOUT_MILLIS;
         private SSHTransportStackFactory transportStackFactory;
         private NetconfClientSessionNegotiatorFactory negotiationFactory;
         private CallHomeSshAuthProvider authProvider;
@@ -157,7 +158,7 @@ public final class CallHomeSshServer implements AutoCloseable {
 
         public @NonNull CallHomeSshServer build() {
             return new CallHomeSshServer(
-                toServerParams(address, port),
+                toServerParams(address, port), timeoutMillis,
                 transportStackFactory == null ? defaultTransportStackFactory() : transportStackFactory,
                 negotiationFactory,
                 contextManager == null ? new CallHomeSshSessionContextManager() : contextManager,
@@ -196,6 +197,11 @@ public final class CallHomeSshServer implements AutoCloseable {
 
         public Builder withNegotiationFactory(final NetconfClientSessionNegotiatorFactory newNegotiationFactory) {
             negotiationFactory = newNegotiationFactory;
+            return this;
+        }
+
+        public Builder withTimeout(final int newTimeoutMillis) {
+            this.timeoutMillis = newTimeoutMillis;
             return this;
         }
     }

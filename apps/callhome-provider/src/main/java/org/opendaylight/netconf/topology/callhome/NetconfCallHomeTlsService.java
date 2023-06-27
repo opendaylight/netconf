@@ -18,32 +18,12 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.metatype.annotations.AttributeDefinition;
-import org.osgi.service.metatype.annotations.Designate;
-import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(service = { }, configurationPid = "org.opendaylight.netconf.callhome.mount.tls.server")
-@Designate(ocd = NetconfCallHomeTlsService.Configuration.class)
+@Component(service = { }, configurationPid = "org.opendaylight.netconf.topology.callhome")
 @Singleton
 public class NetconfCallHomeTlsService implements AutoCloseable {
-
-    @ObjectClassDefinition
-    public @interface Configuration {
-        @AttributeDefinition
-        String host() default "0.0.0.0";
-
-        @AttributeDefinition(min = "1", max = "65535")
-        int port() default 4335;
-
-        @AttributeDefinition
-        int timeoutMillis() default 10_000;
-
-        @AttributeDefinition
-        int maxConnections() default 64;
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfCallHomeTlsService.class);
 
     private final CallHomeTlsServer server;
@@ -55,21 +35,22 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
             final @Reference CallHomeMountService mountService,
             final @Reference CallHomeTlsAuthProvider authProvider,
             final @Reference CallHomeStatusRecorder statusRecorder,
-            final Configuration configuration) {
+            final CallHomeMountService.Configuration configuration) {
 
-        LOG.info("Starting Call-Home TLS server at {}:{}", configuration.host(), configuration.port());
+        LOG.info("Starting Call-Home TLS server at {}:{}", configuration.host(), configuration.tls$_$Port());
         try {
             server = CallHomeTlsServer.builder()
                 .withAddress(InetAddress.getByName(configuration.host()))
-                .withPort(configuration.port())
-                .withTimeout(configuration.timeoutMillis())
-                .withMaxConnections(configuration.maxConnections())
+                .withPort(configuration.tls$_$Port())
+                .withTimeout(configuration.connection$_$Timeout$_$Millis())
+                .withMaxConnections(configuration.max$_$Connections())
                 .withAuthProvider(authProvider)
                 .withStatusRecorder(statusRecorder)
                 .withSessionContextManager(
                     mountService.createTlsSessionContextManager(authProvider, statusRecorder))
                 .withNegotiationFactory(new NetconfClientSessionNegotiatorFactory(timer, Optional.empty(),
-                    configuration.timeoutMillis(), NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES))
+                    configuration.connection$_$Timeout$_$Millis(),
+                    NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES))
                 .build();
         } catch (UnknownHostException e) {
             throw new IllegalArgumentException("invalid host", e);
