@@ -18,26 +18,12 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.metatype.annotations.AttributeDefinition;
-import org.osgi.service.metatype.annotations.Designate;
-import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(service = { }, configurationPid = "org.opendaylight.netconf.callhome.mount.ssh.server")
-@Designate(ocd = IetfZeroTouchCallHomeServerProvider.Configuration.class)
+@Component(service = { }, configurationPid = "org.opendaylight.netconf.callhome.mount")
 @Singleton
 public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable {
-
-    @ObjectClassDefinition
-    public @interface Configuration {
-        @AttributeDefinition
-        String host() default "0.0.0.0";
-
-        @AttributeDefinition(min = "1", max = "65535")
-        int port() default 4334;
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(IetfZeroTouchCallHomeServerProvider.class);
     private final CallHomeSshServer server;
 
@@ -47,16 +33,17 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
             final @Reference CallHomeMountService mountService,
             final @Reference CallHomeSshAuthProvider authProvider,
             final @Reference CallHomeStatusRecorder statusRecorder,
-            final Configuration configuration) {
+            final CallHomeMountService.Configuration configuration) {
 
-        LOG.info("Starting Call-Home SSH server at {}:{}", configuration.host(), configuration.port());
+        LOG.info("Starting Call-Home SSH server at {}:{}", configuration.host(), configuration.sshPort());
 
         try {
             server = CallHomeSshServer.builder()
                 .withAddress(InetAddress.getByName(configuration.host()))
-                .withPort(configuration.port())
+                .withPort(configuration.sshPort())
                 .withAuthProvider(authProvider)
                 .withStatusRecorder(statusRecorder)
+                    .withTimeout(configuration.connectionTimeoutMillis())
                 .withSessionContextManager(mountService.createSshSessionContextManager())
                 .build();
         } catch (UnknownHostException e) {

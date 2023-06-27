@@ -87,12 +87,12 @@ public final class CallHomeTlsServer implements AutoCloseable {
         }
 
         public @NonNull CallHomeTlsServer build() {
+            timeoutMillis = timeoutMillis == null ? DEFAULT_TIMEOUT_MILLIS : timeoutMillis;
             return new CallHomeTlsServer(
                 toServerParams(address, port),
                 bootstrapFactory == null ? defaultBootstrapFactory() : bootstrapFactory,
-                maxConnections == null ? DEFAULT_MAX_CONNECTIONS : maxConnections,
-                timeoutMillis == null ? DEFAULT_TIMEOUT_MILLIS : timeoutMillis,
-                negotiationFactory == null ? defaultNegotiationFactory() : negotiationFactory,
+                maxConnections == null ? DEFAULT_MAX_CONNECTIONS : maxConnections, timeoutMillis,
+                negotiationFactory == null ? defaultNegotiationFactory(timeoutMillis) : negotiationFactory,
                 contextManager, authProvider, statusRecorder);
         }
 
@@ -153,8 +153,8 @@ public final class CallHomeTlsServer implements AutoCloseable {
         return new BootstrapFactory("tls-call-home-server", 0);
     }
 
-    private static NetconfClientSessionNegotiatorFactory defaultNegotiationFactory() {
+    private static NetconfClientSessionNegotiatorFactory defaultNegotiationFactory(final Integer timeoutMillis) {
         return new NetconfClientSessionNegotiatorFactory(new HashedWheelTimer(),
-            Optional.empty(), DEFAULT_TIMEOUT_MILLIS, DEFAULT_CLIENT_CAPABILITIES);
+            Optional.empty(), timeoutMillis, DEFAULT_CLIENT_CAPABILITIES);
     }
 }
