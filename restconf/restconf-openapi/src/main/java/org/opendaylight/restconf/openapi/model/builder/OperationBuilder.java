@@ -77,19 +77,20 @@ public final class OperationBuilder {
 
     public static Operation buildGet(final DataSchemaNode node, final String moduleName,
             final @NonNull String deviceName, final List<Parameter> pathParams, final String defName,
-            final String defNameTop) {
+            final String defNameTop, final boolean isConfig) {
         final String description = node.getDescription().orElse("");
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.GET, deviceName, moduleName,
                 node.getQName().getLocalName());
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        parameters.add(buildQueryParameters());
+        parameters.add(buildQueryParameters(isConfig));
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
-        schema.put(REF_KEY, COMPONENTS_PREFIX + defNameTop);
-        xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + defName);
-
+        if (node.isConfiguration()) {
+            schema.put(REF_KEY, COMPONENTS_PREFIX + defNameTop);
+            xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + defName);
+        }
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
                 buildResponse(Response.Status.OK.getReasonPhrase(), schema, xmlSchema));
 
@@ -102,15 +103,18 @@ public final class OperationBuilder {
             .build();
     }
 
-    private static Parameter buildQueryParameters() {
+    private static Parameter buildQueryParameters(final boolean isConfig) {
         final ArrayNode cases = JsonNodeFactory.instance.arrayNode()
-            .add("config")
             .add("nonconfig")
             .add("all");
+        if (isConfig) {
+            cases.add("config");
+        }
 
         return new Parameter.Builder()
             .in("query")
             .name("content")
+            .required(!isConfig)
             .schema(new Schema.Builder().type("string").schemaEnum(cases).build())
             .build();
     }
@@ -283,17 +287,18 @@ public final class OperationBuilder {
     public static ObjectNode buildResponse(final String description, final ObjectNode schema,
             final ObjectNode xmlSchema) {
         final ObjectNode response = JsonNodeFactory.instance.objectNode();
+        if (!schema.isEmpty()) {
+            final ObjectNode content = JsonNodeFactory.instance.objectNode();
+            final ObjectNode body = JsonNodeFactory.instance.objectNode();
+            final ObjectNode xmlBody = JsonNodeFactory.instance.objectNode();
 
-        final ObjectNode content = JsonNodeFactory.instance.objectNode();
-        final ObjectNode body = JsonNodeFactory.instance.objectNode();
-        final ObjectNode xmlBody = JsonNodeFactory.instance.objectNode();
+            body.set(SCHEMA_KEY, schema);
+            xmlBody.set(SCHEMA_KEY, xmlSchema);
+            content.set(MediaType.APPLICATION_JSON, body);
+            content.set(MediaType.APPLICATION_XML, xmlBody);
 
-        body.set(SCHEMA_KEY, schema);
-        xmlBody.set(SCHEMA_KEY, xmlSchema);
-        content.set(MediaType.APPLICATION_JSON, body);
-        content.set(MediaType.APPLICATION_XML, xmlBody);
-
-        response.set(CONTENT_KEY, content);
+            response.set(CONTENT_KEY, content);
+        }
 
         response.put(DESCRIPTION_KEY, description);
         return response;
