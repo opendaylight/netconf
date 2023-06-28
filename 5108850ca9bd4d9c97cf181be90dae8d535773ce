@@ -66,6 +66,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9e0265fe_2fe2b92c",
+        "filename": "artifacts/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T13:11:44Z",
+      "side": 1,
+      "message": "classifier dropped, IDK if we really need them..",
+      "parentUuid": "b4da1a93_90c5726b",
+      "range": {
+        "startLine": 137,
+        "startChar": 16,
+        "endLine": 137,
+        "endChar": 46
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2388d83e_ddcbafd0",
         "filename": "artifacts/pom.xml",
         "patchSetId": 11
@@ -77,6 +101,30 @@
       "writtenOn": "2023-06-26T21:00:10Z",
       "side": 1,
       "message": "scope\u003dtest these, should be should below main artifacts",
+      "range": {
+        "startLine": 138,
+        "startChar": 16,
+        "endLine": 138,
+        "endChar": 37
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5f3fb44_beee1593",
+        "filename": "artifacts/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T13:11:44Z",
+      "side": 1,
+      "message": "scope added, move \"little bit\" down",
+      "parentUuid": "2388d83e_ddcbafd0",
       "range": {
         "startLine": 138,
         "startChar": 16,
@@ -112,6 +160,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f820c6ed_2a09c287",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T13:11:44Z",
+      "side": 1,
+      "message": "This class has one inheritor - cannot be final.",
+      "parentUuid": "49d30dfa_099de4f6",
+      "range": {
+        "startLine": 38,
+        "startChar": 13,
+        "endLine": 38,
+        "endChar": 37
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "05c63284_b4d68e79",
         "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
         "patchSetId": 11
@@ -123,6 +195,30 @@
       "writtenOn": "2023-06-26T21:00:10Z",
       "side": 1,
       "message": "err... what is this for?",
+      "range": {
+        "startLine": 40,
+        "startChar": 50,
+        "endLine": 40,
+        "endChar": 64
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e43353a_aac9da87",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T13:11:44Z",
+      "side": 1,
+      "message": "IDK 😊",
+      "parentUuid": "05c63284_b4d68e79",
       "range": {
         "startLine": 40,
         "startChar": 50,
@@ -179,6 +275,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ff560dc_486d9d9b",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T13:11:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a2552d8_d7e7c1ca",
+      "range": {
+        "startLine": 109,
+        "startChar": 12,
+        "endLine": 109,
+        "endChar": 65
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de3d55ab_a330e408",
@@ -192,6 +312,30 @@
       "writtenOn": "2023-06-26T21:00:10Z",
       "side": 1,
       "message": "trailing comment",
+      "range": {
+        "startLine": 120,
+        "startChar": 62,
+        "endLine": 120,
+        "endChar": 91
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abb470ad_e56b8474",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T13:11:44Z",
+      "side": 1,
+      "message": "Comment removed, seems not be useful. Maybe we can add some assertion that object is of desired class?",
+      "parentUuid": "de3d55ab_a330e408",
       "range": {
         "startLine": 120,
         "startChar": 62,
@@ -284,6 +428,30 @@
       "writtenOn": "2023-06-26T21:00:10Z",
       "side": 1,
       "message": "trailing comments, again!",
+      "range": {
+        "startLine": 260,
+        "startChar": 82,
+        "endLine": 260,
+        "endChar": 109
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38ccb97a_224cee6d",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/SshClientServerTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T13:11:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47fed7ac_af479ae6",
       "range": {
         "startLine": 260,
         "startChar": 82,
