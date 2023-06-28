@@ -1,0 +1,106 @@
+module operational {
+  namespace "urn:opendaylight:oper";
+  prefix "oper";
+
+  container root {
+    leaf leaf-config {
+      type string;
+    }
+    leaf leaf-oper {
+      mandatory true;
+      type string;
+      config false;
+    }
+    choice first-choice {
+      case first-case {
+        leaf leaf-first-case {
+          config false;
+          type string;
+        }
+      }
+      case second-case {
+        leaf leaf-second-case {
+          type string;
+        }
+      }
+      default first-case;
+    }
+
+    container oper-container {
+      config false;
+      container config-container {
+        leaf config-container-config-leaf {
+          mandatory true;
+          type string;
+        }
+        leaf opconfig-container-oper-leaf {
+          config false;
+          type string;
+        }
+      }
+      list oper-container-list {
+        key oper-container-list-leaf;
+        leaf oper-container-list-leaf {
+          type string;
+        }
+      }
+      leaf-list oper-container-config-leaf-list {
+        type string;
+      }
+      choice first-choice {
+        case first-case {
+          leaf leaf-first-case {
+            config false;
+            type string;
+          }
+          leaf oper-leaf-first-case {
+            type string;
+          }
+        }
+        case second-case {
+          leaf leaf-second-case {
+            type string;
+          }
+        }
+      }
+    }
+    container config-container {
+      leaf config-container-oper-leaf {
+        config false;
+        type string;
+      }
+      leaf config-container-config-leaf {
+        type string;
+      }
+      list config-container-oper-list {
+        config false;
+        key oper-container-list-leaf;
+        leaf oper-container-list-leaf {
+          type string;
+        }
+      }
+      leaf-list config-container-oper-leaf-list {
+        config false;
+        type string;
+      }
+      choice first-choice {
+        case first-case {
+          leaf leaf-first-case {
+            config false;
+            type string;
+          }
+        }
+        case second-case {
+          leaf leaf-second-case {
+            type string;
+          }
+          leaf oper-leaf-second-case {
+            config false;
+            type string;
+          }
+        }
+        default second-case;
+      }
+    }
+  }
+}
