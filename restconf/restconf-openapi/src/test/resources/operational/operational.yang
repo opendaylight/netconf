@@ -1,0 +1,51 @@
+module operational {
+  namespace "urn:opendaylight:oper";
+  prefix "oper";
+
+  container root {
+    leaf leaf-config {
+      type string;
+    }
+    leaf leaf-oper {
+      mandatory true;
+      type string;
+      config false;
+    }
+
+    container oper-container {
+      config false;
+      container config-container {
+        leaf config-container-config-leaf {
+          mandatory true;
+          type string;
+        }
+        leaf opconfig-container-oper-leaf {
+          config false;
+          type string;
+        }
+      }
+      list oper-container-list {
+        key oper-container-list-leaf;
+        leaf oper-container-list-leaf {
+          type string;
+        }
+      }
+    }
+    container config-container {
+      leaf config-container-oper-leaf {
+        config false;
+        type string;
+      }
+      leaf config-container-config-leaf {
+        type string;
+      }
+      list config-container-oper-list {
+        config false;
+        key oper-container-list-leaf;
+        leaf oper-container-list-leaf {
+          type string;
+        }
+      }
+    }
+  }
+}
