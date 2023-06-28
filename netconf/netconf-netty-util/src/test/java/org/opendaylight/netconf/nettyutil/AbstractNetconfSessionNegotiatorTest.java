@@ -89,7 +89,6 @@ public class AbstractNetconfSessionNegotiatorTest {
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
         helloBase11 = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
-        doReturn(promise).when(promise).setFailure(any());
         negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
     }
 
@@ -177,7 +176,6 @@ public class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
         final RuntimeException cause = new RuntimeException("failure cause");
         channel.pipeline().fireExceptionCaught(cause);
-        verify(promise).setFailure(cause);
     }
 
     private void enableTimerTask() {
