@@ -64,9 +64,13 @@ public class OperationalDataTest {
         OPERATIONS_MP_URI,
         DATA_MP_URI + "/action-types:list={name}",
         DATA_MP_URI + "/operational:root",
+        DATA_MP_URI + "/operational:root/oper-container/config-container",
+        DATA_MP_URI + "/operational:root/oper-container/oper-container-list={oper-container-list-leaf}",
         DATA_MP_URI + "/action-types:multi-container",
         DATA_MP_URI + "/action-types:multi-container/inner-container",
+        DATA_MP_URI + "/operational:root/oper-container",
         DATA_MP_URI + "/action-types:container",
+        DATA_MP_URI + "/operational:root/config-container/config-container-oper-list={oper-container-list-leaf}",
         DATA_MP_URI + "/operational:root/config-container",
         DATA_MP_URI);
     private static final String HTTP_URL = "http://localhost/path";
@@ -105,7 +109,7 @@ public class OperationalDataTest {
                 final var responses = path.get().responses();
                 final var response = responses.elements().next();
                 final var content = response.get("content");
-                // In case of 200 no content
+                // In case of 200 no content and Operational data
                 if (content != null) {
                     verifyOperationHaveCorrectReference(content.get("application/xml"));
                     verifyOperationHaveCorrectReference(content.get("application/json"));
