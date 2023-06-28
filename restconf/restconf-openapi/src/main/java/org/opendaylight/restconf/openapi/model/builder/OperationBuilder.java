@@ -102,8 +102,16 @@ public final class OperationBuilder {
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
-        schema.put(REF_KEY, COMPONENTS_PREFIX + defNameTop);
-        xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + defName);
+        if (isConfig) {
+            schema.put(REF_KEY, COMPONENTS_PREFIX + defNameTop);
+            xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + defName);
+        } else {
+            final ObjectNode properties = JsonNodeFactory.instance.objectNode();
+            schema.put(TYPE_KEY, OBJECT);
+            schema.set(PROPERTIES_KEY, properties);
+            xmlSchema.put(TYPE_KEY, OBJECT);
+            xmlSchema.set(PROPERTIES_KEY, properties);
+        }
 
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
                 buildResponse(Response.Status.OK.getReasonPhrase(), schema, xmlSchema));

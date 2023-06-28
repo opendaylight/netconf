@@ -137,7 +137,7 @@ public class OperationalDataTest {
     private void verifyOperationHaveCorrectReference(final JsonNode jsonNode) {
         final var schema = jsonNode.get("schema");
         final var ref = schema.get("$ref");
-        // In case of a POST RPC with a direct input body and no reference value
+        // In case of a POST RPC and Operational data with a direct input body and no reference value
         if (ref != null) {
             final var refValue = ref.textValue();
             final var schemaElement = refValue.substring(refValue.lastIndexOf("/") + 1);
