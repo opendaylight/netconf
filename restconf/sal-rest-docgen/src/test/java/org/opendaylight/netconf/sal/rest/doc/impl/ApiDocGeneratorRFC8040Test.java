@@ -33,10 +33,14 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String PATH_PARAMS_TEST_MODULE = "path-params-test";
     private static final String MANDATORY_TEST = "mandatory-test";
     private static final String CONFIG_ROOT_CONTAINER = "mandatory-test_config_root-container";
+    private static final String CONFIG_ROOT_CONTAINER_POST = "mandatory-test_config_root-container_post";
     private static final String ROOT_CONTAINER = "mandatory-test_root-container";
     private static final String CONFIG_MANDATORY_CONTAINER = "mandatory-test_root-container_config_mandatory-container";
+    private static final String CONFIG_MANDATORY_CONTAINER_POST
+        = "mandatory-test_root-container_config_mandatory-container_post";
     private static final String MANDATORY_CONTAINER = "mandatory-test_root-container_mandatory-container";
     private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_config_mandatory-list";
+    private static final String CONFIG_MANDATORY_LIST_POST = "mandatory-test_root-container_config_mandatory-list_post";
     private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
     private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
     private static final String CHOICE_TEST_MODULE = "choice-test";
@@ -181,18 +185,24 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         containersWithRequired.add(CONFIG_ROOT_CONTAINER);
         verifyRequiredField(definitions.get(ROOT_CONTAINER), reqRootContainerElements);
         containersWithRequired.add(ROOT_CONTAINER);
+        verifyRequiredField(definitions.get(CONFIG_ROOT_CONTAINER_POST), reqRootContainerElements);
+        containersWithRequired.add(CONFIG_ROOT_CONTAINER_POST);
 
         final var reqMandatoryContainerElements = Set.of("mandatory-leaf", "leaf-list-with-min-elements");
         verifyRequiredField(definitions.get(CONFIG_MANDATORY_CONTAINER), reqMandatoryContainerElements);
         containersWithRequired.add(CONFIG_MANDATORY_CONTAINER);
         verifyRequiredField(definitions.get(MANDATORY_CONTAINER), reqMandatoryContainerElements);
         containersWithRequired.add(MANDATORY_CONTAINER);
+        verifyRequiredField(definitions.get(CONFIG_MANDATORY_CONTAINER_POST), reqMandatoryContainerElements);
+        containersWithRequired.add(CONFIG_MANDATORY_CONTAINER_POST);
 
         final var reqMandatoryListElements = Set.of("mandatory-list-field");
         verifyRequiredField(definitions.get(CONFIG_MANDATORY_LIST), reqMandatoryListElements);
         containersWithRequired.add(CONFIG_MANDATORY_LIST);
         verifyRequiredField(definitions.get(MANDATORY_LIST), reqMandatoryListElements);
         containersWithRequired.add(MANDATORY_LIST);
+        verifyRequiredField(definitions.get(CONFIG_MANDATORY_LIST_POST), reqMandatoryListElements);
+        containersWithRequired.add(CONFIG_MANDATORY_LIST_POST);
 
         final var testModuleMandatoryArray = Set.of("root-container", "root-mandatory-list");
         verifyRequiredField(definitions.get(MANDATORY_TEST_MODULE), testModuleMandatoryArray);
