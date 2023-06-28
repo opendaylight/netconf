@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0af3c663_03301beb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T11:09:05Z",
+      "side": 1,
+      "message": "It produces:\n```\u003c?xml version\u003d\"1.0\" encoding\u003d\"UTF-8\"?\u003e\n\u003cnetwork-topology xmlns\u003d\"urn:TBD:params:xml:ns:yang:network-topology\"\u003e\n\t\u003ctopology xmlns\u003d\"urn:TBD:params:xml:ns:yang:network-topology\"\u003e\n\t\t\u003ctopology-id\u003eSome topology-id\u003c/topology-id\u003e\n\t\t\u003cserver-provided\u003etrue\u003c/server-provided\u003e\n\t\t\u003ctopology-types xmlns\u003d\"urn:TBD:params:xml:ns:yang:network-topology\"\u003e\n\t\t\t\u003ctopology-netconf xmlns\u003d\"urn:opendaylight:netconf-node-topology\"\u003e\n\t\t\t\u003c/topology-netconf\u003e\n\t\t\u003c/topology-types\u003e\n```\n\ntopology element is expected to do NOT have namespace.",
+      "revId": "f5fa20859ed1a7affff98050e13eca6602870884",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
