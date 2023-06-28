@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5289c20b_4e079396",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T11:01:29Z",
+      "side": 1,
+      "message": "Chaining with `get` is not null safe. Use `path` instead.",
+      "revId": "033d0087d0006835cad178f5664d72a54ede2b47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
