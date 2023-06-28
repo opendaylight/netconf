@@ -92,26 +92,18 @@ public final class OperationBuilder {
 
     public static Operation buildGet(final DataSchemaNode node, final String moduleName,
             final Optional<String> deviceName, final ArrayNode pathParams, final String defName,
-            final String defNameTop, final boolean isConfig) {
+            final String defNameTop) {
         final String description = node.getDescription().orElse("");
         final String summary = buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName());
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
-        addQueryParameters(parameters, isConfig);
+        addQueryParameters(parameters);
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
-        if (isConfig) {
-            schema.put(REF_KEY, COMPONENTS_PREFIX + defNameTop);
-            xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + defName);
-        } else {
-            final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-            schema.put(TYPE_KEY, OBJECT);
-            schema.set(PROPERTIES_KEY, properties);
-            xmlSchema.put(TYPE_KEY, OBJECT);
-            xmlSchema.set(PROPERTIES_KEY, properties);
-        }
+        schema.put(REF_KEY, COMPONENTS_PREFIX + defNameTop);
+        xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + defName);
 
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
                 buildResponse(Response.Status.OK.getReasonPhrase(), schema, xmlSchema));
@@ -125,15 +117,11 @@ public final class OperationBuilder {
             .build();
     }
 
-    private static void addQueryParameters(final ArrayNode parameters, final boolean isConfig) {
+    private static void addQueryParameters(final ArrayNode parameters) {
         final ObjectNode contentParam = JsonNodeFactory.instance.objectNode();
         final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
         cases.add(NONCONFIG_QUERY_PARAM);
-        if (isConfig) {
-            cases.add(CONFIG_QUERY_PARAM);
-        } else {
-            contentParam.put(REQUIRED_KEY, true);
-        }
+        cases.add(CONFIG_QUERY_PARAM);
         contentParam.put(IN_KEY, QUERY);
         contentParam.put(NAME_KEY, CONTENT);
 
