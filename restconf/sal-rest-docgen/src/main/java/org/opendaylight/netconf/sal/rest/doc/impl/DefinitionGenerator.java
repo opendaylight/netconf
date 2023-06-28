@@ -431,7 +431,11 @@ public class DefinitionGenerator {
             }
 
             if (isConfig) {
+                final JsonNode required = childSchema.get(REQUIRED_KEY);
                 final ObjectNode postSchema = createPostJsonSchema(schemaNode, properties, postNodeName, description);
+                if (required != null && required.size() > 0) {
+                    postSchema.set(REQUIRED_KEY, required);
+                }
                 String truePostNodeName = postNodeName + discriminator;
                 definitions.set(truePostNodeName, postSchema);
 
