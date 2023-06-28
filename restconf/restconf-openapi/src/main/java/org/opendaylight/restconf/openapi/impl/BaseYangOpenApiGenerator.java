@@ -229,9 +229,8 @@ public abstract class BaseYangOpenApiGenerator {
         final Collection<? extends DataSchemaNode> dataSchemaNodes = module.getChildNodes();
         LOG.debug("child nodes size [{}]", dataSchemaNodes.size());
         for (final DataSchemaNode node : dataSchemaNodes) {
-            if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                final boolean isConfig = node.isConfiguration();
-                LOG.debug("Is Configuration node [{}] [{}]", isConfig, node.getQName().getLocalName());
+            if (node.isConfiguration() && (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode)) {
+                LOG.debug("Is Configuration node [{}]",  node.getQName().getLocalName());
 
                 final String localName = moduleName + ":" + node.getQName().getLocalName();
                 final String resourcePath  = getResourcePath("data", context);
@@ -242,7 +241,7 @@ public abstract class BaseYangOpenApiGenerator {
                  * whose config statement is true in module, make sure that
                  * only one root post link is added for this module.
                  */
-                if (isConfig && isForSingleModule && !hasAddRootPostLink) {
+                if (isForSingleModule && !hasAddRootPostLink) {
                     LOG.debug("Has added root post link for module {}", moduleName);
                     addRootPostLink(module, deviceName, pathParams, resourcePath, paths);
 
@@ -250,8 +249,8 @@ public abstract class BaseYangOpenApiGenerator {
                 }
 
                 final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, localName);
-                addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, isConfig,
-                    moduleName, definitionNames, resolvedPath);
+                addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, moduleName, definitionNames,
+                    resolvedPath);
             }
         }
 
@@ -301,8 +300,7 @@ public abstract class BaseYangOpenApiGenerator {
 
     private void addPaths(final DataSchemaNode node, final Optional<String> deviceName, final String moduleName,
             final Map<String, Path> paths, final ArrayNode parentPathParams, final EffectiveModelContext schemaContext,
-            final boolean isConfig, final String parentName, final DefinitionNames definitionNames,
-            final String resourcePath) {
+            final String parentName, final DefinitionNames definitionNames, final String resourcePath) {
         LOG.debug("Adding path: [{}]", resourcePath);
 
         final ArrayNode pathParams = JsonNodeFactory.instance.arrayNode().addAll(parentPathParams);
@@ -312,8 +310,7 @@ public abstract class BaseYangOpenApiGenerator {
             childSchemaNodes = dataNodeContainer.getChildNodes();
         }
 
-        paths.put(resourcePath, operations(node, moduleName, deviceName, pathParams, isConfig, parentName,
-                definitionNames));
+        paths.put(resourcePath, operations(node, moduleName, deviceName, pathParams, parentName, definitionNames));
 
         if (node instanceof ActionNodeContainer) {
             ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
@@ -325,13 +322,13 @@ public abstract class BaseYangOpenApiGenerator {
         }
 
         for (final DataSchemaNode childNode : childSchemaNodes) {
-            if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
+            if (childNode.isConfiguration() && (childNode instanceof ListSchemaNode
+                    || childNode instanceof ContainerSchemaNode)) {
                 final String newParent = parentName + "_" + node.getQName().getLocalName();
                 final String localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
                 final String newResourcePath = resourcePath + "/" + createPath(childNode, pathParams, localName);
-                final boolean newIsConfig = isConfig && childNode.isConfiguration();
-                addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
-                    newIsConfig, newParent, definitionNames, newResourcePath);
+                addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext, newParent,
+                    definitionNames, newResourcePath);
                 pathParams.removeAll();
                 pathParams.addAll(parentPathParams);
             }
@@ -348,8 +345,8 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     private static Path operations(final DataSchemaNode node, final String moduleName,
-            final Optional<String> deviceName, final ArrayNode pathParams, final boolean isConfig,
-            final String parentName, final DefinitionNames definitionNames) {
+            final Optional<String> deviceName, final ArrayNode pathParams, final String parentName,
+            final DefinitionNames definitionNames) {
         final Path.Builder operationsBuilder = new Path.Builder();
 
         final String discriminator = definitionNames.getDiscriminator(node);
@@ -357,25 +354,24 @@ public abstract class BaseYangOpenApiGenerator {
 
         final String defName = parentName + CONFIG + "_" + nodeName + discriminator;
         final String defNameTop = parentName + CONFIG + "_" + nodeName + TOP + discriminator;
-        final Operation get = buildGet(node, moduleName, deviceName, pathParams, defName, defNameTop, isConfig);
+        final Operation get = buildGet(node, moduleName, deviceName, pathParams, defName, defNameTop);
         operationsBuilder.get(get);
 
-        if (isConfig) {
-            final Operation put = buildPut(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
-            operationsBuilder.put(put);
+        final Operation put = buildPut(parentName, nodeName, discriminator, moduleName, deviceName,
+                node.getDescription().orElse(""), pathParams);
+        operationsBuilder.put(put);
 
-            final Operation patch = buildPatch(parentName, nodeName, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
-            operationsBuilder.patch(patch);
+        final Operation patch = buildPatch(parentName, nodeName, moduleName, deviceName,
+                node.getDescription().orElse(""), pathParams);
+        operationsBuilder.patch(patch);
 
-            final Operation delete = buildDelete(node, moduleName, deviceName, pathParams);
-            operationsBuilder.delete(delete);
+        final Operation delete = buildDelete(node, moduleName, deviceName, pathParams);
+        operationsBuilder.delete(delete);
 
-            final Operation post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
-            operationsBuilder.post(post);
-        }
+        final Operation post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
+                node.getDescription().orElse(""), pathParams);
+        operationsBuilder.post(post);
+
         return operationsBuilder.build();
     }
 
