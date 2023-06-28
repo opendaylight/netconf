@@ -101,7 +101,7 @@ public class OperationalDataTest {
                 final var responses = path.get().responses();
                 final var response = responses.elements().next();
                 final var content = response.get("content");
-                // In case of 200 no content
+                // In case of 200 no content and Operational data
                 if (content != null) {
                     verifyOperationHaveCorrectReference(content.get("application/xml"));
                     verifyOperationHaveCorrectReference(content.get("application/json"));

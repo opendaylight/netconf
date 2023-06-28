@@ -102,9 +102,10 @@ public final class OperationBuilder {
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
-        schema.put(REF_KEY, COMPONENTS_PREFIX + defNameTop);
-        xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + defName);
-
+        if (isConfig) {
+            schema.put(REF_KEY, COMPONENTS_PREFIX + defNameTop);
+            xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + defName);
+        }
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
                 buildResponse(Response.Status.OK.getReasonPhrase(), schema, xmlSchema));
 
@@ -309,17 +310,18 @@ public final class OperationBuilder {
     public static ObjectNode buildResponse(final String description, final ObjectNode schema,
             final ObjectNode xmlSchema) {
         final ObjectNode response = JsonNodeFactory.instance.objectNode();
+        if (!schema.isEmpty()) {
+            final ObjectNode content = JsonNodeFactory.instance.objectNode();
+            final ObjectNode body = JsonNodeFactory.instance.objectNode();
+            final ObjectNode xmlBody = JsonNodeFactory.instance.objectNode();
 
-        final ObjectNode content = JsonNodeFactory.instance.objectNode();
-        final ObjectNode body = JsonNodeFactory.instance.objectNode();
-        final ObjectNode xmlBody = JsonNodeFactory.instance.objectNode();
+            body.set(SCHEMA_KEY, schema);
+            xmlBody.set(SCHEMA_KEY, xmlSchema);
+            content.set(MediaType.APPLICATION_JSON, body);
+            content.set(MediaType.APPLICATION_XML, xmlBody);
 
-        body.set(SCHEMA_KEY, schema);
-        xmlBody.set(SCHEMA_KEY, xmlSchema);
-        content.set(MediaType.APPLICATION_JSON, body);
-        content.set(MediaType.APPLICATION_XML, xmlBody);
-
-        response.set(CONTENT_KEY, content);
+            response.set(CONTENT_KEY, content);
+        }
 
         response.put(DESCRIPTION_KEY, description);
         return response;
