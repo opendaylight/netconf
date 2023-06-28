@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d60e75a3_cbf112ac",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "We can just use List.of here.",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff4a4714_9d3dee77",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "We can use new ArrayList\u003c\u003e() here.",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "415a7a7a_c0fb6983",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "We can just use new ArrayList\u003c\u003e() here without creating variable.",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c413f3b8_92270b61",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "Maybe we can use ArrayList(Collection\u003c? extends E\u003e c) constructor.",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86fb7c7e_d8148070",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "Can we use chain the builder usage, please?",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00cb83a4_28b37fc3",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Parameter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "Delete this line please and configure your IDE.",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f645fcc_39b3fc57",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "Maybe we can use different constructor here.",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea611340_be0c1a08",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "DO we need addAll?",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9213f007_4b4e70aa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "Please move builder creation and usage to be together.",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56d108cc_bc2d8d8e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "final var list \u003d List.of(\"one\", \"two\", \"three\");\nSystem.out.println(\"This is it: \" + new ArrayList\u003c\u003e(list));",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fb3ceea_945f36f0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "final var list \u003d List.of(\"one\", \"two\", \"three\");\nSystem.out.println(\"This is it: \" + new ArrayList\u003c\u003e(list));",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c08ae57_bf32a4c0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "final var list \u003d List.of(\"one\", \"two\", \"three\");\nSystem.out.println(\"This is it: \" + new ArrayList\u003c\u003e(list));",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4903e215_e7314cef",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-28T08:00:45Z",
+      "side": 1,
+      "message": "This method can be eliminated IMO.",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
