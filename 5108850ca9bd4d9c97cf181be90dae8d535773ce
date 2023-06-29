@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ebbb732_1df65dda",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/OSGiNetconfServer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-29T14:47:08Z",
+      "side": 1,
+      "message": "reverted",
+      "parentUuid": "b0e4ff48_ac332866",
+      "range": {
+        "startLine": 38,
+        "startChar": 53,
+        "endLine": 38,
+        "endChar": 59
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4da1a93_90c5726b",
@@ -78,6 +102,30 @@
       "side": 1,
       "message": "classifier dropped, IDK if we really need them..",
       "parentUuid": "b4da1a93_90c5726b",
+      "range": {
+        "startLine": 137,
+        "startChar": 16,
+        "endLine": 137,
+        "endChar": 46
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d2f8fd8_043bb7cc",
+        "filename": "artifacts/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-29T14:47:08Z",
+      "side": 1,
+      "message": "these are utilities to ease transport configuration (using binding objects) for testing, quite complicated to just place a copy, could be reorganized to some transport-test-utils if all transport configuration models are moved to separate artifact",
+      "parentUuid": "9e0265fe_2fe2b92c",
       "range": {
         "startLine": 137,
         "startChar": 16,
@@ -135,6 +183,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09026a34_35c57981",
+        "filename": "artifacts/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-29T14:47:08Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f5f3fb44_beee1593",
+      "range": {
+        "startLine": 138,
+        "startChar": 16,
+        "endLine": 138,
+        "endChar": 37
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "49d30dfa_099de4f6",
@@ -172,6 +244,30 @@
       "side": 1,
       "message": "This class has one inheritor - cannot be final.",
       "parentUuid": "49d30dfa_099de4f6",
+      "range": {
+        "startLine": 38,
+        "startChar": 13,
+        "endLine": 38,
+        "endChar": 37
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "723c233c_b50ddaa8",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-29T14:47:08Z",
+      "side": 1,
+      "message": "documentation is in interface",
+      "parentUuid": "f820c6ed_2a09c287",
       "range": {
         "startLine": 38,
         "startChar": 13,
@@ -229,6 +325,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79398054_a594b61d",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-29T14:47:08Z",
+      "side": 1,
+      "message": "transport\u0027s server builder requires non-null transport channel listener,\nempty channel listener for cases we have no extra action to perform when connection is established -- see usage in same file below",
+      "parentUuid": "5e43353a_aac9da87",
+      "range": {
+        "startLine": 40,
+        "startChar": 50,
+        "endLine": 40,
+        "endChar": 64
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "983c16c6_3c3a6d07",
@@ -242,6 +362,30 @@
       "writtenOn": "2023-06-26T21:11:12Z",
       "side": 1,
       "message": "either \"new\" or \"create\" -- shared is not an option due to thread safety concerns. Also explicit @NonNull.",
+      "range": {
+        "startLine": 60,
+        "startChar": 30,
+        "endLine": 60,
+        "endChar": 33
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "740e717e_0f04ae2c",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-29T14:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "983c16c6_3c3a6d07",
       "range": {
         "startLine": 60,
         "startChar": 30,
@@ -346,6 +490,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7e14745_31d7da39",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-29T14:47:08Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "abb470ad_e56b8474",
+      "range": {
+        "startLine": 120,
+        "startChar": 62,
+        "endLine": 120,
+        "endChar": 91
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d76b34ad_a9575a44",
@@ -359,6 +527,30 @@
       "writtenOn": "2023-06-26T21:00:10Z",
       "side": 1,
       "message": "add pointers for replacement",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 30
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ccc846f_1085532c",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/api/NetconfServerDispatcher.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-29T14:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d76b34ad_a9575a44",
       "range": {
         "startLine": 14,
         "startChar": 0,
@@ -394,6 +586,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a685dffb_66ca3c64",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/api/NetconfServerFactory.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-29T14:47:08Z",
+      "side": 1,
+      "message": "currently *Factory* just replaces *Dispatcher* taking into account design change -  transport configuration is not just a socket address now\n\nimo it\u0027s a refactoring intermediate step. Better approach to instantiate netconf server could be used once netconf protocol no longer served by netty handlers",
+      "parentUuid": "1da07e25_49ce3404",
+      "range": {
+        "startLine": 24,
+        "startChar": 17,
+        "endLine": 24,
+        "endChar": 37
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "44c73025_b1e4a2ad",
         "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/api/NetconfServerFactory.java",
         "patchSetId": 11
@@ -405,6 +621,30 @@
       "writtenOn": "2023-06-26T21:11:12Z",
       "side": 1,
       "message": "NPE for nulls",
+      "range": {
+        "startLine": 32,
+        "startChar": 15,
+        "endLine": 32,
+        "endChar": 39
+      },
+      "revId": "5108850ca9bd4d9c97cf181be90dae8d535773ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d577216_5ed5e8ed",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/api/NetconfServerFactory.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-06-29T14:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44c73025_b1e4a2ad",
       "range": {
         "startLine": 32,
         "startChar": 15,
