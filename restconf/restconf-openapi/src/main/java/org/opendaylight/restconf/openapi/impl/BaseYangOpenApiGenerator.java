@@ -283,7 +283,7 @@ public abstract class BaseYangOpenApiGenerator {
             final String name = moduleName + MODULE_NAME_SUFFIX;
             final var postBuilder = new Path.Builder();
             postBuilder.post(buildPost("", name, "", moduleName, deviceName,
-                    module.getDescription().orElse(""), pathParams));
+                module.getDescription().orElse(""), pathParams, null, null));
             paths.put(resourcePath, postBuilder.build());
         }
     }
@@ -313,9 +313,8 @@ public abstract class BaseYangOpenApiGenerator {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
             childSchemaNodes = dataNodeContainer.getChildNodes();
         }
-        paths.put(dataPath, operations(node, moduleName, deviceName, pathParams, isConfig, parentName,
-                definitionNames));
-
+        Path.Builder operations = operations(node, moduleName, deviceName, pathParams, isConfig, parentName,
+            definitionNames);
         if (node instanceof ActionNodeContainer) {
             ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
                 final String operationsPath = getResourcePath("operations", context)
@@ -326,8 +325,15 @@ public abstract class BaseYangOpenApiGenerator {
             });
         }
 
+        boolean addPost = true;
         for (final DataSchemaNode childNode : childSchemaNodes) {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
+                if (addPost) {
+                    final Operation post = buildContainerOrListPostOperation(childNode, moduleName, deviceName,
+                        pathParams, parentName, definitionNames);
+                    operations.post(post);
+                    addPost = false;
+                }
                 final String newParent = parentName + "_" + node.getQName().getLocalName();
                 final String localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
                 final String newPathPart = resourcePathPart + "/" + createPath(childNode, pathParams, localName);
@@ -338,6 +344,7 @@ public abstract class BaseYangOpenApiGenerator {
                 pathParams.addAll(parentPathParams);
             }
         }
+        paths.put(dataPath, operations.build());
     }
 
     private static boolean containsListOrContainer(final Iterable<? extends DataSchemaNode> nodes) {
@@ -349,7 +356,7 @@ public abstract class BaseYangOpenApiGenerator {
         return false;
     }
 
-    private static Path operations(final DataSchemaNode node, final String moduleName,
+    private static Path.Builder operations(final DataSchemaNode node, final String moduleName,
             final String deviceName, final List<Parameter> pathParams, final boolean isConfig,
             final String parentName, final DefinitionNames definitionNames) {
         final Path.Builder operationsBuilder = new Path.Builder();
@@ -373,12 +380,28 @@ public abstract class BaseYangOpenApiGenerator {
 
             final Operation delete = buildDelete(node, moduleName, deviceName, pathParams);
             operationsBuilder.delete(delete);
-
-            final Operation post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
-            operationsBuilder.post(post);
         }
-        return operationsBuilder.build();
+        return operationsBuilder;
+    }
+
+    public static Operation buildContainerOrListPostOperation(final DataSchemaNode node, final String moduleName,
+            final String deviceName, final List<Parameter> pathParams, final String parentName,
+            final DefinitionNames definitionNames) {
+        final String discriminator = definitionNames.getDiscriminator(node);
+        final String nodeName = node.getQName().getLocalName();
+        final Operation post;
+        if (node instanceof ContainerSchemaNode) {
+            post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
+                node.getDescription().orElse(""), pathParams, node, null);
+        } else {
+            final List<QName> keyDefinitions = ((ListSchemaNode) node).getKeyDefinition();
+            final List<String> keys = keyDefinitions.stream().map(key -> key.getLocalName())
+                .collect(Collectors.toList());
+            post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
+                node.getDescription().orElse(""), pathParams, node,
+                keys.size() > 0 ? keys : null);
+        }
+        return post;
     }
 
     private static String createPath(final DataSchemaNode schemaNode, final List<Parameter> pathParams,
