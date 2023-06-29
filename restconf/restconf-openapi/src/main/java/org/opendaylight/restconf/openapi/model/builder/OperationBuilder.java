@@ -48,10 +48,14 @@ public final class OperationBuilder {
     private static final String ENUM_KEY = "enum";
     private static final List<String> MIME_TYPES = List.of(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON);
     private static final String OBJECT = "object";
+    private static final String ARRAY_TYPE = "array";
+    private static final String ITEMS_KEY = "items";
     private static final String REQUIRED_KEY = "required";
     private static final String STRING = "string";
     private static final String TYPE_KEY = "type";
     private static final String QUERY = "query";
+    private static final String CONTAINER = "container";
+    private static final String LIST = "list";
 
     static {
         CONSUMES_PUT_POST = JsonNodeFactory.instance.arrayNode();
@@ -66,7 +70,7 @@ public final class OperationBuilder {
 
     public static Operation buildPost(final String parentName, final String nodeName, final String discriminator,
             final String moduleName, final Optional<String> deviceName, final String description,
-            final ArrayNode pathParams) {
+            final ArrayNode pathParams, final String target, final String listKey) {
         final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
@@ -75,7 +79,16 @@ public final class OperationBuilder {
         final String defName = cleanDefName + discriminator;
         final String xmlDefName = cleanDefName + discriminator;
         ref.put(REF_KEY, COMPONENTS_PREFIX + defName);
-        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
+        final ObjectNode requestBody;
+        if (target.equals(CONTAINER)) {
+            requestBody = createContainerOrListRequestBodyParameter(defName, xmlDefName, nodeName, summary, CONTAINER,
+                "");
+        } else if (target.equals(LIST)) {
+            requestBody = createContainerOrListRequestBodyParameter(defName, xmlDefName, nodeName, summary, LIST,
+                listKey);
+        } else {
+            requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
+        }
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
                 buildResponse(Response.Status.CREATED.getReasonPhrase(), Optional.empty()));
@@ -289,6 +302,45 @@ public final class OperationBuilder {
             content.set(MediaType.APPLICATION_JSON, buildMimeTypeValue(defName));
             content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(xmlDefName));
         }
+        payload.set(CONTENT_KEY, content);
+        payload.put(DESCRIPTION_KEY, name);
+        return payload;
+    }
+
+    private static ObjectNode createContainerOrListRequestBodyParameter(final String defName, final String xmlDefName,
+        final String name, final String summary, final String target, final String listKey) {
+        final ObjectNode payload = JsonNodeFactory.instance.objectNode();
+        final ObjectNode content = JsonNodeFactory.instance.objectNode();
+        final ObjectNode object = JsonNodeFactory.instance.objectNode();
+        if (target.equals(CONTAINER)) {
+            object.put(TYPE_KEY, OBJECT);
+            object.put(PROPERTIES_KEY, JsonNodeFactory.instance.objectNode());
+            object.put(DESCRIPTION_KEY, "");
+        } else {
+            // Then it is list
+            final ObjectNode item = JsonNodeFactory.instance.objectNode();
+            final ObjectNode id = JsonNodeFactory.instance.objectNode();
+            if (listKey != null) {
+                final ObjectNode idValue = JsonNodeFactory.instance.objectNode();
+                idValue.put("default", "Some " + listKey);
+                id.put(listKey, idValue);
+            }
+            item.put(TYPE_KEY, OBJECT);
+            item.put(PROPERTIES_KEY, id);
+            object.put(TYPE_KEY, ARRAY_TYPE);
+            object.put(ITEMS_KEY, item);
+            object.put(DESCRIPTION_KEY, "");
+        }
+        final ObjectNode schema = JsonNodeFactory.instance.objectNode();
+        final ObjectNode container = JsonNodeFactory.instance.objectNode();
+        final ObjectNode value = JsonNodeFactory.instance.objectNode();
+        value.put(name, object);
+        container.put(TYPE_KEY, OBJECT);
+        container.put(PROPERTIES_KEY, value);
+        container.put(DESCRIPTION_KEY, "");
+        schema.put(SCHEMA_KEY, container);
+        content.set(MediaType.APPLICATION_JSON, schema);
+        content.set(MediaType.APPLICATION_XML, schema); // TODO handle XML
         payload.set(CONTENT_KEY, content);
         payload.put(DESCRIPTION_KEY, name);
         return payload;
