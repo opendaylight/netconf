@@ -8,9 +8,8 @@
 package org.opendaylight.restconf.openapi;
 
 import java.util.List;
-import java.util.Map;
+import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
-import org.opendaylight.restconf.openapi.model.Path;
 
 public final class OpenApiTestUtils {
 
@@ -23,8 +22,8 @@ public final class OpenApiTestUtils {
      *
      * @return {@link List} of parameters
      */
-    public static List<String> getPathParameters(final Map<String, Path> paths, final String path) {
-        return paths.get(path).post().parameters()
+    public static List<String> getPathParameters(final Operation operation) {
+        return operation.parameters()
             .stream()
             .map(Parameter::name)
             .toList();
