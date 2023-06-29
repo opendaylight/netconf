@@ -12,7 +12,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
+import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getDataPathParameters;
+import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getOperationsPathParameters;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -185,10 +186,6 @@ public final class MountPointOpenApiTest {
             assertNotNull(delete);
             assertEquals(expectedSize, delete.parameters().size());
 
-            final var post = path.post();
-            assertNotNull(post);
-            assertEquals(expectedSize, post.parameters().size());
-
             final var patch = path.patch();
             assertNotNull(patch);
             assertEquals(expectedSize, patch.parameters().size());
@@ -211,23 +208,23 @@ public final class MountPointOpenApiTest {
 
         var pathToList1 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}";
         assertTrue(mountPointApi.paths().containsKey(pathToList1));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList1));
+        assertEquals(List.of("name"), getDataPathParameters(mountPointApi.paths(), pathToList1));
 
         var pathToList2 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list2={name1}";
         assertTrue(mountPointApi.paths().containsKey(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList2));
+        assertEquals(List.of("name", "name1"), getDataPathParameters(mountPointApi.paths(), pathToList2));
 
         var pathToList3 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
         assertTrue(mountPointApi.paths().containsKey(pathToList3));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList3));
+        assertEquals(List.of("name"), getDataPathParameters(mountPointApi.paths(), pathToList3));
 
         var pathToList4 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name1}";
         assertTrue(mountPointApi.paths().containsKey(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList4));
+        assertEquals(List.of("name", "name1"), getDataPathParameters(mountPointApi.paths(), pathToList4));
 
         var pathToList5 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
         assertTrue(mountPointApi.paths().containsKey(pathToList5));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList5));
+        assertEquals(List.of("name"), getDataPathParameters(mountPointApi.paths(), pathToList5));
     }
 
     /**
@@ -244,12 +241,12 @@ public final class MountPointOpenApiTest {
         final var pathWithParameters =
             "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action";
         assertTrue(mountPointApi.paths().containsKey(pathWithParameters));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathWithParameters));
+        assertEquals(List.of("name"), getOperationsPathParameters(mountPointApi.paths(), pathWithParameters));
 
         final var pathWithoutParameters =
             "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action";
         assertTrue(mountPointApi.paths().containsKey(pathWithoutParameters));
-        assertEquals(List.of(), getPathParameters(mountPointApi.paths(), pathWithoutParameters));
+        assertEquals(List.of(), getOperationsPathParameters(mountPointApi.paths(), pathWithoutParameters));
     }
 
     /**
@@ -259,7 +256,7 @@ public final class MountPointOpenApiTest {
     public void testAuthenticationFeature() throws Exception {
         final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         openApi.onMountPointCreated(INSTANCE_ID);
-        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, "1");
 
         assertEquals("[{\"basicAuth\":[]}]", mountPointApi.security().toString());
         assertEquals("{\"type\":\"http\",\"scheme\":\"basic\"}",
