@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e10f11f_be1d0bac",
+        "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiatorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-29T08:12:19Z",
+      "side": 1,
+      "message": "IIUC after failed attempt to establish connection we were not able to recover. It possible to test that circumstance here?",
+      "revId": "57aee49e19a0debda466b416d7ba7e6ce2ba9192",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
