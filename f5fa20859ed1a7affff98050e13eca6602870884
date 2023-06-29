@@ -16,6 +16,24 @@
       "message": "It produces:\n```\u003c?xml version\u003d\"1.0\" encoding\u003d\"UTF-8\"?\u003e\n\u003cnetwork-topology xmlns\u003d\"urn:TBD:params:xml:ns:yang:network-topology\"\u003e\n\t\u003ctopology xmlns\u003d\"urn:TBD:params:xml:ns:yang:network-topology\"\u003e\n\t\t\u003ctopology-id\u003eSome topology-id\u003c/topology-id\u003e\n\t\t\u003cserver-provided\u003etrue\u003c/server-provided\u003e\n\t\t\u003ctopology-types xmlns\u003d\"urn:TBD:params:xml:ns:yang:network-topology\"\u003e\n\t\t\t\u003ctopology-netconf xmlns\u003d\"urn:opendaylight:netconf-node-topology\"\u003e\n\t\t\t\u003c/topology-netconf\u003e\n\t\t\u003c/topology-types\u003e\n```\n\ntopology element is expected to do NOT have namespace.",
       "revId": "f5fa20859ed1a7affff98050e13eca6602870884",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3846950_b6330d42",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-06-29T19:51:30Z",
+      "side": 1,
+      "message": "Containers and lists have namespaces due to the nature of OpenAPI usage. Instead of creating duplicate elements, we add references to them.\n\n```\n    \"network-topology_network-topology_topology\": {\n        \"properties\": {\n            \"server-provided\": {\n                \"description\": \"\\nIndicates whether the topology is configurable by clients,\\nor whether it is provided by the server.  This leaf is\\n\\npopulated by the server implementing the model.\\nIt is set to false for topologies that are created by a client;\\nit is set to true otherwise.  If it is set to true, any\\nattempt to edit the topology MUST be rejected.\\n\",\n                \"default\": true,\n                \"type\": \"boolean\"\n            },\n            \"topology-types\": {\n                \"$ref\": \"#/components/schemas/network-topology_network-topology_topology_topology-types\"\n            },\n\t}\n     }\t\n```",
+      "parentUuid": "0af3c663_03301beb",
+      "revId": "f5fa20859ed1a7affff98050e13eca6602870884",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
