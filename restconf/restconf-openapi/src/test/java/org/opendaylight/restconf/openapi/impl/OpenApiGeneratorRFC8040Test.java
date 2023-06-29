@@ -16,7 +16,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +107,64 @@ public final class OpenApiGeneratorRFC8040Test {
             assertNotNull(node.post());
             assertNotNull(node.patch());
         }
+    }
+
+    /**
+     * Test that POST request body is generated properly.
+     */
+    @Test
+    public void testPostBody() {
+        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
+        final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+
+        final String rootPath = "/rests/data";
+
+        final ObjectNode expectedRootPost;
+        try {
+            expectedRootPost = (ObjectNode) new ObjectMapper().readTree("""
+            {
+            \"content\":{
+                \"application/json\":{
+                    \"schema\":{
+                        \"type\":\"object\",
+                        \"properties\":{
+                            \"lst\":{
+                                \"type\":\"array\",
+                                \"items\":{
+                                    \"type\":\"object\",
+                                    \"properties\":{}
+                                },
+                                \"description\":\"\"
+                            }
+                        },
+                        \"description\":\"\"
+                    }
+                },
+                \"application/xml\":{
+                    \"schema\":{
+                        \"type\":\"object\",
+                        \"properties\":{
+                            \"lst\":{
+                                \"type\":\"array\",
+                                \"items\":{
+                                    \"type\":\"object\",
+                                    \"properties\":{}
+                                },
+                                \"description\":\"\"
+                            }
+                        },
+                        \"description\":\"\"
+                    }
+                }
+            },
+            \"description\":\"lst\"}""");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        final Path node = doc.paths().get(rootPath);
+        final Operation providedRootPost = node.post();
+        assertNotNull(providedRootPost);
+        assertEquals(expectedRootPost, providedRootPost.requestBody());
     }
 
     /**
