@@ -16,6 +16,75 @@
       "message": "recheck",
       "revId": "5e53d2ba6d7f3837a7bfab2c28658158e30801c5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09089053_088e5387",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-29T12:09:18Z",
+      "side": 1,
+      "message": "this can be 1 line\ncreate Info when calling method, just like Comoponents 2 lines below",
+      "range": {
+        "startLine": 108,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 30
+      },
+      "revId": "5e53d2ba6d7f3837a7bfab2c28658158e30801c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8e2b34f_a8981a75",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-29T12:09:18Z",
+      "side": 1,
+      "message": "this can be 1 line\ncreate Info when calling method, just like Comoponents 2 lines below",
+      "range": {
+        "startLine": 212,
+        "startChar": 0,
+        "endLine": 213,
+        "endChar": 30
+      },
+      "revId": "5e53d2ba6d7f3837a7bfab2c28658158e30801c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95cea702_f6c4e2a5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-29T12:09:18Z",
+      "side": 1,
+      "message": "this can be 1 line\ncreate Info when calling method, just like Comoponents 4 lines below",
+      "range": {
+        "startLine": 205,
+        "startChar": 0,
+        "endLine": 206,
+        "endChar": 40
+      },
+      "revId": "5e53d2ba6d7f3837a7bfab2c28658158e30801c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
