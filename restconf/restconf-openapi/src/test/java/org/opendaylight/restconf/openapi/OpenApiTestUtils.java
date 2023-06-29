@@ -23,7 +23,14 @@ public final class OpenApiTestUtils {
      *
      * @return {@link List} of parameters
      */
-    public static List<String> getPathParameters(final Map<String, Path> paths, final String path) {
+    public static List<String> getDataPathParameters(final Map<String, Path> paths, final String path) {
+        final var params = new ArrayList<String>();
+        paths.get(path).put().parameters().elements()
+            .forEachRemaining(p -> params.add(p.get("name").asText()));
+        return params;
+    }
+
+    public static List<String> getOperationsPathParameters(final Map<String, Path> paths, final String path) {
         final var params = new ArrayList<String>();
         paths.get(path).post().parameters().elements()
             .forEachRemaining(p -> params.add(p.get("name").asText()));
