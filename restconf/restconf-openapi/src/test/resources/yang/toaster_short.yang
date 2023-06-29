@@ -86,7 +86,7 @@
       list toasterSlot {
         key "slotId";
         leaf slotId {
-            type string;
+          type string;
         }
       }
 

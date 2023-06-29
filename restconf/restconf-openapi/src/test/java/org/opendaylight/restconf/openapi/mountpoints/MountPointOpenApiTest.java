@@ -141,7 +141,7 @@ public final class MountPointOpenApiTest {
         }
 
         assertEquals("Unexpected GET paths size", 37, getOperations.size());
-        assertEquals("Unexpected POST paths size", 43, postOperations.size());
+        assertEquals("Unexpected POST paths size", 19, postOperations.size());
         assertEquals("Unexpected PUT paths size", 35, putOperations.size());
         assertEquals("Unexpected PATCH paths size", 35, patchOperations.size());
         assertEquals("Unexpected DELETE paths size", 35, deleteOperations.size());
@@ -185,10 +185,6 @@ public final class MountPointOpenApiTest {
             assertNotNull(delete);
             assertEquals(expectedSize, delete.parameters().size());
 
-            final var post = path.post();
-            assertNotNull(post);
-            assertEquals(expectedSize, post.parameters().size());
-
             final var patch = path.patch();
             assertNotNull(patch);
             assertEquals(expectedSize, patch.parameters().size());
@@ -211,23 +207,23 @@ public final class MountPointOpenApiTest {
 
         var pathToList1 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}";
         assertTrue(mountPointApi.paths().containsKey(pathToList1));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList1));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths().get(pathToList1).patch()));
 
         var pathToList2 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list2={name1}";
         assertTrue(mountPointApi.paths().containsKey(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList2));
+        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths().get(pathToList2).patch()));
 
         var pathToList3 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
         assertTrue(mountPointApi.paths().containsKey(pathToList3));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList3));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths().get(pathToList3).patch()));
 
         var pathToList4 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name1}";
         assertTrue(mountPointApi.paths().containsKey(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList4));
+        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths().get(pathToList4).patch()));
 
         var pathToList5 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
         assertTrue(mountPointApi.paths().containsKey(pathToList5));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathToList5));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths().get(pathToList5).patch()));
     }
 
     /**
@@ -244,12 +240,12 @@ public final class MountPointOpenApiTest {
         final var pathWithParameters =
             "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action";
         assertTrue(mountPointApi.paths().containsKey(pathWithParameters));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathWithParameters));
+        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths().get(pathWithParameters).post()));
 
         final var pathWithoutParameters =
             "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action";
         assertTrue(mountPointApi.paths().containsKey(pathWithoutParameters));
-        assertEquals(List.of(), getPathParameters(mountPointApi.paths(), pathWithoutParameters));
+        assertEquals(List.of(), getPathParameters(mountPointApi.paths().get(pathWithoutParameters).post()));
     }
 
     /**
