@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "72455ce4_10135b78",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/CustomBasePathOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-29T13:55:35Z",
+      "side": 1,
+      "message": "BiFunction kept as it serves as a parameter that changes between runs\n1. constructor without spicfying path:\n  new MountPointOpenApiGeneratorRFC8040(DOMSchemaService schemaService, \n            DOMMountPointService mountService)\n2. constructor with specified path:\n  new MountPointOpenApiGeneratorRFC8040(DOMSchemaService schemaService,\n            DOMMountPointService mountService, String basePath)",
+      "parentUuid": "3e38730c_246a641b",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "78a60828_9e49c8d9",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-06-27T13:58:37Z",
       "side": 1,
       "message": "Just @Parameter",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cda2ac2_0ad08f99",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/CustomBasePathOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-29T13:55:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78a60828_9e49c8d9",
       "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "956f36bd_e393be13",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/CustomBasePathOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-29T13:55:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56544fd0_ba88b004",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25c9152c_8d4f9847",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-06-27T13:57:56Z",
       "side": 1,
       "message": "Different syntax here and below.",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8588b7d6_fca8e38e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/CustomBasePathOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-29T13:55:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25c9152c_8d4f9847",
       "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cba8772e_2bd65244",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/CustomBasePathOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-29T13:55:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aaa70442_f2a47291",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f3cfe2f_43412ef3",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-06-27T13:57:56Z",
       "side": 1,
       "message": "Please create smaller model and use https://git.opendaylight.org/gerrit/c/yangtools/+/106033/10/codec/yang-data-codec-xml/src/test/java/org/opendaylight/yangtools/yang/data/codec/xml/AbstractAnydataTest.java approach.",
+      "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b2eaeff_18f2e7be",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/NETCONF-1021/custom-base-path-test.yang",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-29T13:55:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f3cfe2f_43412ef3",
       "revId": "66a15705e1b3f7c0387123e436134d1136d4e026",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
