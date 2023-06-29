@@ -60,6 +60,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.ListEffectiveStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -278,7 +279,7 @@ public abstract class BaseYangOpenApiGenerator {
             final String name = moduleName + MODULE_NAME_SUFFIX;
             final var postBuilder = new Path.Builder();
             postBuilder.post(buildPost("", name, "", moduleName, deviceName,
-                    module.getDescription().orElse(""), pathParams));
+                    module.getDescription().orElse(""), pathParams, "container", ""));
             paths.put(resourcePath, postBuilder.build());
         }
     }
@@ -369,8 +370,19 @@ public abstract class BaseYangOpenApiGenerator {
             final Operation delete = buildDelete(node, moduleName, deviceName, pathParams);
             operationsBuilder.delete(delete);
 
-            final Operation post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
+            final Operation post;
+            if (node instanceof ContainerSchemaNode) {
+                post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
+                    node.getDescription().orElse(""), pathParams, "container", "");
+            } else if (node instanceof ListSchemaNode) {
+                final var listKeyIterator = ((ListSchemaNode) node).getKeyDefinition().listIterator();
+                post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
+                    node.getDescription().orElse(""), pathParams, "list",
+                    listKeyIterator.hasNext() ? listKeyIterator.next().getLocalName() : null);
+            } else {
+                post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
+                    node.getDescription().orElse(""), pathParams, "", "");
+            }
             operationsBuilder.post(post);
         }
         return operationsBuilder.build();

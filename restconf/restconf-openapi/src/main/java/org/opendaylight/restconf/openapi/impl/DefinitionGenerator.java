@@ -469,7 +469,7 @@ public class DefinitionGenerator {
 
             final ObjectNode property;
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                if (isSchemaNodeMandatory(node)) {
+                if (isSchemaNodeMandatory(node)) { // HERE
                     required.add(name);
                 }
                 property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
@@ -782,7 +782,7 @@ public class DefinitionGenerator {
             }
             setDefaultValue(property, defaultValue);
         } else {
-            setDefaultValue(property, "Some " + nodeName);
+            setDefaultValue(property, "Some " + nodeName); //HERE
         }
         return STRING_TYPE;
     }
