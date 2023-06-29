@@ -222,8 +222,6 @@ public abstract class BaseYangOpenApiGenerator {
         final Map<String, Path> paths = new HashMap<>();
         final String moduleName = module.getName();
 
-        boolean hasAddRootPostLink = false;
-
         final Collection<? extends DataSchemaNode> dataSchemaNodes = module.getChildNodes();
         LOG.debug("child nodes size [{}]", dataSchemaNodes.size());
         for (final DataSchemaNode node : dataSchemaNodes) {
@@ -232,20 +230,8 @@ public abstract class BaseYangOpenApiGenerator {
                 LOG.debug("Is Configuration node [{}] [{}]", isConfig, node.getQName().getLocalName());
 
                 final String localName = moduleName + ":" + node.getQName().getLocalName();
-                final String resourcePath  = getResourcePath("data", context);
-
                 final List<Parameter> pathParams = new ArrayList<>();
-                /*
-                 * When there are two or more top container or list nodes
-                 * whose config statement is true in module, make sure that
-                 * only one root post link is added for this module.
-                 */
-                if (isConfig && isForSingleModule && !hasAddRootPostLink) {
-                    LOG.debug("Has added root post link for module {}", moduleName);
-                    addRootPostLink(module, deviceName, pathParams, resourcePath, paths);
 
-                    hasAddRootPostLink = true;
-                }
                 final String resourcePathPart = createPath(node, pathParams, localName);
                 addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, isConfig,
                     moduleName, definitionNames, resourcePathPart, context);
@@ -268,18 +254,6 @@ public abstract class BaseYangOpenApiGenerator {
         }
 
         return docBuilder.build();
-    }
-
-    private static void addRootPostLink(final Module module, final String deviceName,
-            final List<Parameter> pathParams, final String resourcePath, final Map<String, Path> paths) {
-        if (containsListOrContainer(module.getChildNodes())) {
-            final String moduleName = module.getName();
-            final String name = moduleName + MODULE_NAME_SUFFIX;
-            final var postBuilder = new Path.Builder();
-            postBuilder.post(buildPost("", name, "", moduleName, deviceName,
-                    module.getDescription().orElse(""), pathParams));
-            paths.put(resourcePath, postBuilder.build());
-        }
     }
 
     public OpenApiObject.Builder createOpenApiObjectBuilder(final String schema, final String host,
@@ -307,9 +281,9 @@ public abstract class BaseYangOpenApiGenerator {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
             childSchemaNodes = dataNodeContainer.getChildNodes();
         }
-        paths.put(dataPath, operations(node, moduleName, deviceName, pathParams, isConfig, parentName,
-                definitionNames));
-
+        final Path operations = operations(node, moduleName, deviceName, pathParams, isConfig, parentName,
+            definitionNames);
+        paths.put(dataPath, operations);
         if (node instanceof ActionNodeContainer) {
             ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
                 final String operationsPath = getResourcePath("operations", context)
@@ -368,9 +342,12 @@ public abstract class BaseYangOpenApiGenerator {
             final Operation delete = buildDelete(node, moduleName, deviceName, pathParams);
             operationsBuilder.delete(delete);
 
-            final Operation post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
-            operationsBuilder.post(post);
+            if (node instanceof DataNodeContainer dataNodeContainer
+                && dataNodeContainer.getChildNodes().iterator().hasNext()) {
+                final DataSchemaNode firstChild = dataNodeContainer.getChildNodes().iterator().next();
+                final Operation post = buildPost(moduleName, deviceName, pathParams, firstChild);
+                operationsBuilder.post(post);
+            }
         }
         return operationsBuilder.build();
     }
