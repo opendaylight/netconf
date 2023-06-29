@@ -25,8 +25,10 @@ import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Schema;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 
@@ -49,6 +51,8 @@ public final class OperationBuilder {
     private static final ArrayNode CONSUMES_PUT_POST;
     private static final List<String> MIME_TYPES = List.of(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON);
     private static final String OBJECT = "object";
+    private static final String ARRAY_TYPE = "array";
+    private static final String ITEMS_KEY = "items";
     private static final String STRING = "string";
     private static final String TYPE_KEY = "type";
     private static final String QUERY = "query";
@@ -64,21 +68,24 @@ public final class OperationBuilder {
 
     }
 
-    public static Operation buildPost(final String parentName, final String nodeName, final String discriminator,
-            final String moduleName, final @Nullable String deviceName, final String description,
-            final List<Parameter> pathParams) {
+    public static Operation buildPost(final String nodeName, final String moduleName, final @Nullable String deviceName,
+            final String description, final List<Parameter> pathParams, final DataSchemaNode node,
+            final List<String> listKeys) {
         final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        final ObjectNode ref = JsonNodeFactory.instance.objectNode();
-        final String cleanDefName = parentName + CONFIG + "_" + nodeName;
-        final String defName = cleanDefName + discriminator;
-        final String xmlDefName = cleanDefName + discriminator;
-        ref.put(REF_KEY, COMPONENTS_PREFIX + defName);
-        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
+        final String cleanDefName = CONFIG + "_" + nodeName;
+        final String defName = cleanDefName;
+        final String xmlDefName = cleanDefName;
+        final ObjectNode requestBody;
+        if (node != null) {
+            requestBody = createContainerOrListRequestBodyParameter(nodeName, node, listKeys);
+        } else {
+            requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
+        }
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
-                buildResponse(Response.Status.CREATED.getReasonPhrase()));
+            buildResponse(Response.Status.CREATED.getReasonPhrase()));
 
         return new Operation.Builder()
             .tags(tags)
@@ -280,6 +287,51 @@ public final class OperationBuilder {
             content.set(MediaType.APPLICATION_JSON, buildMimeTypeValue(defName));
             content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(xmlDefName));
         }
+        payload.set(CONTENT_KEY, content);
+        payload.put(DESCRIPTION_KEY, name);
+        return payload;
+    }
+
+    private static ObjectNode createContainerOrListRequestBodyParameter(final String name, final DataSchemaNode node,
+            final List<String> listKeys) {
+        final ObjectNode payload = JsonNodeFactory.instance.objectNode();
+        final ObjectNode content = JsonNodeFactory.instance.objectNode();
+        final ObjectNode object = JsonNodeFactory.instance.objectNode();
+        if (node instanceof ContainerSchemaNode) {
+            object.put(TYPE_KEY, OBJECT);
+            object.put(PROPERTIES_KEY, JsonNodeFactory.instance.objectNode());
+            object.put(DESCRIPTION_KEY, "");
+        } else if (node instanceof ListSchemaNode) {
+            // Then it is list
+            final ObjectNode item = JsonNodeFactory.instance.objectNode();
+            final ObjectNode id = JsonNodeFactory.instance.objectNode();
+            for (final String key : listKeys) {
+                final ObjectNode idValue = JsonNodeFactory.instance.objectNode();
+                idValue.put("default", "Some " + key);
+                id.put(key, idValue);
+            }
+            item.put(TYPE_KEY, OBJECT);
+            item.put(PROPERTIES_KEY, id);
+            object.put(TYPE_KEY, ARRAY_TYPE);
+            object.put(ITEMS_KEY, item);
+            object.put(DESCRIPTION_KEY, "");
+        } else {
+            final ObjectNode id = JsonNodeFactory.instance.objectNode();
+            final ObjectNode idValue = JsonNodeFactory.instance.objectNode();
+            final String localName = node.getQName().getLocalName();
+            idValue.put("default", "Some " + localName);
+            id.put(localName, idValue);
+        }
+        final ObjectNode schema = JsonNodeFactory.instance.objectNode();
+        final ObjectNode container = JsonNodeFactory.instance.objectNode();
+        final ObjectNode value = JsonNodeFactory.instance.objectNode();
+        value.put(name, object);
+        container.put(TYPE_KEY, OBJECT);
+        container.put(PROPERTIES_KEY, value);
+        container.put(DESCRIPTION_KEY, "");
+        schema.put(SCHEMA_KEY, container);
+        content.set(MediaType.APPLICATION_JSON, schema);
+        content.set(MediaType.APPLICATION_XML, schema); // TODO handle XML
         payload.set(CONTENT_KEY, content);
         payload.put(DESCRIPTION_KEY, name);
         return payload;
