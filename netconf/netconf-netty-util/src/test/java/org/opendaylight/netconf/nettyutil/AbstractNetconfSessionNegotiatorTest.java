@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
+import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -35,7 +37,8 @@ import io.netty.util.Timeout;
 import io.netty.util.Timer;
 import io.netty.util.TimerTask;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.Promise;
+import io.netty.util.concurrent.GlobalEventExecutor;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,13 +67,12 @@ public class AbstractNetconfSessionNegotiatorTest {
     @Mock
     private NetconfSessionListener<TestingNetconfSession> listener;
     @Mock
-    private Promise<TestingNetconfSession> promise;
-    @Mock
     private SslHandler sslHandler;
     @Mock
     private Timer timer;
     @Mock
     private Timeout timeout;
+    private NetconfSessionPromise promise;
     private EmbeddedChannel channel;
     private TestSessionNegotiator negotiator;
     private HelloMessage hello;
@@ -78,19 +80,9 @@ public class AbstractNetconfSessionNegotiatorTest {
     private NetconfXMLToHelloMessageDecoder xmlToHello;
 
     @Before
-    public void setUp() {
-        channel = new EmbeddedChannel();
-        xmlToHello = new NetconfXMLToHelloMessageDecoder();
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
-                new ChannelInboundHandlerAdapter());
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, xmlToHello);
-        channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
-                FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
-        channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
-        hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
-        helloBase11 = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
-        doReturn(promise).when(promise).setFailure(any());
-        negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
+    public void setUp() throws Exception {
+        createNetconfSessionPromise();
+        createNegotiator();
     }
 
     @Test
@@ -177,7 +169,46 @@ public class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
         final RuntimeException cause = new RuntimeException("failure cause");
         channel.pipeline().fireExceptionCaught(cause);
-        verify(promise).setFailure(cause);
+        verify(promise, times(0)).setFailure(cause);
+    }
+
+    @Test
+    public void testRetryNegotiationAfterFailure() {
+        enableTimerTask();
+        negotiator.startNegotiation();
+        negotiator.negotiationFailed(new RuntimeException("failure cause"));
+
+        // Try negotiation after initial failure
+        final var session = mock(TestingNetconfSession.class);
+        doReturn(true).when(session).isSharable();
+        createNegotiator();
+        channel.pipeline().addLast(negotiator);
+        negotiator.startNegotiation();
+        negotiator.negotiationSuccessful(session);
+        assertTrue(promise.isDone());
+        assertTrue(promise.isSuccess());
+    }
+
+    private void createNetconfSessionPromise() throws Exception {
+        var address = mock(InetSocketAddress.class);
+        var reconnectStrategy = mock(ReconnectStrategy.class);
+        var bootstrap = mock(Bootstrap.class);
+        doNothing().when(reconnectStrategy).reconnectSuccessful();
+        promise = spy(new NetconfSessionPromise(GlobalEventExecutor.INSTANCE, address, reconnectStrategy, bootstrap));
+    }
+
+    private void createNegotiator() {
+        channel = new EmbeddedChannel();
+        xmlToHello = new NetconfXMLToHelloMessageDecoder();
+        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
+                new ChannelInboundHandlerAdapter());
+        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, xmlToHello);
+        channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
+                FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
+        channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
+        hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
+        helloBase11 = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
+        negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
     }
 
     private void enableTimerTask() {
