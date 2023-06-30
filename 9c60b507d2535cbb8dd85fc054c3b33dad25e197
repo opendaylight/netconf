@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "58ecfc53_31d57d04",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-30T11:03:43Z",
+      "side": 1,
+      "message": "present.",
+      "revId": "9c60b507d2535cbb8dd85fc054c3b33dad25e197",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "3e5de795_b5330c55",
@@ -14,6 +31,40 @@
       "writtenOn": "2023-06-28T08:27:04Z",
       "side": 1,
       "message": "recheck",
+      "revId": "9c60b507d2535cbb8dd85fc054c3b33dad25e197",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3920f1bb_b4aaf03d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-30T11:03:43Z",
+      "side": 1,
+      "message": "ObjectMapper is heavy object, is it possible to make test without it?",
+      "revId": "9c60b507d2535cbb8dd85fc054c3b33dad25e197",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a85a7fc3_ee408b86",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-30T11:03:43Z",
+      "side": 1,
+      "message": "final var",
       "revId": "9c60b507d2535cbb8dd85fc054c3b33dad25e197",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
