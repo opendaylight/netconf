@@ -1,0 +1,15 @@
+module my-yang {
+  yang-version 1.1;
+  namespace "urn:opendaylight:params:xml:ns:yang:my-yang";
+  prefix my;
+  description "demo yang file";
+  revision "2022-10-06" {
+    description "Init";
+  }
+
+  container data {
+    leaf my-data {
+      type string;
+    }
+  }
+}
