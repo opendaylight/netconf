@@ -26,6 +26,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0e1b262a_fba41088",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-30T10:53:46Z",
+      "side": 1,
+      "message": "\u003cp\u003e",
+      "revId": "9f9d305f1de21188dc5a5c4c7cdfbe34627d290a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d7e7ff1d_e10ea024",
         "filename": "restconf/restconf-openapi/src/test/resources/NETCONF-1036/augmentation.yang",
         "patchSetId": 12
@@ -37,6 +54,24 @@
       "writtenOn": "2023-06-30T09:47:19Z",
       "side": 1,
       "message": "consider using this approach with yang test files that are 50 lines or less",
+      "revId": "9f9d305f1de21188dc5a5c4c7cdfbe34627d290a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9040e51d_7d4813aa",
+        "filename": "restconf/restconf-openapi/src/test/resources/NETCONF-1036/augmentation.yang",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-30T10:53:46Z",
+      "side": 1,
+      "message": "Yes, we can create new Java class for this test and use this models there.",
+      "parentUuid": "d7e7ff1d_e10ea024",
       "revId": "9f9d305f1de21188dc5a5c4c7cdfbe34627d290a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
