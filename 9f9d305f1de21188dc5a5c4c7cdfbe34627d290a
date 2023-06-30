@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8123b3d_ad2bd773",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-30T09:47:19Z",
+      "side": 1,
+      "message": "inconsistent with the rest - use explicit type",
+      "range": {
+        "startLine": 451,
+        "startChar": 14,
+        "endLine": 451,
+        "endChar": 17
+      },
+      "revId": "9f9d305f1de21188dc5a5c4c7cdfbe34627d290a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7e7ff1d_e10ea024",
+        "filename": "restconf/restconf-openapi/src/test/resources/NETCONF-1036/augmentation.yang",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-06-30T09:47:19Z",
+      "side": 1,
+      "message": "consider using this approach with yang test files that are 50 lines or less",
+      "revId": "9f9d305f1de21188dc5a5c4c7cdfbe34627d290a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
