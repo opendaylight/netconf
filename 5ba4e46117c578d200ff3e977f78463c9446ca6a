@@ -89,6 +89,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cb56ff6_72b114c8",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerFactoryImpl.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-30T11:15:04Z",
+      "side": 1,
+      "message": "It can be just private/",
+      "parentUuid": "b1213853_7e0bac95",
+      "revId": "5ba4e46117c578d200ff3e977f78463c9446ca6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "53399a68_e9a6718c",
