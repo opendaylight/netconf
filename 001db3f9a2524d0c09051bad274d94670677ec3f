@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b8fa1ae_f3b88482",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-30T12:53:41Z",
+      "side": 1,
+      "message": "We do not align method parameters like this - see original code.",
+      "revId": "001db3f9a2524d0c09051bad274d94670677ec3f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f9c4bb9_87ebfd6f",
+        "filename": "restconf/sal-rest-docgen/src/test/resources/yang/my-yang@2022-10-06.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-06-30T12:53:41Z",
+      "side": 1,
+      "message": "Use 2 spaces indent.",
+      "revId": "001db3f9a2524d0c09051bad274d94670677ec3f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
