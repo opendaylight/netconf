@@ -16,6 +16,24 @@
       "message": "IIUC after failed attempt to establish connection we were not able to recover. It possible to test that circumstance here?",
       "revId": "57aee49e19a0debda466b416d7ba7e6ce2ba9192",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "647014bf_13393f43",
+        "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiatorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-07-01T00:05:15Z",
+      "side": 1,
+      "message": "Added a test case that shows that a negotiation failure due to an exception should not prevent the next attempt from completing successfully.",
+      "parentUuid": "8e10f11f_be1d0bac",
+      "revId": "57aee49e19a0debda466b416d7ba7e6ce2ba9192",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
