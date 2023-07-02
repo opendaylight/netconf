@@ -32,7 +32,7 @@
       <dependency>
         <groupId>org.opendaylight.aaa</groupId>
         <artifactId>aaa-artifacts</artifactId>
-        <version>0.18.0-SNAPSHOT</version>
+        <version>0.18.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
