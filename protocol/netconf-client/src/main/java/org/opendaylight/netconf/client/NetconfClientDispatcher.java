@@ -10,6 +10,11 @@ package org.opendaylight.netconf.client;
 import io.netty.util.concurrent.Future;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 
+/**
+ * Basic interface for Netconf client dispatcher.
+ * @deprecated Due to design change. Use {@link NetconfClientFactory} to instantiate Netconf client.
+ */
+@Deprecated
 public interface NetconfClientDispatcher {
     /**
      * Create netconf client. Network communication has to be set up based on network protocol specified in
