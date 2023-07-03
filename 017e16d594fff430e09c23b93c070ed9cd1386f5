@@ -16,6 +16,52 @@
       "message": "recheck",
       "revId": "017e16d594fff430e09c23b93c070ed9cd1386f5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61321dd8_0ad09661",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/NetconfNorthboundSshServer.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-03T08:50:33Z",
+      "side": 1,
+      "message": "completely undocumented magic path.\n\nif anything, the key should be configurable and if not set, it should be re-generated each and every time.",
+      "range": {
+        "startLine": 52,
+        "startChar": 30,
+        "endLine": 52,
+        "endChar": 47
+      },
+      "revId": "017e16d594fff430e09c23b93c070ed9cd1386f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "686f7a45_193848a9",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/NetconfNorthboundSshServer.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-03T08:50:33Z",
+      "side": 1,
+      "message": "change of behaviour... why is this not completely separated out and rather mangled together in this patch?!",
+      "range": {
+        "startLine": 75,
+        "startChar": 12,
+        "endLine": 75,
+        "endChar": 104
+      },
+      "revId": "017e16d594fff430e09c23b93c070ed9cd1386f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
