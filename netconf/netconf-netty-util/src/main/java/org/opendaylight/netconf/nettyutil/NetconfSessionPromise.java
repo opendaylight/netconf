@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.bootstrap.Bootstrap;
@@ -15,7 +14,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -26,34 +24,21 @@ import org.slf4j.LoggerFactory;
 @Deprecated
 final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromise<S> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionPromise.class);
-    private final ReconnectStrategy strategy;
-    private InetSocketAddress address;
+
     private final Bootstrap bootstrap;
+    private InetSocketAddress address;
 
     @GuardedBy("this")
-    private Future<?> pending;
+    private ChannelFuture pending;
 
-    NetconfSessionPromise(final EventExecutor executor, final InetSocketAddress address,
-            final ReconnectStrategy strategy, final Bootstrap bootstrap) {
+    NetconfSessionPromise(final EventExecutor executor, final InetSocketAddress address, final Bootstrap bootstrap) {
         super(executor);
-        this.strategy = requireNonNull(strategy);
         this.address = requireNonNull(address);
         this.bootstrap = requireNonNull(bootstrap);
     }
 
     @SuppressWarnings("checkstyle:illegalCatch")
     synchronized void connect() {
-        final int timeout;
-        try {
-            timeout = strategy.getConnectTimeout();
-        } catch (Exception e) {
-            LOG.info("Connection to {} aborted due to strategy decision", address, e);
-            setFailure(e);
-            return;
-        }
-
-        LOG.debug("Promise {} attempting connect for {}ms", this, timeout);
-
         final ChannelFuture connectFuture;
         try {
             if (address.isUnresolved()) {
@@ -84,14 +69,12 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
     @Override
     public synchronized Promise<S> setSuccess(final S result) {
         LOG.debug("Promise {} completed", this);
-        strategy.reconnectSuccessful();
         return super.setSuccess(result);
     }
 
     // Triggered when a connection attempt is resolved.
     private synchronized void channelConnectComplete(final ChannelFuture cf) {
         LOG.debug("Promise {} connection resolved", this);
-        verify(pending == cf, "Completed channel future %s while pending %s", cf, pending);
 
         /*
          * The promise we gave out could have been cancelled,
@@ -116,31 +99,6 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
         }
 
         LOG.debug("Attempt to connect to {} failed", address, cf.cause());
-
-        final Future<Void> rf = strategy.scheduleReconnect(cf.cause());
-        pending = rf;
-        rf.addListener(this::reconnectFutureComplete);
-    }
-
-    // Triggered when a connection attempt is to be made.
-    private synchronized void reconnectFutureComplete(final Future<?> sf) {
-        LOG.debug("Promise {} strategy triggered reconnect", this);
-        verify(pending == sf, "Completed strategy future %s while pending %s", sf, pending);
-
-        /*
-         * The promise we gave out could have been cancelled,
-         * which cascades to the reconnect attempt getting
-         * cancelled, but there is a slight race window, where
-         * the reconnect attempt is already enqueued, but the
-         * listener has not yet been notified -- if cancellation
-         * happens at that point, we need to catch it here.
-         */
-        if (!isCancelled()) {
-            if (sf.isSuccess()) {
-                connect();
-            } else {
-                setFailure(sf.cause());
-            }
-        }
+        setFailure(cf.cause());
     }
 }

@@ -35,7 +35,6 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfMessageUtil;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
@@ -141,22 +140,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
      */
     public ListenableFuture<Empty> initializeRemoteConnection(final NetconfClientDispatcher dispatcher,
             final NetconfClientConfiguration config) {
-
-        final Future<?> connectFuture;
-        if (config instanceof NetconfReconnectingClientConfiguration) {
-            // FIXME: This is weird. If I understand it correctly we want to know about the first connection so as to
-            //        forward error state. Analyze the call graph to understand what is going on here. We really want
-            //        to move reconnection away from the socket layer, so that it can properly interface with sessions
-            //        and generally has some event-driven state (as all good network glue does). There is a second story
-            //        which is we want to avoid duplicate code, so it depends on other users as well.
-            final var future = dispatcher.createReconnectingClient((NetconfReconnectingClientConfiguration) config);
-            taskFuture = future;
-            connectFuture = future.firstSessionFuture();
-        } else {
-            taskFuture = connectFuture = dispatcher.createClient(config);
-        }
-
-        connectFuture.addListener(future -> {
+        taskFuture = dispatcher.createClient(config);
+        taskFuture.addListener(future -> {
             if (!future.isSuccess() && !future.isCancelled()) {
                 LOG.debug("{}: Connection failed", id, future.cause());
                 remoteDevice.onRemoteSessionFailed(future.cause());

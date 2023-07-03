@@ -37,7 +37,6 @@ import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
-import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -100,13 +99,11 @@ public class CallHomeMountDispatcherTest {
                 NetconfClientConfiguration.NetconfClientProtocol.SSH;
         final NetconfHelloMessageAdditionalHeader additionalHeader = mock(NetconfHelloMessageAdditionalHeader.class);
         final NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-        final ReconnectStrategy reconnectStrategy = mock(ReconnectStrategy.class);
         final AuthenticationHandler authHandler = mock(AuthenticationHandler.class);
 
         return NetconfClientConfigurationBuilder.create().withProtocol(protocol).withAddress(address)
                 .withConnectionTimeoutMillis(0).withAdditionalHeader(additionalHeader)
-                .withSessionListener(sessionListener).withReconnectStrategy(reconnectStrategy)
-                .withAuthHandler(authHandler).build();
+                .withSessionListener(sessionListener).withAuthHandler(authHandler).build();
     }
 
     @Test
