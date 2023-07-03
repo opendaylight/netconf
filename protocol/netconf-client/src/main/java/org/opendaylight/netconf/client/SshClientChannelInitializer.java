@@ -14,6 +14,13 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.Authenticat
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 
+/**
+ * Client channel initializer for SSH transport.
+ *
+ * @deprecated due to design change. Common {@link ClientChannelInitializer} expected to be used while
+ *      transport is served by dedicated components.
+ */
+@Deprecated
 final class SshClientChannelInitializer extends AbstractClientChannelInitializer {
     private final AuthenticationHandler authenticationHandler;
     private final @Nullable NetconfSshClient sshClient;
