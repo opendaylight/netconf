@@ -16,7 +16,6 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
-import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -31,7 +30,6 @@ public class NetconfClientConfigurationBuilder {
     private long connectionTimeoutMillis = DEFAULT_CONNECTION_TIMEOUT_MILLIS;
     private NetconfHelloMessageAdditionalHeader additionalHeader;
     private NetconfClientSessionListener sessionListener;
-    private ReconnectStrategy reconnectStrategy;
     private AuthenticationHandler authHandler;
     private NetconfClientConfiguration.NetconfClientProtocol clientProtocol = DEFAULT_CLIENT_PROTOCOL;
     private SslHandlerFactory sslHandlerFactory;
@@ -77,12 +75,6 @@ public class NetconfClientConfigurationBuilder {
     @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withSessionListener(final NetconfClientSessionListener sessionListener) {
         this.sessionListener = sessionListener;
-        return this;
-    }
-
-    @SuppressWarnings("checkstyle:hiddenField")
-    public NetconfClientConfigurationBuilder withReconnectStrategy(final ReconnectStrategy reconnectStrategy) {
-        this.reconnectStrategy = reconnectStrategy;
         return this;
     }
 
@@ -140,10 +132,6 @@ public class NetconfClientConfigurationBuilder {
         return sessionListener;
     }
 
-    final ReconnectStrategy getReconnectStrategy() {
-        return reconnectStrategy;
-    }
-
     final AuthenticationHandler getAuthHandler() {
         return authHandler;
     }
@@ -174,7 +162,7 @@ public class NetconfClientConfigurationBuilder {
 
     public NetconfClientConfiguration build() {
         return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
-                sessionListener, reconnectStrategy, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities,
+                sessionListener, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities,
                 maximumIncomingChunkSize, name);
     }
 }

@@ -32,8 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
+import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.DatastoreBackedPublicKeyAuth;
 import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
 import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
@@ -50,8 +49,6 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
-import org.opendaylight.netconf.nettyutil.ReconnectStrategyFactory;
-import org.opendaylight.netconf.nettyutil.TimedReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.topology.api.NetconfTopology;
@@ -184,10 +181,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, nodeOptional);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
-        final NetconfReconnectingClientConfiguration clientConfig =
-                getClientConfig(netconfClientSessionListener, netconfNode, nodeId);
+        final NetconfClientConfiguration clientConfig = getClientConfig(netconfClientSessionListener, netconfNode,
+            nodeId);
         final ListenableFuture<Empty> future =
                 deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
+
+//      final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(eventExecutor,
+//      node.requireMaxConnectionAttempts().toJava(), node.requireBetweenAttemptsTimeoutMillis().toJava(),
+//      node.requireSleepFactor().decimalValue());
 
         activeConnectors.put(nodeId, deviceCommunicatorDTO);
 
@@ -265,7 +266,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, yanglibRegistrations);
     }
 
-    protected RemoteDeviceHandler createSalFacade(RemoteDeviceId deviceId, boolean lockDatastore) {
+    protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final boolean lockDatastore) {
         return new NetconfTopologyDeviceSalFacade(deviceId, mountPointService, lockDatastore, dataBroker);
     }
 
@@ -302,23 +303,20 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return List.of();
     }
 
-    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
-                                                                  final NetconfNode node, final NodeId nodeId) {
-        final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(eventExecutor,
-                node.requireMaxConnectionAttempts().toJava(), node.requireBetweenAttemptsTimeoutMillis().toJava(),
-                node.requireSleepFactor().decimalValue());
-        final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
+    public NetconfClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
+            final NetconfNode node, final NodeId nodeId) {
+        final NetconfClientConfigurationBuilder reconnectingClientConfigurationBuilder;
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
-            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
+            reconnectingClientConfigurationBuilder = NetconfClientConfigurationBuilder.create()
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
                     .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
         } else if (protocol == null || protocol.getName() == Name.SSH) {
-            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
+            reconnectingClientConfigurationBuilder = NetconfClientConfigurationBuilder.create()
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
                     .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
         } else if (protocol.getName() == Name.TLS) {
-            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
+            reconnectingClientConfigurationBuilder = NetconfClientConfigurationBuilder.create()
                 .withSslHandlerFactory(sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification()))
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
         } else {
@@ -334,8 +332,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .withName(nodeId.getValue())
                 .withAddress(NetconfNodeUtils.toInetSocketAddress(node))
                 .withConnectionTimeoutMillis(node.requireConnectionTimeoutMillis().toJava())
-                .withReconnectStrategy(sf.createReconnectStrategy())
-                .withConnectStrategyFactory(sf)
                 .withSessionListener(listener)
                 .build();
     }
