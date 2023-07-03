@@ -55,10 +55,10 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             final ServiceGroupIdentifier serviceGroupIdent, final NetconfTopologySetup setup,
             final CredentialProvider credentialProvider, final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
         this.serviceGroupIdent = requireNonNull(serviceGroupIdent);
-        this.remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(setup.getNode().getNodeId(),
+        remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(setup.getNode().getNodeId(),
                 setup.getNode().augmentation(NetconfNode.class));
 
-        this.topologySingleton = new NetconfTopologySingletonImpl(topologyId, clientDispatcher,
+        topologySingleton = new NetconfTopologySingletonImpl(topologyId, clientDispatcher,
                 eventExecutor, keepaliveExecutor, processingExecutor, schemaManager, dataBroker, mountPointService,
                 encryptionService, deviceActionFactory, baseSchemas, remoteDeviceId, setup, actorResponseWaitTime,
                 credentialProvider, sslHandlerFactoryProvider);
@@ -99,7 +99,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), node.augmentation(NetconfNode.class));
 
         if (isMaster) {
-            getTopologySingleton().disconnectNode(setup.getNode().getNodeId());
+            getTopologySingleton().dropNode(setup.getNode().getNodeId());
             getTopologySingleton().refreshSetupConnection(setup, remoteDeviceId);
         } else {
             getTopologySingleton().refreshDevice(setup, remoteDeviceId);

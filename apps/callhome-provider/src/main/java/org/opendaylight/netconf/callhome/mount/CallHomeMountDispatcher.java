@@ -33,7 +33,6 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -138,10 +137,9 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
             topology.disconnectNode(nodeId);
         });
         if (deviceContext != null) {
-            final NodeId nodeId = deviceContext.getId();
             final Node configNode = deviceContext.getConfigNode();
             LOG.info("Provisioning fake config {}", configNode);
-            topology.connectNode(nodeId, configNode);
+            topology.connectNode(configNode);
         }
     }
 
