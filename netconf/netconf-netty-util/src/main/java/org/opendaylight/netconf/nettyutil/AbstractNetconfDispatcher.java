@@ -136,15 +136,14 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
      * Creates a client.
      *
      * @param address remote address
-     * @param strategy Reconnection strategy to be used when initial connection fails
+     * @param initializer Channel initializer
      *
      * @return Future representing the connection process. Its result represents the combined success of TCP connection
      *         as well as session negotiation.
      */
-    protected Future<S> createClient(final InetSocketAddress address, final ReconnectStrategy strategy,
-            final PipelineInitializer<S> initializer) {
+    protected Future<S> createClient(final InetSocketAddress address, final PipelineInitializer<S> initializer) {
         final Bootstrap b = new Bootstrap();
-        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, strategy, b);
+        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, b);
         b.option(ChannelOption.SO_KEEPALIVE, true).handler(
                 new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -167,9 +166,9 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
      *
      * @param address remote address
      */
-    protected Future<S> createClient(final InetSocketAddress address, final ReconnectStrategy strategy,
-            final Bootstrap bootstrap, final PipelineInitializer<S> initializer) {
-        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, strategy, bootstrap);
+    protected Future<S> createClient(final InetSocketAddress address, final Bootstrap bootstrap,
+            final PipelineInitializer<S> initializer) {
+        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, bootstrap);
 
         bootstrap.handler(
                 new ChannelInitializer<SocketChannel>() {
@@ -181,30 +180,6 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
 
         p.connect();
         LOG.debug("Client created.");
-        return p;
-    }
-
-    /**
-     * Creates a reconnecting client.
-     *
-     * @param address remote address
-     * @param connectStrategyFactory Factory for creating reconnection strategy for every reconnect attempt
-     * @return Future representing the reconnection task. It will report completion based on reestablishStrategy, e.g.
-     *         success is never reported, only failure when it runs out of reconnection attempts.
-     */
-    protected ReconnectFuture createReconnectingClient(final InetSocketAddress address,
-            final ReconnectStrategyFactory connectStrategyFactory, final PipelineInitializer<S> initializer) {
-        final Bootstrap b = new Bootstrap();
-
-        final ReconnectPromise<S, L> p = new ReconnectPromise<>(GlobalEventExecutor.INSTANCE, this, address,
-                connectStrategyFactory, b, initializer);
-
-        b.option(ChannelOption.SO_KEEPALIVE, true);
-
-        setWorkerGroup(b);
-        setChannelFactory(b);
-
-        p.connect();
         return p;
     }
 

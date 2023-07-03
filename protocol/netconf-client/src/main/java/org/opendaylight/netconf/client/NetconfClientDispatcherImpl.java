@@ -18,9 +18,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
-import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -59,70 +57,28 @@ public class NetconfClientDispatcherImpl
         };
     }
 
-    @Override
-    public ReconnectFuture createReconnectingClient(final NetconfReconnectingClientConfiguration clientConfiguration) {
-        return switch (clientConfiguration.getProtocol()) {
-            case TCP -> createReconnectingTcpClient(clientConfiguration);
-            case SSH -> createReconnectingSshClient(clientConfiguration);
-            case TLS -> createReconnectingTlsClient(clientConfiguration);
-        };
-    }
-
     private Future<NetconfClientSession> createTcpClient(final NetconfClientConfiguration currentConfiguration) {
         LOG.debug("Creating TCP client with configuration: {}", currentConfiguration);
-        return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
+        return super.createClient(currentConfiguration.getAddress(),
             (ch, promise) -> new TcpClientChannelInitializer(getNegotiatorFactory(currentConfiguration),
                         currentConfiguration.getSessionListener()).initialize(ch, promise));
     }
 
-    private ReconnectFuture createReconnectingTcpClient(
-            final NetconfReconnectingClientConfiguration currentConfiguration) {
-        LOG.debug("Creating reconnecting TCP client with configuration: {}", currentConfiguration);
-        final TcpClientChannelInitializer init =
-                new TcpClientChannelInitializer(getNegotiatorFactory(currentConfiguration),
-                currentConfiguration.getSessionListener());
-
-        return super.createReconnectingClient(currentConfiguration.getAddress(),
-                currentConfiguration.getConnectStrategyFactory(), init::initialize);
-    }
-
     private Future<NetconfClientSession> createSshClient(final NetconfClientConfiguration currentConfiguration) {
         LOG.debug("Creating SSH client with configuration: {}", currentConfiguration);
-        return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
+        return super.createClient(currentConfiguration.getAddress(),
             (ch, sessionPromise) -> new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
                         getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(),
                         currentConfiguration.getSshClient(), currentConfiguration.getName())
                     .initialize(ch, sessionPromise));
     }
 
-    private ReconnectFuture createReconnectingSshClient(
-            final NetconfReconnectingClientConfiguration currentConfiguration) {
-        LOG.debug("Creating reconnecting SSH client with configuration: {}", currentConfiguration);
-        final SshClientChannelInitializer init = new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
-                getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(),
-                currentConfiguration.getSshClient(), currentConfiguration.getName());
-
-        return super.createReconnectingClient(currentConfiguration.getAddress(),
-                currentConfiguration.getConnectStrategyFactory(), init::initialize);
-    }
-
     private Future<NetconfClientSession> createTlsClient(final NetconfClientConfiguration currentConfiguration) {
         LOG.debug("Creating TLS client with configuration: {}", currentConfiguration);
-        return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
+        return super.createClient(currentConfiguration.getAddress(),
             (ch, sessionPromise) -> new TlsClientChannelInitializer(currentConfiguration.getSslHandlerFactory(),
                     getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener())
                     .initialize(ch, sessionPromise));
-    }
-
-    private ReconnectFuture createReconnectingTlsClient(
-            final NetconfReconnectingClientConfiguration currentConfiguration) {
-        LOG.debug("Creating reconnecting TLS client with configuration: {}", currentConfiguration);
-        final TlsClientChannelInitializer init = new TlsClientChannelInitializer(
-                currentConfiguration.getSslHandlerFactory(), getNegotiatorFactory(currentConfiguration),
-                currentConfiguration.getSessionListener());
-
-        return super.createReconnectingClient(currentConfiguration.getAddress(),
-                currentConfiguration.getConnectStrategyFactory(), init::initialize);
     }
 
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {
