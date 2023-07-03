@@ -22,8 +22,6 @@ import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentit
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.client.keyverifier.ServerKeyVerifier;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
-import org.opendaylight.netconf.shaded.sshd.client.session.SessionFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -76,6 +74,7 @@ final class TransportSshClient extends SshClient {
 
         private Keepalives keepAlives;
         private ClientIdentity clientIdentity;
+        private ClientSubsystemFactory subsystemFactory;
 
         Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group) {
             this.ioServiceFactory = requireNonNull(ioServiceFactory);
@@ -119,6 +118,11 @@ final class TransportSshClient extends SshClient {
             return this;
         }
 
+        Builder subsystemFactory(final ClientSubsystemFactory newSubsystemFactory) {
+            this.subsystemFactory = newSubsystemFactory;
+            return this;
+        }
+
         TransportSshClient buildChecked() throws UnsupportedConfigurationException {
             final var ret = (TransportSshClient) super.build(true);
             if (keepAlives != null) {
@@ -146,13 +150,10 @@ final class TransportSshClient extends SshClient {
                 throw new UnsupportedConfigurationException("Inconsistent client configuration", e);
             }
 
-            ret.setSessionFactory(new SessionFactory(ret) {
-                @Override
-                protected ClientSessionImpl setupSession(final ClientSessionImpl session) {
-                    session.setUsername(username);
-                    return session;
-                }
-            });
+            ret.setSessionFactory(new ClientSessionFactory(ret, username, subsystemFactory));
+            if (subsystemFactory != null) {
+                ret.addSessionListener(new ClientSubsystemSessionListener(subsystemFactory.subsystemName()));
+            }
             return ret;
         }
 
