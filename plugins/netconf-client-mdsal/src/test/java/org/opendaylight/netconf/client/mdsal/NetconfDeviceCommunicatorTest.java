@@ -20,8 +20,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
 
@@ -30,13 +28,8 @@ import com.google.common.base.Strings;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -57,19 +50,12 @@ import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
-import org.opendaylight.netconf.nettyutil.TimedReconnectStrategy;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -388,60 +374,6 @@ public class NetconfDeviceCommunicatorTest {
                 errorInfoMessages.contains(errMsg1) && errorInfoMessages.contains(errMsg2));
     }
 
-    /**
-     * Test whether reconnect is scheduled properly.
-     */
-    @Test
-    public void testNetconfDeviceReconnectInCommunicator() {
-        final RemoteDevice<NetconfDeviceCommunicator> device = mock(RemoteDevice.class);
-
-        final TimedReconnectStrategy timedReconnectStrategy =
-                new TimedReconnectStrategy(GlobalEventExecutor.INSTANCE, 10000, 0, 1.0, null, 100L, null);
-        final ReconnectStrategy reconnectStrategy = spy(new ReconnectStrategy() {
-            @Override
-            @Deprecated
-            public int getConnectTimeout() throws Exception {
-                return timedReconnectStrategy.getConnectTimeout();
-            }
-
-            @Override
-            @Deprecated
-            public Future<Void> scheduleReconnect(final Throwable cause) {
-                return timedReconnectStrategy.scheduleReconnect(cause);
-            }
-
-            @Override
-            @Deprecated
-            public void reconnectSuccessful() {
-                timedReconnectStrategy.reconnectSuccessful();
-            }
-        });
-
-        final EventLoopGroup group = new NioEventLoopGroup();
-        final Timer time = new HashedWheelTimer();
-        try {
-            final NetconfDeviceCommunicator listener = new NetconfDeviceCommunicator(
-                    new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), device, 10);
-            final NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withAddress(new InetSocketAddress("localhost", 65000))
-                    .withReconnectStrategy(reconnectStrategy)
-                    .withConnectStrategyFactory(() -> reconnectStrategy)
-                    .withAuthHandler(new LoginPasswordHandler("admin", "admin"))
-                    .withConnectionTimeoutMillis(10000)
-                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
-                    .withSessionListener(listener)
-                    .build();
-
-            listener.initializeRemoteConnection(new NetconfClientDispatcherImpl(group, group, time), cfg);
-
-            verify(reconnectStrategy,
-                    timeout(TimeUnit.MINUTES.toMillis(4)).times(101)).scheduleReconnect(any(Throwable.class));
-        } finally {
-            time.stop();
-            group.shutdownGracefully();
-        }
-    }
-
     @Test
     public void testOnResponseMessageWithWrongMessageID() throws Exception {
         setupSession();
@@ -483,8 +415,9 @@ public class NetconfDeviceCommunicatorTest {
 
     private static NetconfMessage createMultiErrorResponseMessage(final String messageID) throws Exception {
         // multiple rpc-errors which simulate actual response like in NETCONF-666
-        String xmlStr = "<nc:rpc-reply xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" xmlns:junos=\"http://xml.juniper.net/junos/18.4R1/junos\""
-                + "           message-id=\"" + messageID + "\">"
+        String xmlStr = "<nc:rpc-reply xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
+                + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
+                + "xmlns:junos=\"http://xml.juniper.net/junos/18.4R1/junos\" message-id=\"" + messageID + "\">"
                 + "<nc:rpc-error>\n"
                 + "<nc:error-type>protocol</nc:error-type>\n"
                 + "<nc:error-tag>operation-failed</nc:error-tag>\n"
