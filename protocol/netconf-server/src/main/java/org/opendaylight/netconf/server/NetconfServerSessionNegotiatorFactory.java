@@ -108,10 +108,10 @@ public class NetconfServerSessionNegotiatorFactory
             final NetconfSessionListenerFactory<NetconfServerSessionListener> defunctSessionListenerFactory,
             final Channel channel, final Promise<NetconfServerSession> promise) {
         final var sessionId = idProvider.getNextSessionId();
+        final var socketAddress = channel.parent() == null ? null : channel.parent().localAddress();
 
         return new NetconfServerSessionNegotiator(createHelloMessage(sessionId, monitoringService), sessionId, promise,
-            channel, timer, getListener(sessionId, channel.parent().localAddress()),
-            connectionTimeoutMillis, maximumIncomingChunkSize);
+            channel, timer, getListener(sessionId, socketAddress), connectionTimeoutMillis, maximumIncomingChunkSize);
     }
 
     private NetconfServerSessionListener getListener(final SessionIdType sessionId, final SocketAddress socketAddress) {
