@@ -54,7 +54,7 @@ public class ProxyNetconfDataTreeServiceTest {
     private static final FiniteDuration EXP_NO_MESSAGE_TIMEOUT = Duration.apply(300, TimeUnit.MILLISECONDS);
     private static final RemoteDeviceId DEVICE_ID =
         new RemoteDeviceId("dev1", InetSocketAddress.createUnresolved("localhost", 17830));
-    private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
+    private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
     private static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     private static final ContainerNode NODE = Builders.containerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
@@ -113,7 +113,7 @@ public class ProxyNetconfDataTreeServiceTest {
 
     @Test
     public void testGet() {
-        proxy.get(YangInstanceIdentifier.empty());
+        proxy.get(YangInstanceIdentifier.of());
         masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
         masterActor.reply(new Status.Success(masterActor.ref()));
         masterActor.expectMsgClass(GetRequest.class);
@@ -121,7 +121,7 @@ public class ProxyNetconfDataTreeServiceTest {
 
     @Test
     public void testGetConfig() {
-        proxy.getConfig(YangInstanceIdentifier.empty());
+        proxy.getConfig(YangInstanceIdentifier.of());
         masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
         masterActor.reply(new Status.Success(masterActor.ref()));
         masterActor.expectMsgClass(GetConfigRequest.class);

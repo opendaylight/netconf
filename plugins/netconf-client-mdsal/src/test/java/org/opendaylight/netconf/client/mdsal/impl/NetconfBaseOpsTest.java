@@ -191,14 +191,14 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testGetConfigRunningData() throws Exception {
-        final var dataOpt = baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
+        final var dataOpt = baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.of())).get();
         assertTrue(dataOpt.isPresent());
         assertEquals(NormalizedDataUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().getIdentifier().getNodeType());
     }
 
     @Test
     public void testGetData() throws Exception {
-        final var dataOpt = baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
+        final var dataOpt = baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of())).get();
         assertTrue(dataOpt.isPresent());
         assertEquals(NormalizedDataUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().getIdentifier().getNodeType());
     }
@@ -290,13 +290,13 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     @Test
     public void testGetDataWithoutFields() {
         assertThrows(ExecutionException.class, () -> baseOps.getData(callback,
-                Optional.of(YangInstanceIdentifier.empty()), List.of()).get());
+                Optional.of(YangInstanceIdentifier.of()), List.of()).get());
     }
 
     @Test
     public void getConfigRunningDataWithoutFields() {
         assertThrows(ExecutionException.class, () -> baseOps.getConfigRunningData(callback,
-                Optional.of(YangInstanceIdentifier.empty()), List.of()).get());
+                Optional.of(YangInstanceIdentifier.of()), List.of()).get());
     }
 
     @Test
@@ -306,7 +306,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
                 CONTAINER_C_NID, CONTAINER_D_NID, LEAF_X_NID);
         final YangInstanceIdentifier leafZField = YangInstanceIdentifier.create(CONTAINER_E_NID, LEAF_Z_NID);
 
-        baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty()),
+        baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of()),
                 List.of(leafAField, leafXField, leafZField)).get();
         verify(listener).sendRequest(msg("/netconfMessages/get-with-multiple-subtrees.xml"),
                 eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME));
@@ -319,7 +319,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
                 CONTAINER_C_NID, CONTAINER_D_NID, LEAF_X_NID);
         final YangInstanceIdentifier leafZField = YangInstanceIdentifier.create(CONTAINER_E_NID, LEAF_Z_NID);
 
-        baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.empty()),
+        baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.of()),
                 List.of(leafAField, leafXField, leafZField)).get();
         verify(listener).sendRequest(msg("/netconfMessages/get-config-with-multiple-subtrees.xml"),
                 eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME));
@@ -330,7 +330,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         final YangInstanceIdentifier contCField = YangInstanceIdentifier.create(CONTAINER_C_NID);
         final YangInstanceIdentifier contDField = YangInstanceIdentifier.create(CONTAINER_E_NID);
 
-        baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty()), List.of(contCField, contDField)).get();
+        baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of()), List.of(contCField, contDField)).get();
         verify(listener).sendRequest(msg("/netconfMessages/get-with-multiple-root-subtrees.xml"),
                 eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME));
     }

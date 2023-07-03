@@ -71,7 +71,7 @@ public class MountInstanceTest {
 
         mountInstance = new NetconfDeviceMount(
             new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)),
-            service, YangInstanceIdentifier.empty());
+            service, YangInstanceIdentifier.of());
     }
 
     @Test

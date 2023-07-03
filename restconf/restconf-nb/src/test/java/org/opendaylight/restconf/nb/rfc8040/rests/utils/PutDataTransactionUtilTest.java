@@ -180,7 +180,7 @@ public class PutDataTransactionUtilTest {
 
         // FIXME: more asserts
         assertThrows(RestconfDocumentedException.class,
-            () -> RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.empty(), payload));
+            () -> RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.of(), payload));
     }
 
     @Test

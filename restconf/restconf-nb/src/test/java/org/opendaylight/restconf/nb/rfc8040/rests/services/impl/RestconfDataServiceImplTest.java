@@ -218,10 +218,10 @@ public class RestconfDataServiceImplTest {
         doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(buildBaseContConfig))))
                 .when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
+                .read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
         doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(buildBaseContOperational))))
                 .when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty());
+                .read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
         final Response response = dataService.readData(uriInfo);
         assertNotNull(response);
         assertEquals(200, response.getStatus());

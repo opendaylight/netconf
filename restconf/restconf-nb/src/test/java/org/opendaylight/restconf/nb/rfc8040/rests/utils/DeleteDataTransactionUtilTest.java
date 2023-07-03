@@ -57,7 +57,7 @@ public class DeleteDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
+            .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
     }
 
@@ -67,7 +67,7 @@ public class DeleteDataTransactionUtilTest {
     @Test
     public void deleteData() {
         // assert that data to delete exists
-        when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty()))
+        when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of()))
             .thenReturn(immediateTrueFluentFuture());
         // test
         delete(new MdsalRestconfStrategy(mockDataBroker));
@@ -80,7 +80,7 @@ public class DeleteDataTransactionUtilTest {
     @Test
     public void deleteDataNegativeTest() {
         // assert that data to delete does NOT exist
-        when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty()))
+        when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of()))
             .thenReturn(immediateFalseFluentFuture());
         final NetconfDocumentedException exception = new NetconfDocumentedException("id",
             ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
@@ -96,14 +96,14 @@ public class DeleteDataTransactionUtilTest {
     }
 
     private static void delete(final RestconfStrategy strategy) {
-        final Response response = DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.empty());
+        final Response response = DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.of());
         // assert success
         assertEquals("Not expected response received", Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
     private static void deleteFail(final RestconfStrategy strategy) {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.empty()));
+            () -> DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.of()));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);

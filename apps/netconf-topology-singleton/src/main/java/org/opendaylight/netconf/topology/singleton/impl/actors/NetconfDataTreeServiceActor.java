@@ -139,7 +139,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
                 }
                 NormalizedNodeMessage nodeMessageResp = null;
                 if (result.value() != null) {
-                    nodeMessageResp = new NormalizedNodeMessage(YangInstanceIdentifier.empty(), result.value());
+                    nodeMessageResp = new NormalizedNodeMessage(YangInstanceIdentifier.of(), result.value());
                 }
                 requester.tell(new InvokeRpcMessageReply(nodeMessageResp, result.errors()), self);
             }
@@ -162,7 +162,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
                 }
                 NormalizedNodeMessage nodeMessageResp = null;
                 if (rpcResult.value() != null) {
-                    nodeMessageResp = new NormalizedNodeMessage(YangInstanceIdentifier.empty(), rpcResult.value());
+                    nodeMessageResp = new NormalizedNodeMessage(YangInstanceIdentifier.of(), rpcResult.value());
                 }
                 requester.tell(new InvokeRpcMessageReply(nodeMessageResp, rpcResult.errors()), self);
             }

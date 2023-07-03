@@ -129,7 +129,7 @@ abstract class AbstractGet extends AbstractSingletonNetconfOperation {
             throws DocumentedException {
         final var optFilterElement = operationElement.getOnlyChildElementOptionally(FILTER);
         if (optFilterElement.isEmpty()) {
-            return Optional.of(YangInstanceIdentifier.empty());
+            return Optional.of(YangInstanceIdentifier.of());
         }
 
         final var filterElement = optFilterElement.orElseThrow();

@@ -30,8 +30,8 @@ public class FieldsAwareReadWriteTxTest {
     public void testReadWithFields() {
         final FieldsAwareReadWriteTx tx = new FieldsAwareReadWriteTx(delegateReadTx, delegateWriteTx);
         tx.read(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId(),
-            List.of(YangInstanceIdentifier.empty()));
+            List.of(YangInstanceIdentifier.of()));
         verify(delegateReadTx).read(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId(),
-            List.of(YangInstanceIdentifier.empty()));
+            List.of(YangInstanceIdentifier.of()));
     }
 }

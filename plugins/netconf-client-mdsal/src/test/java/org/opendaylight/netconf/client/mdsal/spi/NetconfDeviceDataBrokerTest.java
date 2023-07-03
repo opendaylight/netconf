@@ -106,14 +106,14 @@ public class NetconfDeviceDataBrokerTest {
 
         // read-only transaction
         final NetconfDOMFieldsReadTransaction roTx = fieldsExtension.newReadOnlyTransaction();
-        roTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty(),
-                List.of(YangInstanceIdentifier.empty()));
+        roTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(),
+                List.of(YangInstanceIdentifier.of()));
         verify(rpcService).invokeNetconf(Mockito.eq(NETCONF_GET_CONFIG_QNAME), any());
 
         // read-write transaction
         final NetconfDOMFieldsReadWriteTransaction rwTx = fieldsExtension.newReadWriteTransaction();
-        rwTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty(),
-                List.of(YangInstanceIdentifier.empty()));
+        rwTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of(),
+                List.of(YangInstanceIdentifier.of()));
         verify(rpcService).invokeNetconf(Mockito.eq(NETCONF_GET_QNAME), any());
     }
 

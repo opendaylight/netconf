@@ -931,7 +931,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         // building filter structure and NETCONF message
         final AnyxmlNode<?> filterStructure = toFilterStructure(
-                List.of(FieldsFilter.of(parentYiid, List.of(capabilitiesField, YangInstanceIdentifier.empty()))),
+                List.of(FieldsFilter.of(parentYiid, List.of(capabilitiesField, YangInstanceIdentifier.of()))),
                 SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));

@@ -65,7 +65,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDataTreeServiceActorTest {
-    static final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
+    static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
     static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
     static final ContainerNode NODE = Builders.containerBuilder()

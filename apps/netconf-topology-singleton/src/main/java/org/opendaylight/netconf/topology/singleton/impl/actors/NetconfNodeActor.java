@@ -254,7 +254,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                 }
                 NormalizedNodeMessage nodeMessageReply = null;
                 if (domRpcResult.value() != null) {
-                    nodeMessageReply = new NormalizedNodeMessage(YangInstanceIdentifier.empty(), domRpcResult.value());
+                    nodeMessageReply = new NormalizedNodeMessage(YangInstanceIdentifier.of(), domRpcResult.value());
                 }
                 recipient.tell(new InvokeRpcMessageReply(nodeMessageReply, domRpcResult.errors()), getSelf());
             }
