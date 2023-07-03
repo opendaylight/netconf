@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f320ab3_f6d32ce7",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHServer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-03T22:14:25Z",
+      "side": 1,
+      "message": "Create a dedicated interface for this:\n\ninterface ServerFactoryManagerConfigurator {\n\n    void configureServerFactoryManager(ServerFactoryManager manager);\n}\n\nso that implementations and interactions are easily discoverable",
+      "range": {
+        "startLine": 85,
+        "startChar": 56,
+        "endLine": 85,
+        "endChar": 86
+      },
+      "revId": "e88098a2b5c8db7c4a2059e5978bc26403564956",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
