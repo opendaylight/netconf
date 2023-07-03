@@ -57,6 +57,13 @@ public final class TLSClient extends TLSTransportStack {
         return transformUnderlay(client, TCPServer.listen(client.asListener(), bootstrap, listenParams));
     }
 
+    public static @NonNull ListenableFuture<TLSClient> listen(final TransportChannelListener listener,
+            final ServerBootstrap bootstrap, final TcpServerGrouping listenParams, final SslHandlerFactory factory)
+            throws UnsupportedConfigurationException {
+        final var client = new TLSClient(listener, factory);
+        return transformUnderlay(client, TCPServer.listen(client.asListener(), bootstrap, listenParams));
+    }
+
     private static TLSClient newClient(final TransportChannelListener listener, final TlsClientGrouping clientParams)
             throws UnsupportedConfigurationException {
         final var builder = SslContextBuilder.forClient();
