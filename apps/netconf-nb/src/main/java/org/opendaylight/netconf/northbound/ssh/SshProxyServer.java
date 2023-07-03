@@ -45,6 +45,7 @@ import org.opendaylight.netconf.shaded.sshd.server.SshServer;
  * Proxy SSH server that just delegates decrypted content to a delegate server within same VM.
  * Implemented using Apache Mina SSH lib.
  */
+@Deprecated(since = "7.0.0", forRemoval = true)
 public class SshProxyServer implements AutoCloseable {
     private final SshServer sshServer;
     private final ScheduledExecutorService minaTimerExecutor;
