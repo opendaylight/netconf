@@ -98,10 +98,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>mockito-configuration</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-test-util</artifactId>
     </dependency>
