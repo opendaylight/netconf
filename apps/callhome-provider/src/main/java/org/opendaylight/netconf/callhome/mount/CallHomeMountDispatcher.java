@@ -25,13 +25,11 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
-import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.osgi.service.component.annotations.Activate;
@@ -113,11 +111,6 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     @Override
     public Future<NetconfClientSession> createClient(final NetconfClientConfiguration clientConfiguration) {
         return activateChannel(clientConfiguration);
-    }
-
-    @Override
-    public ReconnectFuture createReconnectingClient(final NetconfReconnectingClientConfiguration clientConfiguration) {
-        return new SingleReconnectFuture(eventExecutor, activateChannel(clientConfiguration));
     }
 
     private Future<NetconfClientSession> activateChannel(final NetconfClientConfiguration conf) {

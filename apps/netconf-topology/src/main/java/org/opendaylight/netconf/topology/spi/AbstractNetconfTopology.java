@@ -10,19 +10,13 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -30,31 +24,18 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
+import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.DatastoreBackedPublicKeyAuth;
-import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
-import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
-import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
-import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
-import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
-import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
-import org.opendaylight.netconf.nettyutil.ReconnectStrategyFactory;
-import org.opendaylight.netconf.nettyutil.TimedReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.KeyAuth;
@@ -70,19 +51,13 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.common.Empty;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractNetconfTopology {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
-    private final HashMap<NodeId, NetconfConnectorDTO> activeConnectors = new HashMap<>();
+    private final HashMap<NodeId, NetconfNodeHandler> activeConnectors = new HashMap<>();
     private final NetconfClientDispatcher clientDispatcher;
     private final EventExecutor eventExecutor;
     private final DeviceActionFactory deviceActionFactory;
@@ -171,172 +146,63 @@ public abstract class AbstractNetconfTopology {
     }
 
     protected final synchronized void deleteAllNodes() {
-        activeConnectors.values().forEach(NetconfConnectorDTO::close);
+        activeConnectors.values().forEach(NetconfNodeHandler::close);
         activeConnectors.clear();
     }
 
+    @Holding("this")
     protected final void setupConnection(final NodeId nodeId, final Node configNode) {
-        final NetconfNode netconfNode = configNode.augmentation(NetconfNode.class);
-        final NetconfNodeAugmentedOptional nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
+        final var netconfNode = configNode.augmentation(NetconfNode.class);
+        final var nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
 
         requireNonNull(netconfNode.getHost());
         requireNonNull(netconfNode.getPort());
 
-        final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, nodeOptional);
-        final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
-        final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
-        final NetconfReconnectingClientConfiguration clientConfig =
-                getClientConfig(netconfClientSessionListener, netconfNode, nodeId);
-        final ListenableFuture<Empty> future =
-                deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
+        // Instantiate the handler ...
+        final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
+        final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
+        final var nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor.getExecutor(),
+            baseSchemas, schemaManager, processingExecutor, deviceActionFactory,
+            deviceSalFacade, deviceId, nodeId, netconfNode, nodeOptional, getClientConfig(netconfNode, nodeId));
 
-        activeConnectors.put(nodeId, deviceCommunicatorDTO);
+        // ... record it ...
+        activeConnectors.put(nodeId, nodeHandler);
 
-        Futures.addCallback(future, new FutureCallback<>() {
-            @Override
-            public void onSuccess(final Empty result) {
-                LOG.debug("Connector for {} started succesfully", nodeId.getValue());
-            }
-
-            @Override
-            public void onFailure(final Throwable throwable) {
-                LOG.error("Connector for {} failed", nodeId.getValue(), throwable);
-                // remove this node from active connectors?
-            }
-        }, MoreExecutors.directExecutor());
-    }
-
-    protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-            final NetconfNodeAugmentedOptional nodeOptional) {
-        final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
-        final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
-
-        final var deviceSalFacade = createSalFacade(deviceId, node.requireLockDatastore());
-        // The facade we are going it present to NetconfDevice
-        RemoteDeviceHandler salFacade;
-        final KeepaliveSalFacade keepAliveFacade;
-        if (keepaliveDelay > 0) {
-            LOG.info("Adding keepalive facade, for device {}", nodeId);
-            salFacade = keepAliveFacade = new KeepaliveSalFacade(deviceId, deviceSalFacade,
-                keepaliveExecutor.getExecutor(), keepaliveDelay, node.requireDefaultRequestTimeoutMillis().toJava());
-        } else {
-            salFacade = deviceSalFacade;
-            keepAliveFacade = null;
-        }
-
-        // Setup reconnection on empty context, if so configured
-        if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
-            LOG.warn("Ignoring missing schema sources is not currently implemented for {}", deviceId);
-        }
-
-        final RemoteDevice<NetconfDeviceCommunicator> device;
-        final List<SchemaSourceRegistration<?>> yanglibRegistrations;
-        if (node.requireSchemaless()) {
-            device = new SchemalessNetconfDevice(baseSchemas, deviceId, salFacade);
-            yanglibRegistrations = List.of();
-        } else {
-            final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node.getSchemaCacheDirectory(),
-                nodeId.getValue());
-            device = new NetconfDeviceBuilder()
-                .setReconnectOnSchemasChange(node.requireReconnectOnChangedSchema())
-                .setSchemaResourcesDTO(resources)
-                .setGlobalProcessingExecutor(processingExecutor)
-                .setId(deviceId)
-                .setSalFacade(salFacade)
-                .setDeviceActionFactory(deviceActionFactory)
-                .setBaseSchemas(baseSchemas)
-                .build();
-            yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
-        }
-
-        final int rpcMessageLimit = node.requireConcurrentRpcLimit().toJava();
-        if (rpcMessageLimit < 1) {
-            LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", deviceId);
-        }
-
-        final var netconfDeviceCommunicator = new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit,
-            NetconfNodeUtils.extractUserCapabilities(node));
-
-        if (keepAliveFacade != null) {
-            keepAliveFacade.setListener(netconfDeviceCommunicator);
-        }
-
-        return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, yanglibRegistrations);
+        // ... and start it
+        nodeHandler.connect();
     }
 
     protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final boolean lockDatastore) {
         return new NetconfTopologyDeviceSalFacade(deviceId, mountPointService, lockDatastore, dataBroker);
     }
 
-    private static List<SchemaSourceRegistration<?>> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
-            final NetconfNode node, final SchemaResourcesDTO resources) {
-        final var yangLibrary = node.getYangLibrary();
-        if (yangLibrary != null) {
-            final Uri uri = yangLibrary.getYangLibraryUrl();
-            if (uri != null) {
-                final List<SchemaSourceRegistration<?>> registrations = new ArrayList<>();
-                final String yangLibURL = uri.getValue();
-                final SchemaSourceRegistry schemaRegistry = resources.getSchemaRegistry();
+    @VisibleForTesting
+    public NetconfClientConfigurationBuilder getClientConfig(final NetconfNode node, final NodeId nodeId) {
+        final var builder  = NetconfClientConfigurationBuilder.create();
 
-                // pre register yang library sources as fallback schemas to schema registry
-                final LibraryModulesSchemas schemas;
-                final String yangLibUsername = yangLibrary.getUsername();
-                final String yangLigPassword = yangLibrary.getPassword();
-                if (yangLibUsername != null && yangLigPassword != null) {
-                    schemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
-                } else {
-                    schemas = LibraryModulesSchemas.create(yangLibURL);
-                }
-
-                for (final Map.Entry<SourceIdentifier, URL> entry : schemas.getAvailableModels().entrySet()) {
-                    registrations.add(schemaRegistry.registerSchemaSource(new LibrarySchemaSourceProvider(
-                        remoteDeviceId, schemas.getAvailableModels()),
-                        PotentialSchemaSource.create(entry.getKey(), YangTextSchemaSource.class,
-                            PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
-                }
-                return List.copyOf(registrations);
-            }
-        }
-
-        return List.of();
-    }
-
-    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
-                                                                  final NetconfNode node, final NodeId nodeId) {
-        final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(eventExecutor,
-                node.requireMaxConnectionAttempts().toJava(), node.requireBetweenAttemptsTimeoutMillis().toJava(),
-                node.requireSleepFactor().decimalValue());
-        final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
-            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
-                    .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+            builder.withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
+                .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
         } else if (protocol == null || protocol.getName() == Name.SSH) {
-            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
-                    .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+            builder.withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
+                .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
         } else if (protocol.getName() == Name.TLS) {
-            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                .withSslHandlerFactory(sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification()))
-                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
+            builder.withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
+                .withSslHandlerFactory(sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification()));
         } else {
             throw new IllegalStateException("Unsupported protocol type: " + protocol.getName());
         }
 
-        if (node.getOdlHelloMessageCapabilities() != null) {
-            reconnectingClientConfigurationBuilder.withOdlHelloCapabilities(
-                    Lists.newArrayList(node.getOdlHelloMessageCapabilities().getCapability()));
+        final var helloCapabilities = node.getOdlHelloMessageCapabilities();
+        if (helloCapabilities != null) {
+            builder.withOdlHelloCapabilities(List.copyOf(helloCapabilities.requireCapability()));
         }
 
-        return reconnectingClientConfigurationBuilder
-                .withName(nodeId.getValue())
-                .withAddress(NetconfNodeUtils.toInetSocketAddress(node))
-                .withConnectionTimeoutMillis(node.requireConnectionTimeoutMillis().toJava())
-                .withReconnectStrategy(sf.createReconnectStrategy())
-                .withConnectStrategyFactory(sf)
-                .withSessionListener(listener)
-                .build();
+        return builder
+            .withName(nodeId.getValue())
+            .withAddress(NetconfNodeUtils.toInetSocketAddress(node))
+            .withConnectionTimeoutMillis(node.requireConnectionTimeoutMillis().toJava());
     }
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {

@@ -9,11 +9,8 @@ package org.opendaylight.netconf.client;
 
 import io.netty.util.concurrent.Future;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
-import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 
 public interface NetconfClientDispatcher {
-
     /**
      * Create netconf client. Network communication has to be set up based on network protocol specified in
      * clientConfiguration
@@ -22,6 +19,4 @@ public interface NetconfClientDispatcher {
      * @return netconf client based on provided configuration
      */
     Future<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration);
-
-    ReconnectFuture createReconnectingClient(NetconfReconnectingClientConfiguration clientConfiguration);
 }
