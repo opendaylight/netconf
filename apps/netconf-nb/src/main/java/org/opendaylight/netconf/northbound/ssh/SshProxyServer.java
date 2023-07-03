@@ -44,7 +44,12 @@ import org.opendaylight.netconf.shaded.sshd.server.SshServer;
 /**
  * Proxy SSH server that just delegates decrypted content to a delegate server within same VM.
  * Implemented using Apache Mina SSH lib.
+ *
+ * @deprecated As extra. Netconf subsystem for SSH transport is implemented as direct component
+ *     {@code org.opendaylight.netconf.server.NetconfSubsystemFactory}. SSH server can be instantiated using
+ *     {@code org.opendaylight.netconf.server.NetconfServerFactoryImpl}.
  */
+@Deprecated(since = "6.0.0", forRemoval = true)
 public class SshProxyServer implements AutoCloseable {
     private final SshServer sshServer;
     private final ScheduledExecutorService minaTimerExecutor;
