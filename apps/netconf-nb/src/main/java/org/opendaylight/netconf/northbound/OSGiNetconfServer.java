@@ -10,7 +10,6 @@ package org.opendaylight.netconf.northbound;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
-import io.netty.channel.EventLoopGroup;
 import io.netty.util.Timer;
 import java.util.Map;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -43,35 +42,35 @@ public final class OSGiNetconfServer {
 
     private final AggregatedNetconfOperationServiceFactory mappers = new AggregatedNetconfOperationServiceFactory();
     private final ComponentInstance<DefaultNetconfMonitoringService> monitoring;
-    private final ComponentInstance<DefaultNetconfServerDispatcher> dispatcher;
+    private final ComponentInstance<DefaultNetconfServerFactory> serverFactory;
 
     @Activate
     public OSGiNetconfServer(
             @Reference(target = "(component.factory=" + DefaultNetconfMonitoringService.FACTORY_NAME + ")")
             final ComponentFactory<DefaultNetconfMonitoringService> monitoringFactory,
-            @Reference(target = "(component.factory=" + DefaultNetconfServerDispatcher.FACTORY_NAME + ")")
-            final ComponentFactory<DefaultNetconfServerDispatcher> dispatcherFactory,
+            @Reference(target = "(component.factory=" + DefaultNetconfServerFactory.FACTORY_NAME + ")")
+            final ComponentFactory<DefaultNetconfServerFactory> serverFactory,
             @Reference(target = "(type=mapper-aggregator-registry)")
             final NetconfOperationServiceFactory mapperAggregatorRegistry,
             @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
             final ScheduledThreadPool sshScheduledExecutor,
-            @Reference(target = "(type=global-boss-group)") final EventLoopGroup bossGroup,
-            @Reference(target = "(type=global-boss-group)") final EventLoopGroup workerGroup,
+            @Reference final OSGiNetconfThreadGroups threadGroups,
             @Reference(target = "(type=global-timer)") final Timer timer,
             @Reference final SessionIdProvider sessionIdProvider,
             final Configuration configuration) {
         mappers.onAddNetconfOperationServiceFactory(mapperAggregatorRegistry);
         monitoring = monitoringFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfMonitoringService.props(
             mapperAggregatorRegistry, sshScheduledExecutor, configuration.monitoring$_$update$_$interval())));
-        dispatcher = dispatcherFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfServerDispatcher.props(
-            bossGroup, workerGroup, new ServerChannelInitializer(new NetconfServerSessionNegotiatorFactory(timer,
+        this.serverFactory = serverFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfServerFactory.props(
+            threadGroups.getBossGroup(), threadGroups.getWorkerGroup(),
+            new ServerChannelInitializer(new NetconfServerSessionNegotiatorFactory(timer,
                 mappers, sessionIdProvider, configuration.connection$_$timeout$_$millis(),
                 monitoring.getInstance())))));
     }
 
     @Deactivate
     public void deactivate() {
-        dispatcher.dispose();
+        serverFactory.dispose();
         monitoring.dispose();
         mappers.close();
     }
