@@ -72,6 +72,7 @@ final class TransportSshClient extends SshClient {
         private final NettyIoServiceFactoryFactory ioServiceFactory;
         private final EventLoopGroup group;
 
+        private ClientFactoryManagerConfigurator configurator;
         private Keepalives keepAlives;
         private ClientIdentity clientIdentity;
 
@@ -85,8 +86,8 @@ final class TransportSshClient extends SshClient {
             return this;
         }
 
-        Builder keepAlives(final Keepalives newkeepAlives) {
-            keepAlives = newkeepAlives;
+        Builder keepAlives(final Keepalives newKeepAlives) {
+            keepAlives = newKeepAlives;
             return this;
         }
 
@@ -117,6 +118,11 @@ final class TransportSshClient extends SshClient {
             return this;
         }
 
+        Builder configurator(final ClientFactoryManagerConfigurator newConfigurator) {
+            configurator = newConfigurator;
+            return this;
+        }
+
         TransportSshClient buildChecked() throws UnsupportedConfigurationException {
             final var ret = (TransportSshClient) super.build(true);
             if (keepAlives != null) {
@@ -133,7 +139,10 @@ final class TransportSshClient extends SshClient {
             }
 
             if (clientIdentity != null && clientIdentity.getNone() == null) {
-                setClientIdentity(ret, clientIdentity);
+                setClientIdentity(ret, clientIdentity, configurator == null);
+            }
+            if (configurator != null) {
+                configurator.configureClientFactoryManager(ret);
             }
             ret.setIoServiceFactoryFactory(ioServiceFactory);
             ret.setScheduledExecutorService(group);
@@ -180,8 +189,8 @@ final class TransportSshClient extends SshClient {
             return super.fillWithDefaultValues();
         }
 
-        private static void setClientIdentity(final TransportSshClient client, final ClientIdentity clientIdentity)
-                throws UnsupportedConfigurationException {
+        private static void setClientIdentity(final TransportSshClient client, final ClientIdentity clientIdentity,
+                final boolean throwExceptionIfNoAuthMethodDefined) throws UnsupportedConfigurationException {
             final var authFactoriesListBuilder = ImmutableList.<UserAuthFactory>builder();
             final var password = clientIdentity.getPassword();
             if (password != null) {
@@ -212,11 +221,13 @@ final class TransportSshClient extends SshClient {
                 authFactoriesListBuilder.add(factory);
             }
             // FIXME implement authentication using X509 certificate
+
             final var userAuthFactories = authFactoriesListBuilder.build();
-            if (userAuthFactories.isEmpty()) {
+            if (!userAuthFactories.isEmpty()) {
+                client.setUserAuthFactories(userAuthFactories);
+            } else if (throwExceptionIfNoAuthMethodDefined) {
                 throw new UnsupportedConfigurationException("Client Identity has no authentication mechanism defined");
             }
-            client.setUserAuthFactories(userAuthFactories);
         }
     }
 }
