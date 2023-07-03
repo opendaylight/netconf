@@ -49,13 +49,30 @@ public final class SSHTransportStackFactory implements AutoCloseable {
     public @NonNull ListenableFuture<SSHClient> connectClient(final TransportChannelListener listener,
             final TcpClientGrouping connectParams, final SshClientGrouping clientParams)
                 throws UnsupportedConfigurationException {
-        return SSHClient.of(group, listener, clientParams).connect(newBootstrap(), connectParams);
+        return SSHClient.of(group, listener, clientParams, null).connect(newBootstrap(), connectParams);
+    }
+
+    /**
+     * Builds and starts SSH client. Opens custom subsystem channel on successful authentication.
+     *
+     * @param listener transport channel listener
+     * @param connectParams tcp layer configuration parameters
+     * @param clientParams ssh overlay configuration
+     * @param subsystemFactory client subsystem factory
+     * @return client instance as listenable future
+     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
+     * @throws NullPointerException if any parameters is null
+     */
+    public @NonNull ListenableFuture<SSHClient> connectClient(final TransportChannelListener listener,
+            final TcpClientGrouping connectParams, final SshClientGrouping clientParams,
+            final ClientSubsystemFactory subsystemFactory) throws UnsupportedConfigurationException {
+        return SSHClient.of(group, listener, clientParams, subsystemFactory).connect(newBootstrap(), connectParams);
     }
 
     public @NonNull ListenableFuture<SSHClient> listenClient(final TransportChannelListener listener,
             final TcpServerGrouping listenParams, final SshClientGrouping clientParams)
                 throws UnsupportedConfigurationException {
-        return SSHClient.of(group, listener, clientParams).listen(newServerBootstrap(), listenParams);
+        return SSHClient.of(group, listener, clientParams, null).listen(newServerBootstrap(), listenParams);
     }
 
     public @NonNull ListenableFuture<SSHServer> connectServer(final TransportChannelListener listener,

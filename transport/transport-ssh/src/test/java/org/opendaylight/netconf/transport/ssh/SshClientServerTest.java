@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.apache.commons.codec.digest.Crypt;
 import org.junit.jupiter.api.AfterAll;
@@ -50,11 +51,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
+import org.opendaylight.netconf.shaded.sshd.server.SshServer;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
+import org.opendaylight.netconf.shaded.sshd.server.channel.ChannelSession;
+import org.opendaylight.netconf.shaded.sshd.server.command.AbstractCommandSupport;
+import org.opendaylight.netconf.shaded.sshd.server.command.Command;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
+import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -93,6 +100,8 @@ public class SshClientServerTest {
     private SshServerGrouping sshServerConfig;
     @Mock
     private TransportChannelListener serverListener;
+    @Mock
+    private Consumer<Boolean> subsystemFlag;
 
     @Captor
     ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
@@ -113,7 +122,6 @@ public class SshClientServerTest {
 
     @BeforeEach
     void beforeEach() throws IOException {
-
         // create temp socket to get available port for test
         socket = new ServerSocket(0);
         final var localAddress = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
@@ -247,38 +255,75 @@ public class SshClientServerTest {
     }
 
     @Test
-    @DisplayName("SSH server with external initializer")
-    void externalServerInitializer() throws Exception {
+    @DisplayName("Service integrations & custom subsystem")
+    void serviceIntegration() throws Exception {
         final var username = getUsernameAndUpdate();
+        final var subsystem = "subsystem";
         when(sshClientConfig.getClientIdentity()).thenReturn(buildClientIdentityWithPassword(username, PASSWORD));
         // Accept all keys
         when(sshClientConfig.getServerAuthentication()).thenReturn(null);
 
-        final var server = FACTORY.listenServer(serverListener, tcpServerConfig, null,
-            factoryManager -> {
-                // authenticate user by credentials and generate host key
-                factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
-                factoryManager.setPasswordAuthenticator(
-                    (usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
-                factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
-            }).get(2, TimeUnit.SECONDS);
+        // custom subsystem to be auto-opened by client on successful authentication
+        final var clientSubsystemFactory = new ClientSubsystemFactory() {
+            @Override
+            public String subsystemName() {
+                return subsystem;
+            }
+
+            @Override
+            public ChannelSubsystem createSubsystemChannel() {
+                return new ChannelSubsystem(subsystem);
+            }
+        };
+
+        final ServerFactoryManagerConfigurator serverConfigurator = serverFactoryMgr -> {
+            // authenticate user by credentials and generate host key
+            serverFactoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+            serverFactoryMgr.setPasswordAuthenticator(
+                (usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
+            serverFactoryMgr.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+            // set server subsystem factory
+            ((SshServer)serverFactoryMgr).setSubsystemFactories(List.of(
+                new SubsystemFactory() {
+                    @Override
+                    public String getName() {
+                        return subsystem;
+                    }
+
+                    @Override
+                    public Command createSubsystem(final ChannelSession channel) throws IOException {
+                        return new AbstractCommandSupport(subsystem, null) {
+                            @Override
+                            public void run() {
+                                // indicate subsystem initialized
+                                subsystemFlag.accept(Boolean.TRUE);
+                            }
+                        };
+                    }
+                }
+            ));
+        };
+        final var server = FACTORY.listenServer(serverListener, tcpServerConfig, null, serverConfigurator)
+            .get(2, TimeUnit.SECONDS);
         try {
-            final var client = FACTORY.connectClient(clientListener, tcpClientConfig, sshClientConfig)
-                .get(2, TimeUnit.SECONDS);
+            final var client = FACTORY.connectClient(clientListener, tcpClientConfig, sshClientConfig,
+                    clientSubsystemFactory).get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(10_000))
                     .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
                 verify(clientListener, timeout(10_000))
                     .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
                 // validate channels are in expected state
-                var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
-                var clientChannel = assertChannel(clientTransportChannelCaptor.getAllValues());
+                final var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
+                final var clientChannel = assertChannel(clientTransportChannelCaptor.getAllValues());
                 // validate channels are connecting same sockets
                 assertEquals(serverChannel.remoteAddress(), clientChannel.localAddress());
                 assertEquals(serverChannel.localAddress(), clientChannel.remoteAddress());
                 // validate sessions are authenticated
                 assertSession(ServerSession.class, server.getSessions());
                 assertSession(ClientSession.class, client.getSessions());
+                // validate custom subsystem was initialized on server by client request
+                verify(subsystemFlag, timeout(1000)).accept(Boolean.TRUE);
             } finally {
                 client.shutdown().get(2, TimeUnit.SECONDS);
             }

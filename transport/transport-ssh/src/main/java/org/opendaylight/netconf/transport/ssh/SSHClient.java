@@ -15,7 +15,6 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.client.session.SessionFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -35,24 +34,23 @@ public final class SSHClient extends SSHTransportStack {
     private final SessionFactory sessionFactory;
 
     private SSHClient(final TransportChannelListener listener, final ClientFactoryManager clientFactoryManager,
-            final String username) {
+            final String username, final ClientSubsystemFactory subsystemFactory) {
         super(listener);
         this.clientFactoryManager = clientFactoryManager;
         this.clientFactoryManager.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
-        sessionFactory = new SessionFactory(clientFactoryManager) {
-            @Override
-            protected ClientSessionImpl setupSession(final ClientSessionImpl session) {
-                session.setUsername(username);
-                return session;
-            }
-        };
+        if (subsystemFactory != null) {
+            clientFactoryManager.addSessionListener(
+                new ClientSubsystemSessionListener(subsystemFactory.subsystemName()));
+        }
+        sessionFactory = new ClientSessionFactory(clientFactoryManager, username, subsystemFactory);
         ioService = new SshIoService(this.clientFactoryManager,
                 new DefaultChannelGroup("sshd-client-channels", GlobalEventExecutor.INSTANCE),
                 sessionFactory);
     }
 
     static SSHClient of(final EventLoopGroup group, final TransportChannelListener listener,
-            final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
+            final SshClientGrouping clientParams, final ClientSubsystemFactory subsystemFactory)
+            throws UnsupportedConfigurationException {
         final var clientIdentity = clientParams.getClientIdentity();
         final var username = clientIdentity == null ? "" : clientIdentity.getUsername();
 
@@ -61,7 +59,7 @@ public final class SSHClient extends SSHTransportStack {
             .keepAlives(clientParams.getKeepalives())
             .clientIdentity(clientParams.getClientIdentity())
             .serverAuthentication(clientParams.getServerAuthentication())
-            .buildChecked(), username);
+            .buildChecked(), username, subsystemFactory);
     }
 
     @Override
