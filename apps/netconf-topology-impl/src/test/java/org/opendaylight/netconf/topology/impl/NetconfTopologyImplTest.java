@@ -19,8 +19,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
@@ -73,7 +71,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableItem;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.common.Decimal64;
-import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
@@ -160,18 +157,17 @@ public class NetconfTopologyImplTest {
         doReturn(newNode).when(ch).getRootNode();
         changes.add(ch);
         spyTopology.onDataTreeChanged(changes);
-        verify(spyTopology).connectNode(NetconfTopologyImpl.getNodeId(pa), nn.build());
+        verify(spyTopology).ensureNode(nn.build());
 
         doReturn(DataObjectModification.ModificationType.DELETE).when(newNode).getModificationType();
         spyTopology.onDataTreeChanged(changes);
-        verify(spyTopology).disconnectNode(NetconfTopologyImpl.getNodeId(pa));
+        verify(spyTopology).deleteNode(NetconfTopologyImpl.getNodeId(pa));
 
         doReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED).when(newNode).getModificationType();
         spyTopology.onDataTreeChanged(changes);
 
-        //one in previous creating and deleting node and one in updating
-        verify(spyTopology, times(2)).disconnectNode(NetconfTopologyImpl.getNodeId(pa));
-        verify(spyTopology, times(2)).connectNode(NetconfTopologyImpl.getNodeId(pa), nn.build());
+        // one in previous creating and deleting node and one in updating
+        verify(spyTopology, times(2)).ensureNode(nn.build());
     }
 
     @Test
@@ -246,13 +242,13 @@ public class NetconfTopologyImplTest {
         }
 
         @Override
-        public ListenableFuture<Empty> connectNode(final NodeId nodeId, final Node configNode) {
-            return Futures.immediateFuture(Empty.value());
+        public void ensureNode(final Node configNode) {
+            // No-op
         }
 
         @Override
-        public ListenableFuture<Empty> disconnectNode(final NodeId nodeId) {
-            return Futures.immediateFuture(Empty.value());
+        public void deleteNode(final NodeId nodeId) {
+            // No-op
         }
     }
 
