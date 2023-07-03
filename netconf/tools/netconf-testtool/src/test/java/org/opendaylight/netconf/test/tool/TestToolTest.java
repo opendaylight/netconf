@@ -5,148 +5,149 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol.SSH;
+import static org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol.TCP;
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
-import io.netty.util.concurrent.DefaultThreadFactory;
 import java.io.File;
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.auth.AuthProvider;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
+import org.opendaylight.netconf.client.NetconfClientFactory;
+import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
-import org.opendaylight.netconf.test.tool.config.YangResource;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.password.grouping.password.type.CleartextPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.listen.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.client.identity.PasswordBuilder;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.w3c.dom.Document;
 
-@SuppressWarnings("SameParameterValue")
 public class TestToolTest {
-
-    private static final long RECEIVE_TIMEOUT_MS = 5_000;
+    private static final long RESPONSE_TIMEOUT_MS = 30_000;
     private static final int RANDOM_PORT = 0;
-
-    private static final User ADMIN_USER = new User("admin", "admin");
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "pa$$W0rd";
+    private static final AuthProvider AUTH_PROVIDER = (user, passw) -> USERNAME.equals(user) && PASSWORD.equals(passw);
     private static final File CUSTOM_RPC_CONFIG = new File("src/test/resources/customrpc.xml");
-    private static final Configuration SSH_SIMULATOR_CONFIG = getSimulatorConfig(NetconfClientProtocol.SSH,
-        ADMIN_USER);
-    private static final Configuration TCP_SIMULATOR_CONFIG = getSimulatorConfig(NetconfClientProtocol.SSH,
-        ADMIN_USER);
 
-    private static NioEventLoopGroup nettyGroup;
-    private static NetconfClientDispatcherImpl dispatcher;
-
-
-    @Rule
-    public LogPropertyCatcher logPropertyCatcher =
-        new LogPropertyCatcher(Pattern.compile("(start\\(\\) listen on auto-allocated port="
-            + "|Simulated TCP device started on (/0:0:0:0:0:0:0:0|/0.0.0.0):)(\\d+)"));
-
-    private static final String XML_REQUEST_RFC7950_SECTION_4_2_9 = "<rpc message-id=\"101\"\n"
-        + "          xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-        + "       <activate-software-image xmlns=\"http://example.com/system\">\n"
-        + "         <image-name>example-fw-2.3</image-name>\n"
-        + "       </activate-software-image>\n"
-        + "     </rpc>";
-    private static final String EXPECTED_XML_RESPONSE_RFC7950_SECTION_4_2_9 = "<rpc-reply message-id=\"101\"\n"
-        + "                xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-        + "       <status xmlns=\"http://example.com/system\">\n"
-        + "         The image example-fw-2.3 is being installed.\n"
-        + "       </status>\n"
-        + "     </rpc-reply>";
-    private static final String XML_REQUEST_RFC7950_SECTION_7_15_3 = "<rpc message-id=\"101\"\n"
-        + "          xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-        + "       <action xmlns=\"urn:ietf:params:xml:ns:yang:1\">\n"
-        + "         <server xmlns=\"urn:example:server-farm\">\n"
-        + "           <name>apache-1</name>\n"
-        + "           <reset>\n"
-        + "             <reset-at>2014-07-29T13:42:00Z</reset-at>\n"
-        + "           </reset>\n"
-        + "         </server>\n"
-        + "       </action>\n"
-        + "     </rpc>";
-    private static final String EXPECTED_XML_RESPONSE_RFC7950_SECTION_7_15_3 = "<rpc-reply message-id=\"101\"\n"
-        + "           xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-        + "  <reset-finished-at xmlns=\"urn:example:server-farm\">\n"
-        + "    2014-07-29T13:42:12Z\n"
-        + "  </reset-finished-at>\n"
-        + "</rpc-reply>";
+    private static final String RFC7950_4_2_9_REQUEST = """
+        <rpc message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <activate-software-image xmlns="http://example.com/system">
+               <image-name>example-fw-2.3</image-name>
+            </activate-software-image>
+        </rpc>""";
+    private static final String RFC7950_4_2_9_RESPONSE = """
+        <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <status xmlns="http://example.com/system">
+                The image example-fw-2.3 is being installed.
+            </status>
+        </rpc-reply>""";
+    private static final String RFC7950_7_15_3_REQUEST = """
+        <rpc message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <action xmlns="urn:ietf:params:xml:ns:yang:1">
+                <server xmlns="urn:example:server-farm">
+                    <name>apache-1</name>
+                    <reset>
+                        <reset-at>2014-07-29T13:42:00Z</reset-at>
+                    </reset>
+                </server>
+            </action>
+        </rpc>""";
+    private static final String RFC7950_7_15_3_RESPONSE = """
+        <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <reset-finished-at xmlns="urn:example:server-farm">
+                2014-07-29T13:42:12Z
+            </reset-finished-at>
+        </rpc-reply>""";
+    private static final String GET_SCHEMAS_REQUEST = """
+        <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
+            <get>
+                <filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+                    <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                        <schemas/>
+                    </netconf-state>
+                </filter>
+            </get>
+        </rpc>""";
     private static final Map<String, String> PREFIX_2_URI = ImmutableMap.of(
         "base10", "urn:ietf:params:xml:ns:netconf:base:1.0",
         "ncmon", "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring"
     );
 
-    @BeforeClass
-    public static void setUpClass() {
-        HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
-        nettyGroup = new NioEventLoopGroup(1, new DefaultThreadFactory(NetconfClientDispatcher.class));
-        dispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup, hashedWheelTimer);
+    private static NetconfClientFactory clientFactory;
+    private static NetconfDeviceSimulator tcpDeviceSimulator;
+    private static NetconfDeviceSimulator sshDeviceSimulator;
+    private static int tcpDevicePort;
+    private static int sshDevicePort;
+
+    @BeforeAll
+    static void beforeAll() {
+        clientFactory = new NetconfClientFactoryImpl(new HashedWheelTimer());
+        tcpDeviceSimulator = new NetconfDeviceSimulator(getSimulatorConfig(TCP));
+        tcpDevicePort = startSimulator(tcpDeviceSimulator);
+        sshDeviceSimulator = new NetconfDeviceSimulator(getSimulatorConfig(SSH));
+        sshDevicePort = startSimulator(sshDeviceSimulator);
     }
 
-    @AfterClass
-    public static void cleanUpClass()
-        throws InterruptedException {
-        nettyGroup.shutdownGracefully().sync();
+    @AfterAll
+    public static void afterAll() {
+        stopSimulator(tcpDeviceSimulator);
+        tcpDeviceSimulator = null;
+        stopSimulator(sshDeviceSimulator);
+        sshDeviceSimulator = null;
     }
 
-    @Test
-    public void customRpcOverSsh()
-        throws Exception {
-        Document docResponse = invokeRpc(SSH_SIMULATOR_CONFIG, XML_REQUEST_RFC7950_SECTION_7_15_3);
-        assertThat(docResponse)
-            .and(EXPECTED_XML_RESPONSE_RFC7950_SECTION_7_15_3)
-            .ignoreWhitespace()
-            .areIdentical();
+    @ParameterizedTest(name = "Custom RPC -- RFC7950 {0}")
+    @MethodSource("customRpcArgs")
+    void customRpc(final String ignoredTestDesc, final NetconfClientProtocol protocol, final String requestXml,
+            final String responseXml) throws Exception {
+        final var docResponse = sendRequest(protocol, requestXml);
+        assertThat(docResponse).and(responseXml).ignoreWhitespace().areIdentical();
     }
 
-    @Test
-    public void customRpcOverTcp()
-        throws Exception {
-        Document docResponse = invokeRpc(TCP_SIMULATOR_CONFIG, XML_REQUEST_RFC7950_SECTION_4_2_9);
-        assertThat(docResponse)
-            .and(EXPECTED_XML_RESPONSE_RFC7950_SECTION_4_2_9)
-            .ignoreWhitespace()
-            .areIdentical();
+    private static Stream<Arguments> customRpcArgs() {
+        return Stream.of(
+            // # test descriptor, protocol, request, expected response
+            Arguments.of("#7.15.3 @TCP", TCP, RFC7950_7_15_3_REQUEST, RFC7950_7_15_3_RESPONSE),
+            Arguments.of("#7.15.3 @SSH", SSH, RFC7950_7_15_3_REQUEST, RFC7950_7_15_3_RESPONSE),
+            Arguments.of("#4.2.9 @TCP", TCP, RFC7950_4_2_9_REQUEST, RFC7950_4_2_9_RESPONSE),
+            Arguments.of("#4.2.9 @SSH", SSH, RFC7950_4_2_9_REQUEST, RFC7950_4_2_9_RESPONSE)
+        );
     }
 
-    @Test
-    public void shouldSupportGetSchema()
-        throws Exception {
-        String getSchema = "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"m-0\">\n"
-            + "  <get>\n"
-            + "    <filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
-            + "      <netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-            + "        <schemas/>\n"
-            + "      </netconf-state>\n"
-            + "    </filter>\n"
-            + "  </get>\n"
-            + "</rpc>";
-        Document docResponse = invokeRpc(TCP_SIMULATOR_CONFIG, getSchema);
-        Set<YangResource> expectedYangResources = Configuration.DEFAULT_YANG_RESOURCES;
+    @ParameterizedTest(name = "Get Schemas @{0}")
+    @MethodSource("getSchemasArgs")
+    void getSchemas(final NetconfClientProtocol protocol) throws Exception {
+        final var docResponse = sendRequest(protocol, GET_SCHEMAS_REQUEST);
+        final var expectedYangResources = Configuration.DEFAULT_YANG_RESOURCES;
         assertEquals(4, expectedYangResources.size());
         assertThat(docResponse)
             .withNamespaceContext(PREFIX_2_URI)
@@ -154,89 +155,73 @@ public class TestToolTest {
             .isEqualTo(expectedYangResources.size());
     }
 
-    private Document invokeRpc(final Configuration simulatorConfig, final String xmlRequest)
+    private static List<NetconfClientProtocol> getSchemasArgs() {
+        return List.of(SSH, TCP);
+    }
+
+    private static Document sendRequest(final NetconfClientProtocol protocol, final String xml)
         throws Exception {
-        // GIVEN
-        int localPort = launchSimulator(simulatorConfig);
-        SimpleNetconfClientSessionListener sessionListener = new SimpleNetconfClientSessionListener();
-        NetconfClientConfiguration clientConfig = getClientConfig("localhost", localPort,
-            simulatorConfig, sessionListener);
-        Document docRequest = XmlUtil.readXmlToDocument(xmlRequest);
-        NetconfMessage request = new NetconfMessage(docRequest);
-
-        // WHEN
+        final var sessionListener = new SimpleNetconfClientSessionListener();
+        final int port = SSH == protocol ? sshDevicePort : tcpDevicePort;
+        final var clientConfig = getClientConfig(port, protocol, sessionListener);
+        final var request = new NetconfMessage(XmlUtil.readXmlToDocument(xml));
         NetconfMessage response;
-        try (NetconfClientSession ignored = dispatcher.createClient(clientConfig).get()) {
-            response = sessionListener.sendRequest(request)
-                .get(RECEIVE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        try (NetconfClientSession ignored = clientFactory.createClient(clientConfig)
+            .get(RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+            response = sessionListener.sendRequest(request).get(RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         }
-
-        // THEN
         assertNotNull(response);
         return response.getDocument();
     }
 
-    private static final ConcurrentHashMap<Configuration, Integer> CACHED_SIMULATORS = new ConcurrentHashMap<>();
-
     /**
-     * Retrieves a previously launched simulator or launches a new one using the given configuration.
+     * Runs a simulator.
      *
-     * @param configuration The simulator configuration.
+     * @param simulator simulator instance
      * @return The TCP port number to access the launched simulator.
      */
-    private int launchSimulator(final Configuration configuration) {
-        return CACHED_SIMULATORS.computeIfAbsent(configuration, cfg -> {
-            NetconfDeviceSimulator simulator = new NetconfDeviceSimulator(cfg);
-            simulator.start();
-            return logPropertyCatcher.getLastValue()
-                .map(Integer::parseInt)
-                .orElseThrow(() -> new IllegalArgumentException("Unable to capture auto-allocated port from log"));
-        });
+    private static int startSimulator(final NetconfDeviceSimulator simulator) {
+        final var openDevices = simulator.start();
+        if (openDevices != null && !openDevices.isEmpty()) {
+            return openDevices.get(0);
+        }
+        throw new IllegalStateException("Could not start device simulator");
+    }
+
+    private static void stopSimulator(final NetconfDeviceSimulator simulator) {
+        if (simulator != null) {
+            simulator.close();
+        }
     }
 
     @SuppressWarnings("deprecation")
-    private static Configuration getSimulatorConfig(final NetconfClientProtocol protocol, final User user) {
+    private static Configuration getSimulatorConfig(final NetconfClientProtocol protocol) {
         return new ConfigurationBuilder()
             .setStartingPort(RANDOM_PORT)
+            .setDeviceCount(1)
             .setRpcConfigFile(CUSTOM_RPC_CONFIG)
-            .setSsh(protocol == NetconfClientProtocol.SSH)
-            .setAuthProvider(new InMemoryAuthenticationProvider(user))
+            .setSsh(SSH == protocol)
+            .setAuthProvider(AUTH_PROVIDER)
             .build();
     }
 
-    private static NetconfClientConfiguration getClientConfig(final String host, final int port,
-                                                              final Configuration simulatorConfig,
-                                                              final NetconfClientSessionListener sessionListener) {
-        User user = ((InMemoryAuthenticationProvider) simulatorConfig.getAuthProvider()).user;
+    private static NetconfClientConfiguration getClientConfig(final int port,
+        final NetconfClientProtocol protocol, final NetconfClientSessionListener sessionListener) {
         return NetconfClientConfigurationBuilder.create()
-            .withAddress(new InetSocketAddress(host, port))
+            .withTcpParameters(
+                new TcpClientParametersBuilder()
+                    .setRemoteAddress(new Host(IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress())))
+                    .setRemotePort(new PortNumber(Uint16.valueOf(port)))
+                    .build())
+            .withSshParameters(
+                new SshClientParametersBuilder()
+                    .setClientIdentity(new ClientIdentityBuilder()
+                        .setUsername(USERNAME)
+                        .setPassword(new PasswordBuilder().setPasswordType(
+                            new CleartextPasswordBuilder().setCleartextPassword(PASSWORD).build()
+                        ).build()).build()).build())
             .withSessionListener(sessionListener)
-            .withProtocol(simulatorConfig.isSsh() ? NetconfClientProtocol.SSH : NetconfClientProtocol.TCP)
-            .withAuthHandler(new LoginPasswordHandler(user.username, user.password))
+            .withProtocol(protocol)
             .build();
-    }
-
-    private static final class User {
-        private final String username;
-        private final String password;
-
-        private User(final String username, final String password) {
-            this.username = username;
-            this.password = password;
-        }
-    }
-
-    private static final class InMemoryAuthenticationProvider implements AuthProvider {
-
-        private final User user;
-
-        private InMemoryAuthenticationProvider(final User user) {
-            this.user = user;
-        }
-
-        @Override
-        public boolean authenticated(final String username, final String password) {
-            return user.username.equals(username) && user.password.equals(password);
-        }
     }
 }
