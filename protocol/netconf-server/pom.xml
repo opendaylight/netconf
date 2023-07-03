@@ -116,15 +116,6 @@
     </dependency>
     <!-- Test dependencies -->
     <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-buffer</artifactId>
-	  <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>mockito-configuration</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-client</artifactId>
       <scope>test</scope>
@@ -140,13 +131,14 @@
       <artifactId>netconf-test-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>shaded-sshd</artifactId>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-legacy</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xmlunit</groupId>
-      <artifactId>xmlunit-legacy</artifactId>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport-native-epoll</artifactId>
+      <classifier>linux-x86_64</classifier>
       <scope>test</scope>
     </dependency>
   </dependencies>
