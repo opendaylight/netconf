@@ -33,6 +33,24 @@
       "message": "Closing CallHome session after unsuccessful device connection fails on unchecked cast.\n\n```\n192.168.56.101:4334] closed: fail\njava.lang.ClassCastException: class org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator cannot be cast to class org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext$SshWriteAsyncHandlerAdapter (org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator is in unnamed module of loader org.eclipse.osgi.internal.loader.EquinoxClassLoader @48097c8d; org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext$SshWriteAsyncHandlerAdapter is in unnamed module of loader org.eclipse.osgi.internal.loader.EquinoxClassLoader @489da686)\n\tat org.opendaylight.netconf.callhome.protocol.MinaSshNettyChannel.doClose(MinaSshNettyChannel.java:116) ~[?:?]\n\tat io.netty.channel.AbstractChannel$AbstractUnsafe.doClose0(AbstractChannel.java:754) ~[?:?]\n```",
       "revId": "bbeacece3118494d7cab2c9b944a8b52f55122f4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28001103_b4c62686",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-03T15:18:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7557987_fee3aa7a",
+      "revId": "bbeacece3118494d7cab2c9b944a8b52f55122f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
