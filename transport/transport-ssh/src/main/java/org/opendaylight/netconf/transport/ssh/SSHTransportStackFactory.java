@@ -39,14 +39,53 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
     public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
             final TransportChannelListener listener, final TcpClientGrouping connectParams,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams)
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, null)
+            .connect(newBootstrap(), connectParams);
+    }
+
+    /** Builds the SSH Client and initiates connection.
+     *
+     * @param subsystem bound subsystem name
+     * @param listener client channel listener, required
+     * @param connectParams TCP transport configuration addressing server to connect, required
+     * @param clientParams SSH overlay configuration, required, should contain username
+     * @param configurator client factory manager configurator, optional
+     * @return a future producing {@link SSHClient}
+     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
+     * @throws NullPointerException if any of required parameters is null
+     */
+    public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
+            final TransportChannelListener listener, final TcpClientGrouping connectParams,
+            final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
+            throws UnsupportedConfigurationException {
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
             .connect(newBootstrap(), connectParams);
     }
 
     public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
             final TransportChannelListener listener, final TcpServerGrouping listenParams,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams)
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, null)
+            .listen(newServerBootstrap(), listenParams);
+    }
+
+    /**
+     * Builds and starts Call-Home SSH Client.
+     *
+     * @param subsystem bound subsystem name
+     * @param listener client channel listener, required
+     * @param listenParams TCP transport configuration addressing inbound connection, required
+     * @param clientParams SSH overlay configuration, required, should contain username
+     * @param configurator client factory manager configurator, optional
+     * @return a future producing {@link SSHClient}
+     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
+     * @throws NullPointerException if any of required parameters is null
+     */
+    public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
+            final TransportChannelListener listener, final TcpServerGrouping listenParams,
+            final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
+            throws UnsupportedConfigurationException {
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
             .listen(newServerBootstrap(), listenParams);
     }
 
@@ -54,6 +93,29 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
             final TransportChannelListener listener, final TcpClientGrouping connectParams,
             final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
         return SSHServer.of(ioServiceFactory, group, subsystem, listener, requireNonNull(serverParams), null)
+            .connect(newBootstrap(), connectParams);
+    }
+
+    /**
+     * Builds and starts a Call-Home SSH Server, initiates connection to client.
+     *
+     * @param subsystem bound subsystem name
+     * @param listener server channel listener, required
+     * @param connectParams TCP transport configuration addressing client to be connected, required
+     * @param serverParams SSH overlay configuration, optional if configurator is defined, required otherwise
+     * @param configurator server factory manager configurator, optional if serverParams is defined, required otherwise
+     * @return a future producing {@link SSHServer}
+     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
+     * @throws NullPointerException if any of required parameters is null
+     * @throws IllegalArgumentException if both configurator and serverParams are null
+     */
+    public @NonNull ListenableFuture<SSHServer> connectServer(final String subsystem,
+            final TransportChannelListener listener, final TcpClientGrouping connectParams,
+            final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
+            throws UnsupportedConfigurationException {
+        checkArgument(serverParams != null || configurator != null,
+            "Neither server parameters nor factory configurator is defined");
+        return SSHServer.of(ioServiceFactory, group, subsystem, listener, serverParams, configurator)
             .connect(newBootstrap(), connectParams);
     }
 
@@ -71,7 +133,7 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @param listenParams TCP transport configuration, required
      * @param serverParams SSH overlay configuration, optional if configurator is defined, required otherwise
      * @param configurator server factory manager configurator, optional if serverParams is defined, required otherwise
-     * @return server instance as listenable future
+     * @return a future producing {@link SSHServer}
      * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
      * @throws NullPointerException if any of required parameters is null
      * @throws IllegalArgumentException if both configurator and serverParams are null
