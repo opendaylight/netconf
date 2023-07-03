@@ -144,28 +144,20 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             final DataObjectModification<Node> rootNode = change.getRootNode();
             final NodeId nodeId;
             switch (rootNode.getModificationType()) {
-                case SUBTREE_MODIFIED:
-                    nodeId = getNodeId(rootNode.getIdentifier());
-                    LOG.debug("Config for node {} updated", nodeId);
-                    disconnectNode(nodeId);
-                    connectNode(nodeId, rootNode.getDataAfter());
-                    break;
-                case WRITE:
-                    nodeId = getNodeId(rootNode.getIdentifier());
-                    LOG.debug("Config for node {} created", nodeId);
-                    if (activeConnectors.containsKey(nodeId)) {
-                        LOG.warn("RemoteDevice{{}} was already configured, reconfiguring..", nodeId);
-                        disconnectNode(nodeId);
-                    }
-                    connectNode(nodeId, rootNode.getDataAfter());
-                    break;
-                case DELETE:
+                case SUBTREE_MODIFIED -> {
+                    LOG.debug("Config for node {} updated", getNodeId(rootNode.getIdentifier()));
+                    ensureNode(rootNode.getDataAfter());
+                }
+                case WRITE -> {
+                    LOG.debug("Config for node {} created", getNodeId(rootNode.getIdentifier()));
+                    ensureNode(rootNode.getDataAfter());
+                }
+                case DELETE -> {
                     nodeId = getNodeId(rootNode.getIdentifier());
                     LOG.debug("Config for node {} deleted", nodeId);
-                    disconnectNode(nodeId);
-                    break;
-                default:
-                    LOG.debug("Unsupported modification type: {}.", rootNode.getModificationType());
+                    deleteNode(nodeId);
+                }
+                default -> LOG.debug("Unsupported modification type: {}.", rootNode.getModificationType());
             }
         }
     }

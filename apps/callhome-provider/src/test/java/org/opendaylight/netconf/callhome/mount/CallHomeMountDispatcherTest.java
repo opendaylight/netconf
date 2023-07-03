@@ -149,6 +149,6 @@ public class CallHomeMountDispatcherTest {
         // when
         instance.onNetconfSubsystemOpened(mockProtoSess, activator);
         // then
-        verify(instance.topology, times(1)).connectNode(any(NodeId.class), any(Node.class));
+        verify(instance.topology, times(1)).connectNode(any(Node.class));
     }
 }

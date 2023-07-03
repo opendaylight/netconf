@@ -7,33 +7,32 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 
 public final class NetconfConnectorDTO implements AutoCloseable {
-    private final List<SchemaSourceRegistration<?>> yanglibRegistrations;
-    private final NetconfDeviceCommunicator communicator;
-    private final RemoteDeviceHandler facade;
+    private final @NonNull List<SchemaSourceRegistration<?>> yanglibRegistrations;
+    private final @NonNull NetconfDeviceCommunicator communicator;
+    private final @NonNull RemoteDeviceHandler facade;
 
-    public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator, final RemoteDeviceHandler facade,
+    NetconfConnectorDTO(final NetconfDeviceCommunicator communicator, final RemoteDeviceHandler facade,
             final List<SchemaSourceRegistration<?>> yanglibRegistrations) {
-        this.communicator = communicator;
-        this.facade = facade;
-        this.yanglibRegistrations = yanglibRegistrations;
+        this.communicator = requireNonNull(communicator);
+        this.facade = requireNonNull(facade);
+        this.yanglibRegistrations = List.copyOf(yanglibRegistrations);
     }
 
-    public NetconfDeviceCommunicator getCommunicator() {
+    NetconfDeviceCommunicator getCommunicator() {
         return communicator;
     }
 
-    public RemoteDeviceHandler getFacade() {
-        return facade;
-    }
-
-    public NetconfClientSessionListener getSessionListener() {
+    NetconfClientSessionListener getSessionListener() {
         return communicator;
     }
 

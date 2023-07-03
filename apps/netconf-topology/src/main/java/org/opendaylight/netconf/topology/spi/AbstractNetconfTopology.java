@@ -54,7 +54,6 @@ import org.opendaylight.netconf.nettyutil.ReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.TimedReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
-import org.opendaylight.netconf.topology.api.NetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.Credentials;
@@ -80,7 +79,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractNetconfTopology implements NetconfTopology {
+public abstract class AbstractNetconfTopology {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
     private final NetconfClientDispatcher clientDispatcher;
@@ -139,42 +138,39 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         LOG.debug("Topology {} initialized", topologyId);
     }
 
-    @Override
-    public ListenableFuture<Empty> connectNode(final NodeId nodeId, final Node configNode) {
-        LOG.info("Connecting RemoteDevice{{}} , with config {}", nodeId, hideCredentials(configNode));
-        return setupConnection(nodeId, configNode);
+    // Non-final for testing
+    protected void ensureNode(final Node node) {
+        lockedEnsureNode(node);
     }
 
-    /**
-     * Hiding of private credentials from node configuration (credentials data is replaced by asterisks).
-     *
-     * @param nodeConfiguration Node configuration container.
-     * @return String representation of node configuration with credentials replaced by asterisks.
-     */
-    @VisibleForTesting
-    public static String hideCredentials(final Node nodeConfiguration) {
-        final NetconfNode netconfNodeAugmentation = nodeConfiguration.augmentation(NetconfNode.class);
-        final String nodeCredentials = netconfNodeAugmentation.getCredentials().toString();
-        final String nodeConfigurationString = nodeConfiguration.toString();
-        return nodeConfigurationString.replace(nodeCredentials, "***");
+    private synchronized void lockedEnsureNode(final Node node) {
+        final var nodeId = node.requireNodeId();
+        final var prev = activeConnectors.remove(nodeId);
+        if (prev != null) {
+            LOG.info("RemoteDevice{{}} was already configured, disconnecting", nodeId);
+            prev.close();
+        }
+
+        LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(node));
+        setupConnection(nodeId, node);
     }
 
-    @Override
-    public ListenableFuture<Empty> disconnectNode(final NodeId nodeId) {
+    // Non-final for testing
+    protected void deleteNode(final NodeId nodeId) {
+        lockedDeleteNode(nodeId);
+    }
+
+    private synchronized void lockedDeleteNode(final NodeId nodeId) {
         final var nodeName = nodeId.getValue();
         LOG.debug("Disconnecting RemoteDevice{{}}", nodeName);
 
-        final NetconfConnectorDTO connectorDTO = activeConnectors.remove(nodeId);
-        if (connectorDTO == null) {
-            return Futures.immediateFailedFuture(
-                new IllegalStateException("Cannot disconnect " + nodeName + " as it is not connected"));
+        final var connectorDTO = activeConnectors.remove(nodeId);
+        if (connectorDTO != null) {
+            connectorDTO.close();
         }
-
-        connectorDTO.close();
-        return Futures.immediateFuture(Empty.value());
     }
 
-    protected ListenableFuture<Empty> setupConnection(final NodeId nodeId, final Node configNode) {
+    protected final void setupConnection(final NodeId nodeId, final Node configNode) {
         final NetconfNode netconfNode = configNode.augmentation(NetconfNode.class);
         final NetconfNodeAugmentedOptional nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
 
@@ -203,8 +199,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 // remove this node from active connectors?
             }
         }, MoreExecutors.directExecutor());
-
-        return future;
     }
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
@@ -265,7 +259,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, yanglibRegistrations);
     }
 
-    protected RemoteDeviceHandler createSalFacade(RemoteDeviceId deviceId, boolean lockDatastore) {
+    protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final boolean lockDatastore) {
         return new NetconfTopologyDeviceSalFacade(deviceId, mountPointService, lockDatastore, dataBroker);
     }
 
@@ -361,5 +355,19 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 encryptionService);
         }
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
+    }
+
+    /**
+     * Hiding of private credentials from node configuration (credentials data is replaced by asterisks).
+     *
+     * @param nodeConfiguration Node configuration container.
+     * @return String representation of node configuration with credentials replaced by asterisks.
+     */
+    @VisibleForTesting
+    public static final String hideCredentials(final Node nodeConfiguration) {
+        final var netconfNodeAugmentation = nodeConfiguration.augmentation(NetconfNode.class);
+        final var nodeCredentials = netconfNodeAugmentation.getCredentials().toString();
+        final var nodeConfigurationString = nodeConfiguration.toString();
+        return nodeConfigurationString.replace(nodeCredentials, "***");
     }
 }
