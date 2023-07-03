@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.server;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
@@ -28,10 +29,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.server.api.NetconfServerFactory;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.ssh.ClientSubsystemFactory;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
@@ -69,6 +72,7 @@ class NetconfServerFactoryImplTest {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$w0rd";
     private static final String RSA = "RSA";
+    private static final String NETCONF = "netconf";
 
     private static SSHTransportStackFactory FACTORY;
 
@@ -97,6 +101,7 @@ class NetconfServerFactoryImplTest {
     @BeforeEach
     void beforeEach() throws Exception {
         factory = new NetconfServerFactoryImpl(serverChannelInitializer, FACTORY);
+        doNothing().when(clientListener).onTransportChannelEstablished(any());
 
         // create temp socket to get available port for test
         final var socket = new ServerSocket(0);
@@ -153,12 +158,21 @@ class NetconfServerFactoryImplTest {
         throws Exception {
         final var server = serverFuture.get(2, TimeUnit.SECONDS);
         try {
-            final var client = FACTORY.connectClient(clientListener, tcpClientParams, sshClientParams)
-                .get(2, TimeUnit.SECONDS);
+            final var client = FACTORY.connectClient(clientListener, tcpClientParams, sshClientParams,
+                new ClientSubsystemFactory() {
+                    public String subsystemName() {
+                        return NETCONF;
+                    }
+
+                    @Override
+                    public ChannelSubsystem createSubsystemChannel() {
+                        return new ChannelSubsystem(NETCONF);
+                    }
+                }
+            ).get(2, TimeUnit.SECONDS);
             try {
-                // FIXME commented line requires netconf client to trigger netconf subsystem initialization on server
-                // verify(serverChannelInitializer, timeout(10_000L)).initialize(any(Channel.class), any());
                 verify(clientListener, timeout(10_000L)).onTransportChannelEstablished(any(TransportChannel.class));
+                verify(serverChannelInitializer, timeout(10_000L)).initialize(any(Channel.class), any());
             } finally {
                 client.shutdown().get(2, TimeUnit.SECONDS);
             }
