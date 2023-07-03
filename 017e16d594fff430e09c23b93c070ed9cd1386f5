@@ -18,6 +18,23 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0dd3622e_b13165e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-03T15:17:34Z",
+      "side": 1,
+      "message": "change is split to following:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106785\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106788\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106789\n\ncurrent will be abandoned",
+      "revId": "017e16d594fff430e09c23b93c070ed9cd1386f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61321dd8_0ad09661",
@@ -31,6 +48,30 @@
       "writtenOn": "2023-07-03T08:50:33Z",
       "side": 1,
       "message": "completely undocumented magic path.\n\nif anything, the key should be configurable and if not set, it should be re-generated each and every time.",
+      "range": {
+        "startLine": 52,
+        "startChar": 30,
+        "endLine": 52,
+        "endChar": 47
+      },
+      "revId": "017e16d594fff430e09c23b93c070ed9cd1386f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6da190e_99840c45",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/NetconfNorthboundSshServer.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-03T15:17:34Z",
+      "side": 1,
+      "message": "dropped",
+      "parentUuid": "61321dd8_0ad09661",
       "range": {
         "startLine": 52,
         "startChar": 30,
@@ -64,6 +105,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd599832_a1d2c8fe",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/NetconfNorthboundSshServer.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-03T15:17:34Z",
+      "side": 1,
+      "message": "reverted",
+      "parentUuid": "686f7a45_193848a9",
+      "range": {
+        "startLine": 75,
+        "startChar": 12,
+        "endLine": 75,
+        "endChar": 104
+      },
+      "revId": "017e16d594fff430e09c23b93c070ed9cd1386f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e091a1c8_a0ec08d7",
@@ -77,6 +142,30 @@
       "writtenOn": "2023-07-03T08:56:56Z",
       "side": 1,
       "message": "sooo... if I make a mistake here, the wiring will just explode, right?\nWhy would we ever want to make this configurable, and, more notably, why is this tucked into this patch?!",
+      "range": {
+        "startLine": 30,
+        "startChar": 19,
+        "endLine": 30,
+        "endChar": 42
+      },
+      "revId": "017e16d594fff430e09c23b93c070ed9cd1386f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ee105d8_1e5fa891",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/OSGiNetconfThreadGroups.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-03T15:17:34Z",
+      "side": 1,
+      "message": ".. as described in javadoc and commit message..\notherwise the netconf server wont start.\nthe configurationPid is inherited from prior component, it means\nnumber of threads with be handled if configured, \ngroup names removed (replaced with hardcoded)",
+      "parentUuid": "e091a1c8_a0ec08d7",
       "range": {
         "startLine": 30,
         "startChar": 19,
