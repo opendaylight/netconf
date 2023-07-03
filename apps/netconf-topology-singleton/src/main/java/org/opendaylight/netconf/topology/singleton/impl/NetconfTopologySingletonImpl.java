@@ -31,6 +31,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySet
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,13 +74,13 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
                 remoteDeviceId.name(), masterAddress));
 
         // setup connection to device
-        connectNode(setup.getNode().getNodeId(), setup.getNode());
+        ensureNode(setup.getNode());
     }
 
     void becomeTopologyFollower() {
         registerNodeManager();
         // disconnect device from this node and listen for changes from leader
-        disconnectNode(setup.getNode().getNodeId());
+        deleteNode(setup.getNode().getNodeId());
         if (masterActorRef != null) {
             // was leader before
             setup.getActorSystem().stop(masterActorRef);
@@ -113,6 +114,10 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
 
     private void unregisterNodeManager() {
         netconfNodeManager.close();
+    }
+
+    void dropNode(final NodeId nodeId) {
+        deleteNode(nodeId);
     }
 
     @Override
