@@ -15,6 +15,7 @@ import java.net.InetSocketAddress;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
 import org.opendaylight.netconf.server.api.NetconfServerDispatcher;
 
+@Deprecated(since = "7.0.0", forRemoval = true)
 public class NetconfServerDispatcherImpl extends AbstractNetconfDispatcher<NetconfServerSession,
         NetconfServerSessionListener> implements NetconfServerDispatcher {
     private final ServerChannelInitializer initializer;

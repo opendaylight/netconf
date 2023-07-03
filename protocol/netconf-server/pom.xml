@@ -31,6 +31,10 @@
     </dependency>
     <dependency>
       <groupId>io.netty</groupId>
+      <artifactId>netty-buffer</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
       <artifactId>netty-common</artifactId>
     </dependency>
     <dependency>
@@ -44,10 +48,6 @@
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-model-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
@@ -94,13 +94,8 @@
       <artifactId>netconf-netty-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.guicedee.services</groupId>
-      <artifactId>javax.inject</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.service.component.annotations</artifactId>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>shaded-sshd</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
@@ -114,12 +109,17 @@
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>transport-ssh</artifactId>
     </dependency>
-    <!-- Test dependencies -->
     <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-buffer</artifactId>
-	  <scope>test</scope>
+      <groupId>com.guicedee.services</groupId>
+      <artifactId>javax.inject</artifactId>
+      <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
+    </dependency>
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>mockito-configuration</artifactId>
@@ -138,11 +138,6 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-test-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>shaded-sshd</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xmlunit</groupId>
