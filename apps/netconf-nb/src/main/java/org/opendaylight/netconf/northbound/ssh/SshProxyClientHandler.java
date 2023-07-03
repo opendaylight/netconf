@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
  * Netty handler that reads SSH from remote client and writes to delegate server
  * and reads from delegate server and writes to remote client.
  */
+@Deprecated(since = "7.0.0", forRemoval = true)
 final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(SshProxyClientHandler.class);
 
