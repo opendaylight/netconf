@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.test.tool.client.stress;
 
-import io.netty.util.concurrent.GlobalEventExecutor;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -21,7 +20,6 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.nettyutil.NeverReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,10 +79,14 @@ public class StressClientCallable implements Callable<Boolean> {
 
     private static NetconfClientConfiguration getNetconfClientConfiguration(final Parameters params,
             final NetconfDeviceCommunicator sessionListener) {
-        final NetconfClientConfigurationBuilder netconfClientConfigurationBuilder = NetconfClientConfigurationBuilder
-            .create();
-        netconfClientConfigurationBuilder.withSessionListener(sessionListener);
-        netconfClientConfigurationBuilder.withAddress(params.getInetAddress());
+        final var netconfClientConfigurationBuilder = NetconfClientConfigurationBuilder.create()
+            .withSessionListener(sessionListener)
+            .withAddress(params.getInetAddress())
+            .withProtocol(params.ssh ? NetconfClientConfiguration.NetconfClientProtocol.SSH
+                : NetconfClientConfiguration.NetconfClientProtocol.TCP)
+            .withAuthHandler(new LoginPasswordHandler(params.username, params.password))
+            .withConnectionTimeoutMillis(20000L);
+
         if (params.tcpHeader != null) {
             final String header = params.tcpHeader.replace("\"", "").trim() + "\n";
             netconfClientConfigurationBuilder.withAdditionalHeader(
@@ -96,12 +98,6 @@ public class StressClientCallable implements Callable<Boolean> {
                     }
                 });
         }
-        netconfClientConfigurationBuilder.withProtocol(params.ssh ? NetconfClientConfiguration.NetconfClientProtocol.SSH
-            : NetconfClientConfiguration.NetconfClientProtocol.TCP);
-        netconfClientConfigurationBuilder.withAuthHandler(new LoginPasswordHandler(params.username, params.password));
-        netconfClientConfigurationBuilder.withConnectionTimeoutMillis(20000L);
-        netconfClientConfigurationBuilder.withReconnectStrategy(
-            new NeverReconnectStrategy(GlobalEventExecutor.INSTANCE, 5000));
         return netconfClientConfigurationBuilder.build();
     }
 }

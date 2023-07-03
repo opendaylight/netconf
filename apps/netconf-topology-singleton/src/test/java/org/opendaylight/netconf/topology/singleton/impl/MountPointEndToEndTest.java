@@ -34,6 +34,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
 import io.netty.util.concurrent.EventExecutor;
+import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.File;
 import java.util.Iterator;
@@ -108,7 +109,6 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
-import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -274,9 +274,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         setupSlave();
 
         yangNodeInstanceId = bindingToNormalized.toYangInstanceIdentifier(NODE_INSTANCE_ID);
-        final var future = mock(ReconnectFuture.class);
-        doReturn(future).when(mockClientDispatcher).createReconnectingClient(any());
-        doReturn(future).when(future).firstSessionFuture();
+        doReturn(mock(Future.class)).when(mockClientDispatcher).createClient(any());
 
         LOG.info("****** Setup complete");
     }
