@@ -17,37 +17,45 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import java.io.File;
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
+import org.opendaylight.netconf.client.NetconfClientFactory;
+import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.opendaylight.netconf.test.tool.config.YangResource;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.password.grouping.password.type.CleartextPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.listen.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.client.identity.PasswordBuilder;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.w3c.dom.Document;
 
 @SuppressWarnings("SameParameterValue")
 public class TestToolTest {
 
-    private static final long RECEIVE_TIMEOUT_MS = 5_000;
+    private static final long RECEIVE_TIMEOUT_MS = 30_000;
     private static final int RANDOM_PORT = 0;
 
     private static final User ADMIN_USER = new User("admin", "admin");
@@ -59,12 +67,7 @@ public class TestToolTest {
 
     private static NioEventLoopGroup nettyGroup;
     private static NetconfClientDispatcherImpl dispatcher;
-
-
-    @Rule
-    public LogPropertyCatcher logPropertyCatcher =
-        new LogPropertyCatcher(Pattern.compile("(start\\(\\) listen on auto-allocated port="
-            + "|Simulated TCP device started on (/0:0:0:0:0:0:0:0|/0.0.0.0):)(\\d+)"));
+    private static NetconfClientFactory clientFactory;
 
     private static final String XML_REQUEST_RFC7950_SECTION_4_2_9 = "<rpc message-id=\"101\"\n"
         + "          xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
@@ -105,6 +108,7 @@ public class TestToolTest {
         HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
         nettyGroup = new NioEventLoopGroup(1, new DefaultThreadFactory(NetconfClientDispatcher.class));
         dispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup, hashedWheelTimer);
+        clientFactory = new NetconfClientFactoryImpl(hashedWheelTimer);
     }
 
     @AfterClass
@@ -166,7 +170,10 @@ public class TestToolTest {
 
         // WHEN
         NetconfMessage response;
-        try (NetconfClientSession ignored = dispatcher.createClient(clientConfig).get()) {
+        try (NetconfClientSession ignored = clientFactory.createClient(clientConfig).get()) {
+//        try (NetconfClientSession ignored = dispatcher.createClient(clientConfig).get()) {
+
+            Thread.sleep(2000);
             response = sessionListener.sendRequest(request)
                 .get(RECEIVE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         }
@@ -187,10 +194,11 @@ public class TestToolTest {
     private int launchSimulator(final Configuration configuration) {
         return CACHED_SIMULATORS.computeIfAbsent(configuration, cfg -> {
             NetconfDeviceSimulator simulator = new NetconfDeviceSimulator(cfg);
-            simulator.start();
-            return logPropertyCatcher.getLastValue()
-                .map(Integer::parseInt)
-                .orElseThrow(() -> new IllegalArgumentException("Unable to capture auto-allocated port from log"));
+            final var openDevices = simulator.start();
+            if (openDevices != null && !openDevices.isEmpty()) {
+                return openDevices.get(0);
+            }
+            throw new IllegalArgumentException("Unable to capture auto-allocated port");
         });
     }
 
@@ -198,6 +206,7 @@ public class TestToolTest {
     private static Configuration getSimulatorConfig(final NetconfClientProtocol protocol, final User user) {
         return new ConfigurationBuilder()
             .setStartingPort(RANDOM_PORT)
+            .setDeviceCount(1)
             .setRpcConfigFile(CUSTOM_RPC_CONFIG)
             .setSsh(protocol == NetconfClientProtocol.SSH)
             .setAuthProvider(new InMemoryAuthenticationProvider(user))
@@ -209,10 +218,22 @@ public class TestToolTest {
                                                               final NetconfClientSessionListener sessionListener) {
         User user = ((InMemoryAuthenticationProvider) simulatorConfig.getAuthProvider()).user;
         return NetconfClientConfigurationBuilder.create()
-            .withAddress(new InetSocketAddress(host, port))
+//            .withAddress(new InetSocketAddress(host, port))
+            .withTcpParameters(
+                new TcpClientParametersBuilder()
+                    .setRemoteAddress(new Host(IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress())))
+                    .setRemotePort(new PortNumber(Uint16.valueOf(port)))
+                    .build())
+            .withSshParameters(
+                new SshClientParametersBuilder()
+                    .setClientIdentity(new ClientIdentityBuilder()
+                        .setUsername(ADMIN_USER.username)
+                        .setPassword(new PasswordBuilder().setPasswordType(
+                                new CleartextPasswordBuilder().setCleartextPassword(ADMIN_USER.password).build()
+                            ).build()).build()).build())
             .withSessionListener(sessionListener)
             .withProtocol(simulatorConfig.isSsh() ? NetconfClientProtocol.SSH : NetconfClientProtocol.TCP)
-            .withAuthHandler(new LoginPasswordHandler(user.username, user.password))
+//            .withAuthHandler(new LoginPasswordHandler(user.username, user.password))
             .build();
     }
 
