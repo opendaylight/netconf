@@ -7,10 +7,15 @@
  */
 package org.opendaylight.netconf.northbound;
 
-import io.netty.channel.ChannelFuture;
-import java.net.InetSocketAddress;
-import org.opendaylight.netconf.server.api.NetconfServerDispatcher;
+import java.util.concurrent.ExecutionException;
+import org.opendaylight.netconf.server.api.NetconfServerFactory;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev230417.netconf.server.listen.stack.grouping.transport.tls.tls.TcpServerParameters;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev230417.netconf.server.listen.stack.grouping.transport.tls.tls.TcpServerParametersBuilder;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -23,53 +28,48 @@ import org.slf4j.LoggerFactory;
 /**
  * Create an MD-SAL NETCONF server using TCP.
  */
-@Component(service = { }, configurationPid = "org.opendaylight.netconf.tcp", enabled = false)
+@Component(service = {}, configurationPid = "org.opendaylight.netconf.tcp", enabled = false)
 @Designate(ocd = NetconfNorthboundTcpServer.Configuration.class)
 public final class NetconfNorthboundTcpServer implements AutoCloseable {
     @ObjectClassDefinition
     public @interface Configuration {
         @AttributeDefinition
         String bindingAddress() default "0.0.0.0";
+
         @AttributeDefinition(min = "1", max = "65535")
         int portNumber() default 2831;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNorthboundTcpServer.class);
 
-    private final ChannelFuture tcpServer;
+    private final TCPServer tcpServer;
 
     @Activate
     public NetconfNorthboundTcpServer(
-            @Reference(target = "(type=netconf-server-dispatcher)") final NetconfServerDispatcher serverDispatcher,
+            @Reference(target = "(type=netconf-server-factory)") final NetconfServerFactory serverFactory,
             final Configuration configuration) {
-        this(serverDispatcher, configuration.bindingAddress(), configuration.portNumber());
+        this(serverFactory, configuration.bindingAddress(), configuration.portNumber());
     }
 
-    public NetconfNorthboundTcpServer(final NetconfServerDispatcher serverDispatcher, final String address,
+    public NetconfNorthboundTcpServer(final NetconfServerFactory serverFactory, final String address,
             final int port) {
-        final InetSocketAddress inetAddress = getInetAddress(address, port);
-        tcpServer = serverDispatcher.createServer(inetAddress);
-        tcpServer.addListener(future -> {
-            if (future.isDone() && future.isSuccess()) {
-                LOG.info("Netconf TCP endpoint started successfully at {}", inetAddress);
-            } else {
-                LOG.warn("Unable to start TCP netconf server at {}", inetAddress, future.cause());
-                throw new IllegalStateException("Unable to start TCP netconf server", future.cause());
-            }
-        });
+        final TcpServerParameters serverConfig = new TcpServerParametersBuilder()
+            .setLocalAddress(IetfInetUtil.ipAddressFor(address))
+            .setLocalPort(new PortNumber(Uint16.valueOf(port))).build();
+        try {
+            tcpServer = serverFactory.createTcpServer(serverConfig).get();
+        } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
+            LOG.warn("Could not start TCP netconf server at {}:{}", address, port, e);
+            throw new IllegalStateException("Could not start TCP netconf server", e);
+        }
     }
 
     @Override
     public void close() {
-        if (tcpServer.isDone()) {
-            tcpServer.channel().close();
-        } else {
-            tcpServer.cancel(true);
+        try {
+            tcpServer.shutdown().get();
+        } catch (ExecutionException | InterruptedException e) {
+            LOG.warn("Could not stop TCP netconf server", e);
         }
-    }
-
-    private static InetSocketAddress getInetAddress(final String bindingAddress, final int portNumber) {
-        final var inetAd = IetfInetUtil.inetAddressFor(IetfInetUtil.ipAddressFor(bindingAddress));
-        return new InetSocketAddress(inetAd, portNumber);
     }
 }
