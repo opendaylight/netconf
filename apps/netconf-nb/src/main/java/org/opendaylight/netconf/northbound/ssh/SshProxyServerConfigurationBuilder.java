@@ -13,6 +13,7 @@ import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenticator;
 
+@Deprecated(since = "7.0.0", forRemoval = true)
 public final class SshProxyServerConfigurationBuilder {
     private InetSocketAddress bindingAddress;
     private LocalAddress localAddress;

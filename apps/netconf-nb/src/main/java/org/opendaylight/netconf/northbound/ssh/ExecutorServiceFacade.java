@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService;
  * Facade for guarding against {@link #shutdown()} invocations. This is necessary as SSHD wants to shutdown the executor
  * when the server shuts down.
  */
+@Deprecated(since = "7.0.0", forRemoval = true)
 final class ExecutorServiceFacade extends ForwardingExecutorService {
     private final ExecutorService delegate;
 
