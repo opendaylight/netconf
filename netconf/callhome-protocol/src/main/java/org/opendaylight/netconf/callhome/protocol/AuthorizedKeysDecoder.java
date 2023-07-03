@@ -37,20 +37,19 @@ import org.opendaylight.netconf.shaded.sshd.common.util.security.SecurityUtils;
  * FIXME: This should be probably located at AAA library.
  */
 public class AuthorizedKeysDecoder {
-
     private static final String KEY_FACTORY_TYPE_RSA = "RSA";
     private static final String KEY_FACTORY_TYPE_DSA = "DSA";
     private static final String KEY_FACTORY_TYPE_ECDSA = "EC";
+    private static final String ECDSA_SUPPORTED_CURVE_NAME = "nistp256";
 
     private static final Map<String, String> ECDSA_CURVES = new HashMap<>();
 
     static {
-        ECDSA_CURVES.put("nistp256", "secp256r1");
+        ECDSA_CURVES.put(ECDSA_SUPPORTED_CURVE_NAME, "secp256r1");
         ECDSA_CURVES.put("nistp384", "secp384r1");
         ECDSA_CURVES.put("nistp512", "secp512r1");
     }
 
-    private static final String ECDSA_SUPPORTED_CURVE_NAME = "nistp256";
     private static final String ECDSA_SUPPORTED_CURVE_NAME_SPEC = ECDSA_CURVES.get(ECDSA_SUPPORTED_CURVE_NAME);
 
     private static final String KEY_TYPE_RSA = "ssh-rsa";
@@ -142,8 +141,7 @@ public class AuthorizedKeysDecoder {
 
     public static String encodePublicKey(final PublicKey publicKey) throws IOException {
         ByteArrayOutputStream byteOs = new ByteArrayOutputStream();
-        if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_RSA) && publicKey instanceof RSAPublicKey) {
-            RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
+        if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_RSA) && publicKey instanceof RSAPublicKey rsaPublicKey) {
             DataOutputStream dout = new DataOutputStream(byteOs);
             dout.writeInt(KEY_TYPE_RSA.getBytes(StandardCharsets.UTF_8).length);
             dout.write(KEY_TYPE_RSA.getBytes(StandardCharsets.UTF_8));
@@ -151,8 +149,7 @@ public class AuthorizedKeysDecoder {
             dout.write(rsaPublicKey.getPublicExponent().toByteArray());
             dout.writeInt(rsaPublicKey.getModulus().toByteArray().length);
             dout.write(rsaPublicKey.getModulus().toByteArray());
-        } else if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_DSA) && publicKey instanceof DSAPublicKey) {
-            DSAPublicKey dsaPublicKey = (DSAPublicKey) publicKey;
+        } else if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_DSA) && publicKey instanceof DSAPublicKey dsaPublicKey) {
             DSAParams dsaParams = dsaPublicKey.getParams();
             DataOutputStream dout = new DataOutputStream(byteOs);
             dout.writeInt(KEY_TYPE_DSA.getBytes(StandardCharsets.UTF_8).length);
@@ -165,8 +162,7 @@ public class AuthorizedKeysDecoder {
             dout.write(dsaParams.getG().toByteArray());
             dout.writeInt(dsaPublicKey.getY().toByteArray().length);
             dout.write(dsaPublicKey.getY().toByteArray());
-        } else if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_ECDSA) && publicKey instanceof BCECPublicKey) {
-            BCECPublicKey ecPublicKey = (BCECPublicKey) publicKey;
+        } else if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_ECDSA) && publicKey instanceof BCECPublicKey ecPublicKey) {
             DataOutputStream dout = new DataOutputStream(byteOs);
             dout.writeInt(KEY_TYPE_ECDSA.getBytes(StandardCharsets.UTF_8).length);
             dout.write(KEY_TYPE_ECDSA.getBytes(StandardCharsets.UTF_8));
