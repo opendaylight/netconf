@@ -16,6 +16,24 @@
       "message": "It does not work:\n```\n13:36:49.403 ERROR [nioEventLoopGroup-4-3] Server Host Key/Certificate RSA Public Key [de:56:f4:b9:d7:56:96:9e:38:07:38:58:b3:c6:a7:13:79:93:8d:41],[56:66:d1:a4]\n        modulus: b0ab3d241efee265d5d2a9849a613caf76d4dac89f18aaedc186a2d642ea6c5115a7912271f1752c52dc123af4e212234f08bf1439069a58bdce2cec8aaa57423fdb997d24ddff8ecedbbb3b3939b5d1b2ac2d3de64e4db5f9bccbb253e05a7b71ac54d9273a46d0722351fd16358670204dc763c6d901875d0e2dfc912db4a11ac18dd59b0b45d4c66c8254387ca2e71e80e2e11e3d76c3d6b98814842a8b31d13eb799a215afc334214ec79da435b29f7f381266ca0239afe1055a1edaa36efd5bdbffa47e663121d99d8205b615a9ce93b424ca24b125c892d3411647c056366bffe36f363eedabc5ddea520b1eb58175ea98de48d31fb0623283632dad0d\npublic exponent: 10001\n is associated with existing session CallHomeMountSessionContext{address\u003d/172.17.0.2:40368, hostKey\u003dRSA Public Key [de:56:f4:b9:d7:56:96:9e:38:07:38:58:b3:c6:a7:13:79:93:8d:41],[56:66:d1:a4]\n        modulus: b0ab3d241efee265d5d2a9849a613caf76d4dac89f18aaedc186a2d642ea6c5115a7912271f1752c52dc123af4e212234f08bf1439069a58bdce2cec8aaa57423fdb997d24ddff8ecedbbb3b3939b5d1b2ac2d3de64e4db5f9bccbb253e05a7b71ac54d9273a46d0722351fd16358670204dc763c6d901875d0e2dfc912db4a11ac18dd59b0b45d4c66c8254387ca2e71e80e2e11e3d76c3d6b98814842a8b31d13eb799a215afc334214ec79da435b29f7f381266ca0239afe1055a1edaa36efd5bdbffa47e663121d99d8205b615a9ce93b424ca24b125c892d3411647c056366bffe36f363eedabc5ddea520b1eb58175ea98de48d31fb0623283632dad0d\npublic exponent: 10001\n}, closing session ...\n```",
       "revId": "71bd39db6dfdb5b0d7efbae8d5a8a6ea03516416",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01c482e9_a44907bf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-03T15:17:53Z",
+      "side": 1,
+      "message": "Fixed",
+      "parentUuid": "5cc43c8e_9162b556",
+      "revId": "71bd39db6dfdb5b0d7efbae8d5a8a6ea03516416",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
