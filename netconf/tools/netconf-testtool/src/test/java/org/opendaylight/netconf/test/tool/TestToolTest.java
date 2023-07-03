@@ -16,7 +16,6 @@ import com.google.common.collect.ImmutableMap;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -39,7 +38,6 @@ import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.NeverReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
@@ -206,7 +204,6 @@ public class TestToolTest {
             .build();
     }
 
-    @SuppressWarnings("deprecation")
     private static NetconfClientConfiguration getClientConfig(final String host, final int port,
                                                               final Configuration simulatorConfig,
                                                               final NetconfClientSessionListener sessionListener) {
@@ -214,8 +211,6 @@ public class TestToolTest {
         return NetconfClientConfigurationBuilder.create()
             .withAddress(new InetSocketAddress(host, port))
             .withSessionListener(sessionListener)
-            .withReconnectStrategy(new NeverReconnectStrategy(GlobalEventExecutor.INSTANCE,
-                NetconfClientConfigurationBuilder.DEFAULT_CONNECTION_TIMEOUT_MILLIS))
             .withProtocol(simulatorConfig.isSsh() ? NetconfClientProtocol.SSH : NetconfClientProtocol.TCP)
             .withAuthHandler(new LoginPasswordHandler(user.username, user.password))
             .build();

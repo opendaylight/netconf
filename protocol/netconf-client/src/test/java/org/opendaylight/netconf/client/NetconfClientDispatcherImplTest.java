@@ -25,11 +25,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.ReconnectFuture;
-import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
-import org.opendaylight.netconf.nettyutil.ReconnectStrategyFactory;
+import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 
 public class NetconfClientDispatcherImplTest {
@@ -56,42 +52,32 @@ public class NetconfClientDispatcherImplTest {
                 new NetconfHelloMessageAdditionalHeader("a", "host", "port", "trans", "id");
         NetconfClientSessionListener listener = new SimpleNetconfClientSessionListener();
         InetSocketAddress address = InetSocketAddress.createUnresolved("host", 830);
-        ReconnectStrategyFactory reconnectStrategyFactory = Mockito.mock(ReconnectStrategyFactory.class);
         AuthenticationHandler handler = Mockito.mock(AuthenticationHandler.class);
-        ReconnectStrategy reconnect = Mockito.mock(ReconnectStrategy.class);
 
-        doReturn(5).when(reconnect).getConnectTimeout();
-        doReturn("").when(reconnect).toString();
         doReturn("").when(handler).toString();
-        doReturn("").when(reconnectStrategyFactory).toString();
-        doReturn(reconnect).when(reconnectStrategyFactory).createReconnectStrategy();
 
-        NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create()
+        var cfg = NetconfClientConfigurationBuilder.create()
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
                 .withAddress(address)
                 .withConnectionTimeoutMillis(timeout)
-                .withReconnectStrategy(reconnect)
                 .withAdditionalHeader(header)
                 .withSessionListener(listener)
-                .withConnectStrategyFactory(reconnectStrategyFactory)
                 .withAuthHandler(handler).build();
 
-        NetconfReconnectingClientConfiguration cfg2 = NetconfReconnectingClientConfigurationBuilder.create()
+        var cfg2 = NetconfClientConfigurationBuilder.create()
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
                 .withAddress(address)
                 .withConnectionTimeoutMillis(timeout)
-                .withReconnectStrategy(reconnect)
                 .withAdditionalHeader(header)
                 .withSessionListener(listener)
-                .withConnectStrategyFactory(reconnectStrategyFactory)
                 .withAuthHandler(handler).build();
 
         NetconfClientDispatcherImpl dispatcher = new NetconfClientDispatcherImpl(bossGroup, workerGroup, timer);
         Future<NetconfClientSession> sshSession = dispatcher.createClient(cfg);
         Future<NetconfClientSession> tcpSession = dispatcher.createClient(cfg2);
 
-        ReconnectFuture sshReconn = dispatcher.createReconnectingClient(cfg);
-        final ReconnectFuture tcpReconn = dispatcher.createReconnectingClient(cfg2);
+        var sshReconn = dispatcher.createClient(cfg);
+        final var tcpReconn = dispatcher.createClient(cfg2);
 
         assertNotNull(sshSession);
         assertNotNull(tcpSession);
@@ -99,18 +85,16 @@ public class NetconfClientDispatcherImplTest {
         assertNotNull(tcpReconn);
 
         SslHandlerFactory sslHandlerFactory = Mockito.mock(SslHandlerFactory.class);
-        NetconfReconnectingClientConfiguration cfg3 = NetconfReconnectingClientConfigurationBuilder.create()
+        var cfg3 = NetconfClientConfigurationBuilder.create()
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
                 .withAddress(address)
                 .withConnectionTimeoutMillis(timeout)
-                .withReconnectStrategy(reconnect)
                 .withAdditionalHeader(header)
                 .withSessionListener(listener)
-                .withConnectStrategyFactory(reconnectStrategyFactory)
                 .withSslHandlerFactory(sslHandlerFactory).build();
 
         Future<NetconfClientSession> tlsSession = dispatcher.createClient(cfg3);
-        ReconnectFuture tlsReconn = dispatcher.createReconnectingClient(cfg3);
+        var tlsReconn = dispatcher.createClient(cfg3);
 
         assertNotNull(tlsSession);
         assertNotNull(tlsReconn);
