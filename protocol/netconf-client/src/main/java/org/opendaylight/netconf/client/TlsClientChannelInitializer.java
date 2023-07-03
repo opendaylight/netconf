@@ -12,6 +12,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.Promise;
 
+/**
+ * Client channel initializer for TLS transport.
+ *
+ * @deprecated due to design change. Common {@link ClientChannelInitializer} expected to be used while
+ *      transport is served by dedicated components.
+ */
+@Deprecated
 public final class TlsClientChannelInitializer extends AbstractClientChannelInitializer {
     public static final String CHANNEL_ACTIVE_SENTRY = "channelActiveSentry";
 

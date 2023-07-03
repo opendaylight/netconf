@@ -16,6 +16,13 @@ import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 
+/**
+ * Client channel initializer for TCP transport.
+ *
+ * @deprecated due to design change. Common {@link ClientChannelInitializer} expected to be used while
+ *      transport is served by dedicated components.
+ */
+@Deprecated
 final class TcpClientChannelInitializer extends AbstractClientChannelInitializer {
     TcpClientChannelInitializer(final NetconfClientSessionNegotiatorFactory negotiatorFactory,
             final NetconfClientSessionListener sessionListener) {
