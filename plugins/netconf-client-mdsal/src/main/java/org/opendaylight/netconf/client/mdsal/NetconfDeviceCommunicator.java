@@ -11,8 +11,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
-import io.netty.util.concurrent.Future;
 import java.io.EOFException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -30,17 +28,13 @@ import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfMessageUtil;
-import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -64,9 +58,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     private final Queue<Request> requests = new ArrayDeque<>();
     private NetconfClientSession currentSession;
-
-    private final SettableFuture<Empty> firstConnectionFuture = SettableFuture.create();
-    private Future<?> taskFuture;
 
     // isSessionClosing indicates a close operation on the session is issued and
     // tearDown will surely be called later to finish the close.
@@ -124,48 +115,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         } finally {
             sessionLock.unlock();
         }
-
-        // FIXME: right, except ... this does not include the device schema setup, so is it really useful?
-        if (!firstConnectionFuture.set(Empty.value())) {
-            LOG.trace("{}: First connection already completed", id);
-        }
-    }
-
-    /**
-     * Initialize remote connection.
-     *
-     * @param dispatcher {@code NetconfCLientDispatcher}
-     * @param config     {@code NetconfClientConfiguration}
-     * @return a ListenableFuture that returns success on first successful connection and failure when the underlying
-     *         reconnecting strategy runs out of reconnection attempts
-     */
-    public ListenableFuture<Empty> initializeRemoteConnection(final NetconfClientDispatcher dispatcher,
-            final NetconfClientConfiguration config) {
-
-        final Future<?> connectFuture;
-        if (config instanceof NetconfReconnectingClientConfiguration) {
-            // FIXME: This is weird. If I understand it correctly we want to know about the first connection so as to
-            //        forward error state. Analyze the call graph to understand what is going on here. We really want
-            //        to move reconnection away from the socket layer, so that it can properly interface with sessions
-            //        and generally has some event-driven state (as all good network glue does). There is a second story
-            //        which is we want to avoid duplicate code, so it depends on other users as well.
-            final var future = dispatcher.createReconnectingClient((NetconfReconnectingClientConfiguration) config);
-            taskFuture = future;
-            connectFuture = future.firstSessionFuture();
-        } else {
-            taskFuture = connectFuture = dispatcher.createClient(config);
-        }
-
-        connectFuture.addListener(future -> {
-            if (!future.isSuccess() && !future.isCancelled()) {
-                LOG.debug("{}: Connection failed", id, future.cause());
-                remoteDevice.onRemoteSessionFailed(future.cause());
-                if (!firstConnectionFuture.isDone()) {
-                    firstConnectionFuture.setException(future.cause());
-                }
-            }
-        });
-        return firstConnectionFuture;
     }
 
     public void disconnect() {
@@ -252,10 +201,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     @Override
     public void close() {
-        // Cancel reconnect if in progress
-        if (taskFuture != null) {
-            taskFuture.cancel(false);
-        }
         // Disconnect from device
         // tear down not necessary, called indirectly by the close in disconnect()
         disconnect();

@@ -42,8 +42,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
+import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -185,32 +184,32 @@ public class NetconfTopologyImplTest {
                 .setSleepFactor(Decimal64.valueOf("1.5"))
                 .setConnectionTimeoutMillis(Uint32.valueOf(20000));
 
-        final NetconfReconnectingClientConfiguration configuration =
-                spyTopology.getClientConfig(sessionListener, nodeBuilder.setTcpOnly(true).build(), NODE_ID);
-        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TCP, configuration.getProtocol());
+        final var configuration = spyTopology.getClientConfig(nodeBuilder.setTcpOnly(true).build(), NODE_ID)
+            .withSessionListener(sessionListener).build();
+        assertEquals(NetconfClientProtocol.TCP, configuration.getProtocol());
         assertNotNull(configuration.getAuthHandler());
         assertNull(configuration.getSslHandlerFactory());
 
-        final NetconfReconnectingClientConfiguration configuration2 =
-                spyTopology.getClientConfig(sessionListener, nodeBuilder.setTcpOnly(false).build(), NODE_ID);
-        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration2.getProtocol());
+        final var configuration2 = spyTopology.getClientConfig(nodeBuilder.setTcpOnly(false).build(), NODE_ID)
+            .withSessionListener(sessionListener).build();
+        assertEquals(NetconfClientProtocol.SSH, configuration2.getProtocol());
         assertNotNull(configuration2.getAuthHandler());
         assertNull(configuration2.getSslHandlerFactory());
 
-        final NetconfReconnectingClientConfiguration configuration3 =
-                spyTopology.getClientConfig(sessionListener, nodeBuilder
-                        .setProtocol(new ProtocolBuilder().setName(Name.SSH).build()).build(), NODE_ID);
-        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration3.getProtocol());
+        final var configuration3 = spyTopology.getClientConfig(
+            nodeBuilder.setProtocol(new ProtocolBuilder().setName(Name.SSH).build()).build(), NODE_ID)
+            .withSessionListener(sessionListener).build();
+        assertEquals(NetconfClientProtocol.SSH, configuration3.getProtocol());
         assertNotNull(configuration3.getAuthHandler());
         assertNull(configuration3.getSslHandlerFactory());
 
         final var sslHandlerFactory = mock(SslHandlerFactory.class);
         doReturn(sslHandlerFactory).when(sslHandlerFactoryProvider).getSslHandlerFactory(null);
 
-        final NetconfReconnectingClientConfiguration configuration4 =
-                spyTopology.getClientConfig(sessionListener, nodeBuilder
-                        .setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build(), NODE_ID);
-        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, configuration4.getProtocol());
+        final var configuration4 = spyTopology.getClientConfig(
+            nodeBuilder.setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build(), NODE_ID)
+            .withSessionListener(sessionListener).build();
+        assertEquals(NetconfClientProtocol.TLS, configuration4.getProtocol());
         assertNull(configuration4.getAuthHandler());
         assertSame(sslHandlerFactory, configuration4.getSslHandlerFactory());
     }
