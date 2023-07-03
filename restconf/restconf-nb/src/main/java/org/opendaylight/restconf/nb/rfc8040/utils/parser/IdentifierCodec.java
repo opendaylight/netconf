@@ -26,7 +26,7 @@ public final class IdentifierCodec {
     }
 
     public static YangInstanceIdentifier deserialize(final String data, final EffectiveModelContext schemaContext) {
-        return data == null ? YangInstanceIdentifier.empty()
+        return data == null ? YangInstanceIdentifier.of()
             : YangInstanceIdentifierDeserializer.create(schemaContext, data).path;
     }
 }

@@ -59,7 +59,7 @@ public class ProxyDOMDataBrokerTest {
 
         assertEquals(DEVICE_ID, tx.getIdentifier());
 
-        tx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
+        tx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
         masterActor.expectMsgClass(ReadRequest.class);
     }
 
@@ -71,7 +71,7 @@ public class ProxyDOMDataBrokerTest {
 
         assertEquals(DEVICE_ID, tx.getIdentifier());
 
-        tx.delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
+        tx.delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
         masterActor.expectMsgClass(DeleteRequest.class);
     }
 
@@ -83,7 +83,7 @@ public class ProxyDOMDataBrokerTest {
 
         assertEquals(DEVICE_ID, tx.getIdentifier());
 
-        tx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
+        tx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
         masterActor.expectMsgClass(ReadRequest.class);
     }
 

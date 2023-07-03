@@ -640,7 +640,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final NetconfDataTreeService slaveNetconfService = netconfCaptor.getValue();
         assertTrue(slaveNetconfService instanceof ProxyNetconfDataTreeService);
 
-        final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
+        final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
         final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
         final ContainerNode NODE = Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))

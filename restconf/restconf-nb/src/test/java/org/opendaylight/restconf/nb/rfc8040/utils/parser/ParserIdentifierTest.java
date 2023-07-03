@@ -134,7 +134,7 @@ public class ParserIdentifierTest {
                 .getInstance();
 
         // register mount point with null schema context
-        when(mockMountPointService.getMountPoint(YangInstanceIdentifier.empty()))
+        when(mockMountPointService.getMountPoint(YangInstanceIdentifier.of()))
                 .thenReturn(Optional.of(mockMountPoint));
     }
 
@@ -196,7 +196,7 @@ public class ParserIdentifierTest {
         final InstanceIdentifierContext context = ParserIdentifier.toInstanceIdentifier(
                 null, SCHEMA_CONTEXT, Optional.empty());
         assertEquals("Returned not expected identifier",
-                YangInstanceIdentifier.empty(), context.getInstanceIdentifier());
+                YangInstanceIdentifier.of(), context.getInstanceIdentifier());
     }
 
     /**
@@ -217,7 +217,7 @@ public class ParserIdentifierTest {
         final InstanceIdentifierContext context = ParserIdentifier.toInstanceIdentifier(
                 "", SCHEMA_CONTEXT, Optional.empty());
         assertEquals("Returned not expected identifier",
-                YangInstanceIdentifier.empty(), context.getInstanceIdentifier());
+                YangInstanceIdentifier.of(), context.getInstanceIdentifier());
     }
 
     /**

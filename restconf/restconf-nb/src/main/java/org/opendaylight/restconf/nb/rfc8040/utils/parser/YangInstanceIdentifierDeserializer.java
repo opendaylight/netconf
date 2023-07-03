@@ -59,7 +59,7 @@ public final class YangInstanceIdentifierDeserializer {
         public final @NonNull SchemaNode node;
 
         Result(final EffectiveModelContext context) {
-            path = YangInstanceIdentifier.empty();
+            path = YangInstanceIdentifier.of();
             node = requireNonNull(context);
             stack = SchemaInferenceStack.of(context);
         }

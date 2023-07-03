@@ -57,7 +57,7 @@ public class ProxyDOMRpcService implements Rpcs.Normalized {
         LOG.trace("{}: Rpc operation invoked with schema type: {} and node: {}.", id, type, input);
 
         final NormalizedNodeMessage normalizedNodeMessage = input != null
-                ? new NormalizedNodeMessage(YangInstanceIdentifier.empty(), input) : null;
+                ? new NormalizedNodeMessage(YangInstanceIdentifier.of(), input) : null;
         final Future<Object> scalaFuture = Patterns.ask(masterActorRef,
                 new InvokeRpcMessage(new SchemaPathMessage(type), normalizedNodeMessage), actorResponseWaitTime);
 

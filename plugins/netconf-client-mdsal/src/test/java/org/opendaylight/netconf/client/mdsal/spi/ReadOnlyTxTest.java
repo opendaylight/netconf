@@ -50,10 +50,10 @@ public class ReadOnlyTxTest {
     public void testRead() throws Exception {
         try (var readOnlyTx =
                 new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)))) {
-            readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
+            readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
             verify(rpc).invokeNetconf(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME),
                 any(ContainerNode.class));
-            readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty());
+            readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
             verify(rpc).invokeNetconf(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME), any());
         }
     }
@@ -62,9 +62,9 @@ public class ReadOnlyTxTest {
     public void testExists() throws Exception {
         try (var readOnlyTx =
                 new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)))) {
-            readOnlyTx.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
+            readOnlyTx.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
             verify(rpc).invokeNetconf(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME), any());
-            readOnlyTx.exists(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty());
+            readOnlyTx.exists(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
             verify(rpc).invokeNetconf(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME), any());
         }
     }

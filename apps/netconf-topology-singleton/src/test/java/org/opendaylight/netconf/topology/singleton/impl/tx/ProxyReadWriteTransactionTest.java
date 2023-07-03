@@ -59,7 +59,7 @@ public class ProxyReadWriteTransactionTest {
     private static final FiniteDuration EXP_NO_MESSAGE_TIMEOUT = Duration.apply(300, TimeUnit.MILLISECONDS);
     private static final RemoteDeviceId DEVICE_ID =
             new RemoteDeviceId("dev1", InetSocketAddress.createUnresolved("localhost", 17830));
-    private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
+    private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
     private static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
 
     private static ActorSystem system = ActorSystem.apply();
