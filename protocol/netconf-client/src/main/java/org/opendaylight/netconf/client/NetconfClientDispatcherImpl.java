@@ -26,8 +26,14 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Netconf client dispatcher implementation.
+ *
+ * @deprecated due to design change. Use {@link NetconfClientFactory} and {@link NetconfClientFactoryImpl}.
+ */
 @Singleton
 @Component(immediate = true, service = NetconfClientDispatcher.class, property = "type=netconf-client-dispatcher")
+@Deprecated
 public class NetconfClientDispatcherImpl
         extends AbstractNetconfDispatcher<NetconfClientSession, NetconfClientSessionListener>
         implements NetconfClientDispatcher {

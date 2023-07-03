@@ -16,7 +16,9 @@ import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 
 /**
  * Abstract base class for {@link NetconfClientSession} initializers.
+ * @deprecated due to design change. {@link ClientChannelInitializer} to be used for all transports.
  */
+@Deprecated
 abstract class AbstractClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
     private final @NonNull NetconfClientSessionNegotiatorFactory negotiatorFactory;
     private final @NonNull NetconfClientSessionListener sessionListener;
