@@ -27,11 +27,10 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeTopologyService;
@@ -75,25 +74,23 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             @Reference final SchemaResourceManager schemaRepositoryProvider, @Reference final DataBroker dataBroker,
             @Reference final DOMMountPointService mountPointService,
             @Reference final AAAEncryptionService encryptionService,
+            @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
             @Reference final RpcProviderService rpcProviderService, @Reference final BaseNetconfSchemas baseSchemas,
-            @Reference final CredentialProvider credentialProvider,
-            @Reference final SslHandlerFactoryProvider sslHandlerFactoryProvider,
             @Reference final DeviceActionFactory deviceActionFactory) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, clientDispatcher, eventExecutor, keepaliveExecutor,
             processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService, encryptionService,
-            rpcProviderService, baseSchemas, credentialProvider, sslHandlerFactoryProvider, deviceActionFactory);
+            builderFactory, rpcProviderService, baseSchemas, deviceActionFactory);
     }
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
-            final BaseNetconfSchemas baseSchemas, final CredentialProvider credentialProvider,
-            final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
+            final AAAEncryptionService encryptionService, final NetconfClientConfigurationBuilderFactory builderFactory,
+            final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas) {
         this(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, rpcProviderService,
-                baseSchemas, credentialProvider, sslHandlerFactoryProvider, null);
+            schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, builderFactory,
+            rpcProviderService, baseSchemas, null);
     }
 
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
@@ -102,12 +99,11 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
-            final BaseNetconfSchemas baseSchemas, final CredentialProvider credentialProvider,
-            final SslHandlerFactoryProvider sslHandlerFactoryProvider, final DeviceActionFactory deviceActionFactory) {
+            final AAAEncryptionService encryptionService, final NetconfClientConfigurationBuilderFactory builderFactory,
+            final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas,
+            final DeviceActionFactory deviceActionFactory) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory,
-                baseSchemas, credentialProvider, sslHandlerFactoryProvider);
+            schemaRepositoryProvider, dataBroker, mountPointService, builderFactory, deviceActionFactory, baseSchemas);
 
         LOG.debug("Registering datastore listener");
         dtclReg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(

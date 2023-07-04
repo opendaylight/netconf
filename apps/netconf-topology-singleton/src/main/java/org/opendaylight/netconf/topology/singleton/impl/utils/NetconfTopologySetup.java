@@ -14,8 +14,6 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
 import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
 import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
@@ -23,8 +21,6 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -43,10 +39,7 @@ public class NetconfTopologySetup {
     private final String topologyId;
     private final NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
     private final Duration idleTimeout;
-    private final AAAEncryptionService encryptionService;
     private final BaseNetconfSchemas baseSchemas;
-    private final @NonNull CredentialProvider credentialProvider;
-    private final @NonNull SslHandlerFactoryProvider sslHandlerFactoryProvider;
 
     NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
@@ -63,10 +56,7 @@ public class NetconfTopologySetup {
         topologyId = builder.getTopologyId();
         schemaResourceDTO = builder.getSchemaResourceDTO();
         idleTimeout = builder.getIdleTimeout();
-        encryptionService = builder.getEncryptionService();
         baseSchemas = builder.getBaseSchemas();
-        credentialProvider = builder.getCredentialProvider();
-        sslHandlerFactoryProvider = builder.getSslHandlerFactoryProvider();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -125,18 +115,6 @@ public class NetconfTopologySetup {
         return idleTimeout;
     }
 
-    public AAAEncryptionService getEncryptionService() {
-        return encryptionService;
-    }
-
-    public @NonNull CredentialProvider getCredentialProvider() {
-        return credentialProvider;
-    }
-
-    public @NonNull SslHandlerFactoryProvider getSslHandlerFactoryProvider() {
-        return sslHandlerFactoryProvider;
-    }
-
     public BaseNetconfSchemas getBaseSchemas() {
         return baseSchemas;
     }
@@ -156,10 +134,7 @@ public class NetconfTopologySetup {
         private NetconfClientDispatcher netconfClientDispatcher;
         private NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
         private Duration idleTimeout;
-        private AAAEncryptionService encryptionService;
         private BaseNetconfSchemas baseSchemas;
-        private CredentialProvider credentialProvider;
-        private SslHandlerFactoryProvider sslHandlerFactoryProvider;
 
         public NetconfTopologySetupBuilder() {
 
@@ -305,34 +280,6 @@ public class NetconfTopologySetup {
 
         Duration getIdleTimeout() {
             return idleTimeout;
-        }
-
-        AAAEncryptionService getEncryptionService() {
-            return encryptionService;
-        }
-
-        public NetconfTopologySetupBuilder setEncryptionService(final AAAEncryptionService encryptionService) {
-            this.encryptionService = encryptionService;
-            return this;
-        }
-
-        @NonNull CredentialProvider getCredentialProvider() {
-            return requireNonNull(credentialProvider);
-        }
-
-        public NetconfTopologySetupBuilder setCredentialProvider(final CredentialProvider credentialProvider) {
-            this.credentialProvider = credentialProvider;
-            return this;
-        }
-
-        @NonNull SslHandlerFactoryProvider getSslHandlerFactoryProvider() {
-            return requireNonNull(sslHandlerFactoryProvider);
-        }
-
-        public NetconfTopologySetupBuilder setSslHandlerFactoryProvider(
-                final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
-            this.sslHandlerFactoryProvider = sslHandlerFactoryProvider;
-            return this;
         }
 
         public static NetconfTopologySetupBuilder create() {

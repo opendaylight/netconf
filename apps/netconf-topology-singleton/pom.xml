@@ -84,5 +84,15 @@
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-testkit_2.13</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.guicedee.services</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

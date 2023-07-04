@@ -42,15 +42,14 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegist
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
@@ -96,12 +95,12 @@ public class NetconfTopologyManager
     private final AAAEncryptionService encryptionService;
     private final RpcProviderService rpcProviderService;
     private final DeviceActionFactory deviceActionFactory;
-    private final CredentialProvider credentialProvider;
-    private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
+    private final NetconfClientConfigurationBuilderFactory builderFactory;
     private final SchemaResourceManager resourceManager;
 
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
     private Registration rpcReg;
+
 
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
                                   final DOMRpcProviderService rpcProviderRegistry,
@@ -116,17 +115,16 @@ public class NetconfTopologyManager
                                   final RpcProviderService rpcProviderService,
                                   final DeviceActionFactory deviceActionFactory,
                                   final SchemaResourceManager resourceManager,
-                                  final CredentialProvider credentialProvider,
-                                  final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
+                                  final NetconfClientConfigurationBuilderFactory builderFactory) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
         actionProviderRegistry = requireNonNull(actionProviderService);
         this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
         this.keepaliveExecutor = keepaliveExecutor;
-        this.keepaliveExecutorService = keepaliveExecutor.getExecutor();
+        keepaliveExecutorService = keepaliveExecutor.getExecutor();
         this.processingExecutor = processingExecutor;
-        this.processingExecutorService = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
+        processingExecutorService = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
         actorSystem = requireNonNull(actorSystemProvider).getActorSystem();
         this.eventExecutor = requireNonNull(eventExecutor);
         this.clientDispatcher = requireNonNull(clientDispatcher);
@@ -137,8 +135,7 @@ public class NetconfTopologyManager
         this.rpcProviderService = requireNonNull(rpcProviderService);
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         this.resourceManager = requireNonNull(resourceManager);
-        this.credentialProvider = requireNonNull(credentialProvider);
-        this.sslHandlerFactoryProvider = requireNonNull(sslHandlerFactoryProvider);
+        this.builderFactory = requireNonNull(builderFactory);
     }
 
     // Blueprint init method
@@ -237,9 +234,9 @@ public class NetconfTopologyManager
                 setup.getEventExecutor(), keepaliveExecutor,
                 processingExecutor, resourceManager,
                 dataBroker, mountPointService,
-                encryptionService, deviceActionFactory,
+                builderFactory, deviceActionFactory,
                 baseSchemas, actorResponseWaitTime,
-                serviceGroupIdent, setup, credentialProvider, sslHandlerFactoryProvider);
+                serviceGroupIdent, setup);
     }
 
     @Override
@@ -315,9 +312,6 @@ public class NetconfTopologyManager
                 .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode.getSchemaCacheDirectory(),
                     deviceId))
                 .setIdleTimeout(writeTxIdleTimeout)
-                .setEncryptionService(encryptionService)
-                .setCredentialProvider(credentialProvider)
-                .setSslHandlerFactoryProvider(sslHandlerFactoryProvider)
                 .build();
     }
 }
