@@ -15,9 +15,8 @@ import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
+import java.util.concurrent.Executor;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -48,7 +47,7 @@ final class NetconfNodeContext implements AutoCloseable {
     private final BaseNetconfSchemas baseSchemas;
     private final NetconfClientConfigurationBuilderFactory builderFactory;
     private final ScheduledThreadPool keepaliveExecutor;
-    private final ListeningExecutorService processingExecutor;
+    private final Executor processingExecutor;
     private final DataBroker dataBroker;
     private final DOMMountPointService mountPointService;
     private final RemoteDeviceId remoteDeviceId;
@@ -70,8 +69,7 @@ final class NetconfNodeContext implements AutoCloseable {
         this.clientDispatcher = requireNonNull(clientDispatcher);
         this.eventExecutor = requireNonNull(eventExecutor);
         this.keepaliveExecutor = requireNonNull(keepaliveExecutor);
-        // FIXME: share a single instance!
-        this.processingExecutor = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
+        this.processingExecutor = processingExecutor.getExecutor();
         this.schemaManager = requireNonNull(schemaManager);
         this.dataBroker = requireNonNull(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);

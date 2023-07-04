@@ -9,7 +9,7 @@ package org.opendaylight.netconf.client.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.ListeningExecutorService;
+import java.util.concurrent.Executor;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
@@ -21,12 +21,9 @@ public class NetconfDeviceBuilder {
     private SchemaResourcesDTO schemaResourcesDTO;
     private RemoteDeviceId id;
     private RemoteDeviceHandler salFacade;
-    private ListeningExecutorService globalProcessingExecutor;
+    private Executor globalProcessingExecutor;
     private DeviceActionFactory deviceActionFactory;
     private BaseNetconfSchemas baseSchemas;
-
-    public NetconfDeviceBuilder() {
-    }
 
     public NetconfDeviceBuilder setReconnectOnSchemasChange(final boolean reconnectOnSchemasChange) {
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
@@ -48,7 +45,7 @@ public class NetconfDeviceBuilder {
         return this;
     }
 
-    public NetconfDeviceBuilder setGlobalProcessingExecutor(final ListeningExecutorService globalProcessingExecutor) {
+    public NetconfDeviceBuilder setGlobalProcessingExecutor(final Executor globalProcessingExecutor) {
         this.globalProcessingExecutor = globalProcessingExecutor;
         return this;
     }

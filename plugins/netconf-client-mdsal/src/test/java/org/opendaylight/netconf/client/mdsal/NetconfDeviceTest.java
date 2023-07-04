@@ -26,20 +26,16 @@ import static org.mockito.Mockito.verify;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -129,7 +125,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(getExecutor())
+                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
@@ -162,7 +158,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(getExecutor())
+                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
@@ -214,7 +210,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(getExecutor())
+                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
                 .setBaseSchemas(BASE_SCHEMAS)
                 .setId(getId())
                 .setSalFacade(facade)
@@ -260,7 +256,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(getExecutor())
+                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
@@ -293,7 +289,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(getExecutor())
+                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
@@ -329,7 +325,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(getExecutor())
+                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
@@ -359,7 +355,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(getExecutor())
+                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
@@ -375,7 +371,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
 
-        final ArgumentCaptor<NetconfDeviceSchema> argument =  ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
             any(RemoteDeviceServices.class));
         argument.getValue().capabilities().resolvedCapabilities()
@@ -394,7 +390,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(getExecutor())
+                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
@@ -409,7 +405,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
                 any(RemoteDeviceServices.class));
 
-        List<String> notificationModulesName = Arrays.asList(
+        List<String> notificationModulesName = List.of(
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
                         .$YangModuleInfoImpl.getInstance().getName().toString(),
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
@@ -432,7 +428,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(getExecutor())
+                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
@@ -469,14 +465,14 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(getExecutor())
+                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
                 .build();
         final NetconfDevice netconfSpy = spy(device);
 
-        final NetconfSessionPreferences sessionCaps = getSessionCaps(false, Collections.emptyList());
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(false, List.of());
 
         final Map<QName, CapabilityOrigin> moduleBasedCaps = new HashMap<>();
         moduleBasedCaps.put(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
@@ -538,10 +534,6 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         return new RemoteDeviceId("test-D", InetSocketAddress.createUnresolved("localhost", 22));
     }
 
-    public ListeningExecutorService getExecutor() {
-        return MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
-    }
-
     public NetconfSessionPreferences getSessionCaps(final boolean addMonitor,
                                                     final Collection<String> additionalCapabilities) {
         final var capabilities = new ArrayList<String>();
@@ -555,9 +547,6 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     public NetconfDeviceCommunicator getListener() throws Exception {
-        final NetconfDeviceCommunicator remoteDeviceCommunicator = mockCloseableClass(NetconfDeviceCommunicator.class);
-//        doReturn(Futures.immediateFuture(rpcResult))
-//                .when(remoteDeviceCommunicator).sendRequest(any(NetconfMessage.class), any(QName.class));
-        return remoteDeviceCommunicator;
+        return mockCloseableClass(NetconfDeviceCommunicator.class);
     }
 }

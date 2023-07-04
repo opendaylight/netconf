@@ -10,11 +10,11 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -51,8 +51,8 @@ public abstract class AbstractNetconfTopology {
     private final BaseNetconfSchemas baseSchemas;
     private final NetconfClientConfigurationBuilderFactory builderFactory;
 
-    protected final ScheduledThreadPool keepaliveExecutor;
-    protected final ListeningExecutorService processingExecutor;
+    protected final ScheduledExecutorService keepaliveExecutor;
+    protected final Executor processingExecutor;
     protected final DataBroker dataBroker;
     protected final DOMMountPointService mountPointService;
     protected final String topologyId;
@@ -65,8 +65,8 @@ public abstract class AbstractNetconfTopology {
         this.topologyId = requireNonNull(topologyId);
         this.clientDispatcher = clientDispatcher;
         this.eventExecutor = eventExecutor;
-        this.keepaliveExecutor = keepaliveExecutor;
-        this.processingExecutor = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
+        this.keepaliveExecutor = keepaliveExecutor.getExecutor();
+        this.processingExecutor = processingExecutor.getExecutor();
         this.schemaManager = requireNonNull(schemaManager);
         this.deviceActionFactory = deviceActionFactory;
         this.dataBroker = requireNonNull(dataBroker);
@@ -139,7 +139,7 @@ public abstract class AbstractNetconfTopology {
         // Instantiate the handler ...
         final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
-        final var nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor.getExecutor(),
+        final var nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor,
             baseSchemas, schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade,
             deviceId, nodeId, netconfNode, nodeOptional);
 
