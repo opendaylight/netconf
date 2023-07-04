@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20cc21dc_9fb40db6",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHServer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-04T14:34:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c256973d_a9844646",
+      "range": {
+        "startLine": 94,
+        "startChar": 13,
+        "endLine": 94,
+        "endChar": 21
+      },
+      "revId": "8277cd3797465c45a91452e05039c755545ca688",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6fceaaae_24fe144e",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-07-04T12:20:01Z",
       "side": 1,
       "message": "so is this either-or, or what combination of things do we allow?\n\nThe intent has to be very much documented, now that things are not mandatory and clear cut.",
+      "range": {
+        "startLine": 99,
+        "startChar": 12,
+        "endLine": 99,
+        "endChar": 32
+      },
+      "revId": "8277cd3797465c45a91452e05039c755545ca688",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d02bf4c_db9bf00f",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHServer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-04T14:34:16Z",
+      "side": 1,
+      "message": "added documentation to affected method",
+      "parentUuid": "6fceaaae_24fe144e",
       "range": {
         "startLine": 99,
         "startChar": 12,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f348f051_aabf9844",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ServerFactoryManagerConfigurator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-04T14:34:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3effeaa9_c0171cd2",
+      "range": {
+        "startLine": 13,
+        "startChar": 3,
+        "endLine": 13,
+        "endChar": 17
+      },
+      "revId": "8277cd3797465c45a91452e05039c755545ca688",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91096960_635735eb",
@@ -83,6 +155,30 @@
       "writtenOn": "2023-07-04T12:20:01Z",
       "side": 1,
       "message": "undocumented method",
+      "range": {
+        "startLine": 17,
+        "startChar": 9,
+        "endLine": 17,
+        "endChar": 38
+      },
+      "revId": "8277cd3797465c45a91452e05039c755545ca688",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e2c6977_2547915d",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ServerFactoryManagerConfigurator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-04T14:34:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91096960_635735eb",
       "range": {
         "startLine": 17,
         "startChar": 9,
