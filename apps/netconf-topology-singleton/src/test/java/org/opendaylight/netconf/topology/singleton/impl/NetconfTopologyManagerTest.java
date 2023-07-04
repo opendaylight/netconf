@@ -52,9 +52,7 @@ import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
@@ -113,9 +111,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         dataBrokerTest.setup();
         dataBroker = spy(dataBrokerTest.getDataBroker());
 
-        final DOMRpcProviderService rpcProviderRegistry = mock(DOMRpcProviderService.class);
         final ScheduledThreadPool keepaliveExecutor = mock(ScheduledThreadPool.class);
-        final DOMActionProviderService actionProviderRegistry = mock(DOMActionProviderService.class);
         final ThreadPool processingThreadPool = mock(ThreadPool.class);
         final ExecutorService processingService = mock(ExecutorService.class);
         doReturn(processingService).when(processingThreadPool).getExecutor();
@@ -130,10 +126,9 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
             mock(NetconfClientConfigurationBuilderFactory.class);
 
         final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(Uint16.ZERO).build();
-        netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, rpcProviderRegistry,
-                actionProviderRegistry, clusterSingletonServiceProvider, keepaliveExecutor, processingThreadPool,
-                actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
-                mountPointService, encryptionService, rpcProviderService, deviceActionFactory,
+        netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
+                keepaliveExecutor, processingThreadPool, actorSystemProvider, eventExecutor, clientDispatcher,
+                TOPOLOGY_ID, config, mountPointService, encryptionService, rpcProviderService, deviceActionFactory,
                 new DefaultSchemaResourceManager(new DefaultYangParserFactory()), builderFactory) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,

@@ -72,7 +72,6 @@ import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBro
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
@@ -84,7 +83,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementation;
-import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMService;
@@ -189,9 +187,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final String TEST_ROOT_DIRECTORY = "test-cache-root";
     private static final String TEST_DEFAULT_SUBDIR = "test-schema";
 
-    @Mock private DOMRpcProviderService mockRpcProviderRegistry;
     @Mock private RpcProviderService mockRpcProviderService;
-    @Mock private DOMActionProviderService mockActionProviderRegistry;
     @Mock private NetconfClientDispatcher mockClientDispatcher;
     @Mock private AAAEncryptionService mockEncryptionService;
     @Mock private ThreadPool mockThreadPool;
@@ -319,10 +315,10 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 YangTextSchemaSource.class, 1));
 
         masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
-                mockRpcProviderRegistry, mockActionProviderRegistry, masterClusterSingletonServiceProvider,
-                mockKeepaliveExecutor, mockThreadPool, mockMasterActorSystemProvider, eventExecutor,
-                mockClientDispatcher, TOPOLOGY_ID, config, masterMountPointService, mockEncryptionService,
-                mockRpcProviderService, deviceActionFactory, resourceManager, builderFactory) {
+                masterClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
+                mockMasterActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
+                masterMountPointService, mockEncryptionService, mockRpcProviderService, deviceActionFactory,
+                resourceManager, builderFactory) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                     final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -359,8 +355,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         doReturn(mockSlaveClusterSingletonServiceReg).when(mockSlaveClusterSingletonServiceProvider)
                 .registerClusterSingletonService(any());
 
-        slaveNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, slaveDataBroker, mockRpcProviderRegistry,
-            mockActionProviderRegistry, mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
+        slaveNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, slaveDataBroker,
+                mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
                 mockSlaveActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
                 slaveMountPointService, mockEncryptionService, mockRpcProviderService, deviceActionFactory,
                 resourceManager, builderFactory) {

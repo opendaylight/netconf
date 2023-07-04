@@ -15,8 +15,6 @@ import java.time.Duration;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
-import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
@@ -26,8 +24,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NetconfTopologySetup {
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-    private final DOMRpcProviderService rpcProviderRegistry;
-    private final DOMActionProviderService actionProviderRegistry;
     private final DataBroker dataBroker;
     private final InstanceIdentifier<Node> instanceIdentifier;
     private final Node node;
@@ -43,8 +39,6 @@ public class NetconfTopologySetup {
 
     NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
-        rpcProviderRegistry = builder.getRpcProviderRegistry();
-        actionProviderRegistry = builder.getActionProviderRegistry();
         dataBroker = builder.getDataBroker();
         instanceIdentifier = builder.getInstanceIdentifier();
         node = builder.getNode();
@@ -61,14 +55,6 @@ public class NetconfTopologySetup {
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
         return clusterSingletonServiceProvider;
-    }
-
-    public DOMRpcProviderService getRpcProviderRegistry() {
-        return rpcProviderRegistry;
-    }
-
-    public DOMActionProviderService getActionProviderRegistry() {
-        return actionProviderRegistry;
     }
 
     public DataBroker getDataBroker() {
@@ -121,8 +107,6 @@ public class NetconfTopologySetup {
 
     public static class NetconfTopologySetupBuilder {
         private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-        private DOMRpcProviderService rpcProviderRegistry;
-        private DOMActionProviderService actionProviderRegistry;
         private DataBroker dataBroker;
         private InstanceIdentifier<Node> instanceIdentifier;
         private Node node;
@@ -156,25 +140,6 @@ public class NetconfTopologySetup {
         public NetconfTopologySetupBuilder setClusterSingletonServiceProvider(
                 final ClusterSingletonServiceProvider clusterSingletonServiceProvider) {
             this.clusterSingletonServiceProvider = clusterSingletonServiceProvider;
-            return this;
-        }
-
-        DOMRpcProviderService getRpcProviderRegistry() {
-            return rpcProviderRegistry;
-        }
-
-        public NetconfTopologySetupBuilder setRpcProviderRegistry(final DOMRpcProviderService rpcProviderRegistry) {
-            this.rpcProviderRegistry = rpcProviderRegistry;
-            return this;
-        }
-
-        DOMActionProviderService getActionProviderRegistry() {
-            return actionProviderRegistry;
-        }
-
-        public NetconfTopologySetupBuilder setActionProviderRegistry(
-            final DOMActionProviderService actionProviderRegistry) {
-            this.actionProviderRegistry = actionProviderRegistry;
             return this;
         }
 

@@ -15,10 +15,6 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
     <reference id="rpcProvider"
                interface="org.opendaylight.mdsal.binding.api.RpcProviderService"/>
-    <reference id="rpcRegistry"
-               interface="org.opendaylight.mdsal.dom.api.DOMRpcProviderService"/>
-    <reference id="actionRegistry"
-               interface="org.opendaylight.mdsal.dom.api.DOMActionProviderService"/>
     <reference id="clusterSingletonService"
                interface="org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider"/>
     <reference id="keepAliveExecutor"
@@ -56,8 +52,6 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
           init-method="init" destroy-method="close">
         <argument ref="baseSchemas"/>
         <argument ref="dataBroker"/>
-        <argument ref="rpcRegistry"/>
-        <argument ref="actionRegistry"/>
         <argument ref="clusterSingletonService"/>
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>
