@@ -45,6 +45,75 @@
       },
       "revId": "81cd67fd3d413da2bb827f470bdbc79f7bb1c727",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "feb82037_d4fbc815",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/WebInitializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-04T20:09:34Z",
+      "side": 1,
+      "message": "without services \u003d { }, this will end up not activating by default -- only when somebody requests an AutoCloseable service -- and we do not want that.",
+      "range": {
+        "startLine": 31,
+        "startChar": 1,
+        "endLine": 31,
+        "endChar": 10
+      },
+      "revId": "81cd67fd3d413da2bb827f470bdbc79f7bb1c727",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c985e027_42527b65",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-04T20:09:34Z",
+      "side": 1,
+      "message": "same thing here: we only want to publish YangLibService",
+      "range": {
+        "startLine": 70,
+        "startChar": 1,
+        "endLine": 70,
+        "endChar": 10
+      },
+      "revId": "81cd67fd3d413da2bb827f470bdbc79f7bb1c727",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bedd8c74_5dd4fe44",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/YangLibProvider.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-04T20:09:34Z",
+      "side": 1,
+      "message": "also @PreDestroy, otherwise this will not be called",
+      "range": {
+        "startLine": 135,
+        "startChar": 16,
+        "endLine": 135,
+        "endChar": 21
+      },
+      "revId": "81cd67fd3d413da2bb827f470bdbc79f7bb1c727",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
