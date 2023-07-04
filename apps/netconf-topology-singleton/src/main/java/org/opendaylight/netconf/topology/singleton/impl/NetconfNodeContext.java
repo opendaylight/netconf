@@ -15,14 +15,7 @@ import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
-import io.netty.util.concurrent.EventExecutor;
-import java.util.concurrent.Executor;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
-import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -40,15 +33,9 @@ import org.slf4j.LoggerFactory;
 final class NetconfNodeContext implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeContext.class);
 
-    private final NetconfClientDispatcher clientDispatcher;
-    private final EventExecutor eventExecutor;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager schemaManager;
-    private final BaseNetconfSchemas baseSchemas;
     private final NetconfClientConfigurationBuilderFactory builderFactory;
-    private final ScheduledThreadPool keepaliveExecutor;
-    private final Executor processingExecutor;
-    private final DataBroker dataBroker;
     private final DOMMountPointService mountPointService;
     private final RemoteDeviceId remoteDeviceId;
     private final NetconfTopologySetup setup;
@@ -59,25 +46,16 @@ final class NetconfNodeContext implements AutoCloseable {
     private NetconfNodeManager netconfNodeManager;
     private NetconfNodeHandler nodeHandler;
 
-    NetconfNodeContext(final NetconfClientDispatcher clientDispatcher, final EventExecutor eventExecutor,
-            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-            final SchemaResourceManager schemaManager, final DataBroker dataBroker,
+    NetconfNodeContext(final NetconfTopologySetup setup, final SchemaResourceManager schemaManager,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
-            final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas,
-            final RemoteDeviceId remoteDeviceId, final NetconfTopologySetup setup,
+            final DeviceActionFactory deviceActionFactory, final RemoteDeviceId remoteDeviceId,
             final Timeout actorResponseWaitTime) {
-        this.clientDispatcher = requireNonNull(clientDispatcher);
-        this.eventExecutor = requireNonNull(eventExecutor);
-        this.keepaliveExecutor = requireNonNull(keepaliveExecutor);
-        this.processingExecutor = processingExecutor.getExecutor();
+        this.setup = requireNonNull(setup);
         this.schemaManager = requireNonNull(schemaManager);
-        this.dataBroker = requireNonNull(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
         this.builderFactory = requireNonNull(builderFactory);
         this.deviceActionFactory = deviceActionFactory;
-        this.baseSchemas = requireNonNull(baseSchemas);
         this.remoteDeviceId = requireNonNull(remoteDeviceId);
-        this.setup = requireNonNull(setup);
         this.actorResponseWaitTime = actorResponseWaitTime;
         registerNodeManager();
     }
@@ -163,9 +141,10 @@ final class NetconfNodeContext implements AutoCloseable {
         // Instantiate the handler ...
         masterSalFacade = createSalFacade(netconfNode.requireLockDatastore());
 
-        nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor.getExecutor(),
-            baseSchemas, schemaManager, processingExecutor, builderFactory, deviceActionFactory, masterSalFacade,
-            remoteDeviceId, configNode.getNodeId(), netconfNode, nodeOptional);
+        nodeHandler = new NetconfNodeHandler(setup.getNetconfClientDispatcher(), setup.getEventExecutor(),
+            setup.getKeepaliveExecutor(), setup.getBaseSchemas(), schemaManager, setup.getProcessingExecutor(),
+            builderFactory, deviceActionFactory, masterSalFacade, remoteDeviceId, configNode.getNodeId(), netconfNode,
+            nodeOptional);
         nodeHandler.connect();
     }
 
@@ -179,6 +158,6 @@ final class NetconfNodeContext implements AutoCloseable {
     @VisibleForTesting
     MasterSalFacade createSalFacade(final boolean lockDatastore) {
         return new MasterSalFacade(remoteDeviceId, setup.getActorSystem(), masterActorRef, actorResponseWaitTime,
-            mountPointService, dataBroker, lockDatastore);
+            mountPointService, setup.getDataBroker(), lockDatastore);
     }
 }

@@ -82,9 +82,7 @@ public class NetconfTopologyManager
     private final DOMRpcProviderService rpcProviderRegistry;
     private final DOMActionProviderService actionProviderRegistry;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-    private final ScheduledThreadPool keepaliveExecutor;
     private final ScheduledExecutorService keepaliveExecutorService;
-    private final ThreadPool processingExecutor;
     private final Executor processingExecutorService;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
@@ -121,9 +119,7 @@ public class NetconfTopologyManager
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
         actionProviderRegistry = requireNonNull(actionProviderService);
         this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
-        this.keepaliveExecutor = keepaliveExecutor;
         keepaliveExecutorService = keepaliveExecutor.getExecutor();
-        this.processingExecutor = processingExecutor;
         processingExecutorService = processingExecutor.getExecutor();
         actorSystem = requireNonNull(actorSystemProvider).getActorSystem();
         this.eventExecutor = requireNonNull(eventExecutor);
@@ -230,13 +226,8 @@ public class NetconfTopologyManager
     protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
             final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
             final DeviceActionFactory deviceActionFact) {
-        return new NetconfTopologyContext(setup.getNetconfClientDispatcher(),
-                setup.getEventExecutor(), keepaliveExecutor,
-                processingExecutor, resourceManager,
-                dataBroker, mountPointService,
-                builderFactory, deviceActionFactory,
-                baseSchemas, actorResponseWaitTime,
-                serviceGroupIdent, setup);
+        return new NetconfTopologyContext(resourceManager, mountPointService, builderFactory, deviceActionFactory,
+            actorResponseWaitTime, serviceGroupIdent, setup);
     }
 
     @Override

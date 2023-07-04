@@ -12,16 +12,10 @@ import static java.util.Objects.requireNonNull;
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.netty.util.concurrent.EventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
-import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonService;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -44,21 +38,16 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     private RemoteDeviceId remoteDeviceId;
 
-    NetconfTopologyContext(final NetconfClientDispatcher clientDispatcher,
-            final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-            final ThreadPool processingExecutor, final SchemaResourceManager schemaManager,
-            final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final NetconfClientConfigurationBuilderFactory builderFactory,
-            final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas,
-            final Timeout actorResponseWaitTime, final ServiceGroupIdentifier serviceGroupIdent,
-            final NetconfTopologySetup setup) {
+    NetconfTopologyContext(final SchemaResourceManager schemaManager,
+            final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
+            final DeviceActionFactory deviceActionFactory, final Timeout actorResponseWaitTime,
+            final ServiceGroupIdentifier serviceGroupIdent, final NetconfTopologySetup setup) {
         this.serviceGroupIdent = requireNonNull(serviceGroupIdent);
         remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(setup.getNode().getNodeId(),
                 setup.getNode().augmentation(NetconfNode.class));
 
-        topologySingleton = new NetconfNodeContext(clientDispatcher,
-                eventExecutor, keepaliveExecutor, processingExecutor, schemaManager, dataBroker, mountPointService,
-                builderFactory, deviceActionFactory, baseSchemas, remoteDeviceId, setup, actorResponseWaitTime);
+        topologySingleton = new NetconfNodeContext(setup, schemaManager, mountPointService, builderFactory,
+            deviceActionFactory, remoteDeviceId, actorResponseWaitTime);
     }
 
     @VisibleForTesting
