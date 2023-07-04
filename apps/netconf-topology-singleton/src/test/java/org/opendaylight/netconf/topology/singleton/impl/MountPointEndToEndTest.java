@@ -103,7 +103,6 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
-import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -338,7 +337,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                         .newDeviceDataBroker(any(MountPointContext.class), any(NetconfSessionPreferences.class));
                     masterSalFacadeFuture.set(spiedFacade);
                     return spiedFacade;
-                }).when(spiedSingleton).createSalFacade(any(RemoteDeviceId.class), any(boolean.class));
+                }).when(spiedSingleton).createSalFacade(any(boolean.class));
                 doReturn(spiedSingleton).when(spiedContext).getTopologySingleton();
                 return spiedContext;
             }

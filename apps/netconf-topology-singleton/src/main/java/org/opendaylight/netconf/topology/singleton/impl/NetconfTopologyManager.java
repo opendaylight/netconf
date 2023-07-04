@@ -230,7 +230,7 @@ public class NetconfTopologyManager
     protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
             final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
             final DeviceActionFactory deviceActionFact) {
-        return new NetconfTopologyContext(setup.getTopologyId(), setup.getNetconfClientDispatcher(),
+        return new NetconfTopologyContext(setup.getNetconfClientDispatcher(),
                 setup.getEventExecutor(), keepaliveExecutor,
                 processingExecutor, resourceManager,
                 dataBroker, mountPointService,
