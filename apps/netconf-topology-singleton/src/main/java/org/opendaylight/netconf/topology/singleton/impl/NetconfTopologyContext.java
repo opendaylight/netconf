@@ -37,14 +37,14 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyContext.class);
 
     private final @NonNull ServiceGroupIdentifier serviceGroupIdent;
-    private final NetconfTopologySingletonImpl topologySingleton;
+    private final NetconfNodeContext topologySingleton;
 
     private volatile boolean closed;
     private volatile boolean isMaster;
 
     private RemoteDeviceId remoteDeviceId;
 
-    NetconfTopologyContext(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+    NetconfTopologyContext(final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor, final SchemaResourceManager schemaManager,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
@@ -56,13 +56,13 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(setup.getNode().getNodeId(),
                 setup.getNode().augmentation(NetconfNode.class));
 
-        topologySingleton = new NetconfTopologySingletonImpl(topologyId, clientDispatcher,
+        topologySingleton = new NetconfNodeContext(clientDispatcher,
                 eventExecutor, keepaliveExecutor, processingExecutor, schemaManager, dataBroker, mountPointService,
                 builderFactory, deviceActionFactory, baseSchemas, remoteDeviceId, setup, actorResponseWaitTime);
     }
 
     @VisibleForTesting
-    protected NetconfTopologySingletonImpl getTopologySingleton() {
+    protected NetconfNodeContext getTopologySingleton() {
         // FIXME we have to access topology singleton via this method because of mocking in MountPointEndToEndTest
         return topologySingleton;
     }
@@ -95,11 +95,11 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         final var node = requireNonNull(setup).getNode();
         remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), node.augmentation(NetconfNode.class));
 
+        final var singleton = getTopologySingleton();
         if (isMaster) {
-            getTopologySingleton().dropNode(setup.getNode().getNodeId());
-            getTopologySingleton().refreshSetupConnection(setup, remoteDeviceId);
+            singleton.refreshSetupConnection(setup, remoteDeviceId);
         } else {
-            getTopologySingleton().refreshDevice(setup, remoteDeviceId);
+            singleton.refreshDevice(setup, remoteDeviceId);
         }
     }
 

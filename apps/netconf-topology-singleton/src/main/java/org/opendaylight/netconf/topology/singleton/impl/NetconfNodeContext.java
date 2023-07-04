@@ -7,11 +7,16 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import akka.actor.ActorRef;
 import akka.cluster.Cluster;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -20,22 +25,32 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
-import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class NetconfTopologySingletonImpl extends AbstractNetconfTopology implements AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologySingletonImpl.class);
+final class NetconfNodeContext implements AutoCloseable {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeContext.class);
 
+    private final NetconfClientDispatcher clientDispatcher;
+    private final EventExecutor eventExecutor;
+    private final DeviceActionFactory deviceActionFactory;
+    private final SchemaResourceManager schemaManager;
+    private final BaseNetconfSchemas baseSchemas;
+    private final NetconfClientConfigurationBuilderFactory builderFactory;
+    private final ScheduledThreadPool keepaliveExecutor;
+    private final ListeningExecutorService processingExecutor;
+    private final DataBroker dataBroker;
+    private final DOMMountPointService mountPointService;
     private final RemoteDeviceId remoteDeviceId;
     private final NetconfTopologySetup setup;
     private final Timeout actorResponseWaitTime;
@@ -43,19 +58,28 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
     private ActorRef masterActorRef;
     private MasterSalFacade masterSalFacade;
     private NetconfNodeManager netconfNodeManager;
+    private NetconfNodeHandler nodeHandler;
 
-    NetconfTopologySingletonImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-            final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-            final ThreadPool processingExecutor, final SchemaResourceManager schemaManager,
-            final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final NetconfClientConfigurationBuilderFactory builderFactory,
+    NetconfNodeContext(final NetconfClientDispatcher clientDispatcher, final EventExecutor eventExecutor,
+            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
+            final SchemaResourceManager schemaManager, final DataBroker dataBroker,
+            final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas,
             final RemoteDeviceId remoteDeviceId, final NetconfTopologySetup setup,
             final Timeout actorResponseWaitTime) {
-        super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor, schemaManager,
-                dataBroker, mountPointService, builderFactory, deviceActionFactory, baseSchemas);
-        this.remoteDeviceId = remoteDeviceId;
-        this.setup = setup;
+        this.clientDispatcher = requireNonNull(clientDispatcher);
+        this.eventExecutor = requireNonNull(eventExecutor);
+        this.keepaliveExecutor = requireNonNull(keepaliveExecutor);
+        // FIXME: share a single instance!
+        this.processingExecutor = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
+        this.schemaManager = requireNonNull(schemaManager);
+        this.dataBroker = requireNonNull(dataBroker);
+        this.mountPointService = requireNonNull(mountPointService);
+        this.builderFactory = requireNonNull(builderFactory);
+        this.deviceActionFactory = deviceActionFactory;
+        this.baseSchemas = requireNonNull(baseSchemas);
+        this.remoteDeviceId = requireNonNull(remoteDeviceId);
+        this.setup = requireNonNull(setup);
         this.actorResponseWaitTime = actorResponseWaitTime;
         registerNodeManager();
     }
@@ -70,14 +94,15 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
                 actorResponseWaitTime, mountPointService), NetconfTopologyUtils.createMasterActorName(
                 remoteDeviceId.name(), masterAddress));
 
-        // setup connection to device
-        ensureNode(setup.getNode());
+        connectNode();
     }
 
     void becomeTopologyFollower() {
         registerNodeManager();
+
         // disconnect device from this node and listen for changes from leader
-        deleteNode(setup.getNode().getNodeId());
+        dropNode();
+
         if (masterActorRef != null) {
             // was leader before
             setup.getActorSystem().stop(masterActorRef);
@@ -85,6 +110,8 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
     }
 
     void refreshSetupConnection(final NetconfTopologySetup netconfTopologyDeviceSetup, final RemoteDeviceId device) {
+        dropNode();
+
         Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(netconfTopologyDeviceSetup, device),
             actorResponseWaitTime).onComplete(
                 new OnComplete<>() {
@@ -95,7 +122,7 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
                             return;
                         }
                         LOG.debug("Succeed to refresh Master Action data. Creating Connector...");
-                        setupConnection(setup.getNode().getNodeId(), setup.getNode());
+                        connectNode();
                     }
                 }, netconfTopologyDeviceSetup.getActorSystem().dispatcher());
     }
@@ -113,10 +140,6 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
         netconfNodeManager.close();
     }
 
-    void dropNode(final NodeId nodeId) {
-        deleteNode(nodeId);
-    }
-
     @Override
     public void close() {
         unregisterNodeManager();
@@ -130,10 +153,34 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
         }
     }
 
-    @Override
-    public RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final boolean lockDatastore) {
-        masterSalFacade = new MasterSalFacade(deviceId, setup.getActorSystem(), masterActorRef,
-                actorResponseWaitTime, mountPointService, dataBroker, lockDatastore);
-        return masterSalFacade;
+    private void connectNode() {
+        final var configNode = setup.getNode();
+
+        final var netconfNode = configNode.augmentation(NetconfNode.class);
+        final var nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
+
+        requireNonNull(netconfNode.getHost());
+        requireNonNull(netconfNode.getPort());
+
+        // Instantiate the handler ...
+        masterSalFacade = createSalFacade(netconfNode.requireLockDatastore());
+
+        nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor.getExecutor(),
+            baseSchemas, schemaManager, processingExecutor, builderFactory, deviceActionFactory, masterSalFacade,
+            remoteDeviceId, configNode.getNodeId(), netconfNode, nodeOptional);
+        nodeHandler.connect();
+    }
+
+    private void dropNode() {
+        if (nodeHandler != null) {
+            nodeHandler.close();
+            nodeHandler = null;
+        }
+    }
+
+    @VisibleForTesting
+    MasterSalFacade createSalFacade(final boolean lockDatastore) {
+        return new MasterSalFacade(remoteDeviceId, setup.getActorSystem(), masterActorRef, actorResponseWaitTime,
+            mountPointService, dataBroker, lockDatastore);
     }
 }

@@ -140,9 +140,8 @@ public abstract class AbstractNetconfTopology {
         final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
         final var nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor.getExecutor(),
-            baseSchemas, schemaManager, processingExecutor, deviceActionFactory,
-            deviceSalFacade, deviceId, nodeId, netconfNode, nodeOptional,
-            builderFactory.createClientConfigurationBuilder(nodeId, netconfNode));
+            baseSchemas, schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade,
+            deviceId, nodeId, netconfNode, nodeOptional);
 
         // ... record it ...
         activeConnectors.put(nodeId, nodeHandler);
