@@ -14,7 +14,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.util.concurrent.EventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -23,12 +22,11 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonService;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
+import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
@@ -50,18 +48,17 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor, final SchemaResourceManager schemaManager,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final DeviceActionFactory deviceActionFactory,
-            final BaseNetconfSchemas baseSchemas, final Timeout actorResponseWaitTime,
-            final ServiceGroupIdentifier serviceGroupIdent, final NetconfTopologySetup setup,
-            final CredentialProvider credentialProvider, final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
+            final NetconfClientConfigurationBuilderFactory builderFactory,
+            final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas,
+            final Timeout actorResponseWaitTime, final ServiceGroupIdentifier serviceGroupIdent,
+            final NetconfTopologySetup setup) {
         this.serviceGroupIdent = requireNonNull(serviceGroupIdent);
         remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(setup.getNode().getNodeId(),
                 setup.getNode().augmentation(NetconfNode.class));
 
         topologySingleton = new NetconfTopologySingletonImpl(topologyId, clientDispatcher,
                 eventExecutor, keepaliveExecutor, processingExecutor, schemaManager, dataBroker, mountPointService,
-                encryptionService, deviceActionFactory, baseSchemas, remoteDeviceId, setup, actorResponseWaitTime,
-                credentialProvider, sslHandlerFactoryProvider);
+                builderFactory, deviceActionFactory, baseSchemas, remoteDeviceId, setup, actorResponseWaitTime);
     }
 
     @VisibleForTesting

@@ -13,24 +13,22 @@ import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import io.netty.util.concurrent.EventExecutor;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,13 +48,12 @@ final class NetconfTopologySingletonImpl extends AbstractNetconfTopology impleme
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor, final SchemaResourceManager schemaManager,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final DeviceActionFactory deviceActionFactory,
-            final BaseNetconfSchemas baseSchemas, final RemoteDeviceId remoteDeviceId,
-            final NetconfTopologySetup setup, final Timeout actorResponseWaitTime,
-            final CredentialProvider credentialProvider, final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
+            final NetconfClientConfigurationBuilderFactory builderFactory,
+            final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas,
+            final RemoteDeviceId remoteDeviceId, final NetconfTopologySetup setup,
+            final Timeout actorResponseWaitTime) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor, schemaManager,
-                dataBroker, mountPointService, encryptionService, deviceActionFactory, baseSchemas, credentialProvider,
-                sslHandlerFactoryProvider);
+                dataBroker, mountPointService, builderFactory, deviceActionFactory, baseSchemas);
         this.remoteDeviceId = remoteDeviceId;
         this.setup = setup;
         this.actorResponseWaitTime = actorResponseWaitTime;

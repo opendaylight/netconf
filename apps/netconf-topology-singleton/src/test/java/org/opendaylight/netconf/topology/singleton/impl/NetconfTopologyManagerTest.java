@@ -59,12 +59,11 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -127,16 +126,15 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         final AAAEncryptionService encryptionService = mock(AAAEncryptionService.class);
         final DeviceActionFactory deviceActionFactory = mock(DeviceActionFactory.class);
         final RpcProviderService rpcProviderService = mock(RpcProviderService.class);
-        final CredentialProvider credentialProvider = mock(CredentialProvider.class);
-        final SslHandlerFactoryProvider sslHandlerFactoryProvider = mock(SslHandlerFactoryProvider.class);
+        final NetconfClientConfigurationBuilderFactory builderFactory =
+            mock(NetconfClientConfigurationBuilderFactory.class);
 
         final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(Uint16.ZERO).build();
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, rpcProviderRegistry,
                 actionProviderRegistry, clusterSingletonServiceProvider, keepaliveExecutor, processingThreadPool,
                 actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
                 mountPointService, encryptionService, rpcProviderService, deviceActionFactory,
-                new DefaultSchemaResourceManager(new DefaultYangParserFactory()), credentialProvider,
-                sslHandlerFactoryProvider) {
+                new DefaultSchemaResourceManager(new DefaultYangParserFactory()), builderFactory) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,

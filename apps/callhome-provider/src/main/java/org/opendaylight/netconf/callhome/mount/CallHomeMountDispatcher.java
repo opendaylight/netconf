@@ -14,7 +14,6 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.FailedFuture;
 import io.netty.util.concurrent.Future;
 import java.net.InetSocketAddress;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -26,10 +25,9 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.osgi.service.component.annotations.Activate;
@@ -51,9 +49,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final SchemaResourceManager schemaRepositoryProvider;
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
-    private final AAAEncryptionService encryptionService;
-    private final CredentialProvider credentialProvider;
-    private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
+    private final NetconfClientConfigurationBuilderFactory builderFactory;
 
     protected CallHomeTopology topology;
 
@@ -65,10 +61,9 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
             final DataBroker dataBroker, final DOMMountPointService mountService,
-            final AAAEncryptionService encryptionService, final CredentialProvider credentialProvider,
-            final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
+            final NetconfClientConfigurationBuilderFactory builderFactory) {
         this(topologyId, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider, baseSchemas,
-            dataBroker, mountService, encryptionService, credentialProvider, sslHandlerFactoryProvider, null);
+            dataBroker, mountService, builderFactory, null);
     }
 
     @Activate
@@ -79,21 +74,19 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
             @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingExecutor,
             @Reference final SchemaResourceManager schemaRepositoryProvider,
             @Reference final BaseNetconfSchemas baseSchemas, @Reference final DataBroker dataBroker,
-            @Reference final DOMMountPointService mountService, @Reference final AAAEncryptionService encryptionService,
-            @Reference final CredentialProvider credentialProvider,
-            @Reference final SslHandlerFactoryProvider sslHandlerFactoryProvider,
+            @Reference final DOMMountPointService mountService,
+            @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
             @Reference final DeviceActionFactory deviceActionFactory) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, eventExecutor, keepaliveExecutor, processingExecutor,
-            schemaRepositoryProvider, baseSchemas, dataBroker, mountService, encryptionService, credentialProvider,
-            sslHandlerFactoryProvider, deviceActionFactory);
+            schemaRepositoryProvider, baseSchemas, dataBroker, mountService, builderFactory, deviceActionFactory);
     }
 
     public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
             final DataBroker dataBroker, final DOMMountPointService mountService,
-            final AAAEncryptionService encryptionService, final CredentialProvider credentialProvider,
-            final SslHandlerFactoryProvider sslHandlerFactoryProvider, final DeviceActionFactory deviceActionFactory) {
+            final NetconfClientConfigurationBuilderFactory builderFactory,
+            final DeviceActionFactory deviceActionFactory) {
         this.topologyId = topologyId;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
@@ -103,9 +96,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = dataBroker;
         this.mountService = mountService;
-        this.encryptionService = encryptionService;
-        this.credentialProvider = requireNonNull(credentialProvider);
-        this.sslHandlerFactoryProvider = requireNonNull(sslHandlerFactoryProvider);
+        this.builderFactory = requireNonNull(builderFactory);
     }
 
     @Override
@@ -139,8 +130,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     @VisibleForTesting
     void createTopology() {
         topology = new CallHomeTopology(topologyId, this, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountService, encryptionService, baseSchemas,
-                deviceActionFactory, credentialProvider, sslHandlerFactoryProvider);
+                schemaRepositoryProvider, dataBroker, mountService, builderFactory, baseSchemas, deviceActionFactory);
     }
 
     @VisibleForTesting
