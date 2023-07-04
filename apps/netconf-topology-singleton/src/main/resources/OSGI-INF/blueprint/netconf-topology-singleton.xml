@@ -67,6 +67,4 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument ref="schemaManager"/>
         <argument ref="builderFactory"/>
     </bean>
-    <service ref="netconfTopologyManager"
-             interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>
 </blueprint>
