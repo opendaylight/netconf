@@ -23,14 +23,16 @@ import static org.opendaylight.mdsal.binding.api.DataObjectModification.Modifica
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
+import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import io.netty.util.concurrent.EventExecutor;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.junit.Before;
@@ -40,9 +42,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.controller.cluster.ActorSystemProvider;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
@@ -68,8 +67,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -111,11 +108,9 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         dataBrokerTest.setup();
         dataBroker = spy(dataBrokerTest.getDataBroker());
 
-        final ScheduledThreadPool keepaliveExecutor = mock(ScheduledThreadPool.class);
-        final ThreadPool processingThreadPool = mock(ThreadPool.class);
+        final ScheduledExecutorService keepaliveExecutor = mock(ScheduledExecutorService.class);
         final ExecutorService processingService = mock(ExecutorService.class);
-        doReturn(processingService).when(processingThreadPool).getExecutor();
-        final ActorSystemProvider actorSystemProvider = mock(ActorSystemProvider.class);
+        final ActorSystem actorSystem = mock(ActorSystem.class);
         final EventExecutor eventExecutor = mock(EventExecutor.class);
         final NetconfClientDispatcher clientDispatcher = mock(NetconfClientDispatcher.class);
         final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
@@ -125,11 +120,14 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         final NetconfClientConfigurationBuilderFactory builderFactory =
             mock(NetconfClientConfigurationBuilderFactory.class);
 
-        final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(Uint16.ZERO).build();
+        doNothing().when(mockListenerReg).close();
+        doReturn(mockListenerReg).when(dataBroker).registerDataTreeChangeListener(any(), any());
+
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
-                keepaliveExecutor, processingThreadPool, actorSystemProvider, eventExecutor, clientDispatcher,
-                TOPOLOGY_ID, config, mountPointService, encryptionService, rpcProviderService, deviceActionFactory,
-                new DefaultSchemaResourceManager(new DefaultYangParserFactory()), builderFactory) {
+                keepaliveExecutor, processingService, actorSystem, eventExecutor, clientDispatcher,
+                mountPointService, encryptionService, rpcProviderService, deviceActionFactory,
+                new DefaultSchemaResourceManager(new DefaultYangParserFactory()), builderFactory,
+                TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -139,16 +137,10 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                         "No mock context for " + setup.getInstanceIdentifier()).apply(setup);
             }
         };
-
-        doNothing().when(mockListenerReg).close();
-        doReturn(mockListenerReg).when(dataBroker).registerDataTreeChangeListener(any(), any());
     }
 
     @Test
     public void testRegisterDataTreeChangeListener() throws Exception {
-
-        netconfTopologyManager.init();
-
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
             try (ReadTransaction readTx = dataBroker.newReadOnlyTransaction()) {
                 return readTx.exists(LogicalDatastoreType.OPERATIONAL,
@@ -229,7 +221,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doReturn(mockClusterRegistration2).when(clusterSingletonServiceProvider)
                 .registerClusterSingletonService(mockContext2);
 
-        netconfTopologyManager.onDataTreeChanged(Arrays.asList(
+        netconfTopologyManager.onDataTreeChanged(List.of(
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId1), dataObjectModification1),
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
@@ -254,7 +246,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doNothing().when(mockContext1).refresh(any());
         doNothing().when(mockContext2).refresh(any());
 
-        netconfTopologyManager.onDataTreeChanged(Arrays.asList(
+        netconfTopologyManager.onDataTreeChanged(List.of(
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId1), dataObjectModification1),
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
@@ -271,7 +263,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         // Notify of Node 1 deleted.
         doReturn(DELETE).when(dataObjectModification1).getModificationType();
 
-        netconfTopologyManager.onDataTreeChanged(Arrays.asList(
+        netconfTopologyManager.onDataTreeChanged(List.of(
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId1), dataObjectModification1)));
 
@@ -298,7 +290,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
             return newMockContext1;
         });
 
-        netconfTopologyManager.onDataTreeChanged(Arrays.asList(
+        netconfTopologyManager.onDataTreeChanged(List.of(
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId1), dataObjectModification1)));
 
@@ -347,9 +339,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doThrow(new RuntimeException("mock error")).when(clusterSingletonServiceProvider)
                 .registerClusterSingletonService(mockContext);
 
-        netconfTopologyManager.init();
-
-        netconfTopologyManager.onDataTreeChanged(Arrays.asList(
+        netconfTopologyManager.onDataTreeChanged(List.of(
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId), dataObjectModification)));
 
