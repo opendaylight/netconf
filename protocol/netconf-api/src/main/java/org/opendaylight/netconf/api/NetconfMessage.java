@@ -17,14 +17,14 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Document;
 
 /**
- * NetconfMessage represents a wrapper around org.w3c.dom.Document. Needed for
- * implementing ProtocolMessage interface.
+ * NetconfMessage represents a wrapper around {@link Document}.
  */
-public class NetconfMessage {
+public abstract class NetconfMessage {
     private static final Transformer TRANSFORMER;
 
     static {
@@ -41,8 +41,16 @@ public class NetconfMessage {
 
     private final @NonNull Document doc;
 
-    public NetconfMessage(final Document doc) {
+    protected NetconfMessage(final Document doc) {
         this.doc = requireNonNull(doc);
+    }
+
+    public static @NonNull NetconfMessage of(final Document doc) {
+        if (HelloMessage.isHelloMessage(doc)) {
+            return new HelloMessage(doc);
+        } else {
+            throw new IllegalArgumentException("Unhandled message " + XmlUtil.toString(doc));
+        }
     }
 
     public @NonNull Document getDocument() {

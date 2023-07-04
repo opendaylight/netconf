@@ -58,7 +58,7 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
 
     private NetconfEXIToMessageDecoder(final ThreadLocalSAXDecoder reader) {
         this.reader = requireNonNull(reader);
-        this.documentBuilder = UntrustedXML.newDocumentBuilder();
+        documentBuilder = UntrustedXML.newDocumentBuilder();
     }
 
     public static NetconfEXIToMessageDecoder create(final NetconfEXICodec codec) throws EXIException {
@@ -96,6 +96,6 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
             reader.parse(new InputSource(is));
         }
 
-        out.add(new NetconfMessage((Document) domResult.getNode()));
+        out.add(NetconfMessage.of((Document) domResult.getNode()));
     }
 }

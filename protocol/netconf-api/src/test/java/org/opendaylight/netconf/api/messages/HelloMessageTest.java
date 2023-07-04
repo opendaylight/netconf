@@ -23,10 +23,10 @@ public class HelloMessageTest {
         var caps = Set.of("cap1");
         var additionalHeader = new NetconfHelloMessageAdditionalHeader("name", "host", "1", "transp", "id");
         var message = HelloMessage.createClientHello(caps, Optional.of(additionalHeader));
-        assertTrue(HelloMessage.isHelloMessage(message));
+        assertTrue(HelloMessage.isHelloMessage(message.getDocument()));
         assertEquals(Optional.of(additionalHeader), message.getAdditionalHeader());
 
         var serverMessage = HelloMessage.createServerHello(caps, new SessionIdType(Uint32.valueOf(100)));
-        assertTrue(HelloMessage.isHelloMessage(serverMessage));
+        assertTrue(HelloMessage.isHelloMessage(serverMessage.getDocument()));
     }
 }

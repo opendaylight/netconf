@@ -108,16 +108,10 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
     }
 
     private static NetconfMessage getNetconfMessage(final String additionalHeader, final Document doc) {
-        NetconfMessage msg = new NetconfMessage(doc);
-        if (HelloMessage.isHelloMessage(msg)) {
-            if (additionalHeader != null) {
-                return new HelloMessage(doc, NetconfHelloMessageAdditionalHeader.fromString(additionalHeader));
-            } else {
-                return new HelloMessage(doc);
-            }
+        if (additionalHeader != null && HelloMessage.isHelloMessage(doc)) {
+            return new HelloMessage(doc, NetconfHelloMessageAdditionalHeader.fromString(additionalHeader));
         }
-
-        return msg;
+        return NetconfMessage.of(doc);
     }
 
     private static int getAdditionalHeaderEndIndex(final byte[] bytes) {

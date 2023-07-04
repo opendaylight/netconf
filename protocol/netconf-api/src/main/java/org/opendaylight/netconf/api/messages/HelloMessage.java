@@ -82,11 +82,7 @@ public final class HelloMessage extends NetconfMessage {
         return new HelloMessage(doc);
     }
 
-    public static boolean isHelloMessage(final NetconfMessage msg) {
-        return isHelloMessage(msg.getDocument());
-    }
-
-    private static boolean isHelloMessage(final Document document) {
+    public static boolean isHelloMessage(final Document document) {
         final XmlElement element = XmlElement.fromDomElement(document.getDocumentElement());
         if (!HELLO_TAG.equals(element.getName())) {
             return false;

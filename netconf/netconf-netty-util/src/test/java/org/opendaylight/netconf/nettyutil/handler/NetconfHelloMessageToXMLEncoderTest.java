@@ -57,8 +57,8 @@ public class NetconfHelloMessageToXMLEncoderTest {
 
     @Test
     public void testEncodeNotHello() throws Exception {
-        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument(
-                "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
+        final var msg = NetconfMessage.of(
+            XmlUtil.readXmlToDocument("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
         assertThrows(IllegalStateException.class, () -> new NetconfHelloMessageToXMLEncoder().encode(ctx, msg, null));
     }
 }
