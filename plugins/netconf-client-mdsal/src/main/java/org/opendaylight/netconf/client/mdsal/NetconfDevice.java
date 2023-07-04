@@ -19,7 +19,6 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.Serial;
@@ -32,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
@@ -83,7 +83,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     private static final QName RFC8528_SCHEMA_MOUNTS_QNAME = QName.create(
         SchemaMountConstants.RFC8528_MODULE, "schema-mounts").intern();
-    private static final YangInstanceIdentifier RFC8528_SCHEMA_MOUNTS = YangInstanceIdentifier.create(
+    private static final YangInstanceIdentifier RFC8528_SCHEMA_MOUNTS = YangInstanceIdentifier.of(
         NodeIdentifier.create(RFC8528_SCHEMA_MOUNTS_QNAME));
 
     protected final RemoteDeviceId id;
@@ -94,7 +94,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     protected final List<Registration> sourceRegistrations = new ArrayList<>();
 
     private final RemoteDeviceHandler salFacade;
-    private final ListeningExecutorService processingExecutor;
+    private final Executor processingExecutor;
     private final DeviceActionFactory deviceActionFactory;
     private final NetconfDeviceSchemasResolver stateSchemasResolver;
     private final NotificationHandler notificationHandler;
@@ -108,15 +108,14 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private NetconfMessageTransformer messageTransformer;
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
-            final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
-            final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
+            final RemoteDeviceId id, final RemoteDeviceHandler salFacade, final Executor globalProcessingExecutor,
+            final boolean reconnectOnSchemasChange) {
         this(schemaResourcesDTO, baseSchemas, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null);
     }
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
-            final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
-            final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange,
-            final DeviceActionFactory deviceActionFactory) {
+            final RemoteDeviceId id, final RemoteDeviceHandler salFacade, final Executor globalProcessingExecutor,
+            final boolean reconnectOnSchemasChange, final DeviceActionFactory deviceActionFactory) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.id = id;
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
@@ -144,8 +143,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
         final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.getEffectiveModelContext(), listener,
             new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
-        final ListenableFuture<DeviceSources> sourceResolverFuture = processingExecutor.submit(
-            new DeviceSourcesResolver(id, baseSchema, initRpc, remoteSessionCapabilities, stateSchemasResolver));
+        final ListenableFuture<DeviceSources> sourceResolverFuture = Futures.submit(
+            new DeviceSourcesResolver(id, baseSchema, initRpc, remoteSessionCapabilities, stateSchemasResolver),
+            processingExecutor);
 
         if (shouldListenOnSchemaChange(remoteSessionCapabilities)) {
             registerToBaseNetconfStream(initRpc, listener);
