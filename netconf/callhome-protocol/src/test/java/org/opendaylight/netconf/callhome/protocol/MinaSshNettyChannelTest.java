@@ -13,14 +13,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.EmptyByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
-import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext.SshWriteAsyncHandlerAdapter;
@@ -39,35 +37,34 @@ public class MinaSshNettyChannelTest {
     private MinaSshNettyChannel instance;
 
     @Before
-    public void setup() throws IOException {
-        IoReadFuture mockFuture = mock(IoReadFuture.class);
-        IoInputStream mockIn = mock(IoInputStream.class);
+    public void setup() throws Exception {
+        final var mockFuture = mock(IoReadFuture.class);
+        final var mockIn = mock(IoInputStream.class);
         doReturn(mockFuture).when(mockIn).read(any(Buffer.class));
+        doReturn(mockFuture).when(mockFuture).addListener(any());
         mockContext = mock(CallHomeSessionContext.class);
         mockSession = mock(ClientSession.class);
         mockChannel = mock(ClientChannel.class);
         doReturn(mockIn).when(mockChannel).getAsyncOut();
 
-        IoOutputStream mockOut = mock(IoOutputStream.class);
+        final var mockOut = mock(IoOutputStream.class);
         doReturn(mockOut).when(mockChannel).getAsyncIn();
-
-        IoWriteFuture mockWrFuture = mock(IoWriteFuture.class);
         doReturn(false).when(mockOut).isClosed();
         doReturn(false).when(mockOut).isClosing();
+
+        final var mockWrFuture = mock(IoWriteFuture.class);
         doReturn(mockWrFuture).when(mockOut).writeBuffer(any(Buffer.class));
         doReturn(null).when(mockWrFuture).addListener(any());
-
-        doReturn(mockFuture).when(mockFuture).addListener(any());
 
         instance = new MinaSshNettyChannel(mockContext, mockSession);
     }
 
     @Test
     public void ourChannelHandlerShouldForwardWrites() throws Exception {
-        ChannelHandler mockHandler = mock(ChannelHandler.class);
-        ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
+        final var mockHandler = mock(ChannelHandler.class);
+        final var ctx = mock(ChannelHandlerContext.class);
         doReturn(mockHandler).when(ctx).handler();
-        ChannelPromise promise = mock(ChannelPromise.class);
+        final var promise = mock(ChannelPromise.class);
 
         // we would really like to just verify that the async handler write() was
         // called but it is a final class, so no mocking. instead we set up the
@@ -83,9 +80,9 @@ public class MinaSshNettyChannelTest {
         instance.pipeline().addFirst(new SshWriteAsyncHandlerAdapter(mockChannel));
 
         // when
-        ChannelOutboundHandlerAdapter outadapter = (ChannelOutboundHandlerAdapter) instance.pipeline().first();
-        ByteBufAllocator mockAlloc = mock(ByteBufAllocator.class);
-        ByteBuf bytes = new EmptyByteBuf(mockAlloc);
+        final var outadapter = (ChannelOutboundHandlerAdapter) instance.pipeline().first();
+        final var mockAlloc = mock(ByteBufAllocator.class);
+        final var bytes = new EmptyByteBuf(mockAlloc);
         outadapter.write(ctx, bytes, promise);
 
         // then
