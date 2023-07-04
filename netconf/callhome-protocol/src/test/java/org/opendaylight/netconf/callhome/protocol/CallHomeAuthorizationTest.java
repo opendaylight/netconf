@@ -26,10 +26,11 @@ import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 
 public class CallHomeAuthorizationTest {
+
     @Test
     public void anAuthorizationOfRejectedIsNotAllowed() {
         // given
-        CallHomeAuthorization auth = CallHomeAuthorization.rejected();
+        final var auth = CallHomeAuthorization.rejected();
         // expect
         assertFalse(auth.isServerAllowed());
     }
@@ -37,7 +38,7 @@ public class CallHomeAuthorizationTest {
     @Test
     public void anAuthorizationOfRejectedCannotBeAppliedToASession() {
         // given
-        CallHomeAuthorization auth = CallHomeAuthorization.rejected();
+        final var auth = CallHomeAuthorization.rejected();
         // when
         final var ex = assertThrows(IllegalStateException.class, () -> auth.applyTo(mock(ClientSession.class)));
         assertEquals("Server is not allowed.", ex.getMessage());
@@ -46,13 +47,12 @@ public class CallHomeAuthorizationTest {
     @Test
     public void anAuthorizationOfAcceptanceIsAllowed() {
         // given
-        String session = "some-session";
-        String user = "some-user-name";
-        ClientSessionImpl mockSession = mock(ClientSessionImpl.class);
+        final var user = "some-user-name";
+        final var mockSession = mock(ClientSessionImpl.class);
         doNothing().when(mockSession).setUsername(user);
 
         // and
-        CallHomeAuthorization auth = CallHomeAuthorization.serverAccepted(session, user).build();
+        final var auth = CallHomeAuthorization.serverAccepted("some-session", user).build();
         // when
         auth.applyTo(mockSession);
         // then
@@ -62,19 +62,18 @@ public class CallHomeAuthorizationTest {
     @Test
     public void anAuthorizationOfAcceptanceCanBeAppliedToASession() {
         // given
-        String session = "some-session";
-        String user = "some-user-name";
-        String pwd = "pwd1";
-        KeyPair pair = new KeyPair(mock(PublicKey.class), mock(PrivateKey.class));
-        ClientSessionImpl mockSession = mock(ClientSessionImpl.class);
+        final var user = "some-user-name";
+        final var pwd = "pwd1";
+        final var mockSession = mock(ClientSessionImpl.class);
         doNothing().when(mockSession).setUsername(user);
         doNothing().when(mockSession).addPasswordIdentity(pwd);
+        final var pair = new KeyPair(mock(PublicKey.class), mock(PrivateKey.class));
         doNothing().when(mockSession).addPublicKeyIdentity(pair);
         // and
-        CallHomeAuthorization auth = CallHomeAuthorization.serverAccepted(session, user)
-                .addPassword(pwd)
-                .addClientKeys(pair)
-                .build();
+        final var auth = CallHomeAuthorization.serverAccepted("some-session", user)
+            .addPassword(pwd)
+            .addClientKeys(pair)
+            .build();
         // when
         auth.applyTo(mockSession);
         // then
