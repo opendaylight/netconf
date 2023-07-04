@@ -23,7 +23,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
 import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
@@ -54,7 +53,7 @@ import org.slf4j.LoggerFactory;
 /**
  * All state associated with a NETCONF topology node. Each node handles its own reconnection.
  */
-final class NetconfNodeHandler extends AbstractRegistration implements RemoteDeviceHandler {
+public final class NetconfNodeHandler extends AbstractRegistration implements RemoteDeviceHandler {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeHandler.class);
 
     private final @NonNull List<SchemaSourceRegistration<?>> yanglibRegistrations;
@@ -76,12 +75,13 @@ final class NetconfNodeHandler extends AbstractRegistration implements RemoteDev
     @GuardedBy("this")
     private Future<?> currentTask;
 
-    NetconfNodeHandler(final NetconfClientDispatcher clientDispatcher, final EventExecutor eventExecutor,
+    public NetconfNodeHandler(final NetconfClientDispatcher clientDispatcher, final EventExecutor eventExecutor,
             final ScheduledExecutorService keepaliveExecutor, final BaseNetconfSchemas baseSchemas,
             final SchemaResourceManager schemaManager, final ListeningExecutorService processingExecutor,
+            final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
-            final NetconfNodeAugmentedOptional nodeOptional, final NetconfClientConfigurationBuilder configBuilder) {
+            final NetconfNodeAugmentedOptional nodeOptional) {
         this.clientDispatcher = requireNonNull(clientDispatcher);
         this.eventExecutor = requireNonNull(eventExecutor);
         this.delegate = requireNonNull(delegate);
@@ -140,10 +140,12 @@ final class NetconfNodeHandler extends AbstractRegistration implements RemoteDev
             keepAliveFacade.setListener(communicator);
         }
 
-        clientConfig = configBuilder.withSessionListener(communicator).build();
+        clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
+            .withSessionListener(communicator)
+            .build();
     }
 
-    synchronized void connect() {
+    public synchronized void connect() {
         lockedConnect();
     }
 
