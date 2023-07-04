@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dd5f7b8_05f6ae18",
+        "filename": "netconf/yanglib/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-04T20:03:25Z",
+      "side": 1,
+      "message": "nope, we have a JPMS-enabled artifact to do this",
+      "range": {
+        "startLine": 100,
+        "startChar": 22,
+        "endLine": 100,
+        "endChar": 33
+      },
+      "revId": "81cd67fd3d413da2bb827f470bdbc79f7bb1c727",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb9b3b68_7049db89",
+        "filename": "netconf/yanglib/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-04T20:03:25Z",
+      "side": 1,
+      "message": "already declared by odlparent",
+      "range": {
+        "startLine": 108,
+        "startChar": 12,
+        "endLine": 108,
+        "endChar": 35
+      },
+      "revId": "81cd67fd3d413da2bb827f470bdbc79f7bb1c727",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
