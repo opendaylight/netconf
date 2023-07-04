@@ -17,7 +17,6 @@ import static org.mockito.Mockito.verify;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.PublicKey;
@@ -85,32 +84,32 @@ public class NetconfCallHomeServerTest {
     }
 
     @Test
-    public void sessionListenerShouldHandleEventsOfKeyEstablishedAndAuthenticated() throws IOException {
+    public void sessionListenerShouldHandleEventsOfKeyEstablishedAndAuthenticated() throws Exception {
         // Weird - IJ was ok but command line compile failed using the usual array initializer syntax ????
-        SessionListener.Event[] evt = new SessionListener.Event[2];
+        final var evt = new SessionListener.Event[2];
         evt[0] = SessionListener.Event.KeyEstablished;
         evt[1] = SessionListener.Event.Authenticated;
 
-        int[] hitOpen = new int[2];
+        final var hitOpen = new int[2];
         hitOpen[0] = 0;
         hitOpen[1] = 1;
 
-        int[] hitAuth = new int[2];
+        final var hitAuth = new int[2];
         hitAuth[0] = 1;
         hitAuth[1] = 0;
 
-        for (int pass = 0; pass < evt.length; pass++) {
+        for (var pass = 0; pass < evt.length; pass++) {
             // given
-            AuthFuture mockAuthFuture = mock(AuthFuture.class);
+            final var mockAuthFuture = mock(AuthFuture.class);
             doReturn(null).when(mockAuthFuture).addListener(any(SshFutureListener.class));
-            CallHomeSessionContext mockContext = mock(CallHomeSessionContext.class);
+            final var mockContext = mock(CallHomeSessionContext.class);
             doNothing().when(mockContext).openNetconfChannel();
             doReturn(mockContext).when(mockSession).getAttribute(any(Session.AttributeKey.class));
 
-            final PublicKey serverKey = mock(PublicKey.class);
+            final var serverKey = mock(PublicKey.class);
             doReturn(serverKey).when(mockSession).getServerKey();
 
-            final SessionListener listener = instance.createSessionListener();
+            final var listener = instance.createSessionListener();
             doReturn(mockAuthFuture).when(mockContext).authorize();
             doReturn(false).when(mockSession).isAuthenticated();
             // when
@@ -124,10 +123,10 @@ public class NetconfCallHomeServerTest {
     @Test
     public void verificationOfTheServerKeyShouldBeSuccessfulForServerIsAllowed() {
         // given
-        ClientSessionImpl mockClientSession = mock(ClientSessionImpl.class);
+        final var mockClientSession = mock(ClientSessionImpl.class);
         doReturn("test").when(mockClientSession).toString();
-        SocketAddress mockSocketAddr = mock(SocketAddress.class);
-        PublicKey mockPublicKey = mock(PublicKey.class);
+        final var mockSocketAddr = mock(SocketAddress.class);
+        final var mockPublicKey = mock(PublicKey.class);
 
         doReturn(true).when(mockAuth).isServerAllowed();
         doReturn("some-session-name").when(mockAuth).getSessionName();
@@ -142,9 +141,9 @@ public class NetconfCallHomeServerTest {
     public void verificationOfTheServerKeyShouldFailIfTheServerIsNotAllowed() {
         // given
 
-        ClientSessionImpl mockClientSession = mock(ClientSessionImpl.class);
-        SocketAddress mockSocketAddr = mock(SocketAddress.class);
-        PublicKey mockPublicKey = mock(PublicKey.class);
+        final var mockClientSession = mock(ClientSessionImpl.class);
+        final var mockSocketAddr = mock(SocketAddress.class);
+        final var mockPublicKey = mock(PublicKey.class);
 
         doReturn(false).when(mockAuth).isServerAllowed();
         doReturn(mockAuth).when(mockCallHomeAuthProv).provideAuth(mockSocketAddr, mockPublicKey);
@@ -155,18 +154,18 @@ public class NetconfCallHomeServerTest {
     }
 
     @Test
-    public void bindShouldStartTheClientAndBindTheAddress() throws IOException {
+    public void bindShouldStartTheClientAndBindTheAddress() throws Exception {
         // given
-        IoAcceptor mockAcceptor = mock(IoAcceptor.class);
-        IoServiceFactory mockMinaFactory = mock(IoServiceFactory.class);
+        final var mockAcceptor = mock(IoAcceptor.class);
+        final var mockMinaFactory = mock(IoServiceFactory.class);
         doReturn(mockAcceptor).when(mockMinaFactory).createAcceptor(any(IoHandler.class));
         doNothing().when(mockAcceptor).bind(any(SocketAddress.class));
-        NetconfSshClient mockClient = mock(NetconfSshClient.class);
+        final var mockClient = mock(NetconfSshClient.class);
         doNothing().when(mockClient).start();
         doNothing().when(mockClient).setServerKeyVerifier(any());
         doNothing().when(mockClient).addSessionListener(any());
-        NetconfCallHomeServer server = new NetconfCallHomeServer(
-                mockClient, mockCallHomeAuthProv, mockFactory, MOCK_ADDRESS, mockStatusRecorder, mockMinaFactory);
+        final var server = new NetconfCallHomeServer(mockClient, mockCallHomeAuthProv, mockFactory, MOCK_ADDRESS,
+            mockStatusRecorder, mockMinaFactory);
         // when
         server.bind();
         // then
