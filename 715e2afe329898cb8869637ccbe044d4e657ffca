@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f372b2a_e4134f98",
+        "filename": "netconf/yanglib/src/main/java/org/opendaylight/yanglib/impl/WebInitializer.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-04T20:11:40Z",
+      "side": 1,
+      "message": "this is wrong: what Application are you referring to?",
+      "range": {
+        "startLine": 39,
+        "startChar": 60,
+        "endLine": 39,
+        "endChar": 95
+      },
+      "revId": "715e2afe329898cb8869637ccbe044d4e657ffca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
