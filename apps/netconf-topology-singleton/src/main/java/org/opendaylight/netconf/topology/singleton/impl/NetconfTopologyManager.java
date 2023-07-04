@@ -43,7 +43,6 @@ import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -66,9 +65,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfTopologyManager
-        implements ClusteredDataTreeChangeListener<Node>, NetconfTopologySingletonService, AutoCloseable {
-
+public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<Node>, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyManager.class);
 
     private final Map<InstanceIdentifier<Node>, NetconfTopologyContext> contexts = new ConcurrentHashMap<>();

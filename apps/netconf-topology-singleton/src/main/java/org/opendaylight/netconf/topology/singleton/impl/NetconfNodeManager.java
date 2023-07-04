@@ -24,7 +24,6 @@ import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -45,9 +44,7 @@ import org.slf4j.LoggerFactory;
  * Managing and reacting on data tree changes in specific netconf node when master writes status to the operational
  * data store (e.g. handling lifecycle of slave mount point).
  */
-class NetconfNodeManager
-        implements ClusteredDataTreeChangeListener<Node>, NetconfTopologySingletonService, AutoCloseable {
-
+class NetconfNodeManager implements ClusteredDataTreeChangeListener<Node>, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeManager.class);
 
     private final Timeout actorResponseWaitTime;
