@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f706b4af_676bc54f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-04T10:00:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8123b3d_ad2bd773",
+      "range": {
+        "startLine": 451,
+        "startChar": 14,
+        "endLine": 451,
+        "endChar": 17
+      },
+      "revId": "9f9d305f1de21188dc5a5c4c7cdfbe34627d290a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e1b262a_fba41088",
@@ -37,6 +61,24 @@
       "writtenOn": "2023-06-30T10:53:46Z",
       "side": 1,
       "message": "\u003cp\u003e",
+      "revId": "9f9d305f1de21188dc5a5c4c7cdfbe34627d290a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d92170fe_4a55f428",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-04T10:00:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0e1b262a_fba41088",
       "revId": "9f9d305f1de21188dc5a5c4c7cdfbe34627d290a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -72,6 +114,24 @@
       "side": 1,
       "message": "Yes, we can create new Java class for this test and use this models there.",
       "parentUuid": "d7e7ff1d_e10ea024",
+      "revId": "9f9d305f1de21188dc5a5c4c7cdfbe34627d290a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bd6c529_6e89c317",
+        "filename": "restconf/restconf-openapi/src/test/resources/NETCONF-1036/augmentation.yang",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-04T10:00:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9040e51d_7d4813aa",
       "revId": "9f9d305f1de21188dc5a5c4c7cdfbe34627d290a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
