@@ -10,9 +10,9 @@ package org.opendaylight.netconf.topology.singleton.impl.utils;
 import static java.util.Objects.requireNonNull;
 
 import akka.actor.ActorSystem;
-import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
 import java.time.Duration;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
@@ -32,7 +32,7 @@ public class NetconfTopologySetup {
     private final InstanceIdentifier<Node> instanceIdentifier;
     private final Node node;
     private final ScheduledExecutorService keepaliveExecutor;
-    private final ListeningExecutorService processingExecutor;
+    private final Executor processingExecutor;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher netconfClientDispatcher;
@@ -83,7 +83,7 @@ public class NetconfTopologySetup {
         return node;
     }
 
-    public ListeningExecutorService getProcessingExecutor() {
+    public Executor getProcessingExecutor() {
         return processingExecutor;
     }
 
@@ -127,7 +127,7 @@ public class NetconfTopologySetup {
         private InstanceIdentifier<Node> instanceIdentifier;
         private Node node;
         private ScheduledExecutorService keepaliveExecutor;
-        private ListeningExecutorService processingExecutor;
+        private Executor processingExecutor;
         private ActorSystem actorSystem;
         private EventExecutor eventExecutor;
         private String topologyId;
@@ -218,11 +218,11 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        ListeningExecutorService getProcessingExecutor() {
+        Executor getProcessingExecutor() {
             return processingExecutor;
         }
 
-        public NetconfTopologySetupBuilder setProcessingExecutor(final ListeningExecutorService processingExecutor) {
+        public NetconfTopologySetupBuilder setProcessingExecutor(final Executor processingExecutor) {
             this.processingExecutor = processingExecutor;
             return this;
         }
