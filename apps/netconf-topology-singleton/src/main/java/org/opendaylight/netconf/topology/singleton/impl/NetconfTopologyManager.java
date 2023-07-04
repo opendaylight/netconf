@@ -34,9 +34,7 @@ import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
@@ -79,8 +77,6 @@ public class NetconfTopologyManager
 
     private final BaseNetconfSchemas baseSchemas;
     private final DataBroker dataBroker;
-    private final DOMRpcProviderService rpcProviderRegistry;
-    private final DOMActionProviderService actionProviderRegistry;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
     private final ScheduledExecutorService keepaliveExecutorService;
     private final Executor processingExecutorService;
@@ -101,8 +97,6 @@ public class NetconfTopologyManager
 
 
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
-                                  final DOMRpcProviderService rpcProviderRegistry,
-                                  final DOMActionProviderService actionProviderService,
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
                                   final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
                                   final ActorSystemProvider actorSystemProvider,
@@ -116,8 +110,6 @@ public class NetconfTopologyManager
                                   final NetconfClientConfigurationBuilderFactory builderFactory) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = requireNonNull(dataBroker);
-        this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
-        actionProviderRegistry = requireNonNull(actionProviderService);
         this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
         keepaliveExecutorService = keepaliveExecutor.getExecutor();
         processingExecutorService = processingExecutor.getExecutor();
@@ -291,8 +283,6 @@ public class NetconfTopologyManager
                 .setBaseSchemas(baseSchemas)
                 .setDataBroker(dataBroker)
                 .setInstanceIdentifier(instanceIdentifier)
-                .setRpcProviderRegistry(rpcProviderRegistry)
-                .setActionProviderRegistry(actionProviderRegistry)
                 .setNode(node)
                 .setActorSystem(actorSystem)
                 .setEventExecutor(eventExecutor)
