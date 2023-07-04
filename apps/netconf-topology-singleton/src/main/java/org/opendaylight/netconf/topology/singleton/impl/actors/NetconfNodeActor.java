@@ -181,12 +181,12 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             sender().tell(new Success(null), self());
         } else if (message instanceof UnregisterSlaveMountPoint) { //slaves
             unregisterSlaveMountPoint();
-        } else if (message instanceof RefreshSlaveActor) { //slave
-            actorResponseWaitTime = ((RefreshSlaveActor) message).getActorResponseWaitTime();
-            id = ((RefreshSlaveActor) message).getId();
-            schemaRegistry = ((RefreshSlaveActor) message).getSchemaRegistry();
-            setup = ((RefreshSlaveActor) message).getSetup();
-            schemaRepository = ((RefreshSlaveActor) message).getSchemaRepository();
+        } else if (message instanceof RefreshSlaveActor refreshSlave) { //slave
+            actorResponseWaitTime = refreshSlave.getActorResponseWaitTime();
+            id = refreshSlave.getId();
+            schemaRegistry = refreshSlave.getSchemaRegistry();
+            setup = refreshSlave.getSetup();
+            schemaRepository = refreshSlave.getSchemaRepository();
         } else if (message instanceof NetconfDataTreeServiceRequest) {
             ActorRef netconfActor = context()
                 .actorOf(NetconfDataTreeServiceActor.props(netconfService, writeTxIdleTimeout));
