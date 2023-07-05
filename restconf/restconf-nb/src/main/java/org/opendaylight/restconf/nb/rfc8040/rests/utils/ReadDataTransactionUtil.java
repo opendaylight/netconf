@@ -34,7 +34,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -46,10 +45,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.UserLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -317,7 +314,7 @@ public final class ReadDataTransactionUtil {
 
     private static NormalizedNode extractReadData(final RestconfStrategy strategy,
             final YangInstanceIdentifier path, final ListenableFuture<Optional<NormalizedNode>> dataFuture) {
-        final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
+        final var dataFactory = new NormalizedNodeFactory();
         FutureCallbackTx.addCallback(dataFuture, "READ", dataFactory, path);
         return dataFactory.build();
     }
@@ -334,10 +331,9 @@ public final class ReadDataTransactionUtil {
     private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
             final YangInstanceIdentifier path, final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
         // PREPARE STATE DATA NODE
-        final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
+        final var stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
         // PREPARE CONFIG DATA NODE
-        final NormalizedNode configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION,
-            path);
+        final var configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
 
         return mergeConfigAndSTateDataIfNeeded(stateDataNode,
             withDefa == null ? configDataNode : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
@@ -358,12 +354,10 @@ public final class ReadDataTransactionUtil {
             final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
             final @NonNull EffectiveModelContext ctx, final @NonNull List<YangInstanceIdentifier> fields) {
         // PREPARE STATE DATA NODE
-        final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path,
-            fields);
-
+        final var stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, fields);
         // PREPARE CONFIG DATA NODE
-        final NormalizedNode configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
-            fields);
+        final var configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, fields);
+
         return mergeConfigAndSTateDataIfNeeded(stateDataNode,
             withDefa == null ? configDataNode : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
     }
@@ -399,6 +393,7 @@ public final class ReadDataTransactionUtil {
     private static @NonNull NormalizedNode mergeStateAndConfigData(
             final @NonNull NormalizedNode stateDataNode, final @NonNull NormalizedNode configDataNode) {
         validateNodeMerge(stateDataNode, configDataNode);
+        // FIXME: this check is bogus, as it confuses yang.data.api (NormalizedNode) with yang.model.api (RpcDefinition)
         if (configDataNode instanceof RpcDefinition) {
             return prepareRpcData(configDataNode, stateDataNode);
         } else {
@@ -430,16 +425,16 @@ public final class ReadDataTransactionUtil {
      */
     private static @NonNull NormalizedNode prepareRpcData(final @NonNull NormalizedNode configDataNode,
                                                           final @NonNull NormalizedNode stateDataNode) {
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder = ImmutableNodes
-                .mapEntryBuilder();
-        mapEntryBuilder.withNodeIdentifier((NodeIdentifierWithPredicates) configDataNode.name());
+        final var mapEntryBuilder = Builders.mapEntryBuilder()
+            .withNodeIdentifier((NodeIdentifierWithPredicates) configDataNode.name());
 
         // MAP CONFIG DATA
         mapRpcDataNode(configDataNode, mapEntryBuilder);
         // MAP STATE DATA
         mapRpcDataNode(stateDataNode, mapEntryBuilder);
 
-        return ImmutableNodes.mapNodeBuilder(configDataNode.name().getNodeType())
+        return Builders.mapBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(configDataNode.name().getNodeType()))
             .addChild(mapEntryBuilder.build())
             .build();
     }
@@ -465,80 +460,49 @@ public final class ReadDataTransactionUtil {
     @SuppressWarnings("unchecked")
     private static @NonNull NormalizedNode prepareData(final @NonNull NormalizedNode configDataNode,
                                                        final @NonNull NormalizedNode stateDataNode) {
-        if (configDataNode instanceof UserMapNode) {
-            final CollectionNodeBuilder<MapEntryNode, UserMapNode> builder = Builders
-                    .orderedMapBuilder().withNodeIdentifier(((MapNode) configDataNode).name());
-
-            mapValueToBuilder(
-                    ((UserMapNode) configDataNode).body(), ((UserMapNode) stateDataNode).body(), builder);
-
+        if (configDataNode instanceof UserMapNode configMap) {
+            final var builder = Builders.orderedMapBuilder().withNodeIdentifier(configMap.name());
+            mapValueToBuilder(configMap.body(), ((UserMapNode) stateDataNode).body(), builder);
             return builder.build();
-        } else if (configDataNode instanceof MapNode) {
-            final CollectionNodeBuilder<MapEntryNode, SystemMapNode> builder = ImmutableNodes
-                    .mapNodeBuilder().withNodeIdentifier(((MapNode) configDataNode).name());
-
-            mapValueToBuilder(
-                    ((MapNode) configDataNode).body(), ((MapNode) stateDataNode).body(), builder);
-
+        } else if (configDataNode instanceof SystemMapNode configMap) {
+            final var builder = Builders.mapBuilder().withNodeIdentifier(configMap.name());
+            mapValueToBuilder(configMap.body(), ((SystemMapNode) stateDataNode).body(), builder);
             return builder.build();
-        } else if (configDataNode instanceof MapEntryNode) {
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder = ImmutableNodes
-                    .mapEntryBuilder().withNodeIdentifier(((MapEntryNode) configDataNode).name());
-
-            mapValueToBuilder(
-                    ((MapEntryNode) configDataNode).body(), ((MapEntryNode) stateDataNode).body(), builder);
-
+        } else if (configDataNode instanceof MapEntryNode configEntry) {
+            final var builder = Builders.mapEntryBuilder().withNodeIdentifier(configEntry.name());
+            mapValueToBuilder(configEntry.body(), ((MapEntryNode) stateDataNode).body(), builder);
             return builder.build();
-        } else if (configDataNode instanceof ContainerNode) {
-            final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder = Builders
-                    .containerBuilder().withNodeIdentifier(((ContainerNode) configDataNode).name());
-
-            mapValueToBuilder(
-                    ((ContainerNode) configDataNode).body(), ((ContainerNode) stateDataNode).body(), builder);
-
+        } else if (configDataNode instanceof ContainerNode configContaienr) {
+            final var builder = Builders.containerBuilder().withNodeIdentifier(configContaienr.name());
+            mapValueToBuilder(configContaienr.body(), ((ContainerNode) stateDataNode).body(), builder);
             return builder.build();
-        } else if (configDataNode instanceof ChoiceNode) {
-            final DataContainerNodeBuilder<NodeIdentifier, ChoiceNode> builder = Builders
-                    .choiceBuilder().withNodeIdentifier(((ChoiceNode) configDataNode).name());
-
-            mapValueToBuilder(
-                    ((ChoiceNode) configDataNode).body(), ((ChoiceNode) stateDataNode).body(), builder);
-
+        } else if (configDataNode instanceof ChoiceNode configChoice) {
+            final var builder = Builders.choiceBuilder().withNodeIdentifier(configChoice.name());
+            mapValueToBuilder(configChoice.body(), ((ChoiceNode) stateDataNode).body(), builder);
             return builder.build();
-        } else if (configDataNode instanceof LeafNode) {
-            return ImmutableNodes.leafNode(configDataNode.name().getNodeType(), configDataNode.body());
+        } else if (configDataNode instanceof LeafNode configLeaf) {
+            // config trumps oper
+            return configLeaf;
         } else if (configDataNode instanceof UserLeafSetNode) {
-            final ListNodeBuilder<Object, UserLeafSetNode<Object>> builder = Builders
-                .orderedLeafSetBuilder().withNodeIdentifier(((UserLeafSetNode<?>) configDataNode).name());
-
-            mapValueToBuilder(((UserLeafSetNode<Object>) configDataNode).body(),
-                    ((UserLeafSetNode<Object>) stateDataNode).body(), builder);
+            final var configLeafSet = (UserLeafSetNode<Object>) configDataNode;
+            final var builder = Builders.<Object>orderedLeafSetBuilder().withNodeIdentifier(configLeafSet.name());
+            mapValueToBuilder(configLeafSet.body(), ((UserLeafSetNode<Object>) stateDataNode).body(), builder);
             return builder.build();
-        } else if (configDataNode instanceof LeafSetNode) {
-            final ListNodeBuilder<Object, SystemLeafSetNode<Object>> builder = Builders
-                    .leafSetBuilder().withNodeIdentifier(((LeafSetNode<?>) configDataNode).name());
-
-            mapValueToBuilder(((LeafSetNode<Object>) configDataNode).body(),
-                    ((LeafSetNode<Object>) stateDataNode).body(), builder);
+        } else if (configDataNode instanceof SystemLeafSetNode) {
+            final var configLeafSet = (SystemLeafSetNode<Object>) configDataNode;
+            final var builder = Builders.<Object>leafSetBuilder().withNodeIdentifier(configLeafSet.name());
+            mapValueToBuilder(configLeafSet.body(), ((SystemLeafSetNode<Object>) stateDataNode).body(), builder);
             return builder.build();
-        } else if (configDataNode instanceof LeafSetEntryNode) {
-            return Builders.leafSetEntryBuilder()
-                    .withNodeIdentifier(((LeafSetEntryNode<?>) configDataNode).name())
-                    .withValue(configDataNode.body())
-                    .build();
-        } else if (configDataNode instanceof UnkeyedListNode) {
-            final CollectionNodeBuilder<UnkeyedListEntryNode, UnkeyedListNode> builder = Builders
-                    .unkeyedListBuilder().withNodeIdentifier(((UnkeyedListNode) configDataNode).name());
-
-            mapValueToBuilder(((UnkeyedListNode) configDataNode).body(),
-                    ((UnkeyedListNode) stateDataNode).body(), builder);
+        } else if (configDataNode instanceof LeafSetEntryNode<?> configEntry) {
+            // config trumps oper
+            return configEntry;
+        } else if (configDataNode instanceof UnkeyedListNode configList) {
+            final var builder = Builders.unkeyedListBuilder().withNodeIdentifier(configList.name());
+            mapValueToBuilder(configList.body(), ((UnkeyedListNode) stateDataNode).body(), builder);
             return builder.build();
-        } else if (configDataNode instanceof UnkeyedListEntryNode) {
-            final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> builder = Builders
-                .unkeyedListEntryBuilder().withNodeIdentifier(((UnkeyedListEntryNode) configDataNode).name());
-
-            mapValueToBuilder(((UnkeyedListEntryNode) configDataNode).body(),
-                    ((UnkeyedListEntryNode) stateDataNode).body(), builder);
+        } else if (configDataNode instanceof UnkeyedListEntryNode configEntry) {
+            final var builder = Builders.unkeyedListEntryBuilder().withNodeIdentifier(configEntry.name());
+            mapValueToBuilder(configEntry.body(), ((UnkeyedListEntryNode) stateDataNode).body(), builder);
             return builder.build();
         } else {
             throw new RestconfDocumentedException("Unexpected node type: " + configDataNode.getClass().getName());
@@ -555,10 +519,8 @@ public final class ReadDataTransactionUtil {
     private static <T extends NormalizedNode> void mapValueToBuilder(
             final @NonNull Collection<T> configData, final @NonNull Collection<T> stateData,
             final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
-        final Map<PathArgument, T> configMap = configData.stream().collect(
-                Collectors.toMap(NormalizedNode::name, Function.identity()));
-        final Map<PathArgument, T> stateMap = stateData.stream().collect(
-                Collectors.toMap(NormalizedNode::name, Function.identity()));
+        final var configMap = configData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity()));
+        final var stateMap = stateData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity()));
 
         // merge config and state data of children with different identifiers
         mapDataToBuilder(configMap, stateMap, builder);
