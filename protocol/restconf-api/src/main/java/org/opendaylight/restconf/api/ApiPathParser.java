@@ -14,6 +14,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import java.text.ParseException;
+import java.util.HexFormat;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -307,22 +308,13 @@ class ApiPathParser {
         return (byte) (parseHex(str, offset + 1) << 4 | parseHex(str, offset + 2));
     }
 
-    // FIXME: Replace with HexFormat.fromHexDigit(str.charAt(offset)) when we have JDK17+
+    @SuppressWarnings("checkstyle:AvoidHidingCauseException")
     private static int parseHex(final String str, final int offset) throws ParseException {
-        final char ch = str.charAt(offset);
-        if (ch >= '0' && ch <= '9') {
-            return ch - '0';
+        try {
+            return HexFormat.fromHexDigit(str.charAt(offset));
+        } catch (NumberFormatException e) {
+            // There is no way to preserve the cause which CheckStyle would recognize
+            throw new ParseException(e.getMessage(), offset);
         }
-
-        final int zero;
-        if (ch >= 'a' && ch <= 'f') {
-            zero = 'a';
-        } else if (ch >= 'A' && ch <= 'F') {
-            zero = 'A';
-        } else {
-            throw new ParseException("Invalid escape character '" + ch + "'", offset);
-        }
-
-        return ch - zero + 10;
     }
 }
