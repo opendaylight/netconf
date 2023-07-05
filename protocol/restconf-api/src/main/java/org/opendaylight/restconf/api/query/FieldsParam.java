@@ -10,7 +10,6 @@ package org.opendaylight.restconf.api.query;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import java.net.URI;
@@ -23,7 +22,6 @@ import org.opendaylight.yangtools.concepts.Immutable;
  * This class represents a {@code fields} parameter as defined in
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3">RFC8040 section 4.8.3</a>.
  */
-@Beta
 @NonNullByDefault
 public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
     /**

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Parser for a sequence of {@link ApiPath}'s {@link Step}s.
  */
-class ApiPathParser {
+sealed class ApiPathParser {
     private static final Logger LOG = LoggerFactory.getLogger(ApiPathParser.class);
 
     /**
