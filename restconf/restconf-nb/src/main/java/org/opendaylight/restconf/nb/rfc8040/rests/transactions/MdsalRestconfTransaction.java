@@ -26,6 +26,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.TransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.DistinctNodeContainer;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -70,15 +71,15 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
                        final EffectiveModelContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
-            merge(YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree);
+            merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
             TransactionUtil.ensureParentsByMerge(path, schemaContext, this);
 
-            final Collection<? extends NormalizedNode> children = ((NormalizedNodeContainer<?>) data).body();
+            final Collection<? extends NormalizedNode> children = ((DistinctNodeContainer<?, ?>) data).body();
             final BatchedExistenceCheck check =
                 BatchedExistenceCheck.start(verifyNotNull(rwTx), CONFIGURATION, path, children);
 
             for (final NormalizedNode child : children) {
-                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+                final YangInstanceIdentifier childPath = path.node(child.name());
                 verifyNotNull(rwTx).put(CONFIGURATION, childPath, child);
             }
             // ... finally collect existence checks and abort the transaction if any of them failed.
@@ -96,11 +97,11 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
                         final EffectiveModelContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
-            merge(YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+            merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
             TransactionUtil.ensureParentsByMerge(path, schemaContext, this);
 
             for (final NormalizedNode child : ((NormalizedNodeContainer<?>) data).body()) {
-                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+                final YangInstanceIdentifier childPath = path.node(child.name());
                 verifyNotNull(rwTx).put(CONFIGURATION, childPath, child);
             }
         } else {

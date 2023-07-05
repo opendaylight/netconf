@@ -30,7 +30,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -122,11 +121,10 @@ public class RestconfMappingNodeUtilTest {
 
     private static void assertMappedData(final Map<QName, Object> map, final MapEntryNode mappedData) {
         assertNotNull(mappedData);
-        for (final DataContainerChild child : mappedData.body()) {
-            if (child instanceof LeafNode) {
-                final LeafNode<?> leaf = (LeafNode<?>) child;
-                assertTrue(map.containsKey(leaf.getIdentifier().getNodeType()));
-                assertEquals(map.get(leaf.getIdentifier().getNodeType()), leaf.body());
+        for (var child : mappedData.body()) {
+            if (child instanceof LeafNode<?> leaf) {
+                assertTrue(map.containsKey(leaf.name().getNodeType()));
+                assertEquals(map.get(leaf.name().getNodeType()), leaf.body());
             }
         }
     }
@@ -139,11 +137,11 @@ public class RestconfMappingNodeUtilTest {
      */
     private static void verifyDeviations(final ContainerNode containerNode) {
         int deviationsFound = 0;
-        for (final DataContainerChild child : containerNode.body()) {
-            if (child instanceof MapNode) {
-                for (final MapEntryNode mapEntryNode : ((MapNode) child).body()) {
-                    for (final DataContainerChild dataContainerChild : mapEntryNode.body()) {
-                        if (dataContainerChild.getIdentifier().getNodeType().equals(Deviation.QNAME)) {
+        for (var child : containerNode.body()) {
+            if (child instanceof MapNode mapChild) {
+                for (var mapEntryNode : mapChild.body()) {
+                    for (var dataContainerChild : mapEntryNode.body()) {
+                        if (dataContainerChild.name().getNodeType().equals(Deviation.QNAME)) {
                             deviationsFound++;
                         }
                     }
@@ -162,17 +160,17 @@ public class RestconfMappingNodeUtilTest {
     private static void verifyLoadedModules(final ContainerNode containerNode) {
         final Map<String, String> loadedModules = new HashMap<>();
 
-        for (final DataContainerChild child : containerNode.body()) {
+        for (var child : containerNode.body()) {
             if (child instanceof LeafNode) {
-                assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, child.getIdentifier().getNodeType());
+                assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, child.name().getNodeType());
             }
-            if (child instanceof MapNode) {
-                assertEquals(IetfYangLibrary.MODULE_QNAME_LIST, child.getIdentifier().getNodeType());
-                for (final MapEntryNode mapEntryNode : ((MapNode) child).body()) {
+            if (child instanceof MapNode mapChild) {
+                assertEquals(IetfYangLibrary.MODULE_QNAME_LIST, child.name().getNodeType());
+                for (var mapEntryNode : mapChild.body()) {
                     String name = "";
                     String revision = "";
-                    for (final DataContainerChild dataContainerChild : mapEntryNode.body()) {
-                        switch (dataContainerChild.getIdentifier().getNodeType().getLocalName()) {
+                    for (var dataContainerChild : mapEntryNode.body()) {
+                        switch (dataContainerChild.name().getNodeType().getLocalName()) {
                             case "name":
                                 name = String.valueOf(dataContainerChild.body());
                                 break;
@@ -181,7 +179,7 @@ public class RestconfMappingNodeUtilTest {
                                 break;
                             default :
                                 LOG.info("Unknown local name '{}' of node.",
-                                        dataContainerChild.getIdentifier().getNodeType().getLocalName());
+                                    dataContainerChild.name().getNodeType().getLocalName());
                                 break;
                         }
                     }

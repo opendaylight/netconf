@@ -49,7 +49,6 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -99,8 +98,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     public static void setUpBeforeTest() {
         final String name =
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
-        final ListenerAdapter adapter = new ListenerAdapter(YangInstanceIdentifier.create(new NodeIdentifier(
-            QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"))),
+        final ListenerAdapter adapter = new ListenerAdapter(YangInstanceIdentifier.of(
+            QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster")),
             name, NotificationOutputType.JSON);
         ListenersBroker.getInstance().setDataChangeListeners(Map.of(name, adapter));
     }

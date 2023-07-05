@@ -137,7 +137,7 @@ public final class ReadDataTransactionUtil {
 
         final var ctxNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
         if (readData instanceof ContainerNode container) {
-            final var builder = Builders.containerBuilder().withNodeIdentifier(container.getIdentifier());
+            final var builder = Builders.containerBuilder().withNodeIdentifier(container.name());
             buildCont(builder, container.body(), ctxNode, trim);
             return builder.build();
         } else if (readData instanceof MapEntryNode mapEntry) {
@@ -145,7 +145,7 @@ public final class ReadDataTransactionUtil {
                 throw new IllegalStateException("Input " + mapEntry + " does not match " + ctxNode);
             }
 
-            final var builder = Builders.mapEntryBuilder().withNodeIdentifier(mapEntry.getIdentifier());
+            final var builder = Builders.mapEntryBuilder().withNodeIdentifier(mapEntry.name());
             buildMapEntryBuilder(builder, mapEntry.body(), ctxNode, trim, listSchema.getKeyDefinition());
             return builder.build();
         } else {
@@ -175,7 +175,7 @@ public final class ReadDataTransactionUtil {
 
     private static void appendContainer(final DataContainerNodeBuilder<?, ?> builder, final ContainerNode container,
             final DataSchemaContext ctxNode, final boolean trim) {
-        final var childBuilder = Builders.containerBuilder().withNodeIdentifier(container.getIdentifier());
+        final var childBuilder = Builders.containerBuilder().withNodeIdentifier(container.name());
         buildCont(childBuilder, container.body(), ctxNode, trim);
         builder.withChild(childBuilder.build());
     }
@@ -242,7 +242,7 @@ public final class ReadDataTransactionUtil {
             case SYSTEM -> Builders.mapBuilder();
             case USER -> Builders.orderedMapBuilder();
         };
-        buildList(childBuilder.withNodeIdentifier(map.getIdentifier()), map.body(), childCtx, trim,
+        buildList(childBuilder.withNodeIdentifier(map.name()), map.body(), childCtx, trim,
             listSchema.getKeyDefinition());
         builder.withChild(childBuilder.build());
     }
@@ -252,7 +252,7 @@ public final class ReadDataTransactionUtil {
             final List<@NonNull QName> keys) {
         for (var entry : entries) {
             final var childCtx = getChildContext(ctxNode, entry);
-            final var mapEntryBuilder = Builders.mapEntryBuilder().withNodeIdentifier(entry.getIdentifier());
+            final var mapEntryBuilder = Builders.mapEntryBuilder().withNodeIdentifier(entry.name());
             buildMapEntryBuilder(mapEntryBuilder, entry.body(), childCtx, trim, keys);
             builder.withChild(mapEntryBuilder.build());
         }
@@ -414,8 +414,8 @@ public final class ReadDataTransactionUtil {
      */
     private static void validateNodeMerge(final @NonNull NormalizedNode stateDataNode,
                                           final @NonNull NormalizedNode configDataNode) {
-        final QNameModule moduleOfStateData = stateDataNode.getIdentifier().getNodeType().getModule();
-        final QNameModule moduleOfConfigData = configDataNode.getIdentifier().getNodeType().getModule();
+        final QNameModule moduleOfStateData = stateDataNode.name().getNodeType().getModule();
+        final QNameModule moduleOfConfigData = configDataNode.name().getNodeType().getModule();
         if (!moduleOfStateData.equals(moduleOfConfigData)) {
             throw new RestconfDocumentedException("Unable to merge data from different modules.");
         }
@@ -432,14 +432,14 @@ public final class ReadDataTransactionUtil {
                                                           final @NonNull NormalizedNode stateDataNode) {
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder = ImmutableNodes
                 .mapEntryBuilder();
-        mapEntryBuilder.withNodeIdentifier((NodeIdentifierWithPredicates) configDataNode.getIdentifier());
+        mapEntryBuilder.withNodeIdentifier((NodeIdentifierWithPredicates) configDataNode.name());
 
         // MAP CONFIG DATA
         mapRpcDataNode(configDataNode, mapEntryBuilder);
         // MAP STATE DATA
         mapRpcDataNode(stateDataNode, mapEntryBuilder);
 
-        return ImmutableNodes.mapNodeBuilder(configDataNode.getIdentifier().getNodeType())
+        return ImmutableNodes.mapNodeBuilder(configDataNode.name().getNodeType())
             .addChild(mapEntryBuilder.build())
             .build();
     }
@@ -467,7 +467,7 @@ public final class ReadDataTransactionUtil {
                                                        final @NonNull NormalizedNode stateDataNode) {
         if (configDataNode instanceof UserMapNode) {
             final CollectionNodeBuilder<MapEntryNode, UserMapNode> builder = Builders
-                    .orderedMapBuilder().withNodeIdentifier(((MapNode) configDataNode).getIdentifier());
+                    .orderedMapBuilder().withNodeIdentifier(((MapNode) configDataNode).name());
 
             mapValueToBuilder(
                     ((UserMapNode) configDataNode).body(), ((UserMapNode) stateDataNode).body(), builder);
@@ -475,7 +475,7 @@ public final class ReadDataTransactionUtil {
             return builder.build();
         } else if (configDataNode instanceof MapNode) {
             final CollectionNodeBuilder<MapEntryNode, SystemMapNode> builder = ImmutableNodes
-                    .mapNodeBuilder().withNodeIdentifier(((MapNode) configDataNode).getIdentifier());
+                    .mapNodeBuilder().withNodeIdentifier(((MapNode) configDataNode).name());
 
             mapValueToBuilder(
                     ((MapNode) configDataNode).body(), ((MapNode) stateDataNode).body(), builder);
@@ -483,7 +483,7 @@ public final class ReadDataTransactionUtil {
             return builder.build();
         } else if (configDataNode instanceof MapEntryNode) {
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder = ImmutableNodes
-                    .mapEntryBuilder().withNodeIdentifier(((MapEntryNode) configDataNode).getIdentifier());
+                    .mapEntryBuilder().withNodeIdentifier(((MapEntryNode) configDataNode).name());
 
             mapValueToBuilder(
                     ((MapEntryNode) configDataNode).body(), ((MapEntryNode) stateDataNode).body(), builder);
@@ -491,7 +491,7 @@ public final class ReadDataTransactionUtil {
             return builder.build();
         } else if (configDataNode instanceof ContainerNode) {
             final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder = Builders
-                    .containerBuilder().withNodeIdentifier(((ContainerNode) configDataNode).getIdentifier());
+                    .containerBuilder().withNodeIdentifier(((ContainerNode) configDataNode).name());
 
             mapValueToBuilder(
                     ((ContainerNode) configDataNode).body(), ((ContainerNode) stateDataNode).body(), builder);
@@ -499,43 +499,43 @@ public final class ReadDataTransactionUtil {
             return builder.build();
         } else if (configDataNode instanceof ChoiceNode) {
             final DataContainerNodeBuilder<NodeIdentifier, ChoiceNode> builder = Builders
-                    .choiceBuilder().withNodeIdentifier(((ChoiceNode) configDataNode).getIdentifier());
+                    .choiceBuilder().withNodeIdentifier(((ChoiceNode) configDataNode).name());
 
             mapValueToBuilder(
                     ((ChoiceNode) configDataNode).body(), ((ChoiceNode) stateDataNode).body(), builder);
 
             return builder.build();
         } else if (configDataNode instanceof LeafNode) {
-            return ImmutableNodes.leafNode(configDataNode.getIdentifier().getNodeType(), configDataNode.body());
+            return ImmutableNodes.leafNode(configDataNode.name().getNodeType(), configDataNode.body());
         } else if (configDataNode instanceof UserLeafSetNode) {
             final ListNodeBuilder<Object, UserLeafSetNode<Object>> builder = Builders
-                .orderedLeafSetBuilder().withNodeIdentifier(((UserLeafSetNode<?>) configDataNode).getIdentifier());
+                .orderedLeafSetBuilder().withNodeIdentifier(((UserLeafSetNode<?>) configDataNode).name());
 
             mapValueToBuilder(((UserLeafSetNode<Object>) configDataNode).body(),
                     ((UserLeafSetNode<Object>) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof LeafSetNode) {
             final ListNodeBuilder<Object, SystemLeafSetNode<Object>> builder = Builders
-                    .leafSetBuilder().withNodeIdentifier(((LeafSetNode<?>) configDataNode).getIdentifier());
+                    .leafSetBuilder().withNodeIdentifier(((LeafSetNode<?>) configDataNode).name());
 
             mapValueToBuilder(((LeafSetNode<Object>) configDataNode).body(),
                     ((LeafSetNode<Object>) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof LeafSetEntryNode) {
             return Builders.leafSetEntryBuilder()
-                    .withNodeIdentifier(((LeafSetEntryNode<?>) configDataNode).getIdentifier())
+                    .withNodeIdentifier(((LeafSetEntryNode<?>) configDataNode).name())
                     .withValue(configDataNode.body())
                     .build();
         } else if (configDataNode instanceof UnkeyedListNode) {
             final CollectionNodeBuilder<UnkeyedListEntryNode, UnkeyedListNode> builder = Builders
-                    .unkeyedListBuilder().withNodeIdentifier(((UnkeyedListNode) configDataNode).getIdentifier());
+                    .unkeyedListBuilder().withNodeIdentifier(((UnkeyedListNode) configDataNode).name());
 
             mapValueToBuilder(((UnkeyedListNode) configDataNode).body(),
                     ((UnkeyedListNode) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof UnkeyedListEntryNode) {
             final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> builder = Builders
-                .unkeyedListEntryBuilder().withNodeIdentifier(((UnkeyedListEntryNode) configDataNode).getIdentifier());
+                .unkeyedListEntryBuilder().withNodeIdentifier(((UnkeyedListEntryNode) configDataNode).name());
 
             mapValueToBuilder(((UnkeyedListEntryNode) configDataNode).body(),
                     ((UnkeyedListEntryNode) stateDataNode).body(), builder);
@@ -556,9 +556,9 @@ public final class ReadDataTransactionUtil {
             final @NonNull Collection<T> configData, final @NonNull Collection<T> stateData,
             final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         final Map<PathArgument, T> configMap = configData.stream().collect(
-                Collectors.toMap(NormalizedNode::getIdentifier, Function.identity()));
+                Collectors.toMap(NormalizedNode::name, Function.identity()));
         final Map<PathArgument, T> stateMap = stateData.stream().collect(
-                Collectors.toMap(NormalizedNode::getIdentifier, Function.identity()));
+                Collectors.toMap(NormalizedNode::name, Function.identity()));
 
         // merge config and state data of children with different identifiers
         mapDataToBuilder(configMap, stateMap, builder);

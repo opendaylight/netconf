@@ -8,12 +8,9 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -38,15 +35,15 @@ public final class TransactionUtil {
     public static void ensureParentsByMerge(final YangInstanceIdentifier path,
                                             final EffectiveModelContext schemaContext,
                                             final RestconfTransaction transaction) {
-        final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
+        final var normalizedPathWithoutChildArgs = new ArrayList<PathArgument>();
         YangInstanceIdentifier rootNormalizedPath = null;
 
-        final Iterator<PathArgument> it = path.getPathArguments().iterator();
+        final var it = path.getPathArguments().iterator();
 
         while (it.hasNext()) {
-            final PathArgument pathArgument = it.next();
+            final var pathArgument = it.next();
             if (rootNormalizedPath == null) {
-                rootNormalizedPath = YangInstanceIdentifier.create(pathArgument);
+                rootNormalizedPath = YangInstanceIdentifier.of(pathArgument);
             }
 
             if (it.hasNext()) {
@@ -58,8 +55,7 @@ public final class TransactionUtil {
             return;
         }
 
-        final NormalizedNode parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
-                YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
-        transaction.merge(rootNormalizedPath, parentStructure);
+        transaction.merge(rootNormalizedPath,
+            ImmutableNodes.fromInstanceId(schemaContext, YangInstanceIdentifier.of(normalizedPathWithoutChildArgs)));
     }
 }

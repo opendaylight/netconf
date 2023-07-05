@@ -202,7 +202,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testReadData() {
-        doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFluentFuture(Optional.of(buildBaseCont))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, iidBase);
         doReturn(immediateFluentFuture(Optional.empty()))
@@ -215,7 +215,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testReadRootData() {
-        doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(buildBaseContConfig))))
                 .when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
@@ -247,7 +247,7 @@ public class RestconfDataServiceImplTest {
      */
     @Test
     public void testReadDataMountPoint() {
-        doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFluentFuture(Optional.of(buildBaseContConfig))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, iidBase);
         doReturn(immediateFluentFuture(Optional.of(buildBaseContOperational))).when(read)
@@ -263,14 +263,14 @@ public class RestconfDataServiceImplTest {
         final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
         assertTrue(data instanceof ContainerNode);
         assertEquals(3, ((ContainerNode) data).size());
-        assertTrue(((ContainerNode) data).findChildByArg(buildPlayerCont.getIdentifier()).isPresent());
-        assertTrue(((ContainerNode) data).findChildByArg(buildLibraryCont.getIdentifier()).isPresent());
-        assertTrue(((ContainerNode) data).findChildByArg(buildPlaylistList.getIdentifier()).isPresent());
+        assertNotNull(((ContainerNode) data).childByArg(buildPlayerCont.name()));
+        assertNotNull(((ContainerNode) data).childByArg(buildLibraryCont.name()));
+        assertNotNull(((ContainerNode) data).childByArg(buildPlaylistList.name()));
     }
 
     @Test
     public void testReadDataNoData() {
-        doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(read).read(LogicalDatastoreType.CONFIGURATION, iidBase);
         doReturn(immediateFluentFuture(Optional.empty()))
@@ -307,11 +307,11 @@ public class RestconfDataServiceImplTest {
         final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
 
         // config data present
-        assertTrue(((ContainerNode) data).findChildByArg(buildPlayerCont.getIdentifier()).isPresent());
-        assertTrue(((ContainerNode) data).findChildByArg(buildLibraryCont.getIdentifier()).isPresent());
+        assertNotNull(((ContainerNode) data).childByArg(buildPlayerCont.name()));
+        assertNotNull(((ContainerNode) data).childByArg(buildLibraryCont.name()));
 
         // state data absent
-        assertFalse(((ContainerNode) data).findChildByArg(buildPlaylistList.getIdentifier()).isPresent());
+        assertNull(((ContainerNode) data).childByArg(buildPlaylistList.name()));
     }
 
     /**
@@ -335,11 +335,11 @@ public class RestconfDataServiceImplTest {
         final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
 
         // state data present
-        assertTrue(((ContainerNode) data).findChildByArg(buildPlayerCont.getIdentifier()).isPresent());
-        assertTrue(((ContainerNode) data).findChildByArg(buildPlaylistList.getIdentifier()).isPresent());
+        assertNotNull(((ContainerNode) data).childByArg(buildPlayerCont.name()));
+        assertNotNull(((ContainerNode) data).childByArg(buildPlaylistList.name()));
 
         // config data absent
-        assertFalse(((ContainerNode) data).findChildByArg(buildLibraryCont.getIdentifier()).isPresent());
+        assertNull(((ContainerNode) data).childByArg(buildLibraryCont.name()));
     }
 
     @Test
@@ -376,7 +376,7 @@ public class RestconfDataServiceImplTest {
         final NodeIdentifierWithPredicates nodeWithKey =
                 NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band");
 
-        doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(listQname))
@@ -388,7 +388,7 @@ public class RestconfDataServiceImplTest {
             .build());
         final MapNode data = (MapNode) payload.getData();
         final MapEntryNode entryNode = data.body().iterator().next();
-        final NodeIdentifierWithPredicates identifier = entryNode.getIdentifier();
+        final NodeIdentifierWithPredicates identifier = entryNode.name();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doReturn(immediateFalseFluentFuture())

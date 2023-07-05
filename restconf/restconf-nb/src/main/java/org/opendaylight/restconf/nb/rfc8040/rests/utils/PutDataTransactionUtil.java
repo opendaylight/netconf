@@ -149,7 +149,7 @@ public final class PutDataTransactionUtil {
             ParserIdentifier.toInstanceIdentifier(point.value(), schemaContext, Optional.empty());
         int lastItemPosition = 0;
         for (final NormalizedNode nodeChild : readList.body()) {
-            if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
+            if (nodeChild.name().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
             lastItemPosition++;
@@ -159,12 +159,12 @@ public final class PutDataTransactionUtil {
         }
         int lastInsertedPosition = 0;
         final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
-        transaction.merge(YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        transaction.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (final NormalizedNode nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 transaction.replace(path, data, schemaContext);
             }
-            final YangInstanceIdentifier childPath = path.getParent().node(nodeChild.getIdentifier());
+            final YangInstanceIdentifier childPath = path.coerceParent().node(nodeChild.name());
             transaction.replace(childPath, nodeChild, schemaContext);
             lastInsertedPosition++;
         }

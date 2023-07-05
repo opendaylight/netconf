@@ -25,7 +25,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
  * Common constants defined and relating to RFC8040.
  */
 public final class Rfc8040 {
-    private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.create(
+    private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.of(
         NodeIdentifier.create(RestconfState.QNAME), NodeIdentifier.create(Streams.QNAME),
         NodeIdentifier.create(Stream.QNAME));
     private static final QName NAME_QNAME = QName.create(Stream.QNAME, "name").intern();

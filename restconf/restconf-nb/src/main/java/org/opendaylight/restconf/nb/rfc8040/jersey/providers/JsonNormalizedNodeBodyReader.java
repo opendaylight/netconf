@@ -94,19 +94,19 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         while (result instanceof ChoiceNode choice) {
             final var childNode = choice.body().iterator().next();
             if (isPost) {
-                iiToDataList.add(result.getIdentifier());
+                iiToDataList.add(result.name());
             }
             result = childNode;
         }
 
         if (isPost) {
             if (result instanceof MapEntryNode) {
-                iiToDataList.add(new NodeIdentifier(result.getIdentifier().getNodeType()));
-                iiToDataList.add(result.getIdentifier());
+                iiToDataList.add(new NodeIdentifier(result.name().getNodeType()));
+                iiToDataList.add(result.name());
             } else {
                 final var parentPath = parentSchema.statementPath();
                 if (parentPath.isEmpty() || !(parentPath.get(parentPath.size() - 1) instanceof OperationDefinition)) {
-                    iiToDataList.add(result.getIdentifier());
+                    iiToDataList.add(result.name());
                 }
             }
         } else if (result instanceof MapNode map) {

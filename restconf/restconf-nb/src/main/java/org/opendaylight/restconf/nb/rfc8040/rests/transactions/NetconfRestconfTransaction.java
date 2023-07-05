@@ -89,10 +89,10 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             final EffectiveModelContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
-            merge(YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree);
+            merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
 
             for (final NormalizedNode child : ((NormalizedNodeContainer<?>) data).body()) {
-                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+                final YangInstanceIdentifier childPath = path.node(child.name());
                 enqueueOperation(() -> netconfService.create(CONFIGURATION, childPath, child, Optional.empty()));
             }
         } else {
@@ -105,10 +105,10 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             final EffectiveModelContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
-            merge(YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree);
+            merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
 
             for (final NormalizedNode child : ((NormalizedNodeContainer<?>) data).body()) {
-                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+                final YangInstanceIdentifier childPath = path.node(child.name());
                 enqueueOperation(() -> netconfService.replace(CONFIGURATION, childPath, child, Optional.empty()));
             }
         } else {

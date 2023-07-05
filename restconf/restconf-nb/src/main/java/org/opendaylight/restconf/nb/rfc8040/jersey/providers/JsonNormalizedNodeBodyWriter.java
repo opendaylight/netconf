@@ -98,7 +98,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
                     jsonWriter,
                     depth,
                     fields);
-            final Module module = context.getSchemaContext().findModule(data.getIdentifier().getNodeType().getModule())
+            final Module module = context.getSchemaContext().findModule(data.name().getNodeType().getModule())
                 .orElseThrow();
             jsonWriter.name(module.getName() + ":output");
             jsonWriter.beginObject();
@@ -111,7 +111,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
             stack.enterSchemaTree(action.getOutput().getQName());
 
             nnWriter = createNormalizedNodeWriter(context, stack.toInference(), jsonWriter, depth, fields);
-            final Module module = context.getSchemaContext().findModule(data.getIdentifier().getNodeType().getModule())
+            final Module module = context.getSchemaContext().findModule(data.name().getNodeType().getModule())
                 .orElseThrow();
             jsonWriter.name(module.getName() + ":output");
             jsonWriter.beginObject();
@@ -127,9 +127,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
             if (data instanceof MapEntryNode mapEntry) {
                 // Restconf allows returning one list item. We need to wrap it
                 // in map node in order to serialize it properly
-                nnWriter.write(ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
-                    .withChild(mapEntry)
-                    .build());
+                nnWriter.write(ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).withChild(mapEntry).build());
             } else {
                 nnWriter.write(data);
             }

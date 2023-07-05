@@ -206,8 +206,7 @@ abstract class SubscribeToStreamUtil {
     // FIXME: callers are utter duplicates, refactor them
     private static void writeDataToDS(final DOMDataTreeWriteOperations tx, final MapEntryNode mapToStreams) {
         // FIXME: use put() here
-        tx.merge(LogicalDatastoreType.OPERATIONAL, Rfc8040.restconfStateStreamPath(mapToStreams.getIdentifier()),
-            mapToStreams);
+        tx.merge(LogicalDatastoreType.OPERATIONAL, Rfc8040.restconfStateStreamPath(mapToStreams.name()), mapToStreams);
     }
 
     private static void submitData(final DOMDataTreeWriteTransaction readWriteTransaction) {

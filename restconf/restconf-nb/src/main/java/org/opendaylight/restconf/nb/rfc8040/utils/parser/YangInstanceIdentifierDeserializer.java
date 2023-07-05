@@ -75,7 +75,7 @@ public final class YangInstanceIdentifierDeserializer {
         }
 
         Result(final List<PathArgument> steps, final SchemaInferenceStack stack, final SchemaNode node) {
-            path = YangInstanceIdentifier.create(steps);
+            path = YangInstanceIdentifier.of(steps);
             this.stack = requireNonNull(stack);
             this.node = requireNonNull(node);
         }

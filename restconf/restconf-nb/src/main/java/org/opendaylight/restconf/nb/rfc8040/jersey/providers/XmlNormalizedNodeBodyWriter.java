@@ -124,9 +124,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
             if (data instanceof MapEntryNode mapEntry) {
                 // Restconf allows returning one list item. We need to wrap it
                 // in map node in order to serialize it properly
-                nnWriter.write(ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
-                    .addChild(mapEntry)
-                    .build());
+                nnWriter.write(ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).addChild(mapEntry).build());
             } else if (isRoot) {
                 if (data instanceof ContainerNode container && container.isEmpty()) {
                     writeEmptyDataNode(xmlWriter, container);
@@ -150,7 +148,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
 
     private static void writeAndWrapInDataNode(final XMLStreamWriter xmlWriter,
             final RestconfNormalizedNodeWriter nnWriter, final NormalizedNode data) throws IOException {
-        final QName nodeType = data.getIdentifier().getNodeType();
+        final QName nodeType = data.name().getNodeType();
         final String namespace = nodeType.getNamespace().toString();
         try {
             xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);
@@ -165,7 +163,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
 
     private static void writeEmptyDataNode(final XMLStreamWriter xmlWriter, final ContainerNode data)
             throws IOException {
-        final QName nodeType = data.getIdentifier().getNodeType();
+        final QName nodeType = data.name().getNodeType();
         final String namespace = nodeType.getNamespace().toString();
         try {
             xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);
@@ -179,7 +177,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
 
     private static void writeElements(final XMLStreamWriter xmlWriter, final RestconfNormalizedNodeWriter nnWriter,
             final ContainerNode data) throws IOException {
-        final QName nodeType = data.getIdentifier().getNodeType();
+        final QName nodeType = data.name().getNodeType();
         final String namespace = nodeType.getNamespace().toString();
         try {
             xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);

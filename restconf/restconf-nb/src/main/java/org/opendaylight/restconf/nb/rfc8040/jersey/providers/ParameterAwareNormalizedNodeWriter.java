@@ -136,19 +136,19 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
     private boolean wasProcessAsSimpleNode(final NormalizedNode node) throws IOException {
         if (node instanceof LeafSetEntryNode<?> nodeAsLeafList) {
             if (selectedByParameters(node, false)) {
-                writer.startLeafSetEntryNode(nodeAsLeafList.getIdentifier());
+                writer.startLeafSetEntryNode(nodeAsLeafList.name());
                 writer.scalarValue(nodeAsLeafList.body());
                 writer.endNode();
             }
             return true;
         } else if (node instanceof LeafNode<?> nodeAsLeaf) {
-            writer.startLeafNode(nodeAsLeaf.getIdentifier());
+            writer.startLeafNode(nodeAsLeaf.name());
             writer.scalarValue(nodeAsLeaf.body());
             writer.endNode();
             return true;
         } else if (node instanceof AnyxmlNode<?> anyxmlNode) {
             final Class<?> objectModel = anyxmlNode.bodyObjectModel();
-            if (writer.startAnyxmlNode(anyxmlNode.getIdentifier(), objectModel)) {
+            if (writer.startAnyxmlNode(anyxmlNode.name(), objectModel)) {
                 if (DOMSource.class.isAssignableFrom(objectModel)) {
                     writer.domSourceValue((DOMSource) anyxmlNode.body());
                 } else {
@@ -159,7 +159,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             return true;
         } else if (node instanceof AnydataNode<?> anydataNode) {
             final Class<?> objectModel = anydataNode.bodyObjectModel();
-            if (writer.startAnydataNode(anydataNode.getIdentifier(), objectModel)) {
+            if (writer.startAnydataNode(anydataNode.name(), objectModel)) {
                 writer.scalarValue(anydataNode.body());
                 writer.endNode();
             }
@@ -219,7 +219,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
         if (selectedByParameters(mapEntryNode, false)) {
             writeChildren(mapEntryNode.body(), false);
         } else if (fields == null && maxDepth != null && currentDepth == maxDepth) {
-            writeOnlyKeys(mapEntryNode.getIdentifier().entrySet());
+            writeOnlyKeys(mapEntryNode.name().entrySet());
         }
         return true;
     }
@@ -234,7 +234,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
     }
 
     protected boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
-        writer.startMapEntryNode(node.getIdentifier(), node.size());
+        writer.startMapEntryNode(node.name(), node.size());
         currentDepth++;
         writeMapEntryChildren(node);
         currentDepth--;

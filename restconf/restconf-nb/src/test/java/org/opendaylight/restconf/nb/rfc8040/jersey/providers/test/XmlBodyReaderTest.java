@@ -91,7 +91,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         assertNotNull(payload);
 
         final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
-        assertEquals(YangInstanceIdentifier.create(
+        assertEquals(YangInstanceIdentifier.of(
             new NodeIdentifier(TOP_LEVEL_LIST),
             NodeIdentifierWithPredicates.of(TOP_LEVEL_LIST, QName.create(TOP_LEVEL_LIST, "key-leaf"), "key-value")),
             iid.getInstanceIdentifier());
@@ -100,7 +100,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         final MapEntryNode data = (MapEntryNode) payload.getData();
         assertEquals(2, data.size());
         for (final DataContainerChild child : data.body()) {
-            switch (child.getIdentifier().getNodeType().getLocalName()) {
+            switch (child.name().getNodeType().getLocalName()) {
                 case "key-leaf":
                     assertEquals("key-value", child.body());
                     break;
@@ -227,7 +227,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         // check return value
         checkNormalizedNodePayload(payload);
         // check if container was found both according to its name and namespace
-        final var payloadNodeType = payload.getData().getIdentifier().getNodeType();
+        final var payloadNodeType = payload.getData().name().getNodeType();
         assertEquals("foo-bar-container", payloadNodeType.getLocalName());
         assertEquals("foo:module", payloadNodeType.getNamespace().toString());
     }
@@ -247,7 +247,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         // check return value
         checkNormalizedNodePayload(payload);
         // check if container was found both according to its name and namespace
-        final var payloadNodeType = payload.getData().getIdentifier().getNodeType();
+        final var payloadNodeType = payload.getData().name().getNodeType();
         assertEquals("foo-bar-container", payloadNodeType.getLocalName());
         assertEquals("bar:module", payloadNodeType.getNamespace().toString());
     }

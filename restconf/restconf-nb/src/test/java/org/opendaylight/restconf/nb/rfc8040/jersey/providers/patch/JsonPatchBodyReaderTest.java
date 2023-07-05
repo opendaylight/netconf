@@ -169,7 +169,7 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
         final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
         final var data = returnValue.getData().get(0).getNode();
-        assertEquals(LEAF_NAME_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(LEAF_NAME_QNAME, data.name().getNodeType());
         assertEquals(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf20"), data);
     }
 
@@ -221,7 +221,7 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
         final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
         final var data = returnValue.getData().get(0).getNode();
-        assertEquals(CONT_AUG_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(CONT_AUG_QNAME, data.name().getNodeType());
         assertEquals(expectedData, data);
     }
 
@@ -263,7 +263,7 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
         final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
         final var data = returnValue.getData().get(0).getNode();
-        assertEquals(MAP_CONT_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(MAP_CONT_QNAME, data.name().getNodeType());
         assertEquals(expectedData, data);
     }
 
@@ -301,7 +301,7 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
         final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
         final var data = returnValue.getData().get(0).getNode();
-        assertEquals(LEAF_SET_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(LEAF_SET_QNAME, data.name().getNodeType());
         assertEquals(expectedData, data);
     }
 
@@ -343,7 +343,7 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
         final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
         final var data = returnValue.getData().get(0).getNode();
-        assertEquals(LIST_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(LIST_QNAME, data.name().getNodeType());
         assertEquals(expectedData, data);
     }
 
@@ -380,7 +380,7 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
         final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
         final var data = returnValue.getData().get(0).getNode();
-        assertEquals(CHOICE_CONT_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(CHOICE_CONT_QNAME, data.name().getNodeType());
         assertEquals(expectedData, data);
     }
 }

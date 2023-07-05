@@ -33,14 +33,14 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextProvider;
  * @author Michael Vorburger.ch
  */
 public class InMemoryMdsalModule extends AbstractModule {
-
     private static final int NOTIFICATION_SERVICE_QUEUE_DEPTH = 128;
 
     private final AbstractBaseDataBrokerTest dataBrokerTest;
     private final DOMNotificationRouter domNotificationRouter;
 
     public InMemoryMdsalModule() throws Exception {
-        dataBrokerTest = new AbstractConcurrentDataBrokerTest(true) { // NOT AbstractDataBrokerTest
+        dataBrokerTest = new AbstractConcurrentDataBrokerTest(true) {
+            // NOT AbstractDataBrokerTest
         };
         dataBrokerTest.setup();
 

@@ -134,7 +134,7 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     @Test
     public void writeMapNodeAllFieldsTest() throws Exception {
         final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null,
-            List.of(Set.of(keyLeafNodeData.getIdentifier().getNodeType())));
+            List.of(Set.of(keyLeafNodeData.name().getNodeType())));
 
         parameterWriter.write(mapNodeData);
 

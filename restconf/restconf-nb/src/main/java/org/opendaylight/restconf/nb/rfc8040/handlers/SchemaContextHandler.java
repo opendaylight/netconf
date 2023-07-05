@@ -141,7 +141,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
     private void putData(final ContainerNode normNode) {
         final DOMDataTreeWriteTransaction wTx = domDataBroker.newWriteOnlyTransaction();
         wTx.put(LogicalDatastoreType.OPERATIONAL,
-                YangInstanceIdentifier.create(NodeIdentifier.create(normNode.getIdentifier().getNodeType())), normNode);
+                YangInstanceIdentifier.of(NodeIdentifier.create(normNode.name().getNodeType())), normNode);
         try {
             wTx.commit().get();
         } catch (InterruptedException e) {

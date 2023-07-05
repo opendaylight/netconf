@@ -141,7 +141,7 @@ public class PostDataTransactionUtilTest {
 
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
         final NodeIdentifier identifier =
-                ((ContainerNode) ((Collection<?>) payload.getData().body()).iterator().next()).getIdentifier();
+                ((ContainerNode) ((Collection<?>) payload.getData().body()).iterator().next()).name();
         final YangInstanceIdentifier node = iid2.node(identifier);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
@@ -168,7 +168,7 @@ public class PostDataTransactionUtilTest {
 
         final MapNode data = (MapNode) payload.getData();
         final MapEntryNode entryNode = data.body().iterator().next();
-        final NodeIdentifierWithPredicates identifier = entryNode.getIdentifier();
+        final NodeIdentifierWithPredicates identifier = entryNode.name();
         final YangInstanceIdentifier node = iidList.node(identifier);
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
@@ -204,7 +204,7 @@ public class PostDataTransactionUtilTest {
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             iid2);
         final NodeIdentifier identifier =
-                ((ContainerNode) ((Collection<?>) payload.getData().body()).iterator().next()).getIdentifier();
+                ((ContainerNode) ((Collection<?>) payload.getData().body()).iterator().next()).name();
         final YangInstanceIdentifier node = iid2.node(identifier);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
         final DOMException domException = new DOMException((short) 414, "Post request failed");

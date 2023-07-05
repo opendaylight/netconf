@@ -166,7 +166,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         // check return value
         checkMountPointNormalizedNodePayload(payload);
         // check if container was found both according to its name and namespace
-        final var dataNodeType = payload.getData().getIdentifier().getNodeType();
+        final var dataNodeType = payload.getData().name().getNodeType();
         assertEquals("foo-bar-container", dataNodeType.getLocalName());
         assertEquals("foo:module", dataNodeType.getNamespace().toString());
     }
@@ -185,7 +185,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         // check return value
         checkMountPointNormalizedNodePayload(payload);
         // check if container was found both according to its name and namespace
-        final var dataNodeType = payload.getData().getIdentifier().getNodeType();
+        final var dataNodeType = payload.getData().name().getNodeType();
         assertEquals("foo-bar-container", dataNodeType.getLocalName());
         assertEquals("bar:module", dataNodeType.getNamespace().toString());
     }

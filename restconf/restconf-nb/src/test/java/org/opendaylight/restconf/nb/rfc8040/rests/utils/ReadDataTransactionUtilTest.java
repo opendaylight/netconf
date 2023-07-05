@@ -156,7 +156,7 @@ public class ReadDataTransactionUtilTest {
                 .withChild(ImmutableNodes.leafNode(QName.create(DATA.base, "exampleLeaf"), "i am leaf"))
                 .build();
 
-        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(content.getIdentifier()).build();
+        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(content.name()).build();
 
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, path);

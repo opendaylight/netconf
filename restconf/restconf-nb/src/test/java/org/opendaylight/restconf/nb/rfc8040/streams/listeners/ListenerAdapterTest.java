@@ -51,7 +51,6 @@ import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev14070
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -102,8 +101,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private static final String XML_NOTIF_WITHOUT_DATA_DELETE =
             "/listener-adapter-test/notif-without-data-delete.xml";
 
-    private static final YangInstanceIdentifier PATCH_CONT_YIID =
-            YangInstanceIdentifier.create(new NodeIdentifier(PatchCont.QNAME));
+    private static final YangInstanceIdentifier PATCH_CONT_YIID = YangInstanceIdentifier.of(PatchCont.QNAME);
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
 

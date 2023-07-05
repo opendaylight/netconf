@@ -169,7 +169,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         return switch (readParams.content()) {
             case ALL, CONFIG -> {
-                final QName type = node.getIdentifier().getNodeType();
+                final QName type = node.name().getNodeType();
                 yield Response.status(Status.OK)
                     .entity(NormalizedNodePayload.ofReadData(instanceIdentifier, node, queryParams))
                     .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null) + "-"
@@ -208,7 +208,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 listener.getOutputType(), uri);
 
         tx.merge(LogicalDatastoreType.OPERATIONAL,
-            Rfc8040.restconfStateStreamPath(mapToStreams.getIdentifier()), mapToStreams);
+            Rfc8040.restconfStateStreamPath(mapToStreams.name()), mapToStreams);
     }
 
     @Override
@@ -306,7 +306,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final YangInstanceIdentifier yangIIdContext = context.getInstanceIdentifier();
         final NormalizedNode data = payload.getData();
 
-        if (yangIIdContext.isEmpty() && !NETCONF_BASE_QNAME.equals(data.getIdentifier().getNodeType())) {
+        if (yangIIdContext.isEmpty() && !NETCONF_BASE_QNAME.equals(data.name().getNodeType())) {
             throw new RestconfDocumentedException("Instance identifier need to contain at least one path argument",
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
@@ -420,7 +420,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      */
     @VisibleForTesting
     public static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodePayload payload) {
-        final QName dataNodeType = payload.getData().getIdentifier().getNodeType();
+        final QName dataNodeType = payload.getData().name().getNodeType();
         if (path.isEmpty()) {
             if (!NETCONF_BASE_QNAME.equals(dataNodeType)) {
                 throw new RestconfDocumentedException("Instance identifier has to contain at least one path argument",
@@ -450,8 +450,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
         final SchemaNode schemaNode = iiWithData.getSchemaNode();
         final NormalizedNode data = payload.getData();
-        if (schemaNode instanceof ListSchemaNode) {
-            final List<QName> keyDefinitions = ((ListSchemaNode) schemaNode).getKeyDefinition();
+        if (schemaNode instanceof ListSchemaNode listSchema) {
+            final var keyDefinitions = listSchema.getKeyDefinition();
             if (lastPathArgument instanceof NodeIdentifierWithPredicates && data instanceof MapEntryNode) {
                 final Map<QName, Object> uriKeyValues = ((NodeIdentifierWithPredicates) lastPathArgument).asMap();
                 isEqualUriAndPayloadKeyValues(uriKeyValues, (MapEntryNode) data, keyDefinitions);
@@ -467,7 +467,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     mutableCopyUriKeyValues.remove(keyDefinition), ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
                     "Missing key %s in URI.", keyDefinition);
 
-            final Object dataKeyValue = payload.getIdentifier().getValue(keyDefinition);
+            final Object dataKeyValue = payload.name().getValue(keyDefinition);
 
             if (!uriKeyValue.equals(dataKeyValue)) {
                 final String errMsg = "The value '" + uriKeyValue + "' for key '" + keyDefinition.getLocalName()

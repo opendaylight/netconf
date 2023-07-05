@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -30,7 +29,6 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
@@ -153,7 +151,7 @@ public final class PostDataTransactionUtil {
             ParserIdentifier.toInstanceIdentifier(point.value(), schemaContext, Optional.empty());
         int lastItemPosition = 0;
         for (final NormalizedNode nodeChild : readList.body()) {
-            if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
+            if (nodeChild.name().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
             lastItemPosition++;
@@ -163,12 +161,12 @@ public final class PostDataTransactionUtil {
         }
         int lastInsertedPosition = 0;
         final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, parent);
-        transaction.merge(YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        transaction.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (final NormalizedNode nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 transaction.replace(path, data, schemaContext);
             }
-            final YangInstanceIdentifier childPath = parent.node(nodeChild.getIdentifier());
+            final YangInstanceIdentifier childPath = parent.node(nodeChild.name());
             transaction.replace(childPath, nodeChild, schemaContext);
             lastInsertedPosition++;
         }
@@ -200,10 +198,10 @@ public final class PostDataTransactionUtil {
         }
 
         YangInstanceIdentifier path = initialPath;
-        if (data instanceof MapNode) {
-            final Collection<MapEntryNode> children = ((MapNode) data).body();
+        if (data instanceof MapNode mapData) {
+            final var children = mapData.body();
             if (!children.isEmpty()) {
-                path = path.node(children.iterator().next().getIdentifier());
+                path = path.node(children.iterator().next().name());
             }
         }
 

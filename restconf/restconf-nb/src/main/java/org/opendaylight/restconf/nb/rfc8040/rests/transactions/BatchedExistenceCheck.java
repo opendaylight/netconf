@@ -32,7 +32,7 @@ final class BatchedExistenceCheck {
     private volatile int outstanding;
 
     private BatchedExistenceCheck(final int total) {
-        this.outstanding = total;
+        outstanding = total;
     }
 
     static BatchedExistenceCheck start(final DOMDataTreeReadOperations tx,
@@ -40,7 +40,7 @@ final class BatchedExistenceCheck {
                                        final Collection<? extends NormalizedNode> children) {
         final BatchedExistenceCheck ret = new BatchedExistenceCheck(children.size());
         for (NormalizedNode child : children) {
-            final YangInstanceIdentifier path = parentPath.node(child.getIdentifier());
+            final YangInstanceIdentifier path = parentPath.node(child.name());
             tx.exists(datastore, path).addCallback(new FutureCallback<Boolean>() {
                 @Override
                 public void onSuccess(final Boolean result) {
