@@ -140,6 +140,24 @@
       "parentUuid": "b001d359_3cdf0b32",
       "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5799341b_b3459fb9",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-05T18:39:35Z",
+      "side": 1,
+      "message": "Yeah, there is a major difference between keyed/unkeyed lists. Unkeyed lists are similar to leaf-lists in terms of yang-data-api -- i.e. they are pretty much atomic in terms of changes. NodeIdentifierWithPredicates is only applicable to keyed lists -- and then they are a bit of black magic w.r.t. how exactly they work internally.\n\nAt the end of the day, this boils down to accidental features and their clean up -- YangInstanceIdentifier is meant to mirror exactly RFC7950 semantics, but it gets overloaded to act as a substitute to RFC6241 filters in some contexts. The above failure trace is indicative of such misuse -- a RFC7950 instance-identifier is not a filter, but rather a exact identifier and therefore that codepath cannot not be used to create a YangInstanceIdentifier meant to work as a filter -- which might be appropriate to select unkeyed list entries.\n\nAt some point (yangtools-12/mdsal-13 provided we get the funding) we will make a strong distinction between the two, so that the APIs express exact semantics -- and all users will need to be updated to differentiate between the two.",
+      "parentUuid": "9421a210_47c6a421",
+      "revId": "b4e493784810cbd78f1545eb3aba69f2c8138380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
