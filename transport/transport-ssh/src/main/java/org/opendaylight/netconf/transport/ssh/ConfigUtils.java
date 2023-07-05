@@ -25,17 +25,17 @@ import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController;
 import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.AsymmetricKeyPairGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.EcPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.RsaPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.SshPublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.SubjectPublicKeyInfoFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.asymmetric.key.pair.grouping._private.key.type.CleartextPrivateKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212.LocalOrKeystoreEndEntityCertWithKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev221212.ssh.client.grouping.server.authentication.SshHostKeys;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev221212.TransportParamsGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev221212.transport.params.grouping.KeyExchange;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212.LocalOrTruststoreCertsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.AsymmetricKeyPairGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.EcPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.RsaPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.SshPublicKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.SubjectPublicKeyInfoFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.asymmetric.key.pair.grouping._private.key.type.CleartextPrivateKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.InlineOrKeystoreEndEntityCertWithKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.server.authentication.SshHostKeys;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev230417.TransportParamsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev230417.transport.params.grouping.KeyExchange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417.InlineOrTruststoreCertsGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
 
@@ -73,7 +73,7 @@ final class ConfigUtils {
     }
 
     static void setKeepAlives(final @NonNull ServerFactoryManager factoryMgr,
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev221212
+            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417
                     .ssh.server.grouping.Keepalives keepAlives) {
         setKeepAlives(factoryMgr,
                 keepAlives == null ? null : keepAlives.getMaxWait(),
@@ -81,7 +81,7 @@ final class ConfigUtils {
     }
 
     static void setKeepAlives(final @NonNull ClientFactoryManager factoryMgr,
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev221212
+            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417
                     .ssh.client.grouping.Keepalives keepAlives) {
         setKeepAlives(factoryMgr,
                 keepAlives == null ? null : keepAlives.getMaxWait(),
@@ -91,25 +91,25 @@ final class ConfigUtils {
     @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "maxAttempts usage need clarification")
     private static void setKeepAlives(final @NonNull FactoryManager factoryMgr, final @Nullable Uint16 cfgMaxWait,
             final @Nullable Uint8 cfgMaxAttempts) {
-        // FIXME utilize max attempts
+        // FIXME: utilize max attempts
         final var maxAttempts = cfgMaxAttempts == null ? KEEP_ALIVE_DEFAULT_ATTEMPTS : cfgMaxAttempts.intValue();
         final var maxWait = cfgMaxWait == null ? KEEP_ALIVE_DEFAULT_MAX_WAIT : cfgMaxWait.intValue();
         factoryMgr.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.RESERVED, Duration.ofSeconds(maxWait));
     }
 
     static List<KeyPair> extractServerHostKeys(
-            final List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev221212
+            final List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417
                     .ssh.server.grouping.server.identity.HostKey> serverHostKeys)
             throws UnsupportedConfigurationException {
         var listBuilder = ImmutableList.<KeyPair>builder();
         for (var hostKey : serverHostKeys) {
             if (hostKey.getHostKeyType()
-                    instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev221212
+                    instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417
                     .ssh.server.grouping.server.identity.host.key.host.key.type.PublicKey publicKey
                     && publicKey.getPublicKey() != null) {
-                listBuilder.add(extractKeyPair(publicKey.getPublicKey().getLocalOrKeystore()));
+                listBuilder.add(extractKeyPair(publicKey.getPublicKey().getInlineOrKeystore()));
             } else if (hostKey.getHostKeyType()
-                    instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev221212
+                    instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417
                     .ssh.server.grouping.server.identity.host.key.host.key.type.Certificate certificate
                     && certificate.getCertificate() != null) {
                 listBuilder.add(extractCertificateEntry(certificate.getCertificate()).getKey());
@@ -119,16 +119,16 @@ final class ConfigUtils {
     }
 
     static KeyPair extractKeyPair(
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212
-                    .local.or.keystore.asymmetric.key.grouping.LocalOrKeystore input)
+            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417
+                    .inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore input)
             throws UnsupportedConfigurationException {
-        final var local = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212
-                .local.or.keystore.asymmetric.key.grouping.local.or.keystore.Local.class, input);
-        final var localDef = local.getLocalDefinition();
-        if (localDef == null) {
-            throw new UnsupportedConfigurationException("Missing local definition in " + local);
+        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417
+                .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline.class, input);
+        final var inlineDef = inline.getInlineDefinition();
+        if (inlineDef == null) {
+            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
-        return extractKeyPair(localDef);
+        return extractKeyPair(inlineDef);
     }
 
     private static KeyPair extractKeyPair(final AsymmetricKeyPairGrouping input)
@@ -172,36 +172,36 @@ final class ConfigUtils {
         return new KeyPair(publicKey, privateKey);
     }
 
-    static List<Certificate> extractCertificates(@Nullable final LocalOrTruststoreCertsGrouping input)
+    static List<Certificate> extractCertificates(final @Nullable InlineOrTruststoreCertsGrouping input)
             throws UnsupportedConfigurationException {
         if (input == null) {
             return List.of();
         }
-        final var local = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore
-                        .rev221212.local.or.truststore.certs.grouping.local.or.truststore.Local.class,
-                input.getLocalOrTruststore());
-        final var localDef = local.getLocalDefinition();
-        if (localDef == null) {
-            throw new UnsupportedConfigurationException("Missing local definition in " + local);
+        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore
+                        .rev230417.inline.or.truststore.certs.grouping.inline.or.truststore.Inline.class,
+                input.getInlineOrTruststore());
+        final var inlineDef = inline.getInlineDefinition();
+        if (inlineDef == null) {
+            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
         final var listBuilder = ImmutableList.<Certificate>builder();
-        for (var cert : localDef.nonnullCertificate().values()) {
+        for (var cert : inlineDef.nonnullCertificate().values()) {
             listBuilder.add(KeyUtils.buildX509Certificate(cert.requireCertData().getValue()));
         }
         return listBuilder.build();
     }
 
     private static Map.Entry<KeyPair, List<X509Certificate>> extractCertificateEntry(
-            final LocalOrKeystoreEndEntityCertWithKeyGrouping input) throws UnsupportedConfigurationException {
-        final var local = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212
-                        .local.or.keystore.end.entity.cert.with.key.grouping.local.or.keystore.Local.class,
-                input.getLocalOrKeystore());
-        final var localDef = local.getLocalDefinition();
-        if (localDef == null) {
-            throw new UnsupportedConfigurationException("Missing local definition in " + local);
+            final InlineOrKeystoreEndEntityCertWithKeyGrouping input) throws UnsupportedConfigurationException {
+        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417
+                        .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline.class,
+                input.getInlineOrKeystore());
+        final var inlineDef = inline.getInlineDefinition();
+        if (inlineDef == null) {
+            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
-        final var keyPair = extractKeyPair(localDef);
-        final var certificate = KeyUtils.buildX509Certificate(localDef.requireCertData().getValue());
+        final var keyPair = extractKeyPair(inlineDef);
+        final var certificate = KeyUtils.buildX509Certificate(inlineDef.requireCertData().getValue());
         /*
           ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
           "A private/public key pair and an associated certificate.
@@ -221,30 +221,34 @@ final class ConfigUtils {
     }
 
     static List<PublicKey> extractPublicKeys(
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212
-                    .local.or.truststore._public.keys.grouping.LocalOrTruststore input)
+            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417
+                    .inline.or.truststore._public.keys.grouping.InlineOrTruststore input)
             throws UnsupportedConfigurationException {
-        final var local = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212
-                .local.or.truststore._public.keys.grouping.local.or.truststore.Local.class, input);
-        final var localDef = local.getLocalDefinition();
-        if (localDef == null) {
-            throw new UnsupportedConfigurationException("Missing local definition in " + local);
+        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417
+                .inline.or.truststore._public.keys.grouping.inline.or.truststore.Inline.class, input);
+        final var inlineDef = inline.getInlineDefinition();
+        if (inlineDef == null) {
+            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
+
+        final var publicKey = inlineDef.getPublicKey();
+        if (publicKey == null) {
+            return List.of();
+        }
+
         final var listBuilder = ImmutableList.<PublicKey>builder();
-        if (localDef.getPublicKey() != null && localDef.getPublicKey().entrySet() != null) {
-            for (var entry : localDef.getPublicKey().entrySet()) {
-                if (!SshPublicKeyFormat.VALUE.equals(entry.getValue().getPublicKeyFormat())) {
-                    throw new UnsupportedConfigurationException("ssh public key format is expected");
-                }
-                listBuilder.add(KeyUtils.buildPublicKeyFromSshEncoding(entry.getValue().getPublicKey()));
+        for (var entry : publicKey.entrySet()) {
+            if (!SshPublicKeyFormat.VALUE.equals(entry.getValue().getPublicKeyFormat())) {
+                throw new UnsupportedConfigurationException("ssh public key format is expected");
             }
+            listBuilder.add(KeyUtils.buildPublicKeyFromSshEncoding(entry.getValue().getPublicKey()));
         }
         return listBuilder.build();
     }
 
     static List<PublicKey> extractPublicKeys(final @Nullable SshHostKeys sshHostKeys)
             throws UnsupportedConfigurationException {
-        return sshHostKeys == null ? List.of() : extractPublicKeys(sshHostKeys.getLocalOrTruststore());
+        return sshHostKeys == null ? List.of() : extractPublicKeys(sshHostKeys.getInlineOrTruststore());
     }
 
     @FunctionalInterface

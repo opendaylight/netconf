@@ -14,7 +14,7 @@ import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import java.util.concurrent.ThreadFactory;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev221212.tcp.common.grouping.Keepalives;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev230417.tcp.common.grouping.Keepalives;
 
 /**
  * Wrapper around a particular Netty transport implementation.

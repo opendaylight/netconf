@@ -56,12 +56,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev220616.TlsEcdheRsaWithAes128GcmSha256;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev220616.TlsEcdheRsaWithAes256GcmSha384;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev220616.TlsEcdheRsaWithChacha20Poly1305Sha256;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212.LocalOrKeystoreAsymmetricKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212.LocalOrKeystoreEndEntityCertWithKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev221212.HelloParamsGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev221212.TlsVersionBase;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212.LocalOrTruststoreCertsGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212.LocalOrTruststorePublicKeysGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.InlineOrKeystoreAsymmetricKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.InlineOrKeystoreEndEntityCertWithKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev230417.HelloParamsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev230417.TlsVersionBase;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417.InlineOrTruststoreCertsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417.InlineOrTruststorePublicKeysGrouping;
 
 /**
  * Base class for TLS TransportStacks.
@@ -126,14 +126,14 @@ public abstract sealed class TLSTransportStack extends AbstractOverlayTransportS
     }
 
     static KeyManagerFactory newKeyManager(
-            final @NonNull LocalOrKeystoreEndEntityCertWithKeyGrouping endEntityCert
+            final @NonNull InlineOrKeystoreEndEntityCertWithKeyGrouping endEntityCert
     ) throws UnsupportedConfigurationException {
         final var keyStore = newKeyStore();
         setEndEntityCertificateWithKey(keyStore, endEntityCert);
         return buildKeyManagerFactory(keyStore);
     }
 
-    static KeyManagerFactory newKeyManager(final @NonNull LocalOrKeystoreAsymmetricKeyGrouping rawPrivateKey)
+    static KeyManagerFactory newKeyManager(final @NonNull InlineOrKeystoreAsymmetricKeyGrouping rawPrivateKey)
             throws UnsupportedConfigurationException {
         final var keyStore = newKeyStore();
         setAsymmetricKey(keyStore, rawPrivateKey);
@@ -142,9 +142,9 @@ public abstract sealed class TLSTransportStack extends AbstractOverlayTransportS
 
     // FIXME: should be TrustManagerBuilder
     protected static @Nullable TrustManagerFactory newTrustManager(
-            final @Nullable LocalOrTruststoreCertsGrouping caCerts,
-            final @Nullable LocalOrTruststoreCertsGrouping eeCerts,
-            final @Nullable LocalOrTruststorePublicKeysGrouping publicKeys) throws UnsupportedConfigurationException {
+            final @Nullable InlineOrTruststoreCertsGrouping caCerts,
+            final @Nullable InlineOrTruststoreCertsGrouping eeCerts,
+            final @Nullable InlineOrTruststorePublicKeysGrouping publicKeys) throws UnsupportedConfigurationException {
 
         if (publicKeys != null) {
             // FIXME: implement this and advertize server-auth-raw-public-key from IetfTlsClientFeatureProvider

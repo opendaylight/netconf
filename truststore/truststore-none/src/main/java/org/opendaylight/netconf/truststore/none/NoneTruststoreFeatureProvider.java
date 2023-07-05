@@ -10,8 +10,8 @@ package org.opendaylight.netconf.truststore.none;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212.IetfTruststoreData;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212.LocalDefinitionsSupported;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417.IetfTruststoreData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417.InlineDefinitionsSupported;
 import org.opendaylight.yangtools.yang.binding.YangFeature;
 import org.opendaylight.yangtools.yang.binding.YangFeatureProvider;
 
@@ -28,6 +28,6 @@ public final class NoneTruststoreFeatureProvider implements YangFeatureProvider<
 
     @Override
     public Set<? extends YangFeature<?, IetfTruststoreData>> supportedFeatures() {
-        return Set.of(LocalDefinitionsSupported.VALUE);
+        return Set.of(InlineDefinitionsSupported.VALUE);
     }
 }

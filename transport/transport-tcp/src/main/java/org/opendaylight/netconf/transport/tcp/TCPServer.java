@@ -21,7 +21,7 @@ import io.netty.channel.ChannelInitializer;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev221212.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 /**

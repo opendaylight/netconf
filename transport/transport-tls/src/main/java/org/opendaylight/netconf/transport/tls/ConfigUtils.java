@@ -27,15 +27,15 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.AsymmetricKeyPairGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.EcPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.RsaPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.SshPublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.SubjectPublicKeyInfoFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.asymmetric.key.pair.grouping._private.key.type.CleartextPrivateKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212.LocalOrKeystoreAsymmetricKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212.LocalOrKeystoreEndEntityCertWithKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212.LocalOrTruststoreCertsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.AsymmetricKeyPairGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.EcPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.RsaPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.SshPublicKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.SubjectPublicKeyInfoFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.asymmetric.key.pair.grouping._private.key.type.CleartextPrivateKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.InlineOrKeystoreAsymmetricKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.InlineOrKeystoreEndEntityCertWithKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417.InlineOrTruststoreCertsGrouping;
 
 final class ConfigUtils {
 
@@ -56,11 +56,12 @@ final class ConfigUtils {
      * @throws UnsupportedConfigurationException if error occurs
      */
     static void setX509Certificates(final @NonNull KeyStore keyStore,
-            final @Nullable LocalOrTruststoreCertsGrouping caCerts,
-            final @Nullable LocalOrTruststoreCertsGrouping eeCerts) throws UnsupportedConfigurationException {
+            final @Nullable InlineOrTruststoreCertsGrouping caCerts,
+            final @Nullable InlineOrTruststoreCertsGrouping eeCerts) throws UnsupportedConfigurationException {
         var certMap = ImmutableMap.<String, Certificate>builder()
                 .putAll(extractCertificates(caCerts, "ca-"))
-                .putAll(extractCertificates(eeCerts, "ee-")).build();
+                .putAll(extractCertificates(eeCerts, "ee-"))
+                .build();
         for (var entry : certMap.entrySet()) {
             try {
                 keyStore.setCertificateEntry(entry.getKey(), entry.getValue());
@@ -71,20 +72,20 @@ final class ConfigUtils {
     }
 
     private static Map<String, Certificate> extractCertificates(
-            @Nullable final LocalOrTruststoreCertsGrouping certs,
+            @Nullable final InlineOrTruststoreCertsGrouping certs,
             @NonNull final String aliasPrefix) throws UnsupportedConfigurationException {
         if (certs == null) {
             return Map.of();
         }
-        final var local = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore
-                        .rev221212.local.or.truststore.certs.grouping.local.or.truststore.Local.class,
-                certs.getLocalOrTruststore());
-        final var localDef = local.getLocalDefinition();
-        if (localDef == null) {
-            throw new UnsupportedConfigurationException("Missing local definition in " + local);
+        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore
+                        .rev230417.inline.or.truststore.certs.grouping.inline.or.truststore.Inline.class,
+                certs.getInlineOrTruststore());
+        final var inlineDef = inline.getInlineDefinition();
+        if (inlineDef == null) {
+            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
         final var mapBuilder = ImmutableMap.<String, Certificate>builder();
-        for (var cert : localDef.nonnullCertificate().values()) {
+        for (var cert : inlineDef.nonnullCertificate().values()) {
             try {
                 final var alias = aliasPrefix + cert.requireName();
                 mapBuilder.put(alias, buildX509Certificate(cert.requireCertData().getValue()));
@@ -103,27 +104,24 @@ final class ConfigUtils {
      * @throws UnsupportedConfigurationException if key pair is not set to key store
      */
     static void setAsymmetricKey(final @NonNull KeyStore keyStore,
-            final @NonNull LocalOrKeystoreAsymmetricKeyGrouping input)
+            final @NonNull InlineOrKeystoreAsymmetricKeyGrouping input)
             throws UnsupportedConfigurationException {
 
-        final var local = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212
-                        .local.or.keystore.asymmetric.key.grouping.local.or.keystore.Local.class,
-                input.getLocalOrKeystore());
-        final var localDef = local.getLocalDefinition();
-        if (localDef == null) {
-            throw new UnsupportedConfigurationException("Missing local definition in " + local);
+        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417
+                        .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline.class,
+                input.getInlineOrKeystore());
+        final var inlineDef = inline.getInlineDefinition();
+        if (inlineDef == null) {
+            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
-        final var keyPair = extractKeyPair(localDef);
-        /*
-            ietf-crypto-types:grouping asymmetric-key-pair-grouping
-            "A private key and its associated public key.  Implementations
-            SHOULD ensure that the two keys are a matching pair."
-         */
+        final var keyPair = extractKeyPair(inlineDef);
+        // ietf-crypto-types:grouping asymmetric-key-pair-grouping
+        // "A private key and its associated public key.  Implementations
+        // SHOULD ensure that the two keys are a matching pair."
         validateKeyPair(keyPair.getPublic(), keyPair.getPrivate());
         try {
-            // FIXME
-            // below line throws an exception bc keyStore does not support private key without certificate chain
-            // (belongs to implementation of raw public key feature support)
+            // FIXME: the below line throws an exception bc keyStore does not support private key without certificate
+            //        chain (belongs to implementation of raw public key feature support)
             keyStore.setKeyEntry(DEFAULT_PRIVATE_KEY_ALIAS, keyPair.getPrivate(), EMPTY_SECRET, null);
         } catch (KeyStoreException e) {
             throw new UnsupportedConfigurationException("Failed to load private key", e);
@@ -139,26 +137,25 @@ final class ConfigUtils {
      * @throws UnsupportedConfigurationException if key pair and certificate are not set to key store
      */
     static void setEndEntityCertificateWithKey(final @NonNull KeyStore keyStore,
-            final @NonNull LocalOrKeystoreEndEntityCertWithKeyGrouping input) throws UnsupportedConfigurationException {
-        final var local = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212
-                        .local.or.keystore.end.entity.cert.with.key.grouping.local.or.keystore.Local.class,
-                input.getLocalOrKeystore());
-        final var localDef = local.getLocalDefinition();
-        if (localDef == null) {
-            throw new UnsupportedConfigurationException("Missing local definition in " + local);
+            final @NonNull InlineOrKeystoreEndEntityCertWithKeyGrouping input)
+                throws UnsupportedConfigurationException {
+        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417
+                        .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline.class,
+                input.getInlineOrKeystore());
+        final var inlineDef = inline.getInlineDefinition();
+        if (inlineDef == null) {
+            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
-        final var keyPair = extractKeyPair(localDef);
+        final var keyPair = extractKeyPair(inlineDef);
         final Certificate certificate;
         try {
-            certificate = buildX509Certificate(localDef.requireCertData().getValue());
+            certificate = buildX509Certificate(inlineDef.requireCertData().getValue());
         } catch (IOException | CertificateException e) {
-            throw new UnsupportedConfigurationException("Failed to load certificate" + localDef, e);
+            throw new UnsupportedConfigurationException("Failed to load certificate" + inlineDef, e);
         }
-        /*
-          ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
-          "A private/public key pair and an associated certificate.
-          Implementations SHOULD assert that certificates contain the matching public key."
-         */
+        // ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
+        // "A private/public key pair and an associated certificate.
+        // Implementations SHOULD assert that certificates contain the matching public key."
         validateKeyPair(keyPair.getPublic(), keyPair.getPrivate());
         validatePublicKey(keyPair.getPublic(), certificate);
         try {
