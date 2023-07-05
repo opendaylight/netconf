@@ -196,6 +196,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         attempts = 0;
+        delegate.onDeviceConnected(deviceSchema, sessionPreferences, services);
     }
 
     @Override
