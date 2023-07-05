@@ -35,12 +35,12 @@ import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.password.grouping.password.type.CleartextPassword;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev221212.SshClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev221212.ssh.client.grouping.ClientIdentity;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev221212.ssh.client.grouping.ServerAuthentication;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev221212.TcpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev221212.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.password.grouping.password.type.CleartextPassword;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.SshClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentity;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ServerAuthentication;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
 
 /**
  * A {@link TransportStack} acting as an SSH client.
@@ -55,16 +55,16 @@ public final class SSHClient extends SSHTransportStack {
         super(listener);
         this.clientFactoryManager = clientFactoryManager;
         this.clientFactoryManager.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
-        this.sessionFactory = new SessionFactory(clientFactoryManager) {
+        sessionFactory = new SessionFactory(clientFactoryManager) {
             @Override
-            protected ClientSessionImpl setupSession(ClientSessionImpl session) {
+            protected ClientSessionImpl setupSession(final ClientSessionImpl session) {
                 session.setUsername(username);
                 return session;
             }
         };
-        this.ioService = new SshIoService(this.clientFactoryManager,
+        ioService = new SshIoService(this.clientFactoryManager,
                 new DefaultChannelGroup("sshd-client-channels", GlobalEventExecutor.INSTANCE),
-                this.sessionFactory);
+                sessionFactory);
     }
 
     @Override
@@ -113,17 +113,19 @@ public final class SSHClient extends SSHTransportStack {
         if (clientIdentity == null || clientIdentity.getNone() != null) {
             return;
         }
-        var authFactoriesListBuilder = ImmutableList.<UserAuthFactory>builder();
-        if (clientIdentity.getPassword() != null) {
-            if (clientIdentity.getPassword().getPasswordType() instanceof CleartextPassword clearTextPassword) {
+        final var authFactoriesListBuilder = ImmutableList.<UserAuthFactory>builder();
+        final var password = clientIdentity.getPassword();
+        if (password != null) {
+            if (password.getPasswordType() instanceof CleartextPassword clearTextPassword) {
                 factoryMgr.setPasswordIdentityProvider(
                         PasswordIdentityProvider.wrapPasswords(clearTextPassword.requireCleartextPassword()));
                 authFactoriesListBuilder.add(new UserAuthPasswordFactory());
             }
             // TODO support encrypted password -- requires augmentation of default schema
         }
-        if (clientIdentity.getHostbased() != null) {
-            var keyPair = ConfigUtils.extractKeyPair(clientIdentity.getHostbased().getLocalOrKeystore());
+        final var hostBased = clientIdentity.getHostbased();
+        if (hostBased != null) {
+            var keyPair = ConfigUtils.extractKeyPair(hostBased.getInlineOrKeystore());
             var factory = new UserAuthHostBasedFactory();
             factory.setClientHostKeys(HostKeyIdentityProvider.wrap(keyPair));
             factory.setClientUsername(clientIdentity.getUsername());
@@ -131,8 +133,9 @@ public final class SSHClient extends SSHTransportStack {
             factory.setSignatureFactories(factoryMgr.getSignatureFactories());
             authFactoriesListBuilder.add(factory);
         }
-        if (clientIdentity.getPublicKey() != null) {
-            final var keyPairs = ConfigUtils.extractKeyPair(clientIdentity.getPublicKey().getLocalOrKeystore());
+        final var publicKey = clientIdentity.getPublicKey();
+        if (publicKey != null) {
+            final var keyPairs = ConfigUtils.extractKeyPair(publicKey.getInlineOrKeystore());
             factoryMgr.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPairs));
             final var factory = new UserAuthPublicKeyFactory();
             factory.setSignatureFactories(factoryMgr.getSignatureFactories());

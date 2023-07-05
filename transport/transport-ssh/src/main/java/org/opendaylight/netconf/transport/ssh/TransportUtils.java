@@ -72,9 +72,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.alg
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev220616.HmacSha2256;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev220616.HmacSha2512;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev220616.MacAlgBase;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev221212.transport.params.grouping.Encryption;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev221212.transport.params.grouping.HostKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev221212.transport.params.grouping.KeyExchange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev230417.transport.params.grouping.Encryption;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev230417.transport.params.grouping.HostKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev230417.transport.params.grouping.KeyExchange;
 
 final class TransportUtils {
     private static final Map<EncryptionAlgBase, NamedFactory<Cipher>> CIPHERS =
@@ -243,7 +243,7 @@ final class TransportUtils {
     }
 
     public static List<NamedFactory<Mac>> getMacFactories(
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev221212
+            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev230417
                     .transport.params.grouping.Mac mac) throws UnsupportedConfigurationException {
         if (mac != null) {
             final var macAlg = mac.getMacAlg();

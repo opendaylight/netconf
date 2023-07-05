@@ -17,7 +17,7 @@ import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.epoll.EpollSocketChannel;
 import java.util.concurrent.ThreadFactory;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev221212.tcp.common.grouping.Keepalives;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev230417.tcp.common.grouping.Keepalives;
 
 @NonNullByDefault
 final class EpollNettyImpl extends AbstractNettyImpl {

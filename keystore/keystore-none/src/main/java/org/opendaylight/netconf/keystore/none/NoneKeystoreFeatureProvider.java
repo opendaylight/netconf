@@ -10,9 +10,9 @@ package org.opendaylight.netconf.keystore.none;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212.AsymmetricKeys;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212.IetfKeystoreData;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212.LocalDefinitionsSupported;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.AsymmetricKeys;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.IetfKeystoreData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.InlineDefinitionsSupported;
 import org.opendaylight.yangtools.yang.binding.YangFeature;
 import org.opendaylight.yangtools.yang.binding.YangFeatureProvider;
 
@@ -29,6 +29,6 @@ public final class NoneKeystoreFeatureProvider implements YangFeatureProvider<Ie
 
     @Override
     public Set<? extends YangFeature<?, IetfKeystoreData>> supportedFeatures() {
-        return Set.of(LocalDefinitionsSupported.VALUE, AsymmetricKeys.VALUE);
+        return Set.of(InlineDefinitionsSupported.VALUE, AsymmetricKeys.VALUE);
     }
 }

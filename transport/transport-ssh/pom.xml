@@ -44,6 +44,10 @@
             <artifactId>netty-transport</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.kohsuke.metainf-services</groupId>
             <artifactId>metainf-services</artifactId>
         </dependency>
@@ -72,8 +76,8 @@
             <artifactId>truststore-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>draft-ietf-netconf-crypto-types</artifactId>
         </dependency>
 
         <!-- testing -->
@@ -89,6 +93,10 @@
             <artifactId>bcpkix-jdk18on</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc6991-ietf-inet-types</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
