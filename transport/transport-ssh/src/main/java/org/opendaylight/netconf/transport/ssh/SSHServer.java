@@ -35,11 +35,11 @@ import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev221212.SshServerGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev221212.ssh.server.grouping.ClientAuthentication;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev221212.ssh.server.grouping.ServerIdentity;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev221212.TcpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev221212.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.ssh.server.grouping.ClientAuthentication;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.ssh.server.grouping.ServerIdentity;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
 
 /**
  * A {@link TransportStack} acting as an SSH server.
@@ -53,10 +53,10 @@ public final class SSHServer extends SSHTransportStack {
         super(listener);
         this.serverFactoryManager = requireNonNull(serverFactoryManager);
         this.serverFactoryManager.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
-        this.serverSessionFactory = new SessionFactory(serverFactoryManager);
-        this.ioService = new SshIoService(this.serverFactoryManager,
+        serverSessionFactory = new SessionFactory(serverFactoryManager);
+        ioService = new SshIoService(this.serverFactoryManager,
                 new DefaultChannelGroup("sshd-server-channels", GlobalEventExecutor.INSTANCE),
-                this.serverSessionFactory);
+                serverSessionFactory);
     }
 
     @Override
@@ -95,17 +95,17 @@ public final class SSHServer extends SSHTransportStack {
     }
 
     private static void setServerIdentity(final @NonNull ServerFactoryManager factoryMgr,
-            final @NonNull ServerIdentity serverIdentity) throws UnsupportedConfigurationException {
+            final @Nullable ServerIdentity serverIdentity) throws UnsupportedConfigurationException {
         if (serverIdentity == null) {
             throw new UnsupportedConfigurationException("Server identity configuration is required");
         }
-        if (serverIdentity.getHostKey() != null && !serverIdentity.getHostKey().isEmpty()) {
-            final var serverHostKeyPairs = ConfigUtils.extractServerHostKeys(serverIdentity.getHostKey());
-            if (!serverHostKeyPairs.isEmpty()) {
-                factoryMgr.setKeyPairProvider(KeyPairProvider.wrap(serverHostKeyPairs));
-            }
-        } else {
+        final var hostKey = serverIdentity.getHostKey();
+        if (hostKey == null || hostKey.isEmpty()) {
             throw new UnsupportedConfigurationException("Host keys is missing in server identity configuration");
+        }
+        final var serverHostKeyPairs = ConfigUtils.extractServerHostKeys(hostKey);
+        if (!serverHostKeyPairs.isEmpty()) {
+            factoryMgr.setKeyPairProvider(KeyPairProvider.wrap(serverHostKeyPairs));
         }
     }
 
@@ -114,22 +114,29 @@ public final class SSHServer extends SSHTransportStack {
         if (clientAuthentication == null) {
             return;
         }
-        if (clientAuthentication.getUsers() != null && clientAuthentication.getUsers().getUser() != null) {
+        final var users = clientAuthentication.getUsers();
+        if (users == null) {
+            return;
+        }
+        final var userMap = users.getUser();
+        if (userMap != null) {
             final var passwordMapBuilder = ImmutableMap.<String, String>builder();
             final var hostBasedMapBuilder = ImmutableMap.<String, List<PublicKey>>builder();
             final var publicKeyMapBuilder = ImmutableMap.<String, List<PublicKey>>builder();
-            for (var entry : clientAuthentication.getUsers().getUser().entrySet()) {
+            for (var entry : userMap.entrySet()) {
                 final String username = entry.getKey().getName();
-                if (entry.getValue().getPassword() != null) { // password
-                    passwordMapBuilder.put(username, entry.getValue().getPassword().getValue());
+                final var value = entry.getValue();
+                final var password = value.getPassword();
+                if (password != null) {
+                    passwordMapBuilder.put(username, password.getValue());
                 }
-                if (entry.getValue().getHostbased() != null) {
-                    hostBasedMapBuilder.put(username,
-                            ConfigUtils.extractPublicKeys(entry.getValue().getHostbased().getLocalOrTruststore()));
+                final var hostBased = value.getHostbased();
+                if (hostBased != null) {
+                    hostBasedMapBuilder.put(username, ConfigUtils.extractPublicKeys(hostBased.getInlineOrTruststore()));
                 }
-                if (entry.getValue().getPublicKeys() != null) {
-                    publicKeyMapBuilder.put(username,
-                            ConfigUtils.extractPublicKeys(entry.getValue().getPublicKeys().getLocalOrTruststore()));
+                final var publicKey = value.getPublicKeys();
+                if (publicKey != null) {
+                    publicKeyMapBuilder.put(username, ConfigUtils.extractPublicKeys(publicKey.getInlineOrTruststore()));
                 }
             }
             final var authFactoriesBuilder = ImmutableList.<UserAuthFactory>builder();

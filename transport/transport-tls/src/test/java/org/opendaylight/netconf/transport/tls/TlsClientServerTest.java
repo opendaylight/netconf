@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.EC_ALGORITHM;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.RSA_ALGORITHM;
 import static org.opendaylight.netconf.transport.tls.TestUtils.buildEndEntityCertWithKeyGrouping;
-import static org.opendaylight.netconf.transport.tls.TestUtils.buildLocalOrTruststore;
+import static org.opendaylight.netconf.transport.tls.TestUtils.buildInlineOrTruststore;
 import static org.opendaylight.netconf.transport.tls.TestUtils.generateX509CertData;
 import static org.opendaylight.netconf.transport.tls.TestUtils.isRSA;
 
@@ -43,20 +43,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.EcPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.RsaPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.SubjectPublicKeyInfoFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.EcPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.RsaPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.SubjectPublicKeyInfoFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev221212.TcpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev221212.TcpServerGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev221212.TlsClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev221212.tls.client.grouping.ClientIdentityBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev221212.tls.client.grouping.ServerAuthenticationBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev221212.TlsServerGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev221212.tls.server.grouping.ClientAuthenticationBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev221212.tls.server.grouping.ServerIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417.TlsClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417.tls.client.grouping.ClientIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417.tls.client.grouping.ServerAuthenticationBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev230417.TlsServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev230417.tls.server.grouping.ClientAuthenticationBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev230417.tls.server.grouping.ServerIdentityBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
@@ -121,41 +121,47 @@ class TlsClientServerTest {
         final var data = generateX509CertData(algorithm);
 
         // common config parts
-        var localOrKeystore = buildEndEntityCertWithKeyGrouping(
+        var inlineOrKeystore = buildEndEntityCertWithKeyGrouping(
                 SubjectPublicKeyInfoFormat.VALUE, data.publicKey(),
                 isRSA(algorithm) ? RsaPrivateKeyFormat.VALUE : EcPrivateKeyFormat.VALUE,
-                data.privateKey(), data.certBytes()).getLocalOrKeystore();
-        var localOrTrustStore = buildLocalOrTruststore(Map.of("cert", data.certBytes()));
+                data.privateKey(), data.certBytes()).getInlineOrKeystore();
+        var inlineOrTrustStore = buildInlineOrTruststore(Map.of("cert", data.certBytes()));
 
         // client config
         final var clientIdentity = new ClientIdentityBuilder()
-                .setAuthType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev221212
-                        .tls.client.grouping.client.identity.auth.type.CertificateBuilder()
-                        .setCertificate(
-                                new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev221212
-                                        .tls.client.grouping.client.identity.auth.type.certificate.CertificateBuilder()
-                                        .setLocalOrKeystore(localOrKeystore)
-                                        .build()).build()).build();
-        final var serverAuth = new ServerAuthenticationBuilder().setCaCerts(
-                new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev221212
-                        .tls.client.grouping.server.authentication.CaCertsBuilder()
-                        .setLocalOrTruststore(localOrTrustStore).build()).build();
+            .setAuthType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417
+                .tls.client.grouping.client.identity.auth.type.CertificateBuilder()
+                .setCertificate(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417
+                    .tls.client.grouping.client.identity.auth.type.certificate.CertificateBuilder()
+                    .setInlineOrKeystore(inlineOrKeystore)
+                    .build())
+                .build())
+            .build();
+        final var serverAuth = new ServerAuthenticationBuilder()
+            .setCaCerts(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417
+                .tls.client.grouping.server.authentication.CaCertsBuilder()
+                .setInlineOrTruststore(inlineOrTrustStore)
+                .build())
+            .build();
         when(tlsClientConfig.getClientIdentity()).thenReturn(clientIdentity);
         when(tlsClientConfig.getServerAuthentication()).thenReturn(serverAuth);
 
         // server config
         final var serverIdentity = new ServerIdentityBuilder()
-                .setAuthType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev221212
-                        .tls.server.grouping.server.identity.auth.type.CertificateBuilder()
-                        .setCertificate(
-                                new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev221212
-                                        .tls.server.grouping.server.identity.auth.type.certificate.CertificateBuilder()
-                                        .setLocalOrKeystore(localOrKeystore)
-                                        .build()).build()).build();
-        final var clientAuth = new ClientAuthenticationBuilder().setCaCerts(
-                new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev221212
-                        .tls.server.grouping.client.authentication.CaCertsBuilder()
-                        .setLocalOrTruststore(localOrTrustStore).build()).build();
+            .setAuthType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev230417
+                .tls.server.grouping.server.identity.auth.type.CertificateBuilder()
+                .setCertificate(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev230417
+                    .tls.server.grouping.server.identity.auth.type.certificate.CertificateBuilder()
+                    .setInlineOrKeystore(inlineOrKeystore)
+                    .build())
+                .build())
+            .build();
+        final var clientAuth = new ClientAuthenticationBuilder()
+            .setCaCerts(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev230417
+                .tls.server.grouping.client.authentication.CaCertsBuilder()
+                .setInlineOrTruststore(inlineOrTrustStore)
+                .build())
+            .build();
         when(tlsServerConfig.getServerIdentity()).thenReturn(serverIdentity);
         when(tlsServerConfig.getClientAuthentication()).thenReturn(clientAuth);
 
@@ -190,7 +196,7 @@ class TlsClientServerTest {
         }
     }
 
-    private static Channel assertChannel(List<TransportChannel> transportChannels) {
+    private static Channel assertChannel(final List<TransportChannel> transportChannels) {
         assertNotNull(transportChannels);
         assertEquals(1, transportChannels.size());
         final var channel = assertInstanceOf(TLSTransportChannel.class, transportChannels.get(0)).channel();

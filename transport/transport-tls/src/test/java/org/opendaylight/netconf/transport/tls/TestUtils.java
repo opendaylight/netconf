@@ -18,7 +18,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
@@ -26,16 +25,17 @@ import org.bouncycastle.crypto.util.OpenSSHPublicKeyUtil;
 import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.EndEntityCertCms;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.PrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.PublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.TrustAnchorCertCms;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.asymmetric.key.pair.grouping._private.key.type.CleartextPrivateKeyBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212.LocalOrKeystoreAsymmetricKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212.LocalOrKeystoreEndEntityCertWithKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev221212.tls.server.grouping.server.identity.auth.type.raw._private.key.RawPrivateKeyBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212.local.or.truststore.certs.grouping.LocalOrTruststore;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212.local.or.truststore.certs.grouping.local.or.truststore.local.local.definition.CertificateBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.EndEntityCertCms;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.PrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.PublicKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.TrustAnchorCertCms;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.asymmetric.key.pair.grouping._private.key.type.CleartextPrivateKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.InlineOrKeystoreAsymmetricKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.InlineOrKeystoreEndEntityCertWithKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev230417.tls.server.grouping.server.identity.auth.type.raw._private.key.RawPrivateKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417.inline.or.truststore.certs.grouping.InlineOrTruststore;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417.inline.or.truststore.certs.grouping.inline.or.truststore.inline.inline.definition.CertificateBuilder;
+import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 
 public final class TestUtils {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
@@ -44,57 +44,59 @@ public final class TestUtils {
         // utility class
     }
 
-    public static LocalOrTruststore buildLocalOrTruststore(Map<String, byte[]> certNameToBytesMap) {
-        final var certMap = certNameToBytesMap.entrySet().stream()
-                .map(entry -> new CertificateBuilder()
+    public static InlineOrTruststore buildInlineOrTruststore(final Map<String, byte[]> certNameToBytesMap) {
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417
+            .inline.or.truststore.certs.grouping.inline.or.truststore.InlineBuilder()
+            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev230417
+                .inline.or.truststore.certs.grouping.inline.or.truststore.inline.InlineDefinitionBuilder()
+                .setCertificate(certNameToBytesMap.entrySet().stream()
+                    .map(entry -> new CertificateBuilder()
                         .setName(entry.getKey())
                         .setCertData(new TrustAnchorCertCms(entry.getValue()))
-                        .build()
-                ).collect(Collectors.toMap(cert -> cert.key(), cert -> cert));
-        final var localDef = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212
-                .local.or.truststore.certs.grouping.local.or.truststore.local.LocalDefinitionBuilder()
-                .setCertificate(certMap).build();
-        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev221212
-                .local.or.truststore.certs.grouping.local.or.truststore.LocalBuilder()
-                .setLocalDefinition(localDef).build();
+                        .build())
+                    .collect(BindingMap.toMap()))
+                .build())
+            .build();
     }
 
-    public static LocalOrKeystoreAsymmetricKeyGrouping buildAsymmetricKeyGrouping(
+    public static InlineOrKeystoreAsymmetricKeyGrouping buildAsymmetricKeyGrouping(
             final PublicKeyFormat publicKeyFormat, final byte[] publicKeyBytes,
             final PrivateKeyFormat privateKeyFormat, final byte[] privateKeyBytes) {
-        final var localDef = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212
-                .local.or.keystore.asymmetric.key.grouping.local.or.keystore.local.LocalDefinitionBuilder()
-                .setPublicKeyFormat(publicKeyFormat)
-                .setPublicKey(publicKeyBytes)
-                .setPrivateKeyFormat(privateKeyFormat)
-                .setPrivateKeyType(new CleartextPrivateKeyBuilder().setCleartextPrivateKey(privateKeyBytes).build())
-                .build();
         return new RawPrivateKeyBuilder()
-                .setLocalOrKeystore(
-                        new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212
-                                .local.or.keystore.asymmetric.key.grouping.local.or.keystore.LocalBuilder()
-                                .setLocalDefinition(localDef).build())
-                .build();
+            .setInlineOrKeystore(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417
+                .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.InlineBuilder()
+                .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore
+                    .rev230417.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.inline
+                    .InlineDefinitionBuilder()
+                        .setPublicKeyFormat(publicKeyFormat)
+                        .setPublicKey(publicKeyBytes)
+                        .setPrivateKeyFormat(privateKeyFormat)
+                        .setPrivateKeyType(new CleartextPrivateKeyBuilder()
+                            .setCleartextPrivateKey(privateKeyBytes)
+                            .build())
+                        .build())
+                .build())
+            .build();
     }
 
-    public static LocalOrKeystoreEndEntityCertWithKeyGrouping buildEndEntityCertWithKeyGrouping(
+    public static InlineOrKeystoreEndEntityCertWithKeyGrouping buildEndEntityCertWithKeyGrouping(
             final PublicKeyFormat publicKeyFormat, final byte[] publicKeyBytes,
             final PrivateKeyFormat privateKeyFormat, final byte[] privateKeyBytes, final byte[] certificateBytes) {
-        final var localDef = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212
-                .local.or.keystore.end.entity.cert.with.key.grouping.local.or.keystore.local.LocalDefinitionBuilder()
-                .setPublicKeyFormat(publicKeyFormat)
-                .setPublicKey(publicKeyBytes)
-                .setPrivateKeyFormat(privateKeyFormat)
-                .setPrivateKeyType(new CleartextPrivateKeyBuilder().setCleartextPrivateKey(privateKeyBytes).build())
-                .setCertData(new EndEntityCertCms(certificateBytes))
-                .build();
-        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev221212
-                .tls.server.grouping.server.identity.auth.type.certificate.CertificateBuilder()
-                .setLocalOrKeystore(
-                        new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev221212
-                                .local.or.keystore.end.entity.cert.with.key.grouping.local.or.keystore.LocalBuilder()
-                                .setLocalDefinition(localDef).build())
-                .build();
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev230417
+            .tls.server.grouping.server.identity.auth.type.certificate.CertificateBuilder()
+            .setInlineOrKeystore(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417
+                .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.InlineBuilder()
+                .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore
+                    .rev230417.inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.inline
+                    .InlineDefinitionBuilder()
+                    .setPublicKeyFormat(publicKeyFormat)
+                    .setPublicKey(publicKeyBytes)
+                    .setPrivateKeyFormat(privateKeyFormat)
+                    .setPrivateKeyType(new CleartextPrivateKeyBuilder().setCleartextPrivateKey(privateKeyBytes).build())
+                    .setCertData(new EndEntityCertCms(certificateBytes))
+                    .build())
+                .build())
+            .build();
     }
 
     public static X509CertData generateX509CertData(final String algorithm) throws Exception {

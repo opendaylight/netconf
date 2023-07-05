@@ -16,7 +16,7 @@ import static org.opendaylight.netconf.transport.tls.ConfigUtils.DEFAULT_PRIVATE
 import static org.opendaylight.netconf.transport.tls.ConfigUtils.EMPTY_SECRET;
 import static org.opendaylight.netconf.transport.tls.TestUtils.buildAsymmetricKeyGrouping;
 import static org.opendaylight.netconf.transport.tls.TestUtils.buildEndEntityCertWithKeyGrouping;
-import static org.opendaylight.netconf.transport.tls.TestUtils.buildLocalOrTruststore;
+import static org.opendaylight.netconf.transport.tls.TestUtils.buildInlineOrTruststore;
 import static org.opendaylight.netconf.transport.tls.TestUtils.generateX509CertData;
 
 import java.security.KeyStore;
@@ -31,16 +31,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.EcPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.PrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.PublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.RsaPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.SshPublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev221212.SubjectPublicKeyInfoFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev221212.tls.client.grouping.server.authentication.CaCerts;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev221212.tls.client.grouping.server.authentication.CaCertsBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev221212.tls.client.grouping.server.authentication.EeCerts;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev221212.tls.client.grouping.server.authentication.EeCertsBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.EcPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.PrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.PublicKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.RsaPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.SshPublicKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.SubjectPublicKeyInfoFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417.tls.client.grouping.server.authentication.CaCertsBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417.tls.client.grouping.server.authentication.EeCertsBuilder;
 
 class ConfigUtilsTest {
 
@@ -61,10 +59,10 @@ class ConfigUtilsTest {
         assertFalse(keyStore.aliases().hasMoreElements());
 
         // defined
-        final var localOrTruststore = buildLocalOrTruststore(
+        final var inlineOrTruststore = buildInlineOrTruststore(
                 Map.of("cert-rsa", rsaCertData.certBytes(), "cert-ec", ecCertData.certBytes()));
-        final CaCerts caCerts = new CaCertsBuilder().setLocalOrTruststore(localOrTruststore).build();
-        final EeCerts eeCerts = new EeCertsBuilder().setLocalOrTruststore(localOrTruststore).build();
+        final var caCerts = new CaCertsBuilder().setInlineOrTruststore(inlineOrTruststore).build();
+        final var eeCerts = new EeCertsBuilder().setInlineOrTruststore(inlineOrTruststore).build();
         ConfigUtils.setX509Certificates(keyStore, caCerts, eeCerts);
 
         final List<String> aliases = Collections.list(keyStore.aliases());
