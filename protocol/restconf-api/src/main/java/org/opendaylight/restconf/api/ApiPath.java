@@ -10,7 +10,6 @@ package org.opendaylight.restconf.api;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableList;
@@ -27,7 +26,6 @@ import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-3.5.3.1">RFC section 3.5.3.1</a>. It models the
  * path as a series of {@link Step}s.
  */
-@Beta
 @NonNullByDefault
 public final class ApiPath implements Immutable {
     /**

@@ -9,7 +9,6 @@ package org.opendaylight.restconf.api.query;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
@@ -18,9 +17,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 /**
  * Abstract base class for StartTimeParameter and StopTimeParameter.
  */
-@Beta
-// FIXME: sealed when we have JDK17+
-public abstract class AbstractReplayParam<T extends AbstractReplayParam<T>> implements RestconfQueryParam<T> {
+public abstract sealed class AbstractReplayParam<T extends AbstractReplayParam<T>> implements RestconfQueryParam<T>
+        permits StartTimeParam, StopTimeParam {
     private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:replay:1.0");
 
     private final @NonNull DateAndTime value;

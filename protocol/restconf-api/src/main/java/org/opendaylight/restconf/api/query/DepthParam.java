@@ -9,7 +9,6 @@ package org.opendaylight.restconf.api.query;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.annotations.Beta;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -53,12 +52,10 @@ public final class DepthParam implements RestconfQueryParam<DepthParam> {
         return String.valueOf(value);
     }
 
-    @Beta
     public static @NonNull DepthParam min() {
         return MIN;
     }
 
-    @Beta
     public static @NonNull DepthParam max() {
         return MAX;
     }
