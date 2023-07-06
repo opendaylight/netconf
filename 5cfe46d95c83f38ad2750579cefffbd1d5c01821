@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aadd2024_df505023",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-06T07:41:17Z",
+      "side": 1,
+      "message": "IIRC RemoteDeviceHandler has been removed.",
+      "revId": "5cfe46d95c83f38ad2750579cefffbd1d5c01821",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecfe32cc_79223a26",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-06T07:41:17Z",
+      "side": 1,
+      "message": "This seems like not intended change.",
+      "revId": "5cfe46d95c83f38ad2750579cefffbd1d5c01821",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
