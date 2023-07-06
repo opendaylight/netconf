@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6e96ab3_5bcec332",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ConfigUtils.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-06T06:04:56Z",
+      "side": 1,
+      "message": "once local* is now became inline* then all the associated variables, method names and messages became irrelevant and confusing. suggested global updating these as well",
+      "range": {
+        "startLine": 121,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 40
+      },
+      "revId": "7e72f00251979c591dfbbae22a6ef1d204d7dfff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
