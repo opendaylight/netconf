@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "29452f9f_8a0d1dc8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-06T06:01:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58ecfc53_31d57d04",
+      "revId": "9c60b507d2535cbb8dd85fc054c3b33dad25e197",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "3e5de795_b5330c55",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c45aaf1_a5d0176b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-06T06:01:12Z",
+      "side": 1,
+      "message": "Removed ObjectMapper and compared values as strings",
+      "parentUuid": "3920f1bb_b4aaf03d",
+      "revId": "9c60b507d2535cbb8dd85fc054c3b33dad25e197",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a85a7fc3_ee408b86",
@@ -65,6 +101,24 @@
       "writtenOn": "2023-06-30T11:03:43Z",
       "side": 1,
       "message": "final var",
+      "revId": "9c60b507d2535cbb8dd85fc054c3b33dad25e197",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17eed644_b4fee32d",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-06T06:01:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a85a7fc3_ee408b86",
       "revId": "9c60b507d2535cbb8dd85fc054c3b33dad25e197",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
