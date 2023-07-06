@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66b79340_0171242c",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-06T07:08:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b997e3e_a25123ed",
+      "revId": "8666f04821f2e32dde46c207ada0d03c36ff90eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae15b1da_5c5db4f1",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-06-30T12:53:03Z",
       "side": 1,
       "message": "Use 2 spaces indent.",
+      "revId": "8666f04821f2e32dde46c207ada0d03c36ff90eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2a43522_1cc0db4e",
+        "filename": "restconf/sal-rest-docgen/src/test/resources/yang/my-yang@2022-10-06.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-06T07:08:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae15b1da_5c5db4f1",
       "revId": "8666f04821f2e32dde46c207ada0d03c36ff90eb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
