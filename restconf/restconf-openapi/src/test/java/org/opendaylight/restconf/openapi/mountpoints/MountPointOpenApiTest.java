@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.openapi.mountpoints;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -32,6 +33,7 @@ import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
+import org.opendaylight.restconf.openapi.model.Security;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -261,7 +263,16 @@ public final class MountPointOpenApiTest {
         openApi.onMountPointCreated(INSTANCE_ID);
         final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
 
-        assertEquals(mountPointApi.security().toString(), "[{\"basicAuth\":[]}]");
+        final Security sec = mountPointApi.security();
+        assertNotNull(sec);
+        // ensure the security (an array) is not empty
+        assertFalse(sec.isEmpty());
+        // check if the element is not null
+        assertNotNull(sec.get(0));
+        // check that the entry with key "basicAuth" exists in the hashmap
+        assertNotNull(sec.get(0).get("basicAuth"));
+        assertEquals(sec.toString(), "Security[securities=[{basicAuth=[]}]]");
+
         assertEquals(mountPointApi.components().securitySchemes().basicAuth().toString(),
             "{\"type\":\"http\",\"scheme\":\"basic\"}");
     }

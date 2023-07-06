@@ -44,6 +44,7 @@ import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
+import org.opendaylight.restconf.openapi.model.Security;
 import org.opendaylight.restconf.openapi.model.SecuritySchemes;
 import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -78,8 +79,7 @@ public abstract class BaseYangOpenApiGenerator {
     private static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
             .put("type", "http")
             .put("scheme", "basic");
-    private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
-            .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
+    private static final Security SECURITY = new Security(List.of(Map.of("basicAuth", List.of())));
 
     protected BaseYangOpenApiGenerator(final Optional<DOMSchemaService> schemaService) {
         this.schemaService = schemaService.orElse(null);

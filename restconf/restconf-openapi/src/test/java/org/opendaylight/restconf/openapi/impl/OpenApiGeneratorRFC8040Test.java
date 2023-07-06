@@ -31,6 +31,7 @@ import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
+import org.opendaylight.restconf.openapi.model.Security;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -427,7 +428,16 @@ public final class OpenApiGeneratorRFC8040Test {
         final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
-        assertEquals(doc.security().toString(), "[{\"basicAuth\":[]}]");
+        final Security sec = doc.security();
+        assertNotNull(sec);
+        // ensure the security (an array) is not empty
+        assertFalse(sec.isEmpty());
+        // check if the element is not null
+        assertNotNull(sec.get(0));
+        // check that the entry with key "basicAuth" exists in the hashmap
+        assertNotNull(sec.get(0).get("basicAuth"));
+        assertEquals(sec.toString(), "Security[securities=[{basicAuth=[]}]]");
+
         assertEquals(doc.components().securitySchemes().basicAuth().toString(),
             "{\"type\":\"http\",\"scheme\":\"basic\"}");
     }
