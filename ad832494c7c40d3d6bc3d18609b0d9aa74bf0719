@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ce381e4_96c87668",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-06T06:48:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f77f61f4_b204c754",
+      "revId": "ad832494c7c40d3d6bc3d18609b0d9aa74bf0719",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bafec55a_76f809f6",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-06T04:57:09Z",
       "side": 1,
       "message": "Add an empty line here",
+      "revId": "ad832494c7c40d3d6bc3d18609b0d9aa74bf0719",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b0a279e_805ab9c4",
+        "filename": "restconf/sal-rest-docgen/src/test/resources/yang/my-yang@2022-10-06.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-06T06:48:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bafec55a_76f809f6",
       "revId": "ad832494c7c40d3d6bc3d18609b0d9aa74bf0719",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
