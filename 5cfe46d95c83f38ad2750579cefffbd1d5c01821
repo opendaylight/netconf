@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "96c5e648_4a18980e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-07-06T15:36:23Z",
+      "side": 1,
+      "message": "\u0027delegate\u0027 in NetconfNodeHandler is a RemoteDeviceHandler:\n```\nprivate final @NonNull RemoteDeviceHandler delegate;\n```\nUpdated to make it a little more clear.",
+      "parentUuid": "aadd2024_df505023",
+      "revId": "5cfe46d95c83f38ad2750579cefffbd1d5c01821",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ecfe32cc_79223a26",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-06T07:41:17Z",
       "side": 1,
       "message": "This seems like not intended change.",
+      "revId": "5cfe46d95c83f38ad2750579cefffbd1d5c01821",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb712d6e_52d1b860",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-07-06T15:36:23Z",
+      "side": 1,
+      "message": "My editor automatically added a \u0027\\n\u0027 to the last line which didn\u0027t have any. Reverted.",
+      "parentUuid": "ecfe32cc_79223a26",
       "revId": "5cfe46d95c83f38ad2750579cefffbd1d5c01821",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
