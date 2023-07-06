@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3f97157_165d848e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-06T04:59:16Z",
+      "side": 1,
+      "message": "Mark addressed comments as resolved please",
+      "revId": "700a76f2d567b3ad962a05980a4c648a2fc6f069",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3605ecc_11d1c06d",
+        "filename": "restconf/sal-rest-docgen/src/test/resources/yang/my-yang@2022-10-06.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-06T04:59:16Z",
+      "side": 1,
+      "message": "Add empty line",
+      "revId": "700a76f2d567b3ad962a05980a4c648a2fc6f069",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
