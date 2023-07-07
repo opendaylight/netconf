@@ -99,6 +99,8 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
         }
 
         LOG.debug("Attempt to connect to {} failed", address, cf.cause());
-        setFailure(cf.cause());
+        if (!tryFailure(cf.cause())) {
+            LOG.debug("Netconf session negotiation with {} failed", address, cause());
+        }
     }
 }
