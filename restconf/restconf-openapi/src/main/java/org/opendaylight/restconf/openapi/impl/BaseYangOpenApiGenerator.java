@@ -19,7 +19,6 @@ import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathA
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Range;
 import java.io.IOException;
@@ -47,8 +46,9 @@ import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
-import org.opendaylight.restconf.openapi.model.SecuritySchemes;
 import org.opendaylight.restconf.openapi.model.Server;
+import org.opendaylight.restconf.openapi.model.security.Http;
+import org.opendaylight.restconf.openapi.model.security.SecuritySchemeObject.Type;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -72,15 +72,17 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static final String API_VERSION = "1.0.0";
     private static final String OPEN_API_VERSION = "3.0.3";
+    private static final Http OPEN_API_BASIC_AUTH = new Http.Builder()
+        .type(Type.http)
+        .scheme("basic")
+        .build();
 
     private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
     private final DOMSchemaService schemaService;
 
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
-    private static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
-            .put("type", "http")
-            .put("scheme", "basic");
+    public static final String BASIC_AUTH_NAME = "basicAuth";
     private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
             .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
@@ -294,7 +296,7 @@ public abstract class BaseYangOpenApiGenerator {
         docBuilder.openapi(OPEN_API_VERSION);
         docBuilder.info(new Info.Builder().title(title).version(API_VERSION).build())
             .servers(List.of(new Server(schema + "://" + host + basePath)))
-            .components(new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH)))
+            .components(new Components(new HashMap<>(), Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH)))
             .security(SECURITY);
         return docBuilder;
     }
