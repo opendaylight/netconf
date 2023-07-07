@@ -34,6 +34,23 @@
       "parentUuid": "088615a6_78221fe4",
       "revId": "974a94c49c09bf8b5f9127eead94dea0d72cc499",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2852720_b71247c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7231
+      },
+      "writtenOn": "2023-07-07T17:06:09Z",
+      "side": 1,
+      "message": "Seems that something goes wrong with git review. A new patch has been created here: https://git.opendaylight.org/gerrit/c/netconf/+/106843\n\nI\u0027ll close this one. Sorry for the inconvenient.\n\nOlivier",
+      "revId": "974a94c49c09bf8b5f9127eead94dea0d72cc499",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
