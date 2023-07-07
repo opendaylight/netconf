@@ -16,6 +16,24 @@
       "message": "Please file a corresponding JIRA issue to track the new feature",
       "revId": "974a94c49c09bf8b5f9127eead94dea0d72cc499",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d54df9e_39453ccb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7231
+      },
+      "writtenOn": "2023-07-07T07:04:05Z",
+      "side": 1,
+      "message": "Done. See https://jira.opendaylight.org/browse/NETCONF-1076\n\nOnce ancestor patch set approved, I\u0027ll rebase and update my patch, in particular correct the failed test.",
+      "parentUuid": "088615a6_78221fe4",
+      "revId": "974a94c49c09bf8b5f9127eead94dea0d72cc499",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
