@@ -33,6 +33,24 @@
       "message": "Please add empty line at the end of the file.\nhttps://rules.sonarsource.com/java/RSPEC-113/",
       "revId": "efcdc22c06559bef7a0243a5a6dedb27d01b0937",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eeda26fe_9a7c7e43",
+        "filename": "restconf/sal-rest-docgen/src/test/resources/yang/my-yang@2022-10-06.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-07T14:39:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86234091_e152f199",
+      "revId": "efcdc22c06559bef7a0243a5a6dedb27d01b0937",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
