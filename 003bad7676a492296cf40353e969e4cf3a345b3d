@@ -16,6 +16,24 @@
       "message": "Problem with `setFailure` seems like another problem can you create separate task and add there karaf log for the issue?",
       "revId": "003bad7676a492296cf40353e969e4cf3a345b3d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9107c5e0_24ccd438",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-07-07T08:11:25Z",
+      "side": 1,
+      "message": "Created a new JIRA issue \u0026 patch:\n- https://jira.opendaylight.org/browse/NETCONF-1078\n- https://git.opendaylight.org/gerrit/c/netconf/+/106840",
+      "parentUuid": "a20a6018_d4cf1302",
+      "revId": "003bad7676a492296cf40353e969e4cf3a345b3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
