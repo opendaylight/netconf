@@ -19,7 +19,6 @@ import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathA
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Range;
 import java.io.IOException;
@@ -78,9 +77,11 @@ public abstract class BaseYangOpenApiGenerator {
 
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
-    private static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
-            .put("type", "http")
-            .put("scheme", "basic");
+    private static final SecuritySchemes.SecurityObject OPEN_API_BASIC_AUTH =
+            new SecuritySchemes.SecurityObject.Builder()
+            .type(SecuritySchemes.Type.http)
+            .scheme("basic")
+            .build();
     private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
             .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
