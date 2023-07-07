@@ -429,7 +429,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         assertEquals(doc.security().toString(), "[{\"basicAuth\":[]}]");
         assertEquals(doc.components().securitySchemes().basicAuth().toString(),
-            "{\"type\":\"http\",\"scheme\":\"basic\"}");
+                "BasicAuth[type=http, description=null, scheme=basic, bearerFormat=null]");
     }
 
     /**

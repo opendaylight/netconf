@@ -40,6 +40,7 @@ import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.openapi.model.BasicAuth;
 import org.opendaylight.restconf.openapi.model.Components;
 import org.opendaylight.restconf.openapi.model.Info;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
@@ -77,9 +78,10 @@ public abstract class BaseYangOpenApiGenerator {
 
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
-    private static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
-            .put("type", "http")
-            .put("scheme", "basic");
+    private static final BasicAuth OPEN_API_BASIC_AUTH = new BasicAuth.Builder()
+            .type("http")
+            .scheme("basic")
+            .build();
     private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
             .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
