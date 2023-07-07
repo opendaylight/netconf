@@ -47,8 +47,8 @@ import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
-import org.opendaylight.restconf.openapi.model.SecuritySchemes;
 import org.opendaylight.restconf.openapi.model.Server;
+import org.opendaylight.restconf.openapi.model.security.Http;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -74,11 +74,10 @@ public abstract class BaseYangOpenApiGenerator {
     public static final String OPEN_API_VERSION = "3.0.3";
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
-    public static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
-        .put("type", "http")
-        .put("scheme", "basic");
+    public static final String BASIC_AUTH_NAME = "basicAuth";
+    public static final Http OPEN_API_BASIC_AUTH = new Http("basic", null, null);
     public static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
-        .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
+        .add(JsonNodeFactory.instance.objectNode().set(BASIC_AUTH_NAME, JsonNodeFactory.instance.arrayNode()));
 
     private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
     private final DOMSchemaService schemaService;
@@ -103,7 +102,7 @@ public abstract class BaseYangOpenApiGenerator {
             paths.putAll(getPaths(module, "", "Controller", context, definitionNames, false));
         }
 
-        final var components = new Components(schemas, new SecuritySchemes(OPEN_API_BASIC_AUTH));
+        final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
         return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
 
@@ -185,7 +184,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var servers = List.of(new Server(schema + "://" + host + basePath));
         final var definitionNames = new DefinitionNames();
         final var schemas = getSchemas(module, schemaContext, definitionNames, true);
-        final var components = new Components(schemas, new SecuritySchemes(OPEN_API_BASIC_AUTH));
+        final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
         final var paths = getPaths(module, context, null, schemaContext, definitionNames, true);
         return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
