@@ -121,6 +121,24 @@
       "parentUuid": "db8b11f1_58150aff",
       "revId": "343b0817a22467b3c968aa78685125bf55510efd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87dfd91e_d134d1d2",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/keys-mapping.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-07T10:09:49Z",
+      "side": 1,
+      "message": "Please create a new test class for your tests, where you can utilize this approach.",
+      "parentUuid": "18d94199_da251c6b",
+      "revId": "343b0817a22467b3c968aa78685125bf55510efd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76caccb6_05c0f143",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-07T10:09:49Z",
+      "side": 1,
+      "message": "Is it necessary to test it with a MountPoint? Isn\u0027t it sufficient to test it with OpenApiGeneratorRFC8040Test.java approach?",
+      "revId": "7d0e21dcfd1e486e9bf1439768a0a23ad0288a79",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
