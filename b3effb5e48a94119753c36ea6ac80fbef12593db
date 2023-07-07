@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92c1a281_dd632df3",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-07T10:31:25Z",
+      "side": 1,
+      "message": "Why we use here Stack\u003cInteger\u003e and not only AtomicInteger?\nCurrent solution:\n```\n                while (parameters.contains(paramName)) {\n                    int discriminator \u003d discriminators.peek();\n                    paramName \u003d paramName + discriminator;\n                    discriminator++;\n                    discriminators.push(Integer.valueOf(discriminator));\n                }\n```\nSolution with AtomicInteger:\n```\n                while (parameters.contains(paramName)) {\n                    paramName \u003d paramName + discriminator.getAndIncrement();\n                }\n```\n\nAnd last question why is required to put discriminator here? Isn\u0027t while loop enough?",
+      "revId": "b3effb5e48a94119753c36ea6ac80fbef12593db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
