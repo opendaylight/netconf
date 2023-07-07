@@ -11,6 +11,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.API_VERSION;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASE_PATH;
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASIC_AUTH_NAME;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.OPEN_API_BASIC_AUTH;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.OPEN_API_VERSION;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
@@ -45,7 +46,6 @@ import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
-import org.opendaylight.restconf.openapi.model.SecuritySchemes;
 import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -199,7 +199,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             schemas.putAll(openApiGenerator.getSchemas(module, context, definitionNames, false));
             paths.putAll(openApiGenerator.getPaths(module, urlPrefix, deviceName, context, definitionNames, false));
         }
-        final var components = new Components(schemas, new SecuritySchemes(OPEN_API_BASIC_AUTH));
+        final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
         if (includeDataStore) {
             paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
         }
@@ -217,7 +217,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
-        final var components = new Components(new HashMap<>(), new SecuritySchemes(OPEN_API_BASIC_AUTH));
+        final var components = new Components(new HashMap<>(), Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
         final var paths = getDataStoreApiPaths(context, deviceName);
         return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
