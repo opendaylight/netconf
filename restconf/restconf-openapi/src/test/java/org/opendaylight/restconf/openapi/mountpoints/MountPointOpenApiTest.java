@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASIC_AUTH_NAME;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -262,7 +263,7 @@ public final class MountPointOpenApiTest {
         final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, null);
 
         assertEquals("[{\"basicAuth\":[]}]", mountPointApi.security().toString());
-        assertEquals("{\"type\":\"http\",\"scheme\":\"basic\"}",
-            mountPointApi.components().securitySchemes().basicAuth().toString());
+        assertEquals("Http[type=http, scheme=basic, description=null, bearerFormat=null]",
+            mountPointApi.components().securitySchemes().get(BASIC_AUTH_NAME).toString());
     }
 }
