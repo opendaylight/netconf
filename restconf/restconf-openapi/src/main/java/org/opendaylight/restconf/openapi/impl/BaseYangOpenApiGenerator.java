@@ -77,9 +77,11 @@ public abstract class BaseYangOpenApiGenerator {
 
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
-    private static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
-            .put("type", "http")
-            .put("scheme", "basic");
+    private static final SecuritySchemes.SecurityObject OPEN_API_BASIC_AUTH =
+            new SecuritySchemes.SecurityObject.Builder()
+            .type(SecuritySchemes.Type.http)
+            .scheme("basic")
+            .build();
     private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
             .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 

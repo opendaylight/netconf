@@ -262,7 +262,7 @@ public final class MountPointOpenApiTest {
         final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
 
         assertEquals("[{\"basicAuth\":[]}]", mountPointApi.security().toString());
-        assertEquals("{\"type\":\"http\",\"scheme\":\"basic\"}",
+        assertEquals("SecurityObject[type=http, description=null, scheme=basic, bearerFormat=null]",
             mountPointApi.components().securitySchemes().basicAuth().toString());
     }
 }
