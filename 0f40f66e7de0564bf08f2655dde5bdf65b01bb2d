@@ -34,6 +34,52 @@
       "parentUuid": "04bdbfff_e6907124",
       "revId": "0f40f66e7de0564bf08f2655dde5bdf65b01bb2d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed78a433_5c677e31",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-07T10:20:15Z",
+      "side": 1,
+      "message": "inconsistent with previous. use `var` instead of explicit type",
+      "range": {
+        "startLine": 428,
+        "startChar": 14,
+        "endLine": 428,
+        "endChar": 27
+      },
+      "revId": "0f40f66e7de0564bf08f2655dde5bdf65b01bb2d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03c47954_cab52884",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-07T10:20:15Z",
+      "side": 1,
+      "message": "expected value should be the 1st parameter and actual should be the 2nd one\n`assertEquals(\"[{\\\"basicAuth\\\":[]}]\", doc.security().toString());`\nThat way, if the test fails, the message accurately describes what the value is and what the expectation was.\nPlease change the order here and also in MountPointOpenApiTest",
+      "range": {
+        "startLine": 430,
+        "startChar": 8,
+        "endLine": 430,
+        "endChar": 72
+      },
+      "revId": "0f40f66e7de0564bf08f2655dde5bdf65b01bb2d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
