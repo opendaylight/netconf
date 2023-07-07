@@ -33,6 +33,24 @@
       "message": "IMO: this if statement is redundant:\n```\n                while (parameters.contains(paramName)) {\n                    paramName \u003d keyName + discriminator;\n                    discriminator++;\n                }\n```",
       "revId": "c46e402e2044bf7c36eb1eec843c1cfdb4a9ef9c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15ef9130_c78d4c45",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-07T10:41:02Z",
+      "side": 1,
+      "message": "In this case, we will add a new discriminator to the end of String (e.g. name12, instead of name2)",
+      "parentUuid": "ca5cb63b_58f4f1b0",
+      "revId": "c46e402e2044bf7c36eb1eec843c1cfdb4a9ef9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
