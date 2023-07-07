@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7eae6296_531fb746",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-07T10:10:03Z",
+      "side": 1,
+      "message": "(Optional)\nI would personally use Stream for this, but for loop is also good solution.\n```\nfinal Set\u003cString\u003e parameters \u003d StreamSupport.stream(pathParams.spliterator(), false)\n        .map(t -\u003e t.get(\"name\").asText())\n        .collect(Collectors.toSet());\n```",
+      "revId": "c46e402e2044bf7c36eb1eec843c1cfdb4a9ef9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca5cb63b_58f4f1b0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-07T10:10:03Z",
+      "side": 1,
+      "message": "IMO: this if statement is redundant:\n```\n                while (parameters.contains(paramName)) {\n                    paramName \u003d keyName + discriminator;\n                    discriminator++;\n                }\n```",
+      "revId": "c46e402e2044bf7c36eb1eec843c1cfdb4a9ef9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
