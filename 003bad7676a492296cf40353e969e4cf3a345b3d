@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a20a6018_d4cf1302",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-07T06:53:17Z",
+      "side": 1,
+      "message": "Problem with `setFailure` seems like another problem can you create separate task and add there karaf log for the issue?",
+      "revId": "003bad7676a492296cf40353e969e4cf3a345b3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
