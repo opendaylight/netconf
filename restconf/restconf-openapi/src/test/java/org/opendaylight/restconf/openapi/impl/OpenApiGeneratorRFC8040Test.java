@@ -427,7 +427,7 @@ public final class OpenApiGeneratorRFC8040Test {
         final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
-        assertEquals(doc.security().toString(), "[{\"basicAuth\":[]}]");
+        assertEquals(doc.security().toString(), "[{basicAuth=[]}]");
         assertEquals(doc.components().securitySchemes().basicAuth().toString(),
                 "BasicAuth[type=http, description=null, scheme=basic, bearerFormat=null]");
     }
