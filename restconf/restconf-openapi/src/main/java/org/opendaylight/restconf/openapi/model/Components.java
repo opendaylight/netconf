@@ -10,7 +10,8 @@ package org.opendaylight.restconf.openapi.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.Map;
+import org.opendaylight.restconf.openapi.model.security.SecuritySchemeObject;
 
 @JsonInclude(Include.NON_NULL)
-public record Components(Map<String, Schema> schemas, SecuritySchemes securitySchemes) {
+public record Components(Map<String, Schema> schemas, Map<String, SecuritySchemeObject> securitySchemes) {
 }
