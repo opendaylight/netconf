@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "100d8264_fd126f81",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/NetconfSessionPromise.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-07-10T12:29:50Z",
+      "side": 1,
+      "message": "this is not atomic: we should use tryFailure() and check its return value",
+      "range": {
+        "startLine": 102,
+        "startChar": 13,
+        "endLine": 102,
+        "endChar": 19
+      },
+      "revId": "b41934e3c473a6e28701d18cb8ec840525949b42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
