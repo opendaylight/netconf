@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3539f5d_aed236cb",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/BasicAuth.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-10T11:05:08Z",
+      "side": 1,
+      "message": "Please format this record in the following style: https://git.opendaylight.org/gerrit/c/netconf/+/106327/9..12/restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/ReadDataParams.java#b26",
+      "revId": "51cb0303a3e705c49d785294217fd82c04e50b34",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
