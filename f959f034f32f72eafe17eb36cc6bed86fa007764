@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8bdaa89_2c446e14",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 831,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-10T13:25:23Z",
+      "side": 1,
+      "message": "As the above comment suggest, we expect uint64 value here, which can be in Java represented as `BigInteger`, which is also suported by `ObjectNode` (it has a method `put(String name, BigInteger val)`).\nWe also have a dedicated class for this YANG type - `Uint64`\n\nProvide here `BigInteger` instead of a `String` and create a method `setDefaultValue` that accepts one",
+      "range": {
+        "startLine": 831,
+        "startChar": 88,
+        "endLine": 831,
+        "endChar": 105
+      },
+      "revId": "f959f034f32f72eafe17eb36cc6bed86fa007764",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
