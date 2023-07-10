@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f6acf0c_6822512f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 18
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-07-10T12:29:27Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "80700339_20f4ab08",
+      "revId": "9cd37b94e6253e24a9bfeefe1080cd2fba8d5689",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61c273d8_6cee3df3",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-10T11:34:19Z",
       "side": 1,
       "message": "The default value is being set even if the condition in the `if` statement is not satisfied. Here we are repeating ourselves.\nMove this outside the `if-else` statement to make it a 1 line change",
+      "revId": "9cd37b94e6253e24a9bfeefe1080cd2fba8d5689",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93c92232_c2a68537",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-07-10T12:29:27Z",
+      "side": 1,
+      "message": "resolved",
+      "parentUuid": "61c273d8_6cee3df3",
       "revId": "9cd37b94e6253e24a9bfeefe1080cd2fba8d5689",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
