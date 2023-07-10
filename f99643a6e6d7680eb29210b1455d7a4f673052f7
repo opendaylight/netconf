@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "19654c6d_c8b986b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-10T07:16:44Z",
+      "side": 1,
+      "message": "This should be:\n\nJIRA: NETCONF-1076\nChange-Id: Ibeda878a38a52f911dd8fbaa0503c4bfb56ea9b7\nSigned-off-by: Olivier Dugeon \u003colivier.dugeon@orange.com\u003e",
+      "revId": "f99643a6e6d7680eb29210b1455d7a4f673052f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "f7e16d0d_c5f3b70f",
