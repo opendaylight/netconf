@@ -33,6 +33,40 @@
       "message": "recheck",
       "revId": "7ad42c143fc7dcc4bd73dc456e411631e4e96131",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "473a6f16_74429719",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/BasicAuth.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-10T11:16:58Z",
+      "side": 1,
+      "message": "IMO this should be in SecuritySchemas object.\nIn the components, there should be a Map\u003cString, SecuritySchemas\u003e where the name \"BasicAuth\" serves as an example of a key used in the documentation. This name should be unique, and the security object should reference this name.",
+      "revId": "7ad42c143fc7dcc4bd73dc456e411631e4e96131",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f1374af_0b3885f0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/BasicAuth.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-10T11:16:58Z",
+      "side": 1,
+      "message": "\"type\" should be Enum since documentation specify exact types.\nREQUIRED. The type of the security scheme. Valid values are \"apiKey\", \"http\", \"mutualTLS\", \"oauth2\", \"openIdConnect\".",
+      "revId": "7ad42c143fc7dcc4bd73dc456e411631e4e96131",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
