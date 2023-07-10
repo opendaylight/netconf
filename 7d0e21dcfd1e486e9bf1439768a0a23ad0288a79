@@ -16,6 +16,24 @@
       "message": "Is it necessary to test it with a MountPoint? Isn\u0027t it sufficient to test it with OpenApiGeneratorRFC8040Test.java approach?",
       "revId": "7d0e21dcfd1e486e9bf1439768a0a23ad0288a79",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25c60bd5_f47a56fd",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-10T06:48:50Z",
+      "side": 1,
+      "message": "IDK, I just follow previous recommendations from similar patch https://git.opendaylight.org/gerrit/c/netconf/+/105698",
+      "parentUuid": "76caccb6_05c0f143",
+      "revId": "7d0e21dcfd1e486e9bf1439768a0a23ad0288a79",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

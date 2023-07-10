@@ -139,6 +139,24 @@
       "parentUuid": "18d94199_da251c6b",
       "revId": "343b0817a22467b3c968aa78685125bf55510efd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f645d581_b538df38",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/keys-mapping.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-10T06:48:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87dfd91e_d134d1d2",
+      "revId": "343b0817a22467b3c968aa78685125bf55510efd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
