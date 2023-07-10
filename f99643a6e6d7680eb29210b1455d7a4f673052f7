@@ -33,6 +33,23 @@
       "message": "Hi,\n\nHere it is a new version of the patch with corrected test and JIRA reference.",
       "revId": "f99643a6e6d7680eb29210b1455d7a4f673052f7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bca14f48_bf5facd9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-10T07:17:19Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "f99643a6e6d7680eb29210b1455d7a4f673052f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
