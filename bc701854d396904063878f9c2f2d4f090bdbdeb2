@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb15d7d7_5d181f2f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 811,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-10T11:40:43Z",
+      "side": 1,
+      "message": "no need for change, it fits on 1 line",
+      "range": {
+        "startLine": 810,
+        "startChar": 12,
+        "endLine": 811,
+        "endChar": 58
+      },
+      "revId": "bc701854d396904063878f9c2f2d4f090bdbdeb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5dae837_8a1dc75a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 822,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-10T11:40:43Z",
+      "side": 1,
+      "message": "Let\u0027s not repeat ourselves in each `if-else` statement.\nMove this outside the `if-else` block to make it a 1 line change",
+      "range": {
+        "startLine": 821,
+        "startChar": 0,
+        "endLine": 822,
+        "endChar": 66
+      },
+      "revId": "bc701854d396904063878f9c2f2d4f090bdbdeb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
