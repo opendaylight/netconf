@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aee10ee8_573dab31",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/OpenApiObject.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-10T10:55:03Z",
+      "side": 1,
+      "message": "Probably it should be Map\u003cString, List\u003cString\u003e\u003e.\n\nCan we have some unit test for this?\nHere I have found some examples:\nhttps://swagger.io/docs/specification/authentication/?_ga\u003d2.224106779.1452448678.1688985145-1766528962.1688985145#securitySchemes\n\nAlso according to documentation key of the map should point to securitySchemes name. Can we also verify that reference is correct?",
+      "revId": "509dc9c9a56b034b9ba505ea3d5f07a17afb907d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
