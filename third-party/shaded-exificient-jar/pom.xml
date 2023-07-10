@@ -19,7 +19,7 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>shaded-exificient-jar</artifactId>
     <packaging>jar</packaging>
-    <version>6.0.1-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
     <name>${project.artifactId}</name>
 
     <properties>
