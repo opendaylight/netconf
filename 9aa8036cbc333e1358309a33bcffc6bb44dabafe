@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71791d55_4e9114b6",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/KeysMappingTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-10T10:00:46Z",
+      "side": 1,
+      "message": "Please remove redundant empty line",
+      "revId": "9aa8036cbc333e1358309a33bcffc6bb44dabafe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c145cf7_e5a516f5",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/KeysMappingTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-10T10:00:46Z",
+      "side": 1,
+      "message": "Fix two space indent here",
+      "revId": "9aa8036cbc333e1358309a33bcffc6bb44dabafe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
