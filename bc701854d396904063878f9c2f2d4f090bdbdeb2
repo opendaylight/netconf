@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e1269c1_5e303d43",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 811,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-07-10T12:28:23Z",
+      "side": 1,
+      "message": "Resolved",
+      "parentUuid": "fb15d7d7_5d181f2f",
+      "range": {
+        "startLine": 810,
+        "startChar": 12,
+        "endLine": 811,
+        "endChar": 58
+      },
+      "revId": "bc701854d396904063878f9c2f2d4f090bdbdeb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5dae837_8a1dc75a",
@@ -61,6 +85,30 @@
       "side": 1,
       "message": "or do the same thing as when setting example value\n`Integer.valueOf(number.toString())`",
       "parentUuid": "d5dae837_8a1dc75a",
+      "range": {
+        "startLine": 821,
+        "startChar": 0,
+        "endLine": 822,
+        "endChar": 66
+      },
+      "revId": "bc701854d396904063878f9c2f2d4f090bdbdeb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "638658db_54811b52",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 822,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-07-10T12:28:23Z",
+      "side": 1,
+      "message": "Resolved",
+      "parentUuid": "cec3901a_718f418a",
       "range": {
         "startLine": 821,
         "startChar": 0,
