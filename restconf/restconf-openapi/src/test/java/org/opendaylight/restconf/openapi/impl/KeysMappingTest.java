@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
+import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getDataPathParameters;
 
 import java.util.List;
 import org.junit.BeforeClass;
@@ -85,6 +85,6 @@ public class KeysMappingTest {
             + "/multiple-key-list2={name1},{name3}/multiple-key-list3={name31},{name4}/multiple-key-list4={name5}";
         assertTrue(doc.paths().containsKey(pathToMultipleKeyList4));
         assertEquals(List.of("name","name2", "name1", "name3", "name31", "name4", "name5"),
-            getPathParameters(doc.paths(), pathToMultipleKeyList4));
+            getDataPathParameters(doc.paths(), pathToMultipleKeyList4));
     }
 }
