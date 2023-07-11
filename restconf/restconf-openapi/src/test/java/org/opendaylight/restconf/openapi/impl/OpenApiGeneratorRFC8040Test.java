@@ -46,6 +46,8 @@ public final class OpenApiGeneratorRFC8040Test {
     private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_config_mandatory-list";
     private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
     private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
+    private static final String HTTP_URL = "http://localhost/path";
+
 
     private static EffectiveModelContext context;
     private static DOMSchemaService schemaService;
@@ -472,5 +474,19 @@ public final class OpenApiGeneratorRFC8040Test {
             .map(JsonNode::textValue)
             .collect(Collectors.toSet());
         assertEquals(expected, actualContainerArray);
+    }
+
+    /**
+     * Test that POST request for top level element has been created.
+     *
+     * <p>
+     * As paths is a Map, we cannot create more than one request with path "/rests/data".
+     */
+    @Test
+    public void testRootPostRequest() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        final var definitionNames = new DefinitionNames();
+        final var doc = generator.getControllerModulesDoc(mockInfo, definitionNames);
+        assertTrue(doc.paths().containsKey("/rests/data"));
     }
 }
