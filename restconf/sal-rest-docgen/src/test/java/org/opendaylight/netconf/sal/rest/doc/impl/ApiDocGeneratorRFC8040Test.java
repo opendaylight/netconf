@@ -15,8 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +53,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
             ApiDocServiceImpl.OAversion.V2_0);
+        List<String> paths = new ArrayList<>();
+        doc.getPaths().fieldNames().forEachRemaining(paths::add);
 
         assertEquals(List.of("/rests/data",
             "/rests/data/toaster2:toaster",
@@ -68,7 +68,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
             "/rests/operations/toaster2:make-toast",
             "/rests/operations/toaster2:cancel-toast",
             "/rests/operations/toaster2:restock-toaster"),
-            ImmutableList.copyOf(doc.getPaths().fieldNames()));
+            paths);
     }
 
     /**
@@ -304,8 +304,11 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var module = CONTEXT.findModule(MY_YANG, Revision.of(MY_YANG_REVISION)).orElseThrow();
         final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "",
                 CONTEXT,ApiDocServiceImpl.OAversion.V3_0);
+        List<String> paths = new ArrayList<>();
+        doc.getPaths().fieldNames().forEachRemaining(paths::add);
+
         assertEquals(List.of("/rests/data", "/rests/data/my-yang:data"),
-                Lists.newArrayList(doc.getPaths().fieldNames()));
+               paths);
 
         final var JsonNodeMyYangData = doc.getPaths().get("/rests/data/my-yang:data");
         verifyRequestRef(JsonNodeMyYangData.path("post"),
