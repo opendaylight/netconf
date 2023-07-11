@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -319,7 +318,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 CONTEXT, OAversion.V3_0);
 
         assertEquals(List.of("/rests/data", "/rests/data/my-yang:data"),
-                Lists.newArrayList(doc.getPaths().fieldNames()));
+                ImmutableList.copyOf(doc.getPaths().fieldNames()));
         final var JsonNodeMyYangData = doc.getPaths().get("/rests/data/my-yang:data");
         verifyRequestRef(JsonNodeMyYangData.path("post"),
                 "#/components/schemas/my-yang_config_data_post",
