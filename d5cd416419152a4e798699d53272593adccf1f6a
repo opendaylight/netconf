@@ -16,6 +16,24 @@
       "message": "Please use https://www.baeldung.com/java-text-blocks.",
       "revId": "d5cd416419152a4e798699d53272593adccf1f6a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91f3a842_ba2aad73",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-11T08:54:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "427b1e29_72c35178",
+      "revId": "d5cd416419152a4e798699d53272593adccf1f6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
