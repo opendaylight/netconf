@@ -651,7 +651,9 @@ public class DefinitionGenerator {
             jsonType = STRING_TYPE;
         }
         if (!(leafTypeDef instanceof IdentityrefTypeDefinition)) {
-            putIfNonNull(property, TYPE_KEY, jsonType);
+            if (TYPE_KEY != null && jsonType != null) {
+                property.put(TYPE_KEY, jsonType);
+            }
             if (leafTypeDef.getDefaultValue().isPresent()) {
                 final Object defaultValue = leafTypeDef.getDefaultValue().orElseThrow();
                 if (defaultValue instanceof String stringDefaultValue) {
@@ -909,12 +911,6 @@ public class DefinitionGenerator {
             } else if (number instanceof Long) {
                 property.put(key, (Long) number);
             }
-        }
-    }
-
-    private static void putIfNonNull(final ObjectNode property, final String key, final String value) {
-        if (key != null && value != null) {
-            property.put(key, value);
         }
     }
 
