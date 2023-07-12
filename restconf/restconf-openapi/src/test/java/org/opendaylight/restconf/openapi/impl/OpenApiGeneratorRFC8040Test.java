@@ -19,6 +19,7 @@ import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BA
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -428,9 +429,22 @@ public final class OpenApiGeneratorRFC8040Test {
         final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
-        assertEquals("[{\"basicAuth\":[]}]", doc.security().toString());
+        assertEquals("[{basicAuth=[]}]", doc.security().toString());
         assertEquals("Http[scheme=basic, description=null, bearerFormat=null]",
             doc.components().securitySchemes().get(BASIC_AUTH_NAME).toString());
+
+        // take list of all defined security scheme objects => all names of registered SecuritySchemeObjects
+        final var securitySchemesObjectNames = doc.components().securitySchemes().keySet();
+        assertTrue("No Security Schemes Object is defined", securitySchemesObjectNames.size() > 0);
+
+        // collect all referenced security scheme objects
+        final var referencedSecurityObjects = new HashSet<String>();
+        doc.security().forEach(map -> referencedSecurityObjects.addAll(map.keySet()));
+
+        // verify, that each reference references name of registered Security Scheme Object
+        for (final var secObjRef : referencedSecurityObjects) {
+            assertTrue(securitySchemesObjectNames.contains(secObjRef));
+        }
     }
 
     /**
