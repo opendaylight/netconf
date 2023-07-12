@@ -85,6 +85,6 @@ public class KeysMappingTest {
             + "/multiple-key-list2={name1},{name3}/multiple-key-list3={name31},{name4}/multiple-key-list4={name5}";
         assertTrue(doc.paths().containsKey(pathToMultipleKeyList4));
         assertEquals(List.of("name","name2", "name1", "name3", "name31", "name4", "name5"),
-            getPathParameters(doc.paths(), pathToMultipleKeyList4));
+            getPathParameters(doc.paths().get(pathToMultipleKeyList4).patch()));
     }
 }
