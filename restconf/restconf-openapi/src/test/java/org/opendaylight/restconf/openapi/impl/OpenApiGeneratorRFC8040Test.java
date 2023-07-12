@@ -17,7 +17,10 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +34,7 @@ import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
+import org.opendaylight.restconf.openapi.model.SecuritySchemes;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -427,9 +431,25 @@ public final class OpenApiGeneratorRFC8040Test {
         final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
-        assertEquals("[{\"basicAuth\":[]}]", doc.security().toString());
+        assertEquals("[{basicAuth=[]}]", doc.security().toString());
         assertEquals("SecurityObject[type=http, description=null, scheme=basic, bearerFormat=null]",
             doc.components().securitySchemes().basicAuth().toString());
+
+        // take list of all defined security scheme objects => all names of fields defined in the SecuritySchemes class
+        final var securitySchemesObjectNames = Arrays.stream(SecuritySchemes.class.getDeclaredFields())
+                .map(Field::getName)
+                .toList();
+        assertTrue("No Security Schemes Object is defined", securitySchemesObjectNames.size() > 0);
+
+        // collect all referenced security scheme objects
+        final var referencedSecurityObjects = new HashSet<String>();
+        doc.security().forEach(map -> referencedSecurityObjects.addAll(map.keySet()));
+
+        // verify, that each reference references an existing Security Scheme Object.
+        // In other words, verify that the field is defined in the SecuritySchemes
+        for (final var secObjRef : referencedSecurityObjects) {
+            assertTrue(securitySchemesObjectNames.contains(secObjRef));
+        }
     }
 
     /**

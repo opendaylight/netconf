@@ -10,11 +10,13 @@ package org.opendaylight.restconf.openapi.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record Operation(boolean deprecated, ArrayNode tags, ArrayNode parameters, ArrayNode security, ArrayNode servers,
-        ObjectNode callbacks, ObjectNode externalDocs, ObjectNode requestBody, ObjectNode responses,
-        String description, String operationId, String summary) {
+public record Operation(boolean deprecated, ArrayNode tags, ArrayNode parameters,
+        List<Map<String, List<String>>> security, ArrayNode servers, ObjectNode callbacks, ObjectNode externalDocs,
+        ObjectNode requestBody, ObjectNode responses, String description, String operationId, String summary) {
 
     private Operation(final Builder builder) {
         this(builder.deprecated, builder.tags, builder.parameters, builder.security, builder.servers, builder.callbacks,
@@ -27,7 +29,7 @@ public record Operation(boolean deprecated, ArrayNode tags, ArrayNode parameters
         private boolean deprecated;
         private ArrayNode tags;
         private ArrayNode parameters;
-        private ArrayNode security;
+        private List<Map<String, List<String>>> security;
         private ArrayNode servers;
         private ObjectNode callbacks;
         private ObjectNode externalDocs;
@@ -52,7 +54,7 @@ public record Operation(boolean deprecated, ArrayNode tags, ArrayNode parameters
             return this;
         }
 
-        public Builder security(final ArrayNode security) {
+        public Builder security(final List<Map<String, List<String>>> security) {
             this.security = security;
             return this;
         }
