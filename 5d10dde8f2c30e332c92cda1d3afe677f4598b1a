@@ -16,6 +16,24 @@
       "message": "config/operational depends on node.isCofiguration()",
       "revId": "5d10dde8f2c30e332c92cda1d3afe677f4598b1a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3899fb17_dca9d0cf",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-12T10:45:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6394863_9ce45069",
+      "revId": "5d10dde8f2c30e332c92cda1d3afe677f4598b1a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
