@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3340b620_8071beb7",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/BasicAuth.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-12T09:46:23Z",
+      "side": 1,
+      "message": "Moved to SecuritySchemes under name SecurityObject\nThe specification https://swagger.io/specification/#components-object does mention the SecuritySchemes to be a Map[String, SecuritySchemeObject], which in our case can be a record. the `key` is the field name and the `value` is the field value. It also ensures uniquenes of keys (fields of a class/record must be unique).\nThe JSON representation of such object (record) is going to be the same as it would be for a map",
+      "parentUuid": "473a6f16_74429719",
+      "revId": "7ad42c143fc7dcc4bd73dc456e411631e4e96131",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f1374af_0b3885f0",
@@ -65,6 +83,24 @@
       "writtenOn": "2023-07-10T11:16:58Z",
       "side": 1,
       "message": "\"type\" should be Enum since documentation specify exact types.\nREQUIRED. The type of the security scheme. Valid values are \"apiKey\", \"http\", \"mutualTLS\", \"oauth2\", \"openIdConnect\".",
+      "revId": "7ad42c143fc7dcc4bd73dc456e411631e4e96131",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57b44324_46cd80a3",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/BasicAuth.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-12T09:46:23Z",
+      "side": 1,
+      "message": "Done. For now the enum contains only \"http\", which is the only type used",
+      "parentUuid": "9f1374af_0b3885f0",
       "revId": "7ad42c143fc7dcc4bd73dc456e411631e4e96131",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
