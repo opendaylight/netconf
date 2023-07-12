@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "dfd06f1daf4d429038b3baf8173311890a4d343f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f726b2c4_2827fbeb",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/CustomOpenApiBasePathTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-12T08:01:12Z",
+      "side": 1,
+      "message": "Try to use java.util.Set",
+      "revId": "dfd06f1daf4d429038b3baf8173311890a4d343f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
