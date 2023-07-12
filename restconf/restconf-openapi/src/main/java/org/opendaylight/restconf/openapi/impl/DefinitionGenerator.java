@@ -488,10 +488,8 @@ public class DefinitionGenerator {
         final ObjectNode property;
         if (node instanceof LeafSchemaNode leaf) {
             property = processLeafNode(leaf, name, required, stack, definitions, definitionNames, parentNamespace);
-        } else if (node instanceof AnyxmlSchemaNode anyxml) {
-            property = processAnyXMLNode(anyxml, name, required, parentNamespace);
-        } else if (node instanceof AnydataSchemaNode anydata) {
-            property = processAnydataNode(anydata, name, required, parentNamespace);
+        } else if (node instanceof AnyxmlSchemaNode || node instanceof AnydataSchemaNode) {
+            property = processUnknownDataSchemaNode(node, name, required, parentNamespace);
         } else if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
             if (isSchemaNodeMandatory(node)) {
                 required.add(name);
@@ -568,8 +566,10 @@ public class DefinitionGenerator {
         return property;
     }
 
-    private static ObjectNode processAnydataNode(final AnydataSchemaNode leafNode, final String name,
+    private static ObjectNode processUnknownDataSchemaNode(final DataSchemaNode leafNode, final String name,
             final ArrayNode required, final XMLNamespace parentNamespace) {
+        assert (leafNode instanceof AnydataSchemaNode || leafNode instanceof AnyxmlSchemaNode);
+
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -582,25 +582,7 @@ public class DefinitionGenerator {
             // If the parent is not from the same model, define the child XML namespace.
             property.set(XML_KEY, buildXmlParameter(leafNode));
         }
-        processMandatory(leafNode, name, required);
-        return property;
-    }
-
-    private static ObjectNode processAnyXMLNode(final AnyxmlSchemaNode leafNode, final String name,
-            final ArrayNode required, final XMLNamespace parentNamespace) {
-        final ObjectNode property = JsonNodeFactory.instance.objectNode();
-
-        final String leafDescription = leafNode.getDescription().orElse("");
-        property.put(DESCRIPTION_KEY, leafDescription);
-
-        final String localName = leafNode.getQName().getLocalName();
-        setExampleValue(property, String.format("<%s> ... </%s>", localName, localName));
-        property.put(TYPE_KEY, STRING_TYPE);
-        if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
-            // If the parent is not from the same model, define the child XML namespace.
-            property.set(XML_KEY, buildXmlParameter(leafNode));
-        }
-        processMandatory(leafNode, name, required);
+        processMandatory((MandatoryAware) leafNode, name, required);
         return property;
     }
 
