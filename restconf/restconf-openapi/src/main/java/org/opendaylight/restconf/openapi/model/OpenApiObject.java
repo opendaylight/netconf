@@ -9,7 +9,6 @@ package org.opendaylight.restconf.openapi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.List;
 import java.util.Map;
 
@@ -20,5 +19,5 @@ public record OpenApiObject(
         List<Server> servers,
         Map<String, Path> paths,
         Components components,
-        ArrayNode security) {
+        List<Map<String, List<String>>> security) {
 }
