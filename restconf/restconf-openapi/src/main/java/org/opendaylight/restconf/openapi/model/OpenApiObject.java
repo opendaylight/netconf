@@ -9,13 +9,12 @@ package org.opendaylight.restconf.openapi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.List;
 import java.util.Map;
 
 @JsonInclude(Include.NON_NULL)
 public record OpenApiObject(String openapi, Info info, List<Server> servers, Map<String, Path> paths,
-        Components components, ArrayNode security) {
+        Components components, List<Map<String, List<String>>> security) {
 
     private OpenApiObject(final Builder builder) {
         this(builder.openapi, builder.info, builder.servers, builder.paths, builder.components, builder.security);
@@ -28,7 +27,7 @@ public record OpenApiObject(String openapi, Info info, List<Server> servers, Map
         private List<Server> servers;
         private Map<String, Path> paths;
         private Components components;
-        private ArrayNode security;
+        private List<Map<String, List<String>>> security;
 
         public Builder openapi(final String openapi) {
             this.openapi = openapi;
@@ -55,7 +54,7 @@ public record OpenApiObject(String openapi, Info info, List<Server> servers, Map
             return this;
         }
 
-        public Builder security(final ArrayNode security) {
+        public Builder security(final List<Map<String, List<String>>> security) {
             this.security = security;
             return this;
         }
