@@ -25,6 +25,13 @@ public final class OpenApiTestUtils {
      */
     public static List<String> getPathParameters(final Map<String, Path> paths, final String path) {
         final var params = new ArrayList<String>();
+        paths.get(path).patch().parameters().elements()
+            .forEachRemaining(p -> params.add(p.get("name").asText()));
+        return params;
+    }
+
+    public static List<String> getActionsPathParameters(final Map<String, Path> paths, final String path) {
+        final var params = new ArrayList<String>();
         paths.get(path).post().parameters().elements()
             .forEachRemaining(p -> params.add(p.get("name").asText()));
         return params;
