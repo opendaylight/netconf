@@ -64,32 +64,6 @@ public final class OperationBuilder {
 
     }
 
-    public static Operation buildPost(final String parentName, final String nodeName, final String discriminator,
-            final String moduleName, final @Nullable String deviceName, final String description,
-            final ArrayNode pathParams) {
-        final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
-        final ArrayNode tags = buildTagsValue(deviceName, moduleName);
-        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
-        final ObjectNode ref = JsonNodeFactory.instance.objectNode();
-        final String cleanDefName = parentName + CONFIG + "_" + nodeName;
-        final String defName = cleanDefName + discriminator;
-        final String xmlDefName = cleanDefName + discriminator;
-        ref.put(REF_KEY, COMPONENTS_PREFIX + defName);
-        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
-        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
-        responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
-                buildResponse(Response.Status.CREATED.getReasonPhrase()));
-
-        return new Operation.Builder()
-            .tags(tags)
-            .parameters(parameters)
-            .requestBody(requestBody)
-            .responses(responses)
-            .description(description)
-            .summary(summary)
-            .build();
-    }
-
     public static Operation buildGet(final DataSchemaNode node, final String moduleName,
             final @Nullable String deviceName, final ArrayNode pathParams, final String defName,
             final String defNameTop, final boolean isConfig) {
