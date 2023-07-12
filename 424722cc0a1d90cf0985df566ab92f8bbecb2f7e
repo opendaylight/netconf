@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "424478c6_00b152f4",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-12T14:06:53Z",
+      "side": 1,
+      "message": "I propose to create `required` only when needed in `if`.",
+      "revId": "424722cc0a1d90cf0985df566ab92f8bbecb2f7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32511a2a_a2505ac9",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-12T14:06:53Z",
+      "side": 1,
+      "message": "So, we do not need operational - we can see config data in examples, right?",
+      "revId": "424722cc0a1d90cf0985df566ab92f8bbecb2f7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
