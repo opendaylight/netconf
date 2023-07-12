@@ -17,8 +17,6 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.b
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPut;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Range;
 import java.io.IOException;
@@ -82,8 +80,7 @@ public abstract class BaseYangOpenApiGenerator {
             .type(SecuritySchemes.Type.http)
             .scheme("basic")
             .build();
-    private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
-            .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
+    private static final List<Map<String, List<String>>> SECURITY = List.of(Map.of("basicAuth", List.of()));
 
     protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService) {
         this.schemaService = requireNonNull(schemaService);
