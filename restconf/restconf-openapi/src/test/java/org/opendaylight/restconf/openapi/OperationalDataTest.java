@@ -37,34 +37,34 @@ public class OperationalDataTest {
     private static final String DATA_MP_URI = "/rests/data/nodes/node=123/yang-ext:mount";
     private static final String OPERATIONS_MP_URI = "/rests/operations/nodes/node=123/yang-ext:mount";
     private static final Set<String> EXPECTED_SCHEMAS = Set.of(
-        "operational_root_config_config-container_TOP",
-        "operational_config_root",
-        "action-types_config_list",
+        "operational_root_config-container_TOP",
+        "operational_root",
+        "action-types_list",
         "action-types_container-action_input",
-        "operational_root_config-container_config_config-container-oper-list",
-        "action-types_multi-container_config_inner-container",
+        "operational_root_config-container_config-container-oper-list",
+        "action-types_multi-container_inner-container",
         "action-types_list-action_input_TOP",
-        "action-types_multi-container_config_inner-container_TOP",
-        "action-types_config_list_TOP",
+        "action-types_multi-container_inner-container_TOP",
+        "action-types_list_TOP",
         "action-types_container-action_output",
-        "operational_root_oper-container_config_oper-container-list",
-        "operational_root_oper-container_config_oper-container-list_TOP",
-        "operational_root_oper-container_config_config-container",
-        "operational_root_config_config-container",
+        "operational_root_oper-container_oper-container-list",
+        "operational_root_oper-container_oper-container-list_TOP",
+        "operational_root_oper-container_config-container",
+        "operational_root_config-container",
         "action-types_list-action_input",
         "action-types_list-action_output_TOP",
         "action-types_container-action_input_TOP",
-        "operational_config_root_TOP",
+        "operational_root_TOP",
         "action-types_list-action_output",
         "action-types_container-action_output_TOP",
-        "operational_root_config_oper-container",
-        "operational_root_config-container_config_config-container-oper-list_TOP",
-        "action-types_config_multi-container_TOP",
-        "operational_root_config_oper-container_TOP",
-        "action-types_config_container",
-        "action-types_config_container_TOP",
-        "operational_root_oper-container_config_config-container_TOP",
-        "action-types_config_multi-container");
+        "operational_root_oper-container",
+        "operational_root_config-container_config-container-oper-list_TOP",
+        "action-types_multi-container_TOP",
+        "operational_root_oper-container_TOP",
+        "action-types_container",
+        "action-types_container_TOP",
+        "operational_root_oper-container_config-container_TOP",
+        "action-types_multi-container");
     private static final Set<String> EXPECTED_PATHS = Set.of(
         OPERATIONS_MP_URI + "/action-types:list={name}/list-action",
         OPERATIONS_MP_URI + "/action-types:container/container-action",
@@ -151,7 +151,7 @@ public class OperationalDataTest {
 
     @Test
     public void testOperationalConfigRootSchemaProperties() {
-        final var configRoot = schemas.get("operational_config_root");
+        final var configRoot = schemas.get("operational_root");
         assertNotNull(configRoot);
         verifyProperties(configRoot, Set.of("leaf-config", "config-container"));
     }
@@ -159,35 +159,35 @@ public class OperationalDataTest {
     @Test
     public void testOperationalConfigContOperListSchemaProperties() {
         final var configContOperList = schemas.get(
-            "operational_root_config-container_config_config-container-oper-list");
+            "operational_root_config-container_config-container-oper-list");
         assertNotNull(configContOperList);
         verifyProperties(configContOperList, Set.of("oper-container-list-leaf"));
     }
 
     @Test
     public void testOperationalContListSchemaProperties() {
-        final var operContList = schemas.get("operational_root_oper-container_config_oper-container-list");
+        final var operContList = schemas.get("operational_root_oper-container_oper-container-list");
         assertNotNull(operContList);
         verifyProperties(operContList, Set.of("oper-container-list-leaf"));
     }
 
     @Test
     public void testOperationalConConfigContSchemaProperties() {
-        final var operConConfigCont = schemas.get("operational_root_oper-container_config_config-container");
+        final var operConConfigCont = schemas.get("operational_root_oper-container_config-container");
         assertNotNull(operConConfigCont);
         verifyProperties(operConConfigCont, Set.of("config-container-config-leaf", "opconfig-container-oper-leaf"));
     }
 
     @Test
     public void testOperationalConfigContSchemaProperties() {
-        final var configCont = schemas.get("operational_root_config_config-container");
+        final var configCont = schemas.get("operational_root_config-container");
         assertNotNull(configCont);
         verifyProperties(configCont, Set.of("config-container-config-leaf", "leaf-second-case"));
     }
 
     @Test
     public void testOperationalContSchemaProperties() {
-        final var operCont = schemas.get("operational_root_config_oper-container");
+        final var operCont = schemas.get("operational_root_oper-container");
         assertNotNull(operCont);
         verifyProperties(operCont, Set.of("config-container", "oper-container-list", "leaf-first-case",
             "oper-leaf-first-case", "oper-container-config-leaf-list"));
