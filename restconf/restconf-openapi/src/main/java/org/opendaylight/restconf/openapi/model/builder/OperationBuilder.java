@@ -97,14 +97,8 @@ public final class OperationBuilder {
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
 
         final boolean isList = node instanceof ListSchemaNode;
-        final ObjectNode response;
-        if (isConfig) {
-            response = createRequestBodyParameter(defName, nodeName, isList, summary,
+        final ObjectNode response = createRequestBodyParameter(defName, nodeName, isList, summary,
                 String.valueOf(Response.Status.OK.getStatusCode()));
-        } else {
-            response = JsonNodeFactory.instance.objectNode();
-            response.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
-        }
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()), response);
 
         return new Operation.Builder()
@@ -324,18 +318,16 @@ public final class OperationBuilder {
     public static ObjectNode buildResponse(final String description, final ObjectNode schema,
             final ObjectNode xmlSchema) {
         final ObjectNode response = JsonNodeFactory.instance.objectNode();
-        if (!schema.isEmpty()) {
-            final ObjectNode content = JsonNodeFactory.instance.objectNode();
-            final ObjectNode body = JsonNodeFactory.instance.objectNode();
-            final ObjectNode xmlBody = JsonNodeFactory.instance.objectNode();
+        final ObjectNode content = JsonNodeFactory.instance.objectNode();
+        final ObjectNode body = JsonNodeFactory.instance.objectNode();
+        final ObjectNode xmlBody = JsonNodeFactory.instance.objectNode();
 
-            body.set(SCHEMA_KEY, schema);
-            xmlBody.set(SCHEMA_KEY, xmlSchema);
-            content.set(MediaType.APPLICATION_JSON, body);
-            content.set(MediaType.APPLICATION_XML, xmlBody);
+        body.set(SCHEMA_KEY, schema);
+        xmlBody.set(SCHEMA_KEY, xmlSchema);
+        content.set(MediaType.APPLICATION_JSON, body);
+        content.set(MediaType.APPLICATION_XML, xmlBody);
 
-            response.set(CONTENT_KEY, content);
-        }
+        response.set(CONTENT_KEY, content);
 
         response.put(DESCRIPTION_KEY, description);
         return response;

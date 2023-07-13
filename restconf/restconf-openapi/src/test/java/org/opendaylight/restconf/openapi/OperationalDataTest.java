@@ -46,7 +46,12 @@ public class OperationalDataTest {
         "action-types_list-action_input",
         "action-types_multi-container_inner-container",
         "operational_root",
-        "operational_root_config-container");
+        "operational_root_config-container",
+        "operational_root_config-container_config-container-oper-list",
+        "operational_root_oper-container",
+        "operational_root_oper-container_config-container",
+        "operational_root_oper-container_oper-container-list");
+
     private static final Set<String> EXPECTED_PATHS = Set.of(
         OPERATIONS_MP_URI + "/action-types:list={name}/list-action",
         OPERATIONS_MP_URI + "/action-types:container/container-action",
@@ -99,7 +104,7 @@ public class OperationalDataTest {
                 final var responses = path.get().responses();
                 final var response = responses.elements().next();
                 final var content = response.get("content");
-                // In case of 200 no content and Operational data
+                // In case of 200 no content
                 if (content != null) {
                     verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
                     verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
@@ -136,7 +141,32 @@ public class OperationalDataTest {
         final var configRoot = schemas.get("operational_root");
         assertNotNull(configRoot);
         final var actualProperties = getSetOfProperties(configRoot);
-        assertEquals(Set.of("leaf-config", "leaf-first-case", "config-container"), actualProperties);
+        assertEquals(Set.of("leaf-config", "config-container"), actualProperties);
+    }
+
+    @Test
+    public void testOperationalConfigContOperListSchemaProperties() {
+        final var configContOperList = schemas.get(
+            "operational_root_config-container_config-container-oper-list");
+        assertNotNull(configContOperList);
+        final var actualProperties = getSetOfProperties(configContOperList);
+        assertEquals(Set.of("oper-container-list-leaf"), actualProperties);
+    }
+
+    @Test
+    public void testOperationalContListSchemaProperties() {
+        final var operContList = schemas.get("operational_root_oper-container_oper-container-list");
+        assertNotNull(operContList);
+        final var actualProperties = getSetOfProperties(operContList);
+        assertEquals(Set.of("oper-container-list-leaf"), actualProperties);
+    }
+
+    @Test
+    public void testOperationalConConfigContSchemaProperties() {
+        final var operConConfigCont = schemas.get("operational_root_oper-container_config-container");
+        assertNotNull(operConConfigCont);
+        final var actualProperties = getSetOfProperties(operConConfigCont);
+        assertEquals(Set.of("config-container-config-leaf", "opconfig-container-oper-leaf"), actualProperties);
     }
 
     @Test
@@ -144,8 +174,16 @@ public class OperationalDataTest {
         final var configCont = schemas.get("operational_root_config-container");
         assertNotNull(configCont);
         final var actualProperties = getSetOfProperties(configCont);
-        assertEquals(Set.of("config-container-config-leaf", "leaf-second-case", "oper-leaf-second-case"),
-            actualProperties);
+        assertEquals(Set.of("config-container-config-leaf", "leaf-second-case"), actualProperties);
+    }
+
+    @Test
+    public void testOperationalContSchemaProperties() {
+        final var operCont = schemas.get("operational_root_oper-container");
+        assertNotNull(operCont);
+        final var actualProperties = getSetOfProperties(operCont);
+        assertEquals(Set.of("config-container", "oper-container-list", "leaf-first-case", "oper-leaf-first-case",
+            "oper-container-config-leaf-list"), actualProperties);
     }
 
     @Test
