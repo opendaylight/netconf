@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "554cb986_a89f1eb6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-13T12:46:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f203bf4e_730fde92",
+      "revId": "1bbb03551bfc3f70453f3888322e9c7d9a6e96c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44abe8c4_ce7197c4",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-13T07:33:58Z",
       "side": 1,
       "message": "If not possible to use List.of(), this should be final var.",
+      "revId": "1bbb03551bfc3f70453f3888322e9c7d9a6e96c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80376333_c1ad9c9f",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-13T12:46:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44abe8c4_ce7197c4",
       "revId": "1bbb03551bfc3f70453f3888322e9c7d9a6e96c0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -70,6 +106,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba4b651f_9021aa14",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-13T12:46:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c65bf517_2ba554c5",
+      "revId": "1bbb03551bfc3f70453f3888322e9c7d9a6e96c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12f78d35_37deb8af",
@@ -101,6 +155,24 @@
       "side": 1,
       "message": "List\u003cIterator\u003cString\u003e\u003e but we need List\u003cString\u003e",
       "parentUuid": "12f78d35_37deb8af",
+      "revId": "1bbb03551bfc3f70453f3888322e9c7d9a6e96c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5c994f7_837c0251",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-13T12:46:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49b6341d_29ef58d0",
       "revId": "1bbb03551bfc3f70453f3888322e9c7d9a6e96c0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
