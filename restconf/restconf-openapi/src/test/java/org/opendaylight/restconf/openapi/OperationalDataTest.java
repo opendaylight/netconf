@@ -37,12 +37,12 @@ public class OperationalDataTest {
     private static final String DATA_MP_URI = "/rests/data/nodes/node=123/yang-ext:mount";
     private static final String OPERATIONS_MP_URI = "/rests/operations/nodes/node=123/yang-ext:mount";
     private static final Set<String> EXPECTED_SCHEMAS = Set.of(
-        "action-types_config_container",
-        "action-types_config_container_TOP",
-        "action-types_config_list",
-        "action-types_config_list_TOP",
-        "action-types_config_multi-container",
-        "action-types_config_multi-container_TOP",
+        "action-types_container",
+        "action-types_container_TOP",
+        "action-types_list",
+        "action-types_list_TOP",
+        "action-types_multi-container",
+        "action-types_multi-container_TOP",
         "action-types_container-action_input",
         "action-types_container-action_input_TOP",
         "action-types_container-action_output",
@@ -51,12 +51,12 @@ public class OperationalDataTest {
         "action-types_list-action_output_TOP",
         "action-types_list-action_output",
         "action-types_list-action_input",
-        "action-types_multi-container_config_inner-container",
-        "action-types_multi-container_config_inner-container_TOP",
-        "operational_config_root",
-        "operational_config_root_TOP",
-        "operational_root_config_config-container",
-        "operational_root_config_config-container_TOP");
+        "action-types_multi-container_inner-container",
+        "action-types_multi-container_inner-container_TOP",
+        "operational_root",
+        "operational_root_TOP",
+        "operational_root_config-container",
+        "operational_root_config-container_TOP");
     private static final Set<String> EXPECTED_PATHS = Set.of(
         OPERATIONS_MP_URI + "/action-types:list={name}/list-action",
         OPERATIONS_MP_URI + "/action-types:container/container-action",
@@ -139,7 +139,7 @@ public class OperationalDataTest {
 
     @Test
     public void testOperationalConfigRootSchemaProperties() {
-        final var configRoot = schemas.get("operational_config_root");
+        final var configRoot = schemas.get("operational_root");
         assertNotNull(configRoot);
         final var actualProperties = getSetOfProperties(configRoot);
         assertEquals(Set.of("leaf-config", "leaf-first-case", "config-container"), actualProperties);
@@ -147,7 +147,7 @@ public class OperationalDataTest {
 
     @Test
     public void testOperationalConfigContSchemaProperties() {
-        final var configCont = schemas.get("operational_root_config_config-container");
+        final var configCont = schemas.get("operational_root_config-container");
         assertNotNull(configCont);
         final var actualProperties = getSetOfProperties(configCont);
         assertEquals(Set.of("config-container-config-leaf", "leaf-second-case", "oper-leaf-second-case"),
@@ -156,7 +156,7 @@ public class OperationalDataTest {
 
     @Test
     public void testListActionSchemaProperties() {
-        final var configRoot = schemas.get("action-types_config_list");
+        final var configRoot = schemas.get("action-types_list");
         assertNotNull(configRoot);
         final var actualProperties = getSetOfProperties(configRoot);
         assertEquals(Set.of("name"), actualProperties);
@@ -180,7 +180,7 @@ public class OperationalDataTest {
 
     @Test
     public void testContainerActionSchemaProperties() {
-        final var configRoot = schemas.get("action-types_config_container");
+        final var configRoot = schemas.get("action-types_container");
         assertNotNull(configRoot);
         final var actualProperties = getSetOfProperties(configRoot);
         assertEquals(Set.of(), actualProperties);
