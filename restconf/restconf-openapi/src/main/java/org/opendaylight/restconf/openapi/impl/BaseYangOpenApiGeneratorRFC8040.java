@@ -37,9 +37,4 @@ public abstract class BaseYangOpenApiGeneratorRFC8040 extends BaseYangOpenApiGen
         }
         return "/" + basePath + "/operations" + context;
     }
-
-    @Override
-    protected void appendPathKeyValue(final StringBuilder builder, final Object value) {
-        builder.deleteCharAt(builder.length() - 1).append("=").append(value).append('/');
-    }
 }

@@ -459,8 +459,6 @@ public abstract class BaseYangOpenApiGenerator {
         paths.put(resourcePath, pathBuilder.build());
     }
 
-    protected abstract void appendPathKeyValue(StringBuilder builder, Object value);
-
     public String generateUrlPrefixFromInstanceID(final YangInstanceIdentifier key, final String moduleName) {
         final StringBuilder builder = new StringBuilder();
         builder.append("/");
@@ -471,7 +469,7 @@ public abstract class BaseYangOpenApiGenerator {
             final String name = arg.getNodeType().getLocalName();
             if (arg instanceof NodeIdentifierWithPredicates nodeId) {
                 for (final Entry<QName, Object> entry : nodeId.entrySet()) {
-                    appendPathKeyValue(builder, entry.getValue());
+                    builder.deleteCharAt(builder.length() - 1).append("=").append(entry.getValue()).append('/');
                 }
             } else {
                 builder.append(name).append('/');
