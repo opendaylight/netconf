@@ -259,7 +259,7 @@ public final class MountPointOpenApiTest {
     public void testAuthenticationFeature() throws Exception {
         final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         openApi.onMountPointCreated(INSTANCE_ID);
-        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, null);
 
         assertEquals("[{\"basicAuth\":[]}]", mountPointApi.security().toString());
         assertEquals("{\"type\":\"http\",\"scheme\":\"basic\"}",
