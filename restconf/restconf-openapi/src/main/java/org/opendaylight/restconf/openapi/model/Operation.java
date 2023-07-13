@@ -11,9 +11,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
+import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record Operation(boolean deprecated, ArrayNode tags, List<Parameter> parameters, ArrayNode security,
+public record Operation(boolean deprecated, ArrayNode tags, Set<Parameter> parameters, ArrayNode security,
         ArrayNode servers, ObjectNode callbacks, ObjectNode externalDocs, ObjectNode requestBody,
         ObjectNode responses, String description, String operationId, String summary) {
 
@@ -27,7 +28,7 @@ public record Operation(boolean deprecated, ArrayNode tags, List<Parameter> para
     public static class Builder {
         private boolean deprecated;
         private ArrayNode tags;
-        private List<Parameter> parameters;
+        private Set<Parameter> parameters;
         private ArrayNode security;
         private ArrayNode servers;
         private ObjectNode callbacks;
@@ -48,7 +49,7 @@ public record Operation(boolean deprecated, ArrayNode tags, List<Parameter> para
             return this;
         }
 
-        public Builder parameters(final List<Parameter> parameters) {
+        public Builder parameters(final Set<Parameter> parameters) {
             this.parameters = parameters;
             return this;
         }
