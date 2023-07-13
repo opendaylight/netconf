@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f203bf4e_730fde92",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-13T07:33:58Z",
+      "side": 1,
+      "message": "https://cbea.ms/git-commit/",
+      "revId": "1bbb03551bfc3f70453f3888322e9c7d9a6e96c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44abe8c4_ce7197c4",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-13T07:33:58Z",
+      "side": 1,
+      "message": "If not possible to use List.of(), this should be final var.",
+      "revId": "1bbb03551bfc3f70453f3888322e9c7d9a6e96c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a83b67bd_382c30c7",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-13T07:33:58Z",
+      "side": 1,
+      "message": "List.of(doc.getPaths().fieldNames())",
+      "revId": "1bbb03551bfc3f70453f3888322e9c7d9a6e96c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12f78d35_37deb8af",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-13T07:33:58Z",
+      "side": 1,
+      "message": "List.of(doc.getPaths().fieldNames())",
+      "revId": "1bbb03551bfc3f70453f3888322e9c7d9a6e96c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
