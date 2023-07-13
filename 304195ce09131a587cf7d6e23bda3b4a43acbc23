@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "59e0e62c_922bf84e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-13T10:36:38Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2e46db1c_e0bebcaa",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff4a4714_9d3dee77",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "we need to declare pathParams variable to be sure that we process the same Collection inside #createPath and #addPaths",
       "parentUuid": "ff4a4714_9d3dee77",
+      "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01fc8f40_673cb64e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-13T10:36:38Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c1322798_728b9579",
       "revId": "304195ce09131a587cf7d6e23bda3b4a43acbc23",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
