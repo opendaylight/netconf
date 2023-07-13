@@ -31,7 +31,6 @@ import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 
 public final class OperationBuilder {
-    public static final String CONFIG = "_config";
     public static final String CONFIG_QUERY_PARAM = "config";
     public static final String CONTENT_KEY = "content";
     public static final String COMPONENTS_PREFIX = "#/components/schemas/";
@@ -71,11 +70,11 @@ public final class OperationBuilder {
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
-        final String cleanDefName = parentName + CONFIG + "_" + nodeName;
+        final String cleanDefName = parentName  + "_" + nodeName;
         final String defName = cleanDefName + discriminator;
         final String xmlDefName = cleanDefName + discriminator;
         ref.put(REF_KEY, COMPONENTS_PREFIX + defName);
-        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
+        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName, summary);
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
                 buildResponse(Response.Status.CREATED.getReasonPhrase()));
@@ -137,9 +136,9 @@ public final class OperationBuilder {
         final String summary = buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        final String defName = parentName + CONFIG + "_" + nodeName + TOP;
-        final String xmlDefName = parentName + CONFIG + "_" + nodeName;
-        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
+        final String defName = parentName + "_" + nodeName + TOP;
+        final String xmlDefName = parentName + "_" + nodeName;
+        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName, summary);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
@@ -161,9 +160,9 @@ public final class OperationBuilder {
         final String summary = buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        final String defName = parentName + CONFIG + "_" + nodeName + TOP;
-        final String xmlDefName = parentName + CONFIG + "_" + nodeName;
-        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
+        final String defName = parentName + "_" + nodeName + TOP;
+        final String xmlDefName = parentName + "_" + nodeName;
+        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName, summary);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
