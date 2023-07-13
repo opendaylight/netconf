@@ -9,7 +9,6 @@ package org.opendaylight.restconf.openapi.impl;
 
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.MODULE_NAME_SUFFIX;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.COMPONENTS_PREFIX;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.NAME_KEY;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.XML_KEY;
@@ -187,7 +186,7 @@ public class DefinitionGenerator {
                         final ObjectNode childNodeProperties = JsonNodeFactory.instance.objectNode();
 
                         final String ref = COMPONENTS_PREFIX
-                                + moduleName + CONFIG
+                                + moduleName
                                 + "_" + localName
                                 + definitionNames.getDiscriminator(node);
 
@@ -197,7 +196,7 @@ public class DefinitionGenerator {
                             items.put(REF_KEY, ref);
                             childNodeProperties.set(ITEMS_KEY, items);
                             childNodeProperties.put(DESCRIPTION_KEY, childNode.getDescription().orElse(""));
-                            childNodeProperties.put(TITLE_KEY, localName + CONFIG);
+                            childNodeProperties.put(TITLE_KEY, localName);
                         } else {
                          /*
                             Description can't be added, because nothing allowed alongside $ref.
@@ -393,7 +392,7 @@ public class DefinitionGenerator {
         final Collection<? extends DataSchemaNode> containerChildren = dataNode.getChildNodes();
         final SchemaNode schemaNode = (SchemaNode) dataNode;
         final String localName = schemaNode.getQName().getLocalName();
-        final String nodeName = parentName + CONFIG + "_" + localName;
+        final String nodeName = parentName + "_" + localName;
         final Schema.Builder childSchemaBuilder = new Schema.Builder()
             .type(OBJECT_TYPE)
             .title(nodeName)
@@ -404,7 +403,7 @@ public class DefinitionGenerator {
 
         final String discriminator;
         if (!definitionNames.isListedNode(schemaNode)) {
-            final String parentNameConfigLocalName = parentName + CONFIG + "_" + localName;
+            final String parentNameConfigLocalName = parentName + "_" + localName;
             final String nameAsParent = parentName + "_" + localName;
             final List<String> names = List.of(parentNameConfigLocalName, parentNameConfigLocalName + TOP,
                 nameAsParent, nameAsParent + TOP);
