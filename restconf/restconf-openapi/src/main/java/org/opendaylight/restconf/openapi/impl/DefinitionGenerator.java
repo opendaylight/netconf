@@ -213,8 +213,9 @@ public class DefinitionGenerator {
                         Add module name prefix to property name, when ServiceNow can process colons(second parameter
                         of processLeafNode).
                      */
-                    processLeafNode((LeafSchemaNode) node, localName, properties, required, stack,
+                    final ObjectNode leafNode = processLeafNode((LeafSchemaNode) node, localName, required, stack,
                             definitions, definitionNames, module.getNamespace());
+                    properties.set(localName, leafNode);
                 }
             }
             stack.exit();
@@ -393,37 +394,34 @@ public class DefinitionGenerator {
     private ObjectNode processDataNodeContainer(final DataNodeContainer dataNode, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames, final boolean isConfig,
             final SchemaInferenceStack stack) throws IOException {
-        if (dataNode instanceof ListSchemaNode || dataNode instanceof ContainerSchemaNode) {
-            final Collection<? extends DataSchemaNode> containerChildren = dataNode.getChildNodes();
-            final SchemaNode schemaNode = (SchemaNode) dataNode;
-            final String localName = schemaNode.getQName().getLocalName();
-            final String nodeName = parentName + (isConfig ? CONFIG : "") + "_" + localName;
-            final Schema.Builder childSchemaBuilder = new Schema.Builder()
-                .type(OBJECT_TYPE)
-                .title(nodeName)
-                .description(schemaNode.getDescription().orElse(""));
+        final Collection<? extends DataSchemaNode> containerChildren = dataNode.getChildNodes();
+        final SchemaNode schemaNode = (SchemaNode) dataNode;
+        final String localName = schemaNode.getQName().getLocalName();
+        final String nodeName = parentName + (isConfig ? CONFIG : "") + "_" + localName;
+        final Schema.Builder childSchemaBuilder = new Schema.Builder()
+            .type(OBJECT_TYPE)
+            .title(nodeName)
+            .description(schemaNode.getDescription().orElse(""));
 
-            childSchemaBuilder.properties(processChildren(childSchemaBuilder, containerChildren,
-                parentName + "_" + localName, definitions, definitionNames, isConfig, stack));
+        childSchemaBuilder.properties(processChildren(childSchemaBuilder, containerChildren,
+            parentName + "_" + localName, definitions, definitionNames, isConfig, stack));
 
-            final String discriminator;
-            if (!definitionNames.isListedNode(schemaNode)) {
-                final String parentNameConfigLocalName = parentName + CONFIG + "_" + localName;
-                final String nameAsParent = parentName + "_" + localName;
-                final List<String> names = List.of(parentNameConfigLocalName, parentNameConfigLocalName + TOP,
-                    nameAsParent, nameAsParent + TOP);
-                discriminator = definitionNames.pickDiscriminator(schemaNode, names);
-            } else {
-                discriminator = definitionNames.getDiscriminator(schemaNode);
-            }
-
-            final String defName = nodeName + discriminator;
-            childSchemaBuilder.xml(buildXmlParameter(schemaNode));
-            definitions.put(defName, childSchemaBuilder.build());
-
-            return processTopData(nodeName, discriminator, definitions, schemaNode);
+        final String discriminator;
+        if (!definitionNames.isListedNode(schemaNode)) {
+            final String parentNameConfigLocalName = parentName + CONFIG + "_" + localName;
+            final String nameAsParent = parentName + "_" + localName;
+            final List<String> names = List.of(parentNameConfigLocalName, parentNameConfigLocalName + TOP,
+                nameAsParent, nameAsParent + TOP);
+            discriminator = definitionNames.pickDiscriminator(schemaNode, names);
+        } else {
+            discriminator = definitionNames.getDiscriminator(schemaNode);
         }
-        return null;
+
+        final String defName = nodeName + discriminator;
+        childSchemaBuilder.xml(buildXmlParameter(schemaNode));
+        definitions.put(defName, childSchemaBuilder.build());
+
+        return processTopData(nodeName, discriminator, definitions, schemaNode);
     }
 
     /**
@@ -437,76 +435,67 @@ public class DefinitionGenerator {
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         for (final DataSchemaNode node : nodes) {
             if (!isConfig || node.isConfiguration()) {
-                processChildNode(node, parentName, definitions, definitionNames, isConfig, stack, properties, required);
+                if (node instanceof ChoiceSchemaNode choice) {
+                    if (!choice.getCases().isEmpty()) {
+                        final CaseSchemaNode caseSchemaNode = choice.getDefaultCase().orElse(choice.getCases().stream()
+                            .findFirst().orElseThrow());
+                        stack.enterSchemaTree(node.getQName());
+                        stack.enterSchemaTree(caseSchemaNode.getQName());
+                        for (final DataSchemaNode childNode : caseSchemaNode.getChildNodes()) {
+                            final ObjectNode property = processChildNode(childNode, parentName, definitions,
+                                definitionNames, isConfig, stack, required);
+                            properties.set(childNode.getQName().getLocalName(), property);
+                        }
+                        stack.exit();
+                        stack.exit();
+                    }
+                } else {
+                    final ObjectNode property = processChildNode(node, parentName, definitions, definitionNames,
+                        isConfig, stack, required);
+                    properties.set(node.getQName().getLocalName(), property);
+                }
             }
         }
         parentNodeBuilder.properties(properties).required(required.size() > 0 ? required : null);
         return properties;
     }
 
-    private void processChildNode(final DataSchemaNode node, final String parentName,
+    private ObjectNode processChildNode(final DataSchemaNode node, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames, final boolean isConfig,
-            final SchemaInferenceStack stack, final ObjectNode properties, final ArrayNode required)
-            throws IOException {
+            final SchemaInferenceStack stack, final ArrayNode required) throws IOException {
         final XMLNamespace parentNamespace = stack.toSchemaNodeIdentifier().lastNodeIdentifier().getNamespace();
         stack.enterSchemaTree(node.getQName());
-
         /*
             Add module name prefix to property name, when needed, when ServiceNow can process colons,
             use RestDocGenUtil#resolveNodesName for creating property name
          */
         final String name = node.getQName().getLocalName();
-
+        final ObjectNode property;
         if (node instanceof LeafSchemaNode leaf) {
-            processLeafNode(leaf, name, properties, required, stack, definitions, definitionNames, parentNamespace);
-
+            property = processLeafNode(leaf, name, required, stack, definitions, definitionNames, parentNamespace);
         } else if (node instanceof AnyxmlSchemaNode anyxml) {
-            processAnyXMLNode(anyxml, name, properties, required, parentNamespace);
-
+            property = processAnyXMLNode(anyxml, name, required, parentNamespace);
         } else if (node instanceof AnydataSchemaNode anydata) {
-            processAnydataNode(anydata, name, properties, required, parentNamespace);
-
+            property = processAnydataNode(anydata, name, required, parentNamespace);
+        } else if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
+            if (isSchemaNodeMandatory(node)) {
+                required.add(name);
+            }
+            property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
+                definitionNames, isConfig, stack);
+            if (!isConfig) {
+                processActionNodeContainer(node, parentName, definitions, definitionNames, stack);
+            }
+        } else if (node instanceof LeafListSchemaNode leafList) {
+            if (isSchemaNodeMandatory(node)) {
+                required.add(name);
+            }
+            property = processLeafListNode(leafList, stack, definitions, definitionNames);
         } else {
-
-            final ObjectNode property;
-            if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                if (isSchemaNodeMandatory(node)) {
-                    required.add(name);
-                }
-                property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions,
-                        definitionNames, isConfig, stack);
-                if (!isConfig) {
-                    processActionNodeContainer(node, parentName, definitions, definitionNames, stack);
-                }
-            } else if (node instanceof LeafListSchemaNode leafList) {
-                if (isSchemaNodeMandatory(node)) {
-                    required.add(name);
-                }
-                property = processLeafListNode(leafList, stack, definitions, definitionNames);
-
-            } else if (node instanceof ChoiceSchemaNode choice) {
-                if (!choice.getCases().isEmpty()) {
-                    CaseSchemaNode caseSchemaNode = choice.getDefaultCase()
-                            .orElse(choice.getCases().stream()
-                                    .findFirst().orElseThrow());
-                    stack.enterSchemaTree(caseSchemaNode.getQName());
-                    for (final DataSchemaNode childNode : caseSchemaNode.getChildNodes()) {
-                        processChildNode(childNode, parentName, definitions, definitionNames, isConfig, stack,
-                                properties, required);
-                    }
-                    stack.exit();
-                }
-                property = null;
-
-            } else {
-                throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
-            }
-            if (property != null) {
-                properties.set(name, property);
-            }
+            throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
         }
-
         stack.exit();
+        return property;
     }
 
     private ObjectNode processLeafListNode(final LeafListSchemaNode listNode, final SchemaInferenceStack stack,
@@ -544,9 +533,8 @@ public class DefinitionGenerator {
     }
 
     private ObjectNode processLeafNode(final LeafSchemaNode leafNode, final String jsonLeafName,
-            final ObjectNode properties, final ArrayNode required, final SchemaInferenceStack stack,
-            final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final XMLNamespace parentNamespace) {
+            final ArrayNode required, final SchemaInferenceStack stack, final Map<String, Schema> definitions,
+            final DefinitionNames definitionNames, final XMLNamespace parentNamespace) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -559,18 +547,16 @@ public class DefinitionGenerator {
         }
 
         processTypeDef(leafNode.getType(), leafNode, property, stack, definitions, definitionNames);
-        properties.set(jsonLeafName, property);
         if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
             // If the parent is not from the same model, define the child XML namespace.
             property.set(XML_KEY, buildXmlParameter(leafNode));
         }
         processMandatory(leafNode, jsonLeafName, required);
-
         return property;
     }
 
     private static ObjectNode processAnydataNode(final AnydataSchemaNode leafNode, final String name,
-            final ObjectNode properties, final ArrayNode required, final XMLNamespace parentNamespace) {
+            final ArrayNode required, final XMLNamespace parentNamespace) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -584,13 +570,11 @@ public class DefinitionGenerator {
             property.set(XML_KEY, buildXmlParameter(leafNode));
         }
         processMandatory(leafNode, name, required);
-        properties.set(name, property);
-
         return property;
     }
 
     private static ObjectNode processAnyXMLNode(final AnyxmlSchemaNode leafNode, final String name,
-            final ObjectNode properties, final ArrayNode required, final XMLNamespace parentNamespace) {
+            final ArrayNode required, final XMLNamespace parentNamespace) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -604,8 +588,6 @@ public class DefinitionGenerator {
             property.set(XML_KEY, buildXmlParameter(leafNode));
         }
         processMandatory(leafNode, name, required);
-        properties.set(name, property);
-
         return property;
     }
 
