@@ -422,7 +422,7 @@ public abstract class BaseYangOpenApiGenerator {
         return path.toString();
     }
 
-    public SortedSet<Module> getSortedModules(final EffectiveModelContext schemaContext) {
+    private static SortedSet<Module> getSortedModules(final EffectiveModelContext schemaContext) {
         if (schemaContext == null) {
             return Collections.emptySortedSet();
         }
@@ -437,11 +437,7 @@ public abstract class BaseYangOpenApiGenerator {
             }
             return result;
         });
-        for (final Module m : schemaContext.getModules()) {
-            if (m != null) {
-                sortedModules.add(m);
-            }
-        }
+        sortedModules.addAll(schemaContext.getModules());
         return sortedModules;
     }
 
