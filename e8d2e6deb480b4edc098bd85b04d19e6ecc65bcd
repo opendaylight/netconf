@@ -16,6 +16,24 @@
       "message": "operational",
       "revId": "e8d2e6deb480b4edc098bd85b04d19e6ecc65bcd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9195cb49_734458f7",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-13T09:45:40Z",
+      "side": 1,
+      "message": "Resolved by cherry-picking https://git.opendaylight.org/gerrit/c/netconf/+/105482 into 5.0.x, which eliminates the mixing of older `config` / `operational` and current `data`",
+      "parentUuid": "25936f20_ab870eff",
+      "revId": "e8d2e6deb480b4edc098bd85b04d19e6ecc65bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
