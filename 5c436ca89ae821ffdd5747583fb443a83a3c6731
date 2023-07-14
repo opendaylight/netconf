@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af63411c_ed1e7f4b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-14T08:49:10Z",
+      "side": 1,
+      "message": "Maybe here is the best place to create parameters.",
+      "revId": "5c436ca89ae821ffdd5747583fb443a83a3c6731",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
