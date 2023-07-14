@@ -166,10 +166,10 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
     }
 
     /**
-     * Test that checks if securitySchemes and security elements are present.
+     * Test that checks if securitySchemes and security elements are present in OpenApi document.
      */
     @Test
-    public void testAuthenticationFeature() throws Exception {
+    public void testAuthenticationFeatureV3() throws Exception {
         final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         swagger.onMountPointCreated(INSTANCE_ID);
         final var mountPointApi = (OpenApiObject) swagger.getMountPointApi(mockInfo, 1L, Optional.empty(),
@@ -178,5 +178,19 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         assertEquals("[{\"basicAuth\":[]}]", mountPointApi.getSecurity().toString());
         assertEquals("{\"type\":\"http\",\"scheme\":\"basic\"}", mountPointApi.getComponents().getSecuritySchemes()
             .getBasicAuth().toString());
+    }
+
+    /**
+     * Test that checks if securityDefinitions and security elements are present in Swagger document.
+     */
+    @Test
+    public void testAuthenticationFeatureV2() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        swagger.onMountPointCreated(INSTANCE_ID);
+        final var mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, Optional.empty(),
+            OAversion.V2_0);
+
+        assertEquals("[{\"basicAuth\":[]}]", mountPointApi.getSecurity().toString());
+        assertEquals("{\"type\":\"basic\"}", mountPointApi.getSecurityDefinitions().getBasicAuth().toString());
     }
 }

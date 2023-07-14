@@ -402,10 +402,10 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     }
 
     /**
-     * Test that checks if securitySchemes and security elements are present.
+     * Test that checks if securitySchemes and security elements are present in OpenApi document.
      */
     @Test
-    public void testAuthenticationFeature() {
+    public void testAuthenticationFeatureV3() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
             OAversion.V3_0);
@@ -413,6 +413,18 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertEquals("[{\"basicAuth\":[]}]", openApiDoc.getSecurity().toString());
         assertEquals("{\"type\":\"http\",\"scheme\":\"basic\"}",
             openApiDoc.getComponents().getSecuritySchemes().getBasicAuth().toString());
+    }
+
+    /**
+     * Test that checks if securityDefinitions and security elements are present in Swagger document.
+     */
+    @Test
+    public void testAuthenticationFeatureV2() {
+        final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final var swaggerDoc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+            OAversion.V2_0);
+        assertEquals("[{\"basicAuth\":[]}]", swaggerDoc.getSecurity().toString());
+        assertEquals("{\"type\":\"basic\"}", swaggerDoc.getSecurityDefinitions().getBasicAuth().toString());
     }
 
     /**
