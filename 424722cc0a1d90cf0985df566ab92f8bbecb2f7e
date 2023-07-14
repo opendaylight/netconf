@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c0abe26_888ac138",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-14T11:11:34Z",
+      "side": 1,
+      "message": "Required is checked by this if condition. So can\u0027t be done this way.",
+      "parentUuid": "424478c6_00b152f4",
+      "revId": "424722cc0a1d90cf0985df566ab92f8bbecb2f7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32511a2a_a2505ac9",
@@ -49,6 +67,24 @@
       "side": 1,
       "message": "There are also operational data, but testing operational POST data may be unnecessary since POST can only be performed on configuration data.",
       "parentUuid": "32511a2a_a2505ac9",
+      "revId": "424722cc0a1d90cf0985df566ab92f8bbecb2f7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1dac6526_345caa7f",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-14T11:11:34Z",
+      "side": 1,
+      "message": "Yes, we do not need operational for this use-case.",
+      "parentUuid": "ff3d57be_c0327cde",
       "revId": "424722cc0a1d90cf0985df566ab92f8bbecb2f7e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
