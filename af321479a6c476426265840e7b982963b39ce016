@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "753d16e8_942d66e4",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-14T11:39:28Z",
+      "side": 1,
+      "message": "Create separate test for .OAversion.V2_0\n\nSee: https://git.opendaylight.org/gerrit/c/netconf/+/105481\nSee: https://git.opendaylight.org/gerrit/c/netconf/+/105253",
+      "revId": "af321479a6c476426265840e7b982963b39ce016",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af64449f_4aa413f7",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-14T11:39:28Z",
+      "side": 1,
+      "message": "This should be \"{\\\"type\\\":\\\"http\\\",\\\"scheme\\\":\\\"basic\\\"}\"",
+      "revId": "af321479a6c476426265840e7b982963b39ce016",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
