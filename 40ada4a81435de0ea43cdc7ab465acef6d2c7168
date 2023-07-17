@@ -33,6 +33,24 @@
       "message": "Probably this Generic type is redundant. Can we use only \"DataSchemaNode leafNode\" as method parameter?",
       "revId": "40ada4a81435de0ea43cdc7ab465acef6d2c7168",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e00e0129_0ecb52e8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 576,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-17T08:31:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89d38bad_25b160f4",
+      "revId": "40ada4a81435de0ea43cdc7ab465acef6d2c7168",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
