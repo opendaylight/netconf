@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6edd55cb_a6f66f89",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-17T13:19:01Z",
+      "side": 1,
+      "message": "Let\u0027s declare pathParams outside of condition,\n```\nfinal ArrayNode pathParams \u003d JsonNodeFactory.instance.arrayNode();\nif(node.isConfiguration()) {\n```",
+      "revId": "8bd44e0ec50ff84842f549aa69eb64de37b73f46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ba770a4_f589afbf",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-17T13:19:01Z",
+      "side": 1,
+      "message": "We don\u0027t need to declare pathParams here",
+      "revId": "8bd44e0ec50ff84842f549aa69eb64de37b73f46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
