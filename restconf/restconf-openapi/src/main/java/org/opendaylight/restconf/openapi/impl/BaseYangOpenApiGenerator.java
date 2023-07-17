@@ -152,19 +152,19 @@ public abstract class BaseYangOpenApiGenerator {
             throw new IllegalArgumentException(e);
         }
 
-        final Module module = schemaContext.findModule(moduleName, rev).orElse(null);
+        final var module = schemaContext.findModule(moduleName, rev).orElse(null);
         Preconditions.checkArgument(module != null,
                 "Could not find module by name,revision: " + moduleName + "," + revision);
 
-        return getApiDeclaration(module, uriInfo, context, schemaContext, deviceName);
-    }
-
-    private OpenApiObject getApiDeclaration(final Module module, final UriInfo uriInfo, final String context,
-            final EffectiveModelContext schemaContext, final String deviceName) {
-        final String schema = createSchemaFromUriInfo(uriInfo);
-        final String host = createHostFromUriInfo(uriInfo);
-
-        return getOpenApiSpec(module, schema, host, deviceName, BASE_PATH, context, schemaContext);
+        final var schema = createSchemaFromUriInfo(uriInfo);
+        final var host = createHostFromUriInfo(uriInfo);
+        final var info = new Info(API_VERSION, module.getName());
+        final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
+        final var definitionNames = new DefinitionNames();
+        final var schemas = getSchemas(module, schemaContext, definitionNames, true);
+        final var components = new Components(schemas, new SecuritySchemes(OPEN_API_BASIC_AUTH));
+        final var paths = getPaths(module, context, deviceName, schemaContext, definitionNames, true);
+        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -178,18 +178,6 @@ public abstract class BaseYangOpenApiGenerator {
 
     public String createSchemaFromUriInfo(final UriInfo uriInfo) {
         return uriInfo.getBaseUri().getScheme();
-    }
-
-    public OpenApiObject getOpenApiSpec(final Module module, final String schema, final String host,
-            final @NonNull String deviceName, final String basePath, final String context,
-            final EffectiveModelContext schemaContext) {
-        final var info = new Info(API_VERSION, module.getName());
-        final var servers = List.of(new Server(schema + "://" + host + basePath));
-        final var definitionNames = new DefinitionNames();
-        final var schemas = getSchemas(module, schemaContext, definitionNames, true);
-        final var components = new Components(schemas, new SecuritySchemes(OPEN_API_BASIC_AUTH));
-        final var paths = getPaths(module, context, deviceName, schemaContext, definitionNames, true);
-        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
 
     public Map<String, Path> getPaths(final Module module, final String context, final String deviceName,
