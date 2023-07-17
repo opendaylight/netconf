@@ -17,6 +17,7 @@ import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -113,13 +114,13 @@ public class OpenApiXmlNamespaceTest {
     private static Map<String, Schema> schemas;
 
     @BeforeClass
-    public static void startUp() {
+    public static void startUp() throws Exception {
         final var context1036 = YangParserTestUtils.parseYang(MODULE, AUG_MODULE);
-        final var module = context1036.findModule("module").orElseThrow();
         final var mockSchemaService = mock(DOMSchemaService.class);
         when(mockSchemaService.getGlobalContext()).thenReturn(context1036);
         final var generatorRFC8040 = new OpenApiGeneratorRFC8040(mockSchemaService);
-        final var doc = generatorRFC8040.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context1036);
+        final var uriInfo = DocGenTestHelper.createMockUriInfo("http://localhost/path");
+        final var doc = generatorRFC8040.getApiDeclaration("module", null, uriInfo);
         assertNotNull(doc);
         schemas = doc.components().schemas();
     }
