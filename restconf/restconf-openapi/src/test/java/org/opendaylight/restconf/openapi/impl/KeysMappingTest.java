@@ -18,6 +18,7 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -25,7 +26,7 @@ public class KeysMappingTest {
     private static OpenApiObject doc;
 
     @BeforeClass
-    public static void startUp() {
+    public static void startUp() throws Exception {
         final var context = YangParserTestUtils.parseYang("""
             module keys-mapping {
               namespace "mapping";
@@ -67,8 +68,8 @@ public class KeysMappingTest {
         final var schemaService = mock(DOMSchemaService.class);
         when(schemaService.getGlobalContext()).thenReturn(context);
         final var generator = new OpenApiGeneratorRFC8040(schemaService);
-        final var module = context.findModule("keys-mapping").orElseThrow();
-        doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final var uriInfo = DocGenTestHelper.createMockUriInfo("http://localhost/path");
+        doc = generator.getApiDeclaration("keys-mapping", null, uriInfo);
         assertNotNull(doc);
     }
 
