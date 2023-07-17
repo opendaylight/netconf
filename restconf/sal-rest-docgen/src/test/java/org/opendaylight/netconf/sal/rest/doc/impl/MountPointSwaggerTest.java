@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -35,7 +34,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public final class MountPointSwaggerTest extends AbstractApiDocTest {
-    private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
             .node(QName.create("", "node"))
@@ -72,11 +70,10 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
     }
 
     @Test
-    public void testGetDataStoreApi() throws Exception {
-        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+    public void testGetDataStoreApi() {
         swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
 
-        final SwaggerObject mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-",
+        final SwaggerObject mountPointApi = (SwaggerObject) swagger.getMountPointApi(URI_INFO, 1L, "Datastores", "-",
             OAversion.V2_0);
         assertNotNull("failed to find Datastore API", mountPointApi);
 
@@ -113,11 +110,10 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
      * It means we should have name and name1, etc. when we have the same parameter in path multiple times.
      */
     @Test
-    public void testParametersNumberingForMountPointApi() throws Exception {
-        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+    public void testParametersNumberingForMountPointApi() {
         swagger.onMountPointCreated(INSTANCE_ID);
 
-        final OpenApiObject mountPointApi = (OpenApiObject) swagger.getMountPointApi(mockInfo, 1L, Optional.empty(),
+        final OpenApiObject mountPointApi = (OpenApiObject) swagger.getMountPointApi(URI_INFO, 1L, Optional.empty(),
                 OAversion.V3_0);
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
@@ -146,11 +142,10 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
      * Test that request for actions is correct and has parameters.
      */
     @Test
-    public void testActionPathsParamsForMountPointApi() throws Exception {
-        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+    public void testActionPathsParamsForMountPointApi() {
         swagger.onMountPointCreated(INSTANCE_ID);
 
-        final var mountPointApi = (OpenApiObject) swagger.getMountPointApi(mockInfo, 1L, Optional.empty(),
+        final var mountPointApi = (OpenApiObject) swagger.getMountPointApi(URI_INFO, 1L, Optional.empty(),
             OAversion.V3_0);
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
@@ -169,10 +164,9 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
      * Test that checks if securitySchemes and security elements are present in OpenApi document.
      */
     @Test
-    public void testAuthenticationFeatureV3() throws Exception {
-        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+    public void testAuthenticationFeatureV3() {
         swagger.onMountPointCreated(INSTANCE_ID);
-        final var mountPointApi = (OpenApiObject) swagger.getMountPointApi(mockInfo, 1L, Optional.empty(),
+        final var mountPointApi = (OpenApiObject) swagger.getMountPointApi(URI_INFO, 1L, Optional.empty(),
             OAversion.V3_0);
 
         assertEquals("[{\"basicAuth\":[]}]", mountPointApi.getSecurity().toString());
@@ -184,10 +178,9 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
      * Test that checks if securityDefinitions and security elements are present in Swagger document.
      */
     @Test
-    public void testAuthenticationFeatureV2() throws Exception {
-        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+    public void testAuthenticationFeatureV2() {
         swagger.onMountPointCreated(INSTANCE_ID);
-        final var mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, Optional.empty(),
+        final var mountPointApi = (SwaggerObject) swagger.getMountPointApi(URI_INFO, 1L, Optional.empty(),
             OAversion.V2_0);
 
         assertEquals("[{\"basicAuth\":[]}]", mountPointApi.getSecurity().toString());
