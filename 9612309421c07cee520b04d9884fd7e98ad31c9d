@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08af978d_66976e71",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-17T14:00:36Z",
+      "side": 1,
+      "message": "These changes led us to extra names of models in \"/openapi/api/v3/single\" \ne.g. \"mounted Controller network-topology\" instead of \"controller network-topology\"",
+      "revId": "9612309421c07cee520b04d9884fd7e98ad31c9d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
