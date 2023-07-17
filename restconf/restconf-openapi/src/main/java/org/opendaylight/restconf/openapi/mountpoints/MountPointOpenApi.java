@@ -145,7 +145,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
             return generateDataStoreOpenApi(uriInfo, urlPrefix, deviceName);
         }
-        return openApiGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix);
+        return openApiGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix, deviceName);
     }
 
     public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum) {
