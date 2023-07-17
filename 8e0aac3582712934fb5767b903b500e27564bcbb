@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32f2c2c4_4e74da93",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/NotificationQueryParams.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-17T09:31:58Z",
+      "side": 1,
+      "message": "This does not seem correct. The expression is always true after the previous check on line 56.\nWhat we want to check, based on the modified message, is `(changedLeafNodesOnly \u003d\u003d null || leafNodesOnly \u003d\u003d null) \u0026\u0026 (changedLeafNodesOnly \u003d\u003d null || childNodesOnly \u003d\u003d null)`",
+      "range": {
+        "startLine": 60,
+        "startChar": 22,
+        "endLine": 60,
+        "endChar": 101
+      },
+      "revId": "8e0aac3582712934fb5767b903b500e27564bcbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17390b8f_1a855190",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-17T09:31:58Z",
+      "side": 1,
+      "message": "deprecated, use `modificationType()`",
+      "range": {
+        "startLine": 125,
+        "startChar": 20,
+        "endLine": 125,
+        "endChar": 41
+      },
+      "revId": "8e0aac3582712934fb5767b903b500e27564bcbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28c2cb78_023e3e2c",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-17T09:31:58Z",
+      "side": 1,
+      "message": "deprecated, use `childNodes()`",
+      "range": {
+        "startLine": 126,
+        "startChar": 37,
+        "endLine": 126,
+        "endChar": 52
+      },
+      "revId": "8e0aac3582712934fb5767b903b500e27564bcbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8959953f_1370b79f",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-17T09:31:58Z",
+      "side": 1,
+      "message": "deprecated, use `name()`",
+      "range": {
+        "startLine": 127,
+        "startChar": 31,
+        "endLine": 127,
+        "endChar": 46
+      },
+      "revId": "8e0aac3582712934fb5767b903b500e27564bcbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
