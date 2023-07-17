@@ -167,11 +167,11 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getApiDeclaration(module, revision, uriInfo, schemaContext, "");
+        return getApiDeclaration(module, revision, uriInfo, schemaContext, "", "Controller");
     }
 
     public OpenApiObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
-            final EffectiveModelContext schemaContext, final String context) {
+            final EffectiveModelContext schemaContext, final String context, final String deviceName) {
         final Optional<Revision> rev;
 
         try {
@@ -184,15 +184,15 @@ public abstract class BaseYangOpenApiGenerator {
         Preconditions.checkArgument(module != null,
                 "Could not find module by name,revision: " + moduleName + "," + revision);
 
-        return getApiDeclaration(module, uriInfo, context, schemaContext);
+        return getApiDeclaration(module, uriInfo, context, schemaContext, deviceName);
     }
 
-    public OpenApiObject getApiDeclaration(final Module module, final UriInfo uriInfo, final String context,
-            final EffectiveModelContext schemaContext) {
+    private OpenApiObject getApiDeclaration(final Module module, final UriInfo uriInfo, final String context,
+            final EffectiveModelContext schemaContext, final String deviceName) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
 
-        return getOpenApiSpec(module, schema, host, BASE_PATH, context, schemaContext);
+        return getOpenApiSpec(module, schema, host, deviceName, context, schemaContext);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -208,11 +208,11 @@ public abstract class BaseYangOpenApiGenerator {
         return uriInfo.getBaseUri().getScheme();
     }
 
-    public OpenApiObject getOpenApiSpec(final Module module, final String schema, final String host,
-            final String basePath, final String context, final EffectiveModelContext schemaContext) {
-        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, basePath, module.getName());
+    private OpenApiObject getOpenApiSpec(final Module module, final String schema, final String host,
+            final String deviceName, final String context, final EffectiveModelContext schemaContext) {
+        final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, BASE_PATH, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getOpenApiSpec(module, context, null, schemaContext, definitionNames, docBuilder, true);
+        return getOpenApiSpec(module, context, deviceName, schemaContext, definitionNames, docBuilder, true);
     }
 
     private OpenApiObject getOpenApiSpec(final Module module, final String context, final String deviceName,
