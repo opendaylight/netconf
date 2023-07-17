@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import javax.ws.rs.core.UriInfo;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -31,7 +32,6 @@ import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -44,16 +44,17 @@ public final class OpenApiGeneratorRFC8040Test {
     private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
     private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
 
-    private static EffectiveModelContext context;
     private static DOMSchemaService schemaService;
+    private static UriInfo uriInfo;
 
     private final OpenApiGeneratorRFC8040 generator = new OpenApiGeneratorRFC8040(schemaService);
 
     @BeforeClass
-    public static void beforeClass() {
+    public static void beforeClass() throws Exception {
         schemaService = mock(DOMSchemaService.class);
-        context = YangParserTestUtils.parseYangResourceDirectory("/yang");
+        final EffectiveModelContext context = YangParserTestUtils.parseYangResourceDirectory("/yang");
         when(schemaService.getGlobalContext()).thenReturn(context);
+        uriInfo = DocGenTestHelper.createMockUriInfo("http://localhost/path");
     }
 
     /**
@@ -61,8 +62,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testPaths() {
-        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
-        final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final OpenApiObject doc = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
 
         assertEquals(Set.of("/rests/data",
             "/rests/data/toaster2:toaster",
@@ -85,13 +85,11 @@ public final class OpenApiGeneratorRFC8040Test {
     @Test
     public void testConfigPaths() {
         final List<String> configPaths = List.of("/rests/data/toaster2:lst={lf1}",
-                "/rests/data/toaster2:lst={lf1}/cont1",
-                "/rests/data/toaster2:lst={lf1}/cont1/cont11",
-                "/rests/data/toaster2:lst={lf1}/cont1/lst11={lf111}",
-                "/rests/data/toaster2:lst={lf1}/lst1={key1},{key2}");
-
-        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
-        final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+            "/rests/data/toaster2:lst={lf1}/cont1",
+            "/rests/data/toaster2:lst={lf1}/cont1/cont11",
+            "/rests/data/toaster2:lst={lf1}/cont1/lst11={lf111}",
+            "/rests/data/toaster2:lst={lf1}/lst1={key1},{key2}");
+        final OpenApiObject doc = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
 
         for (final String path : configPaths) {
             final Path node = doc.paths().get(path);
@@ -108,8 +106,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testSchemas() {
-        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
-        final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final OpenApiObject doc = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
 
         final Map<String, Schema> schemas = doc.components().schemas();
         assertNotNull(schemas);
@@ -163,8 +160,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testRPC() {
-        final var module = context.findModule("toaster", Revision.of("2009-11-20")).orElseThrow();
-        final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final OpenApiObject doc = generator.getApiDeclaration("toaster", "2009-11-20", uriInfo);
         assertNotNull(doc);
 
         final Map<String, Schema> schemas = doc.components().schemas();
@@ -180,8 +176,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
     @Test
     public void testChoice() {
-        final var module = context.findModule("choice-test").orElseThrow();
-        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final var doc = generator.getApiDeclaration("choice-test", null, uriInfo);
         assertNotNull(doc);
 
         final var schemas = doc.components().schemas();
@@ -197,8 +192,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
     @Test
     public void testMandatory() {
-        final var module = context.findModule(MANDATORY_TEST).orElseThrow();
-        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final var doc = generator.getApiDeclaration(MANDATORY_TEST, null, uriInfo);
         assertNotNull(doc);
         final var schemas = doc.components().schemas();
         final var containersWithRequired = new ArrayList<String>();
@@ -233,8 +227,7 @@ public final class OpenApiGeneratorRFC8040Test {
             "/rests/data/recursive:container-root/root-list={name}/nested-list={name1}", 2,
             "/rests/data/recursive:container-root/root-list={name}/nested-list={name1}/super-nested-list={name2}", 3);
 
-        final var module = context.findModule("recursive", Revision.of("2023-05-22")).orElseThrow();
-        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final var doc = generator.getApiDeclaration("recursive", "2023-05-22", uriInfo);
         assertNotNull(doc);
 
         final var paths = doc.paths();
@@ -276,8 +269,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testParametersNumbering() {
-        final var module = context.findModule("path-params-test").orElseThrow();
-        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final var doc = generator.getApiDeclaration("path-params-test", null, uriInfo);
 
         var pathToList1 = "/rests/data/path-params-test:cont/list1={name}";
         assertTrue(doc.paths().containsKey(pathToList1));
@@ -305,8 +297,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testActionPathsParams() {
-        final var module = context.findModule("action-types").orElseThrow();
-        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final var doc = generator.getApiDeclaration("action-types", null, uriInfo);
 
         final var pathWithParameters = "/rests/operations/action-types:list={name}/list-action";
         assertTrue(doc.paths().containsKey(pathWithParameters));
@@ -319,8 +310,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
     @Test
     public void testSimpleOpenApiObjects() {
-        final var module = context.findModule("my-yang", Revision.of("2022-10-06")).orElseThrow();
-        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final var doc = generator.getApiDeclaration("my-yang", "2022-10-06", uriInfo);
 
         assertEquals(Set.of("/rests/data", "/rests/data/my-yang:data"), doc.paths().keySet());
         final var JsonNodeMyYangData = doc.paths().get("/rests/data/my-yang:data");
@@ -341,8 +331,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
     @Test
     public void testToaster2OpenApiObjects() {
-        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
-        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final var doc = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
 
         final var jsonNodeToaster = doc.paths().get("/rests/data/toaster2:toaster");
         verifyRequestRef(jsonNodeToaster.post(), "#/components/schemas/toaster2_toaster",
@@ -414,8 +403,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testAuthenticationFeature() {
-        final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
-        final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
+        final var doc = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
 
         assertEquals("[{\"basicAuth\":[]}]", doc.security().toString());
         assertEquals("{\"type\":\"http\",\"scheme\":\"basic\"}",
