@@ -69,6 +69,7 @@ import org.slf4j.LoggerFactory;
 public abstract class BaseYangOpenApiGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseYangOpenApiGenerator.class);
+    private static final String CONTROLLER_RESOURCE_NAME = "Controller";
 
     public static final String API_VERSION = "1.0.0";
     public static final String OPEN_API_VERSION = "3.0.3";
@@ -100,7 +101,7 @@ public abstract class BaseYangOpenApiGenerator {
         for (final var module : getSortedModules(context)) {
             LOG.debug("Working on [{},{}]...", module.getName(), module.getQNameModule().getRevision().orElse(null));
             schemas.putAll(getSchemas(module, context, definitionNames, false));
-            paths.putAll(getPaths(module, "", "Controller", context, definitionNames, false));
+            paths.putAll(getPaths(module, "", CONTROLLER_RESOURCE_NAME, context, definitionNames, false));
         }
 
         final var components = new Components(schemas, new SecuritySchemes(OPEN_API_BASIC_AUTH));
@@ -138,7 +139,7 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getApiDeclaration(module, revision, uriInfo, schemaContext, "", "Controller");
+        return getApiDeclaration(module, revision, uriInfo, schemaContext, "", CONTROLLER_RESOURCE_NAME);
     }
 
     public OpenApiObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
