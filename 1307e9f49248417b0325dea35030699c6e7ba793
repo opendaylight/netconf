@@ -16,6 +16,24 @@
       "message": "Can we remove this duplicate code with this?\n```\n    public static List\u003cString\u003e getDataPathParameters(final Operation operation) {\n        return operation.parameters()\n            .stream()\n            .map(Parameter::name)\n            .toList();\n    }\n```",
       "revId": "1307e9f49248417b0325dea35030699c6e7ba793",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "acf60a13_2c7679e3",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-17T14:29:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5b26255_5e9e63c9",
+      "revId": "1307e9f49248417b0325dea35030699c6e7ba793",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
