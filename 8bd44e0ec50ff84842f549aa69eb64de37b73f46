@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a72ac072_8b2b09b7",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-17T13:39:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6edd55cb_a6f66f89",
+      "revId": "8bd44e0ec50ff84842f549aa69eb64de37b73f46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ba770a4_f589afbf",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-17T13:19:01Z",
       "side": 1,
       "message": "We don\u0027t need to declare pathParams here",
+      "revId": "8bd44e0ec50ff84842f549aa69eb64de37b73f46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1405ee6_b8659dae",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-17T13:39:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ba770a4_f589afbf",
       "revId": "8bd44e0ec50ff84842f549aa69eb64de37b73f46",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
