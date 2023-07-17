@@ -149,7 +149,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
             return generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
         }
         final SwaggerObject swaggerObject = swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context,
-                urlPrefix, oaversion);
+                urlPrefix, deviceName, oaversion);
         return BaseYangSwaggerGenerator.getAppropriateDoc(swaggerObject, oaversion);
     }
 
