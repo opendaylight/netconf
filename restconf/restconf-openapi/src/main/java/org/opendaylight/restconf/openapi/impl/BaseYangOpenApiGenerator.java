@@ -72,6 +72,7 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static final String API_VERSION = "1.0.0";
     private static final String OPEN_API_VERSION = "3.0.3";
+    private static final String CONTROLLER_RESOURCE_NAME = "controller";
 
     private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
     private final DOMSchemaService schemaService;
@@ -91,7 +92,7 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getAllModulesDoc(uriInfo, schemaContext, "Controller", "", definitionNames).build();
+        return getAllModulesDoc(uriInfo, schemaContext, CONTROLLER_RESOURCE_NAME, "", definitionNames).build();
     }
 
     public OpenApiObject.Builder getAllModulesDoc(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
@@ -167,7 +168,7 @@ public abstract class BaseYangOpenApiGenerator {
     public OpenApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getApiDeclaration(module, revision, uriInfo, schemaContext, "", "Controller");
+        return getApiDeclaration(module, revision, uriInfo, schemaContext, "", CONTROLLER_RESOURCE_NAME);
     }
 
     public OpenApiObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
