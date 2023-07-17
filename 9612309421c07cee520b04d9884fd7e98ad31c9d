@@ -16,6 +16,24 @@
       "message": "These changes led us to extra names of models in \"/openapi/api/v3/single\" \ne.g. \"mounted Controller network-topology\" instead of \"controller network-topology\"",
       "revId": "9612309421c07cee520b04d9884fd7e98ad31c9d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfef6c60_0c980fe0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-17T19:41:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08af978d_66976e71",
+      "revId": "9612309421c07cee520b04d9884fd7e98ad31c9d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
