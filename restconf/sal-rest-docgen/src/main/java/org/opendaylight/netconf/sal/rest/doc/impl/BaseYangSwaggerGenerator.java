@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
@@ -125,7 +126,7 @@ public abstract class BaseYangSwaggerGenerator {
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
             final SwaggerObject doc = getApiDeclaration(module.getName(), revisionString, uriInfo, schemaContext,
-                    context, oaversion);
+                context, "All Modules", oaversion);
             if (doc != null) {
                 count++;
                 if (count >= start && count < end || all) {
@@ -238,13 +239,14 @@ public abstract class BaseYangSwaggerGenerator {
                                              final OAversion oaversion) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        final SwaggerObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "", oaversion);
+        final SwaggerObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "", "Controller",
+            oaversion);
         return getAppropriateDoc(doc, oaversion);
     }
 
     public SwaggerObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
                                            final EffectiveModelContext schemaContext, final String context,
-                                           final OAversion oaversion) {
+                                           final @NonNull String deviceName, final OAversion oaversion) {
         final Optional<Revision> rev;
 
         try {
@@ -257,15 +259,16 @@ public abstract class BaseYangSwaggerGenerator {
         Preconditions.checkArgument(module != null,
                 "Could not find module by name,revision: " + moduleName + "," + revision);
 
-        return getApiDeclaration(module, uriInfo, context, schemaContext, oaversion);
+        return getApiDeclaration(module, uriInfo, context, schemaContext, deviceName, oaversion);
     }
 
     public SwaggerObject getApiDeclaration(final Module module, final UriInfo uriInfo, final String context,
-                                           final EffectiveModelContext schemaContext, final OAversion oaversion) {
+                                           final EffectiveModelContext schemaContext, final String deviceName,
+                                           final OAversion oaversion) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
 
-        return getSwaggerDocSpec(module, schema, host, BASE_PATH, context, schemaContext, oaversion);
+        return getSwaggerDocSpec(module, schema, host, deviceName, BASE_PATH, context, schemaContext, oaversion);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -283,11 +286,12 @@ public abstract class BaseYangSwaggerGenerator {
 
     public SwaggerObject getSwaggerDocSpec(final Module module, final String schema, final String host,
                                            final String basePath, final String context,
-                                           final EffectiveModelContext schemaContext, final OAversion oaversion) {
+                                           final @NonNull String deviceName, final EffectiveModelContext schemaContext,
+                                           final OAversion oaversion) {
         final SwaggerObject doc = createSwaggerObject(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getSwaggerDocSpec(module, context, Optional.empty(), schemaContext, oaversion, definitionNames, doc,
-            true);
+        return getSwaggerDocSpec(module, context, Optional.of(deviceName), schemaContext, oaversion, definitionNames,
+            doc, true);
     }
 
 
