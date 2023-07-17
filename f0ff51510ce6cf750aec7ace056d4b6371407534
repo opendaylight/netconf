@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b79f66b8_63f91c76",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-17T15:46:25Z",
+      "side": 1,
+      "message": "I would use here:\n```\n        if (node instanceof ContainerSchemaNode) {\n            requestBody \u003d createContainerOrListRequestBodyParameter(defName, xmlDefName, nodeName, summary, CONTAINER,\n                List.of());\n        } else if (node instanceof ListSchemaNode) {\n            List\u003c@NonNull QName\u003e keyDefinition \u003d ((ListSchemaNode) node).getKeyDefinition();\n            requestBody \u003d createContainerOrListRequestBodyParameter(defName, xmlDefName, nodeName, summary, LIST,\n                keyDefinition);\n        } else {\n            requestBody \u003d createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);\n        }\n```\n\nYou can take DataNodeContainer from caller method.\n\nThis way, you can revert all changes with:\n\"Path\" -\u003e \"Path.Builder",
+      "revId": "f0ff51510ce6cf750aec7ace056d4b6371407534",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70ce8e17_cdc54bd8",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-17T15:46:25Z",
+      "side": 1,
+      "message": "Please Remove all commented code.",
+      "revId": "f0ff51510ce6cf750aec7ace056d4b6371407534",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1acf9d86_a2fad2b2",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-17T15:46:25Z",
+      "side": 1,
+      "message": "Should be \"null\"",
+      "revId": "f0ff51510ce6cf750aec7ace056d4b6371407534",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
