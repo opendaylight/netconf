@@ -212,7 +212,7 @@ public abstract class BaseYangOpenApiGenerator {
             final String basePath, final String context, final EffectiveModelContext schemaContext) {
         final OpenApiObject.Builder docBuilder = createOpenApiObjectBuilder(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getOpenApiSpec(module, context, null, schemaContext, definitionNames, docBuilder, true);
+        return getOpenApiSpec(module, context, "Controller", schemaContext, definitionNames, docBuilder, true);
     }
 
     private OpenApiObject getOpenApiSpec(final Module module, final String context, final String deviceName,
