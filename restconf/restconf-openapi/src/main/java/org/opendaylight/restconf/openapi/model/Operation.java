@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record Operation(boolean deprecated, ArrayNode tags, List<Parameter> parameters, ArrayNode security,
+public record Operation(boolean deprecated, List<String> tags, List<Parameter> parameters, ArrayNode security,
         ArrayNode servers, ObjectNode callbacks, ObjectNode externalDocs, ObjectNode requestBody,
         ObjectNode responses, String description, String operationId, String summary) {
 
@@ -26,7 +26,7 @@ public record Operation(boolean deprecated, ArrayNode tags, List<Parameter> para
     @SuppressWarnings("checkstyle:hiddenField")
     public static class Builder {
         private boolean deprecated;
-        private ArrayNode tags;
+        private List<String> tags;
         private List<Parameter> parameters;
         private ArrayNode security;
         private ArrayNode servers;
@@ -43,7 +43,7 @@ public record Operation(boolean deprecated, ArrayNode tags, List<Parameter> para
             return this;
         }
 
-        public Builder tags(final ArrayNode tags) {
+        public Builder tags(final List<String> tags) {
             this.tags = tags;
             return this;
         }
