@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6da0d73f_87fa44b6",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/BasicAuth.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-18T16:04:11Z",
+      "side": 1,
+      "message": "But this not ensure possibility of adding multiple SecuritySchemeObject. In feature, this may be required and will need to rework. So better do it now how it is specified in documentation.",
+      "parentUuid": "3340b620_8071beb7",
+      "revId": "7ad42c143fc7dcc4bd73dc456e411631e4e96131",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9f1374af_0b3885f0",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/BasicAuth.java",
         "patchSetId": 3
