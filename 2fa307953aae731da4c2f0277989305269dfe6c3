@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "913f9f6b_92f5fdaa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-18T12:12:47Z",
+      "side": 1,
+      "message": "Can be in oneline.",
+      "revId": "2fa307953aae731da4c2f0277989305269dfe6c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be89386d_3a8f7967",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-18T12:12:47Z",
+      "side": 1,
+      "message": "Please end sentence with .",
+      "revId": "2fa307953aae731da4c2f0277989305269dfe6c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
