@@ -53,7 +53,7 @@ public final class OperationBuilder {
             final String moduleName, final @NonNull String deviceName, final String description,
             final List<Parameter> pathParams) {
         final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
-        final ArrayNode tags = buildTagsValue(deviceName, moduleName);
+        final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + "_" + nodeName;
@@ -81,7 +81,7 @@ public final class OperationBuilder {
         final String description = node.getDescription().orElse("");
         final String summary = buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName());
-        final ArrayNode tags = buildTagsValue(deviceName, moduleName);
+        final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         parameters.add(buildQueryParameters());
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
@@ -119,7 +119,7 @@ public final class OperationBuilder {
             final String moduleName, final @NonNull String deviceName, final String description,
             final List<Parameter> pathParams) {
         final String summary = buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName);
-        final ArrayNode tags = buildTagsValue(deviceName, moduleName);
+        final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName + TOP;
         final String xmlDefName = parentName + "_" + nodeName;
@@ -143,7 +143,7 @@ public final class OperationBuilder {
     public static Operation buildPatch(final String parentName, final String nodeName, final String moduleName,
             final @NonNull String deviceName, final String description, final List<Parameter> pathParams) {
         final String summary = buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName);
-        final ArrayNode tags = buildTagsValue(deviceName, moduleName);
+        final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName + TOP;
         final String xmlDefName = parentName + "_" + nodeName;
@@ -168,7 +168,7 @@ public final class OperationBuilder {
             final @NonNull String deviceName, final List<Parameter> pathParams) {
         final String summary = buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
                 node.getQName().getLocalName());
-        final ArrayNode tags = buildTagsValue(deviceName, moduleName);
+        final List<String> tags = List.of(deviceName + " " + moduleName);
         final String description = node.getDescription().orElse("");
         final List<Parameter> parameters = new ArrayList<>(pathParams);
 
@@ -241,7 +241,7 @@ public final class OperationBuilder {
             responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse(description));
         }
         final String desc = operDef.getDescription().orElse("");
-        final ArrayNode tags = buildTagsValue(deviceName, moduleName);
+        final List<String> tags = List.of(deviceName + " " + moduleName);
         return new Operation.Builder()
             .tags(tags)
             .parameters(parameters)
@@ -323,10 +323,5 @@ public final class OperationBuilder {
         // FIXME eliminate this method
         return httpMethod + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR
             + moduleName + SUMMARY_SEPARATOR + nodeName;
-    }
-
-    public static ArrayNode buildTagsValue(final String deviceName, final String moduleName) {
-        // FIXME eliminate this method
-        return JsonNodeFactory.instance.arrayNode().add(deviceName + " " + moduleName);
     }
 }
