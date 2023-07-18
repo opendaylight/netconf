@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7eea1ce3_c7fcdb27",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-18T08:06:35Z",
+      "side": 1,
+      "message": "This is not cherry-pick.",
+      "revId": "cd99ecfdaabc867ecbdfb90476230d6567f0a03b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
