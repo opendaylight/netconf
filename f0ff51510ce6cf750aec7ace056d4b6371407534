@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f193a62d_7581b90b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-18T20:11:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b79f66b8_63f91c76",
+      "revId": "f0ff51510ce6cf750aec7ace056d4b6371407534",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70ce8e17_cdc54bd8",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fc230da_e7ed1839",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-18T20:11:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70ce8e17_cdc54bd8",
+      "revId": "f0ff51510ce6cf750aec7ace056d4b6371407534",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1acf9d86_a2fad2b2",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-07-17T15:46:25Z",
       "side": 1,
       "message": "Should be \"null\"",
+      "revId": "f0ff51510ce6cf750aec7ace056d4b6371407534",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2f42aff_f686dc0d",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-18T20:11:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1acf9d86_a2fad2b2",
       "revId": "f0ff51510ce6cf750aec7ace056d4b6371407534",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
