@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f11ca03a_2fa2c75e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-18T12:18:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e929d905_766ac80c",
+      "revId": "22f4182ad5129cf6ba6a36c11a23cbae4a24b766",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "85b933a9_7359f86f",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "754779f3_5513eb46",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-18T12:18:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "85b933a9_7359f86f",
+      "revId": "22f4182ad5129cf6ba6a36c11a23cbae4a24b766",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1597b91_aaf201e3",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-07-18T12:13:29Z",
       "side": 1,
       "message": "Can be in oneline.",
+      "revId": "22f4182ad5129cf6ba6a36c11a23cbae4a24b766",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "259ee2b6_d38d12fe",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-18T12:18:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1597b91_aaf201e3",
       "revId": "22f4182ad5129cf6ba6a36c11a23cbae4a24b766",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
