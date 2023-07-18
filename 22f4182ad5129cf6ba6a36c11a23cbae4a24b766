@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e929d905_766ac80c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-18T12:13:29Z",
+      "side": 1,
+      "message": "Can be in one line.",
+      "revId": "22f4182ad5129cf6ba6a36c11a23cbae4a24b766",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85b933a9_7359f86f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-18T12:13:29Z",
+      "side": 1,
+      "message": ".",
+      "revId": "22f4182ad5129cf6ba6a36c11a23cbae4a24b766",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1597b91_aaf201e3",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-18T12:13:29Z",
+      "side": 1,
+      "message": "Can be in oneline.",
+      "revId": "22f4182ad5129cf6ba6a36c11a23cbae4a24b766",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
