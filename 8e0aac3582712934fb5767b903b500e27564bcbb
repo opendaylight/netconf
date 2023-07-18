@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "70106a8a_554e45c6",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/NotificationQueryParams.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-18T13:13:57Z",
+      "side": 1,
+      "message": "edit: the check that causes this expression to be always true is on line 58, not 56 ;)",
+      "parentUuid": "32f2c2c4_4e74da93",
+      "range": {
+        "startLine": 60,
+        "startChar": 22,
+        "endLine": 60,
+        "endChar": 101
+      },
+      "revId": "8e0aac3582712934fb5767b903b500e27564bcbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "17390b8f_1a855190",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
         "patchSetId": 2
