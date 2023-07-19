@@ -254,7 +254,7 @@ public abstract class BaseYangOpenApiGenerator {
                 }
                 final String resourcePathPart = createPath(node, pathParams, localName);
                 addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, isConfig,
-                    moduleName, definitionNames, resourcePathPart, context);
+                    moduleName, definitionNames, resourcePathPart, context, true);
             }
         }
 
@@ -304,7 +304,8 @@ public abstract class BaseYangOpenApiGenerator {
     private void addPaths(final DataSchemaNode node, final String deviceName, final String moduleName,
             final Map<String, Path> paths, final List<Parameter> parentPathParams,
             final EffectiveModelContext schemaContext, final boolean isConfig, final String parentName,
-            final DefinitionNames definitionNames, final String resourcePathPart, final String context) {
+            final DefinitionNames definitionNames, final String resourcePathPart, final String context,
+            final boolean shouldHavePostRequest) {
         final String dataPath = getResourcePath("data", context) + "/" + resourcePathPart;
         LOG.debug("Adding path: [{}]", dataPath);
         final List<Parameter> pathParams = new ArrayList<>(parentPathParams);
@@ -325,7 +326,7 @@ public abstract class BaseYangOpenApiGenerator {
             });
         }
 
-        boolean addPost = true;
+        boolean addPost = shouldHavePostRequest;
         for (final DataSchemaNode childNode : childSchemaNodes) {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 if (addPost) {
@@ -339,7 +340,7 @@ public abstract class BaseYangOpenApiGenerator {
                 final String newPathPart = resourcePathPart + "/" + createPath(childNode, pathParams, localName);
                 final boolean newIsConfig = isConfig && childNode.isConfiguration();
                 addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
-                    newIsConfig, newParent, definitionNames, newPathPart, context);
+                    newIsConfig, newParent, definitionNames, newPathPart, context, false);
                 pathParams.clear();
                 pathParams.addAll(parentPathParams);
             }
