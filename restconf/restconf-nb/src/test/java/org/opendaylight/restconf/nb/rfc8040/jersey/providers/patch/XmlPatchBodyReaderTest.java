@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -133,6 +134,94 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
         final InputStream inputStream = XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHTargetTopLevelContainerWithEmptyURI.xml");
         checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+    }
+
+    /**
+     * Test of Yang Patch on the top-level container with the full path in the URI and "/" in 'target'.
+     */
+    @Test
+    public void modulePatchTargetTopLevelContainerWithFullPathURITest() throws Exception {
+        mockBodyReader("instance-identifier-patch-module:patch-cont", xmlToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                <patch-id>test-patch</patch-id>
+                <comment>Test patch applied to the top-level container with '/' in target</comment>
+                <edit>
+                    <edit-id>edit1</edit-id>
+                    <operation>replace</operation>
+                    <target>/</target>
+                    <value>
+                        <patch-cont xmlns="instance:identifier:patch:module">
+                            <my-list1>
+                                <name>my-leaf-set</name>
+                                <my-leaf11>leaf-a</my-leaf11>
+                                <my-leaf12>leaf-b</my-leaf12>
+                            </my-list1>
+                        </patch-cont>
+                    </value>
+                </edit>
+            </yang-patch>
+            """.getBytes(StandardCharsets.UTF_8));
+        final var expectedData = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(PATCH_CONT_QNAME))
+                .withChild(Builders.mapBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(MY_LIST1_QNAME))
+                        .withChild(Builders.mapEntryBuilder()
+                                .withNodeIdentifier(NodeIdentifierWithPredicates.of(
+                                        MY_LIST1_QNAME, LEAF_NAME_QNAME, "my-leaf-set"))
+                                .withChild(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf-set"))
+                                .withChild(ImmutableNodes.leafNode(MY_LEAF11_QNAME, "leaf-a"))
+                                .withChild(ImmutableNodes.leafNode(MY_LEAF12_QNAME, "leaf-b"))
+                                .build())
+                        .build())
+                .build();
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(PATCH_CONT_QNAME, data.name().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the second-level list with the full path in the URI and "/" in 'target'.
+     */
+    @Test
+    public void modulePatchTargetSecondLevelListWithFullPathURITest() throws Exception {
+        mockBodyReader("instance-identifier-patch-module:patch-cont/my-list1=my-leaf-set",
+                xmlToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                <patch-id>test-patch</patch-id>
+                <comment>Test patch applied to the second-level list with '/' in target</comment>
+                <edit>
+                    <edit-id>edit1</edit-id>
+                    <operation>replace</operation>
+                    <target>/</target>
+                    <value>
+                        <my-list1 xmlns="instance:identifier:patch:module">
+                            <name>my-leaf-set</name>
+                            <my-leaf11>leaf-a</my-leaf11>
+                            <my-leaf12>leaf-b</my-leaf12>
+                        </my-list1>
+                    </value>
+                </edit>
+            </yang-patch>
+            """.getBytes(StandardCharsets.UTF_8));
+        final var expectedData = Builders.mapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(MY_LIST1_QNAME))
+                .withChild(Builders.mapEntryBuilder()
+                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(
+                                MY_LIST1_QNAME, LEAF_NAME_QNAME, "my-leaf-set"))
+                        .withChild(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf-set"))
+                        .withChild(ImmutableNodes.leafNode(MY_LEAF11_QNAME, "leaf-a"))
+                        .withChild(ImmutableNodes.leafNode(MY_LEAF12_QNAME, "leaf-b"))
+                        .build())
+                .build();
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(MY_LIST1_QNAME, data.name().getNodeType());
+        assertEquals(expectedData, data);
     }
 
     /**
