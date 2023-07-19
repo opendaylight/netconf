@@ -136,6 +136,24 @@
       "message": "Please do not add duplicate code:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106891/7..9/restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
       "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f92374d9_91d3e7bc",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-19T10:42:46Z",
+      "side": 1,
+      "message": "I know about that. But I didn\u0027t have a choice since my task was created before this one. And there is a chance that this one won\u0027t be merged. I\u0027ll left this comment open and we will discus it after all other comments fixed",
+      "parentUuid": "5ea7ad27_8555bc0b",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
