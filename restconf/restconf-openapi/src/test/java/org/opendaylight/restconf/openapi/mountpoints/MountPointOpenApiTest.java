@@ -141,7 +141,7 @@ public final class MountPointOpenApiTest {
         }
 
         assertEquals("Unexpected GET paths size", 37, getOperations.size());
-        assertEquals("Unexpected POST paths size", 19, postOperations.size());
+        assertEquals("Unexpected POST paths size", 14, postOperations.size());
         assertEquals("Unexpected PUT paths size", 35, putOperations.size());
         assertEquals("Unexpected PATCH paths size", 35, patchOperations.size());
         assertEquals("Unexpected DELETE paths size", 35, deleteOperations.size());
@@ -165,7 +165,7 @@ public final class MountPointOpenApiTest {
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
         final var paths = mountPointApi.paths();
-        assertEquals(5, paths.size());
+        assertEquals(4, paths.size());
 
         for (final var expectedPath : configPaths.entrySet()) {
             assertTrue(paths.containsKey(expectedPath.getKey()));
