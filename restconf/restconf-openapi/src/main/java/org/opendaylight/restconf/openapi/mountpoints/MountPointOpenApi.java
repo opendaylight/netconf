@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASE_PATH;
 import static org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.DESCRIPTION_KEY;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_TEMPLATE;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildTagsValue;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -215,7 +215,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     private static Operation createGetPathItem(final String resourceType, final String description,
             final String deviceName) {
-        final String summary = HttpMethod.GET + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR + resourceType;
+        final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.GET, "Datastore", deviceName, resourceType);
         final ArrayNode tags = buildTagsValue(deviceName, "GET root");
         final ObjectNode okResponse = JsonNodeFactory.instance.objectNode();
         okResponse.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
