@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -279,7 +280,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         var pathToList2 = "/rests/data/path-params-test:cont/list1={name}/list2={name1}";
         assertTrue(doc.paths().containsKey(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathParameters(doc.paths(), pathToList2));
+        assertThat(List.of("name", "name1")).hasSameElementsAs(getPathParameters(doc.paths(), pathToList2));
 
         var pathToList3 = "/rests/data/path-params-test:cont/list3={name}";
         assertTrue(doc.paths().containsKey(pathToList3));
@@ -287,7 +288,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         var pathToList4 = "/rests/data/path-params-test:cont/list1={name}/list4={name1}";
         assertTrue(doc.paths().containsKey(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(doc.paths(), pathToList4));
+        assertThat(List.of("name", "name1")).hasSameElementsAs(getPathParameters(doc.paths(), pathToList4));
 
         var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
         assertTrue(doc.paths().containsKey(pathToList4));

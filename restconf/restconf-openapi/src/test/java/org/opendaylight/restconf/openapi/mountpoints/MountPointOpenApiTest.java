@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.mountpoints;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -233,7 +234,7 @@ public final class MountPointOpenApiTest {
 
         var pathToList2 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list2={name1}";
         assertTrue(mountPointApi.paths().containsKey(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList2));
+        assertThat(List.of("name", "name1")).hasSameElementsAs(getPathParameters(mountPointApi.paths(), pathToList2));
 
         var pathToList3 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
         assertTrue(mountPointApi.paths().containsKey(pathToList3));
@@ -241,7 +242,7 @@ public final class MountPointOpenApiTest {
 
         var pathToList4 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name1}";
         assertTrue(mountPointApi.paths().containsKey(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.paths(), pathToList4));
+        assertThat(List.of("name", "name1")).hasSameElementsAs(getPathParameters(mountPointApi.paths(), pathToList4));
 
         var pathToList5 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
         assertTrue(mountPointApi.paths().containsKey(pathToList5));
