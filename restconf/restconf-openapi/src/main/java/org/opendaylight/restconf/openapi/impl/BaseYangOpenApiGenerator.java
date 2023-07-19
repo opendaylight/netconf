@@ -307,7 +307,7 @@ public abstract class BaseYangOpenApiGenerator {
         param.forEach((paramName, description) -> {
             final Parameter.Builder pathParamBuilder = new Parameter.Builder()
                 .name(paramName)
-                .schema(new Schema.Builder().type("string").build())
+                .schema(new Schema.Builder().type(STRING).build())
                 .in("path")
                 .required(true)
                 .description(description);
@@ -328,6 +328,17 @@ public abstract class BaseYangOpenApiGenerator {
             return postBuilder.build();
         }
         return null;
+    }
+
+    public static Parameter createQueryParameter() {
+        final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
+        cases.add("nonconfig");
+        cases.add("config");
+        final Parameter.Builder contentParamBuilder = new Parameter.Builder()
+            .in("query")
+            .name("content")
+            .schema(new Schema.Builder().type(STRING).schemaEnum(cases).build());
+        return contentParamBuilder.build();
     }
 
     private static Path operations(final DataSchemaNode node, final String moduleName,
