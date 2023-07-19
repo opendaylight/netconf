@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5331687d_03935ff6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-19T07:52:35Z",
+      "side": 1,
+      "message": "\"\nThe purpose of this patch is to find out if we can left POST for at\nleast 1 element of the module or all POST should be removed.\"\n\nSo what is the result?\n\nThis patch is to fix POST or found out how we can fix POST? If this is only patch for analyzing possibilities I would expect in task description summary of what you found out.",
+      "revId": "34c48b6830743231f4be290ad435db6ca9054ef6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
