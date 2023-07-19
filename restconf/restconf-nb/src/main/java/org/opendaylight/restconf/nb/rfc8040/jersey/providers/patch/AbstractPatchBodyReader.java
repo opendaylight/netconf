@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
+import static com.google.common.base.Verify.verify;
+
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -34,8 +36,14 @@ abstract class AbstractPatchBodyReader extends AbstractIdentifierAwareJaxRsProvi
     }
 
     static final YangInstanceIdentifier parsePatchTarget(final InstanceIdentifierContext context, final String target) {
-        final var schemaContext = context.getSchemaContext();
         final var urlPath = context.getInstanceIdentifier();
+        if (target.equals("/")) {
+            verify(!urlPath.isEmpty(),
+                "target resource of URI must not be a datastore resource when target is '/'");
+            return urlPath;
+        }
+
+        final var schemaContext = context.getSchemaContext();
         final String targetUrl;
         if (urlPath.isEmpty()) {
             targetUrl = target.startsWith("/") ? target.substring(1) : target;
