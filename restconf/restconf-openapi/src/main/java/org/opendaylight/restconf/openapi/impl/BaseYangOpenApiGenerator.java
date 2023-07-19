@@ -228,8 +228,6 @@ public abstract class BaseYangOpenApiGenerator {
         final Map<String, Path> paths = new HashMap<>();
         final String moduleName = module.getName();
 
-        boolean hasAddRootPostLink = false;
-
         final Collection<? extends DataSchemaNode> dataSchemaNodes = module.getChildNodes();
         LOG.debug("child nodes size [{}]", dataSchemaNodes.size());
         for (final DataSchemaNode node : dataSchemaNodes) {
@@ -238,23 +236,11 @@ public abstract class BaseYangOpenApiGenerator {
                 LOG.debug("Is Configuration node [{}] [{}]", isConfig, node.getQName().getLocalName());
 
                 final String localName = moduleName + ":" + node.getQName().getLocalName();
-                final String resourcePath  = getResourcePath("data", context);
-
                 final List<Parameter> pathParams = new ArrayList<>();
-                /*
-                 * When there are two or more top container or list nodes
-                 * whose config statement is true in module, make sure that
-                 * only one root post link is added for this module.
-                 */
-                if (isConfig && isForSingleModule && !hasAddRootPostLink) {
-                    LOG.debug("Has added root post link for module {}", moduleName);
-                    addRootPostLink(module, deviceName, pathParams, resourcePath, paths);
 
-                    hasAddRootPostLink = true;
-                }
                 final String resourcePathPart = createPath(node, pathParams, localName);
                 addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, isConfig,
-                    moduleName, definitionNames, resourcePathPart, context);
+                    moduleName, definitionNames, resourcePathPart, context, true);
             }
         }
 
@@ -276,18 +262,6 @@ public abstract class BaseYangOpenApiGenerator {
         return docBuilder.build();
     }
 
-    private static void addRootPostLink(final Module module, final String deviceName,
-            final List<Parameter> pathParams, final String resourcePath, final Map<String, Path> paths) {
-        if (containsListOrContainer(module.getChildNodes())) {
-            final String moduleName = module.getName();
-            final String name = moduleName + MODULE_NAME_SUFFIX;
-            final var postBuilder = new Path.Builder();
-            postBuilder.post(buildPost(name, moduleName, deviceName,
-                module.getDescription().orElse(""), pathParams, null, List.of()));
-            paths.put(resourcePath, postBuilder.build());
-        }
-    }
-
     public OpenApiObject.Builder createOpenApiObjectBuilder(final String schema, final String host,
             final String basePath, final String title) {
         final OpenApiObject.Builder docBuilder = new OpenApiObject.Builder();
@@ -304,7 +278,8 @@ public abstract class BaseYangOpenApiGenerator {
     private void addPaths(final DataSchemaNode node, final String deviceName, final String moduleName,
             final Map<String, Path> paths, final List<Parameter> parentPathParams,
             final EffectiveModelContext schemaContext, final boolean isConfig, final String parentName,
-            final DefinitionNames definitionNames, final String resourcePathPart, final String context) {
+            final DefinitionNames definitionNames, final String resourcePathPart, final String context,
+            final boolean shouldHavePostRequest) {
         final String dataPath = getResourcePath("data", context) + "/" + resourcePathPart;
         LOG.debug("Adding path: [{}]", dataPath);
         final List<Parameter> pathParams = new ArrayList<>(parentPathParams);
@@ -325,7 +300,7 @@ public abstract class BaseYangOpenApiGenerator {
             });
         }
 
-        if (childSchemaNodes.iterator().hasNext()) {
+        if (childSchemaNodes.iterator().hasNext() && shouldHavePostRequest) {
             final var next = childSchemaNodes.iterator().next();
             final Operation post = buildContainerOrListPostOperation(next, moduleName, deviceName, pathParams);
             operations.post(post);
@@ -337,7 +312,7 @@ public abstract class BaseYangOpenApiGenerator {
                 final String newPathPart = resourcePathPart + "/" + createPath(childNode, pathParams, localName);
                 final boolean newIsConfig = isConfig && childNode.isConfiguration();
                 addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
-                    newIsConfig, newParent, definitionNames, newPathPart, context);
+                    newIsConfig, newParent, definitionNames, newPathPart, context, false);
                 pathParams.clear();
                 pathParams.addAll(parentPathParams);
             }
