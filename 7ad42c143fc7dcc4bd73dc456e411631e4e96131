@@ -88,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ca36480_fe7ad239",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/BasicAuth.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-19T11:46:52Z",
+      "side": 1,
+      "message": "Resolved. Replaced SecuritySchemes record for a Map\u003cString, SecuritySchemeObject\u003e and created interface SecuritySchemeObject for records, which act as specific type of security scheme object, to implement",
+      "parentUuid": "6da0d73f_87fa44b6",
+      "revId": "7ad42c143fc7dcc4bd73dc456e411631e4e96131",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f1374af_0b3885f0",
