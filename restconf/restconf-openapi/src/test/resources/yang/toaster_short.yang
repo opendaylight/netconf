@@ -74,6 +74,13 @@
         "Indicates the toaster service is available";
       description
         "Top-level container for all toaster database objects.";
+      list toasterSlot {
+        key "slotId";
+        leaf slotId {
+          type string;
+        }
+      }
+
       leaf toasterManufacturer {
         type DisplayString;
         config false;
@@ -81,13 +88,6 @@
         description
           "The name of the toaster's manufacturer. For instance,
                 Microsoft Toaster.";
-      }
-
-      list toasterSlot {
-        key "slotId";
-        leaf slotId {
-            type string;
-        }
       }
 
       leaf toasterModelNumber {
