@@ -15,7 +15,12 @@ import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.OUTPUT_
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
@@ -55,12 +60,11 @@ public final class OperationBuilder {
         // Hidden on purpose
     }
 
-    public static Operation buildPost(final DataSchemaNode node, final String parentName, final String nodeName,
-            final String discriminator, final String moduleName, final @NonNull String deviceName,
-            final String description, final List<Parameter> pathParams) {
+    public static Operation buildPost(final DataSchemaNode node, final String parentName,
+            final String nodeName, final String discriminator, final String moduleName,
+            final @NonNull String deviceName, final String description, final Set<Parameter> parameters) {
         final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
-        final List<Parameter> parameters = new ArrayList<>(pathParams);
         final RequestBody requestBody;
         final DataSchemaNode childNode = node == null ? null : getListOrContainerChildNode(node);
         final List<String> nameElements = new ArrayList<>();
@@ -93,14 +97,14 @@ public final class OperationBuilder {
     }
 
     public static Operation buildGet(final DataSchemaNode node, final String parentName, final String moduleName,
-            final @NonNull String deviceName, final List<Parameter> pathParams, final boolean isConfig) {
+            final @NonNull String deviceName, final Set<Parameter> pathParams, final boolean isConfig) {
         final String nodeName = node.getQName().getLocalName();
         final String defName = parentName + "_" + nodeName;
         final String description = node.getDescription().orElse("");
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.GET, deviceName, moduleName,
                 node.getQName().getLocalName());
         final List<String> tags = List.of(deviceName + " " + moduleName);
-        final List<Parameter> parameters = new ArrayList<>(pathParams);
+        final Set<Parameter> parameters = new HashSet<>(pathParams);
         parameters.add(buildQueryParameters(isConfig));
         final boolean isList = node instanceof ListSchemaNode;
         final ResponseObject response = createResponse(defName, nodeName, isList,
@@ -129,11 +133,10 @@ public final class OperationBuilder {
     }
 
     public static Operation buildPut(final DataSchemaNode node, final String parentName, final String moduleName,
-            final @NonNull String deviceName, final List<Parameter> pathParams, final String fullName) {
+            final @NonNull String deviceName, final Set<Parameter> parameters, final String fullName) {
         final String nodeName = node.getQName().getLocalName();
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.PUT, moduleName, deviceName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
-        final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
         final boolean isList = node instanceof ListSchemaNode;
         final RequestBody requestBody = createRequestBodyParameter(defName, fullName, isList, summary, nodeName);
@@ -154,11 +157,10 @@ public final class OperationBuilder {
     }
 
     public static Operation buildPatch(final DataSchemaNode node, final String parentName, final String moduleName,
-            final @NonNull String deviceName, final List<Parameter> pathParams, final String fullName) {
+            final @NonNull String deviceName, final Set<Parameter> parameters, final String fullName) {
         final String nodeName = node.getQName().getLocalName();
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.PATCH, moduleName, deviceName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
-        final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
         final boolean isList = node instanceof ListSchemaNode;
         final RequestBody requestBody = createRequestBodyParameter(defName, fullName, isList, summary, nodeName);
@@ -179,12 +181,12 @@ public final class OperationBuilder {
     }
 
     public static Operation buildDelete(final DataSchemaNode node, final String moduleName,
-            final @NonNull String deviceName, final List<Parameter> pathParams) {
+            final @NonNull String deviceName, final Set<Parameter> parameters) {
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.DELETE, deviceName, moduleName,
                 node.getQName().getLocalName());
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final String description = node.getDescription().orElse("");
-        final List<Parameter> parameters = new ArrayList<>(pathParams);
+
         final Map<String, ResponseObject> responses = Map.of(String.valueOf(NO_CONTENT.getStatusCode()),
             buildResponse("Deleted"));
 
@@ -199,8 +201,7 @@ public final class OperationBuilder {
 
     public static Operation buildPostOperation(final OperationDefinition operDef, final String moduleName,
             final @NonNull String deviceName, final String parentName, final DefinitionNames definitionNames,
-            final List<Parameter> parentPathParameters) {
-        final List<Parameter> parameters = new ArrayList<>(parentPathParameters);
+            final Set<Parameter> parameters) {
         final String operationName = operDef.getQName().getLocalName();
         final String inputName = operationName + INPUT_SUFFIX;
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, operationName);
