@@ -30,14 +30,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -89,24 +87,15 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             final Element firstValueElement = values != null ? values.get(0) : null;
 
             // find complete path to target, it can be also empty (only slash)
-            final YangInstanceIdentifier targetII;
-            final Inference inference;
-            if (target.equals("/")) {
-                targetII = pathContext.getInstanceIdentifier();
-                inference = pathContext.inference();
-            } else {
-                // interpret as simple context
-                targetII = parsePatchTarget(pathContext, target);
+            final var targetII = parsePatchTarget(pathContext, target);
+            // move schema node
+            final var lookup = DataSchemaContextTree.from(pathContext.getSchemaContext())
+                .enterPath(targetII).orElseThrow();
 
-                // move schema node
-                final var lookup = DataSchemaContextTree.from(pathContext.getSchemaContext())
-                    .enterPath(targetII).orElseThrow();
-
-                final var stack = lookup.stack();
-                inference = stack.toInference();
-                if (!stack.isEmpty()) {
-                    stack.exit();
-                }
+            final var stack = lookup.stack();
+            final var inference = stack.toInference();
+            if (!stack.isEmpty()) {
+                stack.exit();
             }
 
             if (requiresValue(oper)) {
