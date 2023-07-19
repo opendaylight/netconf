@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -68,21 +69,13 @@ public final class OperationBuilder {
 
     }
 
-    public static Operation buildPost(final String nodeName, final String moduleName, final @Nullable String deviceName,
-            final String description, final List<Parameter> pathParams, final DataSchemaNode node,
-            final List<String> listKeys) {
+    public static Operation buildPost(final String moduleName, final @Nullable String deviceName,
+            final List<Parameter> pathParams, final DataSchemaNode node) {
+        final String nodeName = node.getQName().getLocalName();
         final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        final String cleanDefName = CONFIG + "_" + nodeName;
-        final String defName = cleanDefName;
-        final String xmlDefName = cleanDefName;
-        final ObjectNode requestBody;
-        if (node != null) {
-            requestBody = createContainerOrListRequestBodyParameter(nodeName, node, listKeys);
-        } else {
-            requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
-        }
+        final ObjectNode requestBody = createContainerOrListRequestBodyParameter(nodeName, node);
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
             buildResponse(Response.Status.CREATED.getReasonPhrase()));
@@ -92,7 +85,7 @@ public final class OperationBuilder {
             .parameters(parameters)
             .requestBody(requestBody)
             .responses(responses)
-            .description(description)
+            .description(node.getDescription().orElse(""))
             .summary(summary)
             .build();
     }
@@ -292,8 +285,7 @@ public final class OperationBuilder {
         return payload;
     }
 
-    private static ObjectNode createContainerOrListRequestBodyParameter(final String name, final DataSchemaNode node,
-            final List<String> listKeys) {
+    private static ObjectNode createContainerOrListRequestBodyParameter(final String name, final DataSchemaNode node) {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         final ObjectNode content = JsonNodeFactory.instance.objectNode();
         final ObjectNode object = JsonNodeFactory.instance.objectNode();
@@ -301,10 +293,12 @@ public final class OperationBuilder {
             object.put(TYPE_KEY, OBJECT);
             object.put(PROPERTIES_KEY, JsonNodeFactory.instance.objectNode());
             object.put(DESCRIPTION_KEY, "");
-        } else if (node instanceof ListSchemaNode) {
+        } else {
             // Then it is list
             final ObjectNode item = JsonNodeFactory.instance.objectNode();
             final ObjectNode id = JsonNodeFactory.instance.objectNode();
+            final List<String> listKeys = ((ListSchemaNode) node).getKeyDefinition().stream()
+                .map(key -> key.getLocalName()).collect(Collectors.toList());
             for (final String key : listKeys) {
                 final ObjectNode idValue = JsonNodeFactory.instance.objectNode();
                 idValue.put("default", "Some " + key);
@@ -315,12 +309,6 @@ public final class OperationBuilder {
             object.put(TYPE_KEY, ARRAY_TYPE);
             object.put(ITEMS_KEY, item);
             object.put(DESCRIPTION_KEY, "");
-        } else {
-            final ObjectNode id = JsonNodeFactory.instance.objectNode();
-            final ObjectNode idValue = JsonNodeFactory.instance.objectNode();
-            final String localName = node.getQName().getLocalName();
-            idValue.put("default", "Some " + localName);
-            id.put(localName, idValue);
         }
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         final ObjectNode container = JsonNodeFactory.instance.objectNode();

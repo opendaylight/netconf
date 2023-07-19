@@ -120,8 +120,7 @@ public final class CustomOpenApiBasePathTest {
             containerOperationRoot + "/custom-base-path-test:rpc-call",
             containerOperationRoot + "/custom-base-path-test:foo/foo-action",
             containerDataRoot + "/custom-base-path-test:foo/foo-list={fooListKey}",
-            containerDataRoot + "/custom-base-path-test:foo",
-            containerDataRoot);
+            containerDataRoot + "/custom-base-path-test:foo");
 
         assertEquals("Unexpected paths", expectedPaths, mountPointApi.paths().keySet());
     }
