@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Verify.verify;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
@@ -216,15 +217,20 @@ public final class ParserIdentifier {
 
     public static YangInstanceIdentifier parserPatchTarget(final InstanceIdentifierContext context,
             final String target) {
-        final var schemaContext = context.getSchemaContext();
         final var urlPath = context.getInstanceIdentifier();
+        if (target.equals("/")) {
+            verify(!urlPath.isEmpty(),
+                    "target resource of URI must not be a datastore resource when target is '/'");
+            return urlPath;
+        }
+
+        final var schemaContext = context.getSchemaContext();
         final String targetUrl;
         if (urlPath.isEmpty()) {
             targetUrl = target.startsWith("/") ? target.substring(1) : target;
         } else {
             targetUrl = IdentifierCodec.serialize(urlPath, schemaContext) + target;
         }
-
         return toInstanceIdentifier(targetUrl, schemaContext, Optional.empty()).getInstanceIdentifier();
     }
 
