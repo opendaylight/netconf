@@ -165,7 +165,7 @@ public final class MountPointOpenApiTest {
         assertNotNull("Failed to find Datastore API", mountPointApi);
 
         final var paths = mountPointApi.paths();
-        assertEquals(5, paths.size());
+        assertEquals(4, paths.size());
 
         for (final var expectedPath : configPaths.entrySet()) {
             assertTrue(paths.containsKey(expectedPath.getKey()));

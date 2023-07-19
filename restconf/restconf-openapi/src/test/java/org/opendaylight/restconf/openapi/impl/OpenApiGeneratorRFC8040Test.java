@@ -70,8 +70,7 @@ public final class OpenApiGeneratorRFC8040Test {
         final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
-        assertEquals(Set.of("/rests/data",
-            "/rests/data/toaster2:toaster",
+        assertEquals(Set.of("/rests/data/toaster2:toaster",
             "/rests/data/toaster2:toaster/toasterSlot={slotId}",
             "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo",
             "/rests/data/toaster2:lst",
@@ -146,19 +145,9 @@ public final class OpenApiGeneratorRFC8040Test {
                 {
                     "type":"object",
                     "properties":{
-                        "lst1":{
-                            "type":"array",
-                            "items":{
-                                "type":"object",
-                                "properties":{
-                                    "key1":{
-                                        "default":"Some key1"
-                                    },
-                                    "key2":{
-                                        "default":"Some key2"
-                                    }
-                                }
-                            },
+                        "cont1":{
+                            "type":"object",
+                            "properties":{},
                             "description":""
                         }
                     },
@@ -322,7 +311,7 @@ public final class OpenApiGeneratorRFC8040Test {
         assertNotNull(doc);
 
         final var paths = doc.paths();
-        assertEquals(5, paths.size());
+        assertEquals(4, paths.size());
 
         for (final var expectedPath : configPaths.entrySet()) {
             assertTrue(paths.containsKey(expectedPath.getKey()));
@@ -402,7 +391,7 @@ public final class OpenApiGeneratorRFC8040Test {
         final var module = context.findModule("my-yang", Revision.of("2022-10-06")).orElseThrow();
         final var doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
 
-        assertEquals(Set.of("/rests/data", "/rests/data/my-yang:data"), doc.paths().keySet());
+        assertEquals(Set.of("/rests/data/my-yang:data"), doc.paths().keySet());
         final var JsonNodeMyYangData = doc.paths().get("/rests/data/my-yang:data");
         verifyRequestRef(JsonNodeMyYangData.put(), "#/components/schemas/my-yang_config_data_TOP",
                 "#/components/schemas/my-yang_config_data");
