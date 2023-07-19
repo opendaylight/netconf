@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2f16327_5bf349cc",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-19T20:42:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b74de4ce_6f426e33",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a2ef2e3_f580533a",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-07-19T10:15:52Z",
       "side": 1,
       "message": "Unrequired check. You can put inside this method DataSchemaNode as a parameter, and you will be able to check it without passing string here. \n\nA lot of method parameters are created from DataSchemaNode. Please reduce them.",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8efd0a5_581ef93b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-19T20:42:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a2ef2e3_f580533a",
       "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c94ddfd_3911904d",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-19T20:42:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5de0cc38_66cc6385",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f49cc702_e5aaaf6b",
@@ -82,6 +136,24 @@
       "writtenOn": "2023-07-19T10:15:52Z",
       "side": 1,
       "message": "final String key",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b11e3b32_ac293c03",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-19T20:42:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f49cc702_e5aaaf6b",
       "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
