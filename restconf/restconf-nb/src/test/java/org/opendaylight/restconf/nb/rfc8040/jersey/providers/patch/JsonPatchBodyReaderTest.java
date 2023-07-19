@@ -189,6 +189,106 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
     }
 
     /**
+     * Test of Yang Patch on the top-level container with the full path in the URI and "/" in 'target'.
+     */
+    @Test
+    public void modulePatchTargetTopLevelContainerWithFullPathURITest() throws Exception {
+        mockBodyReader("instance-identifier-patch-module:patch-cont", jsonToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream("""
+                {
+                    "ietf-yang-patch:yang-patch": {
+                        "patch-id": "test-patch",
+                        "comment": "Test patch applied to the top-level container with '/' in target",
+                        "edit": [
+                            {
+                                "edit-id": "edit1",
+                                "operation": "replace",
+                                "target": "/",
+                                "value": {
+                                    "patch-cont": {
+                                        "my-list1": [
+                                            {
+                                                "name": "my-leaf-set",
+                                                "my-leaf11": "leaf-a",
+                                                "my-leaf12": "leaf-b"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+                """.getBytes(StandardCharsets.UTF_8));
+        final var expectedData = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(PATCH_CONT_QNAME))
+                .withChild(Builders.mapBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(MY_LIST1_QNAME))
+                        .withChild(Builders.mapEntryBuilder()
+                                .withNodeIdentifier(NodeIdentifierWithPredicates.of(
+                                        MY_LIST1_QNAME, LEAF_NAME_QNAME, "my-leaf-set"))
+                                .withChild(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf-set"))
+                                .withChild(ImmutableNodes.leafNode(MY_LEAF11_QNAME, "leaf-a"))
+                                .withChild(ImmutableNodes.leafNode(MY_LEAF12_QNAME, "leaf-b"))
+                                .build())
+                        .build())
+                .build();
+        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(PATCH_CONT_QNAME, data.name().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the second-level list with the full path in the URI and "/" in 'target'.
+     */
+    @Test
+    public void modulePatchTargetSecondLevelListWithFullPathURITest() throws Exception {
+        mockBodyReader("instance-identifier-patch-module:patch-cont/my-list1=my-leaf-set",
+                jsonToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream("""
+            {
+                "ietf-yang-patch:yang-patch": {
+                    "patch-id": "test-patch",
+                    "comment": "Test patch applied to the second-level list with '/' in target",
+                    "edit": [
+                        {
+                            "edit-id": "edit1",
+                            "operation": "replace",
+                            "target": "/",
+                            "value": {
+                                "my-list1": [
+                                    {
+                                        "name": "my-leaf-set",
+                                        "my-leaf11": "leaf-a",
+                                        "my-leaf12": "leaf-b"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+            """.getBytes(StandardCharsets.UTF_8));
+        final var expectedData = Builders.mapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(MY_LIST1_QNAME))
+                .withChild(Builders.mapEntryBuilder()
+                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(
+                                MY_LIST1_QNAME, LEAF_NAME_QNAME, "my-leaf-set"))
+                        .withChild(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf-set"))
+                        .withChild(ImmutableNodes.leafNode(MY_LEAF11_QNAME, "leaf-a"))
+                        .withChild(ImmutableNodes.leafNode(MY_LEAF12_QNAME, "leaf-b"))
+                        .build())
+                .build();
+        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(MY_LIST1_QNAME, data.name().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
      * Test of Yang Patch on the top augmented element.
      */
     @Test
