@@ -272,23 +272,23 @@ public final class OpenApiGeneratorRFC8040Test {
 
         var pathToList1 = "/rests/data/path-params-test:cont/list1={name}";
         assertTrue(doc.paths().containsKey(pathToList1));
-        assertEquals(List.of("name"), getPathGetParameters(doc.paths(), pathToList1));
+        assertEquals(Set.of("name"), getPathGetParameters(doc.paths(), pathToList1));
 
         var pathToList2 = "/rests/data/path-params-test:cont/list1={name}/list2={name1}";
         assertTrue(doc.paths().containsKey(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathGetParameters(doc.paths(), pathToList2));
+        assertEquals(Set.of("name", "name1"), getPathGetParameters(doc.paths(), pathToList2));
 
         var pathToList3 = "/rests/data/path-params-test:cont/list3={name}";
         assertTrue(doc.paths().containsKey(pathToList3));
-        assertEquals(List.of("name"), getPathGetParameters(doc.paths(), pathToList3));
+        assertEquals(Set.of("name"), getPathGetParameters(doc.paths(), pathToList3));
 
         var pathToList4 = "/rests/data/path-params-test:cont/list1={name}/list4={name1}";
         assertTrue(doc.paths().containsKey(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathGetParameters(doc.paths(), pathToList4));
+        assertEquals(Set.of("name", "name1"), getPathGetParameters(doc.paths(), pathToList4));
 
         var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
         assertTrue(doc.paths().containsKey(pathToList4));
-        assertEquals(List.of("name"), getPathGetParameters(doc.paths(), pathToList5));
+        assertEquals(Set.of("name"), getPathGetParameters(doc.paths(), pathToList5));
     }
 
     /**
@@ -300,11 +300,11 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final var pathWithParameters = "/rests/operations/action-types:list={name}/list-action";
         assertTrue(doc.paths().containsKey(pathWithParameters));
-        assertEquals(List.of("name"), getPathPostParameters(doc.paths(), pathWithParameters));
+        assertEquals(Set.of("name"), getPathPostParameters(doc.paths(), pathWithParameters));
 
         final var pathWithoutParameters = "/rests/operations/action-types:multi-container/inner-container/action";
         assertTrue(doc.paths().containsKey(pathWithoutParameters));
-        assertEquals(List.of(), getPathPostParameters(doc.paths(), pathWithoutParameters));
+        assertEquals(Set.of(), getPathPostParameters(doc.paths(), pathWithoutParameters));
     }
 
     @Test
