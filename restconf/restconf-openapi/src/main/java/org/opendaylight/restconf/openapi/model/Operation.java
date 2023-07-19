@@ -12,12 +12,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record Operation(
         boolean deprecated,
         List<String> tags,
-        List<Parameter> parameters,
+        Set<Parameter> parameters,
         List<Map<String, List<String>>> security,
         ArrayNode servers,
         ObjectNode callbacks,
@@ -38,7 +39,7 @@ public record Operation(
     public static class Builder {
         private boolean deprecated;
         private List<String> tags;
-        private List<Parameter> parameters;
+        private Set<Parameter> parameters;
         private List<Map<String, List<String>>> security;
         private ArrayNode servers;
         private ObjectNode callbacks;
@@ -59,7 +60,7 @@ public record Operation(
             return this;
         }
 
-        public Builder parameters(final List<Parameter> parameters) {
+        public Builder parameters(final Set<Parameter> parameters) {
             this.parameters = parameters;
             return this;
         }
