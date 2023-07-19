@@ -10,12 +10,13 @@ package org.opendaylight.restconf.openapi.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record Operation(
         Boolean deprecated,
         List<String> tags,
-        List<Parameter> parameters,
+        Set<Parameter> parameters,
         List<Map<String, List<String>>> security,
         List<Server> servers,
         Map<String, Path> callbacks,
@@ -28,7 +29,7 @@ public record Operation(
 
     public Operation {
         tags = tags == null ? null : List.copyOf(tags);
-        parameters = parameters == null ? null : List.copyOf(parameters);
+        parameters = parameters == null ? null : Set.copyOf(parameters);
         security = security == null ? null : List.copyOf(security);
         servers = servers == null ? null : List.copyOf(servers);
         callbacks = callbacks == null ? null : Map.copyOf(callbacks);
@@ -45,7 +46,7 @@ public record Operation(
     public static class Builder {
         private Boolean deprecated;
         private List<String> tags;
-        private List<Parameter> parameters;
+        private Set<Parameter> parameters;
         private List<Map<String, List<String>>> security;
         private List<Server> servers;
         private Map<String, Path> callbacks;
@@ -66,7 +67,7 @@ public record Operation(
             return this;
         }
 
-        public Builder parameters(final List<Parameter> parameters) {
+        public Builder parameters(final Set<Parameter> parameters) {
             this.parameters = parameters;
             return this;
         }
