@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5d47dc8_05b49680",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-19T10:15:52Z",
+      "side": 1,
+      "message": "Remove creating a POST for the Module. By the task definition, you should create POST only for the top models. Model root is not the case for this scenario.",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b74de4ce_6f426e33",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-19T10:15:52Z",
+      "side": 1,
+      "message": "Why?",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a2ef2e3_f580533a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-19T10:15:52Z",
+      "side": 1,
+      "message": "Unrequired check. You can put inside this method DataSchemaNode as a parameter, and you will be able to check it without passing string here. \n\nA lot of method parameters are created from DataSchemaNode. Please reduce them.",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5de0cc38_66cc6385",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-19T10:15:52Z",
+      "side": 1,
+      "message": "Reducible else branch here. I don\u0027t know if there is a case where POST request should have reference.",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f49cc702_e5aaaf6b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-19T10:15:52Z",
+      "side": 1,
+      "message": "final String key",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "931f6852_549b83b3",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-19T10:15:52Z",
+      "side": 1,
+      "message": "Should have JSON and XML same schema object? Does it work?",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ea7ad27_8555bc0b",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-19T10:15:52Z",
+      "side": 1,
+      "message": "Please do not add duplicate code:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106891/7..9/restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
