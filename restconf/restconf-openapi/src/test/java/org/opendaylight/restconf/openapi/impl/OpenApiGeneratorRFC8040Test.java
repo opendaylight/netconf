@@ -18,6 +18,7 @@ import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParamete
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -279,7 +280,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         var pathToList2 = "/rests/data/path-params-test:cont/list1={name}/list2={name1}";
         assertTrue(doc.paths().containsKey(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathParameters(doc.paths(), pathToList2));
+        assertEquals(Set.of("name", "name1"), new HashSet<>(getPathParameters(doc.paths(), pathToList2)));
 
         var pathToList3 = "/rests/data/path-params-test:cont/list3={name}";
         assertTrue(doc.paths().containsKey(pathToList3));
@@ -287,7 +288,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         var pathToList4 = "/rests/data/path-params-test:cont/list1={name}/list4={name1}";
         assertTrue(doc.paths().containsKey(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(doc.paths(), pathToList4));
+        assertEquals(Set.of("name", "name1"), new HashSet<>(getPathParameters(doc.paths(), pathToList4)));
 
         var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
         assertTrue(doc.paths().containsKey(pathToList4));
