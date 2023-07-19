@@ -105,6 +105,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f0c5e2eb_cc8c29f4",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-19T10:38:12Z",
+      "side": 1,
+      "message": "Just JSON for now. XML will be handled later",
+      "parentUuid": "931f6852_549b83b3",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5ea7ad27_8555bc0b",
         "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
         "patchSetId": 17
