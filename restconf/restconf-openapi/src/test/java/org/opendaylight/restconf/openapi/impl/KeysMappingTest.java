@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -83,8 +83,8 @@ public class KeysMappingTest {
     public void testKeysMapping() {
         final var pathToMultipleKeyList4 = "/rests/data/keys-mapping:multiple-key-list={name},{name2}"
             + "/multiple-key-list2={name1},{name3}/multiple-key-list3={name31},{name4}/multiple-key-list4={name5}";
+        final var expected = List.of("name","name2", "name1", "name3", "name31", "name4", "name5");
         assertTrue(doc.paths().containsKey(pathToMultipleKeyList4));
-        assertEquals(List.of("name","name2", "name1", "name3", "name31", "name4", "name5"),
-            getPathParameters(doc.paths(), pathToMultipleKeyList4));
+        assertThat(expected).hasSameElementsAs(getPathParameters(doc.paths(), pathToMultipleKeyList4));
     }
 }
