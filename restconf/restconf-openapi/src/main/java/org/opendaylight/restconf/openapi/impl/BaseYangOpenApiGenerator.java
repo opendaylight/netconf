@@ -367,6 +367,20 @@ public abstract class BaseYangOpenApiGenerator {
         return null;
     }
 
+    public static Parameter generateQueryParameter(final boolean isConfig) {
+        final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
+        cases.add("nonconfig");
+        if (isConfig) {
+            cases.add("config");
+        }
+        final Parameter.Builder contentParamBuilder = new Parameter.Builder()
+            .in("query")
+            .name("content")
+            .schema(new Schema.Builder().type("string").schemaEnum(cases).build())
+            .required(!isConfig);
+        return contentParamBuilder.build();
+    }
+
     private static Path operations(final DataSchemaNode node, final String moduleName,
             final String deviceName, final Set<Parameter> pathParams, final boolean isConfig,
             final String parentName, final DefinitionNames definitionNames) {
