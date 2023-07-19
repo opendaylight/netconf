@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathGetParameters;
 
-import java.util.List;
+import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -85,7 +85,7 @@ public class KeysMappingTest {
         final var pathToMultipleKeyList4 = "/rests/data/keys-mapping:multiple-key-list={name},{name2}"
             + "/multiple-key-list2={name1},{name3}/multiple-key-list3={name31},{name4}/multiple-key-list4={name5}";
         assertTrue(doc.paths().containsKey(pathToMultipleKeyList4));
-        assertEquals(List.of("name","name2", "name1", "name3", "name31", "name4", "name5"),
+        assertEquals(Set.of("name","name2", "name1", "name3", "name31", "name4", "name5"),
             getPathGetParameters(doc.paths(), pathToMultipleKeyList4));
     }
 }
