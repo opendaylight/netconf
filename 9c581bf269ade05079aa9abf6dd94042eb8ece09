@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10760986_e566556b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-20T09:30:44Z",
+      "side": 1,
+      "message": "Can we use something like this?\n```\n        if (childSchemaNodes.iterator().hasNext() \u0026\u0026 shouldHavePostRequest) {\n            final var next \u003d childSchemaNodes.iterator().next();\n            final Operation post \u003d buildContainerOrListPostOperation(next, moduleName, deviceName,\n                pathParams, parentName, definitionNames);\n            operations.post(post);\n        }\n\n```\n\nIt will be clearer now that we are processing only the first element.",
+      "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
