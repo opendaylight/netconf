@@ -70,6 +70,24 @@
       "parentUuid": "95ff698e_28a8d9b0",
       "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "226baef3_33c26955",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-20T12:15:40Z",
+      "side": 1,
+      "message": "I missed checking the child\u0027s part, you can leave it as it is. \n\nLet\u0027s just move your change of creating a POST request for the first child in the container/list to your next patch \"Remove POST requests for child elements",
+      "parentUuid": "bcc93ce1_3fca71be",
+      "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
