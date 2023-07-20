@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9307c792_a3cd9746",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-20T10:23:41Z",
+      "side": 1,
+      "message": "Can we have some test for this use-case?\n\n```\nWhen requesting swagger document for a specific module under a specific\nmounted device, the deviceName was ignored and not included in the\nsummary of the paths.\n```",
+      "revId": "2c5e1434ad246b49a5fbb58e4485ddf30132a87b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aced8a38_3ba87f67",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-20T10:23:41Z",
+      "side": 1,
+      "message": "Please switch it to local variable.",
+      "revId": "2c5e1434ad246b49a5fbb58e4485ddf30132a87b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
