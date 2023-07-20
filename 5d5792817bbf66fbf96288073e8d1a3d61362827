@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ff65d1f_6212324d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-20T10:48:42Z",
+      "side": 1,
+      "message": "Now we have \"36001-sim-device\" tag in OpenApi mountpoint and contains it duplicate request from all models",
+      "revId": "5d5792817bbf66fbf96288073e8d1a3d61362827",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
