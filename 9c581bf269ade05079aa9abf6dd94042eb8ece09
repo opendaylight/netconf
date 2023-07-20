@@ -34,6 +34,24 @@
       "parentUuid": "10760986_e566556b",
       "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95ff698e_28a8d9b0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-20T10:47:15Z",
+      "side": 1,
+      "message": "addPost used here to process only first child in container. It\u0027s not limit POSTs only for root element. I still create POST requests for ALL children that are container or list.",
+      "parentUuid": "40b87378_0eb3e43e",
+      "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fee6693_5ed98a55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-20T10:47:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2dc1df6_dddd2692",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b74de4ce_6f426e33",
@@ -211,6 +229,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af110a33_20b3c62a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-20T10:47:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0c5e2eb_cc8c29f4",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ea7ad27_8555bc0b",
@@ -242,6 +278,24 @@
       "side": 1,
       "message": "I know about that. But I didn\u0027t have a choice since my task was created before this one. And there is a chance that this one won\u0027t be merged. I\u0027ll left this comment open and we will discus it after all other comments fixed",
       "parentUuid": "5ea7ad27_8555bc0b",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1fb0818_7dade315",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-20T10:47:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f92374d9_91d3e7bc",
       "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
