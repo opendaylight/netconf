@@ -16,6 +16,24 @@
       "message": "If here will be always \"http\" can we get rid of this and return only constant filed when is asked for a type?",
       "revId": "c1e9384ea35b463b24175b229f7df2beb527d6dc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17ebdfc4_6a234079",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/security/Http.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-20T09:05:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e65085c_3339bae7",
+      "revId": "c1e9384ea35b463b24175b229f7df2beb527d6dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
