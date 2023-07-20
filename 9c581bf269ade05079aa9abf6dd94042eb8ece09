@@ -88,6 +88,24 @@
       "parentUuid": "bcc93ce1_3fca71be",
       "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a768539f_44e8423c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-20T17:15:55Z",
+      "side": 1,
+      "message": "I changed a bit logic to partially include your comment and finish it in next patch. Plus I was able to remove quite a bit of unnecessary code. Tbh - I like this one more. Now it is literally taking first child even if it is leaf. You can check it if you run it with test-tool and open toaster2 on device. There should be path:\n rests/data/network-topology:network-topology/topology\u003dtopology-netconf/node\u003d17830-sim-device/yang-ext:mount/toaster2:toaster\n\nOr here is curl for same request:\n curl -X \u0027POST\u0027 \\\n  \u0027http://localhost:8181/rests/data/network-topology:network-topology/topology\u003dtopology-netconf/node\u003d17830-sim-device/yang-ext:mount/toaster2:toaster\u0027 \\\n  -H \u0027accept: */*\u0027 \\\n  -H \u0027Content-Type: application/json\u0027 \\\n  -d \u0027{\n  \"toasterManufacturer\": \"string\"\n}\u0027",
+      "parentUuid": "226baef3_33c26955",
+      "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
