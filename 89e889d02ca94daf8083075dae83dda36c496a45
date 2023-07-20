@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02c6bf6e_dbfe92b7",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-20T09:30:48Z",
+      "side": 1,
+      "message": "Do we need to check here if this is ContainerSchemaNode if we do it in \"createContainerOrListRequestBodyParameter\" method?",
+      "revId": "89e889d02ca94daf8083075dae83dda36c496a45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91ece5c8_3b9020d1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-20T09:30:48Z",
+      "side": 1,
+      "message": "\"node.getDescription().orElse(\"\")\", \"nodeName\" and \"listKeys\" parameter is redundant like I asked in previous comment.",
+      "revId": "89e889d02ca94daf8083075dae83dda36c496a45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
