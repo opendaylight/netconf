@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9103e354_ded74d5f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-20T10:34:28Z",
+      "side": 1,
+      "message": "Can we use regular string for this instead of text block?\nhttps://docs.oracle.com/en/java/javase/17/text-blocks/index.html#style-guidelines-for-text-blocks\n\nIt is not recommended to use for one line strings.",
+      "revId": "cbbc4e216185541ede2182fe3ede89d6ddf28e3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
