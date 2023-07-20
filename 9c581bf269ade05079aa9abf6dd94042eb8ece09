@@ -16,6 +16,24 @@
       "message": "Can we use something like this?\n```\n        if (childSchemaNodes.iterator().hasNext() \u0026\u0026 shouldHavePostRequest) {\n            final var next \u003d childSchemaNodes.iterator().next();\n            final Operation post \u003d buildContainerOrListPostOperation(next, moduleName, deviceName,\n                pathParams, parentName, definitionNames);\n            operations.post(post);\n        }\n\n```\n\nIt will be clearer now that we are processing only the first element.",
       "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40b87378_0eb3e43e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-20T09:52:40Z",
+      "side": 1,
+      "message": "And why this is even in this commit?\n\n`Replaced POST requestBody for containers and lists to empty\npayload with minimum required data.`\n\nPlease move it to:\nRemove POST requests for child elements",
+      "parentUuid": "10760986_e566556b",
+      "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
