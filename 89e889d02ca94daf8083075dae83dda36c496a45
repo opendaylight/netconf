@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc38eeb6_b6624c1b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-20T16:52:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02c6bf6e_dbfe92b7",
+      "revId": "89e889d02ca94daf8083075dae83dda36c496a45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91ece5c8_3b9020d1",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-20T09:30:48Z",
       "side": 1,
       "message": "\"node.getDescription().orElse(\"\")\", \"nodeName\" and \"listKeys\" parameter is redundant like I asked in previous comment.",
+      "revId": "89e889d02ca94daf8083075dae83dda36c496a45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e10e87c_58868e88",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-20T16:52:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91ece5c8_3b9020d1",
       "revId": "89e889d02ca94daf8083075dae83dda36c496a45",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
