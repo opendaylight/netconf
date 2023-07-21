@@ -16,6 +16,24 @@
       "message": "I would like to see the same assertions as in original patch.",
       "revId": "1ed193855c3187f57e967d56b702ac1c2d006e7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc0b3de9_02f1863a",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/CustomOpenApiBasePathTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-21T13:23:49Z",
+      "side": 1,
+      "message": "Done.\nWe can\u0027t use YangParserTestUtils.parseYang(\"module yang-module {...}\") here as we are using older version of yangtools, which does not support it yet. So a dedicated file must be used instead.",
+      "parentUuid": "d90e1aa2_a9785544",
+      "revId": "1ed193855c3187f57e967d56b702ac1c2d006e7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
