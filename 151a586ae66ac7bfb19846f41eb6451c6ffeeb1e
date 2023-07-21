@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "151a586ae66ac7bfb19846f41eb6451c6ffeeb1e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f66239f_6c28d35d",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OperationalDataTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-21T13:44:06Z",
+      "side": 1,
+      "message": "Remove this empty line.",
+      "revId": "151a586ae66ac7bfb19846f41eb6451c6ffeeb1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0312205b_6e7347ac",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OperationalDataTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-21T13:44:06Z",
+      "side": 1,
+      "message": "static",
+      "revId": "151a586ae66ac7bfb19846f41eb6451c6ffeeb1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1efa1e1c_3f2c82a4",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OperationalDataTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-21T13:44:06Z",
+      "side": 1,
+      "message": "static",
+      "revId": "151a586ae66ac7bfb19846f41eb6451c6ffeeb1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
