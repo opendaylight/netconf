@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f744925_74ab0b2a",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/CustomOpenApiBasePathTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-21T13:02:57Z",
+      "side": 1,
+      "message": "I would like to see the same assertions as in original patch.",
+      "revId": "c97ad451061068b3f3f209c9aba227d52142c935",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
