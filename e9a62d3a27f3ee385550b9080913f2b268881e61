@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7273631a_6f4ce4f1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-21T09:00:18Z",
+      "side": 1,
+      "message": "final",
+      "revId": "e9a62d3a27f3ee385550b9080913f2b268881e61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afff8292_4ee83228",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-21T09:00:18Z",
+      "side": 1,
+      "message": "Please revert this",
+      "revId": "e9a62d3a27f3ee385550b9080913f2b268881e61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
