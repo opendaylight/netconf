@@ -30,25 +30,20 @@ import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 
 public final class OperationBuilder {
-    public static final String CONFIG_QUERY_PARAM = "config";
     public static final String CONTENT_KEY = "content";
     public static final String COMPONENTS_PREFIX = "#/components/schemas/";
     public static final String DESCRIPTION_KEY = "description";
     public static final String INPUT_KEY = "input";
     public static final String NAME_KEY = "name";
-    public static final String NONCONFIG_QUERY_PARAM = "nonconfig";
     public static final String PROPERTIES_KEY = "properties";
     public static final String REF_KEY = "$ref";
     public static final String SCHEMA_KEY = "schema";
     public static final String SUMMARY_SEPARATOR = " - ";
     public static final String TOP = "_TOP";
     public static final String XML_KEY = "xml";
-    private static final String CONTENT = "content";
     private static final List<String> MIME_TYPES = List.of(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON);
     private static final String OBJECT = "object";
-    private static final String STRING = "string";
     private static final String TYPE_KEY = "type";
-    private static final String QUERY = "query";
 
     private OperationBuilder() {
         // Hidden on purpose
@@ -88,7 +83,7 @@ public final class OperationBuilder {
                 node.getQName().getLocalName());
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        addQueryParameters(parameters);
+        parameters.add(buildQueryParameters());
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
@@ -107,16 +102,17 @@ public final class OperationBuilder {
             .build();
     }
 
-    private static void addQueryParameters(final List<Parameter> parameters) {
-        final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
-        cases.add(NONCONFIG_QUERY_PARAM);
-        cases.add(CONFIG_QUERY_PARAM);
+    private static Parameter buildQueryParameters() {
+        final ArrayNode cases = JsonNodeFactory.instance.arrayNode()
+            .add("config")
+            .add("nonconfig")
+            .add("all");
 
-        final Parameter.Builder contentParamBuilder = new Parameter.Builder()
-            .in(QUERY)
-            .name(CONTENT)
-            .schema(new Schema.Builder().type(STRING).schemaEnum(cases).build());
-        parameters.add(contentParamBuilder.build());
+        return new Parameter.Builder()
+            .in("query")
+            .name("content")
+            .schema(new Schema.Builder().type("string").schemaEnum(cases).build())
+            .build();
     }
 
     public static Operation buildPut(final String parentName, final String nodeName, final String discriminator,
