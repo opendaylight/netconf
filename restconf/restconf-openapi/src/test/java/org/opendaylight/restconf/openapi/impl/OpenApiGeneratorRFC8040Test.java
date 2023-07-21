@@ -71,11 +71,11 @@ public final class OpenApiGeneratorRFC8040Test {
             "/rests/data/toaster2:toaster",
             "/rests/data/toaster2:toaster/toasterSlot={slotId}",
             "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo",
-            "/rests/data/toaster2:lst",
-            "/rests/data/toaster2:lst/cont1",
-            "/rests/data/toaster2:lst/cont1/cont11",
-            "/rests/data/toaster2:lst/cont1/lst11",
-            "/rests/data/toaster2:lst/lst1={key1},{key2}",
+            "/rests/data/toaster2:lst={lf1}",
+            "/rests/data/toaster2:lst={lf1}/cont1",
+            "/rests/data/toaster2:lst={lf1}/cont1/cont11",
+            "/rests/data/toaster2:lst={lf1}/cont1/lst11={lf111}",
+            "/rests/data/toaster2:lst={lf1}/lst1={key1},{key2}",
             "/rests/operations/toaster2:make-toast",
             "/rests/operations/toaster2:cancel-toast",
             "/rests/operations/toaster2:restock-toaster"),
@@ -87,11 +87,11 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testConfigPaths() {
-        final List<String> configPaths = List.of("/rests/data/toaster2:lst",
-                "/rests/data/toaster2:lst/cont1",
-                "/rests/data/toaster2:lst/cont1/cont11",
-                "/rests/data/toaster2:lst/cont1/lst11",
-                "/rests/data/toaster2:lst/lst1={key1},{key2}");
+        final List<String> configPaths = List.of("/rests/data/toaster2:lst={lf1}",
+                "/rests/data/toaster2:lst={lf1}/cont1",
+                "/rests/data/toaster2:lst={lf1}/cont1/cont11",
+                "/rests/data/toaster2:lst={lf1}/cont1/lst11={lf111}",
+                "/rests/data/toaster2:lst={lf1}/lst1={key1},{key2}");
 
         final var module = context.findModule(TOASTER_2, Revision.of(REVISION_DATE)).orElseThrow();
         final OpenApiObject doc = generator.getOpenApiSpec(module, "http", "localhost:8181", "/", "", context);
@@ -382,7 +382,7 @@ public final class OpenApiGeneratorRFC8040Test {
         verifyRequestRef(jsonNodeSlotInfo.get(), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo_TOP",
                 "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo");
 
-        final var jsonNodeLst = doc.paths().get("/rests/data/toaster2:lst");
+        final var jsonNodeLst = doc.paths().get("/rests/data/toaster2:lst={lf1}");
         verifyRequestRef(jsonNodeLst.post(), "#/components/schemas/toaster2_config_lst",
                 "#/components/schemas/toaster2_config_lst");
         verifyRequestRef(jsonNodeLst.put(), "#/components/schemas/toaster2_config_lst_TOP",
@@ -390,7 +390,7 @@ public final class OpenApiGeneratorRFC8040Test {
         verifyRequestRef(jsonNodeLst.get(), "#/components/schemas/toaster2_lst_TOP",
                 "#/components/schemas/toaster2_lst");
 
-        final var jsonNodeLst1 = doc.paths().get("/rests/data/toaster2:lst/lst1={key1},{key2}");
+        final var jsonNodeLst1 = doc.paths().get("/rests/data/toaster2:lst={lf1}/lst1={key1},{key2}");
         verifyRequestRef(jsonNodeLst1.post(), "#/components/schemas/toaster2_lst_config_lst1",
                 "#/components/schemas/toaster2_lst_config_lst1");
         verifyRequestRef(jsonNodeLst1.put(), "#/components/schemas/toaster2_lst_config_lst1_TOP",

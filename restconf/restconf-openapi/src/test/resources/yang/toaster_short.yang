@@ -131,6 +131,10 @@
     }  // container toaster
     
     list lst {
+        key "lf1";
+        leaf lf1 {
+            type string;
+        }
         container cont1 {
             container cont11 {
                 leaf lf111 {
@@ -141,6 +145,7 @@
                 }
             }
             list lst11 {
+                key "lf111";
                 leaf lf111 {
                     type string;
                 }
@@ -157,9 +162,6 @@
             leaf lf11 {
                 type int16;
             }
-        }
-        leaf lf1 {
-            type string;
         }
     }    
 
