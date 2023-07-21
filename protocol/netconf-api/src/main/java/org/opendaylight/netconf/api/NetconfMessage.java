@@ -21,8 +21,7 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Document;
 
 /**
- * NetconfMessage represents a wrapper around org.w3c.dom.Document. Needed for
- * implementing ProtocolMessage interface.
+ * NetconfMessage represents a wrapper around {@link Document}.
  */
 public class NetconfMessage {
     private static final Transformer TRANSFORMER;
@@ -39,20 +38,20 @@ public class NetconfMessage {
         TRANSFORMER = t;
     }
 
-    private final @NonNull Document doc;
+    private final @NonNull Document document;
 
-    public NetconfMessage(final Document doc) {
-        this.doc = requireNonNull(doc);
+    public NetconfMessage(final Document document) {
+        this.document = requireNonNull(document);
     }
 
-    public @NonNull Document getDocument() {
-        return doc;
+    public final @NonNull Document getDocument() {
+        return document;
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         final var result = new StreamResult(new StringWriter());
-        final var source = new DOMSource(doc.getDocumentElement());
+        final var source = new DOMSource(document.getDocumentElement());
 
         try {
             // Slight critical section is a tradeoff. This should be reasonably fast.
