@@ -32,7 +32,6 @@ import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 public final class OperationBuilder {
     public static final String BODY = "body";
     public static final String CONFIG = "_config";
-    public static final String CONFIG_QUERY_PARAM = "config";
     public static final String CONSUMES_KEY = "consumes";
     public static final String CONTENT_KEY = "content";
     public static final String COMPONENTS_PREFIX = "#/components/schemas/";
@@ -41,7 +40,6 @@ public final class OperationBuilder {
     public static final String IN_KEY = "in";
     public static final String INPUT_KEY = "input";
     public static final String NAME_KEY = "name";
-    public static final String NONCONFIG_QUERY_PARAM = "nonconfig";
     public static final String PARAMETERS_KEY = "parameters";
     public static final String POST_SUFFIX = "_post";
     public static final String PROPERTIES_KEY = "properties";
@@ -55,16 +53,13 @@ public final class OperationBuilder {
     public static final String TOP = "_TOP";
     public static final String XML_KEY = "xml";
     public static final String XML_SUFFIX = "_xml";
-    private static final String CONTENT = "content";
     private static final ArrayNode CONSUMES_PUT_POST;
     private static final String ENUM_KEY = "enum";
     private static final List<String> MIME_TYPES = ImmutableList.of(MediaType.APPLICATION_XML,
             MediaType.APPLICATION_JSON);
     private static final String OBJECT = "object";
     private static final String REQUIRED_KEY = "required";
-    private static final String STRING = "string";
     private static final String TYPE_KEY = "type";
-    private static final String QUERY = "query";
 
     static {
         CONSUMES_PUT_POST = JsonNodeFactory.instance.arrayNode();
@@ -134,17 +129,18 @@ public final class OperationBuilder {
                                            final OAversion oaversion) {
         final ObjectNode contentParam = JsonNodeFactory.instance.objectNode();
         final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
-        cases.add(NONCONFIG_QUERY_PARAM);
+        cases.add("nonconfig");
         if (isConfig) {
-            cases.add(CONFIG_QUERY_PARAM);
+            cases.add("config");
+            cases.add("all");
         } else {
             contentParam.put(REQUIRED_KEY, true);
         }
-        contentParam.put(IN_KEY, QUERY);
-        contentParam.put(NAME_KEY, CONTENT);
+        contentParam.put(IN_KEY, "query");
+        contentParam.put(NAME_KEY, "content");
 
         final ObjectNode typeParent = getTypeParentNode(contentParam, oaversion);
-        typeParent.put(TYPE_KEY, STRING);
+        typeParent.put(TYPE_KEY, "string");
         typeParent.set(ENUM_KEY, cases);
 
         parameters.add(contentParam);
