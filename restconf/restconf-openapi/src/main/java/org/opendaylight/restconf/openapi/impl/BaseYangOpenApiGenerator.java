@@ -70,6 +70,7 @@ public abstract class BaseYangOpenApiGenerator {
     public static final String OPEN_API_VERSION = "3.0.3";
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
+    public static final String STRING = "string";
     public static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
         .put("type", "http")
         .put("scheme", "basic");
@@ -308,6 +309,20 @@ public abstract class BaseYangOpenApiGenerator {
                 module.getDescription().orElse(""), buildPathParameters(pathParams))).build();
         }
         return null;
+    }
+
+    public static Parameter buildQueryParameter(final boolean isConfig) {
+        final ArrayNode cases = JsonNodeFactory.instance.arrayNode()
+            .add("config")
+            .add("nonconfig")
+            .add("all");
+
+        return new Parameter.Builder()
+            .in("query")
+            .name("content")
+            .required(!isConfig)
+            .schema(new Schema.Builder().type("string").schemaEnum(cases).build())
+            .build();
     }
 
     private static Path operations(final DataSchemaNode node, final String moduleName,
