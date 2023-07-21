@@ -1,3 +1,7 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.opendaylight.mdsal/mdsal-artifacts/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.opendaylight.mdsal/mdsal-artifacts)
+[![Javadocs](https://www.javadoc.io/badge/org.opendaylight.mdsal/mdsal-docs.svg)](https://www.javadoc.io/doc/org.opendaylight.mdsal/mdsal-docs)
+[![License](https://img.shields.io/badge/License-EPL%201.0-blue.svg)](https://opensource.org/licenses/EPL-1.0)
+
 # OpenDaylight NETCONF/RESTCONF implementation
 
 This project hosts implementations of protocols defined by the [IETF NETCONF Working Group](https://datatracker.ietf.org/wg/netconf/about/).
