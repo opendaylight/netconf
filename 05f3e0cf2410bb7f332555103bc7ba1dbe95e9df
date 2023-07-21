@@ -316,6 +316,24 @@
       "parentUuid": "a1fb0818_7dade315",
       "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4adf32a_91ac9287",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-21T10:39:05Z",
+      "side": 1,
+      "message": "In any case, there is definitely no need to create duplicate code. Please remove it.",
+      "parentUuid": "1813eecd_2f3faec1",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
