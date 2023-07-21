@@ -16,6 +16,24 @@
       "message": "- If POST is created for List child with Uint8 key path parameter and example request is created for String key.\n\n- POST for request \"http://localhost:8181/rests/data/network-topology:network-topology/topology\u003dtopology-netconf/node\u003d36001-sim-device/yang-ext:mount/toaster:toaster\" is not working and response with:\n\"Invalid value \u0027string\u0027 for bits type. Allowed values are: [testbit1, testbit2]\"\n\n- POST created for model like this is not working:\n```\n  container first-container {\n    choice default-choice {\n      default second-case;\n      case first-case {\n        leaf leaf-non-default {\n          type string;\n        }\n      }\n      case second-case {\n        leaf leaf-default {\n          type string;\n          default \"default-value\";\n        }\n      }\n    }\n  }\n```\nIt creates invalid example:\n```\n{\n  \"default-choice\": \"string\"\n}\n```\n",
       "revId": "773d202e03ee5c66b09f8881cfca529229d22493",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37abcf5f_370164ce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-21T18:45:27Z",
+      "side": 1,
+      "message": "That\u0027s a good one. We have options here... Let\u0027s discuss it on the meeting",
+      "parentUuid": "f48c4d87_f47a4b2a",
+      "revId": "773d202e03ee5c66b09f8881cfca529229d22493",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
