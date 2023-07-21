@@ -20,7 +20,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
+import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,11 +40,18 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public final class MountPointOpenApiTest {
+    private static final String TOASTER = "toaster";
+    private static final String TOASTER_REVISION = "2009-11-20";
+    private static final Long DEVICE_ID = 1L;
+    private static final String DEVICE_NAME = "123";
+    private static final String GET_ALL = "http://localhost:8181/openapi/api/v3/mounts/" + DEVICE_ID;
+    private static final String GET_TOASTER = "http://localhost:8181/openapi/api/v3/mounts/%s/%s(%s)".formatted(
+        DEVICE_ID, TOASTER, TOASTER_REVISION);
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
             .node(QName.create("", "node"))
-            .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
+            .nodeWithKey(QName.create("", "node"), QName.create("", "id"), DEVICE_NAME).build();
     private static final String INSTANCE_URL = "/nodes/node=123/";
 
     private static EffectiveModelContext context;
@@ -264,5 +273,61 @@ public final class MountPointOpenApiTest {
         assertEquals("[{\"basicAuth\":[]}]", mountPointApi.security().toString());
         assertEquals("{\"type\":\"http\",\"scheme\":\"basic\"}",
             mountPointApi.components().securitySchemes().basicAuth().toString());
+    }
+
+    @Test
+    public void testSummaryForAllModules() throws Exception {
+        final UriInfo uriAll = DocGenTestHelper.createMockUriInfo(GET_ALL);
+        when(uriAll.getQueryParameters()).thenReturn(new MultivaluedStringMap());
+        openApi.onMountPointCreated(INSTANCE_ID);
+        // get OpenApiObject for the device (all modules)
+        final OpenApiObject openApiAll = openApi.getMountPointApi(uriAll, DEVICE_ID, null);
+        final String getToasterSummary = openApiAll.paths()
+            .get("/rests/data/nodes/node=123/yang-ext:mount/toaster:toaster")
+            .get()
+            .summary();
+        assertEquals("GET - " + DEVICE_NAME + " - toaster - toaster", getToasterSummary);
+    }
+
+    @Test
+    public void testSummaryForSingleModule() throws Exception {
+        final UriInfo uriToaster = DocGenTestHelper.createMockUriInfo(GET_TOASTER);
+        when(uriToaster.getQueryParameters()).thenReturn(new MultivaluedStringMap());
+        openApi.onMountPointCreated(INSTANCE_ID);
+        // get OpenApiObject for a specific module (toaster) associated with the mounted device
+        final OpenApiObject openApiToaster = openApi.getMountPointApi(uriToaster, DEVICE_ID, TOASTER, TOASTER_REVISION);
+        final String getToasterSummary = openApiToaster.paths()
+            .get("/rests/data/nodes/node=123/yang-ext:mount/toaster:toaster")
+            .get()
+            .summary();
+        assertEquals("GET - " + DEVICE_NAME + " - toaster - toaster", getToasterSummary);
+    }
+
+    @Test
+    public void testPathsForSpecificModuleOfMounted() throws Exception {
+        final UriInfo uriAll = DocGenTestHelper.createMockUriInfo(GET_ALL);
+        when(uriAll.getQueryParameters()).thenReturn(new MultivaluedStringMap());
+        final UriInfo uriToaster = DocGenTestHelper.createMockUriInfo(GET_TOASTER);
+        when(uriToaster.getQueryParameters()).thenReturn(new MultivaluedStringMap());
+
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        // get OpenApiObject for the device (all modules)
+        final OpenApiObject openApiAll = openApi.getMountPointApi(uriAll, DEVICE_ID, null);
+        // get OpenApiObject for a specific module (toaster(2009-11-20))
+        final OpenApiObject openApiToaster = openApi.getMountPointApi(uriToaster, DEVICE_ID, TOASTER, TOASTER_REVISION);
+
+        // filter paths from openapi for all modules down to only those that are present in openapi for toaster
+        final Set<Map.Entry<String, Path>> toasterPathsFromAll = openApiAll.paths().entrySet()
+            .stream()
+            .filter(e -> openApiToaster.paths().containsKey(e.getKey()) && !e.getKey().endsWith("yang-ext:mount"))
+            .collect(Collectors.toSet());
+
+        final Set<Map.Entry<String, Path>> toasterPathsFromToaster = openApiToaster.paths().entrySet()
+            .stream()
+            .filter(e -> !e.getKey().endsWith("yang-ext:mount"))
+            .collect(Collectors.toSet());
+
+        assertEquals(toasterPathsFromToaster, toasterPathsFromAll);
     }
 }
