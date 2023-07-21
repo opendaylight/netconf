@@ -33,6 +33,24 @@
       "message": "Please switch it to local variable.",
       "revId": "2c5e1434ad246b49a5fbb58e4485ddf30132a87b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a984933_e8a0d740",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-21T10:14:18Z",
+      "side": 1,
+      "message": "Sorry, I marked the wrong line. This is meant for line 50: \"private static EffectiveModelContext context;\"",
+      "parentUuid": "aced8a38_3ba87f67",
+      "revId": "2c5e1434ad246b49a5fbb58e4485ddf30132a87b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
