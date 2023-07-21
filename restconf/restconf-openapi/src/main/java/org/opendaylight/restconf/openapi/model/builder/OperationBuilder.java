@@ -7,11 +7,11 @@
  */
 package org.opendaylight.restconf.openapi.model.builder;
 
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.buildQueryParameter;
 import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.INPUT;
 import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.INPUT_SUFFIX;
 import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.OUTPUT_SUFFIX;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashSet;
@@ -24,7 +24,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
-import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
@@ -52,10 +51,9 @@ public final class OperationBuilder {
 
     public static Operation buildPost(final String parentName, final String nodeName, final String discriminator,
             final String moduleName, final @NonNull String deviceName, final String description,
-            final Set<Parameter> pathParams) {
+            final Set<Parameter> parameters) {
         final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
-        final Set<Parameter> parameters = new HashSet<>(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + "_" + nodeName;
         final String defName = cleanDefName + discriminator;
@@ -68,7 +66,7 @@ public final class OperationBuilder {
 
         return new Operation.Builder()
             .tags(tags)
-            .parameters(parameters)
+            .parameters(Set.copyOf(parameters))
             .requestBody(requestBody)
             .responses(responses)
             .description(description)
@@ -77,14 +75,14 @@ public final class OperationBuilder {
     }
 
     public static Operation buildGet(final DataSchemaNode node, final String moduleName,
-            final @NonNull String deviceName, final Set<Parameter> pathParams, final String defName,
+            final @NonNull String deviceName, final Set<Parameter> parameters, final String defName,
             final String defNameTop) {
         final String description = node.getDescription().orElse("");
         final String summary = buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName());
         final List<String> tags = List.of(deviceName + " " + moduleName);
-        final Set<Parameter> parameters = new HashSet<>(pathParams);
-        parameters.add(buildQueryParameters());
+        final Set<Parameter> pathParams = new HashSet<>(parameters);
+        pathParams.add(buildQueryParameter());
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
@@ -96,32 +94,18 @@ public final class OperationBuilder {
 
         return new Operation.Builder()
             .tags(tags)
-            .parameters(parameters)
+            .parameters(pathParams)
             .responses(responses)
             .description(description)
             .summary(summary)
             .build();
     }
 
-    private static Parameter buildQueryParameters() {
-        final ArrayNode cases = JsonNodeFactory.instance.arrayNode()
-            .add("config")
-            .add("nonconfig")
-            .add("all");
-
-        return new Parameter.Builder()
-            .in("query")
-            .name("content")
-            .schema(new Schema.Builder().type("string").schemaEnum(cases).build())
-            .build();
-    }
-
     public static Operation buildPut(final String parentName, final String nodeName, final String discriminator,
             final String moduleName, final @NonNull String deviceName, final String description,
-            final Set<Parameter> pathParams) {
+            final Set<Parameter> parameters) {
         final String summary = buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
-        final Set<Parameter> parameters = new HashSet<>(pathParams);
         final String defName = parentName + "_" + nodeName + TOP;
         final String xmlDefName = parentName + "_" + nodeName;
         final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName, summary);
@@ -133,7 +117,7 @@ public final class OperationBuilder {
 
         return new Operation.Builder()
             .tags(tags)
-            .parameters(parameters)
+            .parameters(Set.copyOf(parameters))
             .requestBody(requestBody)
             .responses(responses)
             .description(description)
@@ -142,10 +126,9 @@ public final class OperationBuilder {
     }
 
     public static Operation buildPatch(final String parentName, final String nodeName, final String moduleName,
-            final @NonNull String deviceName, final String description, final Set<Parameter> pathParams) {
+            final @NonNull String deviceName, final String description, final Set<Parameter> parameters) {
         final String summary = buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
-        final Set<Parameter> parameters = new HashSet<>(pathParams);
         final String defName = parentName + "_" + nodeName + TOP;
         final String xmlDefName = parentName + "_" + nodeName;
         final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName, summary);
@@ -157,7 +140,7 @@ public final class OperationBuilder {
 
         return new Operation.Builder()
             .tags(tags)
-            .parameters(parameters)
+            .parameters(Set.copyOf(parameters))
             .requestBody(requestBody)
             .responses(responses)
             .description(description)
@@ -166,19 +149,18 @@ public final class OperationBuilder {
     }
 
     public static Operation buildDelete(final DataSchemaNode node, final String moduleName,
-            final @NonNull String deviceName, final Set<Parameter> pathParams) {
+            final @NonNull String deviceName, final Set<Parameter> parameters) {
         final String summary = buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
                 node.getQName().getLocalName());
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final String description = node.getDescription().orElse("");
-        final Set<Parameter> parameters = new HashSet<>(pathParams);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Deleted"));
 
         return new Operation.Builder()
             .tags(tags)
-            .parameters(parameters)
+            .parameters(Set.copyOf(parameters))
             .responses(responses)
             .description(description)
             .summary(summary)
@@ -187,8 +169,7 @@ public final class OperationBuilder {
 
     public static Operation buildPostOperation(final OperationDefinition operDef, final String moduleName,
             final @NonNull String deviceName, final String parentName, final DefinitionNames definitionNames,
-            final Set<Parameter> parentPathParameters) {
-        final Set<Parameter> parameters = new HashSet<>(parentPathParameters);
+            final Set<Parameter> parameters) {
         final String operationName = operDef.getQName().getLocalName();
         final String inputName = operationName + INPUT_SUFFIX;
         final String summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, operationName);
@@ -245,7 +226,7 @@ public final class OperationBuilder {
         final List<String> tags = List.of(deviceName + " " + moduleName);
         return new Operation.Builder()
             .tags(tags)
-            .parameters(parameters)
+            .parameters(Set.copyOf(parameters))
             .requestBody(requestBody)
             .responses(responses)
             .description(desc)
