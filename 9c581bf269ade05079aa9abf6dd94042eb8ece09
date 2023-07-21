@@ -124,6 +124,24 @@
       "parentUuid": "a768539f_44e8423c",
       "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "620ec147_b03cdcff",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-21T10:41:45Z",
+      "side": 1,
+      "message": "IMHO yes move it to another patch.",
+      "parentUuid": "e54d337e_ddcf6df9",
+      "revId": "9c581bf269ade05079aa9abf6dd94042eb8ece09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
