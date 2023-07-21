@@ -17,13 +17,15 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.api.messages.HelloMessage;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Document;
 
 /**
  * NetconfMessage represents a wrapper around {@link Document}.
  */
-public class NetconfMessage {
+public abstract sealed class NetconfMessage permits HelloMessage, NotificationMessage {
     private static final Transformer TRANSFORMER;
 
     static {
@@ -40,7 +42,7 @@ public class NetconfMessage {
 
     private final @NonNull Document document;
 
-    public NetconfMessage(final Document document) {
+    protected NetconfMessage(final Document document) {
         this.document = requireNonNull(document);
     }
 
