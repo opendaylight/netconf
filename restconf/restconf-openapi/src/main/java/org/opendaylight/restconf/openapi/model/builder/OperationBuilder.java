@@ -45,6 +45,8 @@ public final class OperationBuilder {
     public static final String SUMMARY_SEPARATOR = " - ";
     public static final String TOP = "_TOP";
     public static final String XML_KEY = "xml";
+
+    private static final String ALL_QUERY_PARAM = "all";
     private static final String CONTENT = "content";
     private static final ArrayNode CONSUMES_PUT_POST;
     private static final List<String> MIME_TYPES = List.of(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON);
@@ -121,6 +123,7 @@ public final class OperationBuilder {
         final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
         cases.add(NONCONFIG_QUERY_PARAM);
         if (isConfig) {
+            cases.add(ALL_QUERY_PARAM);
             cases.add(CONFIG_QUERY_PARAM);
         }
 
