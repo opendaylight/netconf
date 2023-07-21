@@ -334,6 +334,24 @@
       "parentUuid": "1813eecd_2f3faec1",
       "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b46244a_ee746c17",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-21T18:44:19Z",
+      "side": 1,
+      "message": "I really want to. I know it was wrong from the start. But if I just remove it few tests will fail because old method checked parameters using POST requests. We no longer have POST for EVERY operation - it will throw NullPointerException. I\u0027ll make it the way it is done in Yaroslav\u0027s patch. After I can rebase on top of it and it will go away from this patch.",
+      "parentUuid": "b4adf32a_91ac9287",
+      "revId": "05f3e0cf2410bb7f332555103bc7ba1dbe95e9df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
