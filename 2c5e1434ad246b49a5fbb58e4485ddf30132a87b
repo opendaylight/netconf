@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6549cc10_b6be4b9d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-21T10:16:28Z",
+      "side": 1,
+      "message": "created test cases available here https://git.opendaylight.org/gerrit/c/netconf/+/106943",
+      "parentUuid": "9307c792_a3cd9746",
+      "revId": "2c5e1434ad246b49a5fbb58e4485ddf30132a87b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aced8a38_3ba87f67",
@@ -49,6 +67,24 @@
       "side": 1,
       "message": "Sorry, I marked the wrong line. This is meant for line 50: \"private static EffectiveModelContext context;\"",
       "parentUuid": "aced8a38_3ba87f67",
+      "revId": "2c5e1434ad246b49a5fbb58e4485ddf30132a87b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6d80edb_0c1d4995",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-21T10:16:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a984933_e8a0d740",
       "revId": "2c5e1434ad246b49a5fbb58e4485ddf30132a87b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
