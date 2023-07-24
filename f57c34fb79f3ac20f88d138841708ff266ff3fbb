@@ -16,6 +16,24 @@
       "message": "Make this return properties, too.",
       "revId": "f57c34fb79f3ac20f88d138841708ff266ff3fbb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0921a8f_d29d1b54",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-24T14:53:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8aebefd8_827446c6",
+      "revId": "f57c34fb79f3ac20f88d138841708ff266ff3fbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
