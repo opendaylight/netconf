@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "433191c2_959256bd",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-24T19:47:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2375dbaa_290e9fdd",
+      "revId": "3a520e11f3375ad9fec30283f46e634d94428db7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ff33488_e848318e",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-24T11:34:31Z",
       "side": 1,
       "message": "final var",
+      "revId": "3a520e11f3375ad9fec30283f46e634d94428db7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc9d9ef9_f0cb9923",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-24T19:47:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ff33488_e848318e",
       "revId": "3a520e11f3375ad9fec30283f46e634d94428db7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "379c8d8c_65038e28",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-24T19:47:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0898a7ff_fa57a62b",
+      "revId": "3a520e11f3375ad9fec30283f46e634d94428db7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94b1a257_a85de04f",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-07-24T11:34:31Z",
       "side": 1,
       "message": "final var",
+      "revId": "3a520e11f3375ad9fec30283f46e634d94428db7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b53a83d_50de8763",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-24T19:47:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94b1a257_a85de04f",
       "revId": "3a520e11f3375ad9fec30283f46e634d94428db7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
