@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.legacy.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -159,10 +158,10 @@ public class RestconfStateStreamsTest {
 
         for (var child : containerNode.body()) {
             if (child instanceof LeafNode) {
-                assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, child.name().getNodeType());
+                assertEquals(SchemaContextHandler.MODULE_SET_ID_LEAF_QNAME, child.name().getNodeType());
             }
             if (child instanceof MapNode mapChild) {
-                assertEquals(IetfYangLibrary.MODULE_QNAME_LIST, child.name().getNodeType());
+                assertEquals(SchemaContextHandler.MODULE_QNAME_LIST, child.name().getNodeType());
                 for (var mapEntryNode : mapChild.body()) {
                     String name = "";
                     String revision = "";
