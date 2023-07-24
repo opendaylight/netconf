@@ -25,8 +25,9 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module.ConformanceType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Submodule;
@@ -66,17 +67,19 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
 
     private static final NodeIdentifier MODULE_CONFORMANCE_NODEID =
-        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "conformance-type").intern());
+        NodeIdentifier.create(QName.create(YangLibrary.QNAME, "conformance-type").intern());
     private static final NodeIdentifier MODULE_FEATURE_NODEID =
-        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "feature").intern());
+        NodeIdentifier.create(QName.create(YangLibrary.QNAME, "feature").intern());
     private static final NodeIdentifier MODULE_NAME_NODEID =
-        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "name").intern());
+        NodeIdentifier.create(QName.create(YangLibrary.QNAME, "name").intern());
     private static final NodeIdentifier MODULE_NAMESPACE_NODEID =
-        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "namespace").intern());
+        NodeIdentifier.create(QName.create(YangLibrary.QNAME, "namespace").intern());
     private static final NodeIdentifier MODULE_REVISION_NODEID =
-        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "revision").intern());
+        NodeIdentifier.create(QName.create(YangLibrary.QNAME, "revision").intern());
     private static final NodeIdentifier MODULE_SCHEMA_NODEID =
-        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "schema").intern());
+        NodeIdentifier.create(QName.create(YangLibrary.QNAME, "schema").intern());
+    private static final NodeIdentifier MODULE_SET_ID_LEAF_NODEID =
+        NodeIdentifier.create(QName.create(YangLibrary.QNAME, "module-set-id").intern());
 
     private final AtomicInteger moduleSetId = new AtomicInteger();
     private final DOMDataBroker domDataBroker;
@@ -103,7 +106,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
     public void onModelContextUpdated(final EffectiveModelContext context) {
         schemaContext = requireNonNull(context);
 
-        if (context.findModuleStatement(IetfYangLibrary.MODULE_QNAME).isPresent()) {
+        if (context.findModuleStatement(YangLibrary.QNAME.getModule()).isPresent()) {
             putData(mapModulesByIetfYangLibraryYang(context, String.valueOf(moduleSetId.incrementAndGet())));
         }
     }
@@ -150,13 +153,13 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
     public static ContainerNode mapModulesByIetfYangLibraryYang(final EffectiveModelContext context,
             final String moduleSetId) {
         final var mapBuilder = Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(IetfYangLibrary.MODULE_QNAME_LIST));
+            .withNodeIdentifier(new NodeIdentifier(Module.QNAME));
         for (var module : context.getModules()) {
-            fillMapByModules(mapBuilder, IetfYangLibrary.MODULE_QNAME_LIST, false, module, context);
+            fillMapByModules(mapBuilder, Module.QNAME, false, module, context);
         }
         return Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(ModulesState.QNAME))
-            .withChild(ImmutableNodes.leafNode(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, moduleSetId))
+            .withChild(ImmutableNodes.leafNode(MODULE_SET_ID_LEAF_NODEID, moduleSetId))
             .withChild(mapBuilder.build())
             .build();
     }

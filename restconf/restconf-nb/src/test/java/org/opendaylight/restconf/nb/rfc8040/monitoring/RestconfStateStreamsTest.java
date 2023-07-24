@@ -16,15 +16,13 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.legacy.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -34,7 +32,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,15 +44,12 @@ public class RestconfStateStreamsTest {
 
     private static EffectiveModelContext schemaContext;
     private static EffectiveModelContext schemaContextMonitoring;
-    private static Collection<? extends Module> modulesRest;
 
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
         // FIXME: assemble these from dependencies
         schemaContext = YangParserTestUtils.parseYangResourceDirectory("/modules/restconf-module-testing");
         schemaContextMonitoring = YangParserTestUtils.parseYangResourceDirectory("/modules");
-        modulesRest = YangParserTestUtils
-                .parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing")).getModules();
     }
 
     /**
@@ -157,10 +151,10 @@ public class RestconfStateStreamsTest {
 
         for (var child : containerNode.body()) {
             if (child instanceof LeafNode) {
-                assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, child.name().getNodeType());
+                assertEquals(QName.create(Module.QNAME, "module-set-id"), child.name().getNodeType());
             }
             if (child instanceof MapNode mapChild) {
-                assertEquals(IetfYangLibrary.MODULE_QNAME_LIST, child.name().getNodeType());
+                assertEquals(Module.QNAME, child.name().getNodeType());
                 for (var mapEntryNode : mapChild.body()) {
                     String name = "";
                     String revision = "";
@@ -183,21 +177,10 @@ public class RestconfStateStreamsTest {
             }
         }
 
-        verifyLoadedModules(modulesRest, loadedModules);
-    }
-
-    /**
-     * Verify if correct modules were loaded into Restconf module by comparison with modules from
-     * <code>SchemaContext</code>.
-     * @param expectedModules Modules from <code>SchemaContext</code>
-     * @param loadedModules Loaded modules into Restconf module
-     */
-    private static void verifyLoadedModules(final Collection<? extends Module> expectedModules,
-            final Map<String, String> loadedModules) {
+        final var expectedModules = schemaContext.getModules();
         assertEquals("Number of loaded modules is not as expected", expectedModules.size(), loadedModules.size());
-        for (final Module m : expectedModules) {
+        for (var m : expectedModules) {
             final String name = m.getName();
-
             final String revision = loadedModules.get(name);
             assertNotNull("Expected module not found", revision);
             assertEquals("Incorrect revision of loaded module", Revision.ofNullable(revision), m.getRevision());
