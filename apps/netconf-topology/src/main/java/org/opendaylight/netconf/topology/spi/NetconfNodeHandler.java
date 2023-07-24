@@ -177,7 +177,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         }
 
         // We are invoking callbacks, do not hold locks
-        onDeviceFailed(cause);
+        onDeviceDisconnected();
     }
 
     @Override
