@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2375dbaa_290e9fdd",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-24T11:34:31Z",
+      "side": 1,
+      "message": "Please follow the order:\npublic static final\n\npublic static\n\npublic\n\nprivate static\n\nprivate",
+      "revId": "3a520e11f3375ad9fec30283f46e634d94428db7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ff33488_e848318e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-24T11:34:31Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "3a520e11f3375ad9fec30283f46e634d94428db7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0898a7ff_fa57a62b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-24T11:34:31Z",
+      "side": 1,
+      "message": "Can be one line.",
+      "revId": "3a520e11f3375ad9fec30283f46e634d94428db7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94b1a257_a85de04f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-24T11:34:31Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "3a520e11f3375ad9fec30283f46e634d94428db7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
