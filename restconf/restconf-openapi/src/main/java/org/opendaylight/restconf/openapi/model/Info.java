@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.eclipse.jdt.annotation.NonNull;
@@ -15,4 +17,9 @@ import org.eclipse.jdt.annotation.NonNull;
 public record Info(
         @NonNull String version,
         @NonNull String title) {
+
+    public Info {
+        requireNonNull(version);
+        requireNonNull(title);
+    }
 }
