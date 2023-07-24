@@ -11,9 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import javax.ws.rs.Path;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.legacy.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Restconf;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -42,6 +42,6 @@ public class RestconfImpl implements RestconfService {
         stack.enterDataTree(YANG_LIBRARY_VERSION);
 
         return NormalizedNodePayload.of(InstanceIdentifierContext.ofStack(stack),
-            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, IetfYangLibrary.REVISION.toString()));
+            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, SchemaContextHandler.REVISION.toString()));
     }
 }
