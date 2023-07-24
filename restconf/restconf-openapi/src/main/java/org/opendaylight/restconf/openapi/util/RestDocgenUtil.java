@@ -67,7 +67,7 @@ public final class RestDocgenUtil {
                 && parent.getRevision().equals(node.getRevision());
     }
 
-    private static String resolveFullNameFromNode(final QName node, final SchemaContext schemaContext) {
+    public static String resolveFullNameFromNode(final QName node, final SchemaContext schemaContext) {
         final XMLNamespace namespace = node.getNamespace();
         final Optional<Revision> revision = node.getRevision();
 
