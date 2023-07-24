@@ -156,8 +156,6 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     }
 
     private void connectComplete(final Future<?> future) {
-        final Throwable cause;
-
         // Locked manipulation of internal state
         synchronized (this) {
             // A quick sanity check
@@ -167,7 +165,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             }
 
             currentTask = null;
-            cause = future.cause();
+            final var cause = future.cause();
             if (cause == null || cause instanceof CancellationException) {
                 // Success or cancellation, nothing else to do
                 return;
@@ -177,7 +175,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         }
 
         // We are invoking callbacks, do not hold locks
-        onDeviceFailed(cause);
+        onDeviceDisconnected();
     }
 
     @Override
