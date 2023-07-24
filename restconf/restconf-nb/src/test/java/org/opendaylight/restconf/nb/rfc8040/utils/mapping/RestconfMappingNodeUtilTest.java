@@ -10,6 +10,8 @@ package org.opendaylight.restconf.nb.rfc8040.utils.mapping;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler.MODULE_QNAME_LIST;
+import static org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler.MODULE_SET_ID_LEAF_QNAME;
 
 import java.net.URI;
 import java.time.Instant;
@@ -21,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -162,10 +163,10 @@ public class RestconfMappingNodeUtilTest {
 
         for (var child : containerNode.body()) {
             if (child instanceof LeafNode) {
-                assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, child.name().getNodeType());
+                assertEquals(MODULE_SET_ID_LEAF_QNAME, child.name().getNodeType());
             }
             if (child instanceof MapNode mapChild) {
-                assertEquals(IetfYangLibrary.MODULE_QNAME_LIST, child.name().getNodeType());
+                assertEquals(MODULE_QNAME_LIST, child.name().getNodeType());
                 for (var mapEntryNode : mapChild.body()) {
                     String name = "";
                     String revision = "";
