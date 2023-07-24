@@ -115,7 +115,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         final JsonNode configLstTop = definitions.get("toaster2_config_lst_TOP");
         assertNotNull(configLstTop);
-        DocGenTestHelper.containsReferences(configLstTop, "lst", "#/definitions/toaster2_config_lst");
+        DocGenTestHelper.containsReferences(configLstTop, "toaster2:lst", "#/definitions/toaster2_config_lst");
 
         final JsonNode configLst = definitions.get("toaster2_config_lst");
         assertNotNull(configLst);
@@ -124,14 +124,15 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         final JsonNode configLst1Top = definitions.get("toaster2_lst_config_lst1_TOP");
         assertNotNull(configLst1Top);
-        DocGenTestHelper.containsReferences(configLst1Top, "lst1", "#/definitions/toaster2_lst_config_lst1");
+        DocGenTestHelper.containsReferences(configLst1Top, "toaster2:lst1", "#/definitions/toaster2_lst_config_lst1");
 
         final JsonNode configLst1 = definitions.get("toaster2_lst_config_lst1");
         assertNotNull(configLst1);
 
         final JsonNode configCont1Top = definitions.get("toaster2_lst_config_cont1_TOP");
         assertNotNull(configCont1Top);
-        DocGenTestHelper.containsReferences(configCont1Top, "cont1", "#/definitions/toaster2_lst_config_cont1");
+        DocGenTestHelper.containsReferences(configCont1Top, "toaster2:cont1",
+            "#/definitions/toaster2_lst_config_cont1");
 
         final JsonNode configCont1 = definitions.get("toaster2_lst_config_cont1");
         assertNotNull(configCont1);
@@ -140,15 +141,16 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         final JsonNode configCont11Top = definitions.get("toaster2_lst_cont1_config_cont11_TOP");
         assertNotNull(configCont11Top);
-        DocGenTestHelper.containsReferences(configCont11Top,
-            "cont11", "#/definitions/toaster2_lst_cont1_config_cont11");
+        DocGenTestHelper.containsReferences(configCont11Top, "toaster2:cont11",
+            "#/definitions/toaster2_lst_cont1_config_cont11");
 
         final JsonNode configCont11 = definitions.get("toaster2_lst_cont1_config_cont11");
         assertNotNull(configCont11);
 
         final JsonNode configLst11Top = definitions.get("toaster2_lst_cont1_config_lst11_TOP");
         assertNotNull(configLst11Top);
-        DocGenTestHelper.containsReferences(configLst11Top, "lst11", "#/definitions/toaster2_lst_cont1_config_lst11");
+        DocGenTestHelper.containsReferences(configLst11Top, "toaster2:lst11",
+            "#/definitions/toaster2_lst_cont1_config_lst11");
 
         final JsonNode configLst11 = definitions.get("toaster2_lst_cont1_config_lst11");
         assertNotNull(configLst11);
@@ -167,7 +169,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final ObjectNode definitions = doc.getDefinitions();
         final JsonNode inputTop = definitions.get("toaster_make-toast_input_TOP");
         assertNotNull(inputTop);
-        final String testString = "{\"input\":{\"$ref\":\"#/definitions/toaster_make-toast_input\"}}";
+        final String testString = "{\"toaster:input\":{\"$ref\":\"#/definitions/toaster_make-toast_input\"}}";
         assertEquals(testString, inputTop.get("properties").toString());
         final JsonNode input = definitions.get("toaster_make-toast_input");
         final JsonNode properties = input.get("properties");
