@@ -114,7 +114,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final Schema configLstTop = schemas.get("toaster2_lst_TOP");
         assertNotNull(configLstTop);
-        DocGenTestHelper.containsReferences(configLstTop, "lst", "#/components/schemas/toaster2_lst");
+        DocGenTestHelper.containsReferences(configLstTop, "toaster2:lst", "#/components/schemas/toaster2_lst");
 
         final Schema configLst = schemas.get("toaster2_lst");
         assertNotNull(configLst);
@@ -123,34 +123,35 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final Schema configLst1Top = schemas.get("toaster2_lst_lst1_TOP");
         assertNotNull(configLst1Top);
-        DocGenTestHelper.containsReferences(configLst1Top, "lst1", "#/components/schemas/toaster2_lst_lst1");
+        DocGenTestHelper.containsReferences(configLst1Top, "toaster2:lst1", "#/components/schemas/toaster2_lst_lst1");
 
         final Schema configLst1 = schemas.get("toaster2_lst_lst1");
         assertNotNull(configLst1);
 
         final Schema configCont1Top = schemas.get("toaster2_lst_cont1_TOP");
         assertNotNull(configCont1Top);
-        DocGenTestHelper.containsReferences(configCont1Top, "cont1", "#/components/schemas/toaster2_lst_cont1");
+        DocGenTestHelper.containsReferences(configCont1Top, "toaster2:cont1",
+            "#/components/schemas/toaster2_lst_cont1");
 
         final Schema configCont1 = schemas.get("toaster2_lst_cont1");
         assertNotNull(configCont1);
         DocGenTestHelper.containsReferences(configCont1, "cont11",
-                "#/components/schemas/toaster2_lst_cont1_cont11");
+            "#/components/schemas/toaster2_lst_cont1_cont11");
         DocGenTestHelper.containsReferences(configCont1, "lst11",
-                "#/components/schemas/toaster2_lst_cont1_lst11");
+            "#/components/schemas/toaster2_lst_cont1_lst11");
 
         final Schema configCont11Top = schemas.get("toaster2_lst_cont1_cont11_TOP");
         assertNotNull(configCont11Top);
-        DocGenTestHelper.containsReferences(configCont11Top,
-                "cont11", "#/components/schemas/toaster2_lst_cont1_cont11");
+        DocGenTestHelper.containsReferences(configCont11Top, "toaster2:cont11",
+            "#/components/schemas/toaster2_lst_cont1_cont11");
 
         final Schema configCont11 = schemas.get("toaster2_lst_cont1_cont11");
         assertNotNull(configCont11);
 
         final Schema configLst11Top = schemas.get("toaster2_lst_cont1_lst11_TOP");
         assertNotNull(configLst11Top);
-        DocGenTestHelper.containsReferences(configLst11Top, "lst11",
-                "#/components/schemas/toaster2_lst_cont1_lst11");
+        DocGenTestHelper.containsReferences(configLst11Top, "toaster2:lst11",
+            "#/components/schemas/toaster2_lst_cont1_lst11");
 
         final Schema configLst11 = schemas.get("toaster2_lst_cont1_lst11");
         assertNotNull(configLst11);
@@ -167,7 +168,7 @@ public final class OpenApiGeneratorRFC8040Test {
         final Map<String, Schema> schemas = doc.components().schemas();
         final Schema inputTop = schemas.get("toaster_make-toast_input_TOP");
         assertNotNull(inputTop);
-        final String testString = "{\"input\":{\"$ref\":\"#/components/schemas/toaster_make-toast_input\"}}";
+        final String testString = "{\"toaster:input\":{\"$ref\":\"#/components/schemas/toaster_make-toast_input\"}}";
         assertEquals(testString, inputTop.properties().toString());
         final Schema input = schemas.get("toaster_make-toast_input");
         final JsonNode properties = input.properties();

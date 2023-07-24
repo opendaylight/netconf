@@ -12,6 +12,7 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.C
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.NAME_KEY;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.XML_KEY;
+import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolveFullNameFromNode;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -314,13 +315,13 @@ public class DefinitionGenerator {
             final String discriminator =
                 definitionNames.pickDiscriminator(container, List.of(filename, filename + TOP));
             definitions.put(filename + discriminator, childSchemaBuilder.build());
-            processTopData(filename, discriminator, definitions, container);
+            processTopData(filename, discriminator, definitions, container, stack.getEffectiveModelContext());
         }
         stack.exit();
     }
 
     private static ObjectNode processTopData(final String filename, final String discriminator,
-            final Map<String, Schema> definitions, final SchemaNode schemaNode) {
+            final Map<String, Schema> definitions, final SchemaNode schemaNode, final EffectiveModelContext context) {
         final ObjectNode dataNodeProperties = JsonNodeFactory.instance.objectNode();
         final String name = filename + discriminator;
         final String ref = COMPONENTS_PREFIX + name;
@@ -341,11 +342,7 @@ public class DefinitionGenerator {
         }
 
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-        /*
-            Add module name prefix to property name, when needed, when ServiceNow can process colons,
-            use RestDocGenUtil#resolveNodesName for creating property name
-         */
-        properties.set(schemaNode.getQName().getLocalName(), dataNodeProperties);
+        properties.set(resolveFullNameFromNode(schemaNode.getQName(), context), dataNodeProperties);
         final var schema = new Schema.Builder()
             .type(OBJECT_TYPE)
             .properties(properties)
@@ -416,7 +413,7 @@ public class DefinitionGenerator {
         childSchemaBuilder.xml(buildXmlParameter(schemaNode));
         definitions.put(defName, childSchemaBuilder.build());
 
-        return processTopData(nodeName, discriminator, definitions, schemaNode);
+        return processTopData(nodeName, discriminator, definitions, schemaNode, stack.getEffectiveModelContext());
     }
 
     /**
