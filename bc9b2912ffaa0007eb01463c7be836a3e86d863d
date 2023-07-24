@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34742e8b_8c05fdee",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/security/Http.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-24T12:22:34Z",
+      "side": 1,
+      "message": "We don\u0027t need builder for this record",
+      "revId": "bc9b2912ffaa0007eb01463c7be836a3e86d863d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
