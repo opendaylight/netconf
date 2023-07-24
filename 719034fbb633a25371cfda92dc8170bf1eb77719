@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3496ac5e_2eeb0c86",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-24T11:30:24Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "719034fbb633a25371cfda92dc8170bf1eb77719",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "334300f7_6a195d58",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-24T11:30:24Z",
+      "side": 1,
+      "message": "getPaths",
+      "revId": "719034fbb633a25371cfda92dc8170bf1eb77719",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98352f55_fdcf66e8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-24T11:30:24Z",
+      "side": 1,
+      "message": "Please add // FIXME propagate exception",
+      "revId": "719034fbb633a25371cfda92dc8170bf1eb77719",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
