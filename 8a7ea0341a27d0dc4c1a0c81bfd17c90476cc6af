@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c56a3c1b_93ebe1ad",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-24T19:47:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e1f646aa_1608d084",
+      "revId": "8a7ea0341a27d0dc4c1a0c81bfd17c90476cc6af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd162958_193fe9d0",
@@ -52,6 +70,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc552095_fd70f88d",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-24T19:47:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c89014e8_bb375b44",
+      "revId": "8a7ea0341a27d0dc4c1a0c81bfd17c90476cc6af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b2c2ac4_4bbb31ee",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-24T19:47:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c89014e8_bb375b44",
+      "revId": "8a7ea0341a27d0dc4c1a0c81bfd17c90476cc6af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36e6fe81_3ab67e16",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-07-24T12:11:02Z",
       "side": 1,
       "message": "We do not want `putAll`.",
+      "revId": "8a7ea0341a27d0dc4c1a0c81bfd17c90476cc6af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bc1ca44_07ce3358",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-24T19:47:10Z",
+      "side": 1,
+      "message": "Then how do you see this part? getPaths as well as getSchemas return data Map. How should I combine data from all modules to use it later? Or I\u0027m doing something silly and this data should be processed in other way?",
+      "parentUuid": "36e6fe81_3ab67e16",
       "revId": "8a7ea0341a27d0dc4c1a0c81bfd17c90476cc6af",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
