@@ -15,6 +15,7 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_SUFFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getAppropriateModelPrefix;
+import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveFullNameFromNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -330,13 +331,15 @@ public class DefinitionGenerator {
                     definitionNames.pickDiscriminator(container, List.of(filename, filename + TOP));
             definitions.set(filename + discriminator, childSchema);
 
-            processTopData(filename, discriminator, definitions, container, oaversion);
+            processTopData(filename, discriminator, definitions, container, oaversion,
+                stack.getEffectiveModelContext());
         }
         stack.exit();
     }
 
     private static ObjectNode processTopData(final String filename, final String discriminator,
-            final ObjectNode definitions, final SchemaNode schemaNode, final OAversion oaversion) {
+            final ObjectNode definitions, final SchemaNode schemaNode, final OAversion oaversion,
+            final EffectiveModelContext context) {
         final ObjectNode dataNodeProperties = JsonNodeFactory.instance.objectNode();
         final String name = filename + discriminator;
         final String ref = getAppropriateModelPrefix(oaversion) + name;
@@ -361,7 +364,7 @@ public class DefinitionGenerator {
             Add module name prefix to property name, when needed, when ServiceNow can process colons,
             use RestDocGenUtil#resolveNodesName for creating property name
          */
-        properties.set(schemaNode.getQName().getLocalName(), dataNodeProperties);
+        properties.set(resolveFullNameFromNode(schemaNode.getQName(), context), dataNodeProperties);
         final ObjectNode finalChildSchema = JsonNodeFactory.instance.objectNode();
         finalChildSchema.put(TYPE_KEY, OBJECT_TYPE);
         finalChildSchema.set(PROPERTIES_KEY, properties);
@@ -459,7 +462,8 @@ public class DefinitionGenerator {
             childSchema.set(XML_KEY, buildXmlParameter(schemaNode));
             definitions.set(defName, childSchema);
 
-            return processTopData(nodeName, discriminator, definitions, schemaNode, oaversion);
+            return processTopData(nodeName, discriminator, definitions, schemaNode, oaversion,
+                stack.getEffectiveModelContext());
         }
         return null;
     }
