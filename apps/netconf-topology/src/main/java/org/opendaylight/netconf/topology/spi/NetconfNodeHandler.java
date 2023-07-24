@@ -177,7 +177,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         }
 
         // We are invoking callbacks, do not hold locks
-        onDeviceFailed(cause);
+        onDeviceDisconnected();
     }
 
     @Override
@@ -229,6 +229,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         // We have exceeded the number of connection attempts
         if (maxAttempts > 0 && attempts >= maxAttempts) {
             LOG.info("Failed to connect {} after {} attempts, not attempting", deviceId, attempts);
+            onDeviceFailed(new Throwable("Maximum reconnection attempts reached"));
             return;
         }
 
