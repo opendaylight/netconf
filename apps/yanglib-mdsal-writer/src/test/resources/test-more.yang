@@ -1,0 +1,22 @@
+module test-more {
+  yang-version 1.1;
+  namespace "test:more";
+  prefix mr;
+
+  import test-module {
+    prefix tm;
+  }
+
+  revision 2023-07-25;
+
+  feature first-feature;
+
+  feature second-feature;
+
+  deviation "/tm:cont/tm:lf" {
+    deviate replace {
+      mandatory false;
+      type uint32;
+    }
+  }
+}
