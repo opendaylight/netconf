@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "323f8366_1fbd13ef",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "Usually we do not need keys, split this somehow, create separate method for container and separate for lists, et.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2401f514_8b828536",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "Why? I expect we already have paths for POST requests.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71840c0b_6b47e9c5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "return Path instead of builder",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bb35961_5b835de8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "private, split method for container and lists",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adf9ada5_87494045",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "Please split for lists and containers.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e17f76f3_a2e99ce0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "IMO we do not need JsonNodeFactory we can just create org.opendaylight.restconf.openapi.model.Schema.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "676b711c_1febc83b",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "IIRC we are going back to JsonNodes what we do not want to",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d12d756b_2689c6c0",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "Do we really need object mapper?",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4ac5dcb_e118ebc1",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "IIRC we indent these with 2 spaces.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47247c94_1422db08",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "No, never 😊 just add throws to test method.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "504ed83d_4ab43b94",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "hmm, this looks suspicious..",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88eaf409_56c5d738",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "IMO I do not expect impact like this...",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66b6c96f_f55ceaeb",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "No, we are not reducing the number of POST requests.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74ad73de_6c76ed92",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/toaster_short.yang",
+        "patchSetId": 23
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T14:16:42Z",
+      "side": 1,
+      "message": "Revert this back.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
