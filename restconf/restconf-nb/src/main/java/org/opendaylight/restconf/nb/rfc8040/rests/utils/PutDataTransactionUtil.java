@@ -29,7 +29,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -180,26 +179,24 @@ public final class PutDataTransactionUtil {
 
     public static DataSchemaNode checkListAndOrderedType(final EffectiveModelContext ctx,
             final YangInstanceIdentifier path) {
-        final YangInstanceIdentifier parent = path.getParent();
-        final DataSchemaContext node = DataSchemaContextTree.from(ctx).findChild(parent).orElseThrow();
-        final DataSchemaNode dataSchemaNode = node.dataSchemaNode();
+        final var dataSchemaNode = DataSchemaContextTree.from(ctx).findChild(path.getParent())
+            .orElseThrow()
+            .dataSchemaNode();
 
-        if (dataSchemaNode instanceof ListSchemaNode) {
-            if (!((ListSchemaNode) dataSchemaNode).isUserOrdered()) {
-                throw new RestconfDocumentedException("Insert parameter can be used only with ordered-by user list.",
-                        ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+        final String message;
+        if (dataSchemaNode instanceof ListSchemaNode listSchema) {
+            if (listSchema.isUserOrdered()) {
+                return listSchema;
             }
-            return dataSchemaNode;
-        }
-        if (dataSchemaNode instanceof LeafListSchemaNode) {
-            if (!((LeafListSchemaNode) dataSchemaNode).isUserOrdered()) {
-                throw new RestconfDocumentedException(
-                        "Insert parameter can be used only with ordered-by user leaf-list.",
-                        ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+            message = "Insert parameter can be used only with ordered-by user list.";
+        } else if (dataSchemaNode instanceof LeafListSchemaNode leafListSchema) {
+            if (leafListSchema.isUserOrdered()) {
+                return leafListSchema;
             }
-            return dataSchemaNode;
+            message = "Insert parameter can be used only with ordered-by user leaf-list.";
+        } else {
+            message = "Insert parameter can be used only with list or leaf-list";
         }
-        throw new RestconfDocumentedException("Insert parameter can be used only with list or leaf-list",
-                ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+        throw new RestconfDocumentedException(message, ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
     }
 }
