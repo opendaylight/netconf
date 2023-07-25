@@ -47,7 +47,13 @@ import org.slf4j.LoggerFactory;
  */
 public final class ParserIdentifier {
     private static final Logger LOG = LoggerFactory.getLogger(ParserIdentifier.class);
-    private static final Splitter MP_SPLITTER = Splitter.on("/" + RestconfConstants.MOUNT);
+
+    // FIXME: Remove this constant. All logic relying on this constant should instead rely on YangInstanceIdentifier
+    //        equivalent coming out of argument parsing. This may require keeping List<YangInstanceIdentifier> as the
+    //        nested path split on yang-ext:mount. This splitting needs to be based on consulting the
+    //        EffectiveModelContext and allowing it only where yang-ext:mount is actually used in models.
+    private static final String MOUNT = "yang-ext:mount";
+    private static final Splitter MP_SPLITTER = Splitter.on("/" + MOUNT);
 
     private ParserIdentifier() {
         // Hidden on purpose
@@ -78,7 +84,7 @@ public final class ParserIdentifier {
     //
     public static InstanceIdentifierContext toInstanceIdentifier(final String identifier,
             final EffectiveModelContext schemaContext, final Optional<DOMMountPointService> mountPointService) {
-        if (identifier == null || !identifier.contains(RestconfConstants.MOUNT)) {
+        if (identifier == null || !identifier.contains(MOUNT)) {
             return createIIdContext(schemaContext, identifier, null);
         }
         if (mountPointService.isEmpty()) {
@@ -136,11 +142,10 @@ public final class ParserIdentifier {
                     ErrorTag.INVALID_VALUE);
         }
 
-        final int mountIndex = identifier.indexOf(RestconfConstants.MOUNT);
+        final int mountIndex = identifier.indexOf(MOUNT);
         final String moduleNameAndRevision;
         if (mountIndex >= 0) {
-            moduleNameAndRevision = identifier.substring(mountIndex + RestconfConstants.MOUNT.length())
-                    .replaceFirst("/", "");
+            moduleNameAndRevision = identifier.substring(mountIndex + MOUNT.length()).replaceFirst("/", "");
         } else {
             moduleNameAndRevision = identifier;
         }
@@ -183,7 +188,7 @@ public final class ParserIdentifier {
             final DOMYangTextSourceProvider sourceProvider) {
         final Iterable<String> pathComponents = RestconfConstants.SLASH_SPLITTER.split(identifier);
         final Iterator<String> componentIter = pathComponents.iterator();
-        if (!Iterables.contains(pathComponents, RestconfConstants.MOUNT)) {
+        if (!Iterables.contains(pathComponents, MOUNT)) {
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
             final Module module = schemaContext.findModule(moduleName, revision).orElse(null);
@@ -193,8 +198,8 @@ public final class ParserIdentifier {
             while (componentIter.hasNext()) {
                 final String current = componentIter.next();
 
-                if (RestconfConstants.MOUNT.equals(current)) {
-                    pathBuilder.append('/').append(RestconfConstants.MOUNT);
+                if (MOUNT.equals(current)) {
+                    pathBuilder.append('/').append(MOUNT);
                     break;
                 }
 
