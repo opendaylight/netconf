@@ -19,16 +19,13 @@ module sal-remote {
            http://www.eclipse.org/legal/epl-v10.html";
 
     revision "2014-01-14" {
-        description
-            "Initial revision";
+        description "Initial revision";
     }
 
-
-     typedef q-name {
-       type string;
-       reference
-         "http://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#QName";
-     }
+    typedef q-name {
+        type string;
+        reference "http://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#QName";
+    }
 
     rpc create-data-change-event-subscription {
         input {
@@ -36,13 +33,13 @@ module sal-remote {
                 type instance-identifier;
                 description "Subtree path. ";
             }
-         }
-         output {
+        }
+        output {
             leaf stream-name {
                 type string;
                 description "Notification stream name.";
             }
-         }
+        }
     }
 
     notification data-changed-notification {
@@ -88,10 +85,9 @@ module sal-remote {
 
     rpc begin-transaction {
         output {
-            anyxml data-modification-transaction{
+            anyxml data-modification-transaction {
                 description "DataModificationTransaction xml";
             }
         }
     }
-
 }

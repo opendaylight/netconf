@@ -106,6 +106,7 @@ final class CreateStreamUtil {
      *     }
      *     </pre>
      */
+    // FIXME: this really should be a normal RPC implementation
     static DOMRpcResult createDataChangeNotifiStream(final NormalizedNodePayload payload,
             final EffectiveModelContext refSchemaCtx) {
         // parsing out of container with settings and path
