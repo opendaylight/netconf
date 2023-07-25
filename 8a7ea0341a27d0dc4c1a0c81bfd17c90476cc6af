@@ -139,6 +139,24 @@
       "parentUuid": "36e6fe81_3ab67e16",
       "revId": "8a7ea0341a27d0dc4c1a0c81bfd17c90476cc6af",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecdb19d1_fbf2e0ad",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T07:22:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6bc1ca44_07ce3358",
+      "revId": "8a7ea0341a27d0dc4c1a0c81bfd17c90476cc6af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
