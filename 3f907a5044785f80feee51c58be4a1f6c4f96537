@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "758051f0_f26826ce",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-25T14:08:23Z",
+      "side": 1,
+      "message": "Let\u0027s move it to the imports list, if IDE does not do this automatically, you can do it manually",
+      "range": {
+        "startLine": 95,
+        "startChar": 8,
+        "endLine": 95,
+        "endChar": 105
+      },
+      "revId": "3f907a5044785f80feee51c58be4a1f6c4f96537",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
