@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+import com.google.common.base.Splitter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,8 +82,8 @@ abstract class SubscribeToStreamUtil {
         }
     }
 
-
     private static final Logger LOG = LoggerFactory.getLogger(SubscribeToStreamUtil.class);
+    private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
     SubscribeToStreamUtil() {
         // Hidden on purpose
@@ -224,8 +225,8 @@ abstract class SubscribeToStreamUtil {
      * @return Map od URI parameters and values.
      */
     private static Map<String, String> mapValuesFromUri(final String identifier) {
-        final HashMap<String, String> result = new HashMap<>();
-        for (final String token : RestconfConstants.SLASH_SPLITTER.split(identifier)) {
+        final var result = new HashMap<String, String>();
+        for (final String token : SLASH_SPLITTER.split(identifier)) {
             final String[] paramToken = token.split("=");
             if (paramToken.length == 2) {
                 result.put(paramToken[0], paramToken[1]);

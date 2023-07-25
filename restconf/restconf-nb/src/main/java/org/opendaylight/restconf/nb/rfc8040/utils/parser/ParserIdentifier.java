@@ -29,7 +29,6 @@ import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -54,6 +53,7 @@ public final class ParserIdentifier {
     //        EffectiveModelContext and allowing it only where yang-ext:mount is actually used in models.
     private static final String MOUNT = "yang-ext:mount";
     private static final Splitter MP_SPLITTER = Splitter.on("/" + MOUNT);
+    private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
     private ParserIdentifier() {
         // Hidden on purpose
@@ -150,7 +150,7 @@ public final class ParserIdentifier {
             moduleNameAndRevision = identifier;
         }
 
-        final List<String> pathArgs = RestconfConstants.SLASH_SPLITTER.splitToList(moduleNameAndRevision);
+        final List<String> pathArgs = SLASH_SPLITTER.splitToList(moduleNameAndRevision);
         if (pathArgs.size() != 2) {
             LOG.debug("URI has bad format '{}'. It should be 'moduleName/yyyy-MM-dd'", identifier);
             throw new RestconfDocumentedException(
@@ -186,7 +186,7 @@ public final class ParserIdentifier {
     public static SchemaExportContext toSchemaExportContextFromIdentifier(final EffectiveModelContext schemaContext,
             final String identifier, final DOMMountPointService domMountPointService,
             final DOMYangTextSourceProvider sourceProvider) {
-        final Iterable<String> pathComponents = RestconfConstants.SLASH_SPLITTER.split(identifier);
+        final Iterable<String> pathComponents = SLASH_SPLITTER.split(identifier);
         final Iterator<String> componentIter = pathComponents.iterator();
         if (!Iterables.contains(pathComponents, MOUNT)) {
             final String moduleName = validateAndGetModulName(componentIter);
