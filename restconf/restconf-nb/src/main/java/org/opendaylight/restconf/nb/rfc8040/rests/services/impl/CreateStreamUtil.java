@@ -28,6 +28,8 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListen
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -48,14 +50,11 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for creation of data-change-event or YANG notification streams.
  */
 final class CreateStreamUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(CreateStreamUtil.class);
     private static final QNameModule SAL_REMOTE_AUGMENT = NotificationOutputTypeGrouping.QNAME.getModule();
 
     private static final QNameModule DEVICE_NOTIFICATION_MODULE = SubscribeDeviceNotificationInput.QNAME.getModule();
@@ -74,13 +73,19 @@ final class CreateStreamUtil {
     private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(OUTPUT_TYPE_QNAME);
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
         NodeIdentifier.create(DEVICE_NOTIFICATION_PATH_QNAME);
+    private static final NodeIdentifier SAL_REMOTE_OUTPUT_NODEID =
+        NodeIdentifier.create(CreateDataChangeEventSubscriptionOutput.QNAME);
+    private static final NodeIdentifier PATH_NODEID =
+        NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionInput.QNAME, "path").intern());
+    private static final NodeIdentifier STREAM_NAME_NODEID =
+        NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionOutput.QNAME, "stream-name").intern());
 
     private CreateStreamUtil() {
         // Hidden on purpose
     }
 
     /**
-     * Create data-change-event or notification stream with POST operation via RPC.
+     * Create data-change-event stream with POST operation via RPC.
      *
      * @param payload      Input of RPC - example in JSON (data-change-event stream):
      *                     <pre>
@@ -111,8 +116,7 @@ final class CreateStreamUtil {
             final EffectiveModelContext refSchemaCtx) {
         // parsing out of container with settings and path
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
-        final QName qname = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
-        final YangInstanceIdentifier path = preparePath(data, qname);
+        final YangInstanceIdentifier path = preparePath(data);
 
         // building of stream name
         final StringBuilder streamNameBuilder = new StringBuilder(
@@ -127,12 +131,9 @@ final class CreateStreamUtil {
         ListenersBroker.getInstance().registerDataChangeListener(path, streamName, outputType);
 
         // building of output
-        final QName outputQname = QName.create(qname, "output");
-        final QName streamNameQname = QName.create(qname, "stream-name");
-
         return new DefaultDOMRpcResult(Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(outputQname))
-            .withChild(ImmutableNodes.leafNode(streamNameQname, streamName))
+            .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
+            .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, streamName))
             .build());
     }
 
@@ -239,23 +240,18 @@ final class CreateStreamUtil {
     /**
      * Prepare {@link YangInstanceIdentifier} of stream source.
      *
-     * @param data          Container with stream settings (RPC create-stream).
-     * @param qualifiedName QName of the input RPC context (used only in debugging).
+     * @param data Container with stream settings (RPC create-stream).
      * @return Parsed {@link YangInstanceIdentifier} of data element from which the data-change-event notifications
-     *     are going to be generated.
+     *         are going to be generated.
      */
-    private static YangInstanceIdentifier preparePath(final ContainerNode data, final QName qualifiedName) {
-        final Object pathValue = data.findChildByArg(new NodeIdentifier(QName.create(qualifiedName, "path")))
-            .map(DataContainerChild::body)
-            .orElse(null);
-        if (!(pathValue instanceof YangInstanceIdentifier)) {
-            LOG.debug("Instance identifier {} was not normalized correctly", qualifiedName);
-            throw new RestconfDocumentedException(
-                    "Instance identifier was not normalized correctly",
-                    ErrorType.APPLICATION,
-                    ErrorTag.OPERATION_FAILED);
+    private static YangInstanceIdentifier preparePath(final ContainerNode data) {
+        final var pathLeaf = data.childByArg(PATH_NODEID);
+        if (pathLeaf != null && pathLeaf.body() instanceof YangInstanceIdentifier pathValue) {
+            return pathValue;
         }
-        return (YangInstanceIdentifier) pathValue;
+
+        throw new RestconfDocumentedException("Instance identifier was not normalized correctly",
+            ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
     }
 
     private static @Nullable String extractStringLeaf(final ContainerNode data, final NodeIdentifier childName) {
