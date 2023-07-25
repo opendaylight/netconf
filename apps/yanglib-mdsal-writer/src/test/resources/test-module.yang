@@ -1,0 +1,16 @@
+module test-module {
+    yang-version 1;
+    namespace test:namespace;
+    prefix tm;
+
+    include test-submodule;
+
+    revision 2013-07-22;
+
+    container cont {
+        leaf lf {
+            mandatory true;
+            type string;
+        }
+    }
+}
