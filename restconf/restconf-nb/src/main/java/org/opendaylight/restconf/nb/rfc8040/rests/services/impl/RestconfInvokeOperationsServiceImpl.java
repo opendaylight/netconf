@@ -35,7 +35,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -58,8 +58,6 @@ import org.slf4j.LoggerFactory;
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfInvokeOperationsServiceImpl.class);
 
-    // FIXME: at some point we do not want to have this here, as this is only used for dispatch
-    private static final QNameModule SAL_REMOTE_NAMESPACE = CreateDataChangeEventSubscriptionInput.QNAME.getModule();
     private static final QNameModule DEVICE_NOTIFICATION_NAMESPACE = SubscribeDeviceNotificationInput.QNAME.getModule();
 
     private final DOMRpcService rpcService;
@@ -85,16 +83,8 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
 
         final ListenableFuture<? extends DOMRpcResult> future;
         if (mountPoint == null) {
-            // FIXME: this really should be a normal RPC invocation service which has its own interface with JAX-RS,
-            //        except ... we check 'identifier' for .contains() instead of exact RPC name!
-            if (SAL_REMOTE_NAMESPACE.equals(rpcName.getModule())) {
-                if (identifier.contains("create-data-change-event-subscription")) {
-                    future = Futures.immediateFuture(
-                        CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContext));
-                } else {
-                    future = Futures.immediateFailedFuture(new RestconfDocumentedException("Unsupported operation",
-                        ErrorType.RPC, ErrorTag.OPERATION_NOT_SUPPORTED));
-                }
+            if (CreateDataChangeEventSubscription.QNAME.equals(rpcName)) {
+                future = Futures.immediateFuture(CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContext));
             } else if (DEVICE_NOTIFICATION_NAMESPACE.equals(rpcName.getModule())) {
                 // FIXME: this should be a match on RPC QName
                 final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
