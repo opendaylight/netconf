@@ -20,7 +20,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationListenerAdaptor;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
@@ -87,18 +86,18 @@ final class CreateStreamUtil {
     /**
      * Create data-change-event stream with POST operation via RPC.
      *
-     * @param payload      Input of RPC - example in JSON (data-change-event stream):
-     *                     <pre>
-     *                     {@code
-     *                         {
-     *                             "input": {
-     *                                 "path": "/toaster:toaster/toaster:toasterStatus",
-     *                                 "sal-remote-augment:datastore": "OPERATIONAL",
-     *                                 "sal-remote-augment:scope": "ONE"
-     *                             }
-     *                         }
-     *                     }
-     *                     </pre>
+     * @param input Input of RPC - example in JSON (data-change-event stream):
+     *              <pre>
+     *              {@code
+     *                  {
+     *                      "input": {
+     *                          "path": "/toaster:toaster/toaster:toasterStatus",
+     *                          "sal-remote-augment:datastore": "OPERATIONAL",
+     *                          "sal-remote-augment:scope": "ONE"
+     *                      }
+     *                  }
+     *              }
+     *              </pre>
      * @param refSchemaCtx Reference to {@link EffectiveModelContext}.
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON:
      *     <pre>
@@ -112,16 +111,15 @@ final class CreateStreamUtil {
      *     </pre>
      */
     // FIXME: this really should be a normal RPC implementation
-    static DOMRpcResult createDataChangeNotifiStream(final NormalizedNodePayload payload,
+    static DOMRpcResult createDataChangeNotifiStream(final ContainerNode input,
             final EffectiveModelContext refSchemaCtx) {
         // parsing out of container with settings and path
-        final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
-        final YangInstanceIdentifier path = preparePath(data);
+        final YangInstanceIdentifier path = preparePath(input);
 
         // building of stream name
         final StringBuilder streamNameBuilder = new StringBuilder(
-                prepareDataChangeNotifiStreamName(path, requireNonNull(refSchemaCtx), data));
-        final NotificationOutputType outputType = prepareOutputType(data);
+                prepareDataChangeNotifiStreamName(path, requireNonNull(refSchemaCtx), input));
+        final NotificationOutputType outputType = prepareOutputType(input);
         if (outputType.equals(NotificationOutputType.JSON)) {
             streamNameBuilder.append('/').append(outputType.getName());
         }
@@ -141,19 +139,17 @@ final class CreateStreamUtil {
      * Create device notification stream.
      *
      * @param baseUrl base Url
-     * @param payload data
+     * @param input RPC input
      * @param streamUtil stream utility
      * @param mountPointService dom mount point service
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
-    static DOMRpcResult createDeviceNotificationListener(final String baseUrl, final NormalizedNodePayload payload,
+    static DOMRpcResult createDeviceNotificationListener(final String baseUrl, final ContainerNode input,
             final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
-        final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
-        // FIXME: ugly cast
         final YangInstanceIdentifier path =
-            (YangInstanceIdentifier) data.findChildByArg(DEVICE_NOTIFICATION_PATH_NODEID)
+            (YangInstanceIdentifier) input.findChildByArg(DEVICE_NOTIFICATION_PATH_NODEID)
                 .map(DataContainerChild::body)
                 .orElseThrow(() -> new RestconfDocumentedException("No path specified", ErrorType.APPLICATION,
                     ErrorTag.DATA_MISSING));
@@ -190,7 +186,7 @@ final class CreateStreamUtil {
         }
 
         final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
-            .registerDeviceNotificationListener(deviceName, prepareOutputType(data), mountModelContext,
+            .registerDeviceNotificationListener(deviceName, prepareOutputType(input), mountModelContext,
                 mountPointService, mountPoint.getIdentifier());
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 

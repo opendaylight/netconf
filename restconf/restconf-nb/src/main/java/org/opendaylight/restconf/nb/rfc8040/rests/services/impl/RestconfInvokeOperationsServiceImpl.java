@@ -77,17 +77,19 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         final DOMMountPoint mountPoint = context.getMountPoint();
         final SchemaNode schema = context.getSchemaNode();
         final QName rpcName = schema.getQName();
+        final ContainerNode rpcInput = (ContainerNode) payload.getData();
 
         final ListenableFuture<? extends DOMRpcResult> future;
         if (mountPoint == null) {
             if (CreateDataChangeEventSubscription.QNAME.equals(rpcName)) {
-                future = Futures.immediateFuture(CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContext));
+                future = Futures.immediateFuture(
+                    CreateStreamUtil.createDataChangeNotifiStream(rpcInput, schemaContext));
             } else if (SubscribeDeviceNotification.QNAME.equals(rpcName)) {
                 final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
-                future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, payload,
+                future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, rpcInput,
                     streamUtils, mountPointService));
             } else {
-                future = invokeRpc((ContainerNode)payload.getData(), rpcName, rpcService);
+                future = invokeRpc(rpcInput, rpcName, rpcService);
             }
         } else {
             future = invokeRpc(payload.getData(), rpcName, mountPoint);
