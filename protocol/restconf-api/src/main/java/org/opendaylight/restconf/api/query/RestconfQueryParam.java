@@ -12,7 +12,7 @@ import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
  * Interface implemented by all Java classes which represent a
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8">RESTCONF query parameter</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8">RESTCONF query parameter</a>.
  *
  * <p>
  * Implementations of this interface are required to expose a {@code public static @NonNull uriName} constant, which

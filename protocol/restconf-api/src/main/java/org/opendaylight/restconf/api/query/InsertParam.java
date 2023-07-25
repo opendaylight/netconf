@@ -13,7 +13,7 @@ import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * Enumeration of possible {@code insert} values as defined by
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.5">RFC8040, section 4.8.5</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8.5">RFC8040, section 4.8.5</a>.
  */
 public enum InsertParam implements RestconfQueryParam<InsertParam> {
     /**

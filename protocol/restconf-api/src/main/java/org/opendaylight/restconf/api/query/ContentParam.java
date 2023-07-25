@@ -13,7 +13,7 @@ import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * Enumeration of possible {@code content} values as defined by
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.1">RFC8040, section 4.8.1</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8.1">RFC8040, section 4.8.1</a>.
  */
 public enum ContentParam implements RestconfQueryParam<ContentParam> {
     /**

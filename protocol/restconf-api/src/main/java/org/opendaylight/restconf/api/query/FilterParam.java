@@ -14,7 +14,7 @@ import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * This class represents a {@code filter} parameter as defined in
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.4">RFC8040 section 4.8.4</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8.4">RFC8040 section 4.8.4</a>.
  */
 
 public final class FilterParam implements RestconfQueryParam<FilterParam> {

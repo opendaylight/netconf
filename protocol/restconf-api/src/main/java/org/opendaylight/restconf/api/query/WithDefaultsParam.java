@@ -14,7 +14,7 @@ import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * Enumeration of possible {@code with-defaults} parameter values as defined by
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.9">RFC8040, section 4.8.9</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8.9">RFC8040, section 4.8.9</a>.
  */
 public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
     /**

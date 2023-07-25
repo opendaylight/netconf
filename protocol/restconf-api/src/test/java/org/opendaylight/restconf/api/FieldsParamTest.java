@@ -18,7 +18,7 @@ import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 
 public class FieldsParamTest {
-    // https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3:
+    // https://www.rfc-editor.org/rfc/rfc8040#section-4.8.3:
     //    ";" is used to select multiple nodes.  For example, to retrieve only
     //    the "genre" and "year" of an album, use "fields=genre;year".
     @Test
@@ -35,7 +35,7 @@ public class FieldsParamTest {
         assertEquals(List.of(), selector.subSelectors());
     }
 
-    // https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3:
+    // https://www.rfc-editor.org/rfc/rfc8040#section-4.8.3:
     //    "/" is used in a path to retrieve a child node of a node.  For
     //    example, to retrieve only the "label" of an album, use
     //    "fields=admin/label".
@@ -49,7 +49,7 @@ public class FieldsParamTest {
         assertEquals(List.of(), selector.subSelectors());
     }
 
-    // https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3:
+    // https://www.rfc-editor.org/rfc/rfc8040#section-4.8.3:
     //    For example, assume that the target resource is the "album" list.  To
     //    retrieve only the "label" and "catalogue-number" of the "admin"
     //    container within an album, use
@@ -75,7 +75,7 @@ public class FieldsParamTest {
         assertEquals(List.of(), subSelector.subSelectors());
     }
 
-    // https://datatracker.ietf.org/doc/html/rfc8040#appendix-B.3.3:
+    // https://www.rfc-editor.org/rfc/rfc8040#appendix-B.3.3:
     //    In this example, the client is retrieving the datastore resource in
     //    JSON format, but retrieving only the "modules-state/module" list, and
     //    only the "name" and "revision" nodes from each list entry.  Note that

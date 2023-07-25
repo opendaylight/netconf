@@ -20,7 +20,7 @@ import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
  * This class represents a {@code fields} parameter as defined in
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3">RFC8040 section 4.8.3</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8.3">RFC8040 section 4.8.3</a>.
  */
 @NonNullByDefault
 public final class FieldsParam implements RestconfQueryParam<FieldsParam> {

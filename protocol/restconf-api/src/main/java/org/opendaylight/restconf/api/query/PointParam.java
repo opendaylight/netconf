@@ -13,7 +13,7 @@ import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * This class represents a {@code point} parameter as defined in
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.6">RFC8040 section 4.8.6</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8.6">RFC8040 section 4.8.6</a>.
  */
 public final class PointParam implements RestconfQueryParam<PointParam> {
     // API consistency: must not be confused with enum constants

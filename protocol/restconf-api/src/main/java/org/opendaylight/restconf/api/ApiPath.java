@@ -23,8 +23,8 @@ import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 
 /**
  * Intermediate representation of a parsed {@code api-path} string as defined in
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-3.5.3.1">RFC section 3.5.3.1</a>. It models the
- * path as a series of {@link Step}s.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.5.3.1">RFC section 3.5.3.1</a>. It models the path
+ * as a series of {@link Step}s.
  */
 @NonNullByDefault
 public final class ApiPath implements Immutable {

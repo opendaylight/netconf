@@ -22,7 +22,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 
 /**
  * RESTCONF {@code /operations} content for a {@code GET} operation as per
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-3.3.2">RFC8040</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC8040</a>.
  */
 enum OperationsContent {
     JSON("{ \"ietf-restconf:operations\" : { } }") {

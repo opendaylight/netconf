@@ -204,7 +204,7 @@ public final class ReadDataTransactionUtil {
             //
             //            Data nodes set to the YANG default by the client are reported.
             //
-            //        and RFC8040 (https://datatracker.ietf.org/doc/html/rfc8040#page-60) says:
+            //        and RFC8040 (https://www.rfc-editor.org/rfc/rfc8040#page-60) says:
             //
             //            If the "with-defaults" parameter is set to "explicit", then the
             //            server MUST adhere to the default-reporting behavior defined in

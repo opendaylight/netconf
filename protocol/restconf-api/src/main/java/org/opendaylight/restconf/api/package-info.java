@@ -6,6 +6,6 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * RESTCONF protocol constructs, as specified by <a href="https://datatracker.ietf.org/doc/html/rfc8040">RFC8040</a>.
+ * RESTCONF protocol constructs, as specified by <a href="https://www.rfc-editor.org/rfc/rfc8040">RFC8040</a>.
  */
 package org.opendaylight.restconf.api;

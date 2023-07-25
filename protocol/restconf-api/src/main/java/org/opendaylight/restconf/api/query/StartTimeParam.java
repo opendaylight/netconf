@@ -12,7 +12,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 
 /**
  * This class represents a {@code start-time} parameter as defined in
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.7">RFC8040 section 4.8.7</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8.7">RFC8040 section 4.8.7</a>.
  */
 public final class StartTimeParam extends AbstractReplayParam<StartTimeParam> {
     // API consistency: must not be confused with enum constants

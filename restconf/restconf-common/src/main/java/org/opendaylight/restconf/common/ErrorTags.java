@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * {@link ErrorTag} mapping to HTTP errors. Aside from the mappings defined by
- * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-7">RFC8040 section 7</a>, we also define tags which
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-7">RFC8040 section 7</a>, we also define tags which
  * map to useful {@link Status} codes.
  */
 @Beta

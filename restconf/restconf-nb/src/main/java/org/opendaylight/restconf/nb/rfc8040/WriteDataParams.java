@@ -42,7 +42,7 @@ public final class WriteDataParams implements Immutable {
                 return empty();
             }
 
-            // https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.5:
+            // https://www.rfc-editor.org/rfc/rfc8040#section-4.8.5:
             //        If the values "before" or "after" are used, then a "point" query
             //        parameter for the "insert" query parameter MUST also be present, or a
             //        "400 Bad Request" status-line is returned.
@@ -51,7 +51,7 @@ public final class WriteDataParams implements Immutable {
                     "Insert parameter " + insert.paramValue() + " cannot be used without a Point parameter.");
             }
         } else {
-            // https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.6:
+            // https://www.rfc-editor.org/rfc/rfc8040#section-4.8.6:
             // [when "point" parameter is present and]
             //        If the "insert" query parameter is not present or has a value other
             //        than "before" or "after", then a "400 Bad Request" status-line is
