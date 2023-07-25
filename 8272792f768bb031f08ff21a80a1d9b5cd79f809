@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8be00ec_c504b751",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Operation.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-07-25T13:54:46Z",
+      "side": 1,
+      "message": "Lets\u0027s reformat the record\u0027s fields declaration according to your previous patch https://git.opendaylight.org/gerrit/c/netconf/+/106327 and this https://git.opendaylight.org/gerrit/c/netconf/+/106327/9..12/restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/ReadDataParams.java#b26",
+      "revId": "8272792f768bb031f08ff21a80a1d9b5cd79f809",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
