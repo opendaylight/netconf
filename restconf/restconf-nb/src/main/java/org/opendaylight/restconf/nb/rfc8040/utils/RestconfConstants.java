@@ -17,12 +17,6 @@ public final class RestconfConstants {
     public static final String BASE_URI_PATTERN = "rests";
     public static final String NOTIF = "notif";
 
-    // FIXME: Remove this constant. All logic relying on this constant should instead rely on YangInstanceIdentifier
-    //        equivalent coming out of argument parsing. This may require keeping List<YangInstanceIdentifier> as the
-    //        nested path split on yang-ext:mount. This splitting needs to be based on consulting the
-    //        EffectiveModelContext and allowing it only where yang-ext:mount is actually used in models.
-    public static final String MOUNT = "yang-ext:mount";
-
     private RestconfConstants() {
         // Hidden on purpose
     }

@@ -36,7 +36,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -169,8 +168,7 @@ public class ParserIdentifierTest {
     }
 
     /**
-     * Positive test of creating <code>InstanceIdentifierContext</code> from identifier containing
-     * {@link RestconfConstants#MOUNT}.
+     * Positive test of creating {@code InstanceIdentifierContext} from identifier containing {@code yang-ext:mount}.
      */
     @Test
     public void toInstanceIdentifierMountPointTest() {
@@ -230,8 +228,8 @@ public class ParserIdentifierTest {
     }
 
     /**
-     * Negative test when identifier contains {@link RestconfConstants#MOUNT} but identifier part is not valid. Test
-     * should fail with <code>RestconfDocumentedException</code>.
+     * Negative test when identifier contains {@code yang-ext:mount} but identifier part is not valid. Test
+     * should fail with {@link RestconfDocumentedException}.
      */
     @Test
     public void toInstanceIdentifierMountPointInvalidIdentifierNegativeTest() {
