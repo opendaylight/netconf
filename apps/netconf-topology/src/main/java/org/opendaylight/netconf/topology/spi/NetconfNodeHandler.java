@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import java.util.ArrayList;
@@ -146,6 +147,8 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     }
 
     public synchronized void connect() {
+        attempts = 1;
+        lastSleep = minSleep;
         lockedConnect();
     }
 
@@ -169,7 +172,8 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             currentTask = null;
             cause = future.cause();
             if (cause == null || cause instanceof CancellationException) {
-                // Success or cancellation, nothing else to do
+                // Success or cancellation, nothing else to do.
+                // In case of success the rest of the setup is driven by RemoteDeviceHandler callbacks
                 return;
             }
 
@@ -291,5 +295,10 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         }
 
         return List.of();
+    }
+
+    @VisibleForTesting
+    synchronized long attempts() {
+        return attempts;
     }
 }
