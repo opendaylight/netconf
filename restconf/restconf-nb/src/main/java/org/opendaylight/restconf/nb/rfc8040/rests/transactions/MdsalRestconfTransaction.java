@@ -9,19 +9,18 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil.DELETE_TX_TYPE;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil.checkItemDoesNotExists;
 
 import com.google.common.util.concurrent.FluentFuture;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.TransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -33,8 +32,12 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 final class MdsalRestconfTransaction extends RestconfTransaction {
+    private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfTransaction.class);
+
     private DOMDataTreeReadWriteTransaction rwTx;
 
     MdsalRestconfTransaction(final DOMDataBroker dataBroker) {
@@ -51,8 +54,23 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     public void delete(final YangInstanceIdentifier path) {
-        final FluentFuture<Boolean> isExists = verifyNotNull(rwTx).exists(CONFIGURATION, path);
-        DeleteDataTransactionUtil.checkItemExists(isExists, path, DELETE_TX_TYPE);
+        final var existsFuture = verifyNotNull(rwTx).exists(CONFIGURATION, path);
+        final boolean exists;
+        try {
+            exists = existsFuture.get();
+        } catch (ExecutionException e) {
+            throw new RestconfDocumentedException("Failed to access " + path, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RestconfDocumentedException("Interrupted while accessing " + path, e);
+        }
+
+        if (!exists) {
+            LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
+            throw new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                path);
+        }
+
         rwTx.delete(CONFIGURATION, path);
     }
 

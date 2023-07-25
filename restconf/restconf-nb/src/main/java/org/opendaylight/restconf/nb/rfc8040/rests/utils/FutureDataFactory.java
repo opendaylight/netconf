@@ -9,7 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 class FutureDataFactory<T> {
 
-    protected T result;
+    protected T result = null;
     private boolean statusFail = false;
 
     void setResult(final T result) {
@@ -17,7 +17,7 @@ class FutureDataFactory<T> {
     }
 
     void setFailureStatus() {
-        this.statusFail = true;
+        statusFail = true;
     }
 
     boolean getFailureStatus() {
