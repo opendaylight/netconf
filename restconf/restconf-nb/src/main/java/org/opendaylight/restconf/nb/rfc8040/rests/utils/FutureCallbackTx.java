@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -79,17 +78,13 @@ final class FutureCallbackTx {
             dataFactory.setFailureStatus();
             LOG.warn("Transaction({}) FAILED!", txType, e);
 
-            final Throwable cause = e.getCause();
-            if (cause instanceof TransactionCommitFailedException) {
-                /* If device send some error message we want this message to get to client
-                   and not just to throw it away or override it with new generic message.
-                   We search for NetconfDocumentedException that was send from netconfSB
-                   and we create RestconfDocumentedException accordingly.
-                */
-                final List<Throwable> causalChain = Throwables.getCausalChain(cause);
-                for (Throwable error : causalChain) {
-                    if (error instanceof DocumentedException) {
-                        final ErrorTag errorTag = ((DocumentedException) error).getErrorTag();
+            if (e.getCause() instanceof TransactionCommitFailedException commitFailed) {
+                // If device send some error message we want this message to get to client and not just to throw it away
+                // or override it with new generic message. We search for NetconfDocumentedException that was send from
+                // netconfSB and we create RestconfDocumentedException accordingly.
+                for (Throwable error : Throwables.getCausalChain(commitFailed)) {
+                    if (error instanceof DocumentedException documentedError) {
+                        final ErrorTag errorTag = documentedError.getErrorTag();
                         if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
                             LOG.trace("Operation via Restconf was not executed because data at {} already exists",
                                 path);
@@ -101,11 +96,9 @@ final class FutureCallbackTx {
                             throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
                                 ErrorTag.DATA_MISSING, "Data does not exist", path));
                         }
-                    }
-                    if (error instanceof NetconfDocumentedException) {
-                        throw new RestconfDocumentedException(error.getMessage(),
-                                ((NetconfDocumentedException) error).getErrorType(),
-                                ((NetconfDocumentedException) error).getErrorTag(), e);
+                    } else if (error instanceof NetconfDocumentedException documentedError) {
+                        throw new RestconfDocumentedException(documentedError.getMessage(),
+                            documentedError.getErrorType(), documentedError.getErrorTag(), e);
                     }
                 }
 
