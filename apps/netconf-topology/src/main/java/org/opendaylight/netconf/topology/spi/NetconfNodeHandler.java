@@ -209,7 +209,6 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     public void onDeviceFailed(final Throwable throwable) {
         LOG.debug("Connection attempt failed", throwable);
         delegate.onDeviceFailed(throwable);
-        scheduleReconnect();
     }
 
     @Override
