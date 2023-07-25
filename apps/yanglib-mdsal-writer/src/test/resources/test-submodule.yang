@@ -1,0 +1,10 @@
+submodule test-submodule {
+  yang-version 1.1;
+
+  belongs-to test-module {
+    prefix tm;
+  }
+
+  container sub {
+  }
+}
