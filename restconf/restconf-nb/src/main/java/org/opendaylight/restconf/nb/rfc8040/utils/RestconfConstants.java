@@ -7,13 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils;
 
-import com.google.common.base.Splitter;
-
 /**
  * Util class for Restconf constants.
  */
 public final class RestconfConstants {
-    public static final Splitter SLASH_SPLITTER = Splitter.on('/');
     public static final String BASE_URI_PATTERN = "rests";
     public static final String NOTIF = "notif";
 
