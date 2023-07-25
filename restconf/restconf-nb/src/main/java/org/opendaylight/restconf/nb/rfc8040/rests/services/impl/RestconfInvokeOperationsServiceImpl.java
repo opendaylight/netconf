@@ -42,7 +42,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -77,20 +76,22 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         final DOMMountPoint mountPoint = context.getMountPoint();
         final SchemaNode schema = context.getSchemaNode();
         final QName rpcName = schema.getQName();
+        final ContainerNode rpcInput = (ContainerNode) payload.getData();
 
         final ListenableFuture<? extends DOMRpcResult> future;
         if (mountPoint == null) {
             if (CreateDataChangeEventSubscription.QNAME.equals(rpcName)) {
-                future = Futures.immediateFuture(CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContext));
+                future = Futures.immediateFuture(
+                    CreateStreamUtil.createDataChangeNotifiStream(rpcInput, schemaContext));
             } else if (SubscribeDeviceNotification.QNAME.equals(rpcName)) {
                 final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
-                future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, payload,
+                future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, rpcInput,
                     streamUtils, mountPointService));
             } else {
-                future = invokeRpc((ContainerNode)payload.getData(), rpcName, rpcService);
+                future = invokeRpc(rpcInput, rpcName, rpcService);
             }
         } else {
-            future = invokeRpc(payload.getData(), rpcName, mountPoint);
+            future = invokeRpc(rpcInput, rpcName, mountPoint);
         }
 
         Futures.addCallback(future, new FutureCallback<DOMRpcResult>() {
@@ -127,9 +128,9 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
      * @return {@link DOMRpcResult}
      */
     @VisibleForTesting
-    static ListenableFuture<? extends DOMRpcResult> invokeRpc(final NormalizedNode data, final QName rpc,
+    static ListenableFuture<? extends DOMRpcResult> invokeRpc(final ContainerNode data, final QName rpc,
             final DOMMountPoint mountPoint) {
-        return invokeRpc((ContainerNode) data, rpc, mountPoint.getService(DOMRpcService.class).orElseThrow(() -> {
+        return invokeRpc(data, rpc, mountPoint.getService(DOMRpcService.class).orElseThrow(() -> {
             final String errmsg = "RPC service is missing.";
             LOG.debug(errmsg);
             return new RestconfDocumentedException(errmsg);
@@ -139,15 +140,15 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     /**
      * Invoke rpc.
      *
-     * @param data input data
+     * @param input input data
      * @param rpc RPC type
      * @param rpcService rpc service to invoke rpc
      * @return {@link DOMRpcResult}
      */
     @VisibleForTesting
-    static ListenableFuture<? extends DOMRpcResult> invokeRpc(final ContainerNode data, final QName rpc,
+    static ListenableFuture<? extends DOMRpcResult> invokeRpc(final ContainerNode input, final QName rpc,
             final DOMRpcService rpcService) {
-        return Futures.catching(rpcService.invokeRpc(rpc, nonnullInput(rpc, data)),
+        return Futures.catching(rpcService.invokeRpc(rpc, nonnullInput(rpc, input)),
             DOMRpcException.class,
             cause -> new DefaultDOMRpcResult(List.of(RpcResultBuilder.newError(ErrorType.RPC, ErrorTag.OPERATION_FAILED,
                 cause.getMessage()))),
