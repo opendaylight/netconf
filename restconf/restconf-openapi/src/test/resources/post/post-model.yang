@@ -1,0 +1,88 @@
+module post-model {
+  yang-version 1.1;
+  namespace "http://example.com/post/model";
+  prefix "pst";
+
+  typedef MacAddress {
+    type string {
+      pattern '[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}';
+    }
+  }
+
+  container root {
+    container inner-cont {
+      list inner-list {
+        key name;
+        leaf name {
+          type uint8;
+        }
+      }
+    }
+  }
+
+  container cont {
+    list list1 {
+      key name;
+      leaf name {
+        type string;
+      }
+    }
+  }
+
+  list root-list {
+    key id;
+    leaf id {
+      type uint32;
+    }
+    leaf root-optional-list-field {
+      type string;
+    }
+  }
+
+  container first-container {
+    choice default-choice {
+      default second-case;
+      case first-case {
+        leaf leaf-non-default {
+          type string;
+        }
+      }
+      case second-case {
+        leaf leaf-default {
+          type uint8;
+          default 10;
+        }
+      }
+    }
+  }
+
+  container second-container {
+    choice first-choice {
+      case first-case {
+        leaf leaf-first-case {
+          type boolean;
+        }
+      }
+      case second-case {
+        leaf leaf-second-case {
+          type string;
+        }
+      }
+    }
+  }
+
+  container leaf-list-container {
+    leaf-list leaf-list-node {
+      type union {
+        type int32;
+        type boolean;
+      }
+    }
+  }
+
+  container root-container {
+    leaf mac-address {
+      type MacAddress;
+    }
+  }
+}
