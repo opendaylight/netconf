@@ -21,6 +21,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.yang.gen.v1.subscribe.to.notification.rev161028.Notifi;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -34,10 +35,8 @@ import org.slf4j.LoggerFactory;
 @Path("/")
 public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSubscriptionService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
-    private static final QName LOCATION_QNAME =
-        QName.create("subscribe:to:notification", "2016-10-28", "location").intern();
+    private static final QName LOCATION_QNAME = QName.create(Notifi.QNAME, "location").intern();
     private static final NodeIdentifier LOCATION_NODEID = NodeIdentifier.create(LOCATION_QNAME);
-    private static final QName NOTIFI_QNAME = QName.create(LOCATION_QNAME, "notifi").intern();
 
     private final SubscribeToStreamUtil streamUtils;
     private final HandlersHolder handlersHolder;
@@ -87,7 +86,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      */
     private static InstanceIdentifierContext prepareIIDSubsStreamOutput(final EffectiveModelContext modelContext) {
         return InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.ofDataTreePath(modelContext, NOTIFI_QNAME, LOCATION_QNAME));
+            SchemaInferenceStack.ofDataTreePath(modelContext, Notifi.QNAME, LOCATION_QNAME));
     }
 
     /**
