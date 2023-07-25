@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b84659d_8283a605",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/PostRequestTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-25T13:05:47Z",
+      "side": 1,
+      "message": "private static",
+      "revId": "586662a3173f1b02c8fb9bf0dca13f228918dd43",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
