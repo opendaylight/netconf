@@ -282,8 +282,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return PlainPatchDataTransactionUtil.patchData(payload, strategy, iid.getSchemaContext());
     }
 
-    // FIXME: why is this synchronized?
-    public synchronized RestconfStrategy getRestconfStrategy(final DOMMountPoint mountPoint) {
+    @VisibleForTesting
+    final RestconfStrategy getRestconfStrategy(final DOMMountPoint mountPoint) {
         if (mountPoint == null) {
             return restconfStrategy;
         }
