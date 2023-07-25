@@ -1,0 +1,8 @@
+submodule test-submodule {
+    belongs-to test-module {
+        prefix tm;
+    }
+
+    container sub {
+    }
+}
