@@ -20,16 +20,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
@@ -38,8 +36,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -57,12 +53,10 @@ public class CreateStreamUtilTest {
             prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster", "path"),
             SCHEMA_CTX);
         assertEquals(List.of(), result.errors());
-        final NormalizedNode testedNn = result.value();
-        assertNotNull(testedNn);
-        final NormalizedNodePayload contextRef = prepareDomPayload("create-data-change-event-subscription",
+        assertEquals(prepareDomPayload("create-data-change-event-subscription",
             RpcDefinition::getOutput,
-            "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE", "stream-name");
-        assertEquals(contextRef.getData(), testedNn);
+            "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE", "stream-name"),
+            result.value());
     }
 
     @Test
@@ -91,7 +85,7 @@ public class CreateStreamUtilTest {
         assertEquals("Instance identifier was not normalized correctly", error.getErrorMessage());
     }
 
-    private static NormalizedNodePayload prepareDomPayload(final String rpcName,
+    private static ContainerNode prepareDomPayload(final String rpcName,
             final Function<RpcDefinition, ContainerLike> rpcToContainer, final String toasterValue,
             final String inputOutputName) {
         final Module rpcModule = SCHEMA_CTX.findModules("sal-remote").iterator().next();
@@ -118,11 +112,9 @@ public class CreateStreamUtilTest {
             o = toasterValue;
         }
 
-        return NormalizedNodePayload.of(InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.of(SCHEMA_CTX, Absolute.of(rpcQName, containerSchemaNode.getQName()))),
-            Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(containerSchemaNode.getQName()))
-                .withChild(ImmutableNodes.leafNode(lfQName, o))
-                .build());
+        return Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(containerSchemaNode.getQName()))
+            .withChild(ImmutableNodes.leafNode(lfQName, o))
+            .build();
     }
 }
