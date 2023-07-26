@@ -136,10 +136,9 @@ abstract class SubscribeToStreamUtil {
         notificationListenerAdapter.listen(handlersHolder.getNotificationServiceHandler());
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getDatabindProvider());
-        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(
-                    notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(),
-                    schemaContext.getNotifications(), notificationListenerAdapter.getStart(),
-                    notificationListenerAdapter.getOutputType(), uri);
+        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(schemaContext,
+            notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(), notificationListenerAdapter.getStart(),
+            notificationListenerAdapter.getOutputType(), uri);
 
         // FIXME: how does this correlate with the transaction notificationListenerAdapter.close() will do?
         final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();

@@ -100,9 +100,8 @@ public class RestconfStateStreamsTest {
         final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
         map.put(RestconfStateStreams.DESCRIPTION_QNAME, "Notifi");
 
-        final QName notifiQName = QName.create("urn:nested:module", "2014-06-03", "notifi");
-        final MapEntryNode mappedData = RestconfStateStreams.notificationStreamEntry(notifiQName,
-            schemaContextMonitoring.getNotifications(), start, outputType, uri);
+        final MapEntryNode mappedData = RestconfStateStreams.notificationStreamEntry(schemaContextMonitoring,
+            QName.create("urn:nested:module", "2014-06-03", "notifi"), start, outputType, uri);
         assertMappedData(map, mappedData);
     }
 

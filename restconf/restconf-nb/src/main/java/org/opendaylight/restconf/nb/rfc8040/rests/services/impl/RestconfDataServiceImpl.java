@@ -230,9 +230,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
             final UriInfo uriInfo, final DOMDataTreeWriteOperations tx, final NotificationListenerAdapter listener) {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
-        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(
-                listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
-                listener.getOutputType(), uri);
+        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(schemaContext,
+                listener.getSchemaPath().lastNodeIdentifier(), null, listener.getOutputType(), uri);
 
         tx.merge(LogicalDatastoreType.OPERATIONAL,
             RestconfStateStreams.restconfStateStreamPath(mapToStreams.name()), mapToStreams);

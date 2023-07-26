@@ -9,14 +9,12 @@ package org.opendaylight.restconf.nb.rfc8040.monitoring;
 
 import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.$YangModuleInfoImpl.qnameOf;
 
-import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -36,7 +34,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNode
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
@@ -83,44 +80,26 @@ public final class RestconfStateStreams {
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
-    public static MapEntryNode notificationStreamEntry(final QName notifiQName,
-            final Collection<? extends NotificationDefinition> notifications, final Instant start,
-            final String outputType, final URI uri) {
-        for (final NotificationDefinition notificationDefinition : notifications) {
-            if (notificationDefinition.getQName().equals(notifiQName)) {
-                final String streamName = notifiQName.getLocalName();
-                final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
-                    Builders.mapEntryBuilder()
-                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName))
-                        .withChild(ImmutableNodes.leafNode(NAME_QNAME, streamName));
+    public static MapEntryNode notificationStreamEntry(final EffectiveModelContext context, final QName notifiQName,
+            final Instant start, final String outputType, final URI uri) {
+        final var notificationDefinition = context.findNotification(notifiQName)
+            .orElseThrow(() -> new RestconfDocumentedException(notifiQName + " not found"));
 
-                notificationDefinition.getDescription().ifPresent(
-                    desc -> streamEntry.withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, desc)));
-                streamEntry.withChild(ImmutableNodes.leafNode(REPLAY_SUPPORT_QNAME, Boolean.TRUE));
-                if (start != null) {
-                    streamEntry.withChild(ImmutableNodes.leafNode(REPLAY_LOG_CREATION_TIME,
-                        DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start,
-                            ZoneId.systemDefault()))));
-                }
+        final String streamName = notifiQName.getLocalName();
+        final var streamEntry = Builders.mapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName))
+            .withChild(ImmutableNodes.leafNode(NAME_QNAME, streamName));
 
-                return streamEntry
-                    .withChild(createAccessList(outputType, uri))
-                    .build();
-            }
+        notificationDefinition.getDescription().ifPresent(
+            desc -> streamEntry.withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, desc)));
+        streamEntry.withChild(ImmutableNodes.leafNode(REPLAY_SUPPORT_QNAME, Boolean.TRUE));
+        if (start != null) {
+            streamEntry.withChild(ImmutableNodes.leafNode(REPLAY_LOG_CREATION_TIME,
+                DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start,
+                    ZoneId.systemDefault()))));
         }
 
-        throw new RestconfDocumentedException(notifiQName + " doesn't exist in any modul");
-    }
-
-    private static MapNode createAccessList(final String outputType, final URI uriToWebsocketServer) {
-        return Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(Access.QNAME))
-            .withChild(Builders.mapEntryBuilder()
-                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, outputType))
-                .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, outputType))
-                .withChild(ImmutableNodes.leafNode(LOCATION_QNAME, uriToWebsocketServer.toString()))
-                .build())
-            .build();
+        return streamEntry.withChild(createAccessList(outputType, uri)).build();
     }
 
     /**
@@ -152,6 +131,17 @@ public final class RestconfStateStreams {
             .withChild(ImmutableNodes.leafNode(REPLAY_LOG_CREATION_TIME,
                 DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start, ZoneId.systemDefault()))))
             .withChild(createAccessList(outputType, uri))
+            .build();
+    }
+
+    private static MapNode createAccessList(final String outputType, final URI uriToWebsocketServer) {
+        return Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(Access.QNAME))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, outputType))
+                .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, outputType))
+                .withChild(ImmutableNodes.leafNode(LOCATION_QNAME, uriToWebsocketServer.toString()))
+                .build())
             .build();
     }
 }
