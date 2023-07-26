@@ -47,7 +47,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
@@ -236,7 +235,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 listener.getOutputType(), uri);
 
         tx.merge(LogicalDatastoreType.OPERATIONAL,
-            Rfc8040.restconfStateStreamPath(mapToStreams.name()), mapToStreams);
+            RestconfStateStreams.restconfStateStreamPath(mapToStreams.name()), mapToStreams);
     }
 
     @Override
