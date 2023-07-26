@@ -26,7 +26,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -38,7 +37,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
@@ -51,14 +50,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class PostDataTransactionUtilTest {
-    private static EffectiveModelContext SCHEMA;
-
+public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -72,11 +67,6 @@ public class PostDataTransactionUtilTest {
     private YangInstanceIdentifier iid2;
     private YangInstanceIdentifier iidList;
     private MapNode buildList;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        SCHEMA = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
-    }
 
     @Before
     public void setUp() {
@@ -126,13 +116,13 @@ public class PostDataTransactionUtilTest {
             .create(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
 
         Response response = PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
-            new MdsalRestconfStrategy(mockDataBroker), SCHEMA, WriteDataParams.empty());
+            new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
 
         response = PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
-                new NetconfRestconfStrategy(netconfService), SCHEMA, WriteDataParams.empty());
+                new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
     }
@@ -152,7 +142,7 @@ public class PostDataTransactionUtilTest {
             LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
 
         Response response = PostDataTransactionUtil.postData(uriInfo, iidList, buildList,
-                        new MdsalRestconfStrategy(mockDataBroker), SCHEMA, WriteDataParams.empty());
+                        new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
             containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
@@ -160,12 +150,11 @@ public class PostDataTransactionUtilTest {
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
 
         response = PostDataTransactionUtil.postData(uriInfo, iidList, buildList,
-                new NetconfRestconfStrategy(netconfService), SCHEMA, WriteDataParams.empty());
+                new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
                 containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
-        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, node, entryNode,
-                Optional.empty());
+        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
     }
 
     @Test
@@ -183,7 +172,7 @@ public class PostDataTransactionUtilTest {
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
-                new MdsalRestconfStrategy(mockDataBroker), SCHEMA, WriteDataParams.empty()));
+                new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA, WriteDataParams.empty()));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
 
@@ -191,7 +180,7 @@ public class PostDataTransactionUtilTest {
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
 
         ex = assertThrows(RestconfDocumentedException.class, () -> PostDataTransactionUtil.postData(uriInfo, iid2,
-            buildBaseCont, new NetconfRestconfStrategy(netconfService), SCHEMA, WriteDataParams.empty()));
+            buildBaseCont, new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA, WriteDataParams.empty()));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
 

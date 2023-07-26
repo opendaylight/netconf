@@ -58,7 +58,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
@@ -80,19 +80,13 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class RestconfDataServiceImplTest {
-
-    private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
-
+public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     private ContainerNode buildBaseCont;
     private ContainerNode buildBaseContConfig;
     private ContainerNode buildBaseContOperational;
-    private EffectiveModelContext contextRef;
     private YangInstanceIdentifier iidBase;
     private RestconfDataServiceImpl dataService;
     private QName baseQName;
@@ -180,19 +174,17 @@ public class RestconfDataServiceImplTest {
                 .node(baseQName)
                 .build();
 
-        contextRef = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
-
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
         DOMDataBroker mockDataBroker = mock(DOMDataBroker.class);
         doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
 
-        dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(contextRef), mockDataBroker,
+        dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA), mockDataBroker,
                 mountPointService, delegRestconfSubscrService, actionService, new StreamsConfiguration(0, 1, 0, false));
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
-        doReturn(Optional.of(FixedDOMSchemaService.of(contextRef))).when(mountPoint)
+        doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
                 .getService(DOMSchemaService.class);
         doReturn(Optional.of(mountDataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
@@ -344,7 +336,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPutData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateTrueFluentFuture()).when(read)
@@ -358,7 +350,7 @@ public class RestconfDataServiceImplTest {
     @Test
     public void testPutDataWithMountPoint() {
         final InstanceIdentifierContext iidContext =
-            InstanceIdentifierContext.ofMountPointPath(mountPoint, contextRef, iidBase);
+            InstanceIdentifierContext.ofMountPointPath(mountPoint, JUKEBOX_SCHEMA, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateTrueFluentFuture()).when(read)
@@ -377,7 +369,7 @@ public class RestconfDataServiceImplTest {
                 NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band");
 
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(listQname))
             .withChild(Builders.mapEntryBuilder()
@@ -426,7 +418,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPatchData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)
@@ -450,8 +442,8 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPatchDataMountPoint() throws Exception {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint, contextRef,
-                iidBase);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint,
+            JUKEBOX_SCHEMA, iidBase);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)
@@ -475,7 +467,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPatchDataDeleteNotExist() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)
