@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import com.google.common.util.concurrent.Futures;
 import java.util.Optional;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -38,15 +39,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PlainPatchDataTransactionUtilTest {
-    private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
+    private static EffectiveModelContext SCHEMA;
+
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -61,87 +61,67 @@ public class PlainPatchDataTransactionUtilTest {
     private LeafNode<?> leafGap;
     private ContainerNode jukeboxContainerWithPlayer;
     private ContainerNode jukeboxContainerWithPlaylist;
-    private EffectiveModelContext schema;
     private YangInstanceIdentifier iidGap;
     private YangInstanceIdentifier iidJukebox;
 
-    @Before
-    public void setUp() throws Exception {
-        schema = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        SCHEMA = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
+    }
 
+    @Before
+    public void setUp() {
         final QName qnJukebox = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName qnPlayer = QName.create(qnJukebox, "player");
         final QName qnGap = QName.create(qnJukebox, "gap");
         final QName qnPlaylist = QName.create(qnJukebox, "playlist");
         final QName qnPlaylistKey = QName.create(qnJukebox, "name");
 
-        final NodeIdentifierWithPredicates nidBandA =
-                NodeIdentifierWithPredicates.of(qnPlaylist, qnPlaylistKey, "MyFavoriteBand-A");
-        final NodeIdentifierWithPredicates nidBandB =
-                NodeIdentifierWithPredicates.of(qnPlaylist, qnPlaylistKey, "MyFavoriteBand-B");
-
-        iidGap = YangInstanceIdentifier.builder()
-                .node(qnJukebox)
-                .node(qnPlayer)
-                .node(qnGap)
-                .build();
-
-        iidJukebox = YangInstanceIdentifier.builder()
-                .node(qnJukebox)
-                .build();
+        iidGap = YangInstanceIdentifier.builder().node(qnJukebox).node(qnPlayer).node(qnGap).build();
+        iidJukebox = YangInstanceIdentifier.builder().node(qnJukebox).build();
 
         leafGap = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(qnGap))
                 .withValue(0.2)
                 .build();
-        final ContainerNode playerContainer = Builders.containerBuilder()
+        jukeboxContainerWithPlayer = Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(qnJukebox))
+            .withChild(Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(qnPlayer))
                 .withChild(leafGap)
-                .build();
-        jukeboxContainerWithPlayer = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(qnJukebox))
-                .withChild(playerContainer)
-                .build();
+                .build())
+            .build();
 
         // ----------
 
-        final LeafNode<Object> leafBandA = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(qnJukebox, "name")))
-                .withValue("MyFavoriteBand-A")
-                .build();
-        final LeafNode<Object> leafDescriptionA = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(qnJukebox, "description")))
-                .withValue("band description A")
-                .build();
-        final MapEntryNode entryBandA = Builders.mapEntryBuilder()
-                .withNodeIdentifier(nidBandA)
-                .withChild(leafBandA)
-                .withChild(leafDescriptionA)
-                .build();
-
-        final LeafNode<Object> leafBandB = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(qnJukebox, "name")))
-                .withValue("MyFavoriteBand-B")
-                .build();
-        final LeafNode<Object> leafDescriptionB = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(qnJukebox, "description")))
-                .withValue("band description B")
-                .build();
-        final MapEntryNode entryBandB = Builders.mapEntryBuilder()
-                .withNodeIdentifier(nidBandB)
-                .withChild(leafBandB)
-                .withChild(leafDescriptionB)
-                .build();
-
-        final MapNode listBands = Builders.mapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(qnPlaylist))
-                .withChild(entryBandA)
-                .withChild(entryBandB)
-                .build();
         jukeboxContainerWithPlaylist = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(qnJukebox))
-                .withChild(listBands)
-                .build();
+            .withNodeIdentifier(new NodeIdentifier(qnJukebox))
+            .withChild(Builders.mapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(qnPlaylist))
+                .withChild(Builders.mapEntryBuilder()
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(qnPlaylist, qnPlaylistKey, "MyFavoriteBand-A"))
+                    .withChild(Builders.leafBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(QName.create(qnJukebox, "name")))
+                        .withValue("MyFavoriteBand-A")
+                        .build())
+                    .withChild(Builders.leafBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(QName.create(qnJukebox, "description")))
+                        .withValue("band description A")
+                        .build())
+                    .build())
+                .withChild(Builders.mapEntryBuilder()
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(qnPlaylist, qnPlaylistKey, "MyFavoriteBand-B"))
+                    .withChild(Builders.leafBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(QName.create(qnJukebox, "name")))
+                        .withValue("MyFavoriteBand-B")
+                        .build())
+                    .withChild(Builders.leafBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(QName.create(qnJukebox, "description")))
+                        .withValue("band description B")
+                        .build())
+                    .build())
+                .build())
+            .build();
 
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
@@ -150,7 +130,7 @@ public class PlainPatchDataTransactionUtilTest {
     @Test
     public void testPatchContainerData() {
         final InstanceIdentifierContext iidContext =
-                InstanceIdentifierContext.ofLocalPath(schema, iidJukebox);
+                InstanceIdentifierContext.ofLocalPath(SCHEMA, iidJukebox);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlayer);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -159,19 +139,19 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),any(),
                 any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), schema);
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), SCHEMA);
         verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
         PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
-                schema);
+                SCHEMA);
         verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
     @Test
     public void testPatchLeafData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iidGap);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(SCHEMA, iidGap);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, leafGap);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -180,12 +160,11 @@ public class PlainPatchDataTransactionUtilTest {
             .merge(any(), any(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), schema);
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), SCHEMA);
         verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
-                schema);
+        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService), SCHEMA);
         verify(netconfService).lock();
         verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
@@ -193,7 +172,7 @@ public class PlainPatchDataTransactionUtilTest {
 
     @Test
     public void testPatchListData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iidJukebox);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(SCHEMA, iidJukebox);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlaylist);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -202,11 +181,11 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(),any(),any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), schema);
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), SCHEMA);
         verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, payload.getData());
 
         PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
-                schema);
+                SCHEMA);
         verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, payload.getData(),
                 Optional.empty());
     }
