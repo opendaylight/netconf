@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -72,7 +72,7 @@ public final class PutDataTransactionUtil {
 
         final ResponseFactory responseFactory =
             new ResponseFactory(exists ? Status.NO_CONTENT : Status.CREATED);
-        final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy,
+        final ListenableFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy,
             payload.getData(), params);
         //This method will close transactionChain if any
         FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, responseFactory, path);
@@ -87,13 +87,11 @@ public final class PutDataTransactionUtil {
      * @param strategy      object that perform the actual DS operations
      * @param data          data
      * @param params        {@link WriteDataParams}
-     * @return {@link FluentFuture}
+     * @return A {@link ListenableFuture}
      */
-    private static FluentFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
-                                                                 final EffectiveModelContext schemaContext,
-                                                                 final RestconfStrategy strategy,
-                                                                 final NormalizedNode data,
-                                                                 final WriteDataParams params) {
+    private static ListenableFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
+            final EffectiveModelContext schemaContext, final RestconfStrategy strategy, final NormalizedNode data,
+            final WriteDataParams params) {
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
         final InsertParam insert = params.insert();
         if (insert == null) {
@@ -174,10 +172,9 @@ public final class PutDataTransactionUtil {
         }
     }
 
-    private static FluentFuture<? extends CommitInfo> makePut(final YangInstanceIdentifier path,
-                                                              final EffectiveModelContext schemaContext,
-                                                              final RestconfTransaction transaction,
-                                                              final NormalizedNode data) {
+    private static ListenableFuture<? extends CommitInfo> makePut(final YangInstanceIdentifier path,
+            final EffectiveModelContext schemaContext, final RestconfTransaction transaction,
+            final NormalizedNode data) {
         transaction.replace(path, data, schemaContext);
         return transaction.commit();
     }

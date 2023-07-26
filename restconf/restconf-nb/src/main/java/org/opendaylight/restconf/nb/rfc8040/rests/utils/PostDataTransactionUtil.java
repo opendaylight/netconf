@@ -64,7 +64,7 @@ public final class PostDataTransactionUtil {
                                     final RestconfStrategy strategy,
                                     final EffectiveModelContext schemaContext, final WriteDataParams params) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
-        final FluentFuture<? extends CommitInfo> future = submitData(path, payload.getData(),
+        final ListenableFuture<? extends CommitInfo> future = submitData(path, payload.getData(),
                 strategy, schemaContext, params);
         final URI location = resolveLocation(uriInfo, path, schemaContext, payload.getData());
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
@@ -84,11 +84,9 @@ public final class PostDataTransactionUtil {
      * @param insert        query parameter
      * @return {@link FluentFuture}
      */
-    private static FluentFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
-                                                                 final NormalizedNode data,
-                                                                 final RestconfStrategy strategy,
-                                                                 final EffectiveModelContext schemaContext,
-                                                                 final WriteDataParams params) {
+    private static ListenableFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
+            final NormalizedNode data, final RestconfStrategy strategy, final EffectiveModelContext schemaContext,
+            final WriteDataParams params) {
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
         final InsertParam insert = params.insert();
         if (insert == null) {

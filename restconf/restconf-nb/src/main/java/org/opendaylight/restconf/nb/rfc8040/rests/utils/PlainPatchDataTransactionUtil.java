@@ -8,7 +8,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -59,7 +59,7 @@ public final class PlainPatchDataTransactionUtil {
             throw new IllegalArgumentException(e);
         }
 
-        final FluentFuture<? extends CommitInfo> future = transaction.commit();
+        final ListenableFuture<? extends CommitInfo> future = transaction.commit();
         final ResponseFactory response = new ResponseFactory(Status.OK);
 
         // closes transactionChain if any, may throw
