@@ -30,4 +30,16 @@ public final class OpenApiTestUtils {
             .filter(p -> !"content".equals(p))
             .toList();
     }
+
+    /**
+     * Get path parameters names for {@code path} for POST operation.
+     *
+     * @return {@link List} of parameters
+     */
+    public static List<String> getPathPostParameters(final Map<String, Path> paths, final String path) {
+        return paths.get(path).post().parameters()
+            .stream()
+            .map(Parameter::name)
+            .toList();
+    }
 }

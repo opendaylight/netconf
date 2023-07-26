@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathGetParameters;
+import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathPostParameters;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASIC_AUTH_NAME;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -93,6 +94,8 @@ public final class OpenApiGeneratorRFC8040Test {
                 "/rests/data/toaster2:lst={lf1}/cont1/cont11",
                 "/rests/data/toaster2:lst={lf1}/cont1/lst11={lf111}",
                 "/rests/data/toaster2:lst={lf1}/lst1={key1},{key2}");
+        final List<String> configPathsForPost = List.of("/rests/data/toaster2:lst={lf1}/cont1",
+                "/rests/data/toaster2:lst={lf1}/cont1/cont11");
 
         final OpenApiObject doc = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
 
@@ -101,8 +104,12 @@ public final class OpenApiGeneratorRFC8040Test {
             assertNotNull(node.get());
             assertNotNull(node.put());
             assertNotNull(node.delete());
-            assertNotNull(node.post());
             assertNotNull(node.patch());
+        }
+
+        for (final String path : configPathsForPost) {
+            final Path node = doc.paths().get(path);
+            assertNotNull(node.post());
         }
     }
 
@@ -227,14 +234,16 @@ public final class OpenApiGeneratorRFC8040Test {
             assertNotNull(delete);
             assertEquals(expectedSize, delete.parameters().size());
 
-            final var post = path.post();
-            assertNotNull(post);
-            assertEquals(expectedSize, post.parameters().size());
-
             final var patch = path.patch();
             assertNotNull(patch);
             assertEquals(expectedSize, patch.parameters().size());
         }
+
+        // we do not generate POST for lists
+        final var path = paths.get("/rests/data/recursive:container-root");
+        final var post = path.post();
+        final int expectedSize = configPaths.get("/rests/data/recursive:container-root");
+        assertEquals(expectedSize, post.parameters().size());
     }
 
     /**
@@ -277,11 +286,11 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final var pathWithParameters = "/rests/operations/action-types:list={name}/list-action";
         assertTrue(doc.paths().containsKey(pathWithParameters));
-        assertEquals(List.of("name"), getPathGetParameters(doc.paths(), pathWithParameters));
+        assertEquals(List.of("name"), getPathPostParameters(doc.paths(), pathWithParameters));
 
         final var pathWithoutParameters = "/rests/operations/action-types:multi-container/inner-container/action";
         assertTrue(doc.paths().containsKey(pathWithoutParameters));
-        assertEquals(List.of(), getPathGetParameters(doc.paths(), pathWithoutParameters));
+        assertEquals(List.of(), getPathPostParameters(doc.paths(), pathWithoutParameters));
     }
 
     @Test
@@ -312,8 +321,6 @@ public final class OpenApiGeneratorRFC8040Test {
         verifyRequestRef(jsonNodeToaster.get(), "#/components/schemas/toaster2_toaster", CONTAINER);
 
         final var jsonNodeToasterSlot = doc.paths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
-        verifyRequestRef(jsonNodeToasterSlot.post(), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
-            CONTAINER);
         verifyRequestRef(jsonNodeToasterSlot.put(), "#/components/schemas/toaster2_toaster_toasterSlot", LIST);
         verifyRequestRef(jsonNodeToasterSlot.get(), "#/components/schemas/toaster2_toaster_toasterSlot", LIST);
 
@@ -327,13 +334,10 @@ public final class OpenApiGeneratorRFC8040Test {
             CONTAINER);
 
         final var jsonNodeLst = doc.paths().get("/rests/data/toaster2:lst={lf1}");
-        verifyRequestRef(jsonNodeLst.post(), "#/components/schemas/toaster2_lst_cont1", CONTAINER);
         verifyRequestRef(jsonNodeLst.put(), "#/components/schemas/toaster2_lst", LIST);
         verifyRequestRef(jsonNodeLst.get(), "#/components/schemas/toaster2_lst", LIST);
 
         final var jsonNodeLst1 = doc.paths().get("/rests/data/toaster2:lst={lf1}/lst1={key1},{key2}");
-        verifyPostDataRequestRef(jsonNodeLst1.post(), "#/components/schemas/toaster2_lst_lst1",
-            "#/components/schemas/toaster2_lst_lst1");
         verifyRequestRef(jsonNodeLst1.put(), "#/components/schemas/toaster2_lst_lst1", LIST);
         verifyRequestRef(jsonNodeLst1.get(), "#/components/schemas/toaster2_lst_lst1", LIST);
 
