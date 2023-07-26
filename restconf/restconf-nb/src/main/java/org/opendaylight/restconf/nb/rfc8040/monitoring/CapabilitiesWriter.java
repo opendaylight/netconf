@@ -26,6 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.restconf.api.query.AbstractReplayParam;
+import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FilterParam;
@@ -201,6 +202,7 @@ public final class CapabilitiesWriter
             .withChildValue(WithDefaultsParam.capabilityUri().toString())
             .withChildValue(PrettyPrintParam.capabilityUri().toString())
             .withChildValue(LeafNodesOnlyParam.capabilityUri().toString())
+            .withChildValue(ChangedLeafNodesOnlyParam.capabilityUri().toString())
             .withChildValue(SkipNotificationDataParam.capabilityUri().toString())
             .build();
     }
