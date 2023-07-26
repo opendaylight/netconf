@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
-import com.google.common.util.concurrent.ListenableFuture;
+import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -59,12 +59,19 @@ public final class PutDataTransactionUtil {
                                    final RestconfStrategy strategy, final WriteDataParams params) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
 
-        final ListenableFuture<Boolean> existsFuture = strategy.exists(LogicalDatastoreType.CONFIGURATION, path);
-        final FutureDataFactory<Boolean> existsResponse = new FutureDataFactory<>();
-        FutureCallbackTx.addCallback(existsFuture, PUT_TX_TYPE, existsResponse);
+        final var existsFuture = strategy.exists(LogicalDatastoreType.CONFIGURATION, path);
+        final boolean exists;
+        try {
+            exists = existsFuture.get();
+        } catch (ExecutionException e) {
+            throw new RestconfDocumentedException("Failed to access " + path, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RestconfDocumentedException("Interrupted while accessing " + path, e);
+        }
 
         final ResponseFactory responseFactory =
-            new ResponseFactory(existsResponse.result ? Status.NO_CONTENT : Status.CREATED);
+            new ResponseFactory(exists ? Status.NO_CONTENT : Status.CREATED);
         final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy,
             payload.getData(), params);
         //This method will close transactionChain if any

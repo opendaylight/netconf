@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
+import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -207,18 +208,25 @@ public final class PostDataTransactionUtil {
     }
 
     /**
-     * Check if items do NOT already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
-     * data already exists.
+     * Check if items do NOT already exists at specified {@code path}.
      *
-     * @param isExistsFuture if checked data exists
-     * @param path           Path to be checked
+     * @param existsFuture if checked data exists
+     * @param path         Path to be checked
+     * @throws RestconfDocumentedException if data already exists.
      */
-    public static void checkItemDoesNotExists(final ListenableFuture<Boolean> isExistsFuture,
+    public static void checkItemDoesNotExists(final ListenableFuture<Boolean> existsFuture,
                                               final YangInstanceIdentifier path) {
-        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-        FutureCallbackTx.addCallback(isExistsFuture, POST_TX_TYPE, response);
+        final boolean exists;
+        try {
+            exists = existsFuture.get();
+        } catch (ExecutionException e) {
+            throw new RestconfDocumentedException("Failed to access " + path, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RestconfDocumentedException("Interrupted while accessing " + path, e);
+        }
 
-        if (response.result) {
+        if (exists) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
             throw new RestconfDocumentedException(
                 "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);

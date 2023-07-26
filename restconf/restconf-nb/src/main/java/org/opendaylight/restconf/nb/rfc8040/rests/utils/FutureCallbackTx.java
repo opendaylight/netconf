@@ -32,24 +32,6 @@ final class FutureCallbackTx {
     }
 
     /**
-     * Add callback to the future object.
-     *
-     * @param listenableFuture
-     *             future object
-     * @param txType
-     *             type of operation (READ, POST, PUT, DELETE)
-     * @param dataFactory
-     *             factory setting result
-     * @throws RestconfDocumentedException
-     *             if the Future throws an exception
-     */
-    // FIXME: this is a *synchronous operation* and has to die
-    static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
-                                final FutureDataFactory<? super T> dataFactory) throws RestconfDocumentedException {
-        addCallback(listenableFuture, txType, dataFactory, null);
-    }
-
-    /**
      * Add callback to the future object and close transaction chain.
      *
      * @param listenableFuture
