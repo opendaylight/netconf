@@ -266,7 +266,7 @@ final class CreateStreamUtil {
     static NotificationListenerAdapter createYangNotifiStream(final NotificationDefinition notificationDefinition,
             final EffectiveModelContext refSchemaCtx, final NotificationOutputType outputType) {
         final var streamName = parseNotificationStreamName(requireNonNull(notificationDefinition),
-                requireNonNull(refSchemaCtx), requireNonNull(outputType.getName()));
+                requireNonNull(refSchemaCtx), requireNonNull(outputType));
         final var listenersBroker = ListenersBroker.getInstance();
 
         final var existing = listenersBroker.notificationListenerFor(streamName);
@@ -276,7 +276,7 @@ final class CreateStreamUtil {
     }
 
     private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,
-            final EffectiveModelContext refSchemaCtx, final String outputType) {
+            final EffectiveModelContext refSchemaCtx, final NotificationOutputType outputType) {
         final QName notificationDefinitionQName = notificationDefinition.getQName();
         final Module module = refSchemaCtx.findModule(
                 notificationDefinitionQName.getModule().getNamespace(),
@@ -290,8 +290,8 @@ final class CreateStreamUtil {
                 .append(module.getName())
                 .append(':')
                 .append(notificationDefinitionQName.getLocalName());
-        if (outputType.equals(NotificationOutputType.JSON.getName())) {
-            streamNameBuilder.append('/').append(NotificationOutputType.JSON.getName());
+        if (outputType != NotificationOutputType.XML) {
+            streamNameBuilder.append('/').append(outputType.getName());
         }
         return streamNameBuilder.toString();
     }
