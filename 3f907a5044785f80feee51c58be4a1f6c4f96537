@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b9f1da1_c7339b0a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-26T10:16:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78b6ca37_d211547c",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 12
+      },
+      "revId": "3f907a5044785f80feee51c58be4a1f6c4f96537",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "51a3b093_bbfe87a9",
@@ -41,6 +65,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8028b259_39571c69",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-26T10:16:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51a3b093_bbfe87a9",
+      "revId": "3f907a5044785f80feee51c58be4a1f6c4f96537",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "758051f0_f26826ce",
@@ -54,6 +96,30 @@
       "writtenOn": "2023-07-25T14:08:23Z",
       "side": 1,
       "message": "Let\u0027s move it to the imports list, if IDE does not do this automatically, you can do it manually",
+      "range": {
+        "startLine": 95,
+        "startChar": 8,
+        "endLine": 95,
+        "endChar": 105
+      },
+      "revId": "3f907a5044785f80feee51c58be4a1f6c4f96537",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db217286_28d0b546",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-26T10:16:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "758051f0_f26826ce",
       "range": {
         "startLine": 95,
         "startChar": 8,
