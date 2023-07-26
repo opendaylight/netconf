@@ -302,12 +302,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         requireNonNull(payload);
 
         final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
+        final YangInstanceIdentifier path = iid.getInstanceIdentifier();
         validInputData(iid.getSchemaNode() != null, payload);
-        validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
+        validTopLevelNodeName(path, payload);
         validateListKeysEqualityInPayloadAndUri(payload);
 
         final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
-        return PlainPatchDataTransactionUtil.patchData(payload, strategy, iid.getSchemaContext());
+        return PlainPatchDataTransactionUtil.patchData(path, payload.getData(), strategy, iid.getSchemaContext());
     }
 
     @VisibleForTesting
