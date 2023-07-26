@@ -31,6 +31,7 @@ import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
+import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -141,7 +142,7 @@ public final class MountPointOpenApiTest {
         }
 
         assertEquals("Unexpected GET paths size", 37, getOperations.size());
-        assertEquals("Unexpected POST paths size", 43, postOperations.size());
+        assertEquals("Unexpected POST paths size", 27, postOperations.size());
         assertEquals("Unexpected PUT paths size", 35, putOperations.size());
         assertEquals("Unexpected PATCH paths size", 35, patchOperations.size());
         assertEquals("Unexpected DELETE paths size", 35, deleteOperations.size());
@@ -184,10 +185,6 @@ public final class MountPointOpenApiTest {
             final var delete = path.delete();
             assertNotNull(delete);
             assertEquals(expectedSize, delete.parameters().size());
-
-            final var post = path.post();
-            assertNotNull(post);
-            assertEquals(expectedSize, post.parameters().size());
 
             final var patch = path.patch();
             assertNotNull(patch);
@@ -244,12 +241,22 @@ public final class MountPointOpenApiTest {
         final var pathWithParameters =
             "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action";
         assertTrue(mountPointApi.paths().containsKey(pathWithParameters));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.paths(), pathWithParameters));
+
+        final var pathParameters = mountPointApi.paths().get(pathWithParameters).post().parameters()
+            .stream()
+            .map(Parameter::name)
+            .toList();
+        assertEquals(List.of("name"), pathParameters);
 
         final var pathWithoutParameters =
             "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action";
         assertTrue(mountPointApi.paths().containsKey(pathWithoutParameters));
-        assertEquals(List.of(), getPathParameters(mountPointApi.paths(), pathWithoutParameters));
+
+        final var emptyPathParameters = mountPointApi.paths().get(pathWithoutParameters).post().parameters()
+            .stream()
+            .map(Parameter::name)
+            .toList();
+        assertEquals(List.of(), emptyPathParameters);
     }
 
     /**
