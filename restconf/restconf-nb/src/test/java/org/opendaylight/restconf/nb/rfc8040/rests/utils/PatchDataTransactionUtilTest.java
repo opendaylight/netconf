@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -56,16 +57,16 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PatchDataTransactionUtilTest {
-    private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
+    private static EffectiveModelContext SCHEMA;
+
     @Mock
     private DOMDataTreeReadWriteTransaction rwTransaction;
     @Mock
@@ -73,7 +74,6 @@ public class PatchDataTransactionUtilTest {
     @Mock
     private NetconfDataTreeService netconfService;
 
-    private EffectiveModelContext refSchemaCtx;
     private YangInstanceIdentifier instanceIdContainer;
     private YangInstanceIdentifier instanceIdCreateAndDelete;
     private YangInstanceIdentifier instanceIdMerge;
@@ -82,10 +82,13 @@ public class PatchDataTransactionUtilTest {
     private YangInstanceIdentifier targetNodeMerge;
     private MapNode buildArtistList;
 
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        SCHEMA = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
+    }
+
     @Before
-    public void setUp() throws Exception {
-        refSchemaCtx = YangParserTestUtils.parseYangFiles(
-            TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
+    public void setUp() {
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName containerPlayerQName = QName.create(baseQName, "player");
         final QName leafGapQName = QName.create(baseQName, "gap");
@@ -95,37 +98,24 @@ public class PatchDataTransactionUtilTest {
         final NodeIdentifierWithPredicates nodeWithKey = NodeIdentifierWithPredicates.of(listArtistQName, leafNameQName,
             "name of artist");
 
-        /* instance identifier for accessing container node "player" */
-        instanceIdContainer = YangInstanceIdentifier.builder()
-                .node(baseQName)
-                .node(containerPlayerQName)
-                .build();
+        // instance identifier for accessing container node "player"
+        instanceIdContainer = YangInstanceIdentifier.of(baseQName, containerPlayerQName);
 
-        /* instance identifier for accessing leaf node "gap" */
+        // instance identifier for accessing leaf node "gap"
         instanceIdCreateAndDelete = instanceIdContainer.node(leafGapQName);
 
-        /* values that are used for creating leaf for testPatchDataCreateAndDelete test */
-        final LeafNode<?> buildGapLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(leafGapQName))
-                .withValue(0.2)
-                .build();
-
-        final ContainerNode buildPlayerContainer = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(containerPlayerQName))
-                .withChild(buildGapLeaf)
-                .build();
-
+        // values that are used for creating leaf for testPatchDataCreateAndDelete test
         buildBaseContainerForTests = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(baseQName))
-                .withChild(buildPlayerContainer)
-                .build();
+            .withNodeIdentifier(new NodeIdentifier(baseQName))
+            .withChild(Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(containerPlayerQName))
+                .withChild(ImmutableNodes.leafNode(leafGapQName, 0.2))
+                .build())
+            .build();
 
-        targetNodeForCreateAndDelete = YangInstanceIdentifier.builder(instanceIdCreateAndDelete)
-                .node(containerPlayerQName)
-                .node(leafGapQName)
-                .build();
+        targetNodeForCreateAndDelete = instanceIdCreateAndDelete.node(containerPlayerQName).node(leafGapQName);
 
-        /* instance identifier for accessing leaf node "name" in list "artist" */
+        // instance identifier for accessing leaf node "name" in list "artist"
         instanceIdMerge = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(containerLibraryQName)
@@ -134,27 +124,15 @@ public class PatchDataTransactionUtilTest {
                 .node(leafNameQName)
                 .build();
 
-        /* values that are used for creating leaf for testPatchDataReplaceMergeAndRemove test */
-        final LeafNode<Object> contentName = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "name")))
-                .withValue("name of artist")
-                .build();
-
-        final LeafNode<Object> contentDescription = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
-                .withValue("description of artist")
-                .build();
-
-        final MapEntryNode mapEntryNode = Builders.mapEntryBuilder()
-                .withNodeIdentifier(nodeWithKey)
-                .withChild(contentName)
-                .withChild(contentDescription)
-                .build();
-
+        // values that are used for creating leaf for testPatchDataReplaceMergeAndRemove test
         buildArtistList = Builders.mapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listArtistQName))
-                .withChild(mapEntryNode)
-                .build();
+            .withNodeIdentifier(new NodeIdentifier(listArtistQName))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(nodeWithKey)
+                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "name"), "name of artist"))
+                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "description"), "description of artist"))
+                .build())
+            .build();
 
         targetNodeMerge = YangInstanceIdentifier.builder()
                 .node(baseQName)
@@ -189,7 +167,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityRemove);
 
         final InstanceIdentifierContext iidContext =
-            InstanceIdentifierContext.ofLocalPath(refSchemaCtx, instanceIdMerge);
+            InstanceIdentifierContext.ofLocalPath(SCHEMA, instanceIdMerge);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
 
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -221,7 +199,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityDelete);
 
         final InstanceIdentifierContext iidContext =
-            InstanceIdentifierContext.ofLocalPath(refSchemaCtx, instanceIdCreateAndDelete);
+            InstanceIdentifierContext.ofLocalPath(SCHEMA, instanceIdCreateAndDelete);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchCD");
         patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), true);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), true);
@@ -247,7 +225,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityDelete);
 
         final PatchContext patchContext = new PatchContext(
-            InstanceIdentifierContext.ofLocalPath(refSchemaCtx, instanceIdCreateAndDelete), entities, "patchD");
+            InstanceIdentifierContext.ofLocalPath(SCHEMA, instanceIdCreateAndDelete), entities, "patchD");
         deleteMdsal(patchContext, new MdsalRestconfStrategy(mockDataBroker));
         deleteNetconf(patchContext, new NetconfRestconfStrategy(netconfService));
     }
@@ -261,7 +239,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityMerge);
 
         final InstanceIdentifierContext iidContext =
-            InstanceIdentifierContext.ofLocalPath(refSchemaCtx, instanceIdCreateAndDelete);
+            InstanceIdentifierContext.ofLocalPath(SCHEMA, instanceIdCreateAndDelete);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchM");
         patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), false);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), false);
@@ -270,7 +248,7 @@ public class PatchDataTransactionUtilTest {
     private void patch(final PatchContext patchContext, final RestconfStrategy strategy,
                        final boolean failed) {
         final PatchStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, strategy, refSchemaCtx);
+                PatchDataTransactionUtil.patchData(patchContext, strategy, SCHEMA);
         for (final PatchStatusEntity entity : patchStatusContext.getEditCollection()) {
             if (failed) {
                 assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());
@@ -283,7 +261,7 @@ public class PatchDataTransactionUtilTest {
 
     private void deleteMdsal(final PatchContext patchContext, final RestconfStrategy strategy) {
         final PatchStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, strategy, refSchemaCtx);
+                PatchDataTransactionUtil.patchData(patchContext, strategy, SCHEMA);
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(ErrorType.PROTOCOL,
@@ -294,7 +272,7 @@ public class PatchDataTransactionUtilTest {
 
     private void deleteNetconf(final PatchContext patchContext, final RestconfStrategy strategy) {
         final PatchStatusContext patchStatusContext =
-            PatchDataTransactionUtil.patchData(patchContext, strategy, refSchemaCtx);
+            PatchDataTransactionUtil.patchData(patchContext, strategy, SCHEMA);
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(ErrorType.PROTOCOL,
