@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +50,7 @@ public final class PatchDataTransactionUtil {
      */
     public static PatchStatusContext patchData(final PatchContext context, final RestconfStrategy strategy,
                                                final EffectiveModelContext schemaContext) {
-        final List<PatchStatusEntity> editCollection = new ArrayList<>();
+        final var editCollection = new ArrayList<PatchStatusEntity>();
         boolean noError = true;
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
 
@@ -65,8 +63,7 @@ public final class PatchDataTransactionUtil {
                                 schemaContext, transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                    false, Lists.newArrayList(e.getErrors())));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, e.getErrors()));
                             noError = false;
                         }
                         break;
@@ -75,8 +72,7 @@ public final class PatchDataTransactionUtil {
                             deleteDataWithinTransaction(patchEntity.getTargetNode(), transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                    false, Lists.newArrayList(e.getErrors())));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, e.getErrors()));
                             noError = false;
                         }
                         break;
@@ -86,8 +82,7 @@ public final class PatchDataTransactionUtil {
                                 schemaContext, transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                    false, Lists.newArrayList(e.getErrors())));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, e.getErrors()));
                             noError = false;
                         }
                         break;
@@ -97,8 +92,7 @@ public final class PatchDataTransactionUtil {
                                 schemaContext, transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                    false, Lists.newArrayList(e.getErrors())));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, e.getErrors()));
                             noError = false;
                         }
                         break;
@@ -107,15 +101,14 @@ public final class PatchDataTransactionUtil {
                             removeDataWithinTransaction(patchEntity.getTargetNode(), transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                    false, Lists.newArrayList(e.getErrors())));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, e.getErrors()));
                             noError = false;
                         }
                         break;
                     default:
-                        editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                false, Lists.newArrayList(new RestconfError(ErrorType.PROTOCOL,
-                                ErrorTag.OPERATION_NOT_SUPPORTED, "Not supported Yang Patch operation"))));
+                        editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false,
+                            List.of(new RestconfError(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+                                "Not supported Yang Patch operation"))));
                         noError = false;
                         break;
                 }
@@ -133,14 +126,13 @@ public final class PatchDataTransactionUtil {
                 FutureCallbackTx.addCallback(future, PATCH_TX_TYPE, response, null);
             } catch (final RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false,
-                        Lists.newArrayList(e.getErrors()));
+                return new PatchStatusContext(context.getPatchId(), List.copyOf(editCollection), false, e.getErrors());
             }
 
-            return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true, null);
+            return new PatchStatusContext(context.getPatchId(), List.copyOf(editCollection), true, null);
         } else {
             transaction.cancel();
-            return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
+            return new PatchStatusContext(context.getPatchId(), List.copyOf(editCollection), false, null);
         }
     }
 
