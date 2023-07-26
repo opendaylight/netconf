@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
 import java.net.URI;
-import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -18,14 +17,13 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -146,12 +144,11 @@ public final class PostDataTransactionUtil {
                                             final RestconfTransaction transaction) {
         final YangInstanceIdentifier parent = path.getParent().getParent();
         transaction.remove(parent);
-        final InstanceIdentifierContext instanceIdentifier =
-            // FIXME: Point should be able to give us this method
-            ParserIdentifier.toInstanceIdentifier(point.value(), schemaContext, Optional.empty());
+        final var pointArg = YangInstanceIdentifierDeserializer.create(schemaContext, point.value()).path
+            .getLastPathArgument();
         int lastItemPosition = 0;
-        for (final NormalizedNode nodeChild : readList.body()) {
-            if (nodeChild.name().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
+        for (var nodeChild : readList.body()) {
+            if (nodeChild.name().equals(pointArg)) {
                 break;
             }
             lastItemPosition++;
@@ -160,9 +157,9 @@ public final class PostDataTransactionUtil {
             lastItemPosition++;
         }
         int lastInsertedPosition = 0;
-        final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, parent);
+        final var emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, parent);
         transaction.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
-        for (final NormalizedNode nodeChild : readList.body()) {
+        for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 transaction.replace(path, data, schemaContext);
             }
