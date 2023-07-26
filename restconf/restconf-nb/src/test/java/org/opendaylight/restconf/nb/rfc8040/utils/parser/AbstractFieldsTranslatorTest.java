@@ -20,14 +20,12 @@ import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -124,19 +122,16 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     protected static final QName EPSILON_Q_NAME = QName.create(Q_NAME_MODULE_FOO, "epsilon");
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         identifierJukebox = InstanceIdentifierContext.ofStack(
             SchemaInferenceStack.ofDataTreePath(JUKEBOX_SCHEMA, JUKEBOX_Q_NAME));
 
-        final EffectiveModelContext schemaContextTestServices =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/test-services"));
         identifierTestServices = InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.ofDataTreePath(schemaContextTestServices, TEST_DATA_Q_NAME));
+            SchemaInferenceStack.ofDataTreePath(YangParserTestUtils.parseYangResourceDirectory("/test-services"),
+                TEST_DATA_Q_NAME));
 
-        final EffectiveModelContext schemaContextFoo =
-            YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/same-qname-nodes"));
-        identifierFoo = InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.ofDataTreePath(schemaContextFoo, FOO_Q_NAME));
+        identifierFoo = InstanceIdentifierContext.ofStack(SchemaInferenceStack.ofDataTreePath(
+            YangParserTestUtils.parseYangResourceDirectory("/same-qname-nodes"), FOO_Q_NAME));
     }
 
     protected abstract List<T> translateFields(InstanceIdentifierContext context, FieldsParam fields);

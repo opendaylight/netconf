@@ -44,7 +44,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -82,8 +81,8 @@ public class RestconfInvokeOperationsServiceImplTest {
     private RestconfInvokeOperationsServiceImpl invokeOperationsService;
 
     @BeforeClass
-    public static void beforeClass() throws Exception {
-        CONTEXT = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/invoke-rpc"));
+    public static void beforeClass() {
+        CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc");
     }
 
     @Before

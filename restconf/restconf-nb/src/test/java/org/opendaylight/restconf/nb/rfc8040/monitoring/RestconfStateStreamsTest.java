@@ -53,9 +53,8 @@ public class RestconfStateStreamsTest {
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
         // FIXME: assemble these from dependencies
-        schemaContext =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing"));
-        schemaContextMonitoring = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
+        schemaContext = YangParserTestUtils.parseYangResourceDirectory("/modules/restconf-module-testing");
+        schemaContextMonitoring = YangParserTestUtils.parseYangResourceDirectory("/modules");
         modules = schemaContextMonitoring.getModules();
         modulesRest = YangParserTestUtils
                 .parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing")).getModules();

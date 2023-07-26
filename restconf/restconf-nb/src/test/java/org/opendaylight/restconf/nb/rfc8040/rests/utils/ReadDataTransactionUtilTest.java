@@ -27,7 +27,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -184,14 +183,13 @@ public class ReadDataTransactionUtilTest {
     private EffectiveModelContext schemaContext;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         // FIXME: these tests need to be parameterized somehow. The trouble is we need mocking before we invoke
         //        the strategy. This needs some more thought.
         doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         mdsalStrategy = new MdsalRestconfStrategy(mockDataBroker);
         netconfStrategy = new NetconfRestconfStrategy(netconfService);
-        schemaContext = YangParserTestUtils.parseYangFiles(
-                TestRestconfUtils.loadFiles("/modules"));
+        schemaContext = YangParserTestUtils.parseYangResourceDirectory("/modules");
     }
 
     @Test
