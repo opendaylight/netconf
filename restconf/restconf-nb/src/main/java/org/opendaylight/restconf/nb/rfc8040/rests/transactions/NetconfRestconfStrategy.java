@@ -22,8 +22,6 @@ import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of RESTCONF operations on top of a raw NETCONF backend.
@@ -31,8 +29,6 @@ import org.slf4j.LoggerFactory;
  * @see NetconfDataTreeService
  */
 public final class NetconfRestconfStrategy extends RestconfStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfRestconfStrategy.class);
-
     private final NetconfDataTreeService netconfService;
 
     public NetconfRestconfStrategy(final NetconfDataTreeService netconfService) {
@@ -47,33 +43,19 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     @Override
     public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
-        switch (store) {
-            case CONFIGURATION:
-                return netconfService.getConfig(path);
-            case OPERATIONAL:
-                return netconfService.get(path);
-            default:
-                LOG.info("Unknown datastore type: {}.", store);
-                throw new IllegalArgumentException(String.format(
-                        "%s, Cannot read data %s for %s datastore, unknown datastore type",
-                        netconfService.getDeviceId(), path, store));
-        }
+        return switch (store) {
+            case CONFIGURATION -> netconfService.getConfig(path);
+            case OPERATIONAL -> netconfService.get(path);
+        };
     }
 
     @Override
     public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
-        switch (store) {
-            case CONFIGURATION:
-                return netconfService.getConfig(path, fields);
-            case OPERATIONAL:
-                return netconfService.get(path, fields);
-            default:
-                LOG.info("Unknown datastore type: {}.", store);
-                throw new IllegalArgumentException(String.format(
-                        "%s, Cannot read data %s with fields %s for %s datastore, unknown datastore type",
-                        netconfService.getDeviceId(), path, fields, store));
-        }
+        return switch (store) {
+            case CONFIGURATION -> netconfService.getConfig(path, fields);
+            case OPERATIONAL -> netconfService.get(path, fields);
+        };
     }
 
     @Override
