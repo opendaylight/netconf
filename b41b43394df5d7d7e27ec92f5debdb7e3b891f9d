@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3cc6c14_629854c7",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 642,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-26T15:20:18Z",
+      "side": 1,
+      "message": "Causes class cast exception.",
+      "revId": "b41b43394df5d7d7e27ec92f5debdb7e3b891f9d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
