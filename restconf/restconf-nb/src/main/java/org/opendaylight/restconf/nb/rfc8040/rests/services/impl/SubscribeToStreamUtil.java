@@ -26,7 +26,6 @@ import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
@@ -161,7 +160,7 @@ abstract class SubscribeToStreamUtil {
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
 
-        final String datastoreParam = mapOfValues.get(RestconfStreamsConstants.DATASTORE_PARAM_NAME);
+        final String datastoreParam = mapOfValues.get(SalRemoteAugmentConstants.DATASTORE_QNAME.getLocalName());
         if (isNullOrEmpty(datastoreParam)) {
             final String message = "Stream name does not contain datastore value (pattern /datastore=)";
             LOG.debug(message);
@@ -169,7 +168,7 @@ abstract class SubscribeToStreamUtil {
         }
 
         // FIXME: this is kept only for compatibility, we are not using this parameter
-        if (isNullOrEmpty(mapOfValues.get(RestconfStreamsConstants.SCOPE_PARAM_NAME))) {
+        if (isNullOrEmpty(mapOfValues.get(SalRemoteAugmentConstants.SCOPE_QNAME.getLocalName()))) {
             final String message = "Stream name does not contain scope value (pattern /scope=)";
             LOG.warn(message);
             throw new RestconfDocumentedException(message, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
