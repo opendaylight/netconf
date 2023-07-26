@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import com.google.common.annotations.Beta;
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -37,7 +37,7 @@ public abstract class RestconfTransaction {
      *
      * @return a FluentFuture containing the result of the commit information
      */
-    public abstract FluentFuture<? extends @NonNull CommitInfo> commit();
+    public abstract ListenableFuture<? extends @NonNull CommitInfo> commit();
 
     /**
      * Delete data from the datastore.

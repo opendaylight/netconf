@@ -11,7 +11,7 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil.checkItemDoesNotExists;
 
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -103,8 +103,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             // ... finally collect existence checks and abort the transaction if any of them failed.
             checkExistence(path, check);
         } else {
-            final FluentFuture<Boolean> isExists = verifyNotNull(rwTx).exists(CONFIGURATION, path);
-            checkItemDoesNotExists(isExists, path);
+            checkItemDoesNotExists(verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
             TransactionUtil.ensureParentsByMerge(path, schemaContext, this);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
@@ -129,8 +128,8 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public FluentFuture<? extends @NonNull CommitInfo> commit() {
-        final FluentFuture<? extends @NonNull CommitInfo> ret = verifyNotNull(rwTx).commit();
+    public ListenableFuture<? extends @NonNull CommitInfo> commit() {
+        final var ret = verifyNotNull(rwTx).commit();
         rwTx = null;
         return ret;
     }

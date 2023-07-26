@@ -9,7 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response.Status;
@@ -127,7 +127,7 @@ public final class PatchDataTransactionUtil {
         // if no errors then submit transaction, otherwise cancel
         if (noError) {
             final ResponseFactory response = new ResponseFactory(Status.OK);
-            final FluentFuture<? extends CommitInfo> future = transaction.commit();
+            final ListenableFuture<? extends CommitInfo> future = transaction.commit();
 
             try {
                 FutureCallbackTx.addCallback(future, PATCH_TX_TYPE, response, null);
