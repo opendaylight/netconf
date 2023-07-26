@@ -19,11 +19,23 @@ public final class OpenApiTestUtils {
     }
 
     /**
-     * Get path parameters name for {@code path}.
+     * Get path parameters names for {@code path} for GET operation.
      *
      * @return {@link List} of parameters
      */
     public static List<String> getPathParameters(final Map<String, Path> paths, final String path) {
+        return paths.get(path).put().parameters()
+            .stream()
+            .map(Parameter::name)
+            .toList();
+    }
+
+    /**
+     * Get path parameters names for {@code path} for POST operation.
+     *
+     * @return {@link List} of parameters
+     */
+    public static List<String> getPathPostParameters(final Map<String, Path> paths, final String path) {
         return paths.get(path).post().parameters()
             .stream()
             .map(Parameter::name)
