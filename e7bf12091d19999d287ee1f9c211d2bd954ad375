@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01e29e7b_b455c0c3",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-26T13:20:54Z",
+      "side": 1,
+      "message": "else if (node instanceof AnydataSchemaNode || node instanceof AnyxmlSchemaNode) {\n    processUnknownDataSchemaNode(node, ...);\n}",
+      "revId": "e7bf12091d19999d287ee1f9c211d2bd954ad375",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27281661_c261decc",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 575,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-26T13:20:54Z",
+      "side": 1,
+      "message": "private static ObjectNode processUnknownDataSchemaNode(...)",
+      "revId": "e7bf12091d19999d287ee1f9c211d2bd954ad375",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54af69be_ae1ecd7b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-26T13:20:54Z",
+      "side": 1,
+      "message": "assert (node instanceof AnydataSchemaNode || node instanceof AnyxmlSchemaNode )",
+      "revId": "e7bf12091d19999d287ee1f9c211d2bd954ad375",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
