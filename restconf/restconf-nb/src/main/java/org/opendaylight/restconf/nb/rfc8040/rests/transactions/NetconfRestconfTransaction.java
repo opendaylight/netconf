@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -117,7 +116,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public FluentFuture<? extends @NonNull CommitInfo> commit() {
+    public ListenableFuture<? extends @NonNull CommitInfo> commit() {
         final SettableFuture<CommitInfo> commitResult = SettableFuture.create();
 
         // First complete all resultsFutures and merge them ...
@@ -172,7 +171,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             }
         }, MoreExecutors.directExecutor());
 
-        return FluentFuture.from(commitResult);
+        return commitResult;
     }
 
     private List<ListenableFuture<?>> discardAndUnlock() {
@@ -180,7 +179,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         if (isLocked) {
             return List.of(netconfService.discardChanges(), netconfService.unlock());
         } else {
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -227,7 +226,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     // Transform list of futures related to RPC operation into a single Future
     private static ListenableFuture<DOMRpcResult> mergeFutures(
-        final List<ListenableFuture<? extends DOMRpcResult>> futures) {
+            final List<ListenableFuture<? extends DOMRpcResult>> futures) {
         return Futures.whenAllComplete(futures).call(() -> {
             if (futures.size() == 1) {
                 // Fast path
