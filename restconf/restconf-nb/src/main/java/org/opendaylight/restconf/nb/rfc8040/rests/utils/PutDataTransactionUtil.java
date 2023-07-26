@@ -68,13 +68,9 @@ public final class PutDataTransactionUtil {
             throw new RestconfDocumentedException("Interrupted while accessing " + path, e);
         }
 
-        final ResponseFactory responseFactory =
-            new ResponseFactory(exists ? Status.NO_CONTENT : Status.CREATED);
-        final ListenableFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy, data,
-            params);
-        //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, responseFactory, path);
-        return responseFactory.build();
+        TransactionUtil.syncCommit(submitData(path, schemaContext, strategy, data, params), PUT_TX_TYPE, path);
+        // TODO: Status.CREATED implies a location...
+        return exists ? Response.noContent().build() : Response.status(Status.CREATED).build();
     }
 
     /**
