@@ -13,7 +13,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import java.io.FileNotFoundException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -23,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -46,8 +44,8 @@ public class SchemaContextHandlerTest {
     private ListenerRegistration<?> mockListenerReg;
 
     @BeforeClass
-    public static void beforeClass() throws FileNotFoundException {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
+    public static void beforeClass() {
+        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/modules");
     }
 
     @AfterClass
@@ -95,10 +93,10 @@ public class SchemaContextHandlerTest {
      * <code>SchemaContextHandler</code> reference to new <code>SchemaContext</code> instead of old one.
      */
     @Test
-    public void onGlobalContextUpdateTest() throws Exception {
+    public void onGlobalContextUpdateTest() {
         // create new SchemaContext and update SchemaContextHandler
         final EffectiveModelContext newSchemaContext =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules/modules-behind-mount-point"));
+                YangParserTestUtils.parseYangResourceDirectory("/modules/modules-behind-mount-point");
         schemaContextHandler.onModelContextUpdated(newSchemaContext);
 
         assertNotEquals("SchemaContextHandler should not has reference to old SchemaContext",

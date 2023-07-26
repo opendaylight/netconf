@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import java.io.FileNotFoundException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -27,7 +26,6 @@ import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -69,12 +67,11 @@ public class RestconfSchemaServiceTest {
     private DOMYangTextSourceProvider mockSourceProvider;
 
     @BeforeClass
-    public static void beforeClass() throws FileNotFoundException {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
-        SCHEMA_CONTEXT_BEHIND_MOUNT_POINT = YangParserTestUtils.parseYangFiles(
-            TestRestconfUtils.loadFiles("/modules/modules-behind-mount-point"));
-        SCHEMA_CONTEXT_WITH_MOUNT_POINTS = YangParserTestUtils.parseYangFiles(
-            TestRestconfUtils.loadFiles("/modules/mount-points"));
+    public static void beforeClass() {
+        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/modules");
+        SCHEMA_CONTEXT_BEHIND_MOUNT_POINT =
+            YangParserTestUtils.parseYangResourceDirectory("/modules/modules-behind-mount-point");
+        SCHEMA_CONTEXT_WITH_MOUNT_POINTS = YangParserTestUtils.parseYangResourceDirectory("/modules/mount-points");
     }
 
     @AfterClass

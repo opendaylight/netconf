@@ -17,7 +17,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import com.google.common.util.concurrent.Futures;
-import java.io.FileNotFoundException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -26,7 +25,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
@@ -55,9 +53,9 @@ public class Netconf799Test {
     private static final YangInstanceIdentifier ACTION_YII = YangInstanceIdentifier.of(CONT_QNAME).node(CONT1_QNAME);
 
     @Test
-    public void testInvokeAction() throws FileNotFoundException {
-        final EffectiveModelContext contextRef = YangParserTestUtils.parseYangFiles(
-            TestRestconfUtils.loadFiles("/instanceidentifier/yang"));
+    public void testInvokeAction() {
+        final EffectiveModelContext contextRef =
+            YangParserTestUtils.parseYangResourceDirectory("/instanceidentifier/yang");
 
         final DOMDataBroker mockDataBroker = mock(DOMDataBroker.class);
 
