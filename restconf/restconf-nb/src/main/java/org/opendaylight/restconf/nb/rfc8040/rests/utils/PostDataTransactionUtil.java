@@ -21,7 +21,6 @@ import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
@@ -60,15 +59,11 @@ public final class PostDataTransactionUtil {
      * @param params        {@link WriteDataParams}
      * @return {@link Response}
      */
-    public static Response postData(final UriInfo uriInfo, final NormalizedNodePayload payload,
-                                    final RestconfStrategy strategy,
-                                    final EffectiveModelContext schemaContext, final WriteDataParams params) {
-        final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
-        final ListenableFuture<? extends CommitInfo> future = submitData(path, payload.getData(),
-                strategy, schemaContext, params);
-        final URI location = resolveLocation(uriInfo, path, schemaContext, payload.getData());
+    public static Response postData(final UriInfo uriInfo, final YangInstanceIdentifier path, final NormalizedNode data,
+            final RestconfStrategy strategy, final EffectiveModelContext schemaContext, final WriteDataParams params) {
+        final ListenableFuture<? extends CommitInfo> future = submitData(path, data, strategy, schemaContext, params);
+        final URI location = resolveLocation(uriInfo, path, schemaContext, data);
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
-        //This method will close transactionChain if any
         FutureCallbackTx.addCallback(future, POST_TX_TYPE, dataFactory, path);
         return dataFactory.build();
     }
