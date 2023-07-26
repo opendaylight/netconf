@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.concurrent.ExecutionException;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -45,9 +46,8 @@ final class FutureCallbackTx {
      *             if the Future throws an exception
      */
     // FIXME: this is a *synchronous operation* and has to die
-    static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
-            final FutureDataFactory<? super T> dataFactory, final YangInstanceIdentifier path)
-                throws RestconfDocumentedException {
+    static void addCallback(final ListenableFuture<? extends CommitInfo> listenableFuture, final String txType,
+            final ResponseFactory dataFactory, final YangInstanceIdentifier path) throws RestconfDocumentedException {
         try {
             listenableFuture.get();
         } catch (InterruptedException e) {
