@@ -53,6 +53,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
@@ -67,7 +68,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
-import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -231,7 +231,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
             final UriInfo uriInfo, final DOMDataTreeWriteOperations tx, final NotificationListenerAdapter listener) {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
-        final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(
                 listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
                 listener.getOutputType(), uri);
 

@@ -25,13 +25,13 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
-import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -137,7 +137,7 @@ abstract class SubscribeToStreamUtil {
         notificationListenerAdapter.listen(handlersHolder.getNotificationServiceHandler());
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getDatabindProvider());
-        final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(
                     notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationListenerAdapter.getStart(),
                     notificationListenerAdapter.getOutputType(), uri);
@@ -195,8 +195,7 @@ abstract class SubscribeToStreamUtil {
         final EffectiveModelContext schemaContext = schemaHandler.currentContext().modelContext();
         final String serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 
-        final MapEntryNode mapToStreams =
-            RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.getPath(),
+        final MapEntryNode mapToStreams = RestconfStateStreams.dataChangeStreamEntry(listener.getPath(),
                 listener.getStart(), listener.getOutputType(), uri, schemaContext, serializedPath);
         final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeDataToDS(writeTransaction, mapToStreams);

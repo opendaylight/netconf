@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.utils.mapping;
+package org.opendaylight.restconf.nb.rfc8040.monitoring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -40,10 +40,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Unit tests for {@link RestconfMappingNodeUtil}.
+ * Unit tests for {@link RestconfStateStreams}.
  */
-public class RestconfMappingNodeUtilTest {
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfMappingNodeUtilTest.class);
+public class RestconfStateStreamsTest {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfStateStreamsTest.class);
 
     private static Collection<? extends Module> modules;
     private static EffectiveModelContext schemaContext;
@@ -68,8 +68,7 @@ public class RestconfMappingNodeUtilTest {
     @Test
     public void restconfMappingNodeTest() {
         // write modules into list module in Restconf
-        final ContainerNode mods = SchemaContextHandler.mapModulesByIetfYangLibraryYang(
-            RestconfMappingNodeUtilTest.modules, schemaContext, "1");
+        final ContainerNode mods = SchemaContextHandler.mapModulesByIetfYangLibraryYang(modules, schemaContext, "1");
 
         // verify loaded modules
         verifyLoadedModules(mods);
@@ -87,8 +86,8 @@ public class RestconfMappingNodeUtilTest {
         final String streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
         final Map<QName, Object> map = prepareMap(streamName, uri, start, outputType);
-        final MapEntryNode mappedData = RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-            path, start, outputType, uri, schemaContextMonitoring, streamName);
+        final MapEntryNode mappedData = RestconfStateStreams.dataChangeStreamEntry(path, start, outputType, uri,
+            schemaContextMonitoring, streamName);
         assertMappedData(map, mappedData);
     }
 
@@ -99,23 +98,23 @@ public class RestconfMappingNodeUtilTest {
         final URI uri = new URI("uri");
 
         final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
-        map.put(RestconfMappingNodeUtil.DESCRIPTION_QNAME, "Notifi");
+        map.put(RestconfStateStreams.DESCRIPTION_QNAME, "Notifi");
 
         final QName notifiQName = QName.create("urn:nested:module", "2014-06-03", "notifi");
-        final MapEntryNode mappedData = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-            notifiQName, schemaContextMonitoring.getNotifications(), start, outputType, uri);
+        final MapEntryNode mappedData = RestconfStateStreams.notificationStreamEntry(notifiQName,
+            schemaContextMonitoring.getNotifications(), start, outputType, uri);
         assertMappedData(map, mappedData);
     }
 
     private static Map<QName, Object> prepareMap(final String name, final URI uri, final Instant start,
             final String outputType) {
         final Map<QName, Object> map = new HashMap<>();
-        map.put(RestconfMappingNodeUtil.NAME_QNAME, name);
-        map.put(RestconfMappingNodeUtil.LOCATION_QNAME, uri.toString());
-        map.put(RestconfMappingNodeUtil.REPLAY_SUPPORT_QNAME, Boolean.TRUE);
-        map.put(RestconfMappingNodeUtil.REPLAY_LOG_CREATION_TIME, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
+        map.put(RestconfStateStreams.NAME_QNAME, name);
+        map.put(RestconfStateStreams.LOCATION_QNAME, uri.toString());
+        map.put(RestconfStateStreams.REPLAY_SUPPORT_QNAME, Boolean.TRUE);
+        map.put(RestconfStateStreams.REPLAY_LOG_CREATION_TIME, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
             OffsetDateTime.ofInstant(start, ZoneId.systemDefault())));
-        map.put(RestconfMappingNodeUtil.ENCODING_QNAME, outputType);
+        map.put(RestconfStateStreams.ENCODING_QNAME, outputType);
         return map;
     }
 
@@ -188,7 +187,7 @@ public class RestconfMappingNodeUtilTest {
             }
         }
 
-        verifyLoadedModules(RestconfMappingNodeUtilTest.modulesRest, loadedModules);
+        verifyLoadedModules(modulesRest, loadedModules);
     }
 
     /**

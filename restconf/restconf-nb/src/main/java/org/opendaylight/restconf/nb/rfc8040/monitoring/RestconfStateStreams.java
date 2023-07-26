@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.utils.mapping;
+package org.opendaylight.restconf.nb.rfc8040.monitoring;
 
 import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.$YangModuleInfoImpl.qnameOf;
 
@@ -36,9 +36,9 @@ import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
- * Util class for mapping nodes.
+ * Utilities for creating the content of {@code /ietf-restconf-monitoring:restconf-state/streams}.
  */
-public final class RestconfMappingNodeUtil {
+public final class RestconfStateStreams {
     @VisibleForTesting
     static final QName DESCRIPTION_QNAME = qnameOf("description");
     @VisibleForTesting
@@ -52,7 +52,7 @@ public final class RestconfMappingNodeUtil {
     @VisibleForTesting
     static final QName REPLAY_LOG_CREATION_TIME = qnameOf("replay-log-creation-time");
 
-    private RestconfMappingNodeUtil() {
+    private RestconfStateStreams() {
         // Hidden on purpose
     }
 
@@ -67,7 +67,7 @@ public final class RestconfMappingNodeUtil {
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
-    public static MapEntryNode mapYangNotificationStreamByIetfRestconfMonitoring(final QName notifiQName,
+    public static MapEntryNode notificationStreamEntry(final QName notifiQName,
             final Collection<? extends NotificationDefinition> notifications, final Instant start,
             final String outputType, final URI uri) {
         for (final NotificationDefinition notificationDefinition : notifications) {
@@ -118,9 +118,9 @@ public final class RestconfMappingNodeUtil {
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
-    public static MapEntryNode mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-            final YangInstanceIdentifier path, final Instant start, final String outputType, final URI uri,
-            final EffectiveModelContext schemaContext, final String streamName) {
+    public static MapEntryNode dataChangeStreamEntry(final YangInstanceIdentifier path, final Instant start,
+            final String outputType, final URI uri, final EffectiveModelContext schemaContext,
+            final String streamName) {
         final SchemaNode schemaNode = ParserIdentifier.toInstanceIdentifier(
             IdentifierCodec.serialize(path, schemaContext), schemaContext, Optional.empty()).getSchemaNode();
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
