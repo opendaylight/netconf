@@ -244,13 +244,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final WriteDataParams params = QueryParams.newWriteDataParams(uriInfo);
 
         final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
+        final YangInstanceIdentifier path = iid.getInstanceIdentifier();
 
         validInputData(iid.getSchemaNode() != null, payload);
-        validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
+        validTopLevelNodeName(path, payload);
         validateListKeysEqualityInPayloadAndUri(payload);
 
         final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
-        return PutDataTransactionUtil.putData(payload, iid.getSchemaContext(), strategy, params);
+        return PutDataTransactionUtil.putData(path, payload.getData(), iid.getSchemaContext(), strategy, params);
     }
 
     @Override

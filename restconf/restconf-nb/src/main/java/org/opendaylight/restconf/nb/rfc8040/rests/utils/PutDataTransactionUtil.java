@@ -18,7 +18,6 @@ import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
@@ -49,16 +48,15 @@ public final class PutDataTransactionUtil {
      * Check mount point and prepare variables for put data to DS. Close {@link DOMTransactionChain} if any
      * inside of object {@link RestconfStrategy} provided as a parameter if any.
      *
-     * @param payload       data to put
+     * @param path          path of data
+     * @param data          data
      * @param schemaContext reference to {@link EffectiveModelContext}
      * @param strategy      object that perform the actual DS operations
      * @param params        {@link WriteDataParams}
      * @return {@link Response}
      */
-    public static Response putData(final NormalizedNodePayload payload, final EffectiveModelContext schemaContext,
-                                   final RestconfStrategy strategy, final WriteDataParams params) {
-        final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
-
+    public static Response putData(final YangInstanceIdentifier path, final NormalizedNode data,
+            final EffectiveModelContext schemaContext, final RestconfStrategy strategy, final WriteDataParams params) {
         final var existsFuture = strategy.exists(LogicalDatastoreType.CONFIGURATION, path);
         final boolean exists;
         try {
@@ -72,8 +70,8 @@ public final class PutDataTransactionUtil {
 
         final ResponseFactory responseFactory =
             new ResponseFactory(exists ? Status.NO_CONTENT : Status.CREATED);
-        final ListenableFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy,
-            payload.getData(), params);
+        final ListenableFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy, data,
+            params);
         //This method will close transactionChain if any
         FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, responseFactory, path);
         return responseFactory.build();
