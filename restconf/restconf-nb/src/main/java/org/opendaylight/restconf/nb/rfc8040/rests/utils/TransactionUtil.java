@@ -76,6 +76,26 @@ public final class TransactionUtil {
     }
 
     /**
+     * Synchronize access to a path resource, translating any failure to a {@link RestconfDocumentedException}.
+     *
+     * @param <T> The type being accessed
+     * @param future Access future
+     * @param path Path being accessed
+     * @return The accessed value
+     * @throws RestconfDocumentedException if commit fails
+     */
+    public static <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path) {
+        try {
+            return future.get();
+        } catch (ExecutionException e) {
+            throw new RestconfDocumentedException("Failed to access " + path, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RestconfDocumentedException("Interrupted while accessing " + path, e);
+        }
+    }
+
+    /**
      * Synchronize commit future, translating any failure to a {@link RestconfDocumentedException}.
      *
      * @param future Commit future

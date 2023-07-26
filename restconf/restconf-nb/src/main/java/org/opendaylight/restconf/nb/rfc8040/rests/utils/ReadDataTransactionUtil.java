@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -315,14 +314,7 @@ public final class ReadDataTransactionUtil {
 
     private static @Nullable NormalizedNode extractReadData(final YangInstanceIdentifier path,
             final ListenableFuture<Optional<NormalizedNode>> dataFuture) {
-        try {
-            return dataFuture.get().orElse(null);
-        } catch (ExecutionException e) {
-            throw new RestconfDocumentedException("Failed to access " + path, e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RestconfDocumentedException("Interrupted while accessing " + path, e);
-        }
+        return TransactionUtil.syncAccess(dataFuture, path).orElse(null);
     }
 
     /**

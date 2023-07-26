@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -57,17 +56,7 @@ public final class PutDataTransactionUtil {
      */
     public static Response putData(final YangInstanceIdentifier path, final NormalizedNode data,
             final EffectiveModelContext schemaContext, final RestconfStrategy strategy, final WriteDataParams params) {
-        final var existsFuture = strategy.exists(LogicalDatastoreType.CONFIGURATION, path);
-        final boolean exists;
-        try {
-            exists = existsFuture.get();
-        } catch (ExecutionException e) {
-            throw new RestconfDocumentedException("Failed to access " + path, e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RestconfDocumentedException("Interrupted while accessing " + path, e);
-        }
-
+        final var exists = TransactionUtil.syncAccess(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
         TransactionUtil.syncCommit(submitData(path, schemaContext, strategy, data, params), PUT_TX_TYPE, path);
         // TODO: Status.CREATED implies a location...
         return exists ? Response.noContent().build() : Response.status(Status.CREATED).build();

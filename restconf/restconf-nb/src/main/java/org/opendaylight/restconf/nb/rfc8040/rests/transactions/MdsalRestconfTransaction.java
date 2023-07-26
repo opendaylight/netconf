@@ -14,7 +14,6 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransacti
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
@@ -54,18 +53,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     public void delete(final YangInstanceIdentifier path) {
-        final var existsFuture = verifyNotNull(rwTx).exists(CONFIGURATION, path);
-        final boolean exists;
-        try {
-            exists = existsFuture.get();
-        } catch (ExecutionException e) {
-            throw new RestconfDocumentedException("Failed to access " + path, e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RestconfDocumentedException("Interrupted while accessing " + path, e);
-        }
-
-        if (!exists) {
+        if (!TransactionUtil.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
             throw new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
                 path);
