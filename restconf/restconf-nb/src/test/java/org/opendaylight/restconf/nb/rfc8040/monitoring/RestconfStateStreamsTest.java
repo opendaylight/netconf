@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 public class RestconfStateStreamsTest {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStateStreamsTest.class);
 
-    private static Collection<? extends Module> modules;
     private static EffectiveModelContext schemaContext;
     private static EffectiveModelContext schemaContextMonitoring;
     private static Collection<? extends Module> modulesRest;
@@ -56,7 +55,6 @@ public class RestconfStateStreamsTest {
         schemaContext =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing"));
         schemaContextMonitoring = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
-        modules = schemaContextMonitoring.getModules();
         modulesRest = YangParserTestUtils
                 .parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing")).getModules();
     }
@@ -68,7 +66,7 @@ public class RestconfStateStreamsTest {
     @Test
     public void restconfMappingNodeTest() {
         // write modules into list module in Restconf
-        final ContainerNode mods = SchemaContextHandler.mapModulesByIetfYangLibraryYang(modules, schemaContext, "1");
+        final ContainerNode mods = SchemaContextHandler.mapModulesByIetfYangLibraryYang(schemaContext, "1");
 
         // verify loaded modules
         verifyLoadedModules(mods);

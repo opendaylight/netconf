@@ -48,9 +48,7 @@ import org.opendaylight.yangtools.yang.data.tree.api.ConflictingModificationAppl
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -106,8 +104,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
         schemaContext = requireNonNull(context);
 
         if (context.findModuleStatement(IetfYangLibrary.MODULE_QNAME).isPresent()) {
-            putData(mapModulesByIetfYangLibraryYang(context.getModules(), context,
-                String.valueOf(moduleSetId.incrementAndGet())));
+            putData(mapModulesByIetfYangLibraryYang(context, String.valueOf(moduleSetId.incrementAndGet())));
         }
     }
 
@@ -151,8 +148,8 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
      * @return mapped data as {@link NormalizedNode}
      */
     @VisibleForTesting
-    public static ContainerNode mapModulesByIetfYangLibraryYang(final Collection<? extends Module> modules,
-            final SchemaContext context, final String moduleSetId) {
+    public static ContainerNode mapModulesByIetfYangLibraryYang(final EffectiveModelContext context,
+            final String moduleSetId) {
         final var mapBuilder = Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(IetfYangLibrary.MODULE_QNAME_LIST));
         for (var module : context.getModules()) {
@@ -175,7 +172,8 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
      * @param context schema context
      */
     private static void fillMapByModules(final CollectionNodeBuilder<MapEntryNode, SystemMapNode> mapBuilder,
-            final QName mapQName, final boolean isSubmodule, final ModuleLike module, final SchemaContext context) {
+            final QName mapQName, final boolean isSubmodule, final ModuleLike module,
+            final EffectiveModelContext context) {
         final var mapEntryBuilder = newCommonLeafsMapEntryBuilder(mapQName, module);
 
         mapEntryBuilder.withChild(ImmutableNodes.leafNode(MODULE_SCHEMA_NODEID,
@@ -219,7 +217,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
      */
     private static void addSubmodules(final ModuleLike module,
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
-            final SchemaContext context) {
+            final EffectiveModelContext context) {
         final var mapBuilder = Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(Submodule.QNAME));
 
@@ -241,7 +239,7 @@ public final class SchemaContextHandler implements EffectiveModelContextListener
      */
     private static void addDeviationList(final ModuleLike module,
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
-            final SchemaContext context) {
+            final EffectiveModelContext context) {
         final var deviations = Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(Deviation.QNAME));
         for (var deviation : module.getDeviations()) {
