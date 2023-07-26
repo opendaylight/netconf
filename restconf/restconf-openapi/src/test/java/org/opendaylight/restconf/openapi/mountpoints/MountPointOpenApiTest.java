@@ -160,7 +160,7 @@ public final class MountPointOpenApiTest {
         }
 
         assertEquals("Unexpected GET paths size", 37, getOperations.size());
-        assertEquals("Unexpected POST paths size", 43, postOperations.size());
+        assertEquals("Unexpected POST paths size", 27, postOperations.size());
         assertEquals("Unexpected PUT paths size", 35, putOperations.size());
         assertEquals("Unexpected PATCH paths size", 35, patchOperations.size());
         assertEquals("Unexpected DELETE paths size", 35, deleteOperations.size());
@@ -204,14 +204,16 @@ public final class MountPointOpenApiTest {
             assertNotNull(delete);
             assertEquals(expectedSize, delete.parameters().size());
 
-            final var post = path.post();
-            assertNotNull(post);
-            assertEquals(expectedSize, post.parameters().size());
-
             final var patch = path.patch();
             assertNotNull(patch);
             assertEquals(expectedSize, patch.parameters().size());
         }
+
+        // POST request exists only for containers
+        final var post = paths.get("/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root").post();
+        assertNotNull(post);
+        final int expectedSize = configPaths.get("/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root");
+        assertEquals(expectedSize, post.parameters().size());
     }
 
     /**

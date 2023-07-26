@@ -373,9 +373,11 @@ public abstract class BaseYangOpenApiGenerator {
             final Operation delete = buildDelete(node, moduleName, deviceName, pathParams);
             operationsBuilder.delete(delete);
 
-            final Operation post = buildPost(node, parentName, nodeName, discriminator, moduleName, deviceName,
+            if (!(node instanceof ListSchemaNode)) {
+                final Operation post = buildPost(node, parentName, nodeName, discriminator, moduleName, deviceName,
                     node.getDescription().orElse(""), pathParams);
-            operationsBuilder.post(post);
+                operationsBuilder.post(post);
+            }
         }
         return operationsBuilder.build();
     }
