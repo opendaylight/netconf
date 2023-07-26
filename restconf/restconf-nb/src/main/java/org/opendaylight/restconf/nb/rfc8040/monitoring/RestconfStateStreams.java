@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.monitoring;
 
 import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.$YangModuleInfoImpl.qnameOf;
 
+import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import java.net.URI;
 import java.time.Instant;
@@ -17,9 +18,12 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -39,6 +43,10 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
  * Utilities for creating the content of {@code /ietf-restconf-monitoring:restconf-state/streams}.
  */
 public final class RestconfStateStreams {
+    private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.of(
+        NodeIdentifier.create(RestconfState.QNAME), NodeIdentifier.create(Streams.QNAME),
+        NodeIdentifier.create(Stream.QNAME));
+
     @VisibleForTesting
     static final QName DESCRIPTION_QNAME = qnameOf("description");
     @VisibleForTesting
@@ -54,6 +62,14 @@ public final class RestconfStateStreams {
 
     private RestconfStateStreams() {
         // Hidden on purpose
+    }
+
+    public static @NonNull YangInstanceIdentifier restconfStateStreamPath(final String streamName) {
+        return restconfStateStreamPath(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName));
+    }
+
+    public static @NonNull YangInstanceIdentifier restconfStateStreamPath(final NodeIdentifierWithPredicates arg) {
+        return RESTCONF_STATE_STREAMS.node(arg);
     }
 
     /**
