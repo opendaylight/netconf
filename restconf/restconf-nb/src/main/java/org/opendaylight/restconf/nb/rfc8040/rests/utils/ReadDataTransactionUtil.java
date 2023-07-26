@@ -210,7 +210,7 @@ public final class ReadDataTransactionUtil {
             //            server MUST adhere to the default-reporting behavior defined in
             //            Section 3.3 of [RFC6243].
             //
-            //        and then RFC6243 says:
+            //        and then RFC6243 (https://www.rfc-editor.org/rfc/rfc6243#section-3.3) says:
             //
             //            When data is retrieved with a <with-defaults> parameter equal to
             //            'explicit', a data node that was set by a client to its schema
