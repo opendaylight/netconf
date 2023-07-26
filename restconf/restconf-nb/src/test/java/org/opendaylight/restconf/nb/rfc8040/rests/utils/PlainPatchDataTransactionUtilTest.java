@@ -27,9 +27,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -105,62 +103,55 @@ public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
 
     @Test
     public void testPatchContainerData() {
-        final InstanceIdentifierContext iidContext =
-                InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidJukebox);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlayer);
-
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),any(),
                 any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA);
-        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION,
-                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
+        PlainPatchDataTransactionUtil.patchData(iidJukebox, jukeboxContainerWithPlayer,
+            new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA);
+        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, jukeboxContainerWithPlayer);
 
-        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA);
-        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION,
-                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
+        PlainPatchDataTransactionUtil.patchData(iidJukebox, jukeboxContainerWithPlayer,
+            new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA);
+        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, jukeboxContainerWithPlayer,
+            Optional.empty());
     }
 
     @Test
     public void testPatchLeafData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidGap);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, leafGap);
-
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA);
-        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION,
-                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
+        PlainPatchDataTransactionUtil.patchData(iidGap, leafGap, new MdsalRestconfStrategy(mockDataBroker),
+            JUKEBOX_SCHEMA);
+        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidGap, leafGap);
 
-        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA);
+        PlainPatchDataTransactionUtil.patchData(iidGap, leafGap, new NetconfRestconfStrategy(netconfService),
+            JUKEBOX_SCHEMA);
         verify(netconfService).lock();
-        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION,
-                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
+        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidGap, leafGap, Optional.empty());
     }
 
     @Test
     public void testPatchListData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidJukebox);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlaylist);
-
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(),any(),any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA);
-        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, payload.getData());
+        PlainPatchDataTransactionUtil.patchData(iidJukebox, jukeboxContainerWithPlaylist,
+            new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA);
+        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, jukeboxContainerWithPlaylist);
 
-        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA);
-        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, payload.getData(),
-                Optional.empty());
+        PlainPatchDataTransactionUtil.patchData(iidJukebox, jukeboxContainerWithPlaylist,
+            new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA);
+        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, jukeboxContainerWithPlaylist,
+            Optional.empty());
     }
 }
