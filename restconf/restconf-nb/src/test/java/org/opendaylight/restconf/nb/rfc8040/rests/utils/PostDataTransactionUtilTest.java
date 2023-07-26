@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -46,17 +47,17 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PostDataTransactionUtilTest {
-    private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
+    private static EffectiveModelContext SCHEMA;
 
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
@@ -68,16 +69,17 @@ public class PostDataTransactionUtilTest {
     private NetconfDataTreeService netconfService;
 
     private ContainerNode buildBaseCont;
-    private EffectiveModelContext schema;
     private YangInstanceIdentifier iid2;
     private YangInstanceIdentifier iidList;
     private MapNode buildList;
 
-    @Before
-    public void setUp() throws Exception {
-        schema =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        SCHEMA = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
+    }
 
+    @Before
+    public void setUp() {
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName containerQname = QName.create(baseQName, "player");
         final QName leafQname = QName.create(baseQName, "gap");
@@ -85,44 +87,25 @@ public class PostDataTransactionUtilTest {
         final QName listKeyQname = QName.create(baseQName, "name");
         final NodeIdentifierWithPredicates nodeWithKey = NodeIdentifierWithPredicates.of(listQname, listKeyQname,
             "name of band");
-        iid2 = YangInstanceIdentifier.builder()
-                .node(baseQName)
-                .build();
-        iidList = YangInstanceIdentifier.builder()
-                .node(baseQName)
-                .node(listQname)
-                .build();
+        iid2 = YangInstanceIdentifier.builder().node(baseQName).build();
+        iidList = YangInstanceIdentifier.builder().node(baseQName).node(listQname).build();
 
-        final LeafNode<?> buildLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(leafQname))
-                .withValue(0.2)
-                .build();
-        final ContainerNode buildPlayerCont = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(containerQname))
-                .withChild(buildLeaf)
-                .build();
         buildBaseCont = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(baseQName))
-                .withChild(buildPlayerCont)
-                .build();
+            .withNodeIdentifier(new NodeIdentifier(baseQName))
+            .withChild(Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(containerQname))
+                .withChild(ImmutableNodes.leafNode(leafQname, 0.2))
+                .build())
+            .build();
 
-        final LeafNode<Object> content = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "name")))
-                .withValue("name of band")
-                .build();
-        final LeafNode<Object> content2 = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
-                .withValue("band description")
-                .build();
-        final MapEntryNode mapEntryNode = Builders.mapEntryBuilder()
-                .withNodeIdentifier(nodeWithKey)
-                .withChild(content)
-                .withChild(content2)
-                .build();
         buildList = Builders.mapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(listQname))
-                .withChild(mapEntryNode)
-                .build();
+            .withNodeIdentifier(new NodeIdentifier(listQname))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(nodeWithKey)
+                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "name"), "name of band"))
+                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "description"), "band description"))
+                .build())
+            .build();
 
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -143,13 +126,13 @@ public class PostDataTransactionUtilTest {
             .create(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
 
         Response response = PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
-            new MdsalRestconfStrategy(mockDataBroker), schema, WriteDataParams.empty());
+            new MdsalRestconfStrategy(mockDataBroker), SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
 
         response = PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
-                new NetconfRestconfStrategy(netconfService), schema, WriteDataParams.empty());
+                new NetconfRestconfStrategy(netconfService), SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
     }
@@ -169,7 +152,7 @@ public class PostDataTransactionUtilTest {
             LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
 
         Response response = PostDataTransactionUtil.postData(uriInfo, iidList, buildList,
-                        new MdsalRestconfStrategy(mockDataBroker), schema, WriteDataParams.empty());
+                        new MdsalRestconfStrategy(mockDataBroker), SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
             containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
@@ -177,7 +160,7 @@ public class PostDataTransactionUtilTest {
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
 
         response = PostDataTransactionUtil.postData(uriInfo, iidList, buildList,
-                new NetconfRestconfStrategy(netconfService), schema, WriteDataParams.empty());
+                new NetconfRestconfStrategy(netconfService), SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
                 containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
@@ -200,7 +183,7 @@ public class PostDataTransactionUtilTest {
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
-                new MdsalRestconfStrategy(mockDataBroker), schema, WriteDataParams.empty()));
+                new MdsalRestconfStrategy(mockDataBroker), SCHEMA, WriteDataParams.empty()));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
 
@@ -208,7 +191,7 @@ public class PostDataTransactionUtilTest {
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
 
         ex = assertThrows(RestconfDocumentedException.class, () -> PostDataTransactionUtil.postData(uriInfo, iid2,
-            buildBaseCont, new NetconfRestconfStrategy(netconfService), schema, WriteDataParams.empty()));
+            buildBaseCont, new NetconfRestconfStrategy(netconfService), SCHEMA, WriteDataParams.empty()));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
 
