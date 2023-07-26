@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.Optional;
@@ -84,5 +83,5 @@ public abstract class RestconfStrategy {
      * @param path the data object path
      * @return a FluentFuture containing the result of the check
      */
-    public abstract FluentFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path);
+    public abstract ListenableFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path);
 }

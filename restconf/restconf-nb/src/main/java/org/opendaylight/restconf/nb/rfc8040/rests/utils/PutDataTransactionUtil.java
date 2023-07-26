@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -58,7 +59,7 @@ public final class PutDataTransactionUtil {
                                    final RestconfStrategy strategy, final WriteDataParams params) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
 
-        final FluentFuture<Boolean> existsFuture = strategy.exists(LogicalDatastoreType.CONFIGURATION, path);
+        final ListenableFuture<Boolean> existsFuture = strategy.exists(LogicalDatastoreType.CONFIGURATION, path);
         final FutureDataFactory<Boolean> existsResponse = new FutureDataFactory<>();
         FutureCallbackTx.addCallback(existsFuture, PUT_TX_TYPE, existsResponse);
 

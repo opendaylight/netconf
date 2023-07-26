@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -212,7 +213,7 @@ public final class PostDataTransactionUtil {
      * @param isExistsFuture if checked data exists
      * @param path           Path to be checked
      */
-    public static void checkItemDoesNotExists(final FluentFuture<Boolean> isExistsFuture,
+    public static void checkItemDoesNotExists(final ListenableFuture<Boolean> isExistsFuture,
                                               final YangInstanceIdentifier path) {
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
         FutureCallbackTx.addCallback(isExistsFuture, POST_TX_TYPE, response);

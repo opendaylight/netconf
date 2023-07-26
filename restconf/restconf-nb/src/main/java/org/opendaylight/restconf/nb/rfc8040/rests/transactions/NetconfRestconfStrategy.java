@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -59,16 +58,15 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        return remapException(read(store, path))
-                .transform(optionalNode -> optionalNode != null && optionalNode.isPresent(),
-                        MoreExecutors.directExecutor());
+    public ListenableFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        return Futures.transform(remapException(read(store, path)),
+            optionalNode -> optionalNode != null && optionalNode.isPresent(),
+            MoreExecutors.directExecutor());
     }
 
-    private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
-        final SettableFuture<T> ret = SettableFuture.create();
+    private static <T> ListenableFuture<T> remapException(final ListenableFuture<T> input) {
+        final var ret = SettableFuture.<T>create();
         Futures.addCallback(input, new FutureCallback<T>() {
-
             @Override
             public void onSuccess(final T result) {
                 ret.set(result);
@@ -80,6 +78,6 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
                     : new ReadFailedException("NETCONF operation failed", cause));
             }
         }, MoreExecutors.directExecutor());
-        return FluentFuture.from(ret);
+        return ret;
     }
 }

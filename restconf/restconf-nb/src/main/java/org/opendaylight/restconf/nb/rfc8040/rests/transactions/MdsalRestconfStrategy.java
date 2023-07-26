@@ -9,14 +9,12 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.Optional;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -43,7 +41,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     @Override
     public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
-        try (DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction()) {
+        try (var tx = dataBroker.newReadOnlyTransaction()) {
             return tx.read(store, path);
         }
     }
@@ -56,8 +54,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        try (DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction()) {
+    public ListenableFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        try (var tx = dataBroker.newReadOnlyTransaction()) {
             return tx.exists(store, path);
         }
     }
