@@ -268,7 +268,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final WriteDataParams params = QueryParams.newWriteDataParams(uriInfo);
         final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
-        return PostDataTransactionUtil.postData(uriInfo, payload, strategy, iid.getSchemaContext(), params);
+        return PostDataTransactionUtil.postData(uriInfo, iid.getInstanceIdentifier(), payload.getData(), strategy,
+            iid.getSchemaContext(), params);
     }
 
     @Override

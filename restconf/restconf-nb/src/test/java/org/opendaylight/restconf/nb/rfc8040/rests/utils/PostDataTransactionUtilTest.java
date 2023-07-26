@@ -21,7 +21,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import com.google.common.util.concurrent.Futures;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -37,11 +36,9 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -136,38 +133,30 @@ public class PostDataTransactionUtilTest {
 
     @Test
     public void testPostContainerData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iid2);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
-
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        final NodeIdentifier identifier =
-                ((ContainerNode) ((Collection<?>) payload.getData().body()).iterator().next()).name();
+        final NodeIdentifier identifier = buildBaseCont.body().iterator().next().name();
         final YangInstanceIdentifier node = iid2.node(identifier);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), buildBaseCont);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .create(LogicalDatastoreType.CONFIGURATION, iid2, payload.getData(), Optional.empty());
+            .create(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
 
-        Response response = PostDataTransactionUtil.postData(uriInfo, payload,
+        Response response = PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
             new MdsalRestconfStrategy(mockDataBroker), schema, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, payload.getData());
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
 
-        response = PostDataTransactionUtil.postData(uriInfo, payload,
+        response = PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
                 new NetconfRestconfStrategy(netconfService), schema, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
-        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, iid2, payload.getData(), Optional.empty());
+        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
     }
 
     @Test
     public void testPostListData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iidList);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildList);
-
-        final MapNode data = (MapNode) payload.getData();
-        final MapEntryNode entryNode = data.body().iterator().next();
+        final MapEntryNode entryNode = buildList.body().iterator().next();
         final NodeIdentifierWithPredicates identifier = entryNode.name();
         final YangInstanceIdentifier node = iidList.node(identifier);
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
@@ -179,7 +168,7 @@ public class PostDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).create(
             LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
 
-        Response response = PostDataTransactionUtil.postData(uriInfo, payload,
+        Response response = PostDataTransactionUtil.postData(uriInfo, iidList, buildList,
                         new MdsalRestconfStrategy(mockDataBroker), schema, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
@@ -187,7 +176,7 @@ public class PostDataTransactionUtilTest {
         verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
 
-        response = PostDataTransactionUtil.postData(uriInfo, payload,
+        response = PostDataTransactionUtil.postData(uriInfo, iidList, buildList,
                 new NetconfRestconfStrategy(netconfService), schema, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
@@ -198,15 +187,10 @@ public class PostDataTransactionUtilTest {
 
     @Test
     public void testPostDataFail() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iid2);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
-
-        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
-            iid2);
-        final NodeIdentifier identifier =
-                ((ContainerNode) ((Collection<?>) payload.getData().body()).iterator().next()).name();
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
+        final NodeIdentifier identifier = buildBaseCont.body().iterator().next().name();
         final YangInstanceIdentifier node = iid2.node(identifier);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), buildBaseCont);
         final DOMException domException = new DOMException((short) 414, "Post request failed");
         doReturn(immediateFailedFluentFuture(domException)).when(readWrite).commit();
         doReturn(immediateFailedFluentFuture(domException)).when(netconfService)
@@ -215,19 +199,19 @@ public class PostDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> PostDataTransactionUtil.postData(uriInfo, payload, new MdsalRestconfStrategy(mockDataBroker), schema,
-                WriteDataParams.empty()));
+            () -> PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
+                new MdsalRestconfStrategy(mockDataBroker), schema, WriteDataParams.empty()));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
 
         verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, payload.getData());
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
 
-        ex = assertThrows(RestconfDocumentedException.class, () -> PostDataTransactionUtil.postData(uriInfo, payload,
-            new NetconfRestconfStrategy(netconfService), schema, WriteDataParams.empty()));
+        ex = assertThrows(RestconfDocumentedException.class, () -> PostDataTransactionUtil.postData(uriInfo, iid2,
+            buildBaseCont, new NetconfRestconfStrategy(netconfService), schema, WriteDataParams.empty()));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
 
-        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, iid2, payload.getData(), Optional.empty());
+        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
     }
 }
