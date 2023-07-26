@@ -12,21 +12,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 
-final class ResponseFactory extends FutureDataFactory<CommitInfo> {
-    private ResponseBuilder responseBuilder;
+final class ResponseFactory {
+    private final ResponseBuilder responseBuilder;
 
-    ResponseFactory() {
-    }
+    private boolean statusFail = false;
 
     ResponseFactory(final Status status) {
         responseBuilder = Response.status(status);
-    }
-
-    ResponseFactory status(final Status status) {
-        responseBuilder = Response.status(status);
-        return this;
     }
 
     ResponseFactory location(final URI location) {
@@ -34,9 +27,13 @@ final class ResponseFactory extends FutureDataFactory<CommitInfo> {
         return this;
     }
 
+    void setFailureStatus() {
+        statusFail = true;
+    }
+
     public @NonNull Response build() {
-        if (getFailureStatus()) {
-            responseBuilder = responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
+        if (statusFail) {
+            responseBuilder.status(Status.INTERNAL_SERVER_ERROR);
         }
         return responseBuilder.build();
     }
