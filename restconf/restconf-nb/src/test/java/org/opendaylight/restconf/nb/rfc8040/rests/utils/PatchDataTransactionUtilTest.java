@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -45,7 +44,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -60,13 +59,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class PatchDataTransactionUtilTest {
-    private static EffectiveModelContext SCHEMA;
-
+public class PatchDataTransactionUtilTest extends AbstractJukeboxTest {
     @Mock
     private DOMDataTreeReadWriteTransaction rwTransaction;
     @Mock
@@ -81,11 +76,6 @@ public class PatchDataTransactionUtilTest {
     private YangInstanceIdentifier targetNodeForCreateAndDelete;
     private YangInstanceIdentifier targetNodeMerge;
     private MapNode buildArtistList;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        SCHEMA = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
-    }
 
     @Before
     public void setUp() {
@@ -167,7 +157,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityRemove);
 
         final InstanceIdentifierContext iidContext =
-            InstanceIdentifierContext.ofLocalPath(SCHEMA, instanceIdMerge);
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, instanceIdMerge);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
 
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -199,7 +189,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityDelete);
 
         final InstanceIdentifierContext iidContext =
-            InstanceIdentifierContext.ofLocalPath(SCHEMA, instanceIdCreateAndDelete);
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, instanceIdCreateAndDelete);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchCD");
         patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), true);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), true);
@@ -225,7 +215,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityDelete);
 
         final PatchContext patchContext = new PatchContext(
-            InstanceIdentifierContext.ofLocalPath(SCHEMA, instanceIdCreateAndDelete), entities, "patchD");
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, instanceIdCreateAndDelete), entities, "patchD");
         deleteMdsal(patchContext, new MdsalRestconfStrategy(mockDataBroker));
         deleteNetconf(patchContext, new NetconfRestconfStrategy(netconfService));
     }
@@ -239,16 +229,15 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityMerge);
 
         final InstanceIdentifierContext iidContext =
-            InstanceIdentifierContext.ofLocalPath(SCHEMA, instanceIdCreateAndDelete);
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, instanceIdCreateAndDelete);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchM");
         patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), false);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), false);
     }
 
-    private void patch(final PatchContext patchContext, final RestconfStrategy strategy,
-                       final boolean failed) {
+    private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
         final PatchStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, strategy, SCHEMA);
+                PatchDataTransactionUtil.patchData(patchContext, strategy, JUKEBOX_SCHEMA);
         for (final PatchStatusEntity entity : patchStatusContext.getEditCollection()) {
             if (failed) {
                 assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());
@@ -259,9 +248,9 @@ public class PatchDataTransactionUtilTest {
         assertTrue(patchStatusContext.isOk());
     }
 
-    private void deleteMdsal(final PatchContext patchContext, final RestconfStrategy strategy) {
+    private static void deleteMdsal(final PatchContext patchContext, final RestconfStrategy strategy) {
         final PatchStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, strategy, SCHEMA);
+                PatchDataTransactionUtil.patchData(patchContext, strategy, JUKEBOX_SCHEMA);
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(ErrorType.PROTOCOL,
@@ -270,9 +259,9 @@ public class PatchDataTransactionUtilTest {
                 patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).getErrorTag());
     }
 
-    private void deleteNetconf(final PatchContext patchContext, final RestconfStrategy strategy) {
-        final PatchStatusContext patchStatusContext =
-            PatchDataTransactionUtil.patchData(patchContext, strategy, SCHEMA);
+    private static void deleteNetconf(final PatchContext patchContext, final RestconfStrategy strategy) {
+        final PatchStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, strategy,
+            JUKEBOX_SCHEMA);
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(ErrorType.PROTOCOL,

@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import com.google.common.util.concurrent.Futures;
 import java.util.Optional;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -29,7 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
@@ -41,13 +40,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class PlainPatchDataTransactionUtilTest {
-    private static EffectiveModelContext SCHEMA;
-
+public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -64,11 +59,6 @@ public class PlainPatchDataTransactionUtilTest {
     private ContainerNode jukeboxContainerWithPlaylist;
     private YangInstanceIdentifier iidGap;
     private YangInstanceIdentifier iidJukebox;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        SCHEMA = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
-    }
 
     @Before
     public void setUp() {
@@ -116,7 +106,7 @@ public class PlainPatchDataTransactionUtilTest {
     @Test
     public void testPatchContainerData() {
         final InstanceIdentifierContext iidContext =
-                InstanceIdentifierContext.ofLocalPath(SCHEMA, iidJukebox);
+                InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidJukebox);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlayer);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -125,19 +115,18 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),any(),
                 any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), SCHEMA);
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA);
         verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
-                SCHEMA);
+        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA);
         verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
     @Test
     public void testPatchLeafData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(SCHEMA, iidGap);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidGap);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, leafGap);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -146,11 +135,11 @@ public class PlainPatchDataTransactionUtilTest {
             .merge(any(), any(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), SCHEMA);
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA);
         verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService), SCHEMA);
+        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA);
         verify(netconfService).lock();
         verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
@@ -158,7 +147,7 @@ public class PlainPatchDataTransactionUtilTest {
 
     @Test
     public void testPatchListData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(SCHEMA, iidJukebox);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidJukebox);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlaylist);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -167,11 +156,10 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(),any(),any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), SCHEMA);
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA);
         verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, payload.getData());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
-                SCHEMA);
+        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA);
         verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, payload.getData(),
                 Optional.empty());
     }

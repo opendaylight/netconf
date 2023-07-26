@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -30,7 +31,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public abstract class AbstractFieldsTranslatorTest<T> {
+public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTest {
     private static final QNameModule Q_NAME_MODULE_JUKEBOX = QNameModule.create(
         XMLNamespace.of("http://example.com/ns/example-jukebox"), Revision.of("2015-04-04"));
     private static final QNameModule Q_NAME_MODULE_TEST_SERVICES = QNameModule.create(
@@ -124,10 +125,8 @@ public abstract class AbstractFieldsTranslatorTest<T> {
 
     @Before
     public void setUp() throws Exception {
-        final EffectiveModelContext schemaContextJukebox =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
         identifierJukebox = InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.ofDataTreePath(schemaContextJukebox, JUKEBOX_Q_NAME));
+            SchemaInferenceStack.ofDataTreePath(JUKEBOX_SCHEMA, JUKEBOX_Q_NAME));
 
         final EffectiveModelContext schemaContextTestServices =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/test-services"));
