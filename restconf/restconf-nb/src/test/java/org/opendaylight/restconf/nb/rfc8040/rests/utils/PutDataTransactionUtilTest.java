@@ -18,6 +18,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import com.google.common.util.concurrent.Futures;
 import java.util.Optional;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -45,15 +46,15 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PutDataTransactionUtilTest {
-    private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
+    private static EffectiveModelContext SCHEMA;
 
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
@@ -70,16 +71,17 @@ public class PutDataTransactionUtilTest {
     private ContainerNode buildBaseCont;
     private ContainerNode buildBaseContWithList;
     private MapEntryNode buildListEntry;
-    private EffectiveModelContext schema;
     private YangInstanceIdentifier iid;
     private YangInstanceIdentifier iid2;
     private YangInstanceIdentifier iid3;
 
-    @Before
-    public void setUp() throws Exception {
-        schema =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        SCHEMA = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
+    }
 
+    @Before
+    public void setUp() {
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName containerQname = QName.create(baseQName, "player");
         final QName leafQname = QName.create(baseQName, "gap");
@@ -91,69 +93,35 @@ public class PutDataTransactionUtilTest {
         final NodeIdentifierWithPredicates nodeWithKey2 =
                 NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band 2");
 
-        iid = YangInstanceIdentifier.builder()
-                .node(baseQName)
-                .node(containerQname)
-                .node(leafQname)
-                .build();
+        iid = YangInstanceIdentifier.builder().node(baseQName).node(containerQname).node(leafQname).build();
+        iid2 = YangInstanceIdentifier.builder().node(baseQName).build();
+        iid3 = YangInstanceIdentifier.builder().node(baseQName).node(listQname).node(nodeWithKey).build();
 
-        iid2 = YangInstanceIdentifier.builder()
-                .node(baseQName)
-                .build();
-
-        iid3 = YangInstanceIdentifier.builder()
-                .node(baseQName)
-                .node(listQname)
-                .node(nodeWithKey)
-                .build();
-
-        buildLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(leafQname))
-                .withValue(0.2)
-                .build();
-        final ContainerNode buildPlayerCont = Builders.containerBuilder()
+        buildLeaf = ImmutableNodes.leafNode(leafQname, 0.2);
+        buildBaseCont = Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(baseQName))
+            .withChild(Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(containerQname))
                 .withChild(buildLeaf)
-                .build();
-        buildBaseCont = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(baseQName))
-                .withChild(buildPlayerCont)
-                .build();
-        final LeafNode<Object> content = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "name")))
-                .withValue("name of band")
-                .build();
-        final LeafNode<Object> content2 = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
-                .withValue("band description")
-                .build();
+                .build())
+            .build();
         buildListEntry = Builders.mapEntryBuilder()
-                .withNodeIdentifier(nodeWithKey)
-                .withChild(content)
-                .withChild(content2)
-                .build();
-        final LeafNode<Object> content3 = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "name")))
-                .withValue("name of band 2")
-                .build();
-        final LeafNode<Object> content4 = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
-                .withValue("band description 2")
-                .build();
-        final MapEntryNode buildListEntry2 = Builders.mapEntryBuilder()
-                .withNodeIdentifier(nodeWithKey2)
-                .withChild(content3)
-                .withChild(content4)
-                .build();
-        final MapNode buildList = Builders.mapBuilder()
+            .withNodeIdentifier(nodeWithKey)
+            .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "name"), "name of band"))
+            .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "description"), "band description"))
+            .build();
+        buildBaseContWithList = Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(baseQName))
+            .withChild(Builders.mapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(listQname))
                 .withChild(buildListEntry)
-                .withChild(buildListEntry2)
-                .build();
-        buildBaseContWithList = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(baseQName))
-                .withChild(buildList)
-                .build();
+                .withChild(Builders.mapEntryBuilder()
+                    .withNodeIdentifier(nodeWithKey2)
+                    .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "name"), "name of band 2"))
+                    .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "description"), "band description 2"))
+                    .build())
+                .build())
+            .build();
 
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
@@ -162,20 +130,20 @@ public class PutDataTransactionUtilTest {
     @Test
     public void testValidInputData() {
         RestconfDataServiceImpl.validInputData(true, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(schema, iid), buildLeaf));
+            InstanceIdentifierContext.ofLocalPath(SCHEMA, iid), buildLeaf));
     }
 
     @Test
     public void testValidTopLevelNodeName() {
         RestconfDataServiceImpl.validTopLevelNodeName(iid, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(schema, iid), buildLeaf));
+            InstanceIdentifierContext.ofLocalPath(SCHEMA, iid), buildLeaf));
         RestconfDataServiceImpl.validTopLevelNodeName(iid2, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(schema, iid2), buildBaseCont));
+            InstanceIdentifierContext.ofLocalPath(SCHEMA, iid2), buildBaseCont));
     }
 
     @Test
     public void testValidTopLevelNodeNamePathEmpty() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iid);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(SCHEMA, iid);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
 
         // FIXME: more asserts
@@ -185,7 +153,7 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testValidTopLevelNodeNameWrongTopIdentifier() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iid);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(SCHEMA, iid);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
 
         // FIXME: more asserts
@@ -195,7 +163,7 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testValidateListKeysEqualityInPayloadAndUri() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iid3);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(SCHEMA, iid3);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildListEntry);
         RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
     }
@@ -208,7 +176,7 @@ public class PutDataTransactionUtilTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        PutDataTransactionUtil.putData(iid2, buildBaseCont, schema, new MdsalRestconfStrategy(mockDataBroker),
+        PutDataTransactionUtil.putData(iid2, buildBaseCont, SCHEMA, new MdsalRestconfStrategy(mockDataBroker),
             WriteDataParams.empty());
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, iid2);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
@@ -221,7 +189,7 @@ public class PutDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid2, buildBaseCont, schema, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(iid2, buildBaseCont, SCHEMA, new NetconfRestconfStrategy(netconfService),
             WriteDataParams.empty());
         verify(netconfService).lock();
         verify(netconfService).getConfig(iid2);
@@ -235,7 +203,7 @@ public class PutDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid2, buildBaseCont, schema, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(iid2, buildBaseCont, SCHEMA, new NetconfRestconfStrategy(netconfService),
             WriteDataParams.empty());
         verify(netconfService).getConfig(iid2);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
@@ -249,7 +217,7 @@ public class PutDataTransactionUtilTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        PutDataTransactionUtil.putData(iid, buildLeaf, schema, new MdsalRestconfStrategy(mockDataBroker),
+        PutDataTransactionUtil.putData(iid, buildLeaf, SCHEMA, new MdsalRestconfStrategy(mockDataBroker),
             WriteDataParams.empty());
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, iid);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf);
@@ -262,7 +230,7 @@ public class PutDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid, buildLeaf, schema, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(iid, buildLeaf, SCHEMA, new NetconfRestconfStrategy(netconfService),
             WriteDataParams.empty());
         verify(netconfService).getConfig(iid);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf, Optional.empty());
@@ -275,7 +243,7 @@ public class PutDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid, buildLeaf, schema, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(iid, buildLeaf, SCHEMA, new NetconfRestconfStrategy(netconfService),
             WriteDataParams.empty());
         verify(netconfService).getConfig(iid);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf, Optional.empty());
@@ -289,7 +257,7 @@ public class PutDataTransactionUtilTest {
                 .when(read).exists(LogicalDatastoreType.CONFIGURATION, iid2);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
-        PutDataTransactionUtil.putData(iid2, buildBaseContWithList, schema, new MdsalRestconfStrategy(mockDataBroker),
+        PutDataTransactionUtil.putData(iid2, buildBaseContWithList, SCHEMA, new MdsalRestconfStrategy(mockDataBroker),
             WriteDataParams.empty());
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, iid2);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList);
@@ -303,7 +271,7 @@ public class PutDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid2, buildBaseContWithList, schema, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(iid2, buildBaseContWithList, SCHEMA, new NetconfRestconfStrategy(netconfService),
             WriteDataParams.empty());
         verify(netconfService).getConfig(iid2);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList,
@@ -318,7 +286,7 @@ public class PutDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid2, buildBaseContWithList, schema, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(iid2, buildBaseContWithList, SCHEMA, new NetconfRestconfStrategy(netconfService),
             WriteDataParams.empty());
         verify(netconfService).getConfig(iid2);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList,
