@@ -49,9 +49,7 @@ final class FutureCallbackTx {
             final FutureDataFactory<? super T> dataFactory, final YangInstanceIdentifier path)
                 throws RestconfDocumentedException {
         try {
-            final T result = listenableFuture.get();
-            dataFactory.setResult(result);
-            LOG.trace("Transaction({}) SUCCESSFUL", txType);
+            listenableFuture.get();
         } catch (InterruptedException e) {
             dataFactory.setFailureStatus();
             LOG.warn("Transaction({}) FAILED!", txType, e);
@@ -89,5 +87,7 @@ final class FutureCallbackTx {
                 throw new RestconfDocumentedException("Transaction failed", e);
             }
         }
+
+        LOG.trace("Transaction({}) SUCCESSFUL", txType);
     }
 }

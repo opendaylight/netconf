@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -291,7 +292,7 @@ public final class ReadDataTransactionUtil {
      */
     static @Nullable NormalizedNode readDataViaTransaction(final @NonNull RestconfStrategy strategy,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        return extractReadData(strategy, path, strategy.read(store, path));
+        return extractReadData(path, strategy.read(store, path));
     }
 
     /**
@@ -309,14 +310,19 @@ public final class ReadDataTransactionUtil {
     private static @Nullable NormalizedNode readDataViaTransaction(final @NonNull RestconfStrategy strategy,
             final @NonNull LogicalDatastoreType store, final @NonNull YangInstanceIdentifier path,
             final @NonNull List<YangInstanceIdentifier> fields) {
-        return extractReadData(strategy, path, strategy.read(store, path, fields));
+        return extractReadData(path, strategy.read(store, path, fields));
     }
 
-    private static NormalizedNode extractReadData(final RestconfStrategy strategy,
-            final YangInstanceIdentifier path, final ListenableFuture<Optional<NormalizedNode>> dataFuture) {
-        final var dataFactory = new NormalizedNodeFactory();
-        FutureCallbackTx.addCallback(dataFuture, "READ", dataFactory, path);
-        return dataFactory.build();
+    private static @Nullable NormalizedNode extractReadData(final YangInstanceIdentifier path,
+            final ListenableFuture<Optional<NormalizedNode>> dataFuture) {
+        try {
+            return dataFuture.get().orElse(null);
+        } catch (ExecutionException e) {
+            throw new RestconfDocumentedException("Failed to access " + path, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RestconfDocumentedException("Interrupted while accessing " + path, e);
+        }
     }
 
     /**
