@@ -310,19 +310,21 @@ public abstract class BaseYangOpenApiGenerator {
 
         if (isConfig) {
             final Operation put = buildPut(parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
+                node.getDescription().orElse(""), pathParams);
             operationsBuilder.put(put);
 
             final Operation patch = buildPatch(parentName, nodeName, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
+                node.getDescription().orElse(""), pathParams);
             operationsBuilder.patch(patch);
 
             final Operation delete = buildDelete(node, moduleName, deviceName, pathParams);
             operationsBuilder.delete(delete);
 
-            final Operation post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
+            if (!(node instanceof ListSchemaNode)) {
+                final Operation post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
                     node.getDescription().orElse(""), pathParams);
-            operationsBuilder.post(post);
+                operationsBuilder.post(post);
+            }
         }
         return operationsBuilder.build();
     }
