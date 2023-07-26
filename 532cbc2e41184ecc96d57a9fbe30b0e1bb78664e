@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f8093a6_9dc519e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-07-26T07:50:55Z",
+      "side": 1,
+      "message": "Thus should be before \"Replace POST requestBody\".",
+      "revId": "532cbc2e41184ecc96d57a9fbe30b0e1bb78664e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
