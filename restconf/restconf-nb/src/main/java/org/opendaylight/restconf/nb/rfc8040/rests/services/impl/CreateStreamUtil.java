@@ -29,12 +29,10 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev2211
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -51,22 +49,15 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
  * Utility class for creation of data-change-event or YANG notification streams.
  */
 final class CreateStreamUtil {
-    private static final QNameModule SAL_REMOTE_AUGMENT = NotificationOutputTypeGrouping.QNAME.getModule();
-
-    private static final QNameModule DEVICE_NOTIFICATION_MODULE = SubscribeDeviceNotificationInput.QNAME.getModule();
-    private static final QName DATASTORE_QNAME =
-        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.DATASTORE_PARAM_NAME).intern();
-    private static final QName SCOPE_QNAME =
-        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.SCOPE_PARAM_NAME).intern();
-    private static final QName OUTPUT_TYPE_QNAME =
-        QName.create(SAL_REMOTE_AUGMENT, "notification-output-type").intern();
     private static final QName DEVICE_NOTIFICATION_PATH_QNAME =
-        QName.create(DEVICE_NOTIFICATION_MODULE, "path").intern();
+        QName.create(SubscribeDeviceNotificationInput.QNAME, "path").intern();
     private static final QName DEVICE_NOTIFICATION_STREAM_PATH =
         QName.create(DEVICE_NOTIFICATION_PATH_QNAME, "stream-path").intern();
-    private static final NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(DATASTORE_QNAME);
-    private static final NodeIdentifier SCOPE_NODEID = NodeIdentifier.create(SCOPE_QNAME);
-    private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(OUTPUT_TYPE_QNAME);
+    private static final NodeIdentifier DATASTORE_NODEID =
+        NodeIdentifier.create(SalRemoteAugmentConstants.DATASTORE_QNAME);
+    private static final NodeIdentifier SCOPE_NODEID = NodeIdentifier.create(SalRemoteAugmentConstants.SCOPE_QNAME);
+    private static final NodeIdentifier OUTPUT_TYPE_NODEID =
+        NodeIdentifier.create(SalRemoteAugmentConstants.OUTPUT_TYPE_QNAME);
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
         NodeIdentifier.create(DEVICE_NOTIFICATION_PATH_QNAME);
     private static final NodeIdentifier SAL_REMOTE_OUTPUT_NODEID =
@@ -226,8 +217,8 @@ final class CreateStreamUtil {
 
         return RestconfStreamsConstants.DATA_SUBSCRIPTION
             + "/" + ListenersBroker.createStreamNameFromUri(IdentifierCodec.serialize(path, schemaContext)
-                + "/" + RestconfStreamsConstants.DATASTORE_PARAM_NAME + "=" + datastoreType
-                + "/" + RestconfStreamsConstants.SCOPE_PARAM_NAME + "=" + scope);
+                + "/" + SalRemoteAugmentConstants.DATASTORE_QNAME.getLocalName() + "=" + datastoreType
+                + "/" + SalRemoteAugmentConstants.SCOPE_QNAME.getLocalName() + "=" + scope);
     }
 
     /**

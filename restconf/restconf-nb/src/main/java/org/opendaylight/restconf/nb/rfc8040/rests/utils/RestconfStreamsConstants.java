@@ -11,9 +11,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
  * Constants for streams.
  */
 public final class RestconfStreamsConstants {
-    public static final String DATASTORE_PARAM_NAME = "datastore";
-    public static final String SCOPE_PARAM_NAME = "scope";
-
     public static final String DATA_SUBSCRIPTION = "data-change-event-subscription";
     public static final String NOTIFICATION_STREAM = "notification-stream";
 
