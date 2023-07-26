@@ -15,11 +15,8 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
@@ -30,11 +27,12 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
  * Utilities for creating the content of {@code /ietf-restconf-monitoring:restconf-state/streams}.
@@ -116,15 +114,14 @@ public final class RestconfStateStreams {
     public static MapEntryNode dataChangeStreamEntry(final YangInstanceIdentifier path, final Instant start,
             final String outputType, final URI uri, final EffectiveModelContext schemaContext,
             final String streamName) {
-        final SchemaNode schemaNode = ParserIdentifier.toInstanceIdentifier(
-            IdentifierCodec.serialize(path, schemaContext), schemaContext, Optional.empty()).getSchemaNode();
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
-            Builders.mapEntryBuilder()
+        final var streamEntry = Builders.mapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName))
                 .withChild(ImmutableNodes.leafNode(NAME_QNAME, streamName));
 
-        schemaNode.getDescription().ifPresent(desc ->
-            streamEntry.withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, desc)));
+        DataSchemaContextTree.from(schemaContext).findChild(path)
+            .map(DataSchemaContext::dataSchemaNode)
+            .flatMap(DataSchemaNode::getDescription)
+            .ifPresent(desc -> streamEntry.withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, desc)));
 
         return streamEntry
             .withChild(ImmutableNodes.leafNode(REPLAY_SUPPORT_QNAME, Boolean.TRUE))
