@@ -12,7 +12,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -62,11 +61,8 @@ public final class PostDataTransactionUtil {
      */
     public static Response postData(final UriInfo uriInfo, final YangInstanceIdentifier path, final NormalizedNode data,
             final RestconfStrategy strategy, final EffectiveModelContext schemaContext, final WriteDataParams params) {
-        final ListenableFuture<? extends CommitInfo> future = submitData(path, data, strategy, schemaContext, params);
-        final URI location = resolveLocation(uriInfo, path, schemaContext, data);
-        final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
-        FutureCallbackTx.addCallback(future, POST_TX_TYPE, dataFactory, path);
-        return dataFactory.build();
+        TransactionUtil.syncCommit(submitData(path, data, strategy, schemaContext, params), POST_TX_TYPE, path);
+        return Response.created(resolveLocation(uriInfo, path, schemaContext, data)).build();
     }
 
     /**

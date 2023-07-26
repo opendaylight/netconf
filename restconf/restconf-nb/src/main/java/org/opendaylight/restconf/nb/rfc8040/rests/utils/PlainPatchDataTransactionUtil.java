@@ -9,7 +9,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -53,11 +52,7 @@ public final class PlainPatchDataTransactionUtil {
             throw new IllegalArgumentException(e);
         }
 
-        final var future = transaction.commit();
-        final ResponseFactory response = new ResponseFactory(Status.OK);
-
-        // closes transactionChain if any, may throw
-        FutureCallbackTx.addCallback(future, PatchDataTransactionUtil.PATCH_TX_TYPE, response, path);
-        return response.build();
+        TransactionUtil.syncCommit(transaction.commit(), PatchDataTransactionUtil.PATCH_TX_TYPE, path);
+        return Response.ok().build();
     }
 }

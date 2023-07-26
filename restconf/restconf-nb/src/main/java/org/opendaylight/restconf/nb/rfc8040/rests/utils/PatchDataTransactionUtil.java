@@ -7,11 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.Response.Status;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -119,12 +116,9 @@ public final class PatchDataTransactionUtil {
 
         // if no errors then submit transaction, otherwise cancel
         if (noError) {
-            final ResponseFactory response = new ResponseFactory(Status.OK);
-            final ListenableFuture<? extends CommitInfo> future = transaction.commit();
-
             try {
-                FutureCallbackTx.addCallback(future, PATCH_TX_TYPE, response, null);
-            } catch (final RestconfDocumentedException e) {
+                TransactionUtil.syncCommit(transaction.commit(), PATCH_TX_TYPE, null);
+            } catch (RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 return new PatchStatusContext(context.getPatchId(), List.copyOf(editCollection), false, e.getErrors());
             }

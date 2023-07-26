@@ -7,10 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
@@ -39,10 +36,8 @@ public final class DeleteDataTransactionUtil {
             transaction.cancel();
             throw e;
         }
-        final ListenableFuture<? extends CommitInfo> future = transaction.commit();
-        final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
-        //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(future, "DELETE", response, path);
-        return response.build();
+
+        TransactionUtil.syncCommit(transaction.commit(), "DELETE", path);
+        return Response.noContent().build();
     }
 }
