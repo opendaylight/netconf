@@ -30,6 +30,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
+import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -97,7 +98,6 @@ public final class OpenApiGeneratorRFC8040Test {
             assertNotNull(node.get());
             assertNotNull(node.put());
             assertNotNull(node.delete());
-            assertNotNull(node.post());
             assertNotNull(node.patch());
         }
     }
@@ -253,10 +253,6 @@ public final class OpenApiGeneratorRFC8040Test {
             assertNotNull(delete);
             assertEquals(expectedSize, delete.parameters().size());
 
-            final var post = path.post();
-            assertNotNull(post);
-            assertEquals(expectedSize, post.parameters().size());
-
             final var patch = path.patch();
             assertNotNull(patch);
             assertEquals(expectedSize, patch.parameters().size());
@@ -303,11 +299,21 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final var pathWithParameters = "/rests/operations/action-types:list={name}/list-action";
         assertTrue(doc.paths().containsKey(pathWithParameters));
-        assertEquals(List.of("name"), getPathParameters(doc.paths(), pathWithParameters));
+
+        final var pathParameters = doc.paths().get(pathWithParameters).post().parameters()
+            .stream()
+            .map(Parameter::name)
+            .toList();
+        assertEquals(List.of("name"), pathParameters);
 
         final var pathWithoutParameters = "/rests/operations/action-types:multi-container/inner-container/action";
         assertTrue(doc.paths().containsKey(pathWithoutParameters));
-        assertEquals(List.of(), getPathParameters(doc.paths(), pathWithoutParameters));
+
+        final var emptyPathParameters = doc.paths().get(pathWithoutParameters).post().parameters()
+            .stream()
+            .map(Parameter::name)
+            .toList();
+        assertEquals(List.of(), emptyPathParameters);
     }
 
     @Test
