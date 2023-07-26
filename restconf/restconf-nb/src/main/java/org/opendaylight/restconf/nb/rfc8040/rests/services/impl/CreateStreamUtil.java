@@ -23,7 +23,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationListenerAdaptor;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationOutput;
@@ -45,8 +44,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
@@ -253,46 +250,5 @@ final class CreateStreamUtil {
     private static @Nullable String extractStringLeaf(final ContainerNode data, final NodeIdentifier childName) {
         return data.childByArg(childName) instanceof LeafNode<?> leafNode && leafNode.body() instanceof String str
             ? str : null;
-    }
-
-    /**
-     * Create YANG notification stream using notification definition in YANG schema.
-     *
-     * @param notificationDefinition YANG notification definition.
-     * @param refSchemaCtx           Reference to {@link EffectiveModelContext}
-     * @param outputType             Output type (XML or JSON).
-     * @return {@link NotificationListenerAdapter}
-     */
-    static NotificationListenerAdapter createYangNotifiStream(final NotificationDefinition notificationDefinition,
-            final EffectiveModelContext refSchemaCtx, final NotificationOutputType outputType) {
-        final var streamName = parseNotificationStreamName(requireNonNull(notificationDefinition),
-                requireNonNull(refSchemaCtx), requireNonNull(outputType));
-        final var listenersBroker = ListenersBroker.getInstance();
-
-        final var existing = listenersBroker.notificationListenerFor(streamName);
-        return existing != null ? existing
-            : listenersBroker.registerNotificationListener(
-                Absolute.of(notificationDefinition.getQName()), streamName, outputType);
-    }
-
-    private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,
-            final EffectiveModelContext refSchemaCtx, final NotificationOutputType outputType) {
-        final QName notificationDefinitionQName = notificationDefinition.getQName();
-        final Module module = refSchemaCtx.findModule(
-                notificationDefinitionQName.getModule().getNamespace(),
-                notificationDefinitionQName.getModule().getRevision()).orElse(null);
-        requireNonNull(module, String.format("Module for namespace %s does not exist.",
-                notificationDefinitionQName.getModule().getNamespace()));
-
-        final StringBuilder streamNameBuilder = new StringBuilder();
-        streamNameBuilder.append(RestconfStreamsConstants.NOTIFICATION_STREAM)
-                .append('/')
-                .append(module.getName())
-                .append(':')
-                .append(notificationDefinitionQName.getLocalName());
-        if (outputType != NotificationOutputType.XML) {
-            streamNameBuilder.append('/').append(outputType.getName());
-        }
-        return streamNameBuilder.toString();
     }
 }

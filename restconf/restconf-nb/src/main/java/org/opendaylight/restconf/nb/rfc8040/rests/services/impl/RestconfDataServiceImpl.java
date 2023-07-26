@@ -39,7 +39,6 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
@@ -64,7 +63,9 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactio
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -83,9 +84,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,20 +185,47 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
-        final DOMDataTreeWriteTransaction transaction = dataBroker.newWriteOnlyTransaction();
-        for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
-                CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                    NotificationOutputType.XML));
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
-                CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                    NotificationOutputType.JSON));
+        final var transaction = dataBroker.newWriteOnlyTransaction();
+
+        for (var module : schemaContext.getModuleStatements().values()) {
+            final var moduleName = module.argument().getLocalName();
+            // Note: this handles only RFC6020 notifications
+            module.streamEffectiveSubstatements(NotificationEffectiveStatement.class).forEach(notification -> {
+                final var notifName = notification.argument();
+
+                writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
+                    createYangNotifiStream(moduleName, notifName, NotificationOutputType.XML));
+                writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
+                    createYangNotifiStream(moduleName, notifName, NotificationOutputType.JSON));
+            });
         }
+
         try {
             transaction.commit().get();
         } catch (final InterruptedException | ExecutionException e) {
             throw new RestconfDocumentedException("Problem while putting data to DS.", e);
         }
+    }
+
+    private static NotificationListenerAdapter createYangNotifiStream(final String moduleName, final QName notifName,
+            final NotificationOutputType outputType) {
+        final var streamName = createNotificationStreamName(moduleName, notifName.getLocalName(), outputType);
+        final var listenersBroker = ListenersBroker.getInstance();
+
+        final var existing = listenersBroker.notificationListenerFor(streamName);
+        return existing != null ? existing
+            : listenersBroker.registerNotificationListener(Absolute.of(notifName), streamName, outputType);
+    }
+
+    private static String createNotificationStreamName(final String moduleName, final String notifName,
+            final NotificationOutputType outputType) {
+        final var sb = new StringBuilder()
+            .append(RestconfStreamsConstants.NOTIFICATION_STREAM)
+            .append('/').append(moduleName).append(':').append(notifName);
+        if (outputType != NotificationOutputType.XML) {
+            sb.append('/').append(outputType.getName());
+        }
+        return sb.toString();
     }
 
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
