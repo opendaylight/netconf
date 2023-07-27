@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ae59c30_25ed21c9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-27T08:24:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01e29e7b_b455c0c3",
+      "revId": "e7bf12091d19999d287ee1f9c211d2bd954ad375",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27281661_c261decc",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc865775_955c4feb",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 575,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-27T08:24:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27281661_c261decc",
+      "revId": "e7bf12091d19999d287ee1f9c211d2bd954ad375",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54af69be_ae1ecd7b",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-07-26T13:20:54Z",
       "side": 1,
       "message": "assert (node instanceof AnydataSchemaNode || node instanceof AnyxmlSchemaNode )",
+      "revId": "e7bf12091d19999d287ee1f9c211d2bd954ad375",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c41d922_9d99f692",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-07-27T08:24:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54af69be_ae1ecd7b",
       "revId": "e7bf12091d19999d287ee1f9c211d2bd954ad375",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
