@@ -33,6 +33,24 @@
       "message": "not sure about this one, but I ve been told not to use var outside of tests. consider",
       "revId": "b2522eec0b26341f5137dcc15d65fa9a9692094e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2757e27b_d9c6435b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T13:08:18Z",
+      "side": 1,
+      "message": "IMO using `var` is correct when it is consistently used in method. Mixing it with explicit type declarations is wrong because it leads to inconsistent code style.",
+      "parentUuid": "d3287bf7_9cc0226c",
+      "revId": "b2522eec0b26341f5137dcc15d65fa9a9692094e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
