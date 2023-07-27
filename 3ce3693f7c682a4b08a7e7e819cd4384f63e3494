@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbf30763_52e92209",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-27T11:42:21Z",
+      "side": 1,
+      "message": "extra empty line, can be removed",
+      "revId": "3ce3693f7c682a4b08a7e7e819cd4384f63e3494",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
