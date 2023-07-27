@@ -7,10 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import static org.opendaylight.restconf.nb.rfc8040.URLConstants.BASE_PATH;
+import static org.opendaylight.restconf.nb.rfc8040.URLConstants.SSE_SUBPATH;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.DATA_SUBSCRIPTION;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
-import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.BASE_URI_PATTERN;
-import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.NOTIF;
 
 import com.google.common.annotations.Beta;
 import javax.servlet.ServletException;
@@ -100,17 +100,17 @@ public final class JaxRsNorthbound implements AutoCloseable {
 
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
-            .contextPath("/" + BASE_URI_PATTERN)
+            .contextPath("/" + BASE_PATH)
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new RestconfApplication(databindProvider, mountPointService, dataBroker, rpcService, actionService,
-                        notificationService,schemaService, streamsConfiguration)).build())
+                        notificationService, schemaService, streamsConfiguration)).build())
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern("/" + NOTIF + "/*")
+                .addUrlPattern("/" + SSE_SUBPATH + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new DataStreamApplication(databindProvider, mountPointService,
                         new RestconfDataStreamServiceImpl(scheduledThreadPool, streamsConfiguration))).build())
@@ -140,7 +140,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
-                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(BASE_URI_PATTERN)).build())
+                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(BASE_PATH)).build())
                 .name("Rootfound")
                 .build());
 

@@ -33,13 +33,13 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -122,10 +122,9 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                         configurationSse);
         final NormalizedNodePayload response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
-        assertEquals("http://localhost:8181/" + RestconfConstants.BASE_URI_PATTERN
-                + "/" + RestconfConstants.NOTIF
-                + "/data-change-event-subscription/toaster:toaster/toasterStatus/"
-                + "datastore=OPERATIONAL/scope=ONE", response.getNewHeaders().get("Location").toString());
+        assertEquals("http://localhost:8181/" + URLConstants.BASE_PATH + "/" + URLConstants.SSE_SUBPATH
+            + "/data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
+            response.getNewHeaders().get("Location").toString());
     }
 
     @Test
@@ -139,9 +138,9 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                         configurationWs);
         final NormalizedNodePayload response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
-        assertEquals("ws://localhost:8181/" + RestconfConstants.BASE_URI_PATTERN
-                + "/data-change-event-subscription/toaster:toaster/toasterStatus/"
-                + "datastore=OPERATIONAL/scope=ONE", response.getNewHeaders().get("Location").toString());
+        assertEquals("ws://localhost:8181/" + URLConstants.BASE_PATH
+            + "/data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
+            response.getNewHeaders().get("Location").toString());
     }
 
     @Test
