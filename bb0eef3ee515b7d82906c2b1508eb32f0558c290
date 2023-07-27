@@ -85,6 +85,23 @@
       "message": "Please create new test class and move all test from here. Or move it to test in commit \"Create tests for POST schemas inside paths\".",
       "revId": "bb0eef3ee515b7d82906c2b1508eb32f0558c290",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a493ec8c_2f3b6fc3",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T11:32:56Z",
+      "side": 1,
+      "message": "Please use generic exception in testes:\n\n```\npublic void testPostBody() throws Exception {\n```",
+      "revId": "bb0eef3ee515b7d82906c2b1508eb32f0558c290",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
