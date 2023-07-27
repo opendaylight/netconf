@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8313d841_f21930bf",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-27T12:23:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d85bc850_43075e26",
+      "revId": "61a837dd0826d4f6195d3ade70e65d86421844c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c5dfa04_fb414b81",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd154547_2f0ec106",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-27T12:23:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c5dfa04_fb414b81",
+      "revId": "61a837dd0826d4f6195d3ade70e65d86421844c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d1744228_b1efdc18",
@@ -48,6 +84,30 @@
       "writtenOn": "2023-07-27T11:06:16Z",
       "side": 1,
       "message": "cannot this be extraced to the before() method? The result of the uriToaster/All.getQureyParamteres() method seems invariant to the number of calls, given the use of mocking.",
+      "range": {
+        "startLine": 308,
+        "startChar": 8,
+        "endLine": 311,
+        "endChar": 11
+      },
+      "revId": "61a837dd0826d4f6195d3ade70e65d86421844c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb505a5b_36471e21",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-27T12:23:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1744228_b1efdc18",
       "range": {
         "startLine": 308,
         "startChar": 8,
