@@ -54,7 +54,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.WebsocketDataStreamService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
@@ -99,7 +99,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
     private static final QName NETCONF_BASE_QNAME = SchemaContext.NAME;
 
-    private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
+    private final WebsocketDataStreamService delegRestconfSubscrService;
     private final DatabindProvider databindProvider;
     private final MdsalRestconfStrategy restconfStrategy;
     private final DOMMountPointService mountPointService;
@@ -109,7 +109,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     public RestconfDataServiceImpl(final DatabindProvider databindProvider,
             final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
-            final RestconfStreamsSubscriptionService delegRestconfSubscrService,
+            final WebsocketDataStreamService delegRestconfSubscrService,
             final DOMActionService actionService, final StreamsConfiguration configuration) {
         this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);

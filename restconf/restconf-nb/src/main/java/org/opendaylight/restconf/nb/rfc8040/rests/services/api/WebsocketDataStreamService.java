@@ -17,9 +17,11 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 
 /**
- * Subscribing to streams.
+ * Access to notification streams via WebSockets.
  */
-public interface RestconfStreamsSubscriptionService {
+// FIXME: consider using JSR356
+@Path("/")
+public interface WebsocketDataStreamService {
     /**
      * Subscribing to receive notification from stream support.
      *
@@ -27,9 +29,6 @@ public interface RestconfStreamsSubscriptionService {
      * @param uriInfo URI info
      * @return {@link NormalizedNodePayload}
      */
-    // FIXME: this is a REST violation: GET does not transfer state! This should work in terms of
-    //        https://www.rfc-editor.org/rfc/rfc8639#section-2.4, i.e. when we have that, aggressively deprecate
-    //        and remove this special case. Besides it routes to a very bad thing in RestconfDataServiceImpl
     @GET
     @Path("data/" + RestconfStreamsConstants.STREAMS_PATH  + "/{identifier:.+}")
     NormalizedNodePayload subscribeToStream(@Encoded @PathParam("identifier") String identifier,

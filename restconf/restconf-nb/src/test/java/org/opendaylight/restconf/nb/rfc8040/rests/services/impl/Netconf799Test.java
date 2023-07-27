@@ -27,7 +27,7 @@ import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.WebsocketDataStreamService;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -66,7 +66,7 @@ public class Netconf799Test {
 
         final RestconfDataServiceImpl dataService = new RestconfDataServiceImpl(
             () -> DatabindContext.ofModel(contextRef), mockDataBroker, mock(DOMMountPointService.class),
-            mock(RestconfStreamsSubscriptionService.class), actionService, new StreamsConfiguration(0, 1, 0, false));
+            mock(WebsocketDataStreamService.class), actionService, new StreamsConfiguration(0, 1, 0, false));
 
         final var nodeAndStack = DataSchemaContextTree.from(contextRef).enterPath(ACTION_YII).orElseThrow();
         final var node = nodeAndStack.node().dataSchemaNode();

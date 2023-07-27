@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.net.URI;
-import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -18,7 +17,7 @@ import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.WebsocketDataStreamService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yang.gen.v1.subscribe.to.notification.rev161028.Notifi;
@@ -30,11 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link RestconfStreamsSubscriptionService}.
+ * Implementation of {@link WebsocketDataStreamService}.
  */
-@Path("/")
-public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSubscriptionService {
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
+public class WebsocketDataStreamServiceImpl implements WebsocketDataStreamService {
+    private static final Logger LOG = LoggerFactory.getLogger(WebsocketDataStreamServiceImpl.class);
     private static final QName LOCATION_QNAME = QName.create(Notifi.QNAME, "location").intern();
     private static final NodeIdentifier LOCATION_NODEID = NodeIdentifier.create(LOCATION_QNAME);
 
@@ -49,7 +47,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * @param databindProvider a {@link DatabindProvider}
      * @param configuration configuration for RESTCONF {@link StreamsConfiguration}}
      */
-    public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
+    public WebsocketDataStreamServiceImpl(final DOMDataBroker dataBroker,
             final DOMNotificationService notificationService, final DatabindProvider databindProvider,
             final StreamsConfiguration configuration) {
         handlersHolder = new HandlersHolder(dataBroker, notificationService, databindProvider);

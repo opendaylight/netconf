@@ -17,19 +17,19 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.WebsocketDataStreamService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfInvokeOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.WebsocketDataStreamServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 
 @Singleton
 public class RestconfApplication extends AbstractRestconfApplication {
     private RestconfApplication(final DatabindProvider databindProvider, final DOMMountPointService mountPointService,
-            final RestconfStreamsSubscriptionService streamSubscription, final DOMDataBroker dataBroker,
+            final WebsocketDataStreamService streamSubscription, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
             final StreamsConfiguration configuration) {
@@ -49,7 +49,7 @@ public class RestconfApplication extends AbstractRestconfApplication {
             final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
             final StreamsConfiguration configuration) {
         this(databindProvider, mountPointService,
-            new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider,
+            new WebsocketDataStreamServiceImpl(dataBroker, notificationService, databindProvider,
                 configuration),
             dataBroker, rpcService, actionService, notificationService, domSchemaService, configuration);
     }

@@ -61,7 +61,7 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.WebsocketDataStreamService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -117,7 +117,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     @Mock
     private DOMActionService actionService;
     @Mock
-    private RestconfStreamsSubscriptionService delegRestconfSubscrService;
+    private WebsocketDataStreamService delegRestconfSubscrService;
     @Mock
     private MultivaluedMap<String, String> queryParamenters;
 
