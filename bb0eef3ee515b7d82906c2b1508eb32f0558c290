@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5885d594_3a3b20ce",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T17:18:37Z",
+      "side": 1,
+      "message": "Ivan said that we are not reducing number of POSTs - so I added this to keep all not handled types for now. This logic is similar to logic with different types for leafs. I think we can fix both at same time or at least as related tasks.",
+      "parentUuid": "ec506046_690ed5f8",
+      "revId": "bb0eef3ee515b7d82906c2b1508eb32f0558c290",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3da594cb_7533ba0b",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
         "patchSetId": 28
