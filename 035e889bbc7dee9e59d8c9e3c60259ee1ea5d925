@@ -105,6 +105,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5363829d_f85171b6",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryContentBuilderUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:46:01Z",
+      "side": 1,
+      "message": "Missing final:\n```\nfor (final var deviation : module.getDeviations()) {\n   final var targetQname \u003d deviation.getTargetPath().lastNodeIdentifier().getModule();\n```",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "045fa7ba_80779a0b",
         "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriter.java",
         "patchSetId": 4
