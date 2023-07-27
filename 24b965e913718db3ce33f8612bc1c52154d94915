@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b221344_60f8bae1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-27T10:49:50Z",
+      "side": 1,
+      "message": "Our current logic expects deviceName to be null.\nThis is changed in https://git.opendaylight.org/gerrit/c/netconf/+/106925, but for now, keep the null value.",
+      "range": {
+        "startLine": 212,
+        "startChar": 52,
+        "endLine": 212,
+        "endChar": 54
+      },
+      "revId": "24b965e913718db3ce33f8612bc1c52154d94915",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a18fd47d_9dd72833",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-27T10:49:50Z",
+      "side": 1,
+      "message": "add a space between the comma and the \"true\" (`, true` instead of `,true`)",
+      "range": {
+        "startLine": 212,
+        "startChar": 87,
+        "endLine": 212,
+        "endChar": 91
+      },
+      "revId": "24b965e913718db3ce33f8612bc1c52154d94915",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
