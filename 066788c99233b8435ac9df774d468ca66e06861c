@@ -229,6 +229,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05eca0c0_3f16d7f6",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T11:03:40Z",
+      "side": 1,
+      "message": "Record Operation expect ObjectNode as a requestBody. So this is correct IMHO.",
+      "parentUuid": "4fc53e46_71c9a2ad",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "676b711c_1febc83b",

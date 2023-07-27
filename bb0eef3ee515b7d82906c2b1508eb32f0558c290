@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c096146f_3e29da16",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T11:03:40Z",
+      "side": 1,
+      "message": "```\nif (node instanceof DataNodeContainer dataNodeContainer\n        \u0026\u0026 dataNodeContainer.getChildNodes().iterator().hasNext()) {\n    final DataSchemaNode firstChild \u003d dataNodeContainer.getChildNodes().iterator().next();\n    final Operation post \u003d buildPost(moduleName, deviceName, pathParams, firstChild);\n    operationsBuilder.post(post);\n}\n```",
+      "revId": "bb0eef3ee515b7d82906c2b1508eb32f0558c290",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f1cb283_255db958",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T11:03:40Z",
+      "side": 1,
+      "message": "Is there some case where we will use for POST reference?",
+      "revId": "bb0eef3ee515b7d82906c2b1508eb32f0558c290",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3da594cb_7533ba0b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T11:03:40Z",
+      "side": 1,
+      "message": "This is not correct. Creates invalid payload. For example:\n```\ncurl -X \u0027POST\u0027 \\\n  \u0027http://localhost:8181/rests/data/network-topology:network-topology/topology\u003dtopology-netconf/node\u003d36001-sim-device/yang-ext:mount/post-model:cont/list1\u003d10\u0027 \\\n  -H \u0027accept: */*\u0027 \\\n  -H \u0027Content-Type: application/json\u0027 \\\n  -d \u0027{\n  \"name\": {\n    \"name\": \"Some name\"\n  }\n}\u0027\n```",
+      "revId": "bb0eef3ee515b7d82906c2b1508eb32f0558c290",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "550bc944_467d5990",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T11:03:40Z",
+      "side": 1,
+      "message": "Please create new test class and move all test from here. Or move it to test in commit \"Create tests for POST schemas inside paths\".",
+      "revId": "bb0eef3ee515b7d82906c2b1508eb32f0558c290",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
