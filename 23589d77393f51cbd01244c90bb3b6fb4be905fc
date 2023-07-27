@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14f16f9d_7360169e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T12:41:45Z",
+      "side": 1,
+      "message": "\"type\u003dhttp\" is not expected anymore?",
+      "revId": "23589d77393f51cbd01244c90bb3b6fb4be905fc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
