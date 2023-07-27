@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0e7632f_88a9ee56",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:44:30Z",
+      "side": 1,
+      "message": "Typo in JIRA-ID:\n\"JIRA: NETCONF-688\" -\u003e \"JIRA: NETCONF-668\"",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92f066a9_dbccc920",
+        "filename": "apps/yanglib-mdsal-writer/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:44:30Z",
+      "side": 1,
+      "message": "Please use regular copyright:\n```\n\u003c!--\n Copyright (c) 2023 PANTHEON.tech s.r.o. and others. All rights reserved.\n\n This program and the accompanying materials are made available under the\n terms of the Eclipse Public License v1.0 which accompanies this distribution,\n and is available at http://www.eclipse.org/legal/epl-v10.html\n--\u003e\n```",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b9eade7_aaae2884",
+        "filename": "apps/yanglib-mdsal-writer/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:44:30Z",
+      "side": 1,
+      "message": "Is some reason to import \"guava\" here? No usage in this project.",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5deecda_63101bbb",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryContentBuilderUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:44:30Z",
+      "side": 1,
+      "message": "Please remove redundant space under class definition and reorder class attributes:\n```\nfinal class YangLibraryContentBuilderUtil {\n    private static final CommonLeafs.Revision EMPTY_REVISION \u003d new CommonLeafs.Revision(\"\");\n\n    static final String DEFAULT_MODULE_SET_NAME \u003d \"ODL_modules\";\n    static final String DEFAULT_SCHEMA_NAME \u003d \"ODL_schema\";\n```",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e59d8583_7e450b68",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryContentBuilderUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:44:30Z",
+      "side": 1,
+      "message": "Redundant space and wrong indentation on method parameters.\n\n- Please fix this in the whole file.",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6820e265_5cad1df7",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryContentBuilderUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:44:30Z",
+      "side": 1,
+      "message": "Please keep consistent code style in whole project. If you want to use \u0027var\u0027 do not use explicit type declarations.\n\n```\n        final var result \u003d new HashMap\u003cQNameModule, Set\u003cModule\u003e\u003e();\n        for (final var module : context.getModules()) {\n```\nOr\n```\n        final Map\u003cQNameModule, Set\u003cModule\u003e\u003e result \u003d new HashMap\u003c\u003e();\n        for (final Module module : context.getModules()) {\n```",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "045fa7ba_80779a0b",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:44:30Z",
+      "side": 1,
+      "message": "Probably \"service \u003d {}\" is redundant since this is the default value.",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eaf1cd74_69e35709",
+        "filename": "apps/yanglib-mdsal-writer/src/test/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:44:30Z",
+      "side": 1,
+      "message": "Redundant empty spaces",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3b6ac7c_4098e1bd",
+        "filename": "apps/yanglib-mdsal-writer/src/test/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:44:30Z",
+      "side": 1,
+      "message": "```\n    @Captor\n    private ArgumentCaptor\u003cYangLibrary\u003e yangLibraryCaptor;\n    @Captor\n    private ArgumentCaptor\u003cModulesState\u003e modulesStateCaptor;\n    private YangLibraryWriter writer;\n```",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72290b00_d5374ebd",
+        "filename": "apps/yanglib-mdsal-writer/src/test/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-27T14:44:30Z",
+      "side": 1,
+      "message": "Missing test for writer.close() method",
+      "revId": "035e889bbc7dee9e59d8c9e3c60259ee1ea5d925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
