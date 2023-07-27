@@ -23,6 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
+import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
@@ -30,7 +31,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -51,9 +51,9 @@ abstract class SubscribeToStreamUtil {
 
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
-            final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-            return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/'
-                    + RestconfConstants.NOTIF + '/' + streamName).build();
+            return uriInfo.getBaseUriBuilder()
+                .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.SSE_SUBPATH + '/' + streamName)
+                .build();
         }
     }
 
@@ -77,7 +77,7 @@ abstract class SubscribeToStreamUtil {
                     // Unsecured HTTP and others go to unsecured WebSockets
                     uriBuilder.scheme("ws");
             }
-            return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/' + streamName).build();
+            return uriBuilder.replacePath(URLConstants.BASE_PATH + '/' + streamName).build();
         }
     }
 
