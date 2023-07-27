@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d85bc850_43075e26",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-07-27T11:06:16Z",
+      "side": 1,
+      "message": "this can be a global static variable as it is equal to the path used in the test bellow",
+      "revId": "61a837dd0826d4f6195d3ade70e65d86421844c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c5dfa04_fb414b81",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-07-27T11:06:16Z",
+      "side": 1,
+      "message": "similarly here, moreover, the string will only be computed once of defined as a global static variable",
+      "revId": "61a837dd0826d4f6195d3ade70e65d86421844c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1744228_b1efdc18",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-07-27T11:06:16Z",
+      "side": 1,
+      "message": "cannot this be extraced to the before() method? The result of the uriToaster/All.getQureyParamteres() method seems invariant to the number of calls, given the use of mocking.",
+      "range": {
+        "startLine": 308,
+        "startChar": 8,
+        "endLine": 311,
+        "endChar": 11
+      },
+      "revId": "61a837dd0826d4f6195d3ade70e65d86421844c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
