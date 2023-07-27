@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88afebb4_0acb0263",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "This method is useless. We deleted it in other patch so I\u0027ll delete it here because it cause issues with logic for custom POSTs",
+      "parentUuid": "323f8366_1fbd13ef",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2401f514_8b828536",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-25T14:16:42Z",
       "side": 1,
       "message": "Why? I expect we already have paths for POST requests.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcb5d666_dae81821",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "We are - this is the way to do it. Creating POST operation and applying it to parent is not looking good and cause issues with creating Path record since one of the operations(POST) is created on different iteration of recursion. Current code giving same result without messing with recursion.",
+      "parentUuid": "2401f514_8b828536",
       "revId": "066788c99233b8435ac9df774d468ca66e06861c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebd2e57d_d5008468",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71840c0b_6b47e9c5",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1bb35961_5b835de8",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-07-25T14:16:42Z",
       "side": 1,
       "message": "private, split method for container and lists",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "838be54f_9db22e3c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "I deleted this one and now it works a bit different",
+      "parentUuid": "1bb35961_5b835de8",
       "revId": "066788c99233b8435ac9df774d468ca66e06861c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -88,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "70ef4c77_489312d2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "IMO I think one method is logical considering that I removed keys from parameters and changed name for more describing. Should it be split anyway?",
+      "parentUuid": "adf9ada5_87494045",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e17f76f3_a2e99ce0",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
         "patchSetId": 23
@@ -99,6 +189,24 @@
       "writtenOn": "2023-07-25T14:16:42Z",
       "side": 1,
       "message": "IMO we do not need JsonNodeFactory we can just create org.opendaylight.restconf.openapi.model.Schema.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fc53e46_71c9a2ad",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "I can only partially implement this - I\u0027ll still need JsonNodeFactory for content of parameters. Should I do it this way?",
+      "parentUuid": "e17f76f3_a2e99ce0",
       "revId": "066788c99233b8435ac9df774d468ca66e06861c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -122,6 +230,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "33ebcb50_4a6fa085",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "I just did like here:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106891/7..9/restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java\n\nAfter this patch will be merged this will go away after rebase. If there some problem with this logic then it should be fixed there first.",
+      "parentUuid": "676b711c_1febc83b",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d12d756b_2689c6c0",
         "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
         "patchSetId": 23
@@ -133,6 +259,24 @@
       "writtenOn": "2023-07-25T14:16:42Z",
       "side": 1,
       "message": "Do we really need object mapper?",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54f03f35_4435b245",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "Yes, we do. Even with created Schema - we don\u0027t have object class for properties - I\u0027ll need to create it with ObjectMapper anyway. With this you at least can see request body properly.",
+      "parentUuid": "d12d756b_2689c6c0",
       "revId": "066788c99233b8435ac9df774d468ca66e06861c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac9c5304_7ed84580",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4ac5dcb_e118ebc1",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47247c94_1422db08",
@@ -171,6 +333,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "249f8bd3_38096f46",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47247c94_1422db08",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "504ed83d_4ab43b94",
@@ -184,6 +364,24 @@
       "writtenOn": "2023-07-25T14:16:42Z",
       "side": 1,
       "message": "hmm, this looks suspicious..",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45b05788_52b19f45",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "504ed83d_4ab43b94",
       "revId": "066788c99233b8435ac9df774d468ca66e06861c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -224,6 +422,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1724ef0f_642e3cbf",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "It will be reduced unfortunately. Minus 1 for rootPostLink - it had to go. And few because they are POSTs for choices for example. I\u0027ll add POSTs for them like it is done on the master so I\u0027m not sure if they will work. But we can fix these specific types later",
+      "parentUuid": "66b6c96f_f55ceaeb",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "74ad73de_6c76ed92",
         "filename": "restconf/restconf-openapi/src/test/resources/yang/toaster_short.yang",
         "patchSetId": 23
@@ -235,6 +451,24 @@
       "writtenOn": "2023-07-25T14:16:42Z",
       "side": 1,
       "message": "Revert this back.",
+      "revId": "066788c99233b8435ac9df774d468ca66e06861c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d18d356_46458f26",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/toaster_short.yang",
+        "patchSetId": 23
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T06:25:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74ad73de_6c76ed92",
       "revId": "066788c99233b8435ac9df774d468ca66e06861c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
