@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "b2522eec0b26341f5137dcc15d65fa9a9692094e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3287bf7_9cc0226c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-07-27T12:55:44Z",
+      "side": 1,
+      "message": "not sure about this one, but I ve been told not to use var outside of tests. consider",
+      "revId": "b2522eec0b26341f5137dcc15d65fa9a9692094e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
