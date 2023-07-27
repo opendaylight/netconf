@@ -14,6 +14,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 
 /**
  * Subscribing to streams.
@@ -30,7 +31,7 @@ public interface RestconfStreamsSubscriptionService {
     //        https://www.rfc-editor.org/rfc/rfc8639#section-2.4, i.e. when we have that, aggressively deprecate
     //        and remove this special case. Besides it routes to a very bad thing in RestconfDataServiceImpl
     @GET
-    @Path("data/ietf-restconf-monitoring:restconf-state/streams/stream/{identifier:.+}")
+    @Path("data/" + RestconfStreamsConstants.STREAMS_PATH  + "/{identifier:.+}")
     NormalizedNodePayload subscribeToStream(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 }
