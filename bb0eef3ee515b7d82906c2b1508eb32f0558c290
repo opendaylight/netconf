@@ -156,6 +156,24 @@
       "parentUuid": "a493ec8c_2f3b6fc3",
       "revId": "bb0eef3ee515b7d82906c2b1508eb32f0558c290",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41f849bd_46f31460",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-27T16:58:14Z",
+      "side": 1,
+      "message": "Actually - I\u0027ll delete this one. We already have test for that - testToaster2OpenApiObjects. It is duplicity at this point.\nAnd moving other tests doesn\u0027t looks logical - we are testing not only POST there from the start.",
+      "parentUuid": "550bc944_467d5990",
+      "revId": "bb0eef3ee515b7d82906c2b1508eb32f0558c290",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
