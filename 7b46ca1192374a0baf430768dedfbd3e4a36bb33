@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db45d983_50387fae",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/JsonModelNameTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-27T10:32:26Z",
+      "side": 1,
+      "message": "The requested API is not for Datastore, but for a mounted device with id 1",
+      "range": {
+        "startLine": 53,
+        "startChar": 38,
+        "endLine": 53,
+        "endChar": 51
+      },
+      "revId": "7b46ca1192374a0baf430768dedfbd3e4a36bb33",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cc4d3eb_ce81863e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/JsonModelNameTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-27T10:32:26Z",
+      "side": 1,
+      "message": "private",
+      "range": {
+        "startLine": 102,
+        "startChar": 4,
+        "endLine": 102,
+        "endChar": 10
+      },
+      "revId": "7b46ca1192374a0baf430768dedfbd3e4a36bb33",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
