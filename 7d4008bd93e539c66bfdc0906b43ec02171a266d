@@ -1,0 +1,215 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1d0a602_fdd7cd74",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "Please revert this",
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "657ecac4_fa9f62e1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "Please replace this with pathParams as it was before.",
+      "range": {
+        "startLine": 255,
+        "startChar": 81,
+        "endLine": 255,
+        "endChar": 112
+      },
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26529f3c_b7ea6653",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "What if createRootPostLink method returns null?",
+      "range": {
+        "startLine": 255,
+        "startChar": 43,
+        "endLine": 255,
+        "endChar": 113
+      },
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "295483f9_2c95debc",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "Missing space between parameters.",
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a3cc5b0_4367fe98",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "Please move this variables closer to its actual usage:\n\n```\n        paths.put(dataPath, operations(node, moduleName, deviceName, pathParamsSet, isConfig, parentName,\n            definitionNames));\n```",
+      "range": {
+        "startLine": 302,
+        "startChar": 0,
+        "endLine": 303,
+        "endChar": 92
+      },
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fe88b47_e1fa2e71",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "Add space between map key and value -\u003e \"Map\u003cString,String\u003e\" -\u003e \"Map\u003cString, String\u003e\"",
+      "range": {
+        "startLine": 345,
+        "startChar": 58,
+        "endLine": 345,
+        "endChar": 71
+      },
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b148ddaa_8bbf3096",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "missing final \"final\" in this method",
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98253021_697edbed",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "paramName, description",
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c835093b_688b260a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "Wrong indentation",
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef1af671_607c6e47",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "Missing final and move it closer to its actual usage",
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5db7e70_95defbdc",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:03:01Z",
+      "side": 1,
+      "message": "Missing space between paramName and description",
+      "revId": "7d4008bd93e539c66bfdc0906b43ec02171a266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
