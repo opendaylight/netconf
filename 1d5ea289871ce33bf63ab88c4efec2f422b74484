@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df36a0b9_567d29fd",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:02:26Z",
+      "side": 1,
+      "message": "Please remove the empty line between class constants.",
+      "revId": "1d5ea289871ce33bf63ab88c4efec2f422b74484",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d43eae7f_1f43f682",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:02:26Z",
+      "side": 1,
+      "message": "Please create here a copy of the parameters.\nRight now, a reference is being inserted, and any changes made to the array passed to this method will also affect this builder. This method is called within a for loop in the getOpenApiSpec function, where parameters are updated in every iteration.",
+      "revId": "1d5ea289871ce33bf63ab88c4efec2f422b74484",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc4aa9b5_1f00ee72",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:02:26Z",
+      "side": 1,
+      "message": "Please create here a copy of the parameters.\nRight now, a reference is being inserted, and any changes made to the array passed to this method will also affect this builder. This method is called within a for loop in the getOpenApiSpec function, where parameters are updated in every iteration.",
+      "revId": "1d5ea289871ce33bf63ab88c4efec2f422b74484",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e41d9f76_9807a4a2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:02:26Z",
+      "side": 1,
+      "message": "Please create here a copy of the parameters.\nRight now, a reference is being inserted, and any changes made to the array passed to this method will also affect this builder. This method is called within a for loop in the getOpenApiSpec function, where parameters are updated in every iteration.",
+      "revId": "1d5ea289871ce33bf63ab88c4efec2f422b74484",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32a88759_c9add86f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:02:26Z",
+      "side": 1,
+      "message": "Please create here a copy of the parameters.\nRight now, a reference is being inserted, and any changes made to the array passed to this method will also affect this builder. This method is called within a for loop in the getOpenApiSpec function, where parameters are updated in every iteration.",
+      "revId": "1d5ea289871ce33bf63ab88c4efec2f422b74484",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "701d8caa_1ba6b62f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T13:02:26Z",
+      "side": 1,
+      "message": "Please create here a copy of the parameters.\nRight now, a reference is being inserted, and any changes made to the array passed to this method will also affect this builder. This method is called within a for loop in the getOpenApiSpec function, where parameters are updated in every iteration.",
+      "revId": "1d5ea289871ce33bf63ab88c4efec2f422b74484",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
