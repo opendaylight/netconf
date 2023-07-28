@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58596ef0_5d25ceb6",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T14:32:49Z",
+      "side": 1,
+      "message": "var",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c66ba60e_228ff8e0",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T14:32:49Z",
+      "side": 1,
+      "message": "var",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32e2de72_62be9589",
+        "filename": "apps/yanglib-mdsal-writer/src/test/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriterTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T14:32:49Z",
+      "side": 1,
+      "message": "Can you please divide constants from class attributes with a new line, just like you do in other classes:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/107053/9/apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriter.java",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a75bf193_b21376f4",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-module.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T14:32:49Z",
+      "side": 1,
+      "message": "Can we keep 2 space indentation like you do in ietf-yang-library?\nhttps://git.opendaylight.org/gerrit/c/netconf/+/107053/9/apps/yanglib-mdsal-writer/src/test/resources/ietf-yang-library.yang#1",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fe0e5e2_556e35de",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-module.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T14:32:49Z",
+      "side": 1,
+      "message": "can we use newer version 1.1?",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5ede8d3_9f28f5e8",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-module.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T14:32:49Z",
+      "side": 1,
+      "message": "The namespace should be specified within quotation marks",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f783d8d7_09325f88",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-more.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T14:32:49Z",
+      "side": 1,
+      "message": "\"test:more\"",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "089ee4d2_f0227b4f",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-more.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T14:32:49Z",
+      "side": 1,
+      "message": "Missing quotation marks \"/tm:cont/tm:lf\"",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
