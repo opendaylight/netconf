@@ -105,6 +105,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "18c236c0_0bb479b5",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-module.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-07-28T14:43:04Z",
+      "side": 1,
+      "message": "RFC6020 have examples with quotation. But looks like test create schema-context without problems. So namespace without quotation could be alright. \nMy IDEA YANG plugin YANGinator notified my about this as an issue.\n\nLet me know what you think about it.",
+      "parentUuid": "a5ede8d3_9f28f5e8",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f783d8d7_09325f88",
         "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-more.yang",
         "patchSetId": 9
