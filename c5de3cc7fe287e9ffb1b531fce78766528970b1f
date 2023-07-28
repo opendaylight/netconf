@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1554fc4_b7cde391",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-28T14:10:52Z",
+      "side": 1,
+      "message": "This one can\u0027t be done. And if you tried you know why. If I use var here then it will be considered as HashMap\u003cObject, Object\u003e by java and compiler will mark it as syntax error when I\u0027ll try create OpenApiObject using this as parameter.",
+      "parentUuid": "f4a02daf_cbfe607c",
+      "range": {
+        "startLine": 97,
+        "startChar": 14,
+        "endLine": 97,
+        "endChar": 31
+      },
+      "revId": "c5de3cc7fe287e9ffb1b531fce78766528970b1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "739ac957_066a2d6f",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-07-27T11:41:05Z",
       "side": 1,
       "message": "Previously, the value for deviceName was \"Controller\". Keep it as it was",
+      "range": {
+        "startLine": 109,
+        "startChar": 46,
+        "endLine": 109,
+        "endChar": 48
+      },
+      "revId": "c5de3cc7fe287e9ffb1b531fce78766528970b1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2ffff25_9a789e68",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-28T14:10:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "739ac957_066a2d6f",
       "range": {
         "startLine": 109,
         "startChar": 46,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "07f2ff79_e0efa1d5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-28T14:10:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "154a8010_ed9f4a3b",
+      "range": {
+        "startLine": 192,
+        "startChar": 51,
+        "endLine": 192,
+        "endChar": 54
+      },
+      "revId": "c5de3cc7fe287e9ffb1b531fce78766528970b1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "98bd8f1f_3020d236",
@@ -83,6 +155,30 @@
       "writtenOn": "2023-07-27T11:41:05Z",
       "side": 1,
       "message": "keep this on 1 line",
+      "range": {
+        "startLine": 192,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 35
+      },
+      "revId": "c5de3cc7fe287e9ffb1b531fce78766528970b1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aba5a208_8658da59",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-28T14:10:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98bd8f1f_3020d236",
       "range": {
         "startLine": 192,
         "startChar": 0,
