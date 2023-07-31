@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public final class NettyTransportSupport {
     private static final Logger LOG = LoggerFactory.getLogger(NettyTransportSupport.class);
-    private static final AbstractNettyImpl IMPL = Epoll.isAvailable() ? new EpollNettyImpl() : new NioNettyImpl();
+    private static final AbstractNettyImpl IMPL = Epoll.isAvailable() ? new EpollNettyImpl() : NioNettyImpl.INSTANCE;
 
     static {
         LOG.info("Netty transport backed by {}", IMPL);

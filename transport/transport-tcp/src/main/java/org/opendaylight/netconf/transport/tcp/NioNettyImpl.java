@@ -98,15 +98,35 @@ final class NioNettyImpl extends AbstractNettyImpl {
         SUPPORT = support;
     }
 
+    static final NioNettyImpl INSTANCE;
+
+    static {
+        final var grp = new NioEventLoopGroup();
+        try {
+            try {
+                final var ch = new NioSocketChannel();
+                grp.register(ch).sync();
+
+                final boolean supportsKeepalives;
+                try {
+                    supportsKeepalives = SUPPORT.configureKeepalives(ch.config());
+                } finally {
+                    ch.close().sync();
+                }
+                INSTANCE = new NioNettyImpl(supportsKeepalives);
+            } finally {
+                grp.shutdownGracefully().sync();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
     private final boolean supportsKeepalives;
 
-    NioNettyImpl() {
-        final var ch = new NioSocketChannel();
-        try {
-            supportsKeepalives = SUPPORT.configureKeepalives(ch.config());
-        } finally {
-            ch.close();
-        }
+    NioNettyImpl(final boolean supportsKeepalives) {
+        this.supportsKeepalives = supportsKeepalives;
     }
 
     @Override
