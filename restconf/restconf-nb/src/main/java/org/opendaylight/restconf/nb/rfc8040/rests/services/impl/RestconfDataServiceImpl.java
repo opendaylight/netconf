@@ -16,6 +16,7 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -270,7 +271,7 @@ public final class RestconfDataServiceImpl {
 
         final var existing = listenersBroker.notificationListenerFor(streamName);
         return existing != null ? existing
-            : listenersBroker.registerNotificationListener(Absolute.of(notifName), streamName, outputType);
+            : listenersBroker.registerNotificationListener(ImmutableSet.of(notifName), streamName, outputType);
     }
 
     private static String createNotificationStreamName(final String moduleName, final String notifName,

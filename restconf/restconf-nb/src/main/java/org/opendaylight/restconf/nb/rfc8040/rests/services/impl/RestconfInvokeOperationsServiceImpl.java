@@ -39,6 +39,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStream;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -165,6 +166,9 @@ public final class RestconfInvokeOperationsServiceImpl {
             // Hacked-up integration of streams
             if (CreateDataChangeEventSubscription.QNAME.equals(type)) {
                 return RestconfFuture.of(Optional.of(CreateStreamUtil.createDataChangeNotifiStream(
+                    streamUtils.listenersBroker(), input, localDatabind.modelContext())));
+            } else if (CreateNotificationStream.QNAME.equals(type)) {
+                return RestconfFuture.of(Optional.of(CreateStreamUtil.createNotificationStream(
                     streamUtils.listenersBroker(), input, localDatabind.modelContext())));
             } else if (SubscribeDeviceNotification.QNAME.equals(type)) {
                 final var baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
