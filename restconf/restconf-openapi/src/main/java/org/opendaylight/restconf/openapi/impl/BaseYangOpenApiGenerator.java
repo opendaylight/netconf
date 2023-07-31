@@ -416,7 +416,7 @@ public abstract class BaseYangOpenApiGenerator {
             return Collections.emptySortedSet();
         }
 
-        final SortedSet<Module> sortedModules = new TreeSet<>((module1, module2) -> {
+        final var sortedModules = new TreeSet<Module>((module1, module2) -> {
             int result = module1.getName().compareTo(module2.getName());
             if (result == 0) {
                 result = Revision.compare(module1.getRevision(), module2.getRevision());
