@@ -11,6 +11,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -55,14 +56,14 @@ public class XmlNotificationListenerTest {
 
     @Test
     public void notifi_leafTest() throws Exception {
-        final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-leaf"));
+        final QName schemaPathNotifi = QName.create(MODULE, "notifi-leaf");
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
-        final ContainerNode notifiBody = mockCont(schemaPathNotifi.lastNodeIdentifier(), leaf);
+        final ContainerNode notifiBody = mockCont(schemaPathNotifi, leaf);
 
-        when(notificationData.getType()).thenReturn(schemaPathNotifi);
+        when(notificationData.getType()).thenReturn(Absolute.of(schemaPathNotifi));
         when(notificationData.getBody()).thenReturn(notifiBody);
 
         final String result = prepareXmlResult(notificationData, schemaPathNotifi);
@@ -76,15 +77,15 @@ public class XmlNotificationListenerTest {
 
     @Test
     public void notifi_cont_leafTest() throws Exception {
-        final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-cont"));
+        final QName schemaPathNotifi = QName.create(MODULE, "notifi-cont");
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
         final ContainerNode cont = mockCont(QName.create(MODULE, "cont"), leaf);
-        final ContainerNode notifiBody = mockCont(schemaPathNotifi.lastNodeIdentifier(), cont);
+        final ContainerNode notifiBody = mockCont(schemaPathNotifi, cont);
 
-        when(notificationData.getType()).thenReturn(schemaPathNotifi);
+        when(notificationData.getType()).thenReturn(Absolute.of(schemaPathNotifi));
         when(notificationData.getBody()).thenReturn(notifiBody);
 
         final String result = prepareXmlResult(notificationData, schemaPathNotifi);
@@ -98,18 +99,18 @@ public class XmlNotificationListenerTest {
 
     @Test
     public void notifi_list_Test() throws Exception {
-        final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-list"));
+        final QName schemaPathNotifi = QName.create(MODULE, "notifi-list");
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
         final MapEntryNode entry = mockMapEntry(QName.create(MODULE, "lst"), leaf);
-        final ContainerNode notifiBody = mockCont(schemaPathNotifi.lastNodeIdentifier(), Builders.mapBuilder()
+        final ContainerNode notifiBody = mockCont(schemaPathNotifi, Builders.mapBuilder()
             .withNodeIdentifier(NodeIdentifier.create(QName.create(MODULE, "lst")))
             .withChild(entry)
             .build());
 
-        when(notificationData.getType()).thenReturn(schemaPathNotifi);
+        when(notificationData.getType()).thenReturn(Absolute.of(schemaPathNotifi));
         when(notificationData.getBody()).thenReturn(notifiBody);
 
         final String result = prepareXmlResult(notificationData, schemaPathNotifi);
@@ -123,14 +124,14 @@ public class XmlNotificationListenerTest {
 
     @Test
     public void notifi_grpTest() throws Exception {
-        final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-grp"));
+        final QName schemaPathNotifi = QName.create(MODULE, "notifi-grp");
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
-        final ContainerNode notifiBody = mockCont(schemaPathNotifi.lastNodeIdentifier(), leaf);
+        final ContainerNode notifiBody = mockCont(schemaPathNotifi, leaf);
 
-        when(notificationData.getType()).thenReturn(schemaPathNotifi);
+        when(notificationData.getType()).thenReturn(Absolute.of(schemaPathNotifi));
         when(notificationData.getBody()).thenReturn(notifiBody);
 
         final String result = prepareXmlResult(notificationData, schemaPathNotifi);
@@ -144,14 +145,14 @@ public class XmlNotificationListenerTest {
 
     @Test
     public void notifi_augmTest() throws Exception {
-        final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-augm"));
+        final QName schemaPathNotifi = QName.create(MODULE, "notifi-augm");
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf-augm"));
-        final ContainerNode notifiBody = mockCont(schemaPathNotifi.lastNodeIdentifier(), leaf);
+        final ContainerNode notifiBody = mockCont(schemaPathNotifi, leaf);
 
-        when(notificationData.getType()).thenReturn(schemaPathNotifi);
+        when(notificationData.getType()).thenReturn(Absolute.of(schemaPathNotifi));
         when(notificationData.getBody()).thenReturn(notifiBody);
 
         final String result = prepareXmlResult(notificationData, schemaPathNotifi);
@@ -189,10 +190,10 @@ public class XmlNotificationListenerTest {
         return ImmutableNodes.leafNode(leafQName, "value");
     }
 
-    private static String prepareXmlResult(final DOMNotification notificationData, final Absolute schemaPathNotifi)
+    private static String prepareXmlResult(final DOMNotification notificationData, final QName schemaPathNotifi)
             throws Exception {
         final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
-                schemaPathNotifi, "xml-stream", NotificationOutputTypeGrouping.NotificationOutputType.XML);
+            ImmutableSet.of(schemaPathNotifi), "xml-stream", NotificationOutputTypeGrouping.NotificationOutputType.XML);
         return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false,
                 false, false).orElseThrow();
     }
