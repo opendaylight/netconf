@@ -36,6 +36,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOpe
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStream;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -83,6 +84,9 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             if (CreateDataChangeEventSubscription.QNAME.equals(rpcName)) {
                 future = Futures.immediateFuture(
                     CreateStreamUtil.createDataChangeNotifiStream(rpcInput, schemaContext));
+            } else if (CreateNotificationStream.QNAME.equals(rpcName)) {
+                future = Futures.immediateFuture(
+                    CreateStreamUtil.createNotificationStream(rpcInput, schemaContext));
             } else if (SubscribeDeviceNotification.QNAME.equals(rpcName)) {
                 final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
                 future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, rpcInput,
