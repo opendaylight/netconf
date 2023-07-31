@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67a7adb8_cd3ac485",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1201a71f_807656ce",
+      "range": {
+        "startLine": 101,
+        "startChar": 19,
+        "endLine": 101,
+        "endChar": 25
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ed7f029_24cb72c4",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-07-31T12:09:34Z",
       "side": 1,
       "message": "var",
+      "range": {
+        "startLine": 111,
+        "startChar": 14,
+        "endLine": 111,
+        "endChar": 24
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7939fe02_c7d4a937",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ed7f029_24cb72c4",
       "range": {
         "startLine": 111,
         "startChar": 14,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b99e1b2a_fd39bc4c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00ae2c24_d54085c9",
+      "range": {
+        "startLine": 165,
+        "startChar": 8,
+        "endLine": 165,
+        "endChar": 40
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a42c5a9_42355a21",
@@ -83,6 +155,30 @@
       "writtenOn": "2023-07-31T12:09:34Z",
       "side": 1,
       "message": "This seems to me like a misuse of the Optional API, as it was intended to indicate a \"missing\" value returned from a function. (https://stackoverflow.com/a/23464794)\nWe are not returning this `range` back to any user, only working with it in this method.\nEven using null would look better IMO. Or consider using Range.all() and let `BaseYangOpenApiGenerator#filterByRange` method to handle the case, when the range is `Range.all()`",
+      "range": {
+        "startLine": 176,
+        "startChar": 8,
+        "endLine": 176,
+        "endChar": 58
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa291707_563af053",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a42c5a9_42355a21",
       "range": {
         "startLine": 176,
         "startChar": 8,
@@ -116,6 +212,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bcf60f5_4a53f791",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "969e5eaa_53cd1421",
+      "range": {
+        "startLine": 179,
+        "startChar": 18,
+        "endLine": 179,
+        "endChar": 21
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae9bd3e7_23d506f7",
@@ -129,6 +249,30 @@
       "writtenOn": "2023-07-31T12:09:34Z",
       "side": 1,
       "message": "final var paths \u003d new HashMap\u003cString, Path\u003e();",
+      "range": {
+        "startLine": 195,
+        "startChar": 8,
+        "endLine": 195,
+        "endChar": 56
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b3e34d9_567fd589",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae9bd3e7_23d506f7",
       "range": {
         "startLine": 195,
         "startChar": 8,
@@ -162,6 +306,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5697e861_e2b5c4b1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a67f0e3_3d9482ae",
+      "range": {
+        "startLine": 196,
+        "startChar": 14,
+        "endLine": 196,
+        "endChar": 33
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "262efff3_4df3ade7",
@@ -175,6 +343,30 @@
       "writtenOn": "2023-07-31T12:09:34Z",
       "side": 1,
       "message": "access this in a static way `BaseYangOpenApiGenerator.getSortedModules(context);`\nThis clearly communicates that it is a `public static` method",
+      "range": {
+        "startLine": 198,
+        "startChar": 28,
+        "endLine": 198,
+        "endChar": 61
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "859f02b7_8c275064",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "262efff3_4df3ade7",
       "range": {
         "startLine": 198,
         "startChar": 28,
@@ -208,6 +400,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a86f6fa1_06ac7112",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6603437e_cb364fa0",
+      "range": {
+        "startLine": 206,
+        "startChar": 19,
+        "endLine": 206,
+        "endChar": 25
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91dbcb65_74095c4d",
@@ -231,6 +447,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2337b678_af6053f0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91dbcb65_74095c4d",
+      "range": {
+        "startLine": 208,
+        "startChar": 16,
+        "endLine": 209,
+        "endChar": 34
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a633a89_91d0f846",
@@ -244,6 +484,30 @@
       "writtenOn": "2023-07-31T12:09:34Z",
       "side": 1,
       "message": "this fits on 1 line",
+      "range": {
+        "startLine": 214,
+        "startChar": 12,
+        "endLine": 215,
+        "endChar": 24
+      },
+      "revId": "8cba0be0cccc0237fd623c8f27d38cc7df874287",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9e7c3f5_62653d21",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-07-31T21:14:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a633a89_91d0f846",
       "range": {
         "startLine": 214,
         "startChar": 12,
