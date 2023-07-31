@@ -14,7 +14,6 @@ import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -30,9 +29,8 @@ abstract class AbstractNotificationListenerAdaptor extends AbstractCommonSubscri
     private static final NotificationFormatterFactory JSON_FORMATTER_FACTORY =
         JSONNotificationFormatter.createFactory(JSONCodecFactorySupplier.RFC7951);
 
-    AbstractNotificationListenerAdaptor(final QName lastQName, final String streamName,
-            final NotificationOutputType outputType) {
-        super(lastQName, streamName, outputType, getFormatterFactory(outputType));
+    AbstractNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType) {
+        super(streamName, outputType, getFormatterFactory(outputType));
     }
 
     private static NotificationFormatterFactory getFormatterFactory(final NotificationOutputType outputType) {

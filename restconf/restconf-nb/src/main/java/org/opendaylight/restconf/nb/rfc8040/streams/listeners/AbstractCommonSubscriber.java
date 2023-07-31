@@ -33,7 +33,6 @@ import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,9 +68,8 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
     private boolean changedLeafNodesOnly = false;
     private EventFormatter<T> formatter;
 
-    AbstractCommonSubscriber(final QName lastQName, final String streamName, final NotificationOutputType outputType,
+    AbstractCommonSubscriber(final String streamName, final NotificationOutputType outputType,
             final EventFormatterFactory<T> formatterFactory) {
-        super(lastQName);
         this.streamName = requireNonNull(streamName);
         checkArgument(!streamName.isEmpty());
 
@@ -106,7 +104,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
             registration.close();
             registration = null;
         }
-        deleteDataInDS().get();
+        deleteDataInDS(streamName).get();
         subscribers.clear();
     }
 

@@ -17,7 +17,6 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.nb.rfc8040.streams.SSESessionHandler;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -40,8 +39,7 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
     public DeviceNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType,
             final EffectiveModelContext effectiveModel, final DOMMountPointService mountPointService,
             final YangInstanceIdentifier path) {
-        // FIXME: a dummy QName due to contracts
-        super(QName.create("dummy", "dummy"), streamName, outputType);
+        super(streamName, outputType);
         this.effectiveModel = requireNonNull(effectiveModel);
         this.mountPointService = requireNonNull(mountPointService);
         instanceIdentifier = requireNonNull(path);

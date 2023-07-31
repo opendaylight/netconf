@@ -26,7 +26,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -39,14 +38,8 @@ abstract class AbstractNotificationsData {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationsData.class);
     private static final TransformerFactory TF = TransformerFactory.newInstance();
 
-    private final String localName;
-
     protected DatabindProvider databindProvider;
     private DOMDataBroker dataBroker;
-
-    AbstractNotificationsData(final QName lastQName) {
-        localName = lastQName.getLocalName();
-    }
 
     /**
      * Data broker for delete data in DS on close().
@@ -66,9 +59,9 @@ abstract class AbstractNotificationsData {
      */
     // FIXME: here we touch datastore, which probably should be done by whoever instantiated us or created the resource,
     //        or they should be giving us the transaction
-    protected ListenableFuture<?> deleteDataInDS() {
+    protected final ListenableFuture<?> deleteDataInDS(final String streamName) {
         final DOMDataTreeWriteTransaction wTx = dataBroker.newWriteOnlyTransaction();
-        wTx.delete(LogicalDatastoreType.OPERATIONAL, RestconfStateStreams.restconfStateStreamPath(localName));
+        wTx.delete(LogicalDatastoreType.OPERATIONAL, RestconfStateStreams.restconfStateStreamPath(streamName));
         return wTx.commit();
     }
 

@@ -29,7 +29,7 @@ public final class NotificationListenerAdapter extends AbstractNotificationListe
      * @param outputType Type of output on notification (JSON or XML).
      */
     NotificationListenerAdapter(final Absolute path, final String streamName, final NotificationOutputType outputType) {
-        super(path.lastNodeIdentifier(), streamName, outputType);
+        super(streamName, outputType);
         this.path = requireNonNull(path);
     }
 
