@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98ca83ef_724db496",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-31T07:29:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58596ef0_5d25ceb6",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c66ba60e_228ff8e0",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-28T14:32:49Z",
       "side": 1,
       "message": "var",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b189e227_80200c36",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-31T07:29:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c66ba60e_228ff8e0",
       "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d84efa23_8c65d4ad",
+        "filename": "apps/yanglib-mdsal-writer/src/test/java/org/opendaylight/netconf/yanglib/writer/YangLibraryWriterTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-31T07:29:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32e2de72_62be9589",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a75bf193_b21376f4",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7df36f3b_189bf614",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-module.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-31T07:29:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a75bf193_b21376f4",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8fe0e5e2_556e35de",
@@ -82,6 +154,24 @@
       "writtenOn": "2023-07-28T14:32:49Z",
       "side": 1,
       "message": "can we use newer version 1.1?",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa60edea_866c2d03",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-module.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-31T07:29:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8fe0e5e2_556e35de",
       "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -121,6 +211,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6708b3c8_819dd00b",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-module.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-31T07:29:37Z",
+      "side": 1,
+      "message": "idea plugin is outdated long ago and it causing more problems then benefits.\nupdated, anyway, it plays no role in test scope",
+      "parentUuid": "a5ede8d3_9f28f5e8",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f783d8d7_09325f88",
@@ -138,6 +246,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "584cc274_a84e5c8f",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-more.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-31T07:29:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f783d8d7_09325f88",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "089ee4d2_f0227b4f",
@@ -151,6 +277,24 @@
       "writtenOn": "2023-07-28T14:32:49Z",
       "side": 1,
       "message": "Missing quotation marks \"/tm:cont/tm:lf\"",
+      "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4463b12_37f6b15c",
+        "filename": "apps/yanglib-mdsal-writer/src/test/resources/test-more.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-07-31T07:29:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "089ee4d2_f0227b4f",
       "revId": "4c47ce6f8a1fef6f788887f72f3ab08d4fd2019c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
