@@ -25,7 +25,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -419,15 +418,14 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     @Test
     public void testPatchData() {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase);
-        final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)
                 .node(leafQname)
                 .build();
-        entity.add(new PatchEntity("create data", CREATE, iidBase, buildBaseCont));
-        entity.add(new PatchEntity("replace data", REPLACE, iidBase, buildBaseCont));
-        entity.add(new PatchEntity("delete data", DELETE, iidleaf));
-        final PatchContext patch = new PatchContext(iidContext, entity, "test patch id");
+        final PatchContext patch = new PatchContext(iidContext, List.of(
+            new PatchEntity("create data", CREATE, iidBase, buildBaseCont),
+            new PatchEntity("replace data", REPLACE, iidBase, buildBaseCont),
+            new PatchEntity("delete data", DELETE, iidleaf)), "test patch id");
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(immediateFalseFluentFuture())
@@ -444,15 +442,14 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     public void testPatchDataMountPoint() throws Exception {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint,
             JUKEBOX_SCHEMA, iidBase);
-        final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)
                 .node(leafQname)
                 .build();
-        entity.add(new PatchEntity("create data", CREATE, iidBase, buildBaseCont));
-        entity.add(new PatchEntity("replace data", REPLACE, iidBase, buildBaseCont));
-        entity.add(new PatchEntity("delete data", DELETE, iidleaf));
-        final PatchContext patch = new PatchContext(iidContext, entity, "test patch id");
+        final PatchContext patch = new PatchContext(iidContext, List.of(
+            new PatchEntity("create data", CREATE, iidBase, buildBaseCont),
+            new PatchEntity("replace data", REPLACE, iidBase, buildBaseCont),
+            new PatchEntity("delete data", DELETE, iidleaf)), "test patch id");
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(immediateFalseFluentFuture())
@@ -468,15 +465,14 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     @Test
     public void testPatchDataDeleteNotExist() {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase);
-        final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)
                 .node(leafQname)
                 .build();
-        entity.add(new PatchEntity("create data", CREATE, iidBase, buildBaseCont));
-        entity.add(new PatchEntity("remove data", REMOVE, iidleaf));
-        entity.add(new PatchEntity("delete data", DELETE, iidleaf));
-        final PatchContext patch = new PatchContext(iidContext, entity, "test patch id");
+        final PatchContext patch = new PatchContext(iidContext, List.of(
+            new PatchEntity("create data", CREATE, iidBase, buildBaseCont),
+            new PatchEntity("remove data", REMOVE, iidleaf),
+            new PatchEntity("delete data", DELETE, iidleaf)), "test patch id");
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(immediateFalseFluentFuture())
