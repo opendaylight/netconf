@@ -275,10 +275,9 @@ public abstract class BaseYangOpenApiGenerator {
         if (containsListOrContainer(module.getChildNodes())) {
             final String moduleName = module.getName();
             final String name = moduleName + MODULE_NAME_SUFFIX;
-            final var postBuilder = new Path.Builder();
-            postBuilder.post(buildPost("", name, "", moduleName, deviceName,
-                    module.getDescription().orElse(""), pathParams));
-            paths.put(resourcePath, postBuilder.build());
+            paths.put(resourcePath, new Path.Builder()
+                .post(buildPost("", name, "", moduleName, deviceName, module.getDescription().orElse(""), pathParams))
+                .build());
         }
     }
 
@@ -399,13 +398,13 @@ public abstract class BaseYangOpenApiGenerator {
 
                 final String description = listSchemaNode.findDataChildByName(listKey)
                     .flatMap(DataSchemaNode::getDescription).orElse(null);
-                final Parameter.Builder pathParamBuilder = new Parameter.Builder()
+                pathParams.add(new Parameter.Builder()
                     .name(paramName)
                     .schema(new Schema.Builder().type("string").build())
                     .in("path")
                     .required(true)
-                    .description(description);
-                pathParams.add(pathParamBuilder.build());
+                    .description(description)
+                    .build());
             }
         }
         return path.toString();
@@ -433,10 +432,9 @@ public abstract class BaseYangOpenApiGenerator {
     private static void addOperations(final OperationDefinition operDef, final String moduleName,
             final String deviceName, final Map<String, Path> paths, final String parentName,
             final DefinitionNames definitionNames, final String resourcePath, final List<Parameter> parentPathParams) {
-        final var pathBuilder = new Path.Builder();
-        pathBuilder.post(buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames,
-            parentPathParams));
-        paths.put(resourcePath, pathBuilder.build());
+        paths.put(resourcePath, new Path.Builder()
+            .post(buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames, parentPathParams))
+            .build());
     }
 
     public String generateUrlPrefixFromInstanceID(final YangInstanceIdentifier key, final String moduleName) {
