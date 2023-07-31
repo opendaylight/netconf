@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
@@ -25,7 +27,6 @@ import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentit
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.client.session.SessionFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
@@ -51,17 +52,15 @@ public final class SSHClient extends SSHTransportStack {
     private final SessionFactory sessionFactory;
 
     private SSHClient(final TransportChannelListener listener, final ClientFactoryManager clientFactoryManager,
-            final String username) {
+            final String username, final @Nullable ClientSubsystemFactory subsystemFactory) {
         super(listener);
         this.clientFactoryManager = clientFactoryManager;
         this.clientFactoryManager.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
-        sessionFactory = new SessionFactory(clientFactoryManager) {
-            @Override
-            protected ClientSessionImpl setupSession(final ClientSessionImpl session) {
-                session.setUsername(username);
-                return session;
-            }
-        };
+        if (subsystemFactory != null) {
+            this.clientFactoryManager.addSessionListener(
+                new ClientSubsystemSessionListener(subsystemFactory.subsystemName()));
+        }
+        sessionFactory = new ClientSessionFactory(clientFactoryManager, username, subsystemFactory);
         ioService = new SshIoService(this.clientFactoryManager,
                 new DefaultChannelGroup("sshd-client-channels", GlobalEventExecutor.INSTANCE),
                 sessionFactory);
@@ -75,16 +74,38 @@ public final class SSHClient extends SSHTransportStack {
     public static @NonNull ListenableFuture<SSHClient> connect(final TransportChannelListener listener,
             final Bootstrap bootstrap, final TcpClientGrouping connectParams,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        final var factoryMgr = newFactoryManager(clientParams);
-        final var sshClient = new SSHClient(listener, factoryMgr, getUsername(clientParams));
+        final var factoryMgr = newFactoryManager(requireNonNull(clientParams));
+        final var sshClient = new SSHClient(listener, factoryMgr, getUsername(clientParams), null);
+        return transformUnderlay(sshClient, TCPClient.connect(sshClient.asListener(), bootstrap, connectParams));
+    }
+
+    /**
+     * Builds and starts SSH client. Opens custom subsystem channel on successful authentication.
+     *
+     * @param listener transport channel listener
+     * @param bootstrap bootstrap instance
+     * @param connectParams tcp layer configuration parameters
+     * @param clientParams ssh overlay configuration
+     * @param subsystemFactory client subsystem factory
+     * @return client instance as listenable future
+     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
+     * @throws NullPointerException if any parameters is null
+     */
+    public static @NonNull ListenableFuture<SSHClient> connect(final TransportChannelListener listener,
+            final Bootstrap bootstrap, final TcpClientGrouping connectParams,
+            final SshClientGrouping clientParams,  final ClientSubsystemFactory subsystemFactory)
+            throws UnsupportedConfigurationException {
+        final var factoryMgr = newFactoryManager(requireNonNull(clientParams));
+        final var sshClient = new SSHClient(listener, factoryMgr, getUsername(clientParams),
+            requireNonNull(subsystemFactory));
         return transformUnderlay(sshClient, TCPClient.connect(sshClient.asListener(), bootstrap, connectParams));
     }
 
     public static @NonNull ListenableFuture<SSHClient> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final TcpServerGrouping listenParams, final SshClientGrouping clientParams)
-            throws UnsupportedConfigurationException {
-        final var factoryMgr = newFactoryManager(clientParams);
-        final var sshClient = new SSHClient(listener, factoryMgr, getUsername(clientParams));
+            final ServerBootstrap bootstrap, final TcpServerGrouping listenParams,
+            final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
+        final var factoryMgr = newFactoryManager(requireNonNull(clientParams));
+        final var sshClient = new SSHClient(listener, factoryMgr, getUsername(clientParams), null);
         return transformUnderlay(sshClient, TCPServer.listen(sshClient.asListener(), bootstrap, listenParams));
     }
 
@@ -93,7 +114,7 @@ public final class SSHClient extends SSHTransportStack {
         return clientIdentity == null ? "" : clientIdentity.getUsername();
     }
 
-    private static ClientFactoryManager newFactoryManager(final SshClientGrouping parameters)
+    private static ClientFactoryManager newFactoryManager(final @NonNull SshClientGrouping parameters)
             throws UnsupportedConfigurationException {
         final var factoryMgr = SshClient.setUpDefaultClient();
 
