@@ -255,8 +255,8 @@ public abstract class BaseYangOpenApiGenerator {
         for (final RpcDefinition rpcDefinition : module.getRpcs()) {
             final String resolvedPath = getResourcePath("operations", context) + "/" + moduleName + ":"
                     + rpcDefinition.getQName().getLocalName();
-            addOperations(rpcDefinition, moduleName, deviceName, paths, moduleName, definitionNames,
-                resolvedPath, new ArrayList<>());
+            paths.put(resolvedPath, buildPostPath(rpcDefinition, moduleName, deviceName, moduleName, definitionNames,
+                List.of()));
         }
 
         LOG.debug("Number of Paths found [{}]", paths.size());
@@ -313,8 +313,8 @@ public abstract class BaseYangOpenApiGenerator {
                 final String operationsPath = getResourcePath("operations", context)
                     + "/" + resourcePathPart
                     + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
-                addOperations(actionDef, moduleName, deviceName, paths, parentName, definitionNames, operationsPath,
-                    pathParams);
+                paths.put(operationsPath, buildPostPath(actionDef, operationsPath, operationsPath, operationsPath,
+                    definitionNames, pathParams));
             });
         }
 
@@ -429,12 +429,12 @@ public abstract class BaseYangOpenApiGenerator {
         return sortedModules;
     }
 
-    private static void addOperations(final OperationDefinition operDef, final String moduleName,
-            final String deviceName, final Map<String, Path> paths, final String parentName,
-            final DefinitionNames definitionNames, final String resourcePath, final List<Parameter> parentPathParams) {
-        paths.put(resourcePath, new Path.Builder()
+    private static Path buildPostPath(final OperationDefinition operDef, final String moduleName,
+            final String deviceName, final String parentName, final DefinitionNames definitionNames,
+            final List<Parameter> parentPathParams) {
+        return new Path.Builder()
             .post(buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames, parentPathParams))
-            .build());
+            .build();
     }
 
     public String generateUrlPrefixFromInstanceID(final YangInstanceIdentifier key, final String moduleName) {
