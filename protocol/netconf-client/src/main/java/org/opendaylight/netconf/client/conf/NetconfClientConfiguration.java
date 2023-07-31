@@ -21,6 +21,9 @@ import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.SshClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417.TlsClientGrouping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,14 +45,18 @@ public class NetconfClientConfiguration {
     private final @NonNegative int maximumIncomingChunkSize;
     private final String name;
 
+    private final TcpClientGrouping tcpParameters;
+    private final TlsClientGrouping tlsParameters;
+    private final SshClientGrouping sshParameters;
+
     NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address,
-                               final Long connectionTimeoutMillis,
-                               final NetconfHelloMessageAdditionalHeader additionalHeader,
-                               final NetconfClientSessionListener sessionListener,
-                               final AuthenticationHandler authHandler,
-                               final SslHandlerFactory sslHandlerFactory, final NetconfSshClient sshClient,
-                               final List<Uri> odlHelloCapabilities, final @NonNegative int maximumIncomingChunkSize,
-                               final String name) {
+            final Long connectionTimeoutMillis,
+            final NetconfHelloMessageAdditionalHeader additionalHeader,
+            final NetconfClientSessionListener sessionListener,
+            final AuthenticationHandler authHandler,
+            final SslHandlerFactory sslHandlerFactory, final NetconfSshClient sshClient,
+            final List<Uri> odlHelloCapabilities, final @NonNegative int maximumIncomingChunkSize,
+            final String name) {
         this.address = address;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.additionalHeader = additionalHeader;
@@ -61,7 +68,37 @@ public class NetconfClientConfiguration {
         this.odlHelloCapabilities = odlHelloCapabilities;
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
         this.name = name;
+        this.tcpParameters = null;
+        this.tlsParameters = null;
+        this.sshParameters = null;
         validateConfiguration();
+    }
+
+    NetconfClientConfiguration(final NetconfClientProtocol protocol, final TcpClientGrouping tcpParameters,
+            final TlsClientGrouping tlsParameters, final SshClientGrouping sshParameters,
+            final NetconfClientSessionListener sessionListener, final List<Uri> odlHelloCapabilities,
+            final Long connectionTimeoutMillis, final @NonNegative int maximumIncomingChunkSize,
+            final NetconfHelloMessageAdditionalHeader additionalHeader, final String name) {
+        this.clientProtocol = requireNonNull(protocol);
+        this.tcpParameters = requireNonNull(tcpParameters);
+        this.tlsParameters = tlsParameters;
+        this.sshParameters = sshParameters;
+        this.sessionListener = requireNonNull(sessionListener);
+        this.odlHelloCapabilities = odlHelloCapabilities;
+        this.connectionTimeoutMillis = connectionTimeoutMillis;
+        this.maximumIncomingChunkSize = maximumIncomingChunkSize;
+        this.additionalHeader = additionalHeader;
+        this.name = name;
+        this.address = null;
+        this.authHandler = null;
+        this.sslHandlerFactory = null;
+        this.sshClient = null;
+        // validate
+        if (NetconfClientProtocol.TLS.equals(protocol)) {
+            requireNonNull(tlsParameters);
+        } else if (NetconfClientProtocol.SSH.equals(protocol)) {
+            requireNonNull(sshParameters);
+        }
     }
 
     public final String getName() {
@@ -108,11 +145,23 @@ public class NetconfClientConfiguration {
         return maximumIncomingChunkSize;
     }
 
+    public final TcpClientGrouping getTcpParameters() {
+        return tcpParameters;
+    }
+
+    public final  TlsClientGrouping getTlsParameters() {
+        return tlsParameters;
+    }
+
+    public final SshClientGrouping getSshParameters() {
+        return sshParameters;
+    }
+
     private void validateConfiguration() {
         switch (requireNonNull(clientProtocol)) {
             case TLS:
-                validateTlsConfiguration();
                 validateTcpConfiguration();
+                validateTlsConfiguration();
                 break;
             case SSH:
                 validateSshConfiguration();
