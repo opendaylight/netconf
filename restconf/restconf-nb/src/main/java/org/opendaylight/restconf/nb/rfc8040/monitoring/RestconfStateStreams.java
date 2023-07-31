@@ -15,8 +15,9 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
@@ -70,27 +71,24 @@ public final class RestconfStateStreams {
     /**
      * Map data of yang notification to normalized node according to ietf-restconf-monitoring.
      *
-     * @param context the {@link EffectiveModelContext}
-     * @param notifiQName qname of notification from listener
+     * @param streamName stream name
+     * @param qnames Notification QNames to listen on
      * @param start start-time query parameter of notification
      * @param outputType output type of notification
      * @param uri location of registered listener for sending data of notification
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
-    public static MapEntryNode notificationStreamEntry(final EffectiveModelContext context, final QName notifiQName,
+    public static MapEntryNode notificationStreamEntry(final String streamName, final Set<QName> qnames,
             final Instant start, final String outputType, final URI uri) {
-        final var notificationDefinition = context.findNotification(notifiQName)
-            .orElseThrow(() -> new RestconfDocumentedException(notifiQName + " not found"));
-
-        final String streamName = notifiQName.getLocalName();
         final var streamEntry = Builders.mapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName))
-            .withChild(ImmutableNodes.leafNode(NAME_QNAME, streamName));
-
-        notificationDefinition.getDescription().ifPresent(
-            desc -> streamEntry.withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, desc)));
-        streamEntry.withChild(ImmutableNodes.leafNode(REPLAY_SUPPORT_QNAME, Boolean.TRUE));
+            .withChild(ImmutableNodes.leafNode(NAME_QNAME, streamName))
+            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, qnames.stream()
+                .map(QName::toString)
+                .collect(Collectors.joining(","))))
+            // FIXME: this is not quite accurate
+            .withChild(ImmutableNodes.leafNode(REPLAY_SUPPORT_QNAME, Boolean.TRUE));
         if (start != null) {
             streamEntry.withChild(ImmutableNodes.leafNode(REPLAY_LOG_CREATION_TIME,
                 DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start,

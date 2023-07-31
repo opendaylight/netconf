@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.Nullable;
@@ -27,6 +28,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev2211
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStreamInput;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -40,6 +42,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -70,6 +74,8 @@ final class CreateStreamUtil {
         NodeIdentifier.create(DEVICE_NOTIFICATION_PATH_QNAME);
     private static final NodeIdentifier SAL_REMOTE_OUTPUT_NODEID =
         NodeIdentifier.create(CreateDataChangeEventSubscriptionOutput.QNAME);
+    private static final NodeIdentifier NOTIFICATIONS =
+        NodeIdentifier.create(QName.create(CreateNotificationStreamInput.QNAME, "notifications").intern());
     private static final NodeIdentifier PATH_NODEID =
         NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionInput.QNAME, "path").intern());
     private static final NodeIdentifier STREAM_NAME_NODEID =
@@ -125,6 +131,52 @@ final class CreateStreamUtil {
         listenersBroker.registerDataChangeListener(path, streamName, outputType);
 
         // building of output
+        return Builders.containerBuilder()
+            .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
+            .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, streamName))
+            .build();
+    }
+
+    // FIXME: this really should be a normal RPC implementation
+    static ContainerNode createNotificationStream(final ListenersBroker listenersBroker, final ContainerNode input,
+            final EffectiveModelContext refSchemaCtx) {
+        final var qnames = ((LeafSetNode<String>) input.getChildByArg(NOTIFICATIONS)).body().stream()
+            .map(LeafSetEntryNode::body)
+            .map(QName::create)
+            .sorted()
+            .collect(ImmutableSet.toImmutableSet());
+
+        final var streamNameBuilder = new StringBuilder(RestconfStreamsConstants.NOTIFICATION_STREAM).append('/');
+        var haveFirst = false;
+        for (var qname : qnames) {
+            final var module = refSchemaCtx.findModuleStatement(qname.getModule())
+                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown module",
+                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+            final var stmt = module.findSchemaTreeNode(qname)
+                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an notification",
+                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+            if (!(stmt instanceof NotificationEffectiveStatement)) {
+                throw new RestconfDocumentedException(qname + " refers to a non-notification",
+                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+            }
+
+            if (haveFirst) {
+                streamNameBuilder.append(',');
+            } else {
+                haveFirst = true;
+            }
+            streamNameBuilder.append(module.argument().getLocalName()).append(':').append(qname.getLocalName());
+        }
+        final var outputType = prepareOutputType(input);
+        if (outputType.equals(NotificationOutputType.JSON)) {
+            streamNameBuilder.append('/').append(outputType.getName());
+        }
+
+        final var streamName = streamNameBuilder.toString();
+
+        // registration of the listener
+        listenersBroker.registerNotificationListener(qnames, streamName, outputType);
+
         return Builders.containerBuilder()
             .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
             .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, streamName))

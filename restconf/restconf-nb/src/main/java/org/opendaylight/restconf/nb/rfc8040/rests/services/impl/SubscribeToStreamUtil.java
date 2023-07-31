@@ -140,14 +140,13 @@ abstract class SubscribeToStreamUtil {
                 ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
         }
 
-        final var schemaContext = handlersHolder.getDatabindProvider().currentContext().modelContext();
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         notificationListenerAdapter.setQueryParams(notificationQueryParams);
         notificationListenerAdapter.listen(handlersHolder.getNotificationServiceHandler());
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getDatabindProvider());
-        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(schemaContext,
-            notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(), notificationListenerAdapter.getStart(),
+        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(streamName,
+            notificationListenerAdapter.qnames(), notificationListenerAdapter.getStart(),
             notificationListenerAdapter.getOutputType(), uri);
 
         // FIXME: how does this correlate with the transaction notificationListenerAdapter.close() will do?

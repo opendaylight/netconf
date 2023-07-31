@@ -18,6 +18,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -73,10 +74,10 @@ public class RestconfStateStreamsTest {
         final URI uri = new URI("uri");
 
         final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
-        map.put(RestconfStateStreams.DESCRIPTION_QNAME, "Notifi");
+        map.put(RestconfStateStreams.DESCRIPTION_QNAME, "(urn:nested:module?revision=2014-06-03)notifi");
 
-        final MapEntryNode mappedData = RestconfStateStreams.notificationStreamEntry(schemaContextMonitoring,
-            QName.create("urn:nested:module", "2014-06-03", "notifi"), start, outputType, uri);
+        final MapEntryNode mappedData = RestconfStateStreams.notificationStreamEntry("notifi",
+            Set.of(QName.create("urn:nested:module", "2014-06-03", "notifi")), start, outputType, uri);
         assertMappedData(map, mappedData);
     }
 

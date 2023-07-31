@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.StampedLock;
@@ -21,10 +22,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
@@ -157,21 +158,21 @@ public final class ListenersBroker {
      * Creates new {@link NotificationDefinition} listener using input stream name and schema path
      * if such listener haven't been created yet.
      *
-     * @param schemaPath Schema path of YANG notification structure.
+     * @param notifications {@link QName}s of accepted YANG notifications
      * @param streamName Stream name.
      * @param outputType Specific type of output for notifications - XML or JSON.
      * @return Created or existing notification listener adapter.
      */
-    public NotificationListenerAdapter registerNotificationListener(final Absolute schemaPath,
+    public NotificationListenerAdapter registerNotificationListener(final ImmutableSet<QName> notifications,
             final String streamName, final NotificationOutputType outputType) {
-        requireNonNull(schemaPath);
+        requireNonNull(notifications);
         requireNonNull(streamName);
         requireNonNull(outputType);
 
         final long stamp = notificationListenersLock.writeLock();
         try {
             return notificationListeners.computeIfAbsent(streamName,
-                stream -> new NotificationListenerAdapter(schemaPath, stream, outputType, this));
+                stream -> new NotificationListenerAdapter(notifications, stream, outputType, this));
         } finally {
             notificationListenersLock.unlockWrite(stamp);
         }

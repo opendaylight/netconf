@@ -9,11 +9,9 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAMS_PATH;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_ACCESS_PATH_PART;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_LOCATION_PATH_PART;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
@@ -29,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
@@ -55,7 +52,6 @@ import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -81,15 +77,11 @@ import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.CreateOrReplaceResult;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -99,13 +91,11 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
@@ -183,15 +173,7 @@ public final class RestconfDataServiceImpl {
             @Context final UriInfo uriInfo) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
         final var databind = databindProvider.currentContext();
-        final var schemaContextRef = databind.modelContext();
         final var reqPath = server.bindRequestPath(databind, identifier);
-        final var mountPoint = reqPath.getMountPoint();
-
-        // FIXME: this looks quite crazy, why do we even have it?
-        if (mountPoint == null && identifier != null && identifier.contains(STREAMS_PATH)
-            && !identifier.contains(STREAM_PATH_PART)) {
-            createAllYangNotificationStreams(schemaContextRef, uriInfo);
-        }
 
         final var nodeAndResponse = readData(reqPath, readParams);
 
@@ -241,58 +223,58 @@ public final class RestconfDataServiceImpl {
         });
     }
 
-    private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
-        final var transaction = dataBroker.newWriteOnlyTransaction();
-
-        for (var module : schemaContext.getModuleStatements().values()) {
-            final var moduleName = module.argument().getLocalName();
-            // Note: this handles only RFC6020 notifications
-            module.streamEffectiveSubstatements(NotificationEffectiveStatement.class).forEach(notification -> {
-                final var notifName = notification.argument();
-
-                writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
-                    createYangNotifiStream(moduleName, notifName, NotificationOutputType.XML));
-                writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
-                    createYangNotifiStream(moduleName, notifName, NotificationOutputType.JSON));
-            });
-        }
-
-        try {
-            transaction.commit().get();
-        } catch (final InterruptedException | ExecutionException e) {
-            throw new RestconfDocumentedException("Problem while putting data to DS.", e);
-        }
-    }
-
-    private NotificationListenerAdapter createYangNotifiStream(final String moduleName, final QName notifName,
-            final NotificationOutputType outputType) {
-        final var streamName = createNotificationStreamName(moduleName, notifName.getLocalName(), outputType);
-
-        final var existing = listenersBroker.notificationListenerFor(streamName);
-        return existing != null ? existing
-            : listenersBroker.registerNotificationListener(Absolute.of(notifName), streamName, outputType);
-    }
-
-    private static String createNotificationStreamName(final String moduleName, final String notifName,
-            final NotificationOutputType outputType) {
-        final var sb = new StringBuilder()
-            .append(RestconfStreamsConstants.NOTIFICATION_STREAM)
-            .append('/').append(moduleName).append(':').append(notifName);
-        if (outputType != NotificationOutputType.XML) {
-            sb.append('/').append(outputType.getName());
-        }
-        return sb.toString();
-    }
-
-    private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
-            final UriInfo uriInfo, final DOMDataTreeWriteOperations tx, final NotificationListenerAdapter listener) {
-        final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
-        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(schemaContext,
-                listener.getSchemaPath().lastNodeIdentifier(), null, listener.getOutputType(), uri);
-
-        tx.merge(LogicalDatastoreType.OPERATIONAL,
-            RestconfStateStreams.restconfStateStreamPath(mapToStreams.name()), mapToStreams);
-    }
+//    private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
+//        final var transaction = dataBroker.newWriteOnlyTransaction();
+//
+//        for (var module : schemaContext.getModuleStatements().values()) {
+//            final var moduleName = module.argument().getLocalName();
+//            // Note: this handles only RFC6020 notifications
+//            module.streamEffectiveSubstatements(NotificationEffectiveStatement.class).forEach(notification -> {
+//                final var notifName = notification.argument();
+//
+//                writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
+//                    createYangNotifiStream(moduleName, notifName, NotificationOutputType.XML));
+//                writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
+//                    createYangNotifiStream(moduleName, notifName, NotificationOutputType.JSON));
+//            });
+//        }
+//
+//        try {
+//            transaction.commit().get();
+//        } catch (final InterruptedException | ExecutionException e) {
+//            throw new RestconfDocumentedException("Problem while putting data to DS.", e);
+//        }
+//    }
+//
+//    private NotificationListenerAdapter createYangNotifiStream(final String moduleName, final QName notifName,
+//            final NotificationOutputType outputType) {
+//        final var streamName = createNotificationStreamName(moduleName, notifName.getLocalName(), outputType);
+//
+//        final var existing = listenersBroker.notificationListenerFor(streamName);
+//        return existing != null ? existing
+//            : listenersBroker.registerNotificationListener(ImmutableSet.of(notifName), streamName, outputType);
+//    }
+//
+//    private static String createNotificationStreamName(final String moduleName, final String notifName,
+//            final NotificationOutputType outputType) {
+//        final var sb = new StringBuilder()
+//            .append(RestconfStreamsConstants.NOTIFICATION_STREAM)
+//            .append('/').append(moduleName).append(':').append(notifName);
+//        if (outputType != NotificationOutputType.XML) {
+//            sb.append('/').append(outputType.getName());
+//        }
+//        return sb.toString();
+//    }
+//
+//    private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
+//            final UriInfo uriInfo, final DOMDataTreeWriteOperations tx, final NotificationListenerAdapter listener) {
+//        final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
+//        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(schemaContext,
+//                listener.getSchemaPath().lastNodeIdentifier(), null, listener.getOutputType(), uri);
+//
+//        tx.merge(LogicalDatastoreType.OPERATIONAL,
+//            RestconfStateStreams.restconfStateStreamPath(mapToStreams.name()), mapToStreams);
+//    }
 
     /**
      * Replace the data store.
@@ -796,7 +778,6 @@ public final class RestconfDataServiceImpl {
         yangPatchData(modelContext, parsePatchBody(modelContext, reqPath.getInstanceIdentifier(), body),
             reqPath.getMountPoint(), ar);
     }
-
 
     @VisibleForTesting
     void yangPatchData(final @NonNull EffectiveModelContext modelContext,

@@ -76,7 +76,7 @@ module sal-remote {
                 description "Notification QNames";
                 min-elements 1;
             }
-         }
+        }
         output {
             leaf notification-stream-identifier {
                 type string;
