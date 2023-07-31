@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9669c1c_4ae6c7c8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-31T12:11:25Z",
+      "side": 1,
+      "message": "final var docBuilder",
+      "range": {
+        "startLine": 115,
+        "startChar": 8,
+        "endLine": 115,
+        "endChar": 46
+      },
+      "revId": "3ea3daf2a53b047f32e71cfdc8740d78b5e6d507",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "642974ea_ca23e224",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-31T12:11:25Z",
+      "side": 1,
+      "message": "final var module",
+      "range": {
+        "startLine": 122,
+        "startChar": 13,
+        "endLine": 122,
+        "endChar": 32
+      },
+      "revId": "3ea3daf2a53b047f32e71cfdc8740d78b5e6d507",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fea751e_f658e177",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-31T12:11:25Z",
+      "side": 1,
+      "message": "final var revisionString",
+      "range": {
+        "startLine": 123,
+        "startChar": 12,
+        "endLine": 123,
+        "endChar": 39
+      },
+      "revId": "3ea3daf2a53b047f32e71cfdc8740d78b5e6d507",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7af860e1_73829636",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-31T12:11:25Z",
+      "side": 1,
+      "message": "final var schema",
+      "range": {
+        "startLine": 209,
+        "startChar": 8,
+        "endLine": 209,
+        "endChar": 21
+      },
+      "revId": "3ea3daf2a53b047f32e71cfdc8740d78b5e6d507",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdd2e415_84496220",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-31T12:11:25Z",
+      "side": 1,
+      "message": "final var host",
+      "range": {
+        "startLine": 210,
+        "startChar": 8,
+        "endLine": 210,
+        "endChar": 19
+      },
+      "revId": "3ea3daf2a53b047f32e71cfdc8740d78b5e6d507",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
