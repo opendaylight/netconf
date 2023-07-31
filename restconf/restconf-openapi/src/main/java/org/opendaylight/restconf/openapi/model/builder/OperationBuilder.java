@@ -46,22 +46,14 @@ public final class OperationBuilder {
     public static final String TOP = "_TOP";
     public static final String XML_KEY = "xml";
     private static final String CONTENT = "content";
-    private static final ArrayNode CONSUMES_PUT_POST;
     private static final List<String> MIME_TYPES = List.of(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON);
     private static final String OBJECT = "object";
     private static final String STRING = "string";
     private static final String TYPE_KEY = "type";
     private static final String QUERY = "query";
 
-    static {
-        CONSUMES_PUT_POST = JsonNodeFactory.instance.arrayNode();
-        for (final String mimeType : MIME_TYPES) {
-            CONSUMES_PUT_POST.add(mimeType);
-        }
-    }
-
     private OperationBuilder() {
-
+        // Hidden on purpose
     }
 
     public static Operation buildPost(final String parentName, final String nodeName, final String discriminator,
