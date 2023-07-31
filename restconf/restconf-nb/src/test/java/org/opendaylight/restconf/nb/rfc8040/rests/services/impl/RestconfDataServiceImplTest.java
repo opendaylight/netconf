@@ -401,6 +401,19 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
+    @Test
+    public void testDeleteDataNotExisting() {
+        doReturn(immediateFalseFluentFuture())
+                .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
+        final var ex = assertThrows(RestconfDocumentedException.class,
+            () -> dataService.deleteData("example-jukebox:jukebox"));
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
+    }
+
     /**
      * Test of deleting data on mount point.
      */
