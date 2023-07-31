@@ -32,10 +32,14 @@ import org.slf4j.LoggerFactory;
  * This singleton class is responsible for creation, removal and searching for {@link ListenerAdapter} or
  * {@link NotificationListenerAdapter} listeners.
  */
-// FIXME: this should be a component
+// FIXME: NETCONF-1104: this should be a component
+// FIXME: furthermore, this should be tied to ietf-restconf-monitoring, as the Strings used in its maps are stream
+//        names. We essentially need a component which deals with allocation of stream names and their lifecycle and
+//        the contents of /restconf-state/streams.
 public final class ListenersBroker {
+    // FIXME: NETCONF-1104: remove this class
+    @Deprecated(since = "7.0.0")
     private static final class Holder {
-        // FIXME: remove this global singleton
         static final ListenersBroker INSTANCE = new ListenersBroker();
     }
 
@@ -48,9 +52,8 @@ public final class ListenersBroker {
     private final BiMap<String, NotificationListenerAdapter> notificationListeners = HashBiMap.create();
     private final BiMap<String, DeviceNotificationListenerAdaptor> deviceNotificationListeners = HashBiMap.create();
 
-
     private ListenersBroker() {
-
+        // FIXME: NETCONF-1104: this constructor should be a public thing
     }
 
     /**
@@ -58,6 +61,8 @@ public final class ListenersBroker {
      *
      * @return Reusable instance of {@link ListenersBroker}.
      */
+    // FIXME: NETCONF-1104: remove this method
+    @Deprecated(since = "7.0.0")
     public static ListenersBroker getInstance() {
         return Holder.INSTANCE;
     }
