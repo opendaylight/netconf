@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3416503e_97ce57d8",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/ListPostRequestsTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-31T13:18:50Z",
+      "side": 1,
+      "message": "does this mean that we do not want any post paths to nodes that are within the `list` statement or only in depth 1?\nBecause based on logic in BaseYangOpenApiGenerator_Line:371 we only check the immediate parent (depth 1), which means that we are creating post paths for this:\n```\n...\nlist list {\n  key \"name address\";\n  leaf name {\n    type string;\n  }\n  leaf address {\n    type string;\n  }\n  container child-cont {\n    leaf leaf {\n      type string;\n    }\n    container youngest-cont {\n      leaf youngest-leaf {\n        type int32;\n      }\n    }\n  }\n}\n...\n```\nwith path\n```\n/rests/data/.../list\u003d{name},{address}/child-cont/youngest-cont\n```",
+      "revId": "40945718b52f6276d97e0749016514de8f25e353",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f52fd06_10fc160d",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/ListPostRequestsTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-31T13:18:50Z",
+      "side": 1,
+      "message": "insert 1 empty line at the end of the file",
+      "revId": "40945718b52f6276d97e0749016514de8f25e353",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
