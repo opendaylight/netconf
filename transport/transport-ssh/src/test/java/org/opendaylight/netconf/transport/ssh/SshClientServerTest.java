@@ -11,7 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.transport.ssh.TestUtils.buildClientAuthHostBased;
@@ -53,6 +56,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
+import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
@@ -94,6 +98,8 @@ public class SshClientServerTest {
     private SshServerGrouping sshServerConfig;
     @Mock
     private TransportChannelListener serverListener;
+    @Mock
+    private SessionListener sshSessionListener;
 
     @Captor
     ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
@@ -250,39 +256,48 @@ public class SshClientServerTest {
     }
 
     @Test
-    @DisplayName("SSH server with external initializer")
-    void externalServerInitializer() throws Exception {
+    @DisplayName("SSH client and server using configurators")
+    void configurators() throws Exception {
         final var username = getUsernameAndUpdate();
         when(sshClientConfig.getClientIdentity()).thenReturn(buildClientIdentityWithPassword(username, PASSWORD));
         // Accept all keys
         when(sshClientConfig.getServerAuthentication()).thenReturn(null);
 
+        final ClientFactoryManagerConfigurator clientConfigurator = clientFactoryMgr -> {
+            clientFactoryMgr.addSessionListener(sshSessionListener);
+        };
+        final ServerFactoryManagerConfigurator serverConfigurator = serverFactoryMgr -> {
+            // authenticate user by credentials and generate host key
+            serverFactoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+            serverFactoryMgr.setPasswordAuthenticator(
+                (usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
+            serverFactoryMgr.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+        };
+
         final var server = SSHServer.listen(serverListener,
             NettyTransportSupport.newServerBootstrap().group(group),
-            tcpServerConfig, null, factoryManager -> {
-                // authenticate user by credentials and generate host key
-                factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
-                factoryManager.setPasswordAuthenticator(
-                    (usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
-                factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
-            }).get(2, TimeUnit.SECONDS);
+            tcpServerConfig, null, serverConfigurator).get(2, TimeUnit.SECONDS);
         try {
             final var client = SSHClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
-                tcpClientConfig, sshClientConfig).get(2, TimeUnit.SECONDS);
+                tcpClientConfig, sshClientConfig, clientConfigurator).get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(10_000))
                     .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
                 verify(clientListener, timeout(10_000))
                     .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
                 // validate channels are in expected state
-                var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
-                var clientChannel = assertChannel(clientTransportChannelCaptor.getAllValues());
+                final var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
+                final var clientChannel = assertChannel(clientTransportChannelCaptor.getAllValues());
                 // validate channels are connecting same sockets
                 assertEquals(serverChannel.remoteAddress(), clientChannel.localAddress());
                 assertEquals(serverChannel.localAddress(), clientChannel.remoteAddress());
                 // validate sessions are authenticated
                 assertSession(ServerSession.class, server.getSessions());
                 assertSession(ClientSession.class, client.getSessions());
+                // validate configured additional client session listener invoked
+                verify(sshSessionListener, times(1)).sessionCreated(any(ClientSession.class));
+                verify(sshSessionListener, times(1))
+                    .sessionEvent(any(ClientSession.class), eq(SessionListener.Event.Authenticated));
             } finally {
                 client.shutdown().get(2, TimeUnit.SECONDS);
             }
