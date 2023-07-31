@@ -14,6 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * This service generates swagger (See <a
@@ -27,7 +28,7 @@ public interface OpenApiService {
     @GET
     @Path("/single")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getAllModulesDoc(@Context javax.ws.rs.core.UriInfo uriInfo);
+    Response getAllModulesDoc(@Context UriInfo uriInfo);
 
     /**
      * Generates Swagger compliant document listing APIs for module.
@@ -35,8 +36,8 @@ public interface OpenApiService {
     @GET
     @Path("/{module}({revision})")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getDocByModule(@PathParam("module") String module,
-                            @PathParam("revision") String revision, @Context javax.ws.rs.core.UriInfo uriInfo);
+    Response getDocByModule(@PathParam("module") String module, @PathParam("revision") String revision,
+                            @Context UriInfo uriInfo);
 
     /**
      * Redirects to embedded swagger ui.
@@ -44,7 +45,7 @@ public interface OpenApiService {
     @GET
     @Path("/ui")
     @Produces(MediaType.TEXT_HTML)
-    Response getApiExplorer(@Context javax.ws.rs.core.UriInfo uriInfo);
+    Response getApiExplorer(@Context UriInfo uriInfo);
 
     /**
      * Generates index document for Swagger UI. This document lists out all
@@ -54,7 +55,7 @@ public interface OpenApiService {
     @GET
     @Path("/mounts")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getListOfMounts(@Context javax.ws.rs.core.UriInfo uriInfo);
+    Response getListOfMounts(@Context UriInfo uriInfo);
 
     /**
      * Generates Swagger compliant document listing APIs for module.
@@ -64,7 +65,7 @@ public interface OpenApiService {
     @Produces(MediaType.APPLICATION_JSON)
     Response getMountDocByModule(@PathParam("instance") String instanceNum,
                                  @PathParam("module") String module, @PathParam("revision") String revision,
-                                 @Context javax.ws.rs.core.UriInfo uriInfo);
+                                 @Context UriInfo uriInfo);
 
     /**
      * Generates Swagger compliant document listing APIs for all modules of mount point.
@@ -72,7 +73,5 @@ public interface OpenApiService {
     @GET
     @Path("/mounts/{instance}")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getMountDoc(@PathParam("instance") String instanceNum,
-                         @Context javax.ws.rs.core.UriInfo uriInfo);
-
+    Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo);
 }
