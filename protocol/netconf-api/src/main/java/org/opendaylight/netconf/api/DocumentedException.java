@@ -9,10 +9,11 @@ package org.opendaylight.netconf.api;
 
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.RPC_REPLY_KEY;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -22,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Checked exception to communicate an error that needs to be sent to the
@@ -30,7 +30,14 @@ import org.w3c.dom.NodeList;
  */
 // FIXME: NETCONF-793: implement YangNetconfErrorAware
 public class DocumentedException extends Exception {
-
+    /**
+     * The name of the <a href="https://www.rfc-editor.org/rfc/rfc6241#section-4.3">rpc-error</a> element of a
+     * {@code rpc-reply} NETCONF message.
+     */
+    // FIXME: NETCONF-1014: These should reside in RpcErrorMessage, as it comes from rfc6241.xsd, which should be
+    //                      provided with this package. We also should have a YANG model mirroring the RFC6241's
+    //                      netconf.xsd. This makes for a strong binding to RFC6241, there is not a rfc6241-bis
+    //                      in sight, so we should be just fine.
     public static final String RPC_ERROR = "rpc-error";
     public static final String ERROR_TYPE = "error-type";
     public static final String ERROR_TAG = "error-tag";
@@ -46,20 +53,23 @@ public class DocumentedException extends Exception {
     private static final DocumentBuilderFactory BUILDER_FACTORY;
 
     static {
-        BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+        final var bf = DocumentBuilderFactory.newInstance();
+
         try {
-            BUILDER_FACTORY.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            BUILDER_FACTORY.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            BUILDER_FACTORY.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            BUILDER_FACTORY.setXIncludeAware(false);
-            BUILDER_FACTORY.setExpandEntityReferences(false);
+            bf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            bf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            bf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            bf.setXIncludeAware(false);
+            bf.setExpandEntityReferences(false);
         } catch (final ParserConfigurationException e) {
             throw new ExceptionInInitializerError(e);
         }
-        BUILDER_FACTORY.setNamespaceAware(true);
-        BUILDER_FACTORY.setCoalescing(true);
-        BUILDER_FACTORY.setIgnoringElementContentWhitespace(true);
-        BUILDER_FACTORY.setIgnoringComments(true);
+        bf.setNamespaceAware(true);
+        bf.setCoalescing(true);
+        bf.setIgnoringElementContentWhitespace(true);
+        bf.setIgnoringComments(true);
+
+        BUILDER_FACTORY = bf;
     }
 
     private final ErrorType errorType;
@@ -113,15 +123,14 @@ public class DocumentedException extends Exception {
     }
 
     public static DocumentedException fromXMLDocument(final Document fromDoc) {
-
-        ErrorType errorType = ErrorType.APPLICATION;
-        ErrorTag errorTag = ErrorTag.OPERATION_FAILED;
-        ErrorSeverity errorSeverity = ErrorSeverity.ERROR;
+        var errorType = ErrorType.APPLICATION;
+        var errorTag = ErrorTag.OPERATION_FAILED;
+        var errorSeverity = ErrorSeverity.ERROR;
         Map<String, String> errorInfo = null;
-        String errorMessage = "";
-        StringBuilder allErrorMessages = new StringBuilder();
+        var errorMessage = "";
+        final var allErrorMessages = new StringBuilder();
 
-        Node rpcReply = fromDoc.getDocumentElement();
+        final var rpcReply = fromDoc.getDocumentElement();
 
         // FIXME: we only handle one rpc-error. For now, shove extra errorMessages found in multiple rpc-error in the
         //        errorInfo Map to at least let them propagate back to caller.
@@ -129,24 +138,24 @@ public class DocumentedException extends Exception {
         //        error events
         int rpcErrorCount = 0;
 
-        NodeList replyChildren = rpcReply.getChildNodes();
-        for (int i = 0; i < replyChildren.getLength(); i++) {
-            Node replyChild = replyChildren.item(i);
+        final var replyChildren = rpcReply.getChildNodes();
+        for (int i = 0, ilen = replyChildren.getLength(); i < ilen; i++) {
+            final var replyChild = replyChildren.item(i);
             if (RPC_ERROR.equals(replyChild.getLocalName())) {
                 rpcErrorCount++;
-                NodeList rpcErrorChildren = replyChild.getChildNodes();
-                for (int j = 0; j < rpcErrorChildren.getLength(); j++) {
-                    Node rpcErrorChild = rpcErrorChildren.item(j);
+                final var rpcErrorChildren = replyChild.getChildNodes();
+                for (int j = 0, jlen = rpcErrorChildren.getLength(); j < jlen; j++) {
+                    final var rpcErrorChild = rpcErrorChildren.item(j);
 
                     // FIXME: use a switch expression here
                     if (ERROR_TYPE.equals(rpcErrorChild.getLocalName())) {
-                        final ErrorType type = ErrorType.forElementBody(rpcErrorChild.getTextContent());
+                        final var type = ErrorType.forElementBody(rpcErrorChild.getTextContent());
                         // FIXME: this should be a hard error
                         errorType = type != null ? type : ErrorType.APPLICATION;
                     } else if (ERROR_TAG.equals(rpcErrorChild.getLocalName())) {
                         errorTag = new ErrorTag(rpcErrorChild.getTextContent());
                     } else if (ERROR_SEVERITY.equals(rpcErrorChild.getLocalName())) {
-                        final ErrorSeverity sev = ErrorSeverity.forElementBody(rpcErrorChild.getTextContent());
+                        final var sev = ErrorSeverity.forElementBody(rpcErrorChild.getTextContent());
                         // FIXME: this should be a hard error
                         errorSeverity = sev != null ? sev : ErrorSeverity.ERROR;
                     } else if (ERROR_MESSAGE.equals(rpcErrorChild.getLocalName())) {
@@ -170,10 +179,10 @@ public class DocumentedException extends Exception {
     }
 
     private static Map<String, String> parseErrorInfo(final Node node) {
-        Map<String, String> infoMap = new HashMap<>();
-        NodeList children = node.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node child = children.item(i);
+        final var infoMap = new HashMap<String, String>();
+        final var children = node.getChildNodes();
+        for (int i = 0, length = children.getLength(); i < length; i++) {
+            final var child = children.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
                 // FIXME: Holy namespace ignorance, Batman!
                 //
@@ -222,10 +231,10 @@ public class DocumentedException extends Exception {
         try {
             doc = BUILDER_FACTORY.newDocumentBuilder().newDocument();
 
-            Node rpcReply = doc.createElementNS(NamespaceURN.BASE, RPC_REPLY_KEY);
+            final var rpcReply = doc.createElementNS(NamespaceURN.BASE, RPC_REPLY_KEY);
             doc.appendChild(rpcReply);
 
-            Node rpcError = doc.createElementNS(NamespaceURN.BASE, RPC_ERROR);
+            final var rpcError = doc.createElementNS(NamespaceURN.BASE, RPC_ERROR);
             rpcReply.appendChild(rpcError);
 
             rpcError.appendChild(createTextNode(doc, ERROR_TYPE, getErrorType().elementBody()));
@@ -233,18 +242,17 @@ public class DocumentedException extends Exception {
             rpcError.appendChild(createTextNode(doc, ERROR_SEVERITY, getErrorSeverity().elementBody()));
             rpcError.appendChild(createTextNode(doc, ERROR_MESSAGE, getLocalizedMessage()));
 
-            Map<String, String> errorInfoMap = getErrorInfo();
+            final var errorInfoMap = getErrorInfo();
             if (errorInfoMap != null && !errorInfoMap.isEmpty()) {
                 /*
                  * <error-info> <bad-attribute>message-id</bad-attribute>
                  * <bad-element>rpc</bad-element> </error-info>
                  */
-
-                Node errorInfoNode = doc.createElementNS(NamespaceURN.BASE, ERROR_INFO);
+                final var errorInfoNode = doc.createElementNS(NamespaceURN.BASE, ERROR_INFO);
                 errorInfoNode.setPrefix(rpcReply.getPrefix());
                 rpcError.appendChild(errorInfoNode);
 
-                for (Entry<String, String> entry : errorInfoMap.entrySet()) {
+                for (var entry : errorInfoMap.entrySet()) {
                     errorInfoNode.appendChild(createTextNode(doc, entry.getKey(), entry.getValue()));
                 }
             }
@@ -257,15 +265,22 @@ public class DocumentedException extends Exception {
     }
 
     private static Node createTextNode(final Document doc, final String tag, final String textContent) {
-        Node node = doc.createElementNS(NamespaceURN.BASE, tag);
+        final var node = doc.createElementNS(NamespaceURN.BASE, tag);
         node.setTextContent(textContent);
         return node;
     }
 
     @Override
-    public String toString() {
-        return "NetconfDocumentedException{" + "message=" + getMessage() + ", errorType=" + errorType
-                + ", errorTag=" + errorTag + ", errorSeverity=" + errorSeverity + ", errorInfo="
-                + errorInfo + '}';
+    public final String toString() {
+        return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
+    }
+
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        return helper
+            .add(ERROR_TYPE, errorType)
+            .add(ERROR_TAG, errorTag)
+            .add(ERROR_SEVERITY, errorSeverity)
+            .add(ERROR_INFO, errorInfo)
+            .add("message", getMessage());
     }
 }
