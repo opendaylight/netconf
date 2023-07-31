@@ -304,14 +304,13 @@ public abstract class BaseYangOpenApiGenerator {
         final List<Parameter> pathParams = new ArrayList<>(parentPathParams);
         Iterable<? extends DataSchemaNode> childSchemaNodes = Collections.emptySet();
         if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-            final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
-            childSchemaNodes = dataNodeContainer.getChildNodes();
+            childSchemaNodes = ((DataNodeContainer) node).getChildNodes();
         }
         paths.put(dataPath, operations(node, moduleName, deviceName, pathParams, isConfig, parentName,
                 definitionNames));
 
-        if (node instanceof ActionNodeContainer) {
-            ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
+        if (node instanceof ActionNodeContainer actionContainer) {
+            actionContainer.getActions().forEach(actionDef -> {
                 final String operationsPath = getResourcePath("operations", context)
                     + "/" + resourcePathPart
                     + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
@@ -383,10 +382,10 @@ public abstract class BaseYangOpenApiGenerator {
             .map(Parameter::name)
             .collect(Collectors.toSet());
 
-        if (schemaNode instanceof ListSchemaNode) {
+        if (schemaNode instanceof ListSchemaNode listSchemaNode) {
             String prefix = "=";
             int discriminator = 1;
-            for (final QName listKey : ((ListSchemaNode) schemaNode).getKeyDefinition()) {
+            for (final QName listKey : listSchemaNode.getKeyDefinition()) {
                 final String keyName = listKey.getLocalName();
                 String paramName = keyName;
                 while (!parameters.add(paramName)) {
@@ -398,7 +397,7 @@ public abstract class BaseYangOpenApiGenerator {
                 prefix = ",";
                 path.append(pathParamIdentifier);
 
-                final String description = ((DataNodeContainer) schemaNode).findDataChildByName(listKey)
+                final String description = listSchemaNode.findDataChildByName(listKey)
                     .flatMap(DataSchemaNode::getDescription).orElse(null);
                 final Parameter.Builder pathParamBuilder = new Parameter.Builder()
                     .name(paramName)
