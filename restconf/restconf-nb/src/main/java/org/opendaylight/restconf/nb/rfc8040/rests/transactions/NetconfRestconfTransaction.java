@@ -46,18 +46,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 final class NetconfRestconfTransaction extends RestconfTransaction {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfRestconfTransaction.class);
 
-    private final NetconfDataTreeService netconfService;
     private final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures =
         Collections.synchronizedList(new ArrayList<>());
+    private final NetconfDataTreeService netconfService;
+
     private volatile boolean isLocked = false;
 
     NetconfRestconfTransaction(final NetconfDataTreeService netconfService) {
         this.netconfService = requireNonNull(netconfService);
-        final ListenableFuture<? extends DOMRpcResult> lockResult = netconfService.lock();
-        Futures.addCallback(lockResult, lockOperationCallback, MoreExecutors.directExecutor());
+        final var lockResult = netconfService.lock();
+        Futures.addCallback(lockResult, new FutureCallback<DOMRpcResult>() {
+            @Override
+            public void onSuccess(final DOMRpcResult rpcResult) {
+                if (rpcResult != null && allWarnings(rpcResult.errors())) {
+                    isLocked = true;
+                }
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                // do nothing
+            }
+        }, MoreExecutors.directExecutor());
         resultsFutures.add(lockResult);
     }
 
@@ -182,20 +194,6 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             return List.of();
         }
     }
-
-    private final FutureCallback<DOMRpcResult> lockOperationCallback = new FutureCallback<>() {
-        @Override
-        public void onSuccess(final DOMRpcResult rpcResult) {
-            if (rpcResult != null && allWarnings(rpcResult.errors())) {
-                isLocked = true;
-            }
-        }
-
-        @Override
-        public void onFailure(final Throwable throwable) {
-            // do nothing
-        }
-    };
 
     private void enqueueOperation(final Supplier<ListenableFuture<? extends DOMRpcResult>> operation) {
         final ListenableFuture<? extends DOMRpcResult> operationFuture;
