@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bf2b9c94_3a4d3597",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-07-31T06:20:41Z",
+      "side": 1,
+      "message": "How about this:\n`final var paths \u003d new HashMap\u003cString, Path\u003e();`",
+      "parentUuid": "c1554fc4_b7cde391",
+      "range": {
+        "startLine": 97,
+        "startChar": 14,
+        "endLine": 97,
+        "endChar": 31
+      },
+      "revId": "c5de3cc7fe287e9ffb1b531fce78766528970b1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "739ac957_066a2d6f",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
         "patchSetId": 29
