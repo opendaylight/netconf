@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
@@ -75,17 +77,38 @@ public final class SSHClient extends SSHTransportStack {
     public static @NonNull ListenableFuture<SSHClient> connect(final TransportChannelListener listener,
             final Bootstrap bootstrap, final TcpClientGrouping connectParams,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        final var factoryMgr = newFactoryManager(clientParams);
+        final var factoryMgr = newFactoryManager(requireNonNull(clientParams), null);
+        final var sshClient = new SSHClient(listener, factoryMgr, getUsername(clientParams));
+        return transformUnderlay(sshClient, TCPClient.connect(sshClient.asListener(), bootstrap, connectParams));
+    }
+
+    /**
+     * Builds and starts SSH client.
+     *
+     * @param listener transport channel listener, required
+     * @param bootstrap bootstrap instance, required
+     * @param connectParams tcp layer configuration parameters, required
+     * @param clientParams ssh overlay configuration, required
+     * @param configurator client factory manager configurator, optional
+     * @return client instance as listenable future
+     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
+     * @throws NullPointerException if any of required parameters is null
+     */
+    public static @NonNull ListenableFuture<SSHClient> connect(final TransportChannelListener listener,
+            final Bootstrap bootstrap, final TcpClientGrouping connectParams,
+            final SshClientGrouping clientParams,  final ClientFactoryManagerConfigurator configurator)
+            throws UnsupportedConfigurationException {
+        final var factoryMgr = newFactoryManager(requireNonNull(clientParams), configurator);
         final var sshClient = new SSHClient(listener, factoryMgr, getUsername(clientParams));
         return transformUnderlay(sshClient, TCPClient.connect(sshClient.asListener(), bootstrap, connectParams));
     }
 
     public static @NonNull ListenableFuture<SSHClient> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final TcpServerGrouping listenParams, final SshClientGrouping clientParams)
-            throws UnsupportedConfigurationException {
-        final var factoryMgr = newFactoryManager(clientParams);
+            final ServerBootstrap bootstrap, final TcpServerGrouping connectParams,
+            final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
+        final var factoryMgr = newFactoryManager(requireNonNull(clientParams), null);
         final var sshClient = new SSHClient(listener, factoryMgr, getUsername(clientParams));
-        return transformUnderlay(sshClient, TCPServer.listen(sshClient.asListener(), bootstrap, listenParams));
+        return transformUnderlay(sshClient, TCPServer.listen(sshClient.asListener(), bootstrap, connectParams));
     }
 
     private static String getUsername(final SshClientGrouping clientParams) {
@@ -93,8 +116,8 @@ public final class SSHClient extends SSHTransportStack {
         return clientIdentity == null ? "" : clientIdentity.getUsername();
     }
 
-    private static ClientFactoryManager newFactoryManager(final SshClientGrouping parameters)
-            throws UnsupportedConfigurationException {
+    private static ClientFactoryManager newFactoryManager(final @NonNull SshClientGrouping parameters,
+            final ClientFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
         final var factoryMgr = SshClient.setUpDefaultClient();
 
         ConfigUtils.setTransportParams(factoryMgr, parameters.getTransportParams());
@@ -102,6 +125,9 @@ public final class SSHClient extends SSHTransportStack {
 
         setClientIdentity(factoryMgr, parameters.getClientIdentity());
         setServerAuthentication(factoryMgr, parameters.getServerAuthentication());
+        if (configurator != null) {
+            configurator.configureClientFactoryManager(factoryMgr);
+        }
 
         factoryMgr.setServiceFactories(SshClient.DEFAULT_SERVICE_FACTORIES);
         factoryMgr.setScheduledExecutorService(ThreadUtils.newSingleThreadScheduledExecutor("sshd-client-pool"));
