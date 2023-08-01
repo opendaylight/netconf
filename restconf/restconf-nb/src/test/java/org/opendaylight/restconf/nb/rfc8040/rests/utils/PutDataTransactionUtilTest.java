@@ -50,6 +50,41 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PutDataTransactionUtilTest extends AbstractJukeboxTest {
+    private static final YangInstanceIdentifier JUKEBOX_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME);
+    private static final YangInstanceIdentifier GAP_IID
+        = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYER_QNAME, GAP_QNAME);
+    private static final YangInstanceIdentifier BAND_IID = YangInstanceIdentifier.builder()
+        .node(JUKEBOX_QNAME)
+        .node(PLAYLIST_QNAME)
+        .nodeWithKey(PLAYLIST_QNAME, NAME_QNAME, "name of band")
+        .build();
+
+    private static final LeafNode<?> GAP_LEAF = ImmutableNodes.leafNode(GAP_QNAME, 0.2);
+    private static final ContainerNode EMPTY_JUKEBOX = Builders.containerBuilder()
+        .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
+        .withChild(Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
+            .withChild(GAP_LEAF)
+            .build())
+        .build();
+    private static final MapEntryNode BAND_ENTRY = Builders.mapEntryBuilder()
+        .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band"))
+        .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
+        .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
+        .build();
+    private static final ContainerNode JUKEBOX_WITH_BANDS = Builders.containerBuilder()
+        .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
+        .withChild(Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
+            .withChild(BAND_ENTRY)
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band 2"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band 2"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description 2"))
+                .build())
+            .build())
+        .build();
+
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -61,48 +96,8 @@ public class PutDataTransactionUtilTest extends AbstractJukeboxTest {
     @Mock
     private NetconfDataTreeService netconfService;
 
-    private LeafNode<?> buildLeaf;
-    private ContainerNode buildBaseCont;
-    private ContainerNode buildBaseContWithList;
-    private MapEntryNode buildListEntry;
-    private YangInstanceIdentifier iid;
-    private YangInstanceIdentifier iid2;
-    private YangInstanceIdentifier iid3;
-
     @Before
-    public void setUp() {
-        final var nodeWithKey = NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band");
-
-        iid = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYER_QNAME, GAP_QNAME);
-        iid2 = YangInstanceIdentifier.of(JUKEBOX_QNAME);
-        iid3 = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME).node(nodeWithKey).build();
-
-        buildLeaf = ImmutableNodes.leafNode(GAP_QNAME, 0.2);
-        buildBaseCont = Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-            .withChild(Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
-                .withChild(buildLeaf)
-                .build())
-            .build();
-        buildListEntry = Builders.mapEntryBuilder()
-            .withNodeIdentifier(nodeWithKey)
-            .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
-            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
-            .build();
-        buildBaseContWithList = Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-            .withChild(Builders.mapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
-                .withChild(buildListEntry)
-                .withChild(Builders.mapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band 2"))
-                    .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band 2"))
-                    .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description 2"))
-                    .build())
-                .build())
-            .build();
-
+    public void before() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
     }
@@ -110,21 +105,21 @@ public class PutDataTransactionUtilTest extends AbstractJukeboxTest {
     @Test
     public void testValidInputData() {
         RestconfDataServiceImpl.validInputData(true, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iid), buildLeaf));
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
     }
 
     @Test
     public void testValidTopLevelNodeName() {
-        RestconfDataServiceImpl.validTopLevelNodeName(iid, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iid), buildLeaf));
-        RestconfDataServiceImpl.validTopLevelNodeName(iid2, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iid2), buildBaseCont));
+        RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID, NormalizedNodePayload.of(
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
+        RestconfDataServiceImpl.validTopLevelNodeName(JUKEBOX_IID, NormalizedNodePayload.of(
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID), EMPTY_JUKEBOX));
     }
 
     @Test
     public void testValidTopLevelNodeNamePathEmpty() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iid);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
 
         // FIXME: more asserts
         assertThrows(RestconfDocumentedException.class,
@@ -133,18 +128,18 @@ public class PutDataTransactionUtilTest extends AbstractJukeboxTest {
 
     @Test
     public void testValidTopLevelNodeNameWrongTopIdentifier() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iid);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
 
         // FIXME: more asserts
         assertThrows(RestconfDocumentedException.class,
-            () -> RestconfDataServiceImpl.validTopLevelNodeName(iid.getAncestor(1), payload));
+            () -> RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID.getAncestor(1), payload));
     }
 
     @Test
     public void testValidateListKeysEqualityInPayloadAndUri() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iid3);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildListEntry);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, BAND_IID);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, BAND_ENTRY);
         RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
     }
 
@@ -152,81 +147,85 @@ public class PutDataTransactionUtilTest extends AbstractJukeboxTest {
     public void testPutContainerData() {
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
-        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        PutDataTransactionUtil.putData(iid2, buildBaseCont, JUKEBOX_SCHEMA, new MdsalRestconfStrategy(mockDataBroker),
-            WriteDataParams.empty());
-        verify(read).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
+        PutDataTransactionUtil.putData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA,
+            new MdsalRestconfStrategy(mockDataBroker), WriteDataParams.empty());
+        verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
     }
 
     @Test
     public void testPutCreateContainerData() {
-        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(iid2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
+            .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid2, buildBaseCont, JUKEBOX_SCHEMA, new NetconfRestconfStrategy(netconfService),
-            WriteDataParams.empty());
+        PutDataTransactionUtil.putData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA,
+            new NetconfRestconfStrategy(netconfService), WriteDataParams.empty());
         verify(netconfService).lock();
-        verify(netconfService).getConfig(iid2);
-        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
+        verify(netconfService).getConfig(JUKEBOX_IID);
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
+            Optional.empty());
     }
 
     @Test
     public void testPutReplaceContainerData() {
-        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService).getConfig(iid2);
+        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)
+            .getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
+            .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid2, buildBaseCont, JUKEBOX_SCHEMA, new NetconfRestconfStrategy(netconfService),
-            WriteDataParams.empty());
-        verify(netconfService).getConfig(iid2);
-        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
+        PutDataTransactionUtil.putData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA,
+            new NetconfRestconfStrategy(netconfService), WriteDataParams.empty());
+        verify(netconfService).getConfig(JUKEBOX_IID);
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
+            Optional.empty());
     }
 
     @Test
     public void testPutLeafData() {
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
-        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, iid);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf);
+        doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        PutDataTransactionUtil.putData(iid, buildLeaf, JUKEBOX_SCHEMA, new MdsalRestconfStrategy(mockDataBroker),
+        PutDataTransactionUtil.putData(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA, new MdsalRestconfStrategy(mockDataBroker),
             WriteDataParams.empty());
-        verify(read).exists(LogicalDatastoreType.CONFIGURATION, iid);
-        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf);
+        verify(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
     }
 
     @Test
     public void testPutCreateLeafData() {
-        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(iid);
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(GAP_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf, Optional.empty());
+            .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid, buildLeaf, JUKEBOX_SCHEMA, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA, new NetconfRestconfStrategy(netconfService),
             WriteDataParams.empty());
-        verify(netconfService).getConfig(iid);
-        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf, Optional.empty());
+        verify(netconfService).getConfig(GAP_IID);
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
     }
 
     @Test
     public void testPutReplaceLeafData() {
-        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService).getConfig(iid);
+        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)
+            .getConfig(GAP_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf, Optional.empty());
+            .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid, buildLeaf, JUKEBOX_SCHEMA, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA, new NetconfRestconfStrategy(netconfService),
             WriteDataParams.empty());
-        verify(netconfService).getConfig(iid);
-        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid, buildLeaf, Optional.empty());
+        verify(netconfService).getConfig(GAP_IID);
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
     }
 
     @Test
@@ -234,40 +233,41 @@ public class PutDataTransactionUtilTest extends AbstractJukeboxTest {
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
-                .when(read).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList);
+                .when(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
-        PutDataTransactionUtil.putData(iid2, buildBaseContWithList, JUKEBOX_SCHEMA,
+        PutDataTransactionUtil.putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, JUKEBOX_SCHEMA,
             new MdsalRestconfStrategy(mockDataBroker), WriteDataParams.empty());
-        verify(read).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList);
+        verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
     }
 
     @Test
     public void testPutCreateListData() {
-        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(iid2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList, Optional.empty());
+            .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid2, buildBaseContWithList, JUKEBOX_SCHEMA,
+        PutDataTransactionUtil.putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, JUKEBOX_SCHEMA,
             new NetconfRestconfStrategy(netconfService), WriteDataParams.empty());
-        verify(netconfService).getConfig(iid2);
-        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList,
+        verify(netconfService).getConfig(JUKEBOX_IID);
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
     }
 
     @Test
     public void testPutReplaceListData() {
-        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService).getConfig(iid2);
+        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)
+            .getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList, Optional.empty());
+            .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        PutDataTransactionUtil.putData(iid2, buildBaseContWithList, JUKEBOX_SCHEMA,
+        PutDataTransactionUtil.putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, JUKEBOX_SCHEMA,
             new NetconfRestconfStrategy(netconfService), WriteDataParams.empty());
-        verify(netconfService).getConfig(iid2);
-        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseContWithList,
+        verify(netconfService).getConfig(JUKEBOX_IID);
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
     }
 }
