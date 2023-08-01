@@ -186,6 +186,11 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         return commitResult;
     }
 
+    @Override
+    ListenableFuture<Optional<NormalizedNode>> read(final YangInstanceIdentifier path) {
+        return netconfService.getConfig(path);
+    }
+
     private List<ListenableFuture<?>> discardAndUnlock() {
         // execute discard & unlock operations only if lock operation was completed successfully
         if (isLocked) {

@@ -14,6 +14,7 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransacti
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
@@ -120,6 +121,11 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
         final var ret = verifyNotNull(rwTx).commit();
         rwTx = null;
         return ret;
+    }
+
+    @Override
+    ListenableFuture<Optional<NormalizedNode>> read(final YangInstanceIdentifier path) {
+        return verifyNotNull(rwTx).read(CONFIGURATION, path);
     }
 
     private static void checkExistence(final YangInstanceIdentifier path, final BatchedExistenceCheck check) {
