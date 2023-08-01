@@ -67,13 +67,11 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -88,9 +86,6 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     private ContainerNode buildBaseContOperational;
     private YangInstanceIdentifier iidBase;
     private RestconfDataServiceImpl dataService;
-    private QName baseQName;
-    private QName containerPlayerQname;
-    private QName leafQname;
     private ContainerNode buildPlayerCont;
     private ContainerNode buildLibraryCont;
     private MapNode buildPlaylistList;
@@ -125,53 +120,39 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(Set.of()).when(queryParamenters).entrySet();
         doReturn(queryParamenters).when(uriInfo).getQueryParameters();
 
-        baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
-        containerPlayerQname = QName.create(baseQName, "player");
-        leafQname = QName.create(baseQName, "gap");
-
-        final QName containerLibraryQName = QName.create(baseQName, "library");
-        final QName listPlaylistQName = QName.create(baseQName, "playlist");
-
-        final LeafNode<?> buildLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(leafQname))
-                .withValue(0.2)
-                .build();
-
         buildPlayerCont = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(containerPlayerQname))
-                .withChild(buildLeaf)
+                .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
+                .withChild(ImmutableNodes.leafNode(GAP_QNAME, 0.2))
                 .build();
 
         buildLibraryCont = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(containerLibraryQName))
+                .withNodeIdentifier(new NodeIdentifier(LIBRARY_QNAME))
                 .build();
 
         buildPlaylistList = Builders.mapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(listPlaylistQName))
+                .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
                 .build();
 
         buildBaseCont = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(baseQName))
+                .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
                 .withChild(buildPlayerCont)
                 .build();
 
         // config contains one child the same as in operational and one additional
         buildBaseContConfig = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(baseQName))
+                .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
                 .withChild(buildPlayerCont)
                 .withChild(buildLibraryCont)
                 .build();
 
         // operational contains one child the same as in config and one additional
         buildBaseContOperational = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(baseQName))
+                .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
                 .withChild(buildPlayerCont)
                 .withChild(buildPlaylistList)
                 .build();
 
-        iidBase = YangInstanceIdentifier.builder()
-                .node(baseQName)
-                .build();
+        iidBase = YangInstanceIdentifier.of(JUKEBOX_QNAME);
 
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
@@ -362,19 +343,17 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPostData() {
-        final QName listQname = QName.create(baseQName, "playlist");
-        final QName listKeyQname = QName.create(baseQName, "name");
         final NodeIdentifierWithPredicates nodeWithKey =
-                NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band");
+                NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band");
 
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(listQname))
+            .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
             .withChild(Builders.mapEntryBuilder()
                 .withNodeIdentifier(nodeWithKey)
-                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "name"), "name of band"))
-                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "description"), "band description"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
                 .build())
             .build());
         final MapNode data = (MapNode) payload.getData();
@@ -432,8 +411,8 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     public void testPatchData() {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase);
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
-                .node(containerPlayerQname)
-                .node(leafQname)
+                .node(PLAYER_QNAME)
+                .node(GAP_QNAME)
                 .build();
         final PatchContext patch = new PatchContext(iidContext, List.of(
             new PatchEntity("create data", CREATE, iidBase, buildBaseCont),
@@ -456,8 +435,8 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint,
             JUKEBOX_SCHEMA, iidBase);
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
-                .node(containerPlayerQname)
-                .node(leafQname)
+                .node(PLAYER_QNAME)
+                .node(GAP_QNAME)
                 .build();
         final PatchContext patch = new PatchContext(iidContext, List.of(
             new PatchEntity("create data", CREATE, iidBase, buildBaseCont),
@@ -479,8 +458,8 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     public void testPatchDataDeleteNotExist() {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase);
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
-                .node(containerPlayerQname)
-                .node(leafQname)
+                .node(PLAYER_QNAME)
+                .node(GAP_QNAME)
                 .build();
         final PatchContext patch = new PatchContext(iidContext, List.of(
             new PatchEntity("create data", CREATE, iidBase, buildBaseCont),

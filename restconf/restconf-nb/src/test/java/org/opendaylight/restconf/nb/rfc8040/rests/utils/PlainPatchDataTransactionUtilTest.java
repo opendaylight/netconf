@@ -30,7 +30,6 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -60,20 +59,14 @@ public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
 
     @Before
     public void setUp() {
-        final QName qnJukebox = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
-        final QName qnPlayer = QName.create(qnJukebox, "player");
-        final QName qnGap = QName.create(qnJukebox, "gap");
-        final QName qnPlaylist = QName.create(qnJukebox, "playlist");
-        final QName qnPlaylistKey = QName.create(qnJukebox, "name");
+        iidGap = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYER_QNAME).node(GAP_QNAME).build();
+        iidJukebox = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).build();
 
-        iidGap = YangInstanceIdentifier.builder().node(qnJukebox).node(qnPlayer).node(qnGap).build();
-        iidJukebox = YangInstanceIdentifier.builder().node(qnJukebox).build();
-
-        leafGap = ImmutableNodes.leafNode(qnGap, 0.2);
+        leafGap = ImmutableNodes.leafNode(GAP_QNAME, 0.2);
         jukeboxContainerWithPlayer = Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(qnJukebox))
+            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
             .withChild(Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(qnPlayer))
+                .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
                 .withChild(leafGap)
                 .build())
             .build();
@@ -81,18 +74,18 @@ public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
         // ----------
 
         jukeboxContainerWithPlaylist = Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(qnJukebox))
+            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
             .withChild(Builders.mapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(qnPlaylist))
+                .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
                 .withChild(Builders.mapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(qnPlaylist, qnPlaylistKey, "MyFavoriteBand-A"))
-                    .withChild(ImmutableNodes.leafNode(QName.create(qnJukebox, "name"), "MyFavoriteBand-A"))
-                    .withChild(ImmutableNodes.leafNode(QName.create(qnJukebox, "description"), "band description A"))
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "MyFavoriteBand-A"))
+                    .withChild(ImmutableNodes.leafNode(NAME_QNAME, "MyFavoriteBand-A"))
+                    .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description A"))
                     .build())
                 .withChild(Builders.mapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(qnPlaylist, qnPlaylistKey, "MyFavoriteBand-B"))
-                    .withChild(ImmutableNodes.leafNode(QName.create(qnJukebox, "name"), "MyFavoriteBand-B"))
-                    .withChild(ImmutableNodes.leafNode(QName.create(qnJukebox, "description"), "band description B"))
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "MyFavoriteBand-B"))
+                    .withChild(ImmutableNodes.leafNode(NAME_QNAME, "MyFavoriteBand-B"))
+                    .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description B"))
                     .build())
                 .build())
             .build();

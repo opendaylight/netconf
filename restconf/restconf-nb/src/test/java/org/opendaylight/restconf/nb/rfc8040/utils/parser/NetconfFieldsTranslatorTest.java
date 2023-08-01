@@ -38,7 +38,7 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
         assertEquals(1, result.size());
         final var pathArguments = result.get(0).getPathArguments();
         assertEquals(1, pathArguments.size());
-        assertEquals(LIBRARY_Q_NAME, pathArguments.get(0).getNodeType());
+        assertEquals(LIBRARY_QNAME, pathArguments.get(0).getNodeType());
     }
 
     @Override
@@ -50,10 +50,10 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
     protected void assertDoublePath(final List<YangInstanceIdentifier> result) {
         assertEquals(2, result.size());
 
-        final var libraryPath = assertPath(result, LIBRARY_Q_NAME);
+        final var libraryPath = assertPath(result, LIBRARY_QNAME);
         assertEquals(1, libraryPath.getPathArguments().size());
 
-        final var playerPath = assertPath(result, PLAYER_Q_NAME);
+        final var playerPath = assertPath(result, PLAYER_QNAME);
         assertEquals(1, playerPath.getPathArguments().size());
     }
 
@@ -62,12 +62,12 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
         assertEquals(1, result.size());
         final var pathArguments = result.get(0).getPathArguments();
         assertEquals(6, pathArguments.size());
-        assertEquals(LIBRARY_Q_NAME, pathArguments.get(0).getNodeType());
-        assertEquals(ARTIST_Q_NAME, pathArguments.get(1).getNodeType());
-        assertEquals(ARTIST_Q_NAME, pathArguments.get(2).getNodeType());
-        assertEquals(ALBUM_Q_NAME, pathArguments.get(3).getNodeType());
-        assertEquals(ALBUM_Q_NAME, pathArguments.get(4).getNodeType());
-        assertEquals(NAME_Q_NAME, pathArguments.get(5).getNodeType());
+        assertEquals(LIBRARY_QNAME, pathArguments.get(0).getNodeType());
+        assertEquals(ARTIST_QNAME, pathArguments.get(1).getNodeType());
+        assertEquals(ARTIST_QNAME, pathArguments.get(2).getNodeType());
+        assertEquals(ALBUM_QNAME, pathArguments.get(3).getNodeType());
+        assertEquals(ALBUM_QNAME, pathArguments.get(4).getNodeType());
+        assertEquals(NAME_QNAME, pathArguments.get(5).getNodeType());
     }
 
     @Override
@@ -75,12 +75,12 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
         assertEquals(1, result.size());
         final var pathArguments = result.get(0).getPathArguments();
         assertEquals(6, pathArguments.size());
-        assertEquals(LIBRARY_Q_NAME, pathArguments.get(0).getNodeType());
-        assertEquals(ARTIST_Q_NAME, pathArguments.get(1).getNodeType());
-        assertEquals(ARTIST_Q_NAME, pathArguments.get(2).getNodeType());
-        assertEquals(ALBUM_Q_NAME, pathArguments.get(3).getNodeType());
-        assertEquals(ALBUM_Q_NAME, pathArguments.get(4).getNodeType());
-        assertEquals(NAME_Q_NAME, pathArguments.get(5).getNodeType());
+        assertEquals(LIBRARY_QNAME, pathArguments.get(0).getNodeType());
+        assertEquals(ARTIST_QNAME, pathArguments.get(1).getNodeType());
+        assertEquals(ARTIST_QNAME, pathArguments.get(2).getNodeType());
+        assertEquals(ALBUM_QNAME, pathArguments.get(3).getNodeType());
+        assertEquals(ALBUM_QNAME, pathArguments.get(4).getNodeType());
+        assertEquals(NAME_QNAME, pathArguments.get(5).getNodeType());
     }
 
     @Override
@@ -172,7 +172,7 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
         final var pathArguments = result.get(0).getPathArguments();
 
         assertEquals(2, pathArguments.size());
-        assertEquals(PLAYER_Q_NAME, pathArguments.get(0).getNodeType());
+        assertEquals(PLAYER_QNAME, pathArguments.get(0).getNodeType());
         assertEquals(SPEED_Q_NAME, pathArguments.get(1).getNodeType());
     }
 

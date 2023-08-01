@@ -51,7 +51,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -79,56 +78,47 @@ public class PatchDataTransactionUtilTest extends AbstractJukeboxTest {
 
     @Before
     public void setUp() {
-        final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
-        final QName containerPlayerQName = QName.create(baseQName, "player");
-        final QName leafGapQName = QName.create(baseQName, "gap");
-        final QName containerLibraryQName = QName.create(baseQName, "library");
-        final QName listArtistQName = QName.create(baseQName, "artist");
-        final QName leafNameQName = QName.create(baseQName, "name");
-        final NodeIdentifierWithPredicates nodeWithKey = NodeIdentifierWithPredicates.of(listArtistQName, leafNameQName,
-            "name of artist");
-
         // instance identifier for accessing container node "player"
-        instanceIdContainer = YangInstanceIdentifier.of(baseQName, containerPlayerQName);
+        instanceIdContainer = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYER_QNAME);
 
         // instance identifier for accessing leaf node "gap"
-        instanceIdCreateAndDelete = instanceIdContainer.node(leafGapQName);
+        instanceIdCreateAndDelete = instanceIdContainer.node(GAP_QNAME);
 
         // values that are used for creating leaf for testPatchDataCreateAndDelete test
         buildBaseContainerForTests = Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(baseQName))
+            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
             .withChild(Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(containerPlayerQName))
-                .withChild(ImmutableNodes.leafNode(leafGapQName, 0.2))
+                .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
+                .withChild(ImmutableNodes.leafNode(GAP_QNAME, 0.2))
                 .build())
             .build();
 
-        targetNodeForCreateAndDelete = instanceIdCreateAndDelete.node(containerPlayerQName).node(leafGapQName);
+        targetNodeForCreateAndDelete = instanceIdCreateAndDelete.node(PLAYER_QNAME).node(GAP_QNAME);
 
         // instance identifier for accessing leaf node "name" in list "artist"
         instanceIdMerge = YangInstanceIdentifier.builder()
-                .node(baseQName)
-                .node(containerLibraryQName)
-                .node(listArtistQName)
-                .nodeWithKey(listArtistQName, QName.create(listArtistQName, "name"), "name of artist")
-                .node(leafNameQName)
+                .node(JUKEBOX_QNAME)
+                .node(LIBRARY_QNAME)
+                .node(ARTIST_QNAME)
+                .nodeWithKey(ARTIST_QNAME, NAME_QNAME, "name of artist")
+                .node(NAME_QNAME)
                 .build();
 
         // values that are used for creating leaf for testPatchDataReplaceMergeAndRemove test
         buildArtistList = Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(listArtistQName))
+            .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
             .withChild(Builders.mapEntryBuilder()
-                .withNodeIdentifier(nodeWithKey)
-                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "name"), "name of artist"))
-                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "description"), "description of artist"))
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of artist"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "description of artist"))
                 .build())
             .build();
 
         targetNodeMerge = YangInstanceIdentifier.builder()
-                .node(baseQName)
-                .node(containerLibraryQName)
-                .node(listArtistQName)
-                .nodeWithKey(listArtistQName, leafNameQName, "name of artist")
+                .node(JUKEBOX_QNAME)
+                .node(LIBRARY_QNAME)
+                .node(ARTIST_QNAME)
+                .nodeWithKey(ARTIST_QNAME, NAME_QNAME, "name of artist")
                 .build();
 
         /* Mocks */

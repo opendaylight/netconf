@@ -41,7 +41,6 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -70,30 +69,23 @@ public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
 
     @Before
     public void setUp() {
-        final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
-        final QName containerQname = QName.create(baseQName, "player");
-        final QName leafQname = QName.create(baseQName, "gap");
-        final QName listQname = QName.create(baseQName, "playlist");
-        final QName listKeyQname = QName.create(baseQName, "name");
-        final NodeIdentifierWithPredicates nodeWithKey = NodeIdentifierWithPredicates.of(listQname, listKeyQname,
-            "name of band");
-        iid2 = YangInstanceIdentifier.builder().node(baseQName).build();
-        iidList = YangInstanceIdentifier.builder().node(baseQName).node(listQname).build();
+        iid2 = YangInstanceIdentifier.of(JUKEBOX_QNAME);
+        iidList = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYLIST_QNAME);
 
         buildBaseCont = Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(baseQName))
+            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
             .withChild(Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(containerQname))
-                .withChild(ImmutableNodes.leafNode(leafQname, 0.2))
+                .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
+                .withChild(ImmutableNodes.leafNode(GAP_QNAME, 0.2))
                 .build())
             .build();
 
         buildList = Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(listQname))
+            .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
             .withChild(Builders.mapEntryBuilder()
-                .withNodeIdentifier(nodeWithKey)
-                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "name"), "name of band"))
-                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "description"), "band description"))
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
                 .build())
             .build();
 

@@ -30,8 +30,6 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTest {
-    private static final QNameModule Q_NAME_MODULE_JUKEBOX = QNameModule.create(
-        XMLNamespace.of("http://example.com/ns/example-jukebox"), Revision.of("2015-04-04"));
     private static final QNameModule Q_NAME_MODULE_TEST_SERVICES = QNameModule.create(
         XMLNamespace.of("tests:test-services"), Revision.of("2019-03-25"));
     private static final QNameModule Q_NAME_MODULE_AUGMENTED_JUKEBOX = QNameModule.create(
@@ -43,19 +41,6 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     private InstanceIdentifierContext identifierTestServices;
     private InstanceIdentifierContext identifierFoo;
 
-    // FIXME: remove all this mocking -- just parse the underlying model and be done with it
-
-    // container jukebox
-    private static final QName JUKEBOX_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "jukebox");
-
-    // container player
-    protected static final QName PLAYER_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "player");
-
-    // container library
-    protected static final QName LIBRARY_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "library");
-
-    // list artist
-    protected static final QName ARTIST_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "artist");
 
     // container augmented library
     protected static final QName AUGMENTED_LIBRARY_Q_NAME = QName.create(Q_NAME_MODULE_AUGMENTED_JUKEBOX,
@@ -63,12 +48,6 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
 
     // leaf speed
     protected static final QName SPEED_Q_NAME = QName.create(Q_NAME_MODULE_AUGMENTED_JUKEBOX, "speed");
-
-    // list album
-    public static final QName ALBUM_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "album");
-
-    // leaf name
-    protected static final QName NAME_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "name");
 
     // container test data
     private static final QName TEST_DATA_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "test-data");
@@ -124,7 +103,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     @Before
     public void setUp() {
         identifierJukebox = InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.ofDataTreePath(JUKEBOX_SCHEMA, JUKEBOX_Q_NAME));
+            SchemaInferenceStack.ofDataTreePath(JUKEBOX_SCHEMA, JUKEBOX_QNAME));
 
         identifierTestServices = InstanceIdentifierContext.ofStack(
             SchemaInferenceStack.ofDataTreePath(YangParserTestUtils.parseYangResourceDirectory("/test-services"),

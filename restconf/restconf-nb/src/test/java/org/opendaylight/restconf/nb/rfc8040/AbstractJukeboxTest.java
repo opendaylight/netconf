@@ -9,10 +9,31 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractJukeboxTest {
+    // container jukebox
+    protected static final QName JUKEBOX_QNAME =
+        QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
+    // container player
+    protected static final QName PLAYER_QNAME = QName.create(JUKEBOX_QNAME, "player");
+    // container library
+    protected static final QName LIBRARY_QNAME = QName.create(JUKEBOX_QNAME, "library");
+    // list artist
+    protected static final QName ARTIST_QNAME = QName.create(JUKEBOX_QNAME, "artist");
+    // list album
+    protected static final QName ALBUM_QNAME = QName.create(JUKEBOX_QNAME, "album");
+    // leaf name
+    protected static final QName NAME_QNAME = QName.create(JUKEBOX_QNAME, "name");
+    // leaf gap
+    protected static final QName GAP_QNAME = QName.create(JUKEBOX_QNAME, "gap");
+    // leaf playlist
+    protected static final QName PLAYLIST_QNAME = QName.create(JUKEBOX_QNAME, "playlist");
+    // leaf description
+    protected static final QName DESCRIPTION_QNAME = QName.create(JUKEBOX_QNAME, "description");
+
     protected static EffectiveModelContext JUKEBOX_SCHEMA;
 
     @BeforeClass

@@ -31,31 +31,31 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
     @Override
     protected void assertSimplePath(final List<Set<QName>> result) {
         assertEquals(1, result.size());
-        assertEquals(Set.of(LIBRARY_Q_NAME), result.get(0));
+        assertEquals(Set.of(LIBRARY_QNAME), result.get(0));
     }
 
     @Override
     protected void assertDoublePath(final List<Set<QName>> result) {
         assertEquals(1, result.size());
-        assertEquals(Set.of(LIBRARY_Q_NAME, PLAYER_Q_NAME), result.get(0));
+        assertEquals(Set.of(LIBRARY_QNAME, PLAYER_QNAME), result.get(0));
     }
 
     @Override
     protected void assertSubPath(final List<Set<QName>> result) {
         assertEquals(4, result.size());
-        assertEquals(Set.of(LIBRARY_Q_NAME), result.get(0));
-        assertEquals(Set.of(ARTIST_Q_NAME), result.get(1));
-        assertEquals(Set.of(ALBUM_Q_NAME), result.get(2));
-        assertEquals(Set.of(NAME_Q_NAME), result.get(3));
+        assertEquals(Set.of(LIBRARY_QNAME), result.get(0));
+        assertEquals(Set.of(ARTIST_QNAME), result.get(1));
+        assertEquals(Set.of(ALBUM_QNAME), result.get(2));
+        assertEquals(Set.of(NAME_QNAME), result.get(3));
     }
 
     @Override
     protected void assertChildrenPath(final List<Set<QName>> result) {
         assertEquals(4, result.size());
-        assertEquals(Set.of(LIBRARY_Q_NAME), result.get(0));
-        assertEquals(Set.of(ARTIST_Q_NAME), result.get(1));
-        assertEquals(Set.of(ALBUM_Q_NAME), result.get(2));
-        assertEquals(Set.of(NAME_Q_NAME), result.get(3));
+        assertEquals(Set.of(LIBRARY_QNAME), result.get(0));
+        assertEquals(Set.of(ARTIST_QNAME), result.get(1));
+        assertEquals(Set.of(ALBUM_QNAME), result.get(2));
+        assertEquals(Set.of(NAME_QNAME), result.get(3));
     }
 
     @Override
@@ -107,7 +107,7 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
     @Override
     protected void assertAugmentedChild(final List<Set<QName>> result) {
         assertEquals(2, result.size());
-        assertEquals(Set.of(PLAYER_Q_NAME), result.get(0));
+        assertEquals(Set.of(PLAYER_QNAME), result.get(0));
         assertEquals(Set.of(SPEED_Q_NAME), result.get(1));
     }
 
@@ -121,9 +121,9 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
     @Override
     protected void assertKeyedList(final List<Set<QName>> result) {
         assertEquals(3, result.size());
-        assertEquals(Set.of(LIBRARY_Q_NAME), result.get(0));
-        assertEquals(Set.of(ARTIST_Q_NAME), result.get(1));
-        assertEquals(Set.of(NAME_Q_NAME), result.get(2));
+        assertEquals(Set.of(LIBRARY_QNAME), result.get(0));
+        assertEquals(Set.of(ARTIST_QNAME), result.get(1));
+        assertEquals(Set.of(NAME_QNAME), result.get(2));
     }
 
     @Override
