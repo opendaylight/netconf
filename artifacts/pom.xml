@@ -201,6 +201,12 @@
                 <artifactId>rfc8639</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- RFC8641 Subscription to YANG Notifications -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>rfc8641</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <!-- RFC7407 A YANG Data Model for SNMP Configuration -->
             <dependency>
                 <groupId>org.opendaylight.netconf.model</groupId>
