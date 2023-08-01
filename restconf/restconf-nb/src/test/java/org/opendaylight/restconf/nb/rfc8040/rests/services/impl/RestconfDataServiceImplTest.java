@@ -72,7 +72,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -343,30 +342,23 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPostData() {
-        final NodeIdentifierWithPredicates nodeWithKey =
-                NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band");
+        final var identifier = NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band");
+        final var entryNode = Builders.mapEntryBuilder()
+            .withNodeIdentifier(identifier)
+            .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
+            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
+            .build();
 
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
-            .withChild(Builders.mapEntryBuilder()
-                .withNodeIdentifier(nodeWithKey)
-                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
-                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
-                .build())
-            .build());
-        final MapNode data = (MapNode) payload.getData();
-        final MapEntryNode entryNode = data.body().iterator().next();
-        final NodeIdentifierWithPredicates identifier = entryNode.name();
-        final YangInstanceIdentifier node =
-                payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
-        doReturn(immediateFalseFluentFuture())
-                .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        final var node = iidBase.node(identifier);
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
-        final Response response = dataService.postData(null, payload, uriInfo);
+        final var response = dataService.postData(NormalizedNodePayload.of(
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, iidBase),
+            Builders.mapBuilder().withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME)).withChild(entryNode).build()),
+            uriInfo);
         assertEquals(201, response.getStatus());
     }
 
