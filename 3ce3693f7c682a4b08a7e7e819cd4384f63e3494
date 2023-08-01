@@ -16,6 +16,24 @@
       "message": "extra empty line, can be removed",
       "revId": "3ce3693f7c682a4b08a7e7e819cd4384f63e3494",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a10c2bf_f09e8d47",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-01T06:41:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbf30763_52e92209",
+      "revId": "3ce3693f7c682a4b08a7e7e819cd4384f63e3494",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
