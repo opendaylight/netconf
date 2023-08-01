@@ -40,6 +40,7 @@
         <module>rfc8526</module>
         <module>rfc8639</module>
         <module>rfc8641</module>
+        <module>rfc8650</module>
 
         <!-- draft-ietf-netconf-crypto-types-24 -->
         <module>draft-ietf-netconf-crypto-types</module>
