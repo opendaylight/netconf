@@ -40,6 +40,7 @@
         <module>odl-netconf-model-rfc8341</module>
         <module>odl-netconf-model-rfc8526</module>
         <module>odl-netconf-model-rfc8639</module>
+        <module>odl-netconf-model-rfc8641</module>
 
         <module>odl-aaa-netconf-plugin</module>
         <module>odl-restconf-openapi</module>
