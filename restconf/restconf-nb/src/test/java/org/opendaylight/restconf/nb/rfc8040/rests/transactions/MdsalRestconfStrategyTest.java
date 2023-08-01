@@ -101,4 +101,12 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
     }
+
+    @Override
+    RestconfStrategy testPostContainerDataStrategy() {
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
 }

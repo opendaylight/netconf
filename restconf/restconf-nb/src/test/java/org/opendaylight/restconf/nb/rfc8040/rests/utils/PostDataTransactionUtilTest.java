@@ -74,34 +74,10 @@ public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
 
     @Before
     public void before() {
-        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
 
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
-    }
-
-    @Test
-    public void testPostContainerData() {
-        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        final NodeIdentifier identifier = EMPTY_JUKEBOX.body().iterator().next().name();
-        final YangInstanceIdentifier node = JUKEBOX_IID.node(identifier);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), EMPTY_JUKEBOX);
-        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .create(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
-
-        Response response = PostDataTransactionUtil.postData(uriInfo, JUKEBOX_IID, EMPTY_JUKEBOX,
-            new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA, WriteDataParams.empty());
-        assertEquals(201, response.getStatus());
-        verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
-
-        response = PostDataTransactionUtil.postData(uriInfo, JUKEBOX_IID, EMPTY_JUKEBOX,
-                new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA, WriteDataParams.empty());
-        assertEquals(201, response.getStatus());
-        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
     }
 
     @Test
@@ -118,6 +94,7 @@ public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).create(
             LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
 
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
         Response response = PostDataTransactionUtil.postData(uriInfo, PLAYLIST_IID, PLAYLIST,
                         new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());

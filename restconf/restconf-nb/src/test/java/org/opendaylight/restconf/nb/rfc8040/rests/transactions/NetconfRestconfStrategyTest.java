@@ -60,6 +60,14 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         return new NetconfRestconfStrategy(netconfService);
     }
 
+    @Override
+    RestconfStrategy testPostContainerDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .create(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
     @Test
     public void testPutCreateContainerData() {
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(JUKEBOX_IID);

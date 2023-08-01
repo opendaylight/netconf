@@ -9,13 +9,19 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.doReturn;
 
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
+import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -38,6 +44,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
                 .build())
             .build())
         .build();
+
+    @Mock
+    private UriInfo uriInfo;
 
     /**
      * Test of successful DELETE operation.
@@ -68,4 +77,15 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     abstract @NonNull RestconfStrategy testNegativeDeleteDataStrategy();
+
+    @Test
+    public final void testPostContainerData() {
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+
+        final var response = PostDataTransactionUtil.postData(uriInfo, JUKEBOX_IID, EMPTY_JUKEBOX,
+            testPostContainerDataStrategy(), JUKEBOX_SCHEMA, WriteDataParams.empty());
+        assertEquals(201, response.getStatus());
+    }
+
+    abstract @NonNull RestconfStrategy testPostContainerDataStrategy();
 }
