@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c70008f_cf81bd27",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-01T14:26:01Z",
+      "side": 1,
+      "message": "Revert this variable and just check it like this:\n if (node instanceof ListSchemaNode) {",
+      "revId": "f8677c6ef2ea2be3aa903a24af66ff34ed5bc22c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
