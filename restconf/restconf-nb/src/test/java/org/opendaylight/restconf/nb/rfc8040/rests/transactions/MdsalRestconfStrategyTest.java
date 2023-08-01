@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -25,8 +26,11 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.w3c.dom.DOMException;
@@ -148,5 +152,41 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy() {
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy testPatchDataCreateAndDeleteStrategy() {
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, PLAYER_IID);
+        doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
+            CREATE_AND_DELETE_TARGET);
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy testPatchMergePutContainerStrategy() {
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy deleteNonexistentDataTestStrategy() {
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
+            CREATE_AND_DELETE_TARGET);
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    void assertTestDeleteNonexistentData(final PatchStatusContext status) {
+        final var editCollection = status.getEditCollection();
+        assertEquals(1, editCollection.size());
+        final var editErrors = editCollection.get(0).getEditErrors();
+        assertEquals(1, editErrors.size());
+        final var editError = editErrors.get(0);
+        assertEquals(ErrorType.PROTOCOL, editError.getErrorType());
+        assertEquals(ErrorTag.DATA_MISSING, editError.getErrorTag());
     }
 }

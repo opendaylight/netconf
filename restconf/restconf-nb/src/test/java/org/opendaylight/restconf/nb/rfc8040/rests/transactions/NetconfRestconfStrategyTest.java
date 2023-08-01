@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -26,6 +27,7 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -49,6 +51,8 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),
+            any(), any());
     }
 
     @Override
@@ -198,5 +202,48 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
+    }
+
+    @Override
+    RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .remove(LogicalDatastoreType.CONFIGURATION, ARTIST_IID);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .replace(any(), any(), any(), any());
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy testPatchDataCreateAndDeleteStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, CREATE_AND_DELETE_TARGET);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy testPatchMergePutContainerStrategy() {
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy deleteNonexistentDataTestStrategy() {
+        doReturn(Futures.immediateFailedFuture(
+            new TransactionCommitFailedException("Commit of transaction " + this + " failed",
+                new NetconfDocumentedException("id", ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR))))
+            .when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, CREATE_AND_DELETE_TARGET);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    void assertTestDeleteNonexistentData(final PatchStatusContext status) {
+        final var globalErrors = status.getGlobalErrors();
+        assertEquals(1, globalErrors.size());
+        final var globalError = globalErrors.get(0);
+        assertEquals(ErrorType.PROTOCOL, globalError.getErrorType());
+        assertEquals(ErrorTag.DATA_MISSING, globalError.getErrorTag());
     }
 }
