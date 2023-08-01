@@ -207,6 +207,12 @@
                 <artifactId>rfc7407-ietf-x509-cert-to-name</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- RFC8641 Subscription to YANG Notifications -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>rfc8641</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- draft-ietf-netconf-crypto-types -->
             <dependency>
@@ -444,6 +450,13 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-netconf-model-rfc8639</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-netconf-model-rfc8641</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>
