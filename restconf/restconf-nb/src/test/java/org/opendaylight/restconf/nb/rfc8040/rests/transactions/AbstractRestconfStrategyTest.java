@@ -10,21 +10,34 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
+import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
+import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
+import static org.opendaylight.restconf.common.patch.PatchEditOperation.MERGE;
+import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
+import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchEntity;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -77,6 +90,16 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             .build())
         .build();
     static final YangInstanceIdentifier PLAYLIST_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYLIST_QNAME);
+    // instance identifier for accessing container node "player"
+    static final YangInstanceIdentifier PLAYER_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYER_QNAME);
+    static final YangInstanceIdentifier ARTIST_IID = YangInstanceIdentifier.builder()
+        .node(JUKEBOX_QNAME)
+        .node(LIBRARY_QNAME)
+        .node(ARTIST_QNAME)
+        .nodeWithKey(ARTIST_QNAME, NAME_QNAME, "name of artist")
+        .build();
+    // FIXME: this looks weird
+    static final YangInstanceIdentifier CREATE_AND_DELETE_TARGET = GAP_IID.node(PLAYER_QNAME).node(GAP_QNAME);
 
     @Mock
     private UriInfo uriInfo;
@@ -177,4 +200,70 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     abstract @NonNull RestconfStrategy testPatchListDataStrategy();
+
+    @Test
+    public final void testPatchDataReplaceMergeAndRemove() {
+        final var buildArtistList = Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of artist"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "description of artist"))
+                .build())
+            .build();
+
+        patch(new PatchContext(
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, ARTIST_IID.node(NAME_QNAME)),
+            List.of(new PatchEntity("edit1", REPLACE, ARTIST_IID, buildArtistList),
+                new PatchEntity("edit2", MERGE, ARTIST_IID, buildArtistList),
+                new PatchEntity("edit3", REMOVE, ARTIST_IID)),
+            "patchRMRm"), testPatchDataReplaceMergeAndRemoveStrategy(), false);
+    }
+
+    abstract @NonNull RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy();
+
+    @Test
+    public final void testPatchDataCreateAndDelete() {
+        patch(new PatchContext(InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
+            List.of(new PatchEntity("edit1", CREATE, PLAYER_IID, EMPTY_JUKEBOX),
+                new PatchEntity("edit2", DELETE, CREATE_AND_DELETE_TARGET)),
+            "patchCD"),
+            testPatchDataCreateAndDeleteStrategy(), true);
+    }
+
+    abstract @NonNull RestconfStrategy testPatchDataCreateAndDeleteStrategy();
+
+    @Test
+    public final void testPatchMergePutContainer() {
+        patch(new PatchContext(InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
+            List.of(new PatchEntity("edit1", MERGE, PLAYER_IID, EMPTY_JUKEBOX)), "patchM"),
+            testPatchMergePutContainerStrategy(), false);
+    }
+
+    abstract @NonNull RestconfStrategy testPatchMergePutContainerStrategy();
+
+    @Test
+    public final void testDeleteNonexistentData() {
+        final var patchStatusContext = PatchDataTransactionUtil.patchData(new PatchContext(
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
+            List.of(new PatchEntity("edit", DELETE, CREATE_AND_DELETE_TARGET)), "patchD"),
+            deleteNonexistentDataTestStrategy(), JUKEBOX_SCHEMA);
+        assertFalse(patchStatusContext.isOk());
+    }
+
+    abstract @NonNull RestconfStrategy deleteNonexistentDataTestStrategy();
+
+    abstract void assertTestDeleteNonexistentData(@NonNull PatchStatusContext status);
+
+    private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
+        final var patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, strategy, JUKEBOX_SCHEMA);
+        for (var entity : patchStatusContext.getEditCollection()) {
+            if (failed) {
+                assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());
+            } else {
+                assertTrue(entity.isOk());
+            }
+        }
+        assertTrue(patchStatusContext.isOk());
+    }
 }
