@@ -121,7 +121,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
         buildPlayerCont = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
-                .withChild(ImmutableNodes.leafNode(GAP_QNAME, 0.2))
+                .withChild(GAP_LEAF)
                 .build();
 
         buildLibraryCont = Builders.containerBuilder()
@@ -484,5 +484,50 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(Optional.of(netconfService)).when(mountPoint).getService(NetconfDataTreeService.class);
         restconfStrategy = dataService.getRestconfStrategy(mountPoint);
         assertTrue(restconfStrategy instanceof NetconfRestconfStrategy);
+    }
+
+    @Test
+    public void testValidInputData() {
+        RestconfDataServiceImpl.validInputData(true, NormalizedNodePayload.of(
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
+    }
+
+    @Test
+    public void testValidTopLevelNodeName() {
+        RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID, NormalizedNodePayload.of(
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
+        RestconfDataServiceImpl.validTopLevelNodeName(JUKEBOX_IID, NormalizedNodePayload.of(
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID), EMPTY_JUKEBOX));
+    }
+
+    @Test
+    public void testValidTopLevelNodeNamePathEmpty() {
+        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
+        final var payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
+
+        // FIXME: more asserts
+        assertThrows(RestconfDocumentedException.class,
+            () -> RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.of(), payload));
+    }
+
+    @Test
+    public void testValidTopLevelNodeNameWrongTopIdentifier() {
+        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
+        final var payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
+
+        // FIXME: more asserts
+        assertThrows(RestconfDocumentedException.class,
+            () -> RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID.getAncestor(1), payload));
+    }
+
+    @Test
+    public void testValidateListKeysEqualityInPayloadAndUri() {
+        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, YangInstanceIdentifier.builder()
+            .node(JUKEBOX_QNAME)
+            .node(PLAYLIST_QNAME)
+            .nodeWithKey(PLAYLIST_QNAME, NAME_QNAME, "name of band")
+            .build());
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, BAND_ENTRY);
+        RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
     }
 }

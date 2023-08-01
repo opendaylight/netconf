@@ -428,7 +428,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param payload    input data
      */
     @VisibleForTesting
-    public static void validInputData(final boolean haveSchemaNode, final NormalizedNodePayload payload) {
+    static void validInputData(final boolean haveSchemaNode, final NormalizedNodePayload payload) {
         final boolean haveData = payload.getData() != null;
         if (haveSchemaNode) {
             if (!haveData) {
@@ -447,7 +447,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param payload data
      */
     @VisibleForTesting
-    public static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodePayload payload) {
+    static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodePayload payload) {
         final QName dataNodeType = payload.getData().name().getNodeType();
         if (path.isEmpty()) {
             if (!Data.QNAME.equals(dataNodeType)) {
@@ -465,7 +465,6 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
     }
 
-
     /**
      * Validates whether keys in {@code payload} are equal to values of keys in
      * {@code iiWithData} for list schema node.
@@ -473,7 +472,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @throws RestconfDocumentedException if key values or key count in payload and URI isn't equal
      */
     @VisibleForTesting
-    public static void validateListKeysEqualityInPayloadAndUri(final NormalizedNodePayload payload) {
+    static void validateListKeysEqualityInPayloadAndUri(final NormalizedNodePayload payload) {
         final InstanceIdentifierContext iiWithData = payload.getInstanceIdentifierContext();
         final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
         final SchemaNode schemaNode = iiWithData.getSchemaNode();

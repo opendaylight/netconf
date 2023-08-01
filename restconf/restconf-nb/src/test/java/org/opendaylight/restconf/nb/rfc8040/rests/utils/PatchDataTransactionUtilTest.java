@@ -89,7 +89,7 @@ public class PatchDataTransactionUtilTest extends AbstractJukeboxTest {
             .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
             .withChild(Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
-                .withChild(ImmutableNodes.leafNode(GAP_QNAME, 0.2))
+                .withChild(GAP_LEAF)
                 .build())
             .build();
 

@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -30,49 +29,19 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
-import org.opendaylight.yangtools.yang.common.Decimal64;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PutDataTransactionUtilTest extends AbstractJukeboxTest {
-    private static final YangInstanceIdentifier JUKEBOX_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME);
-    private static final YangInstanceIdentifier GAP_IID
-        = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYER_QNAME, GAP_QNAME);
-    private static final YangInstanceIdentifier BAND_IID = YangInstanceIdentifier.builder()
-        .node(JUKEBOX_QNAME)
-        .node(PLAYLIST_QNAME)
-        .nodeWithKey(PLAYLIST_QNAME, NAME_QNAME, "name of band")
-        .build();
-
-    private static final LeafNode<?> GAP_LEAF = ImmutableNodes.leafNode(GAP_QNAME, Decimal64.valueOf("0.2"));
-    private static final ContainerNode EMPTY_JUKEBOX = Builders.containerBuilder()
-        .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-        .withChild(Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
-            .withChild(GAP_LEAF)
-            .build())
-        .build();
-    private static final MapEntryNode BAND_ENTRY = Builders.mapEntryBuilder()
-        .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band"))
-        .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
-        .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
-        .build();
     private static final ContainerNode JUKEBOX_WITH_BANDS = Builders.containerBuilder()
         .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
         .withChild(Builders.mapBuilder()
@@ -101,47 +70,6 @@ public class PutDataTransactionUtilTest extends AbstractJukeboxTest {
     public void before() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
-    }
-
-    @Test
-    public void testValidInputData() {
-        RestconfDataServiceImpl.validInputData(true, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
-    }
-
-    @Test
-    public void testValidTopLevelNodeName() {
-        RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
-        RestconfDataServiceImpl.validTopLevelNodeName(JUKEBOX_IID, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID), EMPTY_JUKEBOX));
-    }
-
-    @Test
-    public void testValidTopLevelNodeNamePathEmpty() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
-
-        // FIXME: more asserts
-        assertThrows(RestconfDocumentedException.class,
-            () -> RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.of(), payload));
-    }
-
-    @Test
-    public void testValidTopLevelNodeNameWrongTopIdentifier() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
-
-        // FIXME: more asserts
-        assertThrows(RestconfDocumentedException.class,
-            () -> RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID.getAncestor(1), payload));
-    }
-
-    @Test
-    public void testValidateListKeysEqualityInPayloadAndUri() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, BAND_IID);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, BAND_ENTRY);
-        RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
     }
 
     @Test

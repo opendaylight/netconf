@@ -34,7 +34,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
@@ -51,7 +50,6 @@ public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
     @Mock
     private NetconfDataTreeService netconfService;
 
-    private LeafNode<?> leafGap;
     private ContainerNode jukeboxContainerWithPlayer;
     private ContainerNode jukeboxContainerWithPlaylist;
     private YangInstanceIdentifier iidGap;
@@ -62,12 +60,11 @@ public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
         iidGap = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYER_QNAME).node(GAP_QNAME).build();
         iidJukebox = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).build();
 
-        leafGap = ImmutableNodes.leafNode(GAP_QNAME, 0.2);
         jukeboxContainerWithPlayer = Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
             .withChild(Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
-                .withChild(leafGap)
+                .withChild(GAP_LEAF)
                 .build())
             .build();
 
@@ -120,14 +117,14 @@ public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
             .merge(any(), any(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
 
-        PlainPatchDataTransactionUtil.patchData(iidGap, leafGap, new MdsalRestconfStrategy(mockDataBroker),
+        PlainPatchDataTransactionUtil.patchData(iidGap, GAP_LEAF, new MdsalRestconfStrategy(mockDataBroker),
             JUKEBOX_SCHEMA);
-        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidGap, leafGap);
+        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidGap, GAP_LEAF);
 
-        PlainPatchDataTransactionUtil.patchData(iidGap, leafGap, new NetconfRestconfStrategy(netconfService),
+        PlainPatchDataTransactionUtil.patchData(iidGap, GAP_LEAF, new NetconfRestconfStrategy(netconfService),
             JUKEBOX_SCHEMA);
         verify(netconfService).lock();
-        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidGap, leafGap, Optional.empty());
+        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidGap, GAP_LEAF, Optional.empty());
     }
 
     @Test

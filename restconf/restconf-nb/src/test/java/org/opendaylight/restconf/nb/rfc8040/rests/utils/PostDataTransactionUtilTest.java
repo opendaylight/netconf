@@ -41,11 +41,9 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
-import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -54,16 +52,8 @@ import org.w3c.dom.DOMException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
-    private static final YangInstanceIdentifier JUKEBOX_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME);
     private static final YangInstanceIdentifier PLAYLIST_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYLIST_QNAME);
 
-    private static final ContainerNode EMPTY_JUKEBOX = Builders.containerBuilder()
-        .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-        .withChild(Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
-            .withChild(ImmutableNodes.leafNode(GAP_QNAME, Decimal64.valueOf("0.2")))
-            .build())
-        .build();
     private static final MapNode PLAYLIST = Builders.mapBuilder()
         .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
         .withChild(Builders.mapEntryBuilder()
