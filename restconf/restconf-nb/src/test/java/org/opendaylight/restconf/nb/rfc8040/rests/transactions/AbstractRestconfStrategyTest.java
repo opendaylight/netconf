@@ -25,6 +25,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -48,6 +49,22 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band 2"))
                 .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band 2"))
                 .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description 2"))
+                .build())
+            .build())
+        .build();
+    static final ContainerNode JUKEBOX_WITH_PLAYLIST = Builders.containerBuilder()
+        .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
+        .withChild(Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "MyFavoriteBand-A"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "MyFavoriteBand-A"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description A"))
+                .build())
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "MyFavoriteBand-B"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "MyFavoriteBand-B"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description B"))
                 .build())
             .build())
         .build();
@@ -133,4 +150,31 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     abstract @NonNull RestconfStrategy testPostDataFailStrategy(DOMException domException);
+
+    @Test
+    public final void testPatchContainerData() {
+        final var response = PlainPatchDataTransactionUtil.patchData(JUKEBOX_IID, EMPTY_JUKEBOX,
+            testPatchContainerDataStrategy(), JUKEBOX_SCHEMA);
+        assertEquals(200, response.getStatus());
+    }
+
+    abstract @NonNull RestconfStrategy testPatchContainerDataStrategy();
+
+    @Test
+    public final void testPatchLeafData() {
+        final var response = PlainPatchDataTransactionUtil.patchData(GAP_IID, GAP_LEAF,
+            testPatchLeafDataStrategy(), JUKEBOX_SCHEMA);
+        assertEquals(200, response.getStatus());
+    }
+
+    abstract @NonNull RestconfStrategy testPatchLeafDataStrategy();
+
+    @Test
+    public final void testPatchListData() {
+        final var response = PlainPatchDataTransactionUtil.patchData(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST,
+            testPatchListDataStrategy(), JUKEBOX_SCHEMA);
+        assertEquals(200, response.getStatus());
+    }
+
+    abstract @NonNull RestconfStrategy testPatchListDataStrategy();
 }

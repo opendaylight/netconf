@@ -128,4 +128,25 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         return new MdsalRestconfStrategy(mockDataBroker);
     }
+
+    @Override
+    RestconfStrategy testPatchContainerDataStrategy() {
+        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy testPatchLeafDataStrategy() {
+        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy testPatchListDataStrategy() {
+        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
 }

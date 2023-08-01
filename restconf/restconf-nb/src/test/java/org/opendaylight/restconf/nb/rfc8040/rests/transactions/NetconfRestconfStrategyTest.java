@@ -91,6 +91,29 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         return new NetconfRestconfStrategy(netconfService);
     }
 
+    @Override
+    RestconfStrategy testPatchContainerDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),any(),
+            any());
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy testPatchLeafDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .merge(any(), any(), any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy testPatchListDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .merge(any(), any(),any(),any());
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
     @Test
     public void testPutCreateContainerData() {
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(JUKEBOX_IID);
