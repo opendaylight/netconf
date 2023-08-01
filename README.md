@@ -1,6 +1,16 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.opendaylight.netconf/netconf-artifacts/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.opendaylight.netconf/netconf-artifacts)
 [![Javadocs](https://www.javadoc.io/badge/org.opendaylight.netconf/restconf-common.svg)](https://www.javadoc.io/doc/org.opendaylight.netconf/restconf-common)
 [![License](https://img.shields.io/badge/License-EPL%201.0-blue.svg)](https://opensource.org/licenses/EPL-1.0)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=opendaylight_netconf&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=opendaylight_netconf)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=opendaylight_netconf&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=opendaylight_netconf)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=opendaylight_netconf&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=opendaylight_netconf)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=opendaylight_netconf&metric=coverage)](https://sonarcloud.io/summary/new_code?id=opendaylight_netconf)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=opendaylight_netconf&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=opendaylight_netconf)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=opendaylight_netconf&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=opendaylight_netconf)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=opendaylight_netconf&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=opendaylight_netconf)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=opendaylight_netconf&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=opendaylight_netconf)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=opendaylight_netconf&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=opendaylight_netconf)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=opendaylight_netconf&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=opendaylight_netconf)
 
 # OpenDaylight NETCONF/RESTCONF implementation
 
