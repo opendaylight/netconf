@@ -85,8 +85,8 @@ public final class PutDataTransactionUtil {
 
         return switch (insert) {
             case FIRST -> {
-                final var readData = readList(strategy, parentPath);
-                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
+                final var readData = transaction.readList(parentPath);
+                if (readData == null || readData.isEmpty()) {
                     yield makePut(path, schemaContext, transaction, data);
                 }
                 transaction.remove(parentPath);
@@ -96,30 +96,22 @@ public final class PutDataTransactionUtil {
             }
             case LAST -> makePut(path, schemaContext, transaction, data);
             case BEFORE -> {
-                final var readData = readList(strategy, parentPath);
-                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
+                final var readData = transaction.readList(parentPath);
+                if (readData == null || readData.isEmpty()) {
                     yield makePut(path, schemaContext, transaction, data);
                 }
-                insertWithPointPut(transaction, path, data, schemaContext, params.getPoint(),
-                    (NormalizedNodeContainer<?>) readData, true);
+                insertWithPointPut(transaction, path, data, schemaContext, params.getPoint(), readData, true);
                 yield transaction.commit();
             }
             case AFTER -> {
-                final var readData = readList(strategy, parentPath);
-                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
+                final var readData = transaction.readList(parentPath);
+                if (readData == null || readData.isEmpty()) {
                     yield makePut(path, schemaContext, transaction, data);
                 }
-                insertWithPointPut(transaction, path, data, schemaContext, params.getPoint(),
-                    (NormalizedNodeContainer<?>) readData, false);
+                insertWithPointPut(transaction, path, data, schemaContext, params.getPoint(), readData, false);
                 yield transaction.commit();
             }
         };
-    }
-
-    // FIXME: this method is only called from a context where we are modifying data. This should be part of strategy,
-    //        requiring an already-open transaction. It also must return a future, so it can be properly composed.
-    static NormalizedNode readList(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
-        return ReadDataTransactionUtil.readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
     }
 
     private static void insertWithPointPut(final RestconfTransaction transaction,

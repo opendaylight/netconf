@@ -89,38 +89,36 @@ public final class PostDataTransactionUtil {
 
         return switch (insert) {
             case FIRST -> {
-                final var readData = PutDataTransactionUtil.readList(strategy, grandParentPath);
-                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
+                final var readData = transaction.readList(grandParentPath);
+                if (readData == null || readData.isEmpty()) {
                     transaction.replace(path, data, schemaContext);
-                    yield transaction.commit();
+                } else {
+                    checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
+                    transaction.remove(grandParentPath);
+                    transaction.replace(path, data, schemaContext);
+                    transaction.replace(grandParentPath, readData, schemaContext);
                 }
-                checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
-                transaction.remove(grandParentPath);
-                transaction.replace(path, data, schemaContext);
-                transaction.replace(grandParentPath, readData, schemaContext);
                 yield transaction.commit();
             }
             case LAST -> makePost(path, data, schemaContext, transaction);
             case BEFORE -> {
-                final var readData = PutDataTransactionUtil.readList(strategy, grandParentPath);
-                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
+                final var readData = transaction.readList(grandParentPath);
+                if (readData == null || readData.isEmpty()) {
                     transaction.replace(path, data, schemaContext);
-                    yield transaction.commit();
+                } else {
+                    checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
+                    insertWithPointPost(path, data, schemaContext, params.getPoint(), readData, true, transaction);
                 }
-                checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
-                insertWithPointPost(path, data, schemaContext, params.getPoint(),
-                    (NormalizedNodeContainer<?>) readData, true, transaction);
                 yield transaction.commit();
             }
             case AFTER -> {
-                final var readData = PutDataTransactionUtil.readList(strategy, grandParentPath);
-                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
+                final var readData = transaction.readList(grandParentPath);
+                if (readData == null || readData.isEmpty()) {
                     transaction.replace(path, data, schemaContext);
-                    yield transaction.commit();
+                } else {
+                    checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
+                    insertWithPointPost(path, data, schemaContext, params.getPoint(), readData, false, transaction);
                 }
-                checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
-                insertWithPointPost(path, data, schemaContext, params.getPoint(),
-                    (NormalizedNodeContainer<?>) readData, false, transaction);
                 yield transaction.commit();
             }
         };
