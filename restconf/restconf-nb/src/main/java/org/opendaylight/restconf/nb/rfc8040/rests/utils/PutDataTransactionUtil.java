@@ -13,7 +13,6 @@ import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
@@ -75,47 +74,46 @@ public final class PutDataTransactionUtil {
     private static ListenableFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
             final EffectiveModelContext schemaContext, final RestconfStrategy strategy, final NormalizedNode data,
             final WriteDataParams params) {
-        final RestconfTransaction transaction = strategy.prepareWriteExecution();
-        final InsertParam insert = params.insert();
+        final var transaction = strategy.prepareWriteExecution();
+        final var insert = params.insert();
         if (insert == null) {
             return makePut(path, schemaContext, transaction, data);
         }
 
-        checkListAndOrderedType(schemaContext, path);
-        final NormalizedNode readData;
-        switch (insert) {
-            case FIRST:
-                readData = readList(strategy, path.getParent());
+        final var parentPath = path.coerceParent();
+        checkListAndOrderedType(schemaContext, parentPath);
+
+        return switch (insert) {
+            case FIRST -> {
+                final var readData = readList(strategy, parentPath);
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
-                    return makePut(path, schemaContext, transaction, data);
+                    yield makePut(path, schemaContext, transaction, data);
                 }
-                transaction.remove(path.getParent());
+                transaction.remove(parentPath);
                 transaction.replace(path, data, schemaContext);
-                transaction.replace(path.getParent(), readData, schemaContext);
-                return transaction.commit();
-            case LAST:
-                return makePut(path, schemaContext, transaction, data);
-            case BEFORE:
-                readData = readList(strategy, path.getParent());
+                transaction.replace(parentPath, readData, schemaContext);
+                yield transaction.commit();
+            }
+            case LAST -> makePut(path, schemaContext, transaction, data);
+            case BEFORE -> {
+                final var readData = readList(strategy, parentPath);
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
-                    return makePut(path, schemaContext, transaction, data);
+                    yield makePut(path, schemaContext, transaction, data);
                 }
                 insertWithPointPut(transaction, path, data, schemaContext, params.getPoint(),
                     (NormalizedNodeContainer<?>) readData, true);
-                return transaction.commit();
-            case AFTER:
-                readData = readList(strategy, path.getParent());
+                yield transaction.commit();
+            }
+            case AFTER -> {
+                final var readData = readList(strategy, parentPath);
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
-                    return makePut(path, schemaContext, transaction, data);
+                    yield makePut(path, schemaContext, transaction, data);
                 }
                 insertWithPointPut(transaction, path, data, schemaContext, params.getPoint(),
                     (NormalizedNodeContainer<?>) readData, false);
-                return transaction.commit();
-            default:
-                throw new RestconfDocumentedException(
-                        "Used bad value of insert parameter. Possible values are first, last, before or after, "
-                                + "but was: " + insert, ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE);
-        }
+                yield transaction.commit();
+            }
+        };
     }
 
     // FIXME: this method is only called from a context where we are modifying data. This should be part of strategy,
@@ -162,11 +160,10 @@ public final class PutDataTransactionUtil {
         return transaction.commit();
     }
 
+    // FIXME: take parentPath
     public static DataSchemaNode checkListAndOrderedType(final EffectiveModelContext ctx,
             final YangInstanceIdentifier path) {
-        final var dataSchemaNode = DataSchemaContextTree.from(ctx).findChild(path.getParent())
-            .orElseThrow()
-            .dataSchemaNode();
+        final var dataSchemaNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow().dataSchemaNode();
 
         final String message;
         if (dataSchemaNode instanceof ListSchemaNode listSchema) {

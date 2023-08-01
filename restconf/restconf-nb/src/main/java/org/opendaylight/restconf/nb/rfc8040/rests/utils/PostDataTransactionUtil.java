@@ -15,7 +15,6 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
@@ -78,62 +77,60 @@ public final class PostDataTransactionUtil {
     private static ListenableFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
             final NormalizedNode data, final RestconfStrategy strategy, final EffectiveModelContext schemaContext,
             final WriteDataParams params) {
-        final RestconfTransaction transaction = strategy.prepareWriteExecution();
-        final InsertParam insert = params.insert();
+        final var transaction = strategy.prepareWriteExecution();
+        final var insert = params.insert();
         if (insert == null) {
-            makePost(path, data, schemaContext, transaction);
-            return transaction.commit();
+            return makePost(path, data, schemaContext, transaction);
         }
 
-        PutDataTransactionUtil.checkListAndOrderedType(schemaContext, path);
-        final NormalizedNode readData;
-        switch (insert) {
-            case FIRST:
-                readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
+        final var parentPath = path.coerceParent();
+        PutDataTransactionUtil.checkListAndOrderedType(schemaContext, parentPath);
+        final var grandParentPath = parentPath.coerceParent();
+
+        return switch (insert) {
+            case FIRST -> {
+                final var readData = PutDataTransactionUtil.readList(strategy, grandParentPath);
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     transaction.replace(path, data, schemaContext);
-                    return transaction.commit();
+                    yield transaction.commit();
                 }
                 checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
-                transaction.remove(path.getParent().getParent());
+                transaction.remove(grandParentPath);
                 transaction.replace(path, data, schemaContext);
-                transaction.replace(path.getParent().getParent(), readData, schemaContext);
-                return transaction.commit();
-            case LAST:
-                makePost(path, data, schemaContext, transaction);
-                return transaction.commit();
-            case BEFORE:
-                readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
+                transaction.replace(grandParentPath, readData, schemaContext);
+                yield transaction.commit();
+            }
+            case LAST -> makePost(path, data, schemaContext, transaction);
+            case BEFORE -> {
+                final var readData = PutDataTransactionUtil.readList(strategy, grandParentPath);
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     transaction.replace(path, data, schemaContext);
-                    return transaction.commit();
+                    yield transaction.commit();
                 }
                 checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
                 insertWithPointPost(path, data, schemaContext, params.getPoint(),
                     (NormalizedNodeContainer<?>) readData, true, transaction);
-                return transaction.commit();
-            case AFTER:
-                readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
+                yield transaction.commit();
+            }
+            case AFTER -> {
+                final var readData = PutDataTransactionUtil.readList(strategy, grandParentPath);
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     transaction.replace(path, data, schemaContext);
-                    return transaction.commit();
+                    yield transaction.commit();
                 }
                 checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
                 insertWithPointPost(path, data, schemaContext, params.getPoint(),
                     (NormalizedNodeContainer<?>) readData, false, transaction);
-                return transaction.commit();
-            default:
-                throw new RestconfDocumentedException(
-                    "Used bad value of insert parameter. Possible values are first, last, before or after, but was: "
-                        + insert, ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE);
-        }
+                yield transaction.commit();
+            }
+        };
     }
 
     private static void insertWithPointPost(final YangInstanceIdentifier path, final NormalizedNode data,
                                             final EffectiveModelContext schemaContext, final PointParam point,
                                             final NormalizedNodeContainer<?> readList, final boolean before,
                                             final RestconfTransaction transaction) {
-        final YangInstanceIdentifier parent = path.getParent().getParent();
+        final YangInstanceIdentifier parent = path.coerceParent().coerceParent();
         transaction.remove(parent);
         final var pointArg = YangInstanceIdentifierDeserializer.create(schemaContext, point.value()).path
             .getLastPathArgument();
@@ -160,8 +157,9 @@ public final class PostDataTransactionUtil {
         }
     }
 
-    private static void makePost(final YangInstanceIdentifier path, final NormalizedNode data,
-                                 final EffectiveModelContext schemaContext, final RestconfTransaction transaction) {
+    private static ListenableFuture<? extends CommitInfo> makePost(final YangInstanceIdentifier path,
+            final NormalizedNode data, final EffectiveModelContext schemaContext,
+            final RestconfTransaction transaction) {
         try {
             transaction.create(path, data, schemaContext);
         } catch (RestconfDocumentedException e) {
@@ -169,6 +167,8 @@ public final class PostDataTransactionUtil {
             transaction.cancel();
             throw e;
         }
+
+        return transaction.commit();
     }
 
     /**
