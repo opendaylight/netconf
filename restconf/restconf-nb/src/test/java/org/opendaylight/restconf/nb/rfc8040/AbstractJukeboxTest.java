@@ -44,6 +44,8 @@ public abstract class AbstractJukeboxTest {
     protected static final QName DESCRIPTION_QNAME = QName.create(JUKEBOX_QNAME, "description");
 
     protected static final YangInstanceIdentifier JUKEBOX_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME);
+
+    // instance identifier for accessing leaf node "gap"
     protected static final YangInstanceIdentifier GAP_IID =
         YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYER_QNAME, GAP_QNAME);
 
