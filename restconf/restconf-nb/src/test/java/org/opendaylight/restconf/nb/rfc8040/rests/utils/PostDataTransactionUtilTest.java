@@ -41,6 +41,7 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
+import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -53,6 +54,25 @@ import org.w3c.dom.DOMException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
+    private static final YangInstanceIdentifier JUKEBOX_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME);
+    private static final YangInstanceIdentifier PLAYLIST_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYLIST_QNAME);
+
+    private static final ContainerNode EMPTY_JUKEBOX = Builders.containerBuilder()
+        .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
+        .withChild(Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
+            .withChild(ImmutableNodes.leafNode(GAP_QNAME, Decimal64.valueOf("0.2")))
+            .build())
+        .build();
+    private static final MapNode PLAYLIST = Builders.mapBuilder()
+        .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
+        .withChild(Builders.mapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band"))
+            .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
+            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
+            .build())
+        .build();
+
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -62,33 +82,8 @@ public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
     @Mock
     private NetconfDataTreeService netconfService;
 
-    private ContainerNode buildBaseCont;
-    private YangInstanceIdentifier iid2;
-    private YangInstanceIdentifier iidList;
-    private MapNode buildList;
-
     @Before
-    public void setUp() {
-        iid2 = YangInstanceIdentifier.of(JUKEBOX_QNAME);
-        iidList = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYLIST_QNAME);
-
-        buildBaseCont = Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-            .withChild(Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
-                .withChild(ImmutableNodes.leafNode(GAP_QNAME, 0.2))
-                .build())
-            .build();
-
-        buildList = Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
-            .withChild(Builders.mapEntryBuilder()
-                .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band"))
-                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
-                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
-                .build())
-            .build();
-
+    public void before() {
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
 
@@ -98,32 +93,32 @@ public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
 
     @Test
     public void testPostContainerData() {
-        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        final NodeIdentifier identifier = buildBaseCont.body().iterator().next().name();
-        final YangInstanceIdentifier node = iid2.node(identifier);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), buildBaseCont);
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        final NodeIdentifier identifier = EMPTY_JUKEBOX.body().iterator().next().name();
+        final YangInstanceIdentifier node = JUKEBOX_IID.node(identifier);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), EMPTY_JUKEBOX);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .create(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
+            .create(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        Response response = PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
+        Response response = PostDataTransactionUtil.postData(uriInfo, JUKEBOX_IID, EMPTY_JUKEBOX,
             new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
-        verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
+        verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
 
-        response = PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
+        response = PostDataTransactionUtil.postData(uriInfo, JUKEBOX_IID, EMPTY_JUKEBOX,
                 new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
-        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
+        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
     }
 
     @Test
     public void testPostListData() {
-        final MapEntryNode entryNode = buildList.body().iterator().next();
+        final MapEntryNode entryNode = PLAYLIST.body().iterator().next();
         final NodeIdentifierWithPredicates identifier = entryNode.name();
-        final YangInstanceIdentifier node = iidList.node(identifier);
+        final YangInstanceIdentifier node = PLAYLIST_IID.node(identifier);
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
@@ -133,7 +128,7 @@ public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).create(
             LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
 
-        Response response = PostDataTransactionUtil.postData(uriInfo, iidList, buildList,
+        Response response = PostDataTransactionUtil.postData(uriInfo, PLAYLIST_IID, PLAYLIST,
                         new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
@@ -141,7 +136,7 @@ public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
         verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
 
-        response = PostDataTransactionUtil.postData(uriInfo, iidList, buildList,
+        response = PostDataTransactionUtil.postData(uriInfo, PLAYLIST_IID, PLAYLIST,
                 new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA, WriteDataParams.empty());
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
@@ -151,10 +146,10 @@ public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
 
     @Test
     public void testPostDataFail() {
-        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        final NodeIdentifier identifier = buildBaseCont.body().iterator().next().name();
-        final YangInstanceIdentifier node = iid2.node(identifier);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), buildBaseCont);
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        final NodeIdentifier identifier = EMPTY_JUKEBOX.body().iterator().next().name();
+        final YangInstanceIdentifier node = JUKEBOX_IID.node(identifier);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), EMPTY_JUKEBOX);
         final DOMException domException = new DOMException((short) 414, "Post request failed");
         doReturn(immediateFailedFluentFuture(domException)).when(readWrite).commit();
         doReturn(immediateFailedFluentFuture(domException)).when(netconfService)
@@ -163,19 +158,20 @@ public class PostDataTransactionUtilTest extends AbstractJukeboxTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> PostDataTransactionUtil.postData(uriInfo, iid2, buildBaseCont,
+            () -> PostDataTransactionUtil.postData(uriInfo, JUKEBOX_IID, EMPTY_JUKEBOX,
                 new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA, WriteDataParams.empty()));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
 
-        verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
-        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont);
+        verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
 
-        ex = assertThrows(RestconfDocumentedException.class, () -> PostDataTransactionUtil.postData(uriInfo, iid2,
-            buildBaseCont, new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA, WriteDataParams.empty()));
+        ex = assertThrows(RestconfDocumentedException.class, () -> PostDataTransactionUtil.postData(uriInfo,
+            JUKEBOX_IID, EMPTY_JUKEBOX, new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA,
+            WriteDataParams.empty()));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
 
-        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, iid2, buildBaseCont, Optional.empty());
+        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
     }
 }
