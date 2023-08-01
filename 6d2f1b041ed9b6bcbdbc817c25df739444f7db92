@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b58d1c37_988ff429",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-01T13:15:36Z",
+      "side": 1,
+      "message": "minor code formatting issues",
+      "revId": "6d2f1b041ed9b6bcbdbc817c25df739444f7db92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbcfe941_c8334c1d",
+        "filename": "apps/yanglib-mdsal-writer/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-01T13:15:36Z",
+      "side": 1,
+      "message": "Redundant empty line",
+      "revId": "6d2f1b041ed9b6bcbdbc817c25df739444f7db92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "266464c3_23fcc638",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryContentBuilderUtil.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-01T13:15:36Z",
+      "side": 1,
+      "message": "Pls use 1 space for all lines",
+      "range": {
+        "startLine": 50,
+        "startChar": 2,
+        "endLine": 50,
+        "endChar": 4
+      },
+      "revId": "6d2f1b041ed9b6bcbdbc817c25df739444f7db92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94e4476f_437c3f40",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryContentBuilderUtil.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-01T13:15:36Z",
+      "side": 1,
+      "message": "One line between variables with different access modifiers",
+      "revId": "6d2f1b041ed9b6bcbdbc817c25df739444f7db92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "668f7364_215a0cf6",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryContentBuilderUtil.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-01T13:15:36Z",
+      "side": 1,
+      "message": "Move it to line above and adjust formatting. Moving only this part on new line make code looks inconsistent.",
+      "revId": "6d2f1b041ed9b6bcbdbc817c25df739444f7db92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee6a7061_915a261c",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibrarySchemaSourceUrlProvider.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-01T13:15:36Z",
+      "side": 1,
+      "message": "Pls use 1 space for all lines",
+      "range": {
+        "startLine": 20,
+        "startChar": 2,
+        "endLine": 20,
+        "endChar": 4
+      },
+      "revId": "6d2f1b041ed9b6bcbdbc817c25df739444f7db92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
