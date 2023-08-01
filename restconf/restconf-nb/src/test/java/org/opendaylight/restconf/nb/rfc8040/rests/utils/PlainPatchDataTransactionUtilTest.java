@@ -30,7 +30,6 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -39,6 +38,23 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
+    private static final ContainerNode JUKEBOX_WITH_PLAYLIST = Builders.containerBuilder()
+        .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
+        .withChild(Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "MyFavoriteBand-A"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "MyFavoriteBand-A"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description A"))
+                .build())
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "MyFavoriteBand-B"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "MyFavoriteBand-B"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description B"))
+                .build())
+            .build())
+        .build();
+
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -50,43 +66,8 @@ public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
     @Mock
     private NetconfDataTreeService netconfService;
 
-    private ContainerNode jukeboxContainerWithPlayer;
-    private ContainerNode jukeboxContainerWithPlaylist;
-    private YangInstanceIdentifier iidGap;
-    private YangInstanceIdentifier iidJukebox;
-
     @Before
-    public void setUp() {
-        iidGap = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYER_QNAME).node(GAP_QNAME).build();
-        iidJukebox = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).build();
-
-        jukeboxContainerWithPlayer = Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-            .withChild(Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
-                .withChild(GAP_LEAF)
-                .build())
-            .build();
-
-        // ----------
-
-        jukeboxContainerWithPlaylist = Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-            .withChild(Builders.mapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
-                .withChild(Builders.mapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "MyFavoriteBand-A"))
-                    .withChild(ImmutableNodes.leafNode(NAME_QNAME, "MyFavoriteBand-A"))
-                    .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description A"))
-                    .build())
-                .withChild(Builders.mapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "MyFavoriteBand-B"))
-                    .withChild(ImmutableNodes.leafNode(NAME_QNAME, "MyFavoriteBand-B"))
-                    .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description B"))
-                    .build())
-                .build())
-            .build();
-
+    public void before() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
     }
@@ -99,13 +80,13 @@ public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),any(),
                 any());
 
-        PlainPatchDataTransactionUtil.patchData(iidJukebox, jukeboxContainerWithPlayer,
+        PlainPatchDataTransactionUtil.patchData(JUKEBOX_IID, EMPTY_JUKEBOX,
             new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA);
-        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, jukeboxContainerWithPlayer);
+        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
 
-        PlainPatchDataTransactionUtil.patchData(iidJukebox, jukeboxContainerWithPlayer,
+        PlainPatchDataTransactionUtil.patchData(JUKEBOX_IID, EMPTY_JUKEBOX,
             new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA);
-        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, jukeboxContainerWithPlayer,
+        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
             Optional.empty());
     }
 
@@ -117,14 +98,14 @@ public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
             .merge(any(), any(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
 
-        PlainPatchDataTransactionUtil.patchData(iidGap, GAP_LEAF, new MdsalRestconfStrategy(mockDataBroker),
+        PlainPatchDataTransactionUtil.patchData(GAP_IID, GAP_LEAF, new MdsalRestconfStrategy(mockDataBroker),
             JUKEBOX_SCHEMA);
-        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidGap, GAP_LEAF);
+        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
 
-        PlainPatchDataTransactionUtil.patchData(iidGap, GAP_LEAF, new NetconfRestconfStrategy(netconfService),
+        PlainPatchDataTransactionUtil.patchData(GAP_IID, GAP_LEAF, new NetconfRestconfStrategy(netconfService),
             JUKEBOX_SCHEMA);
         verify(netconfService).lock();
-        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidGap, GAP_LEAF, Optional.empty());
+        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
     }
 
     @Test
@@ -135,13 +116,13 @@ public class PlainPatchDataTransactionUtilTest extends AbstractJukeboxTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(),any(),any());
 
-        PlainPatchDataTransactionUtil.patchData(iidJukebox, jukeboxContainerWithPlaylist,
+        PlainPatchDataTransactionUtil.patchData(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST,
             new MdsalRestconfStrategy(mockDataBroker), JUKEBOX_SCHEMA);
-        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, jukeboxContainerWithPlaylist);
+        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST);
 
-        PlainPatchDataTransactionUtil.patchData(iidJukebox, jukeboxContainerWithPlaylist,
+        PlainPatchDataTransactionUtil.patchData(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST,
             new NetconfRestconfStrategy(netconfService), JUKEBOX_SCHEMA);
-        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, jukeboxContainerWithPlaylist,
+        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST,
             Optional.empty());
     }
 }
