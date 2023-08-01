@@ -7,23 +7,36 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.doReturn;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
+import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.w3c.dom.DOMException;
 
 abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     static final ContainerNode JUKEBOX_WITH_BANDS = Builders.containerBuilder()
@@ -38,6 +51,18 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
                 .build())
             .build())
         .build();
+    static final MapNode PLAYLIST = Builders.mapBuilder()
+        .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
+        .withChild(Builders.mapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band"))
+            .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
+            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
+            .build())
+        .build();
+    static final YangInstanceIdentifier PLAYLIST_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYLIST_QNAME);
+
+    @Mock
+    private UriInfo uriInfo;
 
     /**
      * Test of successful DELETE operation.
@@ -68,4 +93,44 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     abstract @NonNull RestconfStrategy testNegativeDeleteDataStrategy();
+
+    @Test
+    public final void testPostContainerData() {
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+
+        final var response = PostDataTransactionUtil.postData(uriInfo, JUKEBOX_IID, EMPTY_JUKEBOX,
+            testPostContainerDataStrategy(), JUKEBOX_SCHEMA, WriteDataParams.empty());
+        assertEquals(201, response.getStatus());
+    }
+
+    abstract @NonNull RestconfStrategy testPostContainerDataStrategy();
+
+    @Test
+    public final void testPostListData() {
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+
+        final var entryNode = PLAYLIST.body().iterator().next();
+        final var identifier = entryNode.name();
+        final var response = PostDataTransactionUtil.postData(uriInfo, PLAYLIST_IID, PLAYLIST,
+            testPostListDataStrategy(entryNode, PLAYLIST_IID.node(identifier)), JUKEBOX_SCHEMA,
+            WriteDataParams.empty());
+        assertEquals(201, response.getStatus());
+        assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
+            containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
+    }
+
+    abstract @NonNull RestconfStrategy testPostListDataStrategy(MapEntryNode entryNode, YangInstanceIdentifier node);
+
+    @Test
+    public final void testPostDataFail() {
+        final var domException = new DOMException((short) 414, "Post request failed");
+
+        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> PostDataTransactionUtil.postData(uriInfo, JUKEBOX_IID, EMPTY_JUKEBOX,
+                testPostDataFailStrategy(domException), JUKEBOX_SCHEMA, WriteDataParams.empty()));
+        assertEquals(1, ex.getErrors().size());
+        assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
+    }
+
+    abstract @NonNull RestconfStrategy testPostDataFailStrategy(DOMException domException);
 }

@@ -7,9 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.util.concurrent.Futures;
@@ -30,7 +32,9 @@ import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.w3c.dom.DOMException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
@@ -57,6 +61,33 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFailedFuture(new TransactionCommitFailedException(
             "Commit of transaction " + this + " failed", new NetconfDocumentedException("id",
                 ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR)))).when(netconfService).commit();
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy testPostContainerDataStrategy() {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .create(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy testPostListDataStrategy(final MapEntryNode entryNode, final YangInstanceIdentifier node) {
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .merge(any(), any(), any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).create(
+            LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy testPostDataFailStrategy(final DOMException domException) {
+        doReturn(immediateFailedFluentFuture(domException)).when(netconfService)
+            .create(any(), any(), any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
         return new NetconfRestconfStrategy(netconfService);
     }
 

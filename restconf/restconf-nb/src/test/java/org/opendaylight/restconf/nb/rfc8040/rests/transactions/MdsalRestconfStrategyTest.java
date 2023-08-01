@@ -11,6 +11,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
@@ -27,6 +28,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.w3c.dom.DOMException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTest {
@@ -56,6 +59,22 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         // assert that data to delete does NOT exist
         when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of()))
             .thenReturn(immediateFalseFluentFuture());
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy testPostListDataStrategy(final MapEntryNode entryNode, final YangInstanceIdentifier node) {
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy testPostDataFailStrategy(final DOMException domException) {
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        doReturn(immediateFailedFluentFuture(domException)).when(readWrite).commit();
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         return new MdsalRestconfStrategy(mockDataBroker);
     }
 
@@ -100,5 +119,13 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
             new MdsalRestconfStrategy(mockDataBroker), WriteDataParams.empty());
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
+    }
+
+    @Override
+    RestconfStrategy testPostContainerDataStrategy() {
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        return new MdsalRestconfStrategy(mockDataBroker);
     }
 }
