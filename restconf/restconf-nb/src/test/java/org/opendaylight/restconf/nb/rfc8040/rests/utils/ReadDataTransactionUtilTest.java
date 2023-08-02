@@ -55,10 +55,13 @@ public class ReadDataTransactionUtilTest {
     private static final QName LIST_KEY_QNAME = QName.create(BASE, "list-key");
     private static final QName LEAF_LIST_QNAME = QName.create(BASE, "leaf-list");
     private static final QName LIST_QNAME = QName.create(BASE, "list");
+    private static final QName CONT_QNAME = QName.create(BASE, "cont");
+
     private static final NodeIdentifierWithPredicates NODE_WITH_KEY =
         NodeIdentifierWithPredicates.of(LIST_QNAME, LIST_KEY_QNAME, "keyValue");
     private static final NodeIdentifierWithPredicates NODE_WITH_KEY_2 =
         NodeIdentifierWithPredicates.of(LIST_QNAME, LIST_KEY_QNAME, "keyValue2");
+
     private static final LeafNode<Object> CONTENT = Builders.leafBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create(BASE, "leaf-content")))
         .withValue("content")
@@ -68,17 +71,17 @@ public class ReadDataTransactionUtilTest {
         .withValue("content-different")
         .build();
     private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.builder()
-        .node(QName.create(BASE, "cont"))
+        .node(CONT_QNAME)
         .node(LIST_QNAME)
         .node(NODE_WITH_KEY)
         .build();
     private static final YangInstanceIdentifier PATH_2 = YangInstanceIdentifier.builder()
-        .node(QName.create(BASE, "cont"))
+        .node(CONT_QNAME)
         .node(LIST_QNAME)
         .node(NODE_WITH_KEY_2)
         .build();
     private static final YangInstanceIdentifier PATH_3 = YangInstanceIdentifier.builder()
-        .node(QName.create(BASE, "cont"))
+        .node(CONT_QNAME)
         .node(LIST_QNAME)
         .build();
     private static final MapEntryNode DATA = Builders.mapEntryBuilder()
@@ -148,7 +151,7 @@ public class ReadDataTransactionUtilTest {
         .withChildValue("four")
         .build();
     private static final YangInstanceIdentifier LEAF_SET_NODE_PATH = YangInstanceIdentifier.builder()
-        .node(QName.create(BASE, "cont"))
+        .node(CONT_QNAME)
         .node(LEAF_LIST_QNAME)
         .build();
     private static final UnkeyedListEntryNode UNKEYED_LIST_ENTRY_NODE_1 = Builders.unkeyedListEntryBuilder()
@@ -270,7 +273,7 @@ public class ReadDataTransactionUtilTest {
     @Test
     public void readLeafWithDefaultParameters() {
         final ContainerNode content = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(BASE, "cont")))
+                .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
                 .withChild(ImmutableNodes.leafNode(QName.create(BASE, "exampleLeaf"), "i am leaf"))
                 .build();
 
@@ -288,32 +291,27 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readContainerWithDefaultParameters() {
-        final QName leafBool = QName.create(BASE, "leafBool");
-        final QName containerBool = QName.create(BASE, "containerBool");
-        final QName containerInt = QName.create(BASE, "containerInt");
-        final QName leafInt = QName.create(BASE, "leafInt");
-        final QName exampleList = QName.create(BASE, "exampleList");
-        final QName cont = QName.create(BASE, "cont");
+        final var exampleList = new NodeIdentifier(QName.create(BASE, "exampleList"));
 
         final ContainerNode content = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(cont))
-                .withChild(Builders.unkeyedListBuilder()
-                    .withNodeIdentifier(NodeIdentifier.create(exampleList))
-                    .withChild(Builders.unkeyedListEntryBuilder()
-                        .withNodeIdentifier(new NodeIdentifier(exampleList))
-                        .withChild(Builders.containerBuilder()
-                            .withNodeIdentifier(NodeIdentifier.create(containerBool))
-                            .withChild(ImmutableNodes.leafNode(leafBool, true))
-                            .build())
-                        .addChild(Builders.containerBuilder()
-                            .withNodeIdentifier(NodeIdentifier.create(containerInt))
-                            .withChild(ImmutableNodes.leafNode(leafInt, 12))
-                            .build())
+            .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
+            .withChild(Builders.unkeyedListBuilder()
+                .withNodeIdentifier(exampleList)
+                .withChild(Builders.unkeyedListEntryBuilder()
+                    .withNodeIdentifier(exampleList)
+                    .withChild(Builders.containerBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(QName.create(BASE, "containerBool")))
+                        .withChild(ImmutableNodes.leafNode(QName.create(BASE, "leafBool"), true))
+                        .build())
+                    .addChild(Builders.containerBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(QName.create(BASE, "containerInt")))
+                        .withChild(ImmutableNodes.leafNode(QName.create(BASE, "leafInt"), 12))
                         .build())
                     .build())
-                .build();
+                .build())
+            .build();
 
-        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(cont).build();
+        final YangInstanceIdentifier path = YangInstanceIdentifier.of(CONT_QNAME);
 
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, path);
@@ -328,22 +326,20 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readLeafInListWithDefaultParameters() {
-        final QName leafInList = QName.create(BASE, "leafInList");
-        final QName exampleList = QName.create(BASE, "exampleList");
-        final QName container = QName.create(BASE, "cont");
+        final var exampleList = new NodeIdentifier(QName.create(BASE, "exampleList"));
 
         final ContainerNode content = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(container))
+                .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
                 .withChild(Builders.unkeyedListBuilder()
-                    .withNodeIdentifier(NodeIdentifier.create(QName.create(BASE, "exampleList")))
+                    .withNodeIdentifier(exampleList)
                     .withChild(Builders.unkeyedListEntryBuilder()
-                        .withNodeIdentifier(new NodeIdentifier(exampleList))
-                        .addChild(ImmutableNodes.leafNode(leafInList, "I am leaf in list"))
+                        .withNodeIdentifier(exampleList)
+                        .addChild(ImmutableNodes.leafNode(QName.create(BASE, "leafInList"), "I am leaf in list"))
                         .build())
                     .build())
                 .build();
 
-        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(container).build();
+        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(CONT_QNAME).build();
 
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, path);
@@ -481,8 +477,7 @@ public class ReadDataTransactionUtilTest {
                         .addAll(ORDERED_LEAF_SET_NODE_2.body())
                         .build())
                 .build();
-        NormalizedNode normalizedNode = readData(ContentParam.ALL, LEAF_SET_NODE_PATH,
-                mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParam.ALL, LEAF_SET_NODE_PATH, mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
 
         normalizedNode = readData(ContentParam.ALL, LEAF_SET_NODE_PATH, netconfStrategy);
