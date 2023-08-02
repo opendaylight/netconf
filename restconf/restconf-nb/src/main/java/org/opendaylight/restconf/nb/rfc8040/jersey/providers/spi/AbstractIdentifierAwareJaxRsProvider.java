@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -83,16 +82,15 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
             throws WebApplicationException;
 
     private String getIdentifier() {
-        return this.uriInfo.getPathParameters(false).getFirst("identifier");
+        return uriInfo.getPathParameters(false).getFirst("identifier");
     }
 
     private InstanceIdentifierContext getInstanceIdentifierContext() {
-        return ParserIdentifier.toInstanceIdentifier(getIdentifier(), getSchemaContext(),
-                Optional.ofNullable(getMountPointService()));
+        return ParserIdentifier.toInstanceIdentifier(getIdentifier(), getSchemaContext(), getMountPointService());
     }
 
     protected UriInfo getUriInfo() {
-        return this.uriInfo;
+        return uriInfo;
     }
 
     protected EffectiveModelContext getSchemaContext() {
@@ -104,7 +102,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     }
 
     protected boolean isPost() {
-        return HttpMethod.POST.equals(this.request.getMethod());
+        return HttpMethod.POST.equals(request.getMethod());
     }
 
     public void setUriInfo(final UriInfo uriInfo) {

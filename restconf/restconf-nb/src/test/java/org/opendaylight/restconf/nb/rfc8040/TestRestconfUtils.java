@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
@@ -70,8 +69,7 @@ public final class TestRestconfUtils {
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static NormalizedNodePayload loadNormalizedContextFromXmlFile(final String pathToInputFile,
             final String uri, final EffectiveModelContext schemaContext) {
-        final InstanceIdentifierContext iiContext =
-                ParserIdentifier.toInstanceIdentifier(uri, schemaContext, Optional.empty());
+        final InstanceIdentifierContext iiContext = ParserIdentifier.toInstanceIdentifier(uri, schemaContext, null);
         final InputStream inputStream = TestRestconfUtils.class.getResourceAsStream(pathToInputFile);
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(inputStream);

@@ -25,7 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Path;
@@ -132,7 +131,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final EffectiveModelContext schemaContextRef = databindProvider.currentContext().modelContext();
         // FIXME: go through
         final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, schemaContextRef, Optional.of(mountPointService));
+                identifier, schemaContextRef, mountPointService);
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
 
         // FIXME: this looks quite crazy, why do we even have it?
@@ -275,8 +274,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response deleteData(final String identifier) {
         final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
-            databindProvider.currentContext().modelContext(), Optional.of(mountPointService));
-
+            databindProvider.currentContext().modelContext(), mountPointService);
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
         return DeleteDataTransactionUtil.deleteData(strategy, instanceIdentifier.getInstanceIdentifier());

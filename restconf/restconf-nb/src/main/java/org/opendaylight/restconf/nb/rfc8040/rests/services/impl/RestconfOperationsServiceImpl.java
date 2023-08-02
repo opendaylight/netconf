@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Optional;
 import javax.ws.rs.Path;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
@@ -44,9 +43,8 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
 
     @Override
     public String getOperationJSON(final String identifier) {
-        final var identifierContext = ParserIdentifier.toInstanceIdentifier(identifier,
-                databindProvider.currentContext().modelContext(), Optional.of(mountPointService));
-        return OperationsContent.JSON.bodyFor(identifierContext);
+        return OperationsContent.JSON.bodyFor(ParserIdentifier.toInstanceIdentifier(identifier,
+            databindProvider.currentContext().modelContext(), mountPointService));
     }
 
     @Override
@@ -56,8 +54,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
 
     @Override
     public String getOperationXML(final String identifier) {
-        final var identifierContext = ParserIdentifier.toInstanceIdentifier(identifier,
-                databindProvider.currentContext().modelContext(), Optional.of(mountPointService));
-        return OperationsContent.XML.bodyFor(identifierContext);
+        return OperationsContent.XML.bodyFor(ParserIdentifier.toInstanceIdentifier(identifier,
+            databindProvider.currentContext().modelContext(), mountPointService));
     }
 }
