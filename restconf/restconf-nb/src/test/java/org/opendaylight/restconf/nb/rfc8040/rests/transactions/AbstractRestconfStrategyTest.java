@@ -44,7 +44,6 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -301,27 +300,21 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPatchContainerData() {
-        final var response = PlainPatchDataTransactionUtil.patchData(JUKEBOX_IID, EMPTY_JUKEBOX,
-            testPatchContainerDataStrategy(), JUKEBOX_SCHEMA);
-        assertEquals(200, response.getStatus());
+        testPatchContainerDataStrategy().merge(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA).getOrThrow();
     }
 
     abstract @NonNull RestconfStrategy testPatchContainerDataStrategy();
 
     @Test
     public final void testPatchLeafData() {
-        final var response = PlainPatchDataTransactionUtil.patchData(GAP_IID, GAP_LEAF,
-            testPatchLeafDataStrategy(), JUKEBOX_SCHEMA);
-        assertEquals(200, response.getStatus());
+        testPatchLeafDataStrategy().merge(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA).getOrThrow();
     }
 
     abstract @NonNull RestconfStrategy testPatchLeafDataStrategy();
 
     @Test
     public final void testPatchListData() {
-        final var response = PlainPatchDataTransactionUtil.patchData(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST,
-            testPatchListDataStrategy(), JUKEBOX_SCHEMA);
-        assertEquals(200, response.getStatus());
+        testPatchListDataStrategy().merge(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST, JUKEBOX_SCHEMA).getOrThrow();
     }
 
     abstract @NonNull RestconfStrategy testPatchListDataStrategy();
