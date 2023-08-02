@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
@@ -83,18 +84,18 @@ public final class ParserIdentifier {
     //        @NonNull InstanceIdentifierContext forUrl(identifier, schemaContexxt, mountPointService)
     //
     public static InstanceIdentifierContext toInstanceIdentifier(final String identifier,
-            final EffectiveModelContext schemaContext, final Optional<DOMMountPointService> mountPointService) {
+            final EffectiveModelContext schemaContext, final @Nullable DOMMountPointService mountPointService) {
         if (identifier == null || !identifier.contains(MOUNT)) {
             return createIIdContext(schemaContext, identifier, null);
         }
-        if (mountPointService.isEmpty()) {
+        if (mountPointService == null) {
             throw new RestconfDocumentedException("Mount point service is not available");
         }
 
         final Iterator<String> pathsIt = MP_SPLITTER.split(identifier).iterator();
         final String mountPointId = pathsIt.next();
         final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContext);
-        final DOMMountPoint mountPoint = mountPointService.orElseThrow().getMountPoint(mountPath)
+        final DOMMountPoint mountPoint = mountPointService.getMountPoint(mountPath)
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
                     ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
 
@@ -210,7 +211,7 @@ public final class ParserIdentifier {
                 pathBuilder.append(current);
             }
             final InstanceIdentifierContext point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
-                Optional.of(domMountPointService));
+                requireNonNull(domMountPointService));
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
             final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
@@ -230,7 +231,7 @@ public final class ParserIdentifier {
             targetUrl = IdentifierCodec.serialize(urlPath, schemaContext) + target;
         }
 
-        return toInstanceIdentifier(targetUrl, schemaContext, Optional.empty()).getInstanceIdentifier();
+        return toInstanceIdentifier(targetUrl, schemaContext, null).getInstanceIdentifier();
     }
 
     /**

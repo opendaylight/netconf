@@ -23,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -91,9 +90,8 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
     public PatchContext readFrom(final String uriPath, final InputStream entityStream)
             throws RestconfDocumentedException {
         try {
-            return readFrom(
-                    ParserIdentifier.toInstanceIdentifier(uriPath, getSchemaContext(),
-                            Optional.ofNullable(getMountPointService())), entityStream);
+            return readFrom(ParserIdentifier.toInstanceIdentifier(uriPath, getSchemaContext(), getMountPointService()),
+                entityStream);
         } catch (final Exception e) {
             throw propagateExceptionAs(e);
         }
