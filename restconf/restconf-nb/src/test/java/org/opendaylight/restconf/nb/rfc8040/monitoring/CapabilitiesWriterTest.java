@@ -18,7 +18,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 public class CapabilitiesWriterTest {
     @Test
     public void restconfStateCapabilitiesTest() {
-        final var capability = CapabilitiesWriter.mapCapabilites();
+        final var capability = CapabilitiesWriter.mapCapabilities();
         assertEquals(CapabilitiesWriter.CAPABILITY, capability.name());
 
         assertThat(capability.body().stream().map(LeafSetEntryNode::body).toList(),
