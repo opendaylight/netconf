@@ -1,0 +1,159 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34dd8fb7_5169742a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-02T10:07:13Z",
+      "side": 1,
+      "message": "needs a manual rebase",
+      "revId": "4584ff424aa7ee07ada91a656ae16645f8f89492",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7eaaba73_990f2a60",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-02T10:07:13Z",
+      "side": 1,
+      "message": "is this change necessary?",
+      "range": {
+        "startLine": 284,
+        "startChar": 8,
+        "endLine": 286,
+        "endChar": 40
+      },
+      "revId": "4584ff424aa7ee07ada91a656ae16645f8f89492",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4f05b54_3e8ae3dd",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-02T10:07:13Z",
+      "side": 1,
+      "message": "use pattern matching in the if statement https://www.baeldung.com/java-pattern-matching-instanceof to remove the explicit cast\nlike here https://git.opendaylight.org/gerrit/c/mdsal/+/104210",
+      "range": {
+        "startLine": 309,
+        "startChar": 42,
+        "endLine": 309,
+        "endChar": 65
+      },
+      "revId": "4584ff424aa7ee07ada91a656ae16645f8f89492",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29ba64c0_b61e697d",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-02T10:07:13Z",
+      "side": 1,
+      "message": "I think we try to avoid ObjectMapper - https://git.opendaylight.org/gerrit/c/netconf/+/106723/comments/3920f1bb_b4aaf03d\nthis could be string comparison just like in the attached change",
+      "range": {
+        "startLine": 337,
+        "startChar": 62,
+        "endLine": 337,
+        "endChar": 81
+      },
+      "revId": "4584ff424aa7ee07ada91a656ae16645f8f89492",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "475a423a_cfab9407",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-02T10:07:13Z",
+      "side": 1,
+      "message": "var",
+      "range": {
+        "startLine": 337,
+        "startChar": 14,
+        "endLine": 337,
+        "endChar": 24
+      },
+      "revId": "4584ff424aa7ee07ada91a656ae16645f8f89492",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "844f43be_c40cdde4",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-02T10:07:13Z",
+      "side": 1,
+      "message": "var",
+      "range": {
+        "startLine": 347,
+        "startChar": 14,
+        "endLine": 347,
+        "endChar": 22
+      },
+      "revId": "4584ff424aa7ee07ada91a656ae16645f8f89492",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef374190_3de07752",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-02T10:07:13Z",
+      "side": 1,
+      "message": "var for all variable declarations in the method",
+      "range": {
+        "startLine": 374,
+        "startChar": 14,
+        "endLine": 374,
+        "endChar": 25
+      },
+      "revId": "4584ff424aa7ee07ada91a656ae16645f8f89492",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
