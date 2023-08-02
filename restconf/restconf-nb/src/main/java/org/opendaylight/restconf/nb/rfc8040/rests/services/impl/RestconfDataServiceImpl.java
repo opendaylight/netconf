@@ -56,7 +56,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataServi
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
@@ -273,11 +272,12 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response deleteData(final String identifier) {
-        final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
+        final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), mountPointService);
-        final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        return DeleteDataTransactionUtil.deleteData(strategy, instanceIdentifier.getInstanceIdentifier());
+        getRestconfStrategy(instanceIdentifier.getMountPoint())
+            .delete(instanceIdentifier.getInstanceIdentifier())
+            .getOrThrow();
+        return Response.noContent().build();
     }
 
     @Override
