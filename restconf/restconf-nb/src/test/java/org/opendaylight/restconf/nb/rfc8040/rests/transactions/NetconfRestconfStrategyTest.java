@@ -246,4 +246,30 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         assertEquals(ErrorType.PROTOCOL, globalError.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, globalError.getErrorTag());
     }
+
+    @Override
+    RestconfStrategy readDataConfigTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readAllHavingOnlyConfigTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).get(PATH);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(netconfService).get(PATH_2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(PATH_2);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readDataNonConfigTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(netconfService).get(PATH_2);
+        return new NetconfRestconfStrategy(netconfService);
+    }
 }

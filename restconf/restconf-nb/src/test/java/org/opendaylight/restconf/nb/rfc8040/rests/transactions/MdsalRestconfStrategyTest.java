@@ -14,8 +14,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -188,5 +190,41 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         final var editError = editErrors.get(0);
         assertEquals(ErrorType.PROTOCOL, editError.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, editError.getErrorTag());
+    }
+
+    @Override
+    RestconfStrategy readDataConfigTestStrategy() {
+        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
+            .read(LogicalDatastoreType.CONFIGURATION, PATH);
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy readAllHavingOnlyConfigTestStrategy() {
+        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
+            .read(LogicalDatastoreType.CONFIGURATION, PATH);
+        doReturn(immediateFluentFuture(Optional.empty())).when(read)
+            .read(LogicalDatastoreType.OPERATIONAL, PATH);
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
+        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
+            .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(read)
+            .read(LogicalDatastoreType.CONFIGURATION, PATH_2);
+        return new MdsalRestconfStrategy(mockDataBroker);
+    }
+
+    @Override
+    RestconfStrategy readDataNonConfigTestStrategy() {
+        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
+            .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
+        return new MdsalRestconfStrategy(mockDataBroker);
     }
 }

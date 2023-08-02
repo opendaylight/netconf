@@ -196,60 +196,6 @@ public class ReadDataTransactionUtilTest {
     }
 
     @Test
-    public void readDataConfigTest() {
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, PATH);
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
-        NormalizedNode normalizedNode = readData(ContentParam.CONFIG, PATH, mdsalStrategy);
-        assertEquals(DATA_3, normalizedNode);
-
-        normalizedNode = readData(ContentParam.CONFIG, PATH, netconfStrategy);
-        assertEquals(DATA_3, normalizedNode);
-    }
-
-    @Test
-    public void readAllHavingOnlyConfigTest() {
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, PATH);
-        doReturn(immediateFluentFuture(Optional.empty())).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, PATH);
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
-        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).get(PATH);
-        NormalizedNode normalizedNode = readData(ContentParam.ALL, PATH, mdsalStrategy);
-        assertEquals(DATA_3, normalizedNode);
-
-        normalizedNode = readData(ContentParam.ALL, PATH, netconfStrategy);
-        assertEquals(DATA_3, normalizedNode);
-    }
-
-    @Test
-    public void readAllHavingOnlyNonConfigTest() {
-        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
-        doReturn(immediateFluentFuture(Optional.empty())).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, PATH_2);
-        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(netconfService).get(PATH_2);
-        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(PATH_2);
-        NormalizedNode normalizedNode = readData(ContentParam.ALL, PATH_2, mdsalStrategy);
-        assertEquals(DATA_2, normalizedNode);
-
-        normalizedNode = readData(ContentParam.ALL, PATH_2, netconfStrategy);
-        assertEquals(DATA_2, normalizedNode);
-    }
-
-    @Test
-    public void readDataNonConfigTest() {
-        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
-        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(netconfService).get(PATH_2);
-        NormalizedNode normalizedNode = readData(ContentParam.NONCONFIG, PATH_2, mdsalStrategy);
-        assertEquals(DATA_2, normalizedNode);
-
-        normalizedNode = readData(ContentParam.NONCONFIG, PATH_2, netconfStrategy);
-        assertEquals(DATA_2, normalizedNode);
-    }
-
-    @Test
     public void readContainerDataAllTest() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, PATH);
@@ -257,8 +203,7 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, PATH);
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
         doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(netconfService).get(PATH);
-        final ContainerNode checkingData = Builders
-                .containerBuilder()
+        final ContainerNode checkingData = Builders.containerBuilder()
                 .withNodeIdentifier(NODE_IDENTIFIER)
                 .withChild(CONTENT_LEAF)
                 .withChild(CONTENT_LEAF_2)
