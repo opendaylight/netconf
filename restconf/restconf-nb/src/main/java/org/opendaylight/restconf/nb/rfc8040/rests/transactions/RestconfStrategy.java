@@ -9,17 +9,23 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.TransactionUtil;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Baseline execution strategy for various RESTCONF operations.
@@ -104,4 +110,31 @@ public abstract class RestconfStrategy {
     }
 
     protected abstract void delete(@NonNull SettableRestconfFuture<Empty> future, @NonNull YangInstanceIdentifier path);
+
+    public final @NonNull RestconfFuture<Empty> merge(final YangInstanceIdentifier path, final NormalizedNode data,
+            final EffectiveModelContext context) {
+        final var ret = new SettableRestconfFuture<Empty>();
+        merge(ret, requireNonNull(path), requireNonNull(data), requireNonNull(context));
+        return ret;
+    }
+
+    private void merge(final @NonNull SettableRestconfFuture<Empty> future,
+            final @NonNull YangInstanceIdentifier path, final @NonNull NormalizedNode data,
+            final @NonNull EffectiveModelContext context) {
+        final var tx = prepareWriteExecution();
+        // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
+        TransactionUtil.ensureParentsByMerge(path, context, tx);
+        tx.merge(path, data);
+        Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                future.set(Empty.value());
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path));
+            }
+        }, MoreExecutors.directExecutor());
+    }
 }
