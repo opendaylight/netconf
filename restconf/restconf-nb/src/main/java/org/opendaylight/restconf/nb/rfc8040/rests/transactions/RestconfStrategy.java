@@ -10,10 +10,12 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -46,6 +48,8 @@ public abstract class RestconfStrategy {
 
         return mountPoint.getService(DOMDataBroker.class).map(MdsalRestconfStrategy::new);
     }
+
+    public abstract @NonNull RestconfFuture<Empty> executeDelete(YangInstanceIdentifier path);
 
     /**
      * Lock the entire datastore.

@@ -8,9 +8,11 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -22,10 +24,11 @@ import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.Futures;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import javax.ws.rs.core.Response.Status;
+import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
@@ -40,7 +43,6 @@ import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
@@ -233,11 +235,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      * Test of successful DELETE operation.
      */
     @Test
-    public final void testDeleteData() {
-        final var response = DeleteDataTransactionUtil.deleteData(testDeleteDataStrategy(),
-            YangInstanceIdentifier.of());
-        // assert success
-        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    public final void testDeleteData() throws Exception {
+        final var future = testDeleteDataStrategy().executeDelete(YangInstanceIdentifier.of());
+        assertNotNull(Futures.getDone(future));
     }
 
     abstract @NonNull RestconfStrategy testDeleteDataStrategy();
@@ -247,10 +247,10 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      */
     @Test
     public final void testNegativeDeleteData() {
-        final var strategy = testNegativeDeleteDataStrategy();
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.of()));
-        final var errors = ex.getErrors();
+        final var future = testNegativeDeleteDataStrategy().executeDelete(YangInstanceIdentifier.of());
+        final var ex = assertThrows(ExecutionException.class, () -> Futures.getDone(future)).getCause();
+        assertThat(ex, instanceOf(RestconfDocumentedException.class));
+        final var errors = ((RestconfDocumentedException) ex).getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());

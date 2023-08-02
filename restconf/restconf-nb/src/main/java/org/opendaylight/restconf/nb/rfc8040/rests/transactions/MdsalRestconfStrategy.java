@@ -8,15 +8,23 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.Optional;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.yangtools.yang.common.Empty;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -36,6 +44,48 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     @Override
     public RestconfTransaction prepareWriteExecution() {
         return new MdsalRestconfTransaction(dataBroker);
+    }
+
+    @Override
+    public RestconfFuture<Empty> executeDelete(final YangInstanceIdentifier path) {
+        final var tx = dataBroker.newReadWriteTransaction();
+        final var ret = new SettableRestconfFuture<Empty>();
+
+        Futures.addCallback(tx.exists(CONFIGURATION, path), new FutureCallback<>() {
+            @Override
+            public void onSuccess(final Boolean result) {
+                if (!result) {
+                    cancelTx(new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL,
+                        ErrorTag.DATA_MISSING, path));
+                    return;
+                }
+
+                tx.delete(CONFIGURATION, path);
+                Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
+                    @Override
+                    public void onSuccess(final CommitInfo result) {
+                        ret.set(Empty.value());
+                    }
+
+                    @Override
+                    public void onFailure(final Throwable cause) {
+                        ret.setFailure(new RestconfDocumentedException("Transaction to delete " + path + " failed",
+                            cause));
+                    }
+                }, MoreExecutors.directExecutor());
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                cancelTx(new RestconfDocumentedException("Failed to access " + path, cause));
+            }
+
+            private void cancelTx(final RestconfDocumentedException ex) {
+                tx.cancel();
+                ret.setFailure(ex);
+            }
+        }, MoreExecutors.directExecutor());
+        return ret;
     }
 
     @Override
