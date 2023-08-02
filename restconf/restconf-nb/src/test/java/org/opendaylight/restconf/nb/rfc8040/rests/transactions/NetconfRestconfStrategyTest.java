@@ -246,4 +246,89 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         assertEquals(ErrorType.PROTOCOL, globalError.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, globalError.getErrorTag());
     }
+
+    @Override
+    RestconfStrategy readDataConfigTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readAllHavingOnlyConfigTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).get(PATH);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(netconfService).get(PATH_2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(PATH_2);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readDataNonConfigTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(netconfService).get(PATH_2);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readContainerDataAllTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(netconfService).get(PATH);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(netconfService).get(PATH);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readListDataAllTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(LIST_DATA))).when(netconfService).get(PATH_3);
+        doReturn(immediateFluentFuture(Optional.of(LIST_DATA_2))).when(netconfService).getConfig(PATH_3);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readOrderedListDataAllTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_1))).when(netconfService).get(PATH_3);
+        doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_2))).when(netconfService).getConfig(PATH_3);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readUnkeyedListDataAllTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_1))).when(netconfService).get(PATH_3);
+        doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_2))).when(netconfService).getConfig(PATH_3);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readLeafListDataAllTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_1))).when(netconfService)
+            .get(LEAF_SET_NODE_PATH);
+        doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_2))).when(netconfService)
+            .getConfig(LEAF_SET_NODE_PATH);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readOrderedLeafListDataAllTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_1))).when(netconfService)
+            .get(LEAF_SET_NODE_PATH);
+        doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_2))).when(netconfService)
+            .getConfig(LEAF_SET_NODE_PATH);
+        return new NetconfRestconfStrategy(netconfService);
+    }
+
+    @Override
+    RestconfStrategy readDataWrongPathOrNoContentTestStrategy() {
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(PATH_2);
+        return new NetconfRestconfStrategy(netconfService);
+    }
 }

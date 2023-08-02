@@ -66,12 +66,12 @@ public abstract class AbstractJukeboxTest {
     protected static EffectiveModelContext JUKEBOX_SCHEMA;
 
     @BeforeClass
-    public static void beforeClass() {
+    public static final void beforeClass() {
         JUKEBOX_SCHEMA = YangParserTestUtils.parseYangResourceDirectory("/jukebox");
     }
 
     @AfterClass
-    public static void afterClass() {
+    public static final void afterClass() {
         JUKEBOX_SCHEMA = null;
     }
 }

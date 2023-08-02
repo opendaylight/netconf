@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
@@ -20,6 +21,7 @@ import static org.opendaylight.restconf.common.patch.PatchEditOperation.MERGE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 
+import com.google.common.collect.ImmutableList;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -27,8 +29,10 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
@@ -40,16 +44,26 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUti
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.DOMException;
 
 abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
@@ -101,6 +115,117 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     // FIXME: this looks weird
     static final YangInstanceIdentifier CREATE_AND_DELETE_TARGET = GAP_IID.node(PLAYER_QNAME).node(GAP_QNAME);
 
+    // Read mock data
+    static final QName BASE = QName.create("ns", "2016-02-28", "base");
+    private static final QName LIST_KEY_QNAME = QName.create(BASE, "list-key");
+    private static final QName LEAF_LIST_QNAME = QName.create(BASE, "leaf-list");
+    private static final QName LIST_QNAME = QName.create(BASE, "list");
+    static final QName CONT_QNAME = QName.create(BASE, "cont");
+
+    private static final NodeIdentifierWithPredicates NODE_WITH_KEY =
+        NodeIdentifierWithPredicates.of(LIST_QNAME, LIST_KEY_QNAME, "keyValue");
+    private static final NodeIdentifierWithPredicates NODE_WITH_KEY_2 =
+        NodeIdentifierWithPredicates.of(LIST_QNAME, LIST_KEY_QNAME, "keyValue2");
+
+    private static final LeafNode<?> CONTENT = ImmutableNodes.leafNode(QName.create(BASE, "leaf-content"), "content");
+    private static final LeafNode<?> CONTENT_2 =
+        ImmutableNodes.leafNode(QName.create(BASE, "leaf-content-different"), "content-different");
+    static final YangInstanceIdentifier PATH = YangInstanceIdentifier.builder()
+        .node(CONT_QNAME)
+        .node(LIST_QNAME)
+        .node(NODE_WITH_KEY)
+        .build();
+    static final YangInstanceIdentifier PATH_2 = YangInstanceIdentifier.builder()
+        .node(CONT_QNAME)
+        .node(LIST_QNAME)
+        .node(NODE_WITH_KEY_2)
+        .build();
+    static final YangInstanceIdentifier PATH_3 = YangInstanceIdentifier.of(CONT_QNAME, LIST_QNAME);
+    private static final MapEntryNode DATA = Builders.mapEntryBuilder()
+        .withNodeIdentifier(NODE_WITH_KEY)
+        .withChild(CONTENT)
+        .build();
+    static final MapEntryNode DATA_2 = Builders.mapEntryBuilder()
+        .withNodeIdentifier(NODE_WITH_KEY)
+        .withChild(CONTENT_2)
+        .build();
+    private static final LeafNode<?> CONTENT_LEAF = ImmutableNodes.leafNode(QName.create(BASE, "content"), "test");
+    private static final LeafNode<?> CONTENT_LEAF_2 = ImmutableNodes.leafNode(QName.create(BASE, "content2"), "test2");
+    static final ContainerNode DATA_3 = Builders.containerBuilder()
+        .withNodeIdentifier(new NodeIdentifier(QName.create(BASE, "container")))
+        .withChild(CONTENT_LEAF)
+        .build();
+    static final ContainerNode DATA_4 = Builders.containerBuilder()
+        .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE, "container2")))
+        .withChild(CONTENT_LEAF_2)
+        .build();
+    static final MapNode LIST_DATA = Builders.mapBuilder()
+        .withNodeIdentifier(new NodeIdentifier(QName.create(LIST_QNAME, "list")))
+        .withChild(DATA)
+        .build();
+    static final MapNode LIST_DATA_2 = Builders.mapBuilder()
+        .withNodeIdentifier(new NodeIdentifier(QName.create(LIST_QNAME, "list")))
+        .withChild(DATA)
+        .withChild(DATA_2)
+        .build();
+    static final UserMapNode ORDERED_MAP_NODE_1 = Builders.orderedMapBuilder()
+        .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+        .withChild(DATA)
+        .build();
+    static final UserMapNode ORDERED_MAP_NODE_2 = Builders.orderedMapBuilder()
+        .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+        .withChild(DATA)
+        .withChild(DATA_2)
+        .build();
+    private static final MapEntryNode CHECK_DATA = Builders.mapEntryBuilder()
+        .withNodeIdentifier(NODE_WITH_KEY)
+        .withChild(CONTENT_2)
+        .withChild(CONTENT)
+        .build();
+    static final LeafSetNode<String> LEAF_SET_NODE_1 = Builders.<String>leafSetBuilder()
+        .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
+        .withChildValue("one")
+        .withChildValue("two")
+        .build();
+    static final LeafSetNode<String> LEAF_SET_NODE_2 = Builders.<String>leafSetBuilder()
+        .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
+        .withChildValue("three")
+        .build();
+    static final LeafSetNode<String> ORDERED_LEAF_SET_NODE_1 = Builders.<String>orderedLeafSetBuilder()
+        .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
+        .withChildValue("one")
+        .withChildValue("two")
+        .build();
+    static final LeafSetNode<String> ORDERED_LEAF_SET_NODE_2 = Builders.<String>orderedLeafSetBuilder()
+        .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
+        .withChildValue("three")
+        .withChildValue("four")
+        .build();
+    static final YangInstanceIdentifier LEAF_SET_NODE_PATH = YangInstanceIdentifier.builder()
+        .node(CONT_QNAME)
+        .node(LEAF_LIST_QNAME)
+        .build();
+    private static final UnkeyedListEntryNode UNKEYED_LIST_ENTRY_NODE_1 = Builders.unkeyedListEntryBuilder()
+        .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+        .withChild(CONTENT)
+        .build();
+    private static final UnkeyedListEntryNode UNKEYED_LIST_ENTRY_NODE_2 = Builders.unkeyedListEntryBuilder()
+        .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+        .withChild(CONTENT_2)
+        .build();
+    static final UnkeyedListNode UNKEYED_LIST_NODE_1 = Builders.unkeyedListBuilder()
+        .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+        .withChild(UNKEYED_LIST_ENTRY_NODE_1)
+        .build();
+    static final UnkeyedListNode UNKEYED_LIST_NODE_2 = Builders.unkeyedListBuilder()
+        .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(LIST_QNAME))
+        .withChild(UNKEYED_LIST_ENTRY_NODE_2)
+        .build();
+    private static final NodeIdentifier NODE_IDENTIFIER =
+        new NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
+
+    @Mock
+    private EffectiveModelContext mockSchemaContext;
     @Mock
     private UriInfo uriInfo;
 
@@ -254,6 +379,135 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy deleteNonexistentDataTestStrategy();
 
     abstract void assertTestDeleteNonexistentData(@NonNull PatchStatusContext status);
+
+    @Test
+    public final void readDataConfigTest() {
+        assertEquals(DATA_3, readData(ContentParam.CONFIG, PATH, readDataConfigTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readDataConfigTestStrategy();
+
+    @Test
+    public final void readAllHavingOnlyConfigTest() {
+        assertEquals(DATA_3, readData(ContentParam.ALL, PATH, readAllHavingOnlyConfigTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readAllHavingOnlyConfigTestStrategy();
+
+    @Test
+    public final void readAllHavingOnlyNonConfigTest() {
+        assertEquals(DATA_2, readData(ContentParam.ALL, PATH_2, readAllHavingOnlyNonConfigTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readAllHavingOnlyNonConfigTestStrategy();
+
+    @Test
+    public final void readDataNonConfigTest() {
+        assertEquals(DATA_2, readData(ContentParam.NONCONFIG, PATH_2, readDataNonConfigTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readDataNonConfigTestStrategy();
+
+    @Test
+    public final void readContainerDataAllTest() {
+        assertEquals(Builders.containerBuilder()
+            .withNodeIdentifier(NODE_IDENTIFIER)
+            .withChild(CONTENT_LEAF)
+            .withChild(CONTENT_LEAF_2)
+            .build(), readData(ContentParam.ALL, PATH, readContainerDataAllTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readContainerDataAllTestStrategy();
+
+    @Test
+    public final void readContainerDataConfigNoValueOfContentTest() {
+        assertEquals(Builders.containerBuilder()
+            .withNodeIdentifier(NODE_IDENTIFIER)
+            .withChild(CONTENT_LEAF)
+            .withChild(CONTENT_LEAF_2)
+            .build(), readData(ContentParam.ALL, PATH, readContainerDataConfigNoValueOfContentTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy();
+
+    @Test
+    public final void readListDataAllTest() {
+        assertEquals(Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
+            .withChild(CHECK_DATA)
+            .build(), readData(ContentParam.ALL, PATH_3, readListDataAllTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readListDataAllTestStrategy();
+
+    @Test
+    public final void readOrderedListDataAllTest() {
+        assertEquals(Builders.orderedMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+            .withChild(CHECK_DATA)
+            .build(), readData(ContentParam.ALL, PATH_3, readOrderedListDataAllTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readOrderedListDataAllTestStrategy();
+
+    @Test
+    public void readUnkeyedListDataAllTest() {
+        assertEquals(Builders.unkeyedListBuilder()
+            .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+            .withChild(Builders.unkeyedListEntryBuilder()
+                .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+                .withChild(UNKEYED_LIST_ENTRY_NODE_1.body().iterator().next())
+                .withChild(UNKEYED_LIST_ENTRY_NODE_2.body().iterator().next())
+                .build())
+            .build(), readData(ContentParam.ALL, PATH_3, readUnkeyedListDataAllTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readUnkeyedListDataAllTestStrategy();
+
+    @Test
+    public final void readLeafListDataAllTest() {
+        assertEquals(Builders.<String>leafSetBuilder()
+            .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
+            .withValue(ImmutableList.<LeafSetEntryNode<String>>builder()
+                .addAll(LEAF_SET_NODE_1.body())
+                .addAll(LEAF_SET_NODE_2.body())
+                .build())
+            .build(), readData(ContentParam.ALL, LEAF_SET_NODE_PATH, readLeafListDataAllTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readLeafListDataAllTestStrategy();
+
+    @Test
+    public final void readOrderedLeafListDataAllTest() {
+        assertEquals(Builders.<String>orderedLeafSetBuilder()
+            .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
+            .withValue(ImmutableList.<LeafSetEntryNode<String>>builder()
+                .addAll(ORDERED_LEAF_SET_NODE_1.body())
+                .addAll(ORDERED_LEAF_SET_NODE_2.body())
+                .build())
+            .build(), readData(ContentParam.ALL, LEAF_SET_NODE_PATH, readOrderedLeafListDataAllTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readOrderedLeafListDataAllTestStrategy();
+
+    @Test
+    public void readDataWrongPathOrNoContentTest() {
+        assertNull(readData(ContentParam.CONFIG, PATH_2, readDataWrongPathOrNoContentTestStrategy()));
+    }
+
+    abstract @NonNull RestconfStrategy readDataWrongPathOrNoContentTestStrategy();
+
+    /**
+     * Read specific type of data from data store via transaction.
+     *
+     * @param content        type of data to read (config, state, all)
+     * @param strategy       {@link RestconfStrategy} - wrapper for variables
+     * @return {@link NormalizedNode}
+     */
+    private @Nullable NormalizedNode readData(final @NonNull ContentParam content,
+            final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) {
+        return ReadDataTransactionUtil.readData(content, path, strategy, null, mockSchemaContext);
+    }
 
     private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
         final var patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, strategy, JUKEBOX_SCHEMA);
