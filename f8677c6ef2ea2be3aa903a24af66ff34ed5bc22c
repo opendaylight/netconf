@@ -16,6 +16,24 @@
       "message": "Revert this variable and just check it like this:\n if (node instanceof ListSchemaNode) {",
       "revId": "f8677c6ef2ea2be3aa903a24af66ff34ed5bc22c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbf1c2fe_46bf23f0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-02T07:56:17Z",
+      "side": 1,
+      "message": "We need to eliminate POST for each request that contains a list in the path. This applies not only to lists but also to child resources of lists.",
+      "parentUuid": "6c70008f_cf81bd27",
+      "revId": "f8677c6ef2ea2be3aa903a24af66ff34ed5bc22c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
