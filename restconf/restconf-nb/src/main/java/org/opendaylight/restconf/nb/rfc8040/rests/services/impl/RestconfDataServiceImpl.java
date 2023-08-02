@@ -57,7 +57,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSu
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
@@ -304,8 +303,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         validTopLevelNodeName(path, payload);
         validateListKeysEqualityInPayloadAndUri(payload);
 
-        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
-        return PlainPatchDataTransactionUtil.patchData(path, payload.getData(), strategy, iid.getSchemaContext());
+        getRestconfStrategy(iid.getMountPoint()).merge(path, payload.getData(), iid.getSchemaContext())
+            .getOrThrow();
+        return Response.ok().build();
     }
 
     @VisibleForTesting
