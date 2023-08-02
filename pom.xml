@@ -47,6 +47,7 @@
 
         <module>keystore</module>
         <module>truststore</module>
+        <module>features/odl-yanglib-mdsal-writer</module>
     </modules>
 
     <profiles>
