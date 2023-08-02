@@ -30,7 +30,6 @@
 
   <modules>
     <module>netconf-config</module>
-    <module>mdsal-netconf-yang-library</module>
     <module>netconf-netty-util</module>
     <module>netconf-auth</module>
     <module>yanglib</module>
