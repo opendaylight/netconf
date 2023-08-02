@@ -117,13 +117,23 @@ public final class TransactionUtil {
         LOG.trace("Transaction({}) SUCCESSFUL", txType);
     }
 
+    public static @NonNull RestconfDocumentedException decodeException(final Throwable throwable,
+            final String txType, final YangInstanceIdentifier path) {
+        return decodeException(throwable, throwable, txType, path);
+    }
+
     private static @NonNull RestconfDocumentedException decodeException(final ExecutionException ex,
             final String txType, final YangInstanceIdentifier path) {
-        if (ex.getCause() instanceof TransactionCommitFailedException commitFailed) {
+        return decodeException(ex, ex.getCause(), txType, path);
+    }
+
+    private static @NonNull RestconfDocumentedException decodeException(final Throwable ex, final Throwable cause,
+            final String txType, final YangInstanceIdentifier path) {
+        if (cause instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
             // or override it with new generic message. We search for NetconfDocumentedException that was send from
             // netconfSB and we create RestconfDocumentedException accordingly.
-            for (var error : Throwables.getCausalChain(commitFailed)) {
+            for (var error : Throwables.getCausalChain(cause)) {
                 if (error instanceof DocumentedException documentedError) {
                     final ErrorTag errorTag = documentedError.getErrorTag();
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
