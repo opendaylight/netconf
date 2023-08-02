@@ -47,6 +47,12 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-yanglib-mdsal-writer</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-nb</artifactId>
         </dependency>
         <dependency>

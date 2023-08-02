@@ -1,9 +1,0 @@
-submodule test-submodule {
-    belongs-to "test-module" {
-        prefix "tt";
-    }
-
-    container cont {
-
-    }
-}
