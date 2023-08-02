@@ -10,10 +10,12 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -84,4 +86,14 @@ public abstract class RestconfStrategy {
      * @return a FluentFuture containing the result of the check
      */
     public abstract ListenableFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path);
+
+    /**
+     * Delete data from the datastore. If the data does not exist, this operation will fail, as outlined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.7">RFC8040 section 4.7</a>
+     *
+     * @param path Path to delete
+     * @return A {@link RestconfFuture}
+     * @throws NullPointerException if {@code path} is {@code null}
+     */
+    public abstract @NonNull RestconfFuture<Empty> delete(YangInstanceIdentifier path);
 }
