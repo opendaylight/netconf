@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.restconf.nb.rfc8040.legacy.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
@@ -50,21 +49,6 @@ public class RestconfStateStreamsTest {
         // FIXME: assemble these from dependencies
         schemaContext = YangParserTestUtils.parseYangResourceDirectory("/modules/restconf-module-testing");
         schemaContextMonitoring = YangParserTestUtils.parseYangResourceDirectory("/modules");
-    }
-
-    /**
-     * Test of writing modules into {@link RestconfModule#MODULE_LIST_SCHEMA_NODE} and checking if modules were
-     * correctly written.
-     */
-    @Test
-    public void restconfMappingNodeTest() {
-        // write modules into list module in Restconf
-        final ContainerNode mods = SchemaContextHandler.mapModulesByIetfYangLibraryYang(schemaContext, "1");
-
-        // verify loaded modules
-        verifyLoadedModules(mods);
-        // verify deviations
-        verifyDeviations(mods);
     }
 
     @Test
