@@ -19,6 +19,7 @@ import java.util.Optional;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -32,6 +33,11 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     public NetconfRestconfStrategy(final NetconfDataTreeService netconfService) {
         this.netconfService = requireNonNull(netconfService);
+    }
+
+    @Override
+    public RestconfFuture<Empty> executeDelete(final YangInstanceIdentifier path) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
