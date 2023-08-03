@@ -20,8 +20,5 @@ public interface RemoteDevice<L extends RemoteDeviceCommunicator> {
     void onRemoteSessionDown();
 
     // FIXME: document this node
-    void onRemoteSessionFailed(Throwable throwable);
-
-    // FIXME: document this node
     void onNotification(NetconfMessage notification);
 }

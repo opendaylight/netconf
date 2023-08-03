@@ -41,7 +41,6 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
         final SchemalessMessageTransformer messageTransformer = mock(SchemalessMessageTransformer.class);
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test-D",
                 InetSocketAddress.createUnresolved("localhost", 22));
-        final Throwable throwable = new Throwable();
 
         final SchemalessNetconfDevice device = new SchemalessNetconfDevice(BASE_SCHEMAS, remoteDeviceId, facade,
             messageTransformer);
@@ -60,9 +59,6 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 
         device.onRemoteSessionDown();
         verify(facade).onDeviceDisconnected();
-
-        device.onRemoteSessionFailed(throwable);
-        verify(facade).onDeviceFailed(throwable);
     }
 
     private static RemoteDeviceHandler getFacade() throws Exception {
