@@ -22,6 +22,30 @@
       },
       "revId": "03a43f070617011fc6e31a31b1d68ca74f483ffc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb1221d5_292575cf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-03T13:39:39Z",
+      "side": 1,
+      "message": "Changed to \"Set device failed when runs out of attempts\".",
+      "parentUuid": "eac98e6a_bc50ca1d",
+      "range": {
+        "startLine": 7,
+        "startChar": 23,
+        "endLine": 7,
+        "endChar": 24
+      },
+      "revId": "03a43f070617011fc6e31a31b1d68ca74f483ffc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
