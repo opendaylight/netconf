@@ -241,8 +241,8 @@ public class RestconfDocumentedException extends WebApplicationException {
      * @param cause Proposed cause of a RestconfDocumented exception
      */
     public static void throwIfYangError(final Throwable cause) {
-        if (cause instanceof YangNetconfErrorAware) {
-            throw new RestconfDocumentedException(cause, ((YangNetconfErrorAware) cause).getNetconfErrors().stream()
+        if (cause instanceof YangNetconfErrorAware infoAware) {
+            throw new RestconfDocumentedException(cause, infoAware.getNetconfErrors().stream()
                 .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),
                     // FIXME: pass down error info
                     null, error.path()))
@@ -251,13 +251,14 @@ public class RestconfDocumentedException extends WebApplicationException {
     }
 
     private static List<RestconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
-        final List<RestconfError> errorList = new ArrayList<>();
-        if (rpcErrors != null) {
-            for (RpcError rpcError : rpcErrors) {
-                errorList.add(new RestconfError(rpcError));
-            }
+        if (rpcErrors == null || rpcErrors.isEmpty()) {
+            return List.of();
         }
 
+        final var errorList = new ArrayList<RestconfError>();
+        for (var rpcError : rpcErrors) {
+            errorList.add(new RestconfError(rpcError));
+        }
         return errorList;
     }
 
