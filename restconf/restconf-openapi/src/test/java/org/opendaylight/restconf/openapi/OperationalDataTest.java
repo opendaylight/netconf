@@ -115,7 +115,7 @@ public class OperationalDataTest {
                 final var responses = path.put().requestBody();
                 final var content = responses.get("content");
                 verifyOperationHaveCorrectReference(content.get("application/xml"));
-                verifyOperationHaveCorrectReference(content.get("application/json"));
+                verifyOperationHaveCorrectJsonReference(content.get("application/json"));
             }
             if (path.post() != null) {
                 final var responses = path.post().requestBody();
@@ -216,6 +216,28 @@ public class OperationalDataTest {
             assertNotNull(type);
             assertEquals("object", type.asText());
         }
+    }
+
+    private static void verifyOperationHaveCorrectJsonReference(final JsonNode schema) {
+        final var properties = schema.findPath("properties");
+        final String refValue;
+        if (!properties.isMissingNode()) {
+            final var node = properties.elements().next();
+            final var type = node.path("type");
+            if (type.isMissingNode()) {
+                refValue = node.path("$ref").asText();
+            } else if (type.asText().equals("array")) {
+                refValue = node.path("items").path("$ref").asText();
+            } else {
+                assertEquals("object", type.asText());
+                return;
+            }
+        } else {
+            refValue = schema.path("$ref").asText();
+        }
+        final var schemaElement = refValue.substring(refValue.lastIndexOf("/") + 1);
+        assertTrue("Reference [" + refValue + "] not found in EXPECTED Schemas",
+                EXPECTED_SCHEMAS.contains(schemaElement));
     }
 
     private static Set<String> getSetOfProperties(final Schema schema) {
