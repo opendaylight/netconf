@@ -313,12 +313,6 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     @Override
-    public void onRemoteSessionFailed(final Throwable throwable) {
-        setConnected(false);
-        salFacade.onDeviceFailed(throwable);
-    }
-
-    @Override
     public void onNotification(final NetconfMessage notification) {
         notificationHandler.handleNotification(notification);
     }
