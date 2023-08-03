@@ -17,9 +17,17 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Encoded;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
@@ -31,8 +39,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
@@ -49,11 +57,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link RestconfInvokeOperationsService}.
- *
+ * An operation resource represents a protocol operation defined with the YANG {@code rpc} statement. It is invoked
+ * using a POST method on the operation resource.
  */
 @Path("/")
-public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
+public final class RestconfInvokeOperationsServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfInvokeOperationsServiceImpl.class);
 
     private final DOMRpcService rpcService;
@@ -68,9 +76,32 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             : SubscribeToStreamUtil.webSockets();
     }
 
-    @Override
-    public void invokeRpc(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo,
-            final AsyncResponse ar) {
+    /**
+     * Invoke RPC operation.
+     *
+     * @param identifier module name and rpc identifier string for the desired operation
+     * @param payload {@link NormalizedNodePayload} - the body of the operation
+     * @param uriInfo URI info
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link NormalizedNodePayload} output
+     */
+    @POST
+    @Path("/operations/{identifier:.+}")
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void invokeRpc(@Encoded @PathParam("identifier") final String identifier,
+            final NormalizedNodePayload payload, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         final InstanceIdentifierContext context = payload.getInstanceIdentifierContext();
         final EffectiveModelContext schemaContext = context.getSchemaContext();
         final DOMMountPoint mountPoint = context.getMountPoint();
