@@ -28,8 +28,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Encoded;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -45,8 +56,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
@@ -54,7 +67,6 @@ import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -91,10 +103,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link RestconfDataService}.
+ * The "{+restconf}/data" subtree represents the datastore resource type, which is a collection of configuration data
+ * and state data nodes.
  */
 @Path("/")
-public class RestconfDataServiceImpl implements RestconfDataService {
+public final class RestconfDataServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
@@ -120,13 +133,43 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 : SubscribeToStreamUtil.webSockets();
     }
 
-    @Override
-    public Response readData(final UriInfo uriInfo) {
+    /**
+     * Get target data resource from data root.
+     *
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodePayload}
+     */
+    @GET
+    @Path("/data")
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public Response readData(@Context final UriInfo uriInfo) {
         return readData(null, uriInfo);
     }
 
-    @Override
-    public Response readData(final String identifier, final UriInfo uriInfo) {
+    /**
+     * Get target data resource.
+     *
+     * @param identifier path to target
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodePayload}
+     */
+    @GET
+    @Path("/data/{identifier:.+}")
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public Response readData(@Encoded @PathParam("identifier") final String identifier,
+            @Context final UriInfo uriInfo) {
         final ReadDataParams readParams = QueryParams.newReadDataParams(uriInfo);
 
         final EffectiveModelContext schemaContextRef = databindProvider.currentContext().modelContext();
@@ -236,8 +279,24 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             RestconfStateStreams.restconfStateStreamPath(mapToStreams.name()), mapToStreams);
     }
 
-    @Override
-    public Response putData(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo) {
+    /**
+     * Create or replace the target data resource.
+     *
+     * @param identifier path to target
+     * @param payload data node for put to config DS
+     * @return {@link Response}
+     */
+    @PUT
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public Response putData(@Encoded @PathParam("identifier") final String identifier,
+            final NormalizedNodePayload payload, @Context final UriInfo uriInfo) {
         requireNonNull(payload);
 
         final WriteDataParams params = QueryParams.newWriteDataParams(uriInfo);
@@ -253,13 +312,45 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return PutDataTransactionUtil.putData(path, payload.getData(), iid.getSchemaContext(), strategy, params);
     }
 
-    @Override
-    public Response postData(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo) {
+    /**
+     * Create a data resource in target.
+     *
+     * @param identifier path to target
+     * @param payload new data
+     * @param uriInfo URI info
+     * @return {@link Response}
+     */
+    @POST
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public Response postData(@Encoded @PathParam("identifier") final String identifier,
+            final NormalizedNodePayload payload, @Context final UriInfo uriInfo) {
         return postData(payload, uriInfo);
     }
 
-    @Override
-    public Response postData(final NormalizedNodePayload payload, final UriInfo uriInfo) {
+    /**
+     * Create a data resource.
+     *
+     * @param payload new data
+     * @param uriInfo URI info
+     * @return {@link Response}
+     */
+    @POST
+    @Path("/data")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public Response postData(final NormalizedNodePayload payload, @Context final UriInfo uriInfo) {
         requireNonNull(payload);
         final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
         if (iid.getSchemaNode() instanceof ActionDefinition) {
@@ -272,8 +363,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             iid.getSchemaContext(), params);
     }
 
-    @Override
-    public void deleteData(final String identifier, final AsyncResponse ar) {
+    /**
+     * Delete the target data resource.
+     *
+     * @param identifier path to target
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @DELETE
+    @Path("/data/{identifier:.+}")
+    public void deleteData(@Encoded @PathParam("identifier") final String identifier,
+            @Suspended final AsyncResponse ar) {
         final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), mountPointService);
         final var strategy = getRestconfStrategy(instanceIdentifier.getMountPoint());
@@ -291,13 +390,49 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }, MoreExecutors.directExecutor());
     }
 
-    @Override
-    public PatchStatusContext patchData(final String identifier, final PatchContext context, final UriInfo uriInfo) {
+    /**
+     * Ordered list of edits that are applied to the target datastore by the server.
+     *
+     * @param identifier path to target
+     * @param context edits
+     * @param uriInfo URI info
+     * @return {@link PatchStatusContext}
+     */
+    @Patch
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_PATCH_JSON,
+        MediaTypes.APPLICATION_YANG_PATCH_XML
+    })
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
+    })
+    public PatchStatusContext patchData(@Encoded @PathParam("identifier") final String identifier,
+            final PatchContext context, @Context final UriInfo uriInfo) {
         return patchData(context, uriInfo);
     }
 
-    @Override
-    public PatchStatusContext patchData(final PatchContext context, final UriInfo uriInfo) {
+    /**
+     * Ordered list of edits that are applied to the datastore by the server.
+     *
+     * @param context
+     *            edits
+     * @param uriInfo
+     *            URI info
+     * @return {@link PatchStatusContext}
+     */
+    @Patch
+    @Path("/data")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_PATCH_JSON,
+        MediaTypes.APPLICATION_YANG_PATCH_XML
+    })
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
+    })
+    public PatchStatusContext patchData(final PatchContext context, @Context final UriInfo uriInfo) {
         final InstanceIdentifierContext iid = RestconfDocumentedException.throwIfNull(context,
             ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "No patch documented provided")
             .getInstanceIdentifierContext();
@@ -305,9 +440,24 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return PatchDataTransactionUtil.patchData(context, strategy, iid.getSchemaContext());
     }
 
-    @Override
-    public void patchData(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo,
-            final AsyncResponse ar) {
+    /**
+     * Partially modify the target data resource.
+     *
+     * @param identifier path to target
+     * @param payload data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @Patch
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void patchData(@Encoded @PathParam("identifier") final String identifier,
+            final NormalizedNodePayload payload, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
         final YangInstanceIdentifier path = iid.getInstanceIdentifier();
         validInputData(iid.getSchemaNode() != null, payload);
@@ -329,7 +479,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @VisibleForTesting
-    final RestconfStrategy getRestconfStrategy(final DOMMountPoint mountPoint) {
+    RestconfStrategy getRestconfStrategy(final DOMMountPoint mountPoint) {
         if (mountPoint == null) {
             return restconfStrategy;
         }
