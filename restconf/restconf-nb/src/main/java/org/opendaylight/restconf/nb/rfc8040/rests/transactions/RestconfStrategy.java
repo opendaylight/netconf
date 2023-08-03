@@ -23,6 +23,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
+import org.opendaylight.restconf.common.patch.PatchEntity;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.TransactionUtil;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -148,5 +150,22 @@ public abstract class RestconfStrategy {
                 future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path));
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    /**
+     * Patch data in the configuration datastore, as outlined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6">RFC8040 section 4.6</a> and
+     * <a href="https://www.rfc-editor.org/rfc/rfc8072">RFC8072</a>.
+     */
+    public final @NonNull RestconfFuture<PatchStatusContext> patch(final String patchId, final List<PatchEntity> edits,
+            final EffectiveModelContext context) {
+        final var ret = new SettableRestconfFuture<PatchStatusContext>();
+        patch(ret, requireNonNull(patchId), requireNonNull(edits), requireNonNull(context));
+        return ret;
+    }
+
+    private void patch(final @NonNull SettableRestconfFuture<PatchStatusContext> future, @NonNull final String patchId,
+            @NonNull final List<PatchEntity> edits, @NonNull final EffectiveModelContext context) {
+
     }
 }
