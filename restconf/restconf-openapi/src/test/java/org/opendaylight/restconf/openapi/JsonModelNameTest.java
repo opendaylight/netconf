@@ -62,29 +62,25 @@ public class JsonModelNameTest {
 
     @Test
     public void testIfFirstNodeInJsonPayloadContainsCorrectModelName() {
-        final var schemas = mountPointApi.components().schemas();
         for (final var stringPathEntry : mountPointApi.paths().entrySet()) {
             final var value = stringPathEntry.getValue();
             if (value.put() != null) {
-                final var schemaReference = getSchemaJsonReference(value.put());
-                assertNotNull("PUT reference for [" + value.put() + "] is in wrong format", schemaReference);
-                final var tested = schemas.get(schemaReference);
-                assertNotNull("Reference for [" + value.put() + "] was not found", tested);
-                final var nodeName = tested.properties().fields().next().getKey();
+                final var moduleName = getSchemaPutOperationModuleName(value.put());
+                assertNotNull("PUT module name for [" + value.put() + "] is in wrong format", moduleName);
                 final var key = stringPathEntry.getKey();
                 final var expectedModuleName = extractModuleName(key);
-                assertTrue(nodeName.contains(expectedModuleName));
+                assertTrue(moduleName.contains(expectedModuleName));
             }
         }
     }
 
-    private static String getSchemaJsonReference(final Operation put) {
-        final var reference = put.requestBody().path("content")
-            .path("application/json").path("schema").path("$ref").textValue();
+    private static String getSchemaPutOperationModuleName(final Operation put) {
+        final var parentName  = put.requestBody().path("content").path("application/json").path("schema")
+            .path("properties").properties().iterator().next().getKey();
 
-        final var lastSlashIndex = reference.lastIndexOf('/');
-        if (lastSlashIndex >= 0 && lastSlashIndex < reference.length() - 1) {
-            return reference.substring(lastSlashIndex + 1);
+        final var doubleDotsIndex = parentName.indexOf(':');
+        if (doubleDotsIndex >= 0 && doubleDotsIndex < parentName.length() - 1) {
+            return parentName.substring(0, doubleDotsIndex + 1);
         }
         return null; // Return null if there is no string after the last "/"
     }
