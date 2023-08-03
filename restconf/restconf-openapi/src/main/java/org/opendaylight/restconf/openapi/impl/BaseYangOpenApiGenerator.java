@@ -312,7 +312,7 @@ public abstract class BaseYangOpenApiGenerator {
                 final String operationsPath = getResourcePath("operations", context)
                     + "/" + resourcePathPart
                     + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
-                paths.put(operationsPath, buildPostPath(actionDef, operationsPath, operationsPath, operationsPath,
+                paths.put(operationsPath, buildPostPath(actionDef, moduleName, deviceName, parentName,
                     definitionNames, pathParams));
             });
         }
