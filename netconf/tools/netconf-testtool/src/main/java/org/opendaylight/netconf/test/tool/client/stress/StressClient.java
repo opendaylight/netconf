@@ -272,11 +272,6 @@ public final class StressClient {
         }
 
         @Override
-        public void onRemoteSessionFailed(final Throwable throwable) {
-            LOG.info("Session failed");
-        }
-
-        @Override
         public void onNotification(final NetconfMessage notification) {
             LOG.info("Notification received: {}", notification);
         }

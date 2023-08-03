@@ -68,11 +68,6 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
     }
 
     @Override
-    public void onRemoteSessionFailed(final Throwable throwable) {
-        salFacade.onDeviceFailed(throwable);
-    }
-
-    @Override
     public void onNotification(final NetconfMessage notification) {
         salFacade.onNotification(messageTransformer.toNotification(notification));
     }
