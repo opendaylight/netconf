@@ -127,7 +127,7 @@ public class OperationalDataTest {
                 final var responses = path.patch().requestBody();
                 final var content = responses.get("content");
                 verifyOperationHaveCorrectReference(content.get("application/yang-data+xml"));
-                verifyOperationHaveCorrectReference(content.get("application/yang-data+json"));
+                verifyOperationHaveCorrectJsonReference(content.get("application/yang-data+json"));
             }
         }
     }
