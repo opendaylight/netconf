@@ -140,7 +140,7 @@ public final class YangInstanceIdentifierSerializer {
             final char ch = valueOf.charAt(i);
 
             if (PERCENT_ENCODE_CHARS.matches(ch)) {
-                final String upperCase = String.format("%x", (int) ch).toUpperCase(Locale.ROOT);
+                final String upperCase = String.format(Locale.ROOT, "%X", (int) ch);
                 sb.append('%').append(upperCase);
             } else {
                 sb.append(ch);
