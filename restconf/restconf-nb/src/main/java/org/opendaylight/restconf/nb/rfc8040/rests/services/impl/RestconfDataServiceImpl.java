@@ -16,6 +16,7 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Path;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -67,6 +69,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListen
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.restconf.Data;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -270,13 +273,22 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response deleteData(final String identifier) {
+    public void deleteData(final String identifier, final AsyncResponse ar) {
         final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), mountPointService);
-        getRestconfStrategy(instanceIdentifier.getMountPoint())
-            .delete(instanceIdentifier.getInstanceIdentifier())
-            .getOrThrow();
-        return Response.noContent().build();
+        final var strategy = getRestconfStrategy(instanceIdentifier.getMountPoint());
+
+        Futures.addCallback(strategy.delete(instanceIdentifier.getInstanceIdentifier()), new FutureCallback<>() {
+            @Override
+            public void onSuccess(final Empty result) {
+                ar.resume(Response.noContent().build());
+            }
+
+            @Override
+            public void onFailure(final Throwable failure) {
+                ar.resume(failure);
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     @Override
@@ -294,18 +306,26 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response patchData(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo) {
-        requireNonNull(payload);
-
+    public void patchData(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo,
+            final AsyncResponse ar) {
         final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
         final YangInstanceIdentifier path = iid.getInstanceIdentifier();
         validInputData(iid.getSchemaNode() != null, payload);
         validTopLevelNodeName(path, payload);
         validateListKeysEqualityInPayloadAndUri(payload);
+        final var strategy = getRestconfStrategy(iid.getMountPoint());
 
-        getRestconfStrategy(iid.getMountPoint()).merge(path, payload.getData(), iid.getSchemaContext())
-            .getOrThrow();
-        return Response.ok().build();
+        Futures.addCallback(strategy.merge(path, payload.getData(), iid.getSchemaContext()), new FutureCallback<>() {
+            @Override
+            public void onSuccess(final Empty result) {
+                ar.resume(Response.ok().build());
+            }
+
+            @Override
+            public void onFailure(final Throwable failure) {
+                ar.resume(failure);
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     @VisibleForTesting

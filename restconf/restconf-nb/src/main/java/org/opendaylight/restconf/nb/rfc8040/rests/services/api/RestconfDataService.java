@@ -16,6 +16,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -137,13 +139,12 @@ public interface RestconfDataService {
     /**
      * Delete the target data resource.
      *
-     * @param identifier
-     *            path to target
-     * @return {@link Response}
+     * @param identifier path to target
+     * @param ar {@link AsyncResponse} which needs to be completed
      */
     @DELETE
     @Path("/data/{identifier:.+}")
-    Response deleteData(@Encoded @PathParam("identifier") String identifier);
+    void deleteData(@Encoded @PathParam("identifier") String identifier, @Suspended AsyncResponse ar);
 
     /**
      * Ordered list of edits that are applied to the target datastore by the
@@ -191,15 +192,12 @@ public interface RestconfDataService {
     })
     PatchStatusContext patchData(PatchContext context, @Context UriInfo uriInfo);
 
-
     /**
      * Partially modify the target data resource.
      *
-     * @param identifier
-     *            path to target
-     * @param payload
-     *            data node for put to config DS
-     * @return {@link Response}
+     * @param identifier path to target
+     * @param payload data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
      */
     @Patch
     @Path("/data/{identifier:.+}")
@@ -210,6 +208,6 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response patchData(@Encoded @PathParam("identifier") String identifier, NormalizedNodePayload payload,
-                       @Context UriInfo uriInfo);
+    void patchData(@Encoded @PathParam("identifier") String identifier, NormalizedNodePayload payload,
+                   @Context UriInfo uriInfo, @Suspended AsyncResponse ar);
 }

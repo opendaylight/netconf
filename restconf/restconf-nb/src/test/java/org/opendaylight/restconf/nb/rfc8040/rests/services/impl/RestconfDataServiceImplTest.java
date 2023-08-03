@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -37,6 +38,7 @@ import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -113,6 +115,8 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     private RestconfStreamsSubscriptionService delegRestconfSubscrService;
     @Mock
     private MultivaluedMap<String, String> queryParamenters;
+    @Mock
+    private AsyncResponse asyncResponse;
 
     @Before
     public void setUp() throws Exception {
@@ -367,18 +371,22 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidBase);
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
-        final Response response = dataService.deleteData("example-jukebox:jukebox");
-        assertNotNull(response);
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        final var captor = ArgumentCaptor.forClass(Response.class);
+        doReturn(true).when(asyncResponse).resume(captor.capture());
+        dataService.deleteData("example-jukebox:jukebox", asyncResponse);
+
+        assertEquals(204, captor.getValue().getStatus());
     }
 
     @Test
     public void testDeleteDataNotExisting() {
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> dataService.deleteData("example-jukebox:jukebox"));
-        final var errors = ex.getErrors();
+        final var captor = ArgumentCaptor.forClass(RestconfDocumentedException.class);
+        doReturn(true).when(asyncResponse).resume(captor.capture());
+        dataService.deleteData("example-jukebox:jukebox", asyncResponse);
+
+        final var errors = captor.getValue().getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
@@ -393,10 +401,11 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidBase);
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
-        final Response response =
-                dataService.deleteData("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox");
-        assertNotNull(response);
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        final var captor = ArgumentCaptor.forClass(Response.class);
+        doReturn(true).when(asyncResponse).resume(captor.capture());
+        dataService.deleteData("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", asyncResponse);
+
+        assertEquals(204, captor.getValue().getStatus());
     }
 
     @Test
