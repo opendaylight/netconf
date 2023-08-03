@@ -10,12 +10,18 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.Encoded;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStreamService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.SSESessionHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
@@ -27,10 +33,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link RestconfDataStreamService}.
+ * Access to notification streams via Server-Sent Events.
  */
+@Path("/")
 @Singleton
-public class RestconfDataStreamServiceImpl implements RestconfDataStreamService {
+public final class RestconfDataStreamServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataStreamServiceImpl.class);
 
     private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
@@ -46,8 +53,17 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
         maximumFragmentLength = configuration.maximumFragmentLength();
     }
 
-    @Override
-    public void getSSE(final String identifier, final UriInfo uriInfo, final SseEventSink sink, final Sse sse) {
+    /**
+     * Get target data resource.
+     *
+     * @param identifier path to target
+     * @param uriInfo URI info
+     */
+    @GET
+    @Path("/{identifier:.+}")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void getSSE(@Encoded @PathParam("identifier") final String identifier, @Context final UriInfo uriInfo,
+            @Context final SseEventSink sink, @Context final Sse sse) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         final BaseListenerInterface listener;
         final String notificaionType =

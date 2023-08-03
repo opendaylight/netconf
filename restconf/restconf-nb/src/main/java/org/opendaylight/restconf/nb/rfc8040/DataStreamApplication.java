@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStreamService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
 
 /**
  * Restconf Application extends {@link AbstractRestconfApplication}. Is used for sending SSE.
@@ -21,7 +21,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStrea
 public class DataStreamApplication extends AbstractRestconfApplication {
     @Inject
     public DataStreamApplication(final DatabindProvider databindProvider, final DOMMountPointService mountPointService,
-            final RestconfDataStreamService dataStreamService) {
+            final RestconfDataStreamServiceImpl dataStreamService) {
         super(databindProvider, mountPointService, List.of(dataStreamService));
     }
 }
