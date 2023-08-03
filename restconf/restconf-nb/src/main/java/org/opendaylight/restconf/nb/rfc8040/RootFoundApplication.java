@@ -10,11 +10,10 @@ package org.opendaylight.restconf.nb.rfc8040;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RootResourceDiscoveryService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RootResourceDiscoveryServiceImpl;
 
 public class RootFoundApplication extends Application {
-    private final RootResourceDiscoveryService rrds;
+    private final RootResourceDiscoveryServiceImpl rrds;
 
     public RootFoundApplication(final String restconfRoot) {
         rrds = new RootResourceDiscoveryServiceImpl(restconfRoot);
