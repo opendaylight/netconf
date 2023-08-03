@@ -278,7 +278,7 @@ public final class StressClient {
 
         @Override
         public void onNotification(final NetconfMessage notification) {
-            LOG.info("Notification received: {}", notification.toString());
+            LOG.info("Notification received: {}", notification);
         }
     }
 }
