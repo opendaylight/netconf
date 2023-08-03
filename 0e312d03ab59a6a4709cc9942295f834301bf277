@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0efea0f_b6b9257a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-03T14:43:03Z",
+      "side": 1,
+      "message": "We did not want to ignore device name. Add it into list.",
+      "revId": "0e312d03ab59a6a4709cc9942295f834301bf277",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
