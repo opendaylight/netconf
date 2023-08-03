@@ -150,7 +150,6 @@ public final class PutDataTransactionUtil {
         return transaction.commit();
     }
 
-    // FIXME: take parentPath
     public static DataSchemaNode checkListAndOrderedType(final EffectiveModelContext ctx,
             final YangInstanceIdentifier path) {
         final var dataSchemaNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow().dataSchemaNode();
