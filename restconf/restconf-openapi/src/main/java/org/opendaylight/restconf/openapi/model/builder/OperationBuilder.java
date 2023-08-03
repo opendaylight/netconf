@@ -128,7 +128,7 @@ public final class OperationBuilder {
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
         final boolean isList = node instanceof ListSchemaNode;
-        final ObjectNode requestBody = createPutRequestBodyParameter(defName, fullName, isList);
+        final ObjectNode requestBody = createRequestBodyParameter1(defName, fullName, isList, summary);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
@@ -145,14 +145,16 @@ public final class OperationBuilder {
             .build();
     }
 
-    public static Operation buildPatch(final String parentName, final String nodeName, final String moduleName,
-            final @NonNull String deviceName, final String description, final List<Parameter> pathParams) {
-        final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.PATCH, deviceName, moduleName, nodeName);
+    public static Operation buildPatch(final DataSchemaNode node, final String parentName, final String moduleName,
+            final @NonNull String deviceName, final List<Parameter> pathParams) {
+        final String nodeName = node.getQName().getLocalName();
+        final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.PATCH, moduleName, deviceName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        final String defName = parentName + "_" + nodeName + TOP;
-        final String xmlDefName = parentName + "_" + nodeName;
-        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName, summary);
+        final String defName = parentName + "_" + nodeName;
+        final boolean isList = node instanceof ListSchemaNode;
+        final ObjectNode requestBody = createRequestBodyParameter1(defName, nodeName, isList, summary);
+
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
@@ -164,7 +166,7 @@ public final class OperationBuilder {
             .parameters(parameters)
             .requestBody(requestBody)
             .responses(responses)
-            .description(description)
+            .description(node.getDescription().orElse(""))
             .summary(summary)
             .build();
     }
@@ -273,8 +275,10 @@ public final class OperationBuilder {
         return payload;
     }
 
-    private static ObjectNode createPutRequestBodyParameter(final String defName, final String name,
-            final boolean isList) {
+    // TODO change name after this method will be finished.(for now it's just PUT and PATCH but there might be more
+    //  in next patches)
+    private static ObjectNode createRequestBodyParameter1(final String defName, final String name,
+            final boolean isList, final String summary) {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         final ObjectNode content = JsonNodeFactory.instance.objectNode();
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
@@ -292,8 +296,13 @@ public final class OperationBuilder {
         }
         final ObjectNode jsonSchema = JsonNodeFactory.instance.objectNode();
         jsonSchema.set(SCHEMA_KEY, properties);
-        content.set(MediaType.APPLICATION_JSON, jsonSchema);
-        content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(defName));
+        if (summary != null && summary.contains(HttpMethod.PATCH)) {
+            content.set("application/yang-data+json", jsonSchema);
+            content.set("application/yang-data+xml", buildMimeTypeValue(defName));
+        } else {
+            content.set(MediaType.APPLICATION_JSON, jsonSchema);
+            content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(defName));
+        }
         payload.set(CONTENT_KEY, content);
         payload.put(DESCRIPTION_KEY, name);
         return payload;
