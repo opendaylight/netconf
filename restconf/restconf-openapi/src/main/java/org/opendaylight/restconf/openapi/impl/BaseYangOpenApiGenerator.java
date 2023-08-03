@@ -314,8 +314,7 @@ public abstract class BaseYangOpenApiGenerator {
         final Operation put = buildPut(node, parentName, moduleName, deviceName, pathParams);
         operationsBuilder.put(put);
 
-        final Operation patch = buildPatch(parentName, nodeName, moduleName, deviceName,
-                node.getDescription().orElse(""), pathParams);
+        final Operation patch = buildPatch(node, parentName, moduleName, deviceName, pathParams);
         operationsBuilder.patch(patch);
 
         final Operation delete = buildDelete(node, moduleName, deviceName, pathParams);
