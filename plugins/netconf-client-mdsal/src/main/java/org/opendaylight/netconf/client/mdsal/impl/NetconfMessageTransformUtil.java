@@ -20,7 +20,6 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -355,7 +354,7 @@ public final class NetconfMessageTransformUtil {
         }
 
         // Step two: set the top builder's metadata
-        builders.peek().builder.withAnnotation(NETCONF_OPERATION_QNAME_LEGACY, oper.toString().toLowerCase(Locale.US));
+        builders.peek().builder.withAnnotation(NETCONF_OPERATION_QNAME_LEGACY, oper.xmlValue());
 
         // Step three: build the tree
         while (true) {
