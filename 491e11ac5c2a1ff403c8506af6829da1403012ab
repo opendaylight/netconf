@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6371575_625500e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-08-03T14:32:47Z",
+      "side": 1,
+      "message": "Alternatively javax.ws.rs.core.StreamingOutput could be tied in",
+      "revId": "491e11ac5c2a1ff403c8506af6829da1403012ab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
