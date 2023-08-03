@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96f57abb_1237750c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 24
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-03T11:55:35Z",
+      "side": 1,
+      "message": "please maintain order:\n1. JIRA:\n2. Change-Id:\n3. Sign-off",
+      "revId": "7d6ddee5b384f3a63c93c1dceb231504fd61341c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48126eb6_f5caefb4",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-03T11:55:35Z",
+      "side": 1,
+      "message": "var\nMake this change in all your methods",
+      "range": {
+        "startLine": 61,
+        "startChar": 14,
+        "endLine": 61,
+        "endChar": 33
+      },
+      "revId": "7d6ddee5b384f3a63c93c1dceb231504fd61341c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f5e1510_34e07e48",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-03T11:55:35Z",
+      "side": 1,
+      "message": "final\nAlso in your other tests",
+      "range": {
+        "startLine": 65,
+        "startChar": 8,
+        "endLine": 65,
+        "endChar": 22
+      },
+      "revId": "7d6ddee5b384f3a63c93c1dceb231504fd61341c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
