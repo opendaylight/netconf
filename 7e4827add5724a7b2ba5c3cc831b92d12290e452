@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36c2dd90_b7b41b48",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-03T14:50:07Z",
+      "side": 1,
+      "message": "We want to see:\n    –\n    config\n    nonconfig\n    all",
+      "revId": "7e4827add5724a7b2ba5c3cc831b92d12290e452",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86096574_0371b4d1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-03T14:50:07Z",
+      "side": 1,
+      "message": "Organize all parameter values together. And make them private.",
+      "revId": "7e4827add5724a7b2ba5c3cc831b92d12290e452",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ae0e308_ec5affd2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-03T14:50:07Z",
+      "side": 1,
+      "message": "isConfig has been removed. We will ad all cases here in order we want.",
+      "revId": "7e4827add5724a7b2ba5c3cc831b92d12290e452",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
