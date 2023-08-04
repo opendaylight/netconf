@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7792e43c_d87deb41",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-04T13:19:51Z",
+      "side": 1,
+      "message": "This has nothing common with NETCONF-1112.",
+      "revId": "d98fd57a1247586c15872c4db0eac14f0f0997dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
