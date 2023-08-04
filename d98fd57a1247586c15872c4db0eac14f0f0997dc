@@ -16,6 +16,24 @@
       "message": "This has nothing common with NETCONF-1112.",
       "revId": "d98fd57a1247586c15872c4db0eac14f0f0997dc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d36dc93_43a5efa2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-08-04T14:04:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7792e43c_d87deb41",
+      "revId": "d98fd57a1247586c15872c4db0eac14f0f0997dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
