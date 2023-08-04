@@ -48,6 +48,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String CONFIG_MANDATORY_LIST_POST = "mandatory-test_root-container_config_mandatory-list_post";
     private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
     private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
+    private static final String CONTAINER = "container";
+    private static final String LIST = "list";
 
     private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
 
@@ -337,17 +339,18 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var doc = (OpenApiObject) generator.getApiDeclaration(NAME, REVISION_DATE, URI_INFO,
                 OAversion.V3_0);
         final var jsonNodeToaster = doc.getPaths().get("/rests/data/toaster2:toaster");
-        verifyRequestRef(jsonNodeToaster.path("post"), "#/components/schemas/toaster2_config_toaster_post",
-                "#/components/schemas/toaster2_config_toaster_post_xml");
+        verifyPostRequestRef(jsonNodeToaster.path("post"),
+            "#/components/schemas/toaster2_toaster_config_toasterSlot_post",
+            "#/components/schemas/toaster2_toaster_config_toasterSlot_post_xml", LIST);
         verifyRequestRef(jsonNodeToaster.path("put"), "#/components/schemas/toaster2_config_toaster_TOP",
                 "#/components/schemas/toaster2_config_toaster");
         verifyRequestRef(jsonNodeToaster.path("get"), "#/components/schemas/toaster2_toaster_TOP",
                 "#/components/schemas/toaster2_toaster");
 
         final var jsonNodeToasterSlot = doc.getPaths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
-        verifyRequestRef(jsonNodeToasterSlot.path("post"),
-                "#/components/schemas/toaster2_toaster_config_toasterSlot_post",
-                "#/components/schemas/toaster2_toaster_config_toasterSlot_post_xml");
+        verifyPostRequestRef(jsonNodeToasterSlot.path("post"),
+                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_post",
+                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_post_xml", CONTAINER);
         verifyRequestRef(jsonNodeToasterSlot.path("put"),
                 "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
                 "#/components/schemas/toaster2_toaster_config_toasterSlot");
@@ -366,8 +369,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo");
 
         final var jsonNodeLst = doc.getPaths().get("/rests/data/toaster2:lst");
-        verifyRequestRef(jsonNodeLst.path("post"), "#/components/schemas/toaster2_config_lst_post",
-                "#/components/schemas/toaster2_config_lst_post_xml");
+        verifyPostRequestRef(jsonNodeLst.path("post"), "#/components/schemas/toaster2_lst_config_cont1_post",
+                "#/components/schemas/toaster2_lst_config_cont1_post_xml", CONTAINER);
         verifyRequestRef(jsonNodeLst.path("put"), "#/components/schemas/toaster2_config_lst_TOP",
                 "#/components/schemas/toaster2_config_lst");
         verifyRequestRef(jsonNodeLst.path("get"), "#/components/schemas/toaster2_lst_TOP",
@@ -439,6 +442,29 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var postJsonRef = postContent.get("application/json").get("schema").get("$ref");
         assertNotNull(postJsonRef);
         assertEquals(expectedJsonRef, postJsonRef.textValue());
+        final var postXmlRef = postContent.get("application/xml").get("schema").get("$ref");
+        assertNotNull(postXmlRef);
+        assertEquals(expectedXmlRef, postXmlRef.textValue());
+    }
+
+    private static void verifyPostRequestRef(final JsonNode path, final String expectedJsonRef,
+        final String expectedXmlRef, String nodeType) {
+        final JsonNode postContent;
+        if (path.get("requestBody") != null) {
+            postContent = path.get("requestBody").get("content");
+        } else {
+            postContent = path.get("responses").get("200").get("content");
+        }
+        assertNotNull(postContent);
+        final String postJsonRef;
+        if (nodeType.equals(CONTAINER)) {
+            postJsonRef = postContent.path("application/json").path("schema").path("properties").elements().next()
+                .path("$ref").textValue();
+        } else {
+            postJsonRef = postContent.path("application/json").path("schema").path("properties").elements().next()
+                .path("items").path("$ref").textValue();
+        }
+        assertEquals(expectedJsonRef, postJsonRef);
         final var postXmlRef = postContent.get("application/xml").get("schema").get("$ref");
         assertNotNull(postXmlRef);
         assertEquals(expectedXmlRef, postXmlRef.textValue());
