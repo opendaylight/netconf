@@ -1,0 +1,86 @@
+module test {
+  namespace "urn:opendaylight:params:xml:ns:yang:netconf:monitoring:test";
+  prefix "test";
+
+  revision 2023-07-31 {
+    description "Test model.";
+  }
+
+  container cont {
+    container cont1 {
+      list list4 {
+        key "key4";
+
+        leaf key4 {
+          type string;
+        }
+
+        leaf value4 {
+          type string;
+        }
+
+        list list5 {
+          key "key5";
+
+          leaf key5 {
+            type string;
+          }
+
+          leaf value5 {
+            type string;
+          }
+        }
+
+        container cont2 {
+          list list6 {
+            key "key6";
+
+            leaf key6 {
+              type string;
+            }
+
+            leaf value6 {
+              type string;
+            }
+          }
+        }
+      }
+    }
+
+    list list1 {
+      key "key1";
+
+      leaf key1 {
+        type string;
+      }
+
+      leaf value1 {
+        type string;
+      }
+    }
+
+    list list2 {
+      key "key2";
+
+      leaf key2 {
+        type string;
+      }
+
+      leaf value2 {
+        type string;
+      }
+    }
+
+    list list3 {
+      key "key3";
+
+      leaf key3 {
+        type string;
+      }
+
+      leaf value3 {
+        type string;
+      }
+    }
+  }
+}
