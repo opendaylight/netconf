@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cf5277a_8a7b7db5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 805,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-04T14:51:58Z",
+      "side": 1,
+      "message": "Decimal64.valueOf((String) number).decimalValue()",
+      "revId": "bd80cebc847eec394d9a9ae578befa6fb4cfb955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ad014e2_d8ef0eb9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 816,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-04T14:51:58Z",
+      "side": 1,
+      "message": "Integer.valueOf((String) number)",
+      "revId": "bd80cebc847eec394d9a9ae578befa6fb4cfb955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1df0e0e_3fad8f25",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 823,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-04T14:51:58Z",
+      "side": 1,
+      "message": "Long.valueOf((String) number)",
+      "revId": "bd80cebc847eec394d9a9ae578befa6fb4cfb955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1800cd1d_76e835fa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 828,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-04T14:51:58Z",
+      "side": 1,
+      "message": "new BigInteger((String) number)",
+      "revId": "bd80cebc847eec394d9a9ae578befa6fb4cfb955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
