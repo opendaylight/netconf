@@ -188,7 +188,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             @Override
             public void onSuccess(final DOMRpcResult domRpcResult) {
                 notificationHandler.addNotificationFilter(notification -> {
-                    if (NetconfCapabilityChange.QNAME.equals(notification.getBody().getIdentifier().getNodeType())) {
+                    if (NetconfCapabilityChange.QNAME.equals(notification.getBody().name().getNodeType())) {
                         LOG.info("{}: Schemas change detected, reconnecting", id);
                         // Only disconnect is enough,
                         // the reconnecting nature of the connector will take care of reconnecting

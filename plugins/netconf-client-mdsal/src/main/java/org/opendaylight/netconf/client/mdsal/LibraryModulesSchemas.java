@@ -274,7 +274,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         checkState(modulesStateNode instanceof ContainerNode, "Expecting container containing module list, but was %s",
             modulesStateNode);
         final ContainerNode modulesState = (ContainerNode) modulesStateNode;
-        final NodeIdentifier nodeName = modulesState.getIdentifier();
+        final NodeIdentifier nodeName = modulesState.name();
         checkState(MODULES_STATE_NID.equals(nodeName), "Wrong container identifier %s", nodeName);
 
         return create((ContainerNode) modulesStateNode);
@@ -335,7 +335,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static @Nullable Entry<QName, URL> createFromEntry(final MapEntryNode moduleNode) {
-        final QName moduleNodeId = moduleNode.getIdentifier().getNodeType();
+        final QName moduleNodeId = moduleNode.name().getNodeType();
         checkArgument(moduleNodeId.equals(Module.QNAME), "Wrong QName %s", moduleNodeId);
 
         final String moduleName = getSingleChildNodeValue(moduleNode, NAME_NID).orElseThrow();

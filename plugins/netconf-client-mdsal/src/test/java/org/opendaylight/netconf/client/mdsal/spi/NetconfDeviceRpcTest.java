@@ -113,7 +113,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     public void testInvokeRpc() throws Exception {
         ContainerNode input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
         final DOMRpcResult result = rpc.invokeRpc(type, input).get();
-        assertEquals(expectedReply.value().getIdentifier(), result.value().getIdentifier());
+        assertEquals(expectedReply.value().name(), result.value().name());
         assertEquals(resolveNode(expectedReply), resolveNode(result));
     }
 

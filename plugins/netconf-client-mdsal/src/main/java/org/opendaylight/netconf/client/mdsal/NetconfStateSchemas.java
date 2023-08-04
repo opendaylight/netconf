@@ -269,7 +269,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         static Optional<RemoteYangSchema> createFromNormalizedNode(final RemoteDeviceId id,
                                                                    final MapEntryNode schemaNode) {
-            final QName schemaNodeId = schemaNode.getIdentifier().getNodeType();
+            final QName schemaNodeId = schemaNode.name().getNodeType();
             checkArgument(schemaNodeId.equals(Schema.QNAME), "Wrong QName %s", schemaNodeId);
 
             QName childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_FORMAT;

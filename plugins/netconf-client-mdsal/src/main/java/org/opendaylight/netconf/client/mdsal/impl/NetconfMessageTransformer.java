@@ -497,7 +497,7 @@ public class NetconfMessageTransformer
         NetconfDeviceNotification(final ContainerNode content, final Instant eventTime) {
             this.content = content;
             this.eventTime = eventTime;
-            schemaPath = Absolute.of(content.getIdentifier().getNodeType());
+            schemaPath = Absolute.of(content.name().getNodeType());
         }
 
         NetconfDeviceNotification(final ContainerNode content, final Absolute schemaPath, final Instant eventTime) {

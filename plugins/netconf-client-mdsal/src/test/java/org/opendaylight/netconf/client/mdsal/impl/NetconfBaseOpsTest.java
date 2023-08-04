@@ -193,14 +193,14 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     public void testGetConfigRunningData() throws Exception {
         final var dataOpt = baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.of())).get();
         assertTrue(dataOpt.isPresent());
-        assertEquals(NormalizedDataUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().getIdentifier().getNodeType());
+        assertEquals(NormalizedDataUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().name().getNodeType());
     }
 
     @Test
     public void testGetData() throws Exception {
         final var dataOpt = baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of())).get();
         assertTrue(dataOpt.isPresent());
-        assertEquals(NormalizedDataUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().getIdentifier().getNodeType());
+        assertEquals(NormalizedDataUtil.NETCONF_DATA_QNAME, dataOpt.orElseThrow().name().getNodeType());
     }
 
     @Test
