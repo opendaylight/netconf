@@ -16,6 +16,24 @@
       "message": "All these can be shorter, for example: BitsTypeDefinition bitsType",
       "revId": "2a2d92afecbc915709584bc3b58095970eaeff6d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "895ec800_8a4dd318",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 616,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-08-04T08:24:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0ccca1b_32b880f1",
+      "revId": "2a2d92afecbc915709584bc3b58095970eaeff6d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
