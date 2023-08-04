@@ -78,9 +78,10 @@ public final class OperationBuilder {
             .build();
     }
 
-    public static Operation buildGet(final DataSchemaNode node, final String moduleName,
-            final @Nullable String deviceName, final List<Parameter> pathParams, final String defName,
-            final String defNameTop) {
+    public static Operation buildGet(final DataSchemaNode node, final String parentName, final String moduleName,
+            final @Nullable String deviceName, final List<Parameter> pathParams, final String discriminator) {
+        final String nodeName = node.getQName().getLocalName();
+        final String defName = parentName + "_" + nodeName + discriminator;
         final String description = node.getDescription().orElse("");
         final String summary = buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName());
@@ -88,13 +89,10 @@ public final class OperationBuilder {
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         parameters.add(buildQueryParameters());
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
-        final ObjectNode schema = JsonNodeFactory.instance.objectNode();
-        final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
-        schema.put(REF_KEY, COMPONENTS_PREFIX + defNameTop);
-        xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + defName);
 
-        responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
-                buildResponse(Response.Status.OK.getReasonPhrase(), schema, xmlSchema));
+        final var response = createRequestBodyParameter1(defName, nodeName, node, summary,
+            String.valueOf(Response.Status.OK.getStatusCode()));
+        responses.set(String.valueOf(Response.Status.OK.getStatusCode()), response);
 
         return new Operation.Builder()
             .tags(tags)
@@ -125,7 +123,7 @@ public final class OperationBuilder {
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
-        final ObjectNode requestBody = createRequestBodyParameter1(defName, nodeName, node, summary);
+        final ObjectNode requestBody = createRequestBodyParameter1(defName, nodeName, node, summary, nodeName);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
@@ -149,7 +147,7 @@ public final class OperationBuilder {
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
-        final ObjectNode requestBody = createRequestBodyParameter1(defName, nodeName, node, summary);
+        final ObjectNode requestBody = createRequestBodyParameter1(defName, nodeName, node, summary, nodeName);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
@@ -273,7 +271,7 @@ public final class OperationBuilder {
     // TODO change name after this method will be finished.(for now it's just PUT and PATCH but there might be more
     //  in next patches)
     private static ObjectNode createRequestBodyParameter1(final String defName, final String name,
-            final DataSchemaNode node, final String summary) {
+            final DataSchemaNode node, final String summary, final String description) {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         final ObjectNode content = JsonNodeFactory.instance.objectNode();
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
@@ -299,7 +297,7 @@ public final class OperationBuilder {
             content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(defName));
         }
         payload.set(CONTENT_KEY, content);
-        payload.put(DESCRIPTION_KEY, name);
+        payload.put(DESCRIPTION_KEY, description);
         return payload;
     }
 
