@@ -900,6 +900,9 @@ public class DefinitionGenerator {
     }
 
     private static void putIfNonNull(final ObjectNode property, final String key, final Number number) {
+        // FIXME eliminate this method because range type is always of Integer and
+        //  range is designed to reject null values
+        //  and key is never null - we have passed it here :)
         if (key != null && number != null) {
             if (number instanceof Double) {
                 property.put(key, (Double) number);
