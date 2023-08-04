@@ -214,23 +214,24 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private synchronized void handleSalInitializationSuccess(final RemoteDeviceCommunicator listener,
             final NetconfDeviceSchema deviceSchema, final NetconfSessionPreferences remoteSessionCapabilities,
             final Rpcs deviceRpc) {
-        //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
-        //since salFacade.onDeviceDisconnected was already called.
-        if (connected) {
-            final var mount = deviceSchema.mountContext();
-            messageTransformer = new NetconfMessageTransformer(mount, true,
-                resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
-
-            // salFacade.onDeviceConnected has to be called before the notification handler is initialized
-            salFacade.onDeviceConnected(deviceSchema, remoteSessionCapabilities,
-                new RemoteDeviceServices(deviceRpc, deviceActionFactory == null ? null
-                    : deviceActionFactory.createDeviceAction(messageTransformer, listener)));
-            notificationHandler.onRemoteSchemaUp(messageTransformer);
-
-            LOG.info("{}: Netconf connector initialized successfully", id);
-        } else {
+        // NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
+        // since salFacade.onDeviceDisconnected was already called.
+        if (!connected) {
             LOG.warn("{}: Device communicator was closed before schema setup finished.", id);
+            return;
         }
+
+        messageTransformer = new NetconfMessageTransformer(deviceSchema.mountContext(), true,
+            resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
+
+        // Order is important here: salFacade has to see the device come up and then the notificationHandler can deliver
+        // whatever notifications have been held back
+        salFacade.onDeviceConnected(deviceSchema, remoteSessionCapabilities,
+            new RemoteDeviceServices(deviceRpc, deviceActionFactory == null ? null
+                : deviceActionFactory.createDeviceAction(messageTransformer, listener)));
+        notificationHandler.onRemoteSchemaUp(messageTransformer);
+
+        LOG.info("{}: Netconf connector initialized successfully", id);
     }
 
     private void handleSalInitializationFailure(final RemoteDeviceCommunicator listener, final Throwable cause) {
