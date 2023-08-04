@@ -76,9 +76,10 @@ public final class OperationBuilder {
             .build();
     }
 
-    public static Operation buildGet(final DataSchemaNode node, final String moduleName,
-            final @NonNull String deviceName, final List<Parameter> pathParams, final String defName,
-            final String defNameTop, final boolean isConfig) {
+    public static Operation buildGet(final DataSchemaNode node, final String parentName, final String moduleName,
+            final @NonNull String deviceName, final List<Parameter> pathParams, final boolean isConfig) {
+        final String nodeName = node.getQName().getLocalName();
+        final String defName = parentName + "_" + nodeName;
         final String description = node.getDescription().orElse("");
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.GET, deviceName, moduleName,
                 node.getQName().getLocalName());
@@ -86,14 +87,17 @@ public final class OperationBuilder {
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         parameters.add(buildQueryParameters(isConfig));
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
-        final ObjectNode schema = JsonNodeFactory.instance.objectNode();
-        final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
-        if (node.isConfiguration()) {
-            schema.put(REF_KEY, COMPONENTS_PREFIX + defNameTop);
-            xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + defName);
+
+        final boolean isList = node instanceof ListSchemaNode;
+        final ObjectNode response;
+        if (isConfig) {
+            response = createRequestBodyParameter1(defName, nodeName, isList, summary,
+                String.valueOf(Response.Status.OK.getStatusCode()));
+        } else {
+            response = JsonNodeFactory.instance.objectNode();
+            response.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
         }
-        responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
-                buildResponse(Response.Status.OK.getReasonPhrase(), schema, xmlSchema));
+        responses.set(String.valueOf(Response.Status.OK.getStatusCode()), response);
 
         return new Operation.Builder()
             .tags(tags)
@@ -126,7 +130,7 @@ public final class OperationBuilder {
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
         final boolean isList = node instanceof ListSchemaNode;
-        final ObjectNode requestBody = createRequestBodyParameter1(defName, fullName, isList, summary);
+        final ObjectNode requestBody = createRequestBodyParameter1(defName, fullName, isList, summary, nodeName);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
@@ -151,8 +155,7 @@ public final class OperationBuilder {
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
         final boolean isList = node instanceof ListSchemaNode;
-        final ObjectNode requestBody = createRequestBodyParameter1(defName, fullName, isList, summary);
-
+        final ObjectNode requestBody = createRequestBodyParameter1(defName, fullName, isList, summary, nodeName);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
@@ -276,7 +279,7 @@ public final class OperationBuilder {
     // TODO change name after this method will be finished.(for now it's just PUT and PATCH but there might be more
     //  in next patches)
     private static ObjectNode createRequestBodyParameter1(final String defName, final String name,
-            final boolean isList, final String summary) {
+            final boolean isList, final String summary, final String description) {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         final ObjectNode content = JsonNodeFactory.instance.objectNode();
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
@@ -302,7 +305,7 @@ public final class OperationBuilder {
             content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(defName));
         }
         payload.set(CONTENT_KEY, content);
-        payload.put(DESCRIPTION_KEY, name);
+        payload.put(DESCRIPTION_KEY, description);
         return payload;
     }
 
