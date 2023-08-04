@@ -1,0 +1,35 @@
+module container-test {
+  namespace "urn:opendaylight:params:xml:ns:yang:netconf:monitoring:cont-test";
+  prefix "ctest";
+  revision 2023-07-31 {
+    description "Test model.";
+  }
+
+  container cont {
+    container cont1 {
+      list list4 {
+        key "key4";
+        leaf key4 {
+          type string;
+        }
+        leaf value4 {
+          type string;
+        }
+        container cont2 {
+          leaf value7 {
+            type string;
+          }
+          list list5 {
+            key "key5";
+            leaf key5 {
+              type string;
+            }
+            leaf value5 {
+              type string;
+            }
+          }
+        }
+      }
+    }
+  }
+}

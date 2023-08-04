@@ -24,8 +24,11 @@ import javax.ws.rs.core.Response;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 
@@ -72,10 +75,10 @@ public final class OperationBuilder {
 
     }
 
-    public static ObjectNode buildPost(final String parentName, final String nodeName, final String discriminator,
-                                       final String moduleName, final Optional<String> deviceName,
-                                       final String description, final ArrayNode pathParams,
-                                       final OAversion oaversion) {
+    public static ObjectNode buildPost(final DataSchemaNode node, final String parentName, final String nodeName,
+                                       final String discriminator, final String moduleName,
+                                       final Optional<String> deviceName, final String description,
+                                       final ArrayNode pathParams, final OAversion oaversion) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
@@ -86,7 +89,17 @@ public final class OperationBuilder {
         final String defName = cleanDefName + discriminator;
         final String xmlDefName = cleanDefName + XML_SUFFIX + discriminator;
         ref.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
-        insertRequestBodyParameter(parameters, value, defName, xmlDefName, nodeName + CONFIG, oaversion);
+        final DataSchemaNode childNode = getListOrContainerChildNode(Optional.ofNullable(node));
+        if (childNode != null && childNode.isConfiguration()) {
+            final String childNodeName = childNode.getQName().getLocalName();
+            final String cleanChildDefName = parentName + "_" + nodeName + CONFIG + "_" + childNodeName + POST_SUFFIX;
+            final String childDefName = cleanChildDefName + discriminator;
+            final String childXmlDefName = cleanChildDefName + XML_SUFFIX + discriminator;
+            insertPostRequestBodyParameter(childNode, parameters, value, childDefName, childXmlDefName, childNodeName,
+                oaversion);
+        } else {
+            insertRequestBodyParameter(parameters, value, defName, xmlDefName, nodeName + CONFIG, oaversion);
+        }
         value.set(PARAMETERS_KEY, parameters);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
@@ -283,6 +296,40 @@ public final class OperationBuilder {
         }
     }
 
+    private static void insertPostRequestBodyParameter(final DataSchemaNode childNode, final ArrayNode parameters,
+            final ObjectNode operation, final String defName, final String xmlDefName, final String name,
+            final OAversion oaversion) {
+        final ObjectNode payload = JsonNodeFactory.instance.objectNode();
+        if (oaversion.equals(OAversion.V3_0)) {
+            final ObjectNode content = JsonNodeFactory.instance.objectNode();
+            final ObjectNode properties = JsonNodeFactory.instance.objectNode();
+            if (childNode instanceof ListSchemaNode) {
+                final ObjectNode list = JsonNodeFactory.instance.objectNode();
+                final ObjectNode listValue = JsonNodeFactory.instance.objectNode();
+                listValue.put(TYPE_KEY, "array");
+                listValue.set("items", buildRefSchema(defName, oaversion));
+                list.set(name, listValue);
+                properties.set(PROPERTIES_KEY, list);
+            } else {
+                final ObjectNode container = JsonNodeFactory.instance.objectNode();
+                container.set(name, buildRefSchema(defName, oaversion));
+                properties.set(PROPERTIES_KEY, container);
+            }
+            final ObjectNode jsonSchema = JsonNodeFactory.instance.objectNode();
+            jsonSchema.set(SCHEMA_KEY, properties);
+            content.set(MediaType.APPLICATION_JSON, jsonSchema);
+            content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(xmlDefName));
+            payload.set(CONTENT_KEY, content);
+            payload.put(DESCRIPTION_KEY, name);
+            operation.set(REQUEST_BODY_KEY, payload);
+        } else {
+            payload.put(IN_KEY, BODY);
+            payload.put(NAME_KEY, name);
+            payload.set(SCHEMA_KEY, buildRefSchema(defName, OAversion.V2_0));
+            parameters.add(payload);
+        }
+    }
+
     private static ObjectNode buildRefSchema(final String defName, final OAversion oaversion) {
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         schema.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
@@ -371,5 +418,11 @@ public final class OperationBuilder {
             return schema;
         }
         return parameter;
+    }
+
+    private static DataSchemaNode getListOrContainerChildNode(final Optional<DataSchemaNode> node) {
+        return node.flatMap(schemaNode -> ((DataNodeContainer) schemaNode).getChildNodes().stream()
+            .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
+            .findFirst()).orElse(null);
     }
 }

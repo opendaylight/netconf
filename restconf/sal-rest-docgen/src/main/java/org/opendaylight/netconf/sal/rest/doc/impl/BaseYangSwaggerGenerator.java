@@ -383,7 +383,7 @@ public abstract class BaseYangSwaggerGenerator {
             final ObjectNode post = JsonNodeFactory.instance.objectNode();
             final String moduleName = module.getName();
             final String name = moduleName + MODULE_NAME_SUFFIX;
-            post.set("post", buildPost("", name, "", moduleName, deviceName,
+            post.set("post", buildPost(null, "", name, "", moduleName, deviceName,
                     module.getDescription().orElse(""), pathParams, oaversion));
             paths.set(resourcePath, post);
         }
@@ -513,7 +513,7 @@ public abstract class BaseYangSwaggerGenerator {
             final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams, oaversion);
             operations.put("delete", delete);
 
-            operations.put("post", buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
+            operations.put("post", buildPost(node, parentName, nodeName, discriminator, moduleName, deviceName,
                     node.getDescription().orElse(""), pathParams, oaversion));
         }
         return operations;
