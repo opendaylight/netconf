@@ -24,6 +24,7 @@ import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Schema;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
@@ -57,12 +58,19 @@ public final class OperationBuilder {
 
     public static Operation buildPost(final String parentName, final String nodeName, final String discriminator,
             final String moduleName, final @Nullable String deviceName, final String description,
-            final List<Parameter> pathParams) {
+            final List<Parameter> pathParams, DataSchemaNode node) {
         final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
-        final String cleanDefName = parentName + CONFIG + "_" + nodeName;
+        String cleanDefName;
+        if (parentName.equals(moduleName)) {
+            Iterable<? extends DataSchemaNode> childSchemaNodes = ((DataNodeContainer) node).getChildNodes();
+            String childNodeName = childSchemaNodes.iterator().next().getQName().getLocalName();
+            cleanDefName = parentName + "_" + nodeName + CONFIG + "_" + childNodeName;
+        } else {
+            cleanDefName = parentName + CONFIG + "_" + nodeName;
+        }
         final String defName = cleanDefName + discriminator;
         final String xmlDefName = cleanDefName + discriminator;
         ref.put(REF_KEY, COMPONENTS_PREFIX + defName);
