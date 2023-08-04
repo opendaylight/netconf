@@ -151,32 +151,28 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             registerToBaseNetconfStream(initRpc, listener);
         }
 
-        // Set up the SchemaContext for the device
-        final ListenableFuture<SchemaResult> futureSchema = Futures.transformAsync(sourceResolverFuture,
+        // Set up the EffectiveModelContext for the device
+        final var futureSchema = Futures.transformAsync(sourceResolverFuture,
             deviceSources -> assembleSchemaContext(deviceSources, remoteSessionCapabilities), processingExecutor);
 
-        // Potentially acquire mount point list and interpret it
-        final ListenableFuture<NetconfDeviceSchema> futureContext = Futures.transformAsync(futureSchema,
-            result -> Futures.transform(createMountPointContext(result.modelContext(), baseSchema, listener),
-                mount -> new NetconfDeviceSchema(result.capabilities(), mount), processingExecutor),
-            processingExecutor);
+        Futures.addCallback(
+            // Potentially acquire mount point list and interpret it
+            Futures.transformAsync(futureSchema,
+                result -> Futures.transform(createMountPointContext(result.modelContext(), baseSchema, listener),
+                    mount -> new NetconfDeviceSchema(result.capabilities(), mount), processingExecutor),
+                processingExecutor),
+            new FutureCallback<>() {
+                @Override
+                public void onSuccess(final NetconfDeviceSchema result) {
+                    handleSalInitializationSuccess(listener, result, remoteSessionCapabilities,
+                        getDeviceSpecificRpc(result.mountContext(), listener, baseSchema));
+                }
 
-        Futures.addCallback(futureContext, new FutureCallback<>() {
-            @Override
-            public void onSuccess(final NetconfDeviceSchema result) {
-                handleSalInitializationSuccess(result, remoteSessionCapabilities,
-                        getDeviceSpecificRpc(result.mountContext(), listener, baseSchema), listener);
-            }
-
-            @Override
-            public void onFailure(final Throwable cause) {
-                LOG.warn("{}: Unexpected error resolving device sources", id, cause);
-                // FIXME: this causes salFacade to see onDeviceDisconnected() and then onDeviceFailed(), which is quite
-                //        weird
-                handleSalInitializationFailure(cause, listener);
-                salFacade.onDeviceFailed(cause);
-            }
-        }, MoreExecutors.directExecutor());
+                @Override
+                public void onFailure(final Throwable cause) {
+                    handleSalInitializationFailure(listener, cause);
+                }
+            }, MoreExecutors.directExecutor());
     }
 
     private void registerToBaseNetconfStream(final NetconfDeviceRpc deviceRpc,
@@ -215,9 +211,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
     }
 
-    private synchronized void handleSalInitializationSuccess(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences remoteSessionCapabilities, final Rpcs deviceRpc,
-            final RemoteDeviceCommunicator listener) {
+    private synchronized void handleSalInitializationSuccess(final RemoteDeviceCommunicator listener,
+            final NetconfDeviceSchema deviceSchema, final NetconfSessionPreferences remoteSessionCapabilities,
+            final Rpcs deviceRpc) {
         //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
         //since salFacade.onDeviceDisconnected was already called.
         if (connected) {
@@ -237,11 +233,16 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         }
     }
 
-    private void handleSalInitializationFailure(final Throwable throwable, final RemoteDeviceCommunicator listener) {
-        LOG.error("{}: Initialization in sal failed, disconnecting from device", id, throwable);
+    private void handleSalInitializationFailure(final RemoteDeviceCommunicator listener, final Throwable cause) {
+        // FIXME: pick one of these messages
+        LOG.warn("{}: Unexpected error resolving device sources", id, cause);
+        LOG.error("{}: Initialization in sal failed, disconnecting from device", id, cause);
         listener.close();
         onRemoteSessionDown();
         resetMessageTransformer();
+
+        // FIXME: this causes salFacade to see onDeviceDisconnected() and then onDeviceFailed(), which is quite weird
+        salFacade.onDeviceFailed(cause);
     }
 
     /**
