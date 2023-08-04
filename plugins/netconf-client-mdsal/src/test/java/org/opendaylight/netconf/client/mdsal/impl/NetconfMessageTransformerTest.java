@@ -321,7 +321,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         final Map<QName, Object> keys = new HashMap<>();
         for (final DataContainerChild value : values) {
-            keys.put(value.getIdentifier().getNodeType(), value.body());
+            keys.put(value.name().getNodeType(), value.body());
         }
 
         final NodeIdentifierWithPredicates identifierWithPredicates =
@@ -403,7 +403,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         final Map<QName, Object> keys = new HashMap<>();
         for (final DataContainerChild value : values) {
-            keys.put(value.getIdentifier().getNodeType(), value.body());
+            keys.put(value.name().getNodeType(), value.body());
         }
 
         final NodeIdentifierWithPredicates identifierWithPredicates =

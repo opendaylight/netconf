@@ -114,7 +114,7 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
             NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
         assertNotNull(result.value());
         final ContainerNode rpcReply = result.value();
-        assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getIdentifier().getNodeType());
+        assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.name().getNodeType());
         final DOMSourceAnyxmlNode data =
             (DOMSourceAnyxmlNode) rpcReply.getChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID);
         final Diff diff = XMLUnit.compareXML(dataElement.getOwnerDocument(), (Document) data.body().getNode());
