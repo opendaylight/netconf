@@ -762,8 +762,8 @@ public class DefinitionGenerator {
 
         type.getLengthConstraint().ifPresent(constraint -> {
             final Range<Integer> range = constraint.getAllowedRanges().span();
-            putIfNonNull(property, MIN_LENGTH_KEY, range.lowerEndpoint());
-            putIfNonNull(property, MAX_LENGTH_KEY, range.upperEndpoint());
+            property.put(MIN_LENGTH_KEY, range.lowerEndpoint());
+            property.put(MAX_LENGTH_KEY, range.upperEndpoint());
         });
 
         if (type.getPatternConstraints().iterator().hasNext()) {
@@ -897,22 +897,6 @@ public class DefinitionGenerator {
         xml.put(NAME_KEY, qName.getLocalName());
         xml.put(NAMESPACE_KEY, qName.getNamespace().toString());
         return xml;
-    }
-
-    private static void putIfNonNull(final ObjectNode property, final String key, final Number number) {
-        if (key != null && number != null) {
-            if (number instanceof Double) {
-                property.put(key, (Double) number);
-            } else if (number instanceof Float) {
-                property.put(key, (Float) number);
-            } else if (number instanceof Integer) {
-                property.put(key, (Integer) number);
-            } else if (number instanceof Short) {
-                property.put(key, (Short) number);
-            } else if (number instanceof Long) {
-                property.put(key, (Long) number);
-            }
-        }
     }
 
     private static void setExampleValue(final ObjectNode property, final String value) {
