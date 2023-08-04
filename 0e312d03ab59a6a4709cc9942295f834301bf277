@@ -16,6 +16,24 @@
       "message": "We did not want to ignore device name. Add it into list.",
       "revId": "0e312d03ab59a6a4709cc9942295f834301bf277",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "551b612a_fe7a0053",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-04T10:25:46Z",
+      "side": 1,
+      "message": "Sure, however, what we don\u0027t want to is to have the device name and module name as separate tags: `List.of(deviceName, moduleName)` - this would organize together all requests with that deviceName (which is all requests for every module in that device)\nWe instead want a unique tag per device-module (each module in each device should have its own unique tag). So, the solution is to simply concatenate the two strings.",
+      "parentUuid": "f0efea0f_b6b9257a",
+      "revId": "0e312d03ab59a6a4709cc9942295f834301bf277",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
