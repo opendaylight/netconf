@@ -886,16 +886,16 @@ public class DefinitionGenerator {
 
     private static void putIfNonNull(final ObjectNode property, final String key, final Number number) {
         if (key != null && number != null) {
-            if (number instanceof Double) {
-                property.put(key, (Double) number);
-            } else if (number instanceof Float) {
-                property.put(key, (Float) number);
-            } else if (number instanceof Integer) {
-                property.put(key, (Integer) number);
-            } else if (number instanceof Short) {
-                property.put(key, (Short) number);
-            } else if (number instanceof Long) {
-                property.put(key, (Long) number);
+            if (number instanceof Double doubleNum) {
+                property.put(key, doubleNum);
+            } else if (number instanceof Float floatNum) {
+                property.put(key, floatNum);
+            } else if (number instanceof Integer intNum) {
+                property.put(key, intNum);
+            } else if (number instanceof Short shortNum) {
+                property.put(key, shortNum);
+            } else if (number instanceof Long longNum) {
+                property.put(key, longNum);
             }
         }
     }
