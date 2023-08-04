@@ -328,10 +328,8 @@ public final class OpenApiGeneratorRFC8040Test {
         final var JsonNodeMyYangData = doc.paths().get("/rests/data/my-yang:data");
         verifyRequestRef(JsonNodeMyYangData.post(), "#/components/schemas/my-yang_config_data",
             "#/components/schemas/my-yang_config_data");
-        verifyPutRequestRef(JsonNodeMyYangData.put(), "#/components/schemas/my-yang_config_data",
-            "data", CONTAINER);
-        verifyRequestRef(JsonNodeMyYangData.get(), "#/components/schemas/my-yang_config_data_TOP",
-            "#/components/schemas/my-yang_config_data");
+        verifyPutRequestRef(JsonNodeMyYangData.put(), "#/components/schemas/my-yang_config_data", "data", CONTAINER);
+        verifyPutRequestRef(JsonNodeMyYangData.get(), "#/components/schemas/my-yang_config_data", "data", CONTAINER);
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
@@ -349,18 +347,18 @@ public final class OpenApiGeneratorRFC8040Test {
         final var jsonNodeToaster = doc.paths().get("/rests/data/toaster2:toaster");
         verifyRequestRef(jsonNodeToaster.post(), "#/components/schemas/toaster2_config_toaster",
             "#/components/schemas/toaster2_config_toaster");
-        verifyPutRequestRef(jsonNodeToaster.put(), "#/components/schemas/toaster2_config_toaster",
-            "toaster", CONTAINER);
-        verifyRequestRef(jsonNodeToaster.get(), "#/components/schemas/toaster2_config_toaster_TOP",
-            "#/components/schemas/toaster2_config_toaster");
+        verifyPutRequestRef(jsonNodeToaster.put(), "#/components/schemas/toaster2_config_toaster", "toaster",
+            CONTAINER);
+        verifyPutRequestRef(jsonNodeToaster.get(), "#/components/schemas/toaster2_config_toaster", "toaster",
+            CONTAINER);
 
         final var jsonNodeToasterSlot = doc.paths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
         verifyRequestRef(jsonNodeToasterSlot.post(), "#/components/schemas/toaster2_toaster_config_toasterSlot",
             "#/components/schemas/toaster2_toaster_config_toasterSlot");
         verifyPutRequestRef(jsonNodeToasterSlot.put(), "#/components/schemas/toaster2_toaster_config_toasterSlot",
             "toasterSlot", LIST);
-        verifyRequestRef(jsonNodeToasterSlot.get(), "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
-            "#/components/schemas/toaster2_toaster_config_toasterSlot");
+        verifyPutRequestRef(jsonNodeToasterSlot.get(), "#/components/schemas/toaster2_toaster_config_toasterSlot",
+            "toasterSlot", LIST);
 
         final var jsonNodeSlotInfo = doc.paths().get(
             "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
@@ -369,26 +367,20 @@ public final class OpenApiGeneratorRFC8040Test {
             "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
         verifyPutRequestRef(jsonNodeSlotInfo.put(), "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo",
             "slotInfo", CONTAINER);
-        verifyRequestRef(jsonNodeSlotInfo.get(),
-            "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
-            "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
+        verifyPutRequestRef(jsonNodeSlotInfo.get(), "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo",
+            "slotInfo", CONTAINER);
 
         final var jsonNodeLst = doc.paths().get("/rests/data/toaster2:lst");
         verifyRequestRef(jsonNodeLst.post(), "#/components/schemas/toaster2_config_lst",
             "#/components/schemas/toaster2_config_lst");
-        verifyPutRequestRef(jsonNodeLst.put(), "#/components/schemas/toaster2_config_lst",
-            "lst", LIST);
-        verifyRequestRef(jsonNodeLst.get(), "#/components/schemas/toaster2_config_lst_TOP",
-            "#/components/schemas/toaster2_config_lst");
+        verifyPutRequestRef(jsonNodeLst.put(), "#/components/schemas/toaster2_config_lst", "lst", LIST);
+        verifyPutRequestRef(jsonNodeLst.get(), "#/components/schemas/toaster2_config_lst", "lst", LIST);
 
         final var jsonNodeLst1 = doc.paths().get("/rests/data/toaster2:lst/lst1={key1},{key2}");
         verifyRequestRef(jsonNodeLst1.post(), "#/components/schemas/toaster2_lst_config_lst1",
             "#/components/schemas/toaster2_lst_config_lst1");
-        verifyPutRequestRef(jsonNodeLst1.put(), "#/components/schemas/toaster2_lst_config_lst1", "lst1",
-            LIST);
-        verifyRequestRef(jsonNodeLst1.get(), "#/components/schemas/toaster2_lst_config_lst1_TOP",
-            "#/components/schemas/toaster2_lst_config_lst1");
-
+        verifyPutRequestRef(jsonNodeLst1.put(), "#/components/schemas/toaster2_lst_config_lst1", "lst1", LIST);
+        verifyPutRequestRef(jsonNodeLst1.get(), "#/components/schemas/toaster2_lst_config_lst1", "lst1", LIST);
         final var jsonNodeMakeToast = doc.paths().get("/rests/operations/toaster2:make-toast");
         assertNull(jsonNodeMakeToast.get());
         verifyRequestRef(jsonNodeMakeToast.post(), "#/components/schemas/toaster2_make-toast_input_TOP",
