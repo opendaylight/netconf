@@ -276,7 +276,8 @@ public abstract class BaseYangOpenApiGenerator {
             final String moduleName = module.getName();
             final String name = moduleName + MODULE_NAME_SUFFIX;
             paths.put(resourcePath, new Path.Builder()
-                .post(buildPost("", name, "", moduleName, deviceName, module.getDescription().orElse(""), pathParams))
+                .post(buildPost("", name, "", moduleName, deviceName, module.getDescription().orElse(""), pathParams,
+                    null))
                 .build());
         }
     }
@@ -365,7 +366,7 @@ public abstract class BaseYangOpenApiGenerator {
         operationsBuilder.delete(delete);
 
         final Operation post = buildPost(parentName, nodeName, discriminator, moduleName, deviceName,
-                node.getDescription().orElse(""), pathParams);
+                node.getDescription().orElse(""), pathParams, node);
         operationsBuilder.post(post);
 
         return operationsBuilder.build();
