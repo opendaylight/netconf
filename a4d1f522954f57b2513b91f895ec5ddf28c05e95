@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3f523e6_5481c64f",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/toaster_short.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-04T10:32:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef69ca6a_7258fa08",
+      "revId": "a4d1f522954f57b2513b91f895ec5ddf28c05e95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9207a593_1260a996",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-03T14:59:21Z",
       "side": 1,
       "message": "When at place please remove these blanks.",
+      "revId": "a4d1f522954f57b2513b91f895ec5ddf28c05e95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a216841a_7c969234",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/toaster_short.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-04T10:32:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9207a593_1260a996",
       "revId": "a4d1f522954f57b2513b91f895ec5ddf28c05e95",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
