@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "42df2f68a91b380f03ab7b95652d07fe5bf14645",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "247afa30_cd199c3c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-04T08:24:01Z",
+      "side": 1,
+      "message": "Please add your new bundle into artifacts/pom.xml.",
+      "revId": "42df2f68a91b380f03ab7b95652d07fe5bf14645",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
