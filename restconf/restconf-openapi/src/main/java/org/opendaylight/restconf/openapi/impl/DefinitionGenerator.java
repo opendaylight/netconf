@@ -612,33 +612,27 @@ public class DefinitionGenerator {
         final String jsonType;
         if (leafTypeDef instanceof BinaryTypeDefinition) {
             jsonType = processBinaryType(property);
-
-        } else if (leafTypeDef instanceof BitsTypeDefinition) {
-            jsonType = processBitsType((BitsTypeDefinition) leafTypeDef, property);
-
-        } else if (leafTypeDef instanceof EnumTypeDefinition) {
-            jsonType = processEnumType((EnumTypeDefinition) leafTypeDef, property);
-
-        } else if (leafTypeDef instanceof IdentityrefTypeDefinition) {
-            jsonType = processIdentityRefType((IdentityrefTypeDefinition) leafTypeDef, property, definitions,
+        } else if (leafTypeDef instanceof BitsTypeDefinition bitsType) {
+            jsonType = processBitsType(bitsType, property);
+        } else if (leafTypeDef instanceof EnumTypeDefinition enumType) {
+            jsonType = processEnumType(enumType, property);
+        } else if (leafTypeDef instanceof IdentityrefTypeDefinition identityrefType) {
+            jsonType = processIdentityRefType(identityrefType, property, definitions,
                     definitionNames, stack.getEffectiveModelContext());
-
-        } else if (leafTypeDef instanceof StringTypeDefinition) {
-            jsonType = processStringType(leafTypeDef, property, node.getQName().getLocalName());
-
-        } else if (leafTypeDef instanceof UnionTypeDefinition) {
-            jsonType = processUnionType((UnionTypeDefinition) leafTypeDef);
-
+        } else if (leafTypeDef instanceof StringTypeDefinition stringType) {
+            jsonType = processStringType(stringType, property, node.getQName().getLocalName());
+        } else if (leafTypeDef instanceof UnionTypeDefinition unionType) {
+            jsonType = processUnionType(unionType);
         } else if (leafTypeDef instanceof EmptyTypeDefinition) {
             jsonType = OBJECT_TYPE;
-        } else if (leafTypeDef instanceof LeafrefTypeDefinition) {
-            return processTypeDef(stack.resolveLeafref((LeafrefTypeDefinition) leafTypeDef), node, property,
+        } else if (leafTypeDef instanceof LeafrefTypeDefinition leafrefType) {
+            return processTypeDef(stack.resolveLeafref(leafrefType), node, property,
                 stack, definitions, definitionNames);
         } else if (leafTypeDef instanceof BooleanTypeDefinition) {
             jsonType = BOOLEAN_TYPE;
             setExampleValue(property, true);
-        } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition) {
-            jsonType = processNumberType((RangeRestrictedTypeDefinition<?, ?>) leafTypeDef, property);
+        } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) {
+            jsonType = processNumberType(rangeRestrictedType, property);
         } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition) {
             jsonType = processInstanceIdentifierType(node, property, stack.getEffectiveModelContext());
         } else {
@@ -656,9 +650,9 @@ public class DefinitionGenerator {
                     } else if (leafTypeDef instanceof DecimalTypeDefinition
                             || leafTypeDef instanceof Uint64TypeDefinition) {
                         setDefaultValue(property, new BigDecimal(stringDefaultValue));
-                    } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition) {
+                    } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) {
                         //uint8,16,32 int8,16,32,64
-                        if (isHexadecimalOrOctal((RangeRestrictedTypeDefinition<?, ?>)leafTypeDef)) {
+                        if (isHexadecimalOrOctal(rangeRestrictedType)) {
                             setDefaultValue(property, stringDefaultValue);
                         } else {
                             setDefaultValue(property, Long.valueOf(stringDefaultValue));
