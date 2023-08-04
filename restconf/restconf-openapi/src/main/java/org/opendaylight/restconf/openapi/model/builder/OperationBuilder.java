@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -24,6 +25,8 @@ import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Schema;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -52,15 +55,24 @@ public final class OperationBuilder {
         // Hidden on purpose
     }
 
-    public static Operation buildPost(final String parentName, final String nodeName, final String discriminator,
-            final String moduleName, final @NonNull String deviceName, final String description,
-            final List<Parameter> pathParams) {
+    public static Operation buildPost(final DataSchemaNode node, final String parentName,
+        final String nodeName,
+            final String discriminator, final String moduleName, final @NonNull String deviceName,
+            final String description, final List<Parameter> pathParams) {
         final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        final String cleanDefName = parentName + "_" + nodeName;
-        final String defName = cleanDefName + discriminator;
-        final ObjectNode requestBody = createPostDataRequestBodyParameter(defName, nodeName);
+        final ObjectNode requestBody;
+        final DataSchemaNode childNode = getListOrContainerChildNode(Optional.ofNullable(node));
+        if (childNode != null && childNode.effectiveConfig().orElse(true)) {
+            final String childNodeName = childNode.getQName().getLocalName();
+            final String childDefName = parentName + "_" + nodeName + "_" + childNodeName + discriminator;
+            requestBody = createRequestBodyParameter(childDefName, childNodeName, childNode instanceof ListSchemaNode,
+                summary, childNodeName);
+        } else {
+            final String defName = parentName + "_" + nodeName + discriminator;
+            requestBody = createPostDataRequestBodyParameter(defName, nodeName);
+        }
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
                 buildResponse(Response.Status.CREATED.getReasonPhrase()));
@@ -349,5 +361,11 @@ public final class OperationBuilder {
         response.set(CONTENT_KEY, content);
         response.put(DESCRIPTION_KEY, description);
         return response;
+    }
+
+    private static DataSchemaNode getListOrContainerChildNode(final Optional<DataSchemaNode> node) {
+        return node.map(schemaNode -> ((DataNodeContainer) schemaNode).getChildNodes().stream()
+            .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
+            .findFirst().orElse(null)).orElse(null);
     }
 }

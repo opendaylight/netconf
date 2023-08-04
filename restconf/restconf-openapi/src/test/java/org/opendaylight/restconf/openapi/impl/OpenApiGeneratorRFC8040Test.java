@@ -305,14 +305,13 @@ public final class OpenApiGeneratorRFC8040Test {
         final var doc = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
 
         final var jsonNodeToaster = doc.paths().get("/rests/data/toaster2:toaster");
-        verifyPostDataRequestRef(jsonNodeToaster.post(), "#/components/schemas/toaster2_toaster",
-            "#/components/schemas/toaster2_toaster");
+        verifyRequestRef(jsonNodeToaster.post(), "#/components/schemas/toaster2_toaster_toasterSlot", LIST);
         verifyRequestRef(jsonNodeToaster.put(), "#/components/schemas/toaster2_toaster", CONTAINER);
         verifyRequestRef(jsonNodeToaster.get(), "#/components/schemas/toaster2_toaster", CONTAINER);
 
         final var jsonNodeToasterSlot = doc.paths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
-        verifyPostDataRequestRef(jsonNodeToasterSlot.post(), "#/components/schemas/toaster2_toaster_toasterSlot",
-            "#/components/schemas/toaster2_toaster_toasterSlot");
+        verifyRequestRef(jsonNodeToasterSlot.post(), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
+            CONTAINER);
         verifyRequestRef(jsonNodeToasterSlot.put(), "#/components/schemas/toaster2_toaster_toasterSlot", LIST);
         verifyRequestRef(jsonNodeToasterSlot.get(), "#/components/schemas/toaster2_toaster_toasterSlot", LIST);
 
@@ -326,8 +325,7 @@ public final class OpenApiGeneratorRFC8040Test {
             CONTAINER);
 
         final var jsonNodeLst = doc.paths().get("/rests/data/toaster2:lst={lf1}");
-        verifyPostDataRequestRef(jsonNodeLst.post(), "#/components/schemas/toaster2_lst",
-            "#/components/schemas/toaster2_lst");
+        verifyRequestRef(jsonNodeLst.post(), "#/components/schemas/toaster2_lst_cont1", CONTAINER);
         verifyRequestRef(jsonNodeLst.put(), "#/components/schemas/toaster2_lst", LIST);
         verifyRequestRef(jsonNodeLst.get(), "#/components/schemas/toaster2_lst", LIST);
 
