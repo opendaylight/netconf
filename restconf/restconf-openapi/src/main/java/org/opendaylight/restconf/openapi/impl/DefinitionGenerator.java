@@ -70,7 +70,6 @@ import org.opendaylight.yangtools.yang.model.api.type.Int32TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.Int64TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.Int8TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.LengthConstraint;
 import org.opendaylight.yangtools.yang.model.api.type.PatternConstraint;
 import org.opendaylight.yangtools.yang.model.api.type.RangeConstraint;
 import org.opendaylight.yangtools.yang.model.api.type.RangeRestrictedTypeDefinition;
@@ -751,20 +750,18 @@ public class DefinitionGenerator {
         return STRING_TYPE;
     }
 
-    private static String processStringType(final TypeDefinition<?> stringType, final ObjectNode property,
+    private static String processStringType(final StringTypeDefinition stringType, final ObjectNode property,
             final String nodeName) {
-        StringTypeDefinition type = (StringTypeDefinition) stringType;
-        Optional<LengthConstraint> lengthConstraints = ((StringTypeDefinition) stringType).getLengthConstraint();
-        while (lengthConstraints.isEmpty() && type.getBaseType() != null) {
+        var type = stringType;
+        while (type.getLengthConstraint().isEmpty() && type.getBaseType() != null) {
             type = type.getBaseType();
-            lengthConstraints = type.getLengthConstraint();
         }
 
-        if (lengthConstraints.isPresent()) {
-            final Range<Integer> range = lengthConstraints.orElseThrow().getAllowedRanges().span();
+        type.getLengthConstraint().ifPresent(constraint -> {
+            final Range<Integer> range = constraint.getAllowedRanges().span();
             putIfNonNull(property, MIN_LENGTH_KEY, range.lowerEndpoint());
             putIfNonNull(property, MAX_LENGTH_KEY, range.upperEndpoint());
-        }
+        });
 
         if (type.getPatternConstraints().iterator().hasNext()) {
             final PatternConstraint pattern = type.getPatternConstraints().iterator().next();
