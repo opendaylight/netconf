@@ -12,6 +12,7 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 /**
  * Remote device.
  */
+// FIXME: this needs
 public interface RemoteDevice<L extends RemoteDeviceCommunicator> {
     // FIXME: document this node
     void onRemoteSessionUp(NetconfSessionPreferences remoteSessionCapabilities, L listener);

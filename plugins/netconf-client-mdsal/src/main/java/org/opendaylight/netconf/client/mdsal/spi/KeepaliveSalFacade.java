@@ -25,13 +25,13 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.transform.dom.DOMSource;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceConnection;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -40,6 +40,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemalessRpcService;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -51,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * and to detect incorrect session drops (netconf session is inactive, but TCP/SSH connection is still present).
  * The keepalive RPC is a get-config with empty filter.
  */
-public final class KeepaliveSalFacade implements RemoteDeviceHandler {
+public final class KeepaliveSalFacade extends AbstractRegistration implements RemoteDeviceHandler {
     private static final Logger LOG = LoggerFactory.getLogger(KeepaliveSalFacade.class);
 
     // 2 minutes keepalive delay by default
@@ -67,8 +68,10 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     private final long timeoutNanos;
     private final long delayNanos;
 
+    @GuardedBy("this")
+    private KeepaliveConnection connection;
+
     private volatile NetconfDeviceCommunicator listener;
-    private volatile KeepaliveTask task;
 
     public KeepaliveSalFacade(final RemoteDeviceId deviceId, final RemoteDeviceHandler deviceHandler,
             final NetconfTimer timer, final long keepaliveDelaySeconds, final long requestTimeoutMillis) {
@@ -94,43 +97,17 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         this.listener = listener;
     }
 
-    /**
-     * Cancel current keepalive and free it.
-     */
-    private synchronized void stopKeepalives() {
-        final var localTask = task;
-        if (localTask != null) {
-            localTask.disableKeepalive();
-            task = null;
-        }
-    }
-
-    private void disableKeepalive() {
-        final var localTask = task;
-        if (localTask != null) {
-            localTask.disableKeepalive();
-        }
-    }
-
-    private void enableKeepalive() {
-        final var localTask = task;
-        if (localTask != null) {
-            localTask.enableKeepalive();
-        }
-    }
-
-    private void disconnect() {
+    void disconnect() {
         checkState(listener != null, "%s: Unable to reconnect, session listener is missing", deviceId);
-        stopKeepalives();
+        connection.stopKeepalives();
         LOG.info("{}: Reconnecting inactive netconf session", deviceId);
         listener.disconnect();
     }
 
     @Override
-    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
+    public synchronized RemoteDeviceConnection onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         final var devRpc = services.rpcs();
-        task = new KeepaliveTask(devRpc);
 
         final Rpcs keepaliveRpcs;
         if (devRpc instanceof Rpcs.Normalized normalized) {
@@ -141,44 +118,37 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             throw new IllegalStateException("Unhandled " + devRpc);
         }
 
-        deviceHandler.onDeviceConnected(deviceSchema, sessionPreferences, new RemoteDeviceServices(keepaliveRpcs,
-            // FIXME: wrap with keepalive
-            services.actions()));
+        connection = new KeepaliveConnection(
+            salFacade.onDeviceConnected(deviceSchema, sessionPreferences,
+                // FIXME: wrap services.actions() with keepalive
+                new RemoteDeviceServices(keepaliveRpcs, services.actions())),
+            new KeepaliveTask(devRpc));
 
-        // We have performed a callback, which might have termined keepalives
-        final var localTask = task;
-        if (localTask != null) {
-            LOG.debug("{}: Netconf session initiated, starting keepalives", deviceId);
-            LOG.trace("{}: Scheduling keepalives every {}s", deviceId, keepaliveDelaySeconds);
-            localTask.enableKeepalive();
-        }
-    }
-
-    @Override
-    public void onDeviceDisconnected() {
-        stopKeepalives();
-        deviceHandler.onDeviceDisconnected();
+        LOG.trace("{}: Scheduling keepalives every {}s", deviceId, keepaliveDelaySeconds);
+        LOG.debug("{}: Netconf session initiated, starting keepalives", deviceId);
+        connection.enableKeepalive();
     }
 
     @Override
     public void onDeviceFailed(final Throwable throwable) {
-        stopKeepalives();
-        deviceHandler.onDeviceFailed(throwable);
-    }
-
-    @Override
-    public void onNotification(final DOMNotification domNotification) {
-        final var localTask = task;
-        if (localTask != null) {
-            localTask.recordActivity();
+        // TODO: needlessly defensive?
+        synchronized (this) {
+            if (connection != null) {
+                connection.close();
+                connection = null;
+            }
         }
-        deviceHandler.onNotification(domNotification);
+
+        salFacade.onDeviceFailed(throwable);
     }
 
     @Override
-    public void close() {
-        stopKeepalives();
-        deviceHandler.close();
+    protected synchronized void removeRegistration() {
+        if (connection != null) {
+            connection.close();
+            connection = null;
+        }
+        salFacade.close();
     }
 
     private <T> @NonNull ListenableFuture<T> scheduleTimeout(final ListenableFuture<T> invokeFuture) {
@@ -198,9 +168,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
      * response received, or the rcp could not even be sent) immediate reconnect is triggered as netconf session
      * is considered inactive/failed.
      */
-    private final class KeepaliveTask implements TimerTask, FutureCallback<DOMRpcResult> {
+    final class KeepaliveTask implements TimerTask, FutureCallback<DOMRpcResult> {
         // Keepalive RPC static resources
-        static final @NonNull ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(
+        private static final @NonNull ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(
             NETCONF_GET_CONFIG_NODEID, getSourceNode(NETCONF_RUNNING_NODEID), NetconfMessageTransformUtil.EMPTY_FILTER);
 
         private final Rpcs devRpc;
@@ -210,7 +180,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         private volatile long lastActivity;
 
-        KeepaliveTask(final Rpcs devRpc) {
+        private KeepaliveTask(final Rpcs devRpc) {
             this.devRpc = requireNonNull(devRpc);
         }
 
