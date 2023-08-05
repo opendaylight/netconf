@@ -10,6 +10,7 @@ package org.opendaylight.netconf.client.mdsal.spi;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -49,15 +50,14 @@ class NetconfDeviceSalFacadeTest {
 
     @Test
     void testOnDeviceDisconnected() {
-        deviceFacade.onDeviceDisconnected();
+        deviceFacade.close();
 
-        verify(mountInstance, times(1)).onDeviceDisconnected();
+        verify(mountInstance, never()).onDeviceDisconnected();
     }
 
     @Test
     void testOnDeviceFailed() {
-        final Throwable throwable = new Throwable();
-        deviceFacade.onDeviceFailed(throwable);
+        deviceFacade.onDeviceFailed(new Throwable());
 
         verify(mountInstance, times(1)).onDeviceDisconnected();
     }
@@ -76,14 +76,13 @@ class NetconfDeviceSalFacadeTest {
         final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
 
         // Verify that onDeviceConnected is not called after close.
-        deviceFacade.onDeviceConnected(
+        try (var connection = deviceFacade.onDeviceConnected(
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), MountPointContext.of(schemaContext)),
-            netconfSessionPreferences, deviceServices);
-        verify(mountInstance, times(0)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
-            any(DOMDataBroker.class), any(NetconfDataTreeService.class));
-
+            netconfSessionPreferences, deviceServices)) {
+            verify(mountInstance, times(0)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
+                any(DOMDataBroker.class), any(NetconfDataTreeService.class));
+        }
         // Verify that onDeviceDisconnected is not called after close.
-        deviceFacade.onDeviceDisconnected();
         verify(mountInstance, times(0)).onDeviceDisconnected();
 
         // Verify that onDeviceDisconnected is not called after close.
@@ -93,22 +92,19 @@ class NetconfDeviceSalFacadeTest {
 
     @Test
     void testOnDeviceConnected() {
-        final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
+        final var modelContext = mock(EffectiveModelContext.class);
 
         final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
         final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
-        deviceFacade.onDeviceConnected(
-            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), MountPointContext.of(schemaContext)),
+        final var connection = deviceFacade.onDeviceConnected(
+            new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), MountPointContext.of(modelContext)),
             netconfSessionPreferences, deviceServices);
 
-        verify(mountInstance, times(1)).onDeviceConnected(eq(schemaContext), eq(deviceServices),
+        verify(mountInstance, times(1)).onDeviceConnected(eq(modelContext), eq(deviceServices),
             any(DOMDataBroker.class), any(NetconfDataTreeService.class));
-    }
 
-    @Test
-    void testOnDeviceNotification() {
-        final DOMNotification domNotification = mock(DOMNotification.class);
-        deviceFacade.onNotification(domNotification);
+        final var domNotification = mock(DOMNotification.class);
+        connection.onNotification(domNotification);
         verify(mountInstance).publish(domNotification);
     }
 }

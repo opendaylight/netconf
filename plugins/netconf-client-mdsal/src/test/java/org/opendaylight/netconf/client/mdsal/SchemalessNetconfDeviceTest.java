@@ -24,6 +24,7 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceConnection;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -49,7 +50,8 @@ class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
                 List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
 
         device.onRemoteSessionUp(sessionCaps, listener);
-        verify(facade).onDeviceConnected(
+
+        final var connection = verify(facade).onDeviceConnected(
                 any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
 
         final NetconfMessage netconfMessage = mock(NetconfMessage.class);
@@ -61,18 +63,20 @@ class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
         doReturn(document).when(netconfMessage).getDocument();
 
         device.onNotification(netconfMessage);
-        verify(facade).onNotification(any());
+        verify(connection).onNotification(any());
 
         device.onRemoteSessionDown();
-        verify(facade).onDeviceDisconnected();
+        verify(connection).close();
+        verify(facade).close();
     }
 
     private static RemoteDeviceHandler getFacade() throws Exception {
-        final RemoteDeviceHandler remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
-        doNothing().when(remoteDeviceHandler).onDeviceConnected(
+        final var remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
+        final var connection = mock(RemoteDeviceConnection.class);
+        doReturn(connection).when(remoteDeviceHandler).onDeviceConnected(
                 any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
-        doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
-        doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
+        doNothing().when(remoteDeviceHandler).close();
+        doNothing().when(connection).onNotification(any(DOMNotification.class));
         return remoteDeviceHandler;
     }
 

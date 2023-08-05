@@ -59,20 +59,21 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private static final YangInstanceIdentifier RFC8528_SCHEMA_MOUNTS = YangInstanceIdentifier.of(
         NodeIdentifier.create(RFC8528_SCHEMA_MOUNTS_QNAME));
 
-    protected final RemoteDeviceId id;
+    protected final @NonNull RemoteDeviceId id;
     private final BaseNetconfSchemaProvider baseSchemaProvider;
     private final DeviceNetconfSchemaProvider deviceSchemaProvider;
     private final Executor processingExecutor;
 
     private final RemoteDeviceHandler salFacade;
     private final DeviceActionFactory deviceActionFactory;
-    private final NotificationHandler notificationHandler;
     private final boolean reconnectOnSchemasChange;
 
     @GuardedBy("this")
     private ListenableFuture<?> schemaFuture;
     @GuardedBy("this")
     private boolean connected = false;
+    @GuardedBy("this")
+    private NotificationHandler notificationHandler;
 
     public NetconfDevice(final RemoteDeviceId id,final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,
@@ -92,7 +93,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         this.deviceActionFactory = deviceActionFactory;
         this.salFacade = salFacade;
         processingExecutor = requireNonNull(globalProcessingExecutor);
-        notificationHandler = new NotificationHandler(salFacade, id);
+        notificationHandler = new NotificationHandler.Disconnected(id);
     }
 
     @Override
@@ -153,16 +154,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         Futures.addCallback(rpcResultListenableFuture, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult domRpcResult) {
-                notificationHandler.addNotificationFilter(notification -> {
-                    if (NetconfCapabilityChange.QNAME.equals(notification.getBody().name().getNodeType())) {
-                        LOG.info("{}: Schemas change detected, reconnecting", id);
-                        // Only disconnect is enough,
-                        // the reconnecting nature of the connector will take care of reconnecting
-                        listener.disconnect();
-                        return false;
-                    }
-                    return true;
-                });
+                addFilter(listener);
             }
 
             @Override
@@ -171,6 +163,19 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
                         throwable);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private synchronized void addFilter(final NetconfDeviceCommunicator listener) {
+        notificationHandler = notificationHandler.withFilter(notification -> {
+            if (!NetconfCapabilityChange.QNAME.equals(notification.getBody().name().getNodeType())) {
+                return true;
+            }
+
+            LOG.info("{}: Schemas change detected, reconnecting", id);
+            // Only disconnect is enough, the reconnecting nature of the connector will take care of reconnecting
+            listener.disconnect();
+            return false;
+        });
     }
 
     private boolean shouldListenOnSchemaChange(final NetconfSessionPreferences remoteSessionCapabilities) {
@@ -187,6 +192,11 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             return;
         }
 
+        if (!(notificationHandler instanceof NotificationHandler.Disconnected disconnected)) {
+            LOG.warn("{}: Ignoring duplicate completion", id, new Throwable());
+            return;
+        }
+
         if (shouldListenOnSchemaChange(remoteSessionCapabilities)) {
             registerToBaseNetconfStream(deviceRpc, listener);
         }
@@ -195,11 +205,11 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
         // Order is important here: salFacade has to see the device come up and then the notificationHandler can deliver
         // whatever notifications have been held back
-        salFacade.onDeviceConnected(deviceSchema, remoteSessionCapabilities,
+        final var connection = salFacade.onDeviceConnected(deviceSchema, remoteSessionCapabilities,
             new RemoteDeviceServices(deviceRpc, deviceActionFactory == null ? null
                 : deviceActionFactory.createDeviceAction(messageTransformer, listener)));
-        notificationHandler.onRemoteSchemaUp(messageTransformer);
 
+        notificationHandler = disconnected.toConnected(connection, messageTransformer);
         LOG.info("{}: Netconf connector initialized successfully", id);
     }
 
@@ -215,7 +225,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         if (schemaFuture != null && !schemaFuture.isDone() && !schemaFuture.cancel(true)) {
             LOG.warn("The cleanup of Schema Futures for device {} was unsuccessful.", id);
         }
-        notificationHandler.onRemoteSchemaDown();
+        notificationHandler = new NotificationHandler.Disconnected(id);
     }
 
     private ListenableFuture<@NonNull MountPointContext> createMountPointContext(
@@ -254,12 +264,12 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     @Override
     public void onRemoteSessionDown() {
         cleanupInitialization();
-        salFacade.onDeviceDisconnected();
+        salFacade.close();
     }
 
     @Override
-    public void onNotification(final NetconfMessage notification) {
-        notificationHandler.handleNotification(notification);
+    public synchronized void onNotification(final NetconfMessage notification) {
+        notificationHandler.onNotification(notification);
     }
 
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
