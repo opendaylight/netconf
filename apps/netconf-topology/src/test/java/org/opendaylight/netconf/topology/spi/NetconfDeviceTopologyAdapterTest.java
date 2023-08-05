@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.topology.spi;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -30,6 +31,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
@@ -61,7 +63,8 @@ public class NetconfDeviceTopologyAdapterTest {
     public void before() {
         doReturn(mockTx).when(mockChain).newWriteOnlyTransaction();
         // FIXME: exact match
-        doNothing().when(mockTx).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
+        doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class),
+            any(Node.class));
         doReturn("test transaction").when(mockTx).getIdentifier();
         doReturn(CommitInfo.emptyFluentFuture()).when(mockTx).commit();
 
@@ -71,12 +74,18 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void replaceChainIfFailed() {
+        doNothing().when(mockChain).close();
+        doReturn("mockChain").when(mockChain).toString();
         adapter.onTransactionChainFailed(mockChain, mockTx, new Exception("chain failed"));
         verify(mockBroker, times(2)).createMergingTransactionChain(any());
     }
 
     @Test
     public void testFailedDevice() {
+        // FIXME: exact match
+        doNothing().when(mockTx).mergeParentStructurePut(eq(LogicalDatastoreType.OPERATIONAL),
+            any(InstanceIdentifier.class), any(NetconfNode.class));
+
         adapter.setDeviceAsFailed(null);
 
         verify(mockChain, times(2)).newWriteOnlyTransaction();
@@ -87,6 +96,8 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testDeviceUpdate() throws Exception {
+        doNothing().when(mockTx).mergeParentStructurePut(eq(LogicalDatastoreType.OPERATIONAL),
+            any(InstanceIdentifier.class), any(NetconfNode.class));
         adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), new SessionIdType(Uint32.ONE));
 
         verify(mockChain, times(2)).newWriteOnlyTransaction();
@@ -96,6 +107,9 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testRemoveDeviceConfiguration() throws Exception {
+        // FIXME: exact match
+        doNothing().when(mockTx).delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
+        doNothing().when(mockChain).close();
         listeners.getValue().onTransactionChainSuccessful(mockChain);
         adapter.close();
 
