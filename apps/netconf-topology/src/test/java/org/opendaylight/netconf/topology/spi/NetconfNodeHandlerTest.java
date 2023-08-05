@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -122,7 +124,7 @@ public class NetconfNodeHandlerTest {
     }
 
     @Before
-    public void setUp() {
+    public void before() {
         // Instantiate the handler
         handler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor, BASE_SCHEMAS,
             schemaManager, processingExecutor,
@@ -159,6 +161,24 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
+    public void failedSchemaCausesReconnect() {
+        assertSuccessfulConnect();
+        assertEquals(1, handler.attempts());
+
+        // Note: this will count as a second attempt
+        doReturn(scheduleFuture).when(eventExecutor).schedule(scheduleCaptor.capture(), eq(150L),
+            eq(TimeUnit.MILLISECONDS));
+        handler.onDeviceFailed(new AssertionError("schema failure"));
+
+        assertEquals(2, handler.attempts());
+
+        // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
+        scheduleCaptor.getValue().run();
+        verify(clientDispatcher, times(2)).createClient(any());
+        assertEquals(2, handler.attempts());
+    }
+
+    @Test
     public void downAfterUpCausesReconnect() {
         // Let's borrow common bits
         successfullOnDeviceConnectedPropagates();
@@ -185,12 +205,9 @@ public class NetconfNodeHandlerTest {
         handler.connect();
         assertEquals(1, handler.attempts());
 
-        // FIXME: NETCONF-1097 remove this stubbing
-        final var firstFailure = new AssertionError("first");
-        doNothing().when(delegate).onDeviceFailed(firstFailure);
         doReturn(scheduleFuture).when(eventExecutor).schedule(scheduleCaptor.capture(), eq(150L),
             eq(TimeUnit.MILLISECONDS));
-        firstPromise.setFailure(firstFailure);
+        firstPromise.setFailure(new AssertionError("first"));
 
         assertEquals(2, handler.attempts());
 
@@ -200,9 +217,10 @@ public class NetconfNodeHandlerTest {
         assertEquals(2, handler.attempts());
 
         // now report the second failure
-        final var secondFailure = new AssertionError("second");
-        doNothing().when(delegate).onDeviceFailed(secondFailure);
-        secondPromise.setFailure(secondFailure);
+        final var throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
+        doNothing().when(delegate).onDeviceFailed(throwableCaptor.capture());
+        secondPromise.setFailure(new AssertionError("second"));
+        assertThat(throwableCaptor.getValue(), instanceOf(ConnectGivenUpException.class));
 
         // but nothing else happens
         assertEquals(2, handler.attempts());
