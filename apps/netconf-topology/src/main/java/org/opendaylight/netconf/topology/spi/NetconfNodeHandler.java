@@ -181,7 +181,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         }
 
         // We are invoking callbacks, do not hold locks
-        onDeviceFailed(cause);
+        reconnectOrFail();
     }
 
     @Override
@@ -208,14 +208,14 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     @Override
     public void onDeviceDisconnected() {
         delegate.onDeviceDisconnected();
-        scheduleReconnect();
+        reconnectOrFail();
     }
 
     @Override
     public void onDeviceFailed(final Throwable throwable) {
+        // We have not reported onDeviceConnected(), so from the view of delete we are still connecting
         LOG.debug("Connection attempt failed", throwable);
-        delegate.onDeviceFailed(throwable);
-        scheduleReconnect();
+        reconnectOrFail();
     }
 
     @Override
@@ -223,9 +223,16 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         delegate.onNotification(domNotification);
     }
 
-    private synchronized void scheduleReconnect() {
+    private void reconnectOrFail() {
+        final var ex = scheduleReconnect();
+        if (ex != null) {
+            delegate.onDeviceFailed(ex);
+        }
+    }
+
+    private synchronized Exception scheduleReconnect() {
         if (isClosed()) {
-            return;
+            return null;
         }
 
         final long delayMillis;
@@ -233,7 +240,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         // We have exceeded the number of connection attempts
         if (maxAttempts > 0 && attempts >= maxAttempts) {
             LOG.info("Failed to connect {} after {} attempts, not attempting", deviceId, attempts);
-            return;
+            return new ConnectGivenUpException("Given up connecting " + deviceId + " after " + attempts + " attempts");
         }
 
         // First connection attempt gets initialized to minimum sleep, each subsequent is exponentially backed off
@@ -250,14 +257,12 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         lastSleep = delayMillis;
         LOG.debug("Retrying {} connection attempt {} after {} milliseconds", deviceId, attempts, delayMillis);
 
-        // If we are not sleeping at all, return an already-succeeded future
-        if (delayMillis == 0) {
-            lockedConnect();
-            return;
-        }
-
-        // Schedule a task for the right time. It will also clear the flag.
+        // Schedule a task for the right time. We always go through the executor to eliminate the special case of
+        // immediate reconnect. While we could check and got to lockedConnect(), it makes for a rare special case.
+        // That special case makes for more code paths to test and introduces additional uncertainty as to whether
+        // the attempt was executed on on this thread or not.
         currentTask = eventExecutor.schedule(this::reconnect, delayMillis, TimeUnit.MILLISECONDS);
+        return null;
     }
 
     private synchronized void reconnect() {
