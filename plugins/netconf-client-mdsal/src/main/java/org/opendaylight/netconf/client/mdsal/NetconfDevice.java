@@ -235,26 +235,18 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     private void handleSalInitializationFailure(final RemoteDeviceCommunicator listener, final Throwable cause) {
-        // FIXME: pick one of these messages
         LOG.warn("{}: Unexpected error resolving device sources", id, cause);
-        LOG.error("{}: Initialization in sal failed, disconnecting from device", id, cause);
         listener.close();
-        onRemoteSessionDown();
-        resetMessageTransformer();
-
-        // FIXME: this causes salFacade to see onDeviceDisconnected() and then onDeviceFailed(), which is quite weird
+        cleanupInitialization();
         salFacade.onDeviceFailed(cause);
     }
 
-    /**
-     * Set the transformer to null as is in initial state.
-     */
-    private void resetMessageTransformer() {
-        updateTransformer(null);
-    }
-
-    private synchronized void updateTransformer(final NetconfMessageTransformer transformer) {
-        messageTransformer = transformer;
+    private synchronized void cleanupInitialization() {
+        connected = false;
+        notificationHandler.onRemoteSchemaDown();
+        messageTransformer = null;
+        sourceRegistrations.forEach(Registration::close);
+        sourceRegistrations.clear();
     }
 
     private synchronized void setConnected(final boolean connected) {
@@ -305,13 +297,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     @Override
     public void onRemoteSessionDown() {
-        setConnected(false);
-        notificationHandler.onRemoteSchemaDown();
-
+        cleanupInitialization();
         salFacade.onDeviceDisconnected();
-        sourceRegistrations.forEach(Registration::close);
-        sourceRegistrations.clear();
-        resetMessageTransformer();
     }
 
     @Override
