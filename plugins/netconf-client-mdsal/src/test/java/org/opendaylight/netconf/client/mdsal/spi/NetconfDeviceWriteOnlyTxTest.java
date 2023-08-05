@@ -45,7 +45,6 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
@@ -77,10 +76,8 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)),
                 false);
         final MapNode emptyList = ImmutableNodes.mapNodeBuilder(NETCONF_FILTER_QNAME).build();
-        tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier
-                .create(new NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
-        tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier
-                .create(new NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
+        tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(NETCONF_FILTER_QNAME), emptyList);
+        tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(NETCONF_FILTER_QNAME), emptyList);
 
         verify(rpc, atMost(1)).invokeNetconf(any(), any());
     }

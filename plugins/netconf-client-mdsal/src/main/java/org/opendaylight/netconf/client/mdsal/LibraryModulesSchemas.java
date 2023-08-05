@@ -110,7 +110,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             .getShared(LIBRARY_CONTEXT);
 
     private static final YangInstanceIdentifier MODULES_STATE_MODULE_LIST =
-            YangInstanceIdentifier.create(MODULES_STATE_NID, MODULE_NID);
+            YangInstanceIdentifier.of(MODULES_STATE_NID, MODULE_NID);
 
     private static final @NonNull ContainerNode GET_MODULES_STATE_MODULE_LIST_RPC = Builders.containerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID)

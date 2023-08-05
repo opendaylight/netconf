@@ -310,8 +310,8 @@ public final class NetconfBaseOps {
     private DataContainerChild getSubtreeFilterFromRootFields(final List<YangInstanceIdentifier> fields) {
         return transformer.toFilterStructure(fields.stream()
             .map(fieldPath -> Map.entry(
-                YangInstanceIdentifier.create(Iterables.limit(fieldPath.getPathArguments(), 1)),
-                YangInstanceIdentifier.create(Iterables.skip(fieldPath.getPathArguments(), 1))))
+                YangInstanceIdentifier.of(Iterables.limit(fieldPath.getPathArguments(), 1)),
+                YangInstanceIdentifier.of(Iterables.skip(fieldPath.getPathArguments(), 1))))
             .collect(Collectors.groupingBy(Entry::getKey,
                 Collectors.mapping(Entry::getValue, Collectors.toUnmodifiableList())))
             .entrySet().stream()
