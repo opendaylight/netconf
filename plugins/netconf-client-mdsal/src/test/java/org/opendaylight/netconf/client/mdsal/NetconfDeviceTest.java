@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -28,7 +30,6 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,12 +37,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.client.mdsal.NetconfDevice.EmptySchemaContextException;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -59,23 +65,11 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
-import org.xml.sax.SAXException;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceTest extends AbstractTestModelTest {
-    private static final NetconfMessage NOTIFICATION;
-
-    static {
-        try {
-            NOTIFICATION = new NetconfMessage(XmlUtil
-                    .readXmlToDocument(NetconfDeviceTest.class.getResourceAsStream("/notification-payload.xml")));
-        } catch (SAXException | IOException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
-
     public static final String TEST_NAMESPACE = "test:namespace";
     public static final String TEST_MODULE = "test-module";
     public static final String TEST_REVISION = "2013-07-22";
@@ -90,6 +84,16 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     private static final NetconfDeviceSchemasResolver STATE_SCHEMAS_RESOLVER =
         (deviceRpc, remoteSessionCapabilities, id, schemaContext) -> NetconfStateSchemas.EMPTY;
 
+    private static NetconfMessage NOTIFICATION;
+
+    @Mock
+    private SchemaSourceRegistry schemaRegistry;
+
+    @BeforeClass
+    public static final void setupNotification() throws Exception {
+        NOTIFICATION = new NetconfMessage(XmlUtil.readXmlToDocument(
+            NetconfDeviceTest.class.getResourceAsStream("/notification-payload.xml")));
+    }
 
     @Test
     public void testNetconfDeviceFlawedModelFailedResolution() throws Exception {
@@ -119,8 +123,9 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
         };
 
+        doReturn(mock(SchemaSourceRegistration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
-                .SchemaResourcesDTO(getSchemaRegistry(), schemaRepository, schemaFactory, stateSchemasResolver);
+                .SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaFactory, stateSchemasResolver);
 
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
@@ -154,7 +159,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .when(schemaFactory).createEffectiveModelContext(anyCollection());
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
-                .SchemaResourcesDTO(getSchemaRegistry(), schemaRepository, schemaFactory, STATE_SCHEMAS_RESOLVER);
+                .SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
@@ -169,6 +174,10 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         device.onRemoteSessionUp(sessionCaps, listener);
 
         verify(facade, timeout(5000)).onDeviceDisconnected();
+        final var captor = ArgumentCaptor.forClass(Throwable.class);
+        verify(facade, timeout(5000)).onDeviceFailed(captor.capture());
+        assertThat(captor.getValue(), instanceOf(EmptySchemaContextException.class));
+
         verify(listener, timeout(5000)).close();
         verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollection());
     }
@@ -204,8 +213,9 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
         };
 
+        doReturn(mock(SchemaSourceRegistration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
-                .SchemaResourcesDTO(getSchemaRegistry(), schemaRepository, schemaFactory, stateSchemasResolver);
+                .SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaFactory, stateSchemasResolver);
 
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
@@ -225,16 +235,6 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollection());
     }
 
-    private static SchemaSourceRegistry getSchemaRegistry() {
-        final SchemaSourceRegistry mock = mock(SchemaSourceRegistry.class);
-        final SchemaSourceRegistration<?> mockReg = mock(SchemaSourceRegistration.class);
-        doNothing().when(mockReg).close();
-        doReturn(mockReg).when(mock).registerSchemaSource(
-                any(org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider.class),
-                any(PotentialSchemaSource.class));
-        return mock;
-    }
-
     private static SchemaRepository getSchemaRepository() {
         final SchemaRepository mock = mock(SchemaRepository.class);
         final YangTextSchemaSource mockRep = mock(YangTextSchemaSource.class);
@@ -250,9 +250,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final EffectiveModelContextFactory schemaContextProviderFactory = mock(EffectiveModelContextFactory.class);
         final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
         doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(anyCollection());
-        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO =
-                new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
-                        schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry,
+            getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
@@ -285,7 +284,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
-                getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+                schemaRegistry, getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
@@ -319,9 +318,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final EffectiveModelContextFactory schemaContextProviderFactory = mock(EffectiveModelContextFactory.class);
         final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
         doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(anyCollection());
-        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
-                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
-                schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry,
+            getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
@@ -350,8 +348,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
 
-        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
-                getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry,
+            getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
@@ -386,8 +384,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDeviceCommunicator listener = getListener();
         final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
 
-        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
-                getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry,
+            getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setSchemaResourcesDTO(schemaResourcesDTO)
                 .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
@@ -424,8 +422,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDeviceCommunicator listener = getListener();
         final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
 
-        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
-                getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry,
+            getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setSchemaResourcesDTO(schemaResourcesDTO)
                 .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
@@ -461,8 +459,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDeviceCommunicator listener = getListener();
         final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
 
-        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
-                getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry,
+            getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setSchemaResourcesDTO(schemaResourcesDTO)
                 .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
@@ -502,7 +500,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     private static EffectiveModelContextFactory getSchemaFactory() throws Exception {
-        final EffectiveModelContextFactory schemaFactory = mockClass(EffectiveModelContextFactory.class);
+        final EffectiveModelContextFactory schemaFactory = mock(EffectiveModelContextFactory.class);
         doReturn(Futures.immediateFuture(SCHEMA_CONTEXT))
                 .when(schemaFactory).createEffectiveModelContext(anyCollection());
         return schemaFactory;
@@ -519,14 +517,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     private static <T extends AutoCloseable> T mockCloseableClass(final Class<T> remoteDeviceHandlerClass)
             throws Exception {
-        final T mock = mockClass(remoteDeviceHandlerClass);
-        doNothing().when(mock).close();
-        return mock;
-    }
-
-    private static <T> T mockClass(final Class<T> remoteDeviceHandlerClass) {
         final T mock = mock(remoteDeviceHandlerClass);
-        doReturn(remoteDeviceHandlerClass.getSimpleName()).when(mock).toString();
+        doNothing().when(mock).close();
         return mock;
     }
 
