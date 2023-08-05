@@ -37,6 +37,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceConnection;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -278,23 +279,24 @@ class KeepaliveSalFacadeResponseWaitingTest {
         private volatile Rpcs.Normalized rpcs;
 
         @Override
-        public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
+        public RemoteDeviceConnection onDeviceConnected(final NetconfDeviceSchema deviceSchema,
                 final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
             rpcs = assertInstanceOf(Rpcs.Normalized.class, services.rpcs());
-        }
+            return new RemoteDeviceConnection() {
+                @Override
+                protected void removeRegistration() {
+                    rpcs = null;
+                }
 
-        @Override
-        public void onDeviceDisconnected() {
-            rpcs = null;
+                @Override
+                protected void onNotificationImpl(final DOMNotification domNotification) {
+                    // No-op
+                }
+            };
         }
 
         @Override
         public void onDeviceFailed(final Throwable throwable) {
-            // No-op
-        }
-
-        @Override
-        public void onNotification(final DOMNotification domNotification) {
             // No-op
         }
 

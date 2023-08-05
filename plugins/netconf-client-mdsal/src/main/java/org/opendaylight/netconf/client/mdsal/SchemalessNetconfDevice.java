@@ -13,6 +13,7 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceConnection;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -27,6 +28,7 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
     private final RemoteDeviceHandler salFacade;
 
     private SchemalessMessageTransformer messageTransformer;
+    private RemoteDeviceConnection connection;
 
     public SchemalessNetconfDevice(final BaseNetconfSchemaProvider baseSchemas, final RemoteDeviceId id,
             final RemoteDeviceHandler salFacade) {
@@ -45,7 +47,7 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
         final var rpcTransformer = new BaseRpcSchemalessTransformer(baseSchema, counter);
         messageTransformer = new SchemalessMessageTransformer(counter);
 
-        salFacade.onDeviceConnected(
+        connection = salFacade.onDeviceConnected(
             // FIXME: or bound from base schema rather?
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(), mountContext), remoteSessionCapabilities,
             new RemoteDeviceServices(
@@ -55,12 +57,13 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
 
     @Override
     public void onRemoteSessionDown() {
-        salFacade.onDeviceDisconnected();
+        connection.close();
+        salFacade.close();
         messageTransformer = null;
     }
 
     @Override
     public void onNotification(final NetconfMessage notification) {
-        salFacade.onNotification(messageTransformer.toNotification(notification));
+        connection.onNotification(messageTransformer.toNotification(notification));
     }
 }

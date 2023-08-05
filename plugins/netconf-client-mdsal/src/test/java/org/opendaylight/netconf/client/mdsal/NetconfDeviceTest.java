@@ -44,6 +44,7 @@ import org.opendaylight.netconf.client.mdsal.NetconfDevice.EmptySchemaContextExc
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceConnection;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -78,6 +79,8 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     private DeviceNetconfSchemaProvider schemaProvider;
     @Mock
     private RemoteDeviceHandler facade;
+    @Mock
+    private RemoteDeviceConnection connection;
     @Mock
     private NetconfDeviceCommunicator listener;
     @Mock
@@ -129,8 +132,10 @@ class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     void testNotificationBeforeSchema() {
-        final var remoteDeviceHandler = mockRemoteDeviceHandler();
-        doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
+        doReturn(connection).when(facade).onDeviceConnected(
+            any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
+
+        doNothing().when(connection).onNotification(any(DOMNotification.class));
         final var schemaFuture = SettableFuture.<DeviceNetconfSchema>create();
         doReturn(schemaFuture).when(deviceSchemaProvider).deviceNetconfSchemaFor(any(), any(), any(), any(), any());
 
@@ -139,7 +144,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .setDeviceSchemaProvider(deviceSchemaProvider)
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
-            .setSalFacade(remoteDeviceHandler)
+            .setSalFacade(facade)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
 
@@ -148,23 +153,16 @@ class NetconfDeviceTest extends AbstractTestModelTest {
 
         device.onNotification(NOTIFICATION);
         device.onNotification(NOTIFICATION);
-        verify(remoteDeviceHandler, times(0)).onNotification(any(DOMNotification.class));
+        verify(connection, times(0)).onNotification(any(DOMNotification.class));
 
         // Now enable schema
         schemaFuture.set(new DeviceNetconfSchema(NetconfDeviceCapabilities.empty(),
             NetconfToNotificationTest.getNotificationSchemaContext(NetconfDeviceTest.class, false)));
 
-        verify(remoteDeviceHandler, timeout(10000).times(2))
-            .onNotification(any(DOMNotification.class));
+        verify(connection, timeout(10000).times(2)).onNotification(any(DOMNotification.class));
 
         device.onNotification(NOTIFICATION);
-        verify(remoteDeviceHandler, times(3)).onNotification(any(DOMNotification.class));
-    }
-
-    private RemoteDeviceHandler mockRemoteDeviceHandler() {
-        doNothing().when(facade).onDeviceConnected(
-            any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
-        return facade;
+        verify(connection, times(3)).onNotification(any(DOMNotification.class));
     }
 
     @Test
@@ -187,7 +185,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
                 any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
 
         device.onRemoteSessionDown();
-        verify(facade, timeout(5000)).onDeviceDisconnected();
+        verify(facade, timeout(5000)).close();
 
         device.onRemoteSessionUp(sessionCaps, listener);
 
@@ -197,7 +195,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     void testNetconfDeviceDisconnectListenerCallCancellation() {
-        doNothing().when(facade).onDeviceDisconnected();
+        doNothing().when(facade).close();
         final var schemaFuture = SettableFuture.<DeviceNetconfSchema>create();
         doReturn(schemaFuture).when(schemaProvider).deviceNetconfSchemaFor(any(), any(), any(), any(), any());
 
@@ -215,7 +213,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             listener);
         //session closed
         device.onRemoteSessionDown();
-        verify(facade, timeout(5000)).onDeviceDisconnected();
+        verify(facade, timeout(5000)).close();
         //complete schema setup
         schemaFuture.set(new DeviceNetconfSchema(NetconfDeviceCapabilities.empty(), SCHEMA_CONTEXT));
         //facade.onDeviceDisconnected() was called, so facade.onDeviceConnected() shouldn't be called anymore
@@ -245,7 +243,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
         device.onRemoteSessionUp(sessionCaps, listener);
         // session down
         device.onRemoteSessionDown();
-        verify(facade, timeout(5000)).onDeviceDisconnected();
+        verify(facade, timeout(5000)).close();
         // session back up, start another schema resolution
         device.onRemoteSessionUp(sessionCaps, listener);
         // complete schema setup
