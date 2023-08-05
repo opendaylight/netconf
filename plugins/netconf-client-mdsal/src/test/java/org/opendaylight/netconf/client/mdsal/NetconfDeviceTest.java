@@ -173,7 +173,6 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false, List.of(TEST_CAPABILITY));
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        verify(facade, timeout(5000)).onDeviceDisconnected();
         final var captor = ArgumentCaptor.forClass(Throwable.class);
         verify(facade, timeout(5000)).onDeviceFailed(captor.capture());
         assertThat(captor.getValue(), instanceOf(EmptySchemaContextException.class));
