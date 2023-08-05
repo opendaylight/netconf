@@ -65,9 +65,9 @@ public class Netconf538Test {
 
         assertNotNull(node);
         Node nodeUser = node.getFirstChild();
-        assertEquals(data.getIdentifier().getNodeType().getLocalName(), nodeUser.getLocalName());
+        assertEquals(data.name().getNodeType().getLocalName(), nodeUser.getLocalName());
         Node nodeName = nodeUser.getFirstChild();
-        assertEquals(leafNode.getIdentifier().getNodeType().getLocalName(), nodeName.getLocalName());
+        assertEquals(leafNode.name().getNodeType().getLocalName(), nodeName.getLocalName());
         assertEquals(leafNode.body(), nodeName.getFirstChild().getNodeValue());
     }
 }

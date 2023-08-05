@@ -106,7 +106,7 @@ public final class CopyConfig extends AbstractEdit {
             parseIntoNormalizedNode(getSchemaNodeFromNamespace(element.getNamespace(), element), element,
                 ImmutableNormalizedNodeStreamWriter.from(resultHolder));
             final NormalizedNode data = resultHolder.getResult().data();
-            final YangInstanceIdentifier path = YangInstanceIdentifier.create(data.getIdentifier());
+            final YangInstanceIdentifier path = YangInstanceIdentifier.of(data.name());
             // Doing merge instead of put to support top-level list:
             rwTx.merge(LogicalDatastoreType.CONFIGURATION, path, data);
         }
