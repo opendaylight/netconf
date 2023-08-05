@@ -1,0 +1,48 @@
+/*
+ * Copyright (c) 2023 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.netconf.client.mdsal.api;
+
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.base.MoreObjects.ToStringHelper;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+
+/**
+ * An intermediate connection, routing {@link #onNotificationImpl(DOMNotification)} and other lifecycle-irrelevant
+ * methods to a downstream delegate.
+ *
+ * @apiNote
+ *     This is not a {@code ForwardingRemoteDeviceConnection} because it has lifecycle implementations and, unlike
+ *     Guava's {@code ForwardingObject}, contains direct state link to the delegate.
+ */
+public abstract class DelegatedRemoteDeviceConnection extends RemoteDeviceConnection {
+    protected final @NonNull RemoteDeviceConnection delegate;
+
+    protected DelegatedRemoteDeviceConnection(final RemoteDeviceConnection delegate) {
+        this.delegate = requireNonNull(delegate);
+    }
+
+    @Override
+    protected void onNotificationImpl(final DOMNotification domNotification) {
+        delegate.onNotification(domNotification);
+    }
+
+    @Override
+    protected final void removeRegistration() {
+        preCloseDelegate();
+        delegate.close();
+    }
+
+    protected abstract void preCloseDelegate();
+
+    @Override
+    protected ToStringHelper addToStringAttributes(final ToStringHelper toStringHelper) {
+        return super.addToStringAttributes(toStringHelper.add("delegate", delegate));
+    }
+}
