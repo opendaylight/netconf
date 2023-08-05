@@ -185,12 +185,9 @@ public class NetconfNodeHandlerTest {
         handler.connect();
         assertEquals(1, handler.attempts());
 
-        // FIXME: NETCONF-1097 remove this stubbing
-        final var firstFailure = new AssertionError("first");
-        doNothing().when(delegate).onDeviceFailed(firstFailure);
         doReturn(scheduleFuture).when(eventExecutor).schedule(scheduleCaptor.capture(), eq(150L),
             eq(TimeUnit.MILLISECONDS));
-        firstPromise.setFailure(firstFailure);
+        firstPromise.setFailure(new AssertionError("first"));
 
         assertEquals(2, handler.attempts());
 
@@ -200,9 +197,8 @@ public class NetconfNodeHandlerTest {
         assertEquals(2, handler.attempts());
 
         // now report the second failure
-        final var secondFailure = new AssertionError("second");
-        doNothing().when(delegate).onDeviceFailed(secondFailure);
-        secondPromise.setFailure(secondFailure);
+        doNothing().when(delegate).onDeviceFailed(any(ConnectGivenUpException.class));
+        secondPromise.setFailure(new AssertionError("second"));
 
         // but nothing else happens
         assertEquals(2, handler.attempts());
