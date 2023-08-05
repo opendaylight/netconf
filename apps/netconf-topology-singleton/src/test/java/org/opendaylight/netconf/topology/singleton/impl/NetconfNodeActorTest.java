@@ -553,7 +553,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final QName testQName = QName.create("test", "2019-08-16", "TestActionQname");
         final Absolute schemaPath = Absolute.of(testQName);
 
-        final YangInstanceIdentifier yangIIdPath = YangInstanceIdentifier.create(new NodeIdentifier(testQName));
+        final YangInstanceIdentifier yangIIdPath = YangInstanceIdentifier.of(testQName);
 
         final DOMDataTreeIdentifier domDataTreeIdentifier = new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL,
             yangIIdPath);
