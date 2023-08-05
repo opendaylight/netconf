@@ -9,7 +9,7 @@ package org.opendaylight.netconf.topology.spi;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class NetconfTopologyRPCProviderTest {
 
     @Before
     public void setUp() {
-        when(encryptionService.encrypt(TEST_PWD)).thenReturn(ENC_PWD);
+        doReturn(ENC_PWD).when(encryptionService).encrypt(TEST_PWD);
         rpcProvider = new NetconfTopologyRPCProvider(dataBroker, encryptionService, TOPOLOGY_ID);
     }
 
@@ -99,8 +99,7 @@ public class NetconfTopologyRPCProviderTest {
             .setHost(new Host(new IpAddress(new Ipv4Address("10.18.16.188"))))
             .setPort(new PortNumber(Uint16.valueOf(830)))
             .setTcpOnly(Boolean.FALSE)
-            // FIXME: do we really want 'toString()' here?
-            .setNodeId(NODE_ID.toString())
+            .setNodeId(NODE_ID.getValue())
             .build();
     }
 }

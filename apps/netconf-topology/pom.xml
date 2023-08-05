@@ -50,6 +50,10 @@
             <artifactId>awaitility</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>mockito-configuration</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-binding-test-utils</artifactId>
         </dependency>
