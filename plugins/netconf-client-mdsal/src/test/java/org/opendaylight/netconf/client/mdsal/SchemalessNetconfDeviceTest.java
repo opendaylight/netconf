@@ -10,7 +10,6 @@ package org.opendaylight.netconf.client.mdsal;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.Lists;
@@ -18,42 +17,56 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceConnection;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
-import org.w3c.dom.Document;
 
+@ExtendWith(MockitoExtension.class)
 class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
-
     private static final String TEST_NAMESPACE = "test:namespace";
     private static final String TEST_MODULE = "test-module";
     private static final String TEST_REVISION = "2013-07-22";
 
+    @Mock
+    private RemoteDeviceConnection connection;
+    @Mock
+    private RemoteDeviceHandler remoteDeviceHandler;
+    @Mock
+    private NetconfDeviceCommunicator listener;
+    @Mock
+    private NetconfMessage netconfMessage;
+
     @Test
     void testSessionOnMethods() throws Exception {
-        final RemoteDeviceHandler facade = getFacade();
-        final NetconfDeviceCommunicator listener = mockCloseableClass(NetconfDeviceCommunicator.class);
-        final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test-D",
-                InetSocketAddress.createUnresolved("localhost", 22));
+        doNothing().when(remoteDeviceHandler).close();
 
-        final SchemalessNetconfDevice device = new SchemalessNetconfDevice(BASE_SCHEMAS, remoteDeviceId, facade);
+        doReturn(connection).when(remoteDeviceHandler).onDeviceConnected(
+                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
+        doNothing().when(connection).onNotification(any(DOMNotification.class));
 
-        final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
+        final var remoteDeviceId = new RemoteDeviceId("test-D", InetSocketAddress.createUnresolved("localhost", 22));
+
+        final var device = new SchemalessNetconfDevice(BASE_SCHEMAS, remoteDeviceId, remoteDeviceHandler);
+
+        final var sessionCaps = getSessionCaps(true,
                 List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
 
         device.onRemoteSessionUp(sessionCaps, listener);
-        verify(facade).onDeviceConnected(
+
+        verify(remoteDeviceHandler).onDeviceConnected(
                 any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
 
-        final NetconfMessage netconfMessage = mock(NetconfMessage.class);
-        final Document document = XmlUtil.readXmlToDocument("""
+        final var document = XmlUtil.readXmlToDocument("""
             <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
               <eventTime>2021-11-11T11:26:16Z</eventTime>
               <netconf-config-change xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-notifications"/>
@@ -61,32 +74,11 @@ class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
         doReturn(document).when(netconfMessage).getDocument();
 
         device.onNotification(netconfMessage);
-        verify(facade).onNotification(any());
+        verify(connection).onNotification(any());
 
         device.onRemoteSessionDown();
-        verify(facade).onDeviceDisconnected();
-    }
-
-    private static RemoteDeviceHandler getFacade() throws Exception {
-        final RemoteDeviceHandler remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
-        doNothing().when(remoteDeviceHandler).onDeviceConnected(
-                any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
-        doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
-        doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
-        return remoteDeviceHandler;
-    }
-
-    private static <T extends AutoCloseable> T mockCloseableClass(
-            final Class<T> remoteDeviceHandlerClass) throws Exception {
-        final T mock = mockClass(remoteDeviceHandlerClass);
-        doNothing().when(mock).close();
-        return mock;
-    }
-
-    private static <T> T mockClass(final Class<T> remoteDeviceHandlerClass) {
-        final T mock = mock(remoteDeviceHandlerClass);
-        Mockito.doReturn(remoteDeviceHandlerClass.getSimpleName()).when(mock).toString();
-        return mock;
+        verify(connection).close();
+        verify(remoteDeviceHandler).close();
     }
 
     private static NetconfSessionPreferences getSessionCaps(final boolean addMonitor,

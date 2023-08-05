@@ -7,28 +7,33 @@
  */
 package org.opendaylight.netconf.client.mdsal.api;
 
-import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 
+/**
+ * A handler for a particular logical remote device.
+ */
 public interface RemoteDeviceHandler extends AutoCloseable {
     /**
-     * When device connected, init new mount point with specific schema context and DOM services.
+     * Create a logical connection to a {@link RemoteDevice}, allocating whatever resources and performing whatever
+     * actions are necessary to logically attach the remote device to node-local state.
+     *
+     * <p>This can include, for example, creating YANG operational datastore state, setting up a {@link DOMMountPoint}
+     * with services, and similar.
+     *
+     * <p>Implementations of this method must not invoke {@link #close()} or cause it to be invoked.
      *
      * @param deviceSchema {@link NetconfDeviceSchema} of connected device
      * @param sessionPreferences session of device
      * @param services {@link RemoteDeviceServices} available
+     * @return A {@link RemoteDeviceConnection}, which needs to be closed at some point
      */
-    void onDeviceConnected(NetconfDeviceSchema deviceSchema, NetconfSessionPreferences sessionPreferences,
-            RemoteDeviceServices services);
-
-    // FIXME: document this node
-    void onDeviceDisconnected();
+    @NonNull RemoteDeviceConnection onDeviceConnected(NetconfDeviceSchema deviceSchema,
+            NetconfSessionPreferences sessionPreferences, RemoteDeviceServices services);
 
     // FIXME: document this node
     void onDeviceFailed(Throwable throwable);
-
-    // FIXME: document this node
-    void onNotification(DOMNotification domNotification);
 
     @Override
     void close();

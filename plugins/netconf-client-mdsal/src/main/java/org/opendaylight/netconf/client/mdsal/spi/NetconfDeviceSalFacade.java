@@ -15,6 +15,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceConnection;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -44,17 +45,13 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
     }
 
     @Override
-    public synchronized void onNotification(final DOMNotification domNotification) {
-        mount.publish(domNotification);
-    }
-
-    @Override
-    public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
+    public synchronized RemoteDeviceConnection onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         if (closed()) {
-            LOG.warn("{}: Device mount was closed before device connected setup finished.", id);
-            return;
+            // Should never happen
+            throw new IllegalStateException("Device mount " + id + "was closed before device connected setup finished");
         }
+
         final var mountContext = deviceSchema.mountContext();
         final var modelContext = mountContext.modelContext();
 
@@ -66,15 +63,18 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
             lockDatastore);
 
         mount.onDeviceConnected(modelContext, services, netconfDataBroker, netconfDataTree);
-    }
 
-    @Override
-    public synchronized void onDeviceDisconnected() {
-        if (closed()) {
-            LOG.warn("{}: Device mount was closed before device disconnected setup finished.", id);
-            return;
-        }
-        mount.onDeviceDisconnected();
+        return new RemoteDeviceConnection() {
+            @Override
+            protected void removeRegistration() {
+                mount.onDeviceDisconnected();
+            }
+
+            @Override
+            protected void onNotificationImpl(final DOMNotification domNotification) {
+                mount.publish(domNotification);
+            }
+        };
     }
 
     @Override

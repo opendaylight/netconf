@@ -31,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceConnection;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -51,6 +52,8 @@ class KeepaliveSalFacadeTest {
     private RemoteDeviceHandler underlyingSalFacade;
     @Mock
     private NetconfDeviceCommunicator listener;
+    @Mock
+    private RemoteDeviceConnection connection;
     @Mock
     private Rpcs.Normalized deviceRpc;
     @Mock
@@ -75,7 +78,7 @@ class KeepaliveSalFacadeTest {
 
     @Test
     void testKeepaliveSuccess() {
-        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        doReturn(connection).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID)
             .build()))).when(deviceRpc).invokeNetconf(any(), any());
@@ -89,7 +92,7 @@ class KeepaliveSalFacadeTest {
 
     @Test
     void testKeepaliveRpcFailure() {
-        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        doReturn(connection).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
         doReturn(Futures.immediateFailedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeNetconf(any(), any());
         doNothing().when(listener).disconnect();
@@ -105,7 +108,7 @@ class KeepaliveSalFacadeTest {
 
     @Test
     void testKeepaliveSuccessWithRpcError() {
-        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        doReturn(connection).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(mock(RpcError.class)))).when(deviceRpc)
             .invokeNetconf(any(), any());
 
@@ -120,8 +123,10 @@ class KeepaliveSalFacadeTest {
 
     @Test
     void testNonKeepaliveRpcFailure() {
-        doAnswer(invocation -> proxyRpc = invocation.getArgument(2, RemoteDeviceServices.class).rpcs())
-                .when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class));
+        doAnswer(inv -> {
+            proxyRpc = inv.<RemoteDeviceServices>getArgument(2).rpcs();
+            return connection;
+        }).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class));
         doReturn(Futures.immediateFailedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceDomRpc).invokeRpc(any(), any());
 
@@ -138,7 +143,7 @@ class KeepaliveSalFacadeTest {
 
     @Test
     void testKeepaliveRpcResponseTimeout() {
-        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        doReturn(connection).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
         doNothing().when(listener).disconnect();
         doReturn(SettableFuture.create()).when(deviceRpc).invokeNetconf(any(), any());
 
