@@ -345,7 +345,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void testGetConfigLeafRequest() throws Exception {
         final AnyxmlNode<?> filter = toFilterStructure(
-                YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME), toId(Schema.QNAME),
+                YangInstanceIdentifier.of(toId(NetconfState.QNAME), toId(Schemas.QNAME), toId(Schema.QNAME),
                     NodeIdentifierWithPredicates.of(Schema.QNAME),
                     toId(QName.create(Schemas.QNAME, "version"))), SCHEMA);
 
@@ -375,7 +375,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void testGetConfigRequest() throws Exception {
         final AnyxmlNode<?> filter = toFilterStructure(
-                YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME)), SCHEMA);
+                YangInstanceIdentifier.of(toId(NetconfState.QNAME), toId(Schemas.QNAME)), SCHEMA);
 
         final ContainerNode source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_NODEID);
 
@@ -456,7 +456,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         final QName capability = QName.create(Capabilities.QNAME, "capability");
         final DataContainerChild filter = toFilterStructure(
-                YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Capabilities.QNAME), toId(capability),
+                YangInstanceIdentifier.of(toId(NetconfState.QNAME), toId(Capabilities.QNAME), toId(capability),
                     new NodeWithValue<>(capability, "a:b:c")), SCHEMA);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
@@ -477,10 +477,10 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testGetLeafList() throws IOException, SAXException {
-        final YangInstanceIdentifier path = YangInstanceIdentifier.create(
-                toId(NetconfState.QNAME),
-                toId(Capabilities.QNAME),
-                toId(QName.create(Capabilities.QNAME, "capability")));
+        final YangInstanceIdentifier path = YangInstanceIdentifier.of(
+                NetconfState.QNAME,
+                Capabilities.QNAME,
+                QName.create(Capabilities.QNAME, "capability"));
         final DataContainerChild filter = toFilterStructure(path, SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
@@ -500,10 +500,10 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testGetList() throws IOException, SAXException {
-        final YangInstanceIdentifier path = YangInstanceIdentifier.create(
-                toId(NetconfState.QNAME),
-                toId(Datastores.QNAME),
-                toId(QName.create(Datastores.QNAME, "datastore")));
+        final YangInstanceIdentifier path = YangInstanceIdentifier.of(
+                NetconfState.QNAME,
+                Datastores.QNAME,
+                QName.create(Datastores.QNAME, "datastore"));
         final DataContainerChild filter = toFilterStructure(path, SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
@@ -865,10 +865,10 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void getTwoNonOverlappingFieldsTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME));
-        final YangInstanceIdentifier netconfStartTimeField = YangInstanceIdentifier.create(toId(Statistics.QNAME),
-                toId(QName.create(Statistics.QNAME, "netconf-start-time")));
-        final YangInstanceIdentifier datastoresField = YangInstanceIdentifier.create(toId(Datastores.QNAME));
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
+        final YangInstanceIdentifier netconfStartTimeField = YangInstanceIdentifier.of(Statistics.QNAME,
+                QName.create(Statistics.QNAME, "netconf-start-time"));
+        final YangInstanceIdentifier datastoresField = YangInstanceIdentifier.of(Datastores.QNAME);
 
         // building filter structure and NETCONF message
         final AnyxmlNode<?> filterStructure = toFilterStructure(
@@ -894,12 +894,12 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void getOverlappingFieldsTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME));
-        final YangInstanceIdentifier capabilitiesField = YangInstanceIdentifier.create(toId(Capabilities.QNAME));
-        final YangInstanceIdentifier capabilityField = YangInstanceIdentifier.create(toId(Capabilities.QNAME),
-                toId(QName.create(Capabilities.QNAME, "capability").intern()));
-        final YangInstanceIdentifier datastoreField = YangInstanceIdentifier.create(toId(Datastores.QNAME));
-        final YangInstanceIdentifier locksFields = YangInstanceIdentifier.create(toId(Datastores.QNAME),
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
+        final YangInstanceIdentifier capabilitiesField = YangInstanceIdentifier.of(Capabilities.QNAME);
+        final YangInstanceIdentifier capabilityField = YangInstanceIdentifier.of(Capabilities.QNAME,
+                QName.create(Capabilities.QNAME, "capability"));
+        final YangInstanceIdentifier datastoreField = YangInstanceIdentifier.of(Datastores.QNAME);
+        final YangInstanceIdentifier locksFields = YangInstanceIdentifier.of(toId(Datastores.QNAME),
                 toId(Datastore.QNAME), NodeIdentifierWithPredicates.of(Datastore.QNAME), toId(Locks.QNAME));
 
         // building filter structure and NETCONF message
@@ -926,8 +926,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void getOverlappingFieldsWithEmptyFieldTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME));
-        final YangInstanceIdentifier capabilitiesField = YangInstanceIdentifier.create(toId(Capabilities.QNAME));
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
+        final YangInstanceIdentifier capabilitiesField = YangInstanceIdentifier.of(Capabilities.QNAME);
 
         // building filter structure and NETCONF message
         final AnyxmlNode<?> filterStructure = toFilterStructure(
@@ -949,12 +949,12 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void getSpecificFieldsUnderListTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME),
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(toId(NetconfState.QNAME),
                 toId(Schemas.QNAME), toId(Schema.QNAME), NodeIdentifierWithPredicates.of(Schema.QNAME));
-        final YangInstanceIdentifier versionField = YangInstanceIdentifier.create(
-                toId(QName.create(Schema.QNAME, "version").intern()));
-        final YangInstanceIdentifier identifierField = YangInstanceIdentifier.create(
-                toId(QName.create(Schema.QNAME, "namespace").intern()));
+        final YangInstanceIdentifier versionField = YangInstanceIdentifier.of(
+                QName.create(Schema.QNAME, "version"));
+        final YangInstanceIdentifier identifierField = YangInstanceIdentifier.of(
+                QName.create(Schema.QNAME, "namespace"));
 
         // building filter structure and NETCONF message
         final AnyxmlNode<?> filterStructure = toFilterStructure(
@@ -985,9 +985,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void getSpecificFieldsUnderMultipleLists() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(
-                toId(NetconfState.QNAME), toId(Datastores.QNAME));
-        final YangInstanceIdentifier partialLockYiid = YangInstanceIdentifier.create(toId(Datastore.QNAME),
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME, Datastores.QNAME);
+        final YangInstanceIdentifier partialLockYiid = YangInstanceIdentifier.of(toId(Datastore.QNAME),
                 NodeIdentifierWithPredicates.of(Datastore.QNAME), toId(Locks.QNAME),
                 toId(QName.create(Locks.QNAME, "lock-type").intern()), toId(PartialLock.QNAME),
                 NodeIdentifierWithPredicates.of(PartialLock.QNAME));
@@ -1029,10 +1028,10 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void getWholeListsUsingFieldsTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME));
-        final YangInstanceIdentifier datastoreListField = YangInstanceIdentifier.create(toId(Datastores.QNAME),
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
+        final YangInstanceIdentifier datastoreListField = YangInstanceIdentifier.of(toId(Datastores.QNAME),
                 toId(Datastore.QNAME), NodeIdentifierWithPredicates.of(Datastore.QNAME));
-        final YangInstanceIdentifier sessionListField = YangInstanceIdentifier.create(toId(Sessions.QNAME),
+        final YangInstanceIdentifier sessionListField = YangInstanceIdentifier.of(toId(Sessions.QNAME),
                 toId(Session.QNAME), NodeIdentifierWithPredicates.of(Session.QNAME));
 
         // building filter structure and NETCONF message
@@ -1061,12 +1060,11 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void getSpecificListEntriesWithSpecificFieldsTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME),
-                toId(Sessions.QNAME));
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME, Sessions.QNAME);
         final QName sessionId = QName.create(Session.QNAME, "session-id").intern();
-        final YangInstanceIdentifier session1Field = YangInstanceIdentifier.create(toId(Session.QNAME),
+        final YangInstanceIdentifier session1Field = YangInstanceIdentifier.of(toId(Session.QNAME),
                 NodeIdentifierWithPredicates.of(Session.QNAME, sessionId, 1));
-        final YangInstanceIdentifier session2TransportField = YangInstanceIdentifier.create(toId(Session.QNAME),
+        final YangInstanceIdentifier session2TransportField = YangInstanceIdentifier.of(toId(Session.QNAME),
                 NodeIdentifierWithPredicates.of(Session.QNAME, sessionId, 2),
                 toId(QName.create(Session.QNAME, "transport").intern()));
 

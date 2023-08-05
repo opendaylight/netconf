@@ -29,7 +29,7 @@ public final class DataTreeChange {
 
         final Builder<PathArgument> builder = ImmutableList.builderWithExpectedSize(path.size());
         path.descendingIterator().forEachRemaining(builder::add);
-        this.path = YangInstanceIdentifier.create(builder.build());
+        this.path = YangInstanceIdentifier.of(builder.build());
     }
 
     public NormalizedNode getChangeRoot() {

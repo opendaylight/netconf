@@ -88,11 +88,11 @@ public class FieldsSchemalessRpcStructureTransformerTest {
 
     @Test
     public void toFilterStructureWithSingleRootTest() throws SAXException, IOException, URISyntaxException {
-        final YangInstanceIdentifier rootPath = YangInstanceIdentifier.create(C1_NID);
-        final YangInstanceIdentifier leaf1Field = YangInstanceIdentifier.create(LEAF1_NID);
-        final YangInstanceIdentifier leaf3Field = YangInstanceIdentifier.create(NodeIdentifierWithPredicates.of(
+        final YangInstanceIdentifier rootPath = YangInstanceIdentifier.of(C1_NID);
+        final YangInstanceIdentifier leaf1Field = YangInstanceIdentifier.of(LEAF1_NID);
+        final YangInstanceIdentifier leaf3Field = YangInstanceIdentifier.of(NodeIdentifierWithPredicates.of(
                 LIST1_QNAME, Map.of(KEY1_QNAME, "key1", KEY2_QNAME, "key2")), C2_NID, LEAF3_NID);
-        final YangInstanceIdentifier key1Field = YangInstanceIdentifier.create(NodeIdentifierWithPredicates.of(
+        final YangInstanceIdentifier key1Field = YangInstanceIdentifier.of(NodeIdentifierWithPredicates.of(
                 LIST1_QNAME, Map.of(KEY1_QNAME, "key1", KEY2_QNAME, "key2")), KEY1_NID);
         final FieldsFilter filter = FieldsFilter.of(rootPath, List.of(leaf1Field, leaf3Field, key1Field));
 
@@ -104,11 +104,11 @@ public class FieldsSchemalessRpcStructureTransformerTest {
 
     @Test
     public void toFilterStructureWithTwoRootContainersTest() throws SAXException, IOException, URISyntaxException {
-        final YangInstanceIdentifier c1RootPath = YangInstanceIdentifier.create(C1_NID);
-        final YangInstanceIdentifier cxRootPath = YangInstanceIdentifier.create(CX_NID);
-        final YangInstanceIdentifier c2Field = YangInstanceIdentifier.create(LIST1_NID, C2_NID);
-        final YangInstanceIdentifier leaf2Field = YangInstanceIdentifier.create(LIST1_NID, C2_NID, LEAF2_NID);
-        final YangInstanceIdentifier lxField = YangInstanceIdentifier.create(LX_NID);
+        final YangInstanceIdentifier c1RootPath = YangInstanceIdentifier.of(C1_NID);
+        final YangInstanceIdentifier cxRootPath = YangInstanceIdentifier.of(CX_NID);
+        final YangInstanceIdentifier c2Field = YangInstanceIdentifier.of(LIST1_NID, C2_NID);
+        final YangInstanceIdentifier leaf2Field = YangInstanceIdentifier.of(LIST1_NID, C2_NID, LEAF2_NID);
+        final YangInstanceIdentifier lxField = YangInstanceIdentifier.of(LX_NID);
 
         final FieldsFilter filter1 = FieldsFilter.of(c1RootPath, List.of(c2Field, leaf2Field));
         final FieldsFilter filter2 = FieldsFilter.of(cxRootPath, Collections.singletonList(lxField));
