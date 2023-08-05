@@ -104,9 +104,6 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     @GuardedBy("this")
     private boolean connected = false;
 
-    // Message transformer is constructed once the schemas are available
-    private NetconfMessageTransformer messageTransformer;
-
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
             final RemoteDeviceId id, final RemoteDeviceHandler salFacade, final Executor globalProcessingExecutor,
             final boolean reconnectOnSchemasChange) {
@@ -132,11 +129,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     @Override
     public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
                                   final NetconfDeviceCommunicator listener) {
-        // SchemaContext setup has to be performed in a dedicated thread since
-        // we are in a netty thread in this method
-        // Yang models are being downloaded in this method and it would cause a
-        // deadlock if we used the netty thread
-        // http://netty.io/wiki/thread-model.html
+        // SchemaContext setup has to be performed in a dedicated thread since we are in a Netty thread in this method
+        // YANG models are being downloaded in this method and it would cause a deadlock if we used the netty thread
+        // https://netty.io/wiki/thread-model.html
         setConnected(true);
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
@@ -221,7 +216,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             return;
         }
 
-        messageTransformer = new NetconfMessageTransformer(deviceSchema.mountContext(), true,
+        final var messageTransformer = new NetconfMessageTransformer(deviceSchema.mountContext(), true,
             resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
 
         // Order is important here: salFacade has to see the device come up and then the notificationHandler can deliver
@@ -235,26 +230,17 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     private void handleSalInitializationFailure(final RemoteDeviceCommunicator listener, final Throwable cause) {
-        // FIXME: pick one of these messages
         LOG.warn("{}: Unexpected error resolving device sources", id, cause);
-        LOG.error("{}: Initialization in sal failed, disconnecting from device", id, cause);
         listener.close();
-        onRemoteSessionDown();
-        resetMessageTransformer();
-
-        // FIXME: this causes salFacade to see onDeviceDisconnected() and then onDeviceFailed(), which is quite weird
+        cleanupInitialization();
         salFacade.onDeviceFailed(cause);
     }
 
-    /**
-     * Set the transformer to null as is in initial state.
-     */
-    private void resetMessageTransformer() {
-        updateTransformer(null);
-    }
-
-    private synchronized void updateTransformer(final NetconfMessageTransformer transformer) {
-        messageTransformer = transformer;
+    private synchronized void cleanupInitialization() {
+        connected = false;
+        notificationHandler.onRemoteSchemaDown();
+        sourceRegistrations.forEach(Registration::close);
+        sourceRegistrations.clear();
     }
 
     private synchronized void setConnected(final boolean connected) {
@@ -305,13 +291,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     @Override
     public void onRemoteSessionDown() {
-        setConnected(false);
-        notificationHandler.onRemoteSchemaDown();
-
+        cleanupInitialization();
         salFacade.onDeviceDisconnected();
-        sourceRegistrations.forEach(Registration::close);
-        sourceRegistrations.clear();
-        resetMessageTransformer();
     }
 
     @Override

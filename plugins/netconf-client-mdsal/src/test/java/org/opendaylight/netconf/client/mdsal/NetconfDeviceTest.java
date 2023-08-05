@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -42,6 +44,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.client.mdsal.NetconfDevice.EmptySchemaContextException;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -142,6 +145,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     @Test
     public void testNetconfDeviceFailFirstSchemaFailSecondEmpty() throws Exception {
         final RemoteDeviceHandler facade = getFacade();
+        doNothing().when(facade).onDeviceFailed(any());
         final NetconfDeviceCommunicator listener = getListener();
 
         final EffectiveModelContextFactory schemaFactory = getSchemaFactory();
@@ -168,7 +172,10 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false, List.of(TEST_CAPABILITY));
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        verify(facade, timeout(5000)).onDeviceDisconnected();
+        final var captor = ArgumentCaptor.forClass(Throwable.class);
+        verify(facade, timeout(5000)).onDeviceFailed(captor.capture());
+        assertThat(captor.getValue(), instanceOf(EmptySchemaContextException.class));
+
         verify(listener, timeout(5000)).close();
         verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollection());
     }
