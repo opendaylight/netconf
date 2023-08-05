@@ -267,9 +267,9 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testGetWithFields() throws ExecutionException, InterruptedException {
-        final YangInstanceIdentifier path = YangInstanceIdentifier.create(CONTAINER_C_NID);
-        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.create(LEAF_A_NID);
-        final YangInstanceIdentifier leafBField = YangInstanceIdentifier.create(LEAF_B_NID);
+        final YangInstanceIdentifier path = YangInstanceIdentifier.of(CONTAINER_C_NID);
+        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(LEAF_A_NID);
+        final YangInstanceIdentifier leafBField = YangInstanceIdentifier.of(LEAF_B_NID);
 
         baseOps.getData(callback, Optional.of(path), List.of(leafAField, leafBField)).get();
         verify(listener).sendRequest(msg("/netconfMessages/get-fields-request.xml"),
@@ -278,9 +278,9 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testGetConfigWithFields() throws ExecutionException, InterruptedException {
-        final YangInstanceIdentifier path = YangInstanceIdentifier.create(CONTAINER_C_NID);
-        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.create(LEAF_A_NID);
-        final YangInstanceIdentifier leafBField = YangInstanceIdentifier.create(LEAF_B_NID);
+        final YangInstanceIdentifier path = YangInstanceIdentifier.of(CONTAINER_C_NID);
+        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(LEAF_A_NID);
+        final YangInstanceIdentifier leafBField = YangInstanceIdentifier.of(LEAF_B_NID);
 
         baseOps.getConfigRunningData(callback, Optional.of(path), List.of(leafAField, leafBField)).get();
         verify(listener).sendRequest(msg("/netconfMessages/get-config-fields-request.xml"),
@@ -301,10 +301,10 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testGetWithFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
-        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.create(CONTAINER_C_NID, LEAF_A_NID);
-        final YangInstanceIdentifier leafXField = YangInstanceIdentifier.create(
+        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(CONTAINER_C_NID, LEAF_A_NID);
+        final YangInstanceIdentifier leafXField = YangInstanceIdentifier.of(
                 CONTAINER_C_NID, CONTAINER_D_NID, LEAF_X_NID);
-        final YangInstanceIdentifier leafZField = YangInstanceIdentifier.create(CONTAINER_E_NID, LEAF_Z_NID);
+        final YangInstanceIdentifier leafZField = YangInstanceIdentifier.of(CONTAINER_E_NID, LEAF_Z_NID);
 
         baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of()),
                 List.of(leafAField, leafXField, leafZField)).get();
@@ -314,10 +314,10 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testGetConfigWithFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
-        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.create(CONTAINER_C_NID, LEAF_A_NID);
-        final YangInstanceIdentifier leafXField = YangInstanceIdentifier.create(
+        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(CONTAINER_C_NID, LEAF_A_NID);
+        final YangInstanceIdentifier leafXField = YangInstanceIdentifier.of(
                 CONTAINER_C_NID, CONTAINER_D_NID, LEAF_X_NID);
-        final YangInstanceIdentifier leafZField = YangInstanceIdentifier.create(CONTAINER_E_NID, LEAF_Z_NID);
+        final YangInstanceIdentifier leafZField = YangInstanceIdentifier.of(CONTAINER_E_NID, LEAF_Z_NID);
 
         baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.of()),
                 List.of(leafAField, leafXField, leafZField)).get();
@@ -327,8 +327,8 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testGetWithRootFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
-        final YangInstanceIdentifier contCField = YangInstanceIdentifier.create(CONTAINER_C_NID);
-        final YangInstanceIdentifier contDField = YangInstanceIdentifier.create(CONTAINER_E_NID);
+        final YangInstanceIdentifier contCField = YangInstanceIdentifier.of(CONTAINER_C_NID);
+        final YangInstanceIdentifier contDField = YangInstanceIdentifier.of(CONTAINER_E_NID);
 
         baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of()), List.of(contCField, contDField)).get();
         verify(listener).sendRequest(msg("/netconfMessages/get-with-multiple-root-subtrees.xml"),
