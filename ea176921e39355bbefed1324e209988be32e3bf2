@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "abf683a2_3aa32ea3",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/ConnectGivenUpException.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-08-07T08:03:37Z",
+      "side": 1,
+      "message": "importing it for a single use is wasteful",
+      "parentUuid": "775140c5_2c2a766e",
+      "revId": "ea176921e39355bbefed1324e209988be32e3bf2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b2f6632_f41eb24f",
@@ -65,6 +83,24 @@
       "writtenOn": "2023-08-07T07:40:10Z",
       "side": 1,
       "message": "Maybe can be done in separate patch but cause has now limited visibility from line 173 only.",
+      "revId": "ea176921e39355bbefed1324e209988be32e3bf2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f497d76e_f55ca4e5",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-08-07T08:03:37Z",
+      "side": 1,
+      "message": "ah, yes, that\u0027s what I accidentally dropped",
+      "parentUuid": "8b2f6632_f41eb24f",
       "revId": "ea176921e39355bbefed1324e209988be32e3bf2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
