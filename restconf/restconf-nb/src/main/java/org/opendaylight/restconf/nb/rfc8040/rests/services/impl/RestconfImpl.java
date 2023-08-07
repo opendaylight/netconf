@@ -18,10 +18,10 @@ import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Restconf;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 /**
@@ -53,11 +53,10 @@ public final class RestconfImpl {
         MediaType.TEXT_XML
     })
     public NormalizedNodePayload getLibraryVersion() {
-        final EffectiveModelContext context = databindProvider.currentContext().modelContext();
+        final var context = databindProvider.currentContext().modelContext();
 
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(context);
-        // FIXME: use rc:data instantiation once the stack supports it
-        stack.enterGrouping(Restconf.QNAME);
+        final var stack = SchemaInferenceStack.of(context);
+        stack.enterYangData(YangApi.NAME);
         stack.enterDataTree(Restconf.QNAME);
         stack.enterDataTree(YANG_LIBRARY_VERSION);
 
