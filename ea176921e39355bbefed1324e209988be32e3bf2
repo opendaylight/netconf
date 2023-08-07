@@ -103,6 +103,24 @@
       "parentUuid": "8b2f6632_f41eb24f",
       "revId": "ea176921e39355bbefed1324e209988be32e3bf2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f974c28e_952a474c",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-08-07T08:07:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f497d76e_f55ca4e5",
+      "revId": "ea176921e39355bbefed1324e209988be32e3bf2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
