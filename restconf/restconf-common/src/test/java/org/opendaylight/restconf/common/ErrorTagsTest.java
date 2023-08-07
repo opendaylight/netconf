@@ -7,21 +7,22 @@
  */
 package org.opendaylight.restconf.common;
 
-import static java.util.Objects.requireNonNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Arrays;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 
-@RunWith(Parameterized.class)
 public class ErrorTagsTest {
-    @Parameters(name = "{0} => {1}")
-    public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {
+    @MethodSource("testStatusOfData")
+    @ParameterizedTest(name = "{0} => {1}")
+    void testStatusOf(final String tagName, final int status) {
+        assertEquals(status, ErrorTags.statusOf(new ErrorTag(tagName)).getStatusCode());
+    }
+
+    static Stream<Object[]> testStatusOfData() {
+        return Stream.of(new Object[][] {
             { "in-use", 409 },
             { "invalid-value", 400 },
             { "too-big", 413 },
@@ -46,16 +47,4 @@ public class ErrorTagsTest {
         });
     }
 
-    private final String tagName;
-    private final int status;
-
-    public ErrorTagsTest(final String tagName, final int status) {
-        this.tagName = requireNonNull(tagName);
-        this.status = status;
-    }
-
-    @Test
-    public void testStatusOf() {
-        assertEquals(status, ErrorTags.statusOf(new ErrorTag(tagName)).getStatusCode());
-    }
 }
