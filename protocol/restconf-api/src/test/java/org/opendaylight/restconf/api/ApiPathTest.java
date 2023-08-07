@@ -7,47 +7,45 @@
  */
 package org.opendaylight.restconf.api;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 
-public class ApiPathTest {
+class ApiPathTest {
     @Test
-    public void testNull() {
+    void testNull() {
         assertThrows(NullPointerException.class, () -> ApiPath.parse(null));
     }
 
     @Test
-    public void testEmpty() {
+    void testEmpty() {
         assertEquals(List.of(), parse("/"));
     }
 
     @Test
-    public void testSingleSlash() throws ParseException {
+    void testSingleSlash() {
         final var ex = assertThrows(ParseException.class, () -> ApiPath.parseUrl("/"));
         assertEquals("Identifier may not be empty", ex.getMessage());
         assertEquals(0, ex.getErrorOffset());
     }
 
     @Test
-    public void testTrailingSlash() throws ParseException {
+    void testTrailingSlash() {
         final var ex = assertThrows(ParseException.class, () -> ApiPath.parseUrl("foo/"));
         assertEquals("Identifier may not be empty", ex.getMessage());
         assertEquals(4, ex.getErrorOffset());
     }
 
     @Test
-    public void testExample1() {
+    void testExample1() {
         final var path = parse("/example-top:top/list1=key1,key2,key3/list2=key4,key5/X");
         assertEquals(4, path.size());
         assertApiIdentifier(path.get(0), "example-top", "top");
@@ -57,7 +55,7 @@ public class ApiPathTest {
     }
 
     @Test
-    public void testExample2() {
+    void testExample2() {
         final var path = parse("/example-top:top/Y=instance-value");
         assertEquals(2, path.size());
         assertApiIdentifier(path.get(0), "example-top", "top");
@@ -65,7 +63,7 @@ public class ApiPathTest {
     }
 
     @Test
-    public void testExample3() {
+    void testExample3() {
         final var path = parse("/example-top:top/list1=%2C%27\"%3A\"%20%2F,,foo");
         assertEquals(2, path.size());
         assertApiIdentifier(path.get(0), "example-top", "top");
@@ -73,45 +71,45 @@ public class ApiPathTest {
     }
 
     @Test
-    public void testEscapedColon() {
+    void testEscapedColon() {
         final var path = parse("/foo%3Afoo");
         assertEquals(1, path.size());
         assertApiIdentifier(path.get(0), "foo", "foo");
     }
 
     @Test
-    public void nonAsciiFirstIdentifier() {
+    void nonAsciiFirstIdentifier() {
         final var ex = assertThrows(ParseException.class, () -> ApiPath.parse("a%80"));
         assertEquals("Expecting %00-%7F, not %80", ex.getMessage());
         assertEquals(1, ex.getErrorOffset());
     }
 
     @Test
-    public void nonAsciiSecondIdentifier() {
+    void nonAsciiSecondIdentifier() {
         final var ex = assertThrows(ParseException.class, () -> ApiPath.parse("foo:a%80"));
         assertEquals("Expecting %00-%7F, not %80", ex.getMessage());
         assertEquals(5, ex.getErrorOffset());
     }
 
     @Test
-    public void testIllegalEscape() {
+    void testIllegalEscape() {
         final var ex = assertThrows(ParseException.class, () -> ApiPath.parse("foo:foo=%41%FF%42%FF%43"));
         assertEquals("Invalid UTF-8 sequence 'A�B�C': Input length = 1", ex.getMessage());
         assertEquals(8, ex.getErrorOffset());
     }
 
     private static void assertApiIdentifier(final Step step, final String module, final String identifier) {
-        assertThat(step, instanceOf(ApiIdentifier.class));
+        assertInstanceOf(ApiIdentifier.class, step);
         assertEquals(module, step.module());
         assertEquals(Unqualified.of(identifier), step.identifier());
     }
 
     private static void assertListInstance(final Step step, final String module, final String identifier,
             final String... keyValues) {
-        assertThat(step, instanceOf(ListInstance.class));
+        final var listInstance = assertInstanceOf(ListInstance.class, step);
         assertEquals(module, step.module());
         assertEquals(Unqualified.of(identifier), step.identifier());
-        assertEquals(Arrays.asList(keyValues), ((ListInstance) step).keyValues());
+        assertEquals(List.of(keyValues), listInstance.keyValues());
     }
 
     private static List<Step> parse(final String str) {
