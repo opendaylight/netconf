@@ -15,6 +15,12 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.gson.JsonParseException;
+import com.google.gson.stream.JsonReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Consumes;
@@ -30,6 +36,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -37,22 +44,28 @@ import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.databind.StreamableOperationInput;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
+import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,12 +77,14 @@ import org.slf4j.LoggerFactory;
 public final class RestconfInvokeOperationsServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfInvokeOperationsServiceImpl.class);
 
+    private final DatabindProvider databindProvider;
     private final DOMRpcService rpcService;
     private final DOMMountPointService mountPointService;
     private final SubscribeToStreamUtil streamUtils;
 
-    public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService,
+    public RestconfInvokeOperationsServiceImpl(final DatabindProvider databindProvider, final DOMRpcService rpcService,
             final DOMMountPointService mountPointService, final StreamsConfiguration configuration) {
+        this.databindProvider = requireNonNull(databindProvider);
         this.rpcService = requireNonNull(rpcService);
         this.mountPointService = requireNonNull(mountPointService);
         streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
@@ -80,12 +95,18 @@ public final class RestconfInvokeOperationsServiceImpl {
      * Invoke RPC operation.
      *
      * @param identifier module name and rpc identifier string for the desired operation
-     * @param payload {@link NormalizedNodePayload} - the body of the operation
+     * @param body the body of the operation
      * @param uriInfo URI info
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link NormalizedNodePayload} output
      */
     @POST
+    // FIXME: identifier is just a *single* QName
     @Path("/operations/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     @Produces({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML,
@@ -93,36 +114,96 @@ public final class RestconfInvokeOperationsServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
+    public void invokeRpcXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+        invokeRpc(identifier, uriInfo, ar, (context, inference, writer) -> {
+            // Adjust inference to point to input
+            final var stack = inference.toSchemaInferenceStack();
+            if (stack.currentStatement() instanceof RpcEffectiveStatement rpcStmt) {
+                stack.enterSchemaTree(rpcStmt.input().argument());
+            } else {
+                throw new IllegalStateException(inference + " does not identify an 'rpc' statement");
+            }
+
+            try {
+                XmlParserStream.create(writer, context.xmlCodecs(), stack.toInference())
+                    .parse(UntrustedXML.createXMLStreamReader(body));
+            } catch (XMLStreamException e) {
+                LOG.debug("Error parsing XML input", e);
+                RestconfDocumentedException.throwIfYangError(e);
+                throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
+                        ErrorTag.MALFORMED_MESSAGE, e);
+            }
+        });
+    }
+
+    /**
+     * Invoke RPC operation.
+     *
+     * @param identifier module name and rpc identifier string for the desired operation
+     * @param body the body of the operation
+     * @param uriInfo URI info
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link NormalizedNodePayload} output
+     */
+    @POST
+    // FIXME: identifier is just a *single* QName
+    @Path("/operations/{identifier:.+}")
     @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaType.APPLICATION_JSON,
+    })
+    @Produces({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void invokeRpc(@Encoded @PathParam("identifier") final String identifier,
-            final NormalizedNodePayload payload, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        final InstanceIdentifierContext context = payload.getInstanceIdentifierContext();
-        final EffectiveModelContext schemaContext = context.getSchemaContext();
-        final DOMMountPoint mountPoint = context.getMountPoint();
-        final SchemaNode schema = context.getSchemaNode();
-        final QName rpcName = schema.getQName();
-        final ContainerNode rpcInput = (ContainerNode) payload.getData();
+    public void invokeRpcJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+        invokeRpc(identifier, uriInfo, ar, (context, inference, writer) -> {
+            try {
+                JsonParserStream.create(writer, context.jsonCodecs(), inference)
+                    .parse(new JsonReader(new InputStreamReader(body, StandardCharsets.UTF_8)));
+            } catch (JsonParseException e) {
+                LOG.debug("Error parsing JSON input", e);
+                throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
+                        ErrorTag.MALFORMED_MESSAGE, e);
+            }
+        });
+    }
+
+    private void invokeRpc(final String identifier, final UriInfo uriInfo, final AsyncResponse ar,
+            final StreamableOperationInput body) {
+        final var dataBind = databindProvider.currentContext();
+        final var schemaContext = dataBind.modelContext();
+        final var context = ParserIdentifier.toInstanceIdentifier(identifier, schemaContext, mountPointService);
+
+        final var holder = new NormalizationResultHolder();
+        try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
+            body.streamTo(dataBind, context.inference(), streamWriter);
+        } catch (IOException e) {
+            LOG.debug("Error reading input", e);
+            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
+                    ErrorTag.MALFORMED_MESSAGE, e);
+        }
+        final var rpcName = context.getSchemaNode().getQName();
+        final var input = (ContainerNode) holder.getResult().data();
 
         final ListenableFuture<? extends DOMRpcResult> future;
+        final var mountPoint = context.getMountPoint();
         if (mountPoint == null) {
             if (CreateDataChangeEventSubscription.QNAME.equals(rpcName)) {
-                future = Futures.immediateFuture(
-                    CreateStreamUtil.createDataChangeNotifiStream(rpcInput, schemaContext));
+                future = Futures.immediateFuture(CreateStreamUtil.createDataChangeNotifiStream(input, schemaContext));
             } else if (SubscribeDeviceNotification.QNAME.equals(rpcName)) {
                 final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
-                future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, rpcInput,
+                future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, input,
                     streamUtils, mountPointService));
             } else {
-                future = invokeRpc(rpcInput, rpcName, rpcService);
+                future = invokeRpc(input, rpcName, rpcService);
             }
         } else {
-            future = invokeRpc(rpcInput, rpcName, mountPoint);
+            future = invokeRpc(input, rpcName, mountPoint);
         }
 
         Futures.addCallback(future, new FutureCallback<DOMRpcResult>() {
