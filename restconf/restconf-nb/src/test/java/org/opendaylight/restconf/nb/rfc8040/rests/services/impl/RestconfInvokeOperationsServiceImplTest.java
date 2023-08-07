@@ -14,12 +14,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -42,8 +46,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -54,8 +58,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -70,7 +72,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         .withChild(ImmutableNodes.leafNode(QName.create(RPC, "content"), "operation result"))
         .build();
 
-    private static EffectiveModelContext CONTEXT;
+    private static DatabindContext CONTEXT;
 
     @Mock
     private DOMRpcService rpcService;
@@ -82,23 +84,26 @@ public class RestconfInvokeOperationsServiceImplTest {
 
     @BeforeClass
     public static void beforeClass() {
-        CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc");
+        CONTEXT = DatabindContext.ofModel(YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc"));
     }
 
     @Before
     public void setup() {
-        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(rpcService, mountPointService,
+        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(() -> CONTEXT, rpcService, mountPointService,
             new StreamsConfiguration(0, 1, 0, false));
     }
 
     @Test
     public void testInvokeRpcWithNonEmptyOutput() {
-        final ContainerNode result = mock(ContainerNode.class);
+        final var result = mock(ContainerNode.class);
         doReturn(false).when(result).isEmpty();
 
-        final AsyncResponse ar = mock(AsyncResponse.class);
-        final ArgumentCaptor<NormalizedNodePayload> response = ArgumentCaptor.forClass(NormalizedNodePayload.class);
-        invokeOperationsService.invokeRpc("invoke-rpc-module:rpcTest", prepNNC(result), mock(UriInfo.class), ar);
+        prepNNC(result);
+        final var ar = mock(AsyncResponse.class);
+        final var response = ArgumentCaptor.forClass(NormalizedNodePayload.class);
+        invokeOperationsService.invokeRpcXML("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
+            <input xmlns="invoke:rpc:module"/>
+            """.getBytes(StandardCharsets.UTF_8)), mock(UriInfo.class), ar);
         verify(ar).resume(response.capture());
 
         assertSame(result, response.getValue().getData());
@@ -106,12 +111,18 @@ public class RestconfInvokeOperationsServiceImplTest {
 
     @Test
     public void testInvokeRpcWithEmptyOutput() {
-        final ContainerNode result = mock(ContainerNode.class);
+        final var result = mock(ContainerNode.class);
         doReturn(true).when(result).isEmpty();
 
-        final AsyncResponse ar = mock(AsyncResponse.class);
-        final ArgumentCaptor<Throwable> response = ArgumentCaptor.forClass(Throwable.class);
-        invokeOperationsService.invokeRpc("invoke-rpc-module:rpcTest", prepNNC(result), mock(UriInfo.class), ar);
+        prepNNC(result);
+        final var ar = mock(AsyncResponse.class);
+        final var response = ArgumentCaptor.forClass(Throwable.class);
+        invokeOperationsService.invokeRpcJSON("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
+            {
+              "invoke-rpc-module:input" : {
+              }
+            }
+            """.getBytes(StandardCharsets.UTF_8)), mock(UriInfo.class), ar);
         verify(ar).resume(response.capture());
 
         final Throwable failure = response.getValue();
@@ -170,17 +181,10 @@ public class RestconfInvokeOperationsServiceImplTest {
         assertEquals(OUTPUT, rpcResult.value());
     }
 
-    private NormalizedNodePayload prepNNC(final ContainerNode result) {
+    private void prepNNC(final ContainerNode result) {
         final QName qname = QName.create("invoke:rpc:module", "2013-12-03", "rpc-test");
-        final RpcDefinition schemaNode = CONTEXT.getOperations().stream().filter(rpc -> rpc.getQName().equals(qname))
-            .findFirst()
-            .orElseThrow();
-
-        final ContainerNode data = mock(ContainerNode.class);
         final DOMRpcResult domRpcResult = mock(DOMRpcResult.class);
-        doReturn(immediateFluentFuture(domRpcResult)).when(rpcService).invokeRpc(qname, data);
+        doReturn(immediateFluentFuture(domRpcResult)).when(rpcService).invokeRpc(eq(qname), any(ContainerNode.class));
         doReturn(result).when(domRpcResult).value();
-        return NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofRpcInput(CONTEXT, schemaNode, null), data);
     }
 }
