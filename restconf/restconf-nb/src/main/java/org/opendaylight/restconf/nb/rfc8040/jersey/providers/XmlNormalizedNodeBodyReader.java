@@ -15,11 +15,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -34,7 +34,6 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
@@ -65,14 +64,15 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected NormalizedNodePayload readBody(final InstanceIdentifierContext path, final InputStream entityStream)
-            throws WebApplicationException {
+    protected NormalizedNodePayload readBody(final InstanceIdentifierContext path, final InputStream entityStream) {
+        return readXML(path, entityStream, isPost());
+    }
+
+    public static @NonNull NormalizedNodePayload readXML(final InstanceIdentifierContext path,
+            final InputStream inputStream, final boolean isPost) throws RestconfDocumentedException {
         try {
-            final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
-            return parse(path, doc);
-        } catch (final RestconfDocumentedException e) {
-            throw e;
-        } catch (final Exception e) {
+            return readXML(path, UntrustedXML.newDocumentBuilder().parse(inputStream), isPost);
+        } catch (XMLStreamException | IOException | SAXException | URISyntaxException e) {
             LOG.debug("Error parsing xml input", e);
             RestconfDocumentedException.throwIfYangError(e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
@@ -80,8 +80,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         }
     }
 
-    private NormalizedNodePayload parse(final InstanceIdentifierContext pathContext, final Document doc)
-            throws XMLStreamException, IOException, SAXException, URISyntaxException {
+    private static NormalizedNodePayload readXML(final InstanceIdentifierContext pathContext, final Document doc,
+            final boolean isPost) throws XMLStreamException, URISyntaxException, IOException, SAXException {
         final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
         DataSchemaNode schemaNode;
         final List<PathArgument> iiToDataList = new ArrayList<>();
@@ -97,7 +97,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
             final String docRootElm = doc.getDocumentElement().getLocalName();
             final XMLNamespace docRootNamespace = XMLNamespace.of(doc.getDocumentElement().getNamespaceURI());
-            if (isPost()) {
+            if (isPost) {
                 final var context = pathContext.getSchemaContext();
                 final var it = context.findModuleStatements(docRootNamespace).iterator();
                 checkState(it.hasNext(), "Failed to find module for %s", docRootNamespace);
@@ -138,36 +138,39 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             throw new IllegalStateException("Unknown SchemaNode " + schemaNodeContext);
         }
 
-        NormalizedNode parsed;
-        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
-        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-
-        if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
-                || schemaNode instanceof LeafSchemaNode) {
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
-            xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
-            parsed = resultHolder.getResult().data();
-
-            // When parsing an XML source with a list root node
-            // the new XML parser always returns a MapNode with one MapEntryNode inside.
-            // However, the old XML parser returned a MapEntryNode directly in this place.
-            // Therefore we now have to extract the MapEntryNode from the parsed MapNode.
-            if (parsed instanceof MapNode mapNode) {
-                // extracting the MapEntryNode
-                parsed = mapNode.body().iterator().next();
-            }
-
-            if (schemaNode instanceof ListSchemaNode && isPost()) {
-                // Supply the last item
-                iiToDataList.add(parsed.name());
-            }
-        } else {
+        if (!(schemaNode instanceof ContainerLike) && !(schemaNode instanceof ListSchemaNode)
+            && !(schemaNode instanceof LeafSchemaNode)) {
+            // FIXME: hard exception
             LOG.warn("Unknown schema node extension {} was not parsed", schemaNode.getClass());
-            parsed = null;
+            return NormalizedNodePayload.empty(pathContext.withConcatenatedArgs(iiToDataList));
         }
 
-        // FIXME: can result really be null?
-        return NormalizedNodePayload.ofNullable(pathContext.withConcatenatedArgs(iiToDataList), parsed);
+        final var parsed = readXML(pathContext, inference, doc);
+        if (schemaNode instanceof ListSchemaNode && isPost) {
+            // Supply the last item
+            iiToDataList.add(parsed.name());
+        }
+        return NormalizedNodePayload.of(pathContext.withConcatenatedArgs(iiToDataList), parsed);
+    }
+
+    private static @NonNull NormalizedNode readXML(final InstanceIdentifierContext pathContext,
+            final Inference inference, final Document doc)
+                throws XMLStreamException, URISyntaxException, IOException, SAXException {
+        final var resultHolder = new NormalizationResultHolder();
+        try (var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder)) {
+            XmlParserStream.create(writer, inference).traverse(new DOMSource(doc.getDocumentElement()));
+        }
+
+        final var parsed = resultHolder.getResult().data();
+        // When parsing an XML source with a list root node
+        // the new XML parser always returns a MapNode with one MapEntryNode inside.
+        // However, the old XML parser returned a MapEntryNode directly in this place.
+        // Therefore we now have to extract the MapEntryNode from the parsed MapNode.
+        if (parsed instanceof MapNode mapNode) {
+            // extracting the MapEntryNode
+            return mapNode.body().iterator().next();
+        }
+        return parsed;
     }
 }
 
