@@ -58,12 +58,9 @@ public final class OperationBuilder {
         final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + "_" + nodeName;
         final String defName = cleanDefName + discriminator;
-        final String xmlDefName = cleanDefName + discriminator;
-        ref.put(REF_KEY, COMPONENTS_PREFIX + defName);
-        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName, summary);
+        final ObjectNode requestBody = createPostDataRequestBodyParameter(defName, nodeName);
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
                 buildResponse(Response.Status.CREATED.getReasonPhrase()));
@@ -92,10 +89,10 @@ public final class OperationBuilder {
 
         final ObjectNode response;
         if (node instanceof ContainerSchemaNode) {
-            response = createRequestBodyParameter1(defName, nodeName, false, summary,
+            response = createRequestBodyParameter(defName, nodeName, false, summary,
                 String.valueOf(Response.Status.OK.getStatusCode()));
         } else {
-            response = createRequestBodyParameter1(defName, nodeName, true, summary,
+            response = createRequestBodyParameter(defName, nodeName, true, summary,
                 String.valueOf(Response.Status.OK.getStatusCode()));
         }
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()), response);
@@ -131,9 +128,9 @@ public final class OperationBuilder {
         final String defName = parentName + "_" + nodeName;
         final ObjectNode requestBody;
         if (node instanceof ContainerSchemaNode) {
-            requestBody = createRequestBodyParameter1(defName, fullName, false, summary, nodeName);
+            requestBody = createRequestBodyParameter(defName, fullName, false, summary, nodeName);
         } else {
-            requestBody = createRequestBodyParameter1(defName, fullName, true, summary, nodeName);
+            requestBody = createRequestBodyParameter(defName, fullName, true, summary, nodeName);
         }
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
@@ -160,9 +157,9 @@ public final class OperationBuilder {
         final String defName = parentName + "_" + nodeName;
         final ObjectNode requestBody;
         if (node instanceof ContainerSchemaNode) {
-            requestBody = createRequestBodyParameter1(defName, nodeName, false, summary, nodeName);
+            requestBody = createRequestBodyParameter(defName, nodeName, false, summary, nodeName);
         } else {
-            requestBody = createRequestBodyParameter1(defName, nodeName, true, summary, nodeName);
+            requestBody = createRequestBodyParameter(defName, nodeName, true, summary, nodeName);
         }
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
@@ -215,8 +212,7 @@ public final class OperationBuilder {
             final String discriminator = definitionNames.getDiscriminator(input);
             final String clearDefName = parentName + "_" + operationName + INPUT_SUFFIX;
             final String defName = clearDefName + discriminator;
-            final String defTopName = clearDefName + TOP + discriminator;
-            requestBody = createRequestBodyParameter(defTopName, defName, inputName, summary);
+            requestBody = createRequestBodyParameter(defName, INPUT_KEY, false, summary, inputName);
         } else {
             final ObjectNode payload = JsonNodeFactory.instance.objectNode();
             final ObjectNode jsonSchema = JsonNodeFactory.instance.objectNode();
@@ -249,7 +245,7 @@ public final class OperationBuilder {
 
         if (!output.getChildNodes().isEmpty()) {
             final ObjectNode schema = JsonNodeFactory.instance.objectNode();
-            final String defName = parentName + "_" + operationName + OUTPUT_SUFFIX + TOP
+            final String defName = parentName + "_" + operationName + OUTPUT_SUFFIX
                     + definitionNames.getDiscriminator(output);
             schema.put(REF_KEY, COMPONENTS_PREFIX + defName);
             responses.set(String.valueOf(Response.Status.OK.getStatusCode()), buildResponse(description, schema));
@@ -268,25 +264,18 @@ public final class OperationBuilder {
             .build();
     }
 
-    private static ObjectNode createRequestBodyParameter(final String defName, final String xmlDefName,
-            final String name, final String summary) {
+    private static ObjectNode createPostDataRequestBodyParameter(final String defName, final String name) {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         final ObjectNode content = JsonNodeFactory.instance.objectNode();
-        if (summary != null && summary.contains(HttpMethod.PATCH)) {
-            content.set("application/yang-data+json", buildMimeTypeValue(defName));
-            content.set("application/yang-data+xml", buildMimeTypeValue(xmlDefName));
-        } else {
-            content.set(MediaType.APPLICATION_JSON, buildMimeTypeValue(defName));
-            content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(xmlDefName));
-        }
+        final ObjectNode value = buildMimeTypeValue(defName);
+        content.set(MediaType.APPLICATION_JSON, value);
+        content.set(MediaType.APPLICATION_XML, value);
         payload.set(CONTENT_KEY, content);
         payload.put(DESCRIPTION_KEY, name);
         return payload;
     }
 
-    // TODO change name after this method will be finished.(for now it's just PUT and PATCH but there might be more
-    //  in next patches)
-    private static ObjectNode createRequestBodyParameter1(final String defName, final String name,
+    private static ObjectNode createRequestBodyParameter(final String defName, final String name,
             final boolean isList, final String summary, final String description) {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         final ObjectNode content = JsonNodeFactory.instance.objectNode();
