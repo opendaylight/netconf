@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,7 +22,10 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +62,8 @@ import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonResourceBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
@@ -289,29 +295,30 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPutData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, EMPTY_JUKEBOX);
-
         doReturn(immediateTrueFluentFuture()).when(read)
                 .exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
-        final Response response = dataService.putData(null, payload, uriInfo);
+        final var response = dataService.putData(null, uriInfo, new JsonResourceBody(stringInputStream("""
+                // FIXME: JSON input corresponding to EMPTY_JUKEBOX
+            """)));
         assertNotNull(response);
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testPutDataWithMountPoint() {
-        final InstanceIdentifierContext iidContext =
-            InstanceIdentifierContext.ofMountPointPath(mountPoint, JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, EMPTY_JUKEBOX);
-
         doReturn(immediateTrueFluentFuture()).when(read)
                 .exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
-        final Response response = dataService.putData(null, payload, uriInfo);
+        final var response = dataService.putData("yang:ext", uriInfo, new XmlResourceBody(stringInputStream("""
+                // FIXME: XML input corresponding to EMPTY_JUKEBOX
+            """)));
         assertNotNull(response);
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
+    private static InputStream stringInputStream(final String str) {
+        return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -466,36 +473,26 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testValidInputData() {
-        RestconfDataServiceImpl.validInputData(true, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
+        RestconfDataServiceImpl.validInputData(true, GAP_LEAF);
     }
 
     @Test
     public void testValidTopLevelNodeName() {
-        RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
-        RestconfDataServiceImpl.validTopLevelNodeName(JUKEBOX_IID, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID), EMPTY_JUKEBOX));
+        assertSame(GAP_IID, RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID, GAP_LEAF));
     }
 
     @Test
     public void testValidTopLevelNodeNamePathEmpty() {
-        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
-        final var payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
-
         // FIXME: more asserts
         assertThrows(RestconfDocumentedException.class,
-            () -> RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.of(), payload));
+            () -> RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.of(), GAP_LEAF));
     }
 
     @Test
     public void testValidTopLevelNodeNameWrongTopIdentifier() {
-        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
-        final var payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
-
         // FIXME: more asserts
         assertThrows(RestconfDocumentedException.class,
-            () -> RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID.getAncestor(1), payload));
+            () -> RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID.getAncestor(1), GAP_LEAF));
     }
 
     @Test
@@ -505,7 +502,6 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
             .node(PLAYLIST_QNAME)
             .nodeWithKey(PLAYLIST_QNAME, NAME_QNAME, "name of band")
             .build());
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, BAND_ENTRY);
-        RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
+        RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(iidContext, BAND_ENTRY);
     }
 }
