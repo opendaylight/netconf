@@ -123,7 +123,7 @@ public final class DefinitionGeneratorTest {
         final var networkRef = properties.get("network-ref");
 
         assertNotNull(networkRef);
-        assertEquals("string", networkRef.get("type"));
+        assertEquals("string", networkRef.get("type").asText());
 
         assertEquals("/network/nodes[node-id='node1']", networkRef.get("default").asText());
         assertEquals("/sample:binary-container", networkRef.get("example").asText());
