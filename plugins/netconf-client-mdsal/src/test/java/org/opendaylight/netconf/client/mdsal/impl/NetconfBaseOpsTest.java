@@ -32,7 +32,7 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.EffectiveOperation;
-import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractTestModelTest;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;

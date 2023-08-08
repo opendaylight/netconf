@@ -11,7 +11,6 @@ import com.google.common.collect.Sets;
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.NamespaceURN;
-import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;

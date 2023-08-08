@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.client.mdsal.api;
 
-import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NetconfMessage;
 
 /**
  * Remote device.

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import org.junit.Test;
-import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 
 public class NetconfMessageUtilTest {
