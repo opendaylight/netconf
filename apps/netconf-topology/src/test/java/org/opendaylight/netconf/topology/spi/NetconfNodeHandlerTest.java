@@ -155,8 +155,10 @@ public class NetconfNodeHandlerTest {
 
         // when the device is connected, we propagate the information
         // TODO: create non-null values
-        doNothing().when(delegate).onDeviceConnected(null, null, null);
-        handler.onDeviceConnected(null, null, null);
+        doNothing().when(delegate).onDeviceConnected(schemaCaptor.capture(), prefsCaptor.capture(),
+            servicesCaptor.capture());
+        handler.onDeviceConnected(any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class),
+            any(RemoteDeviceServices.class));
         assertEquals(0, handler.attempts());
     }
 
