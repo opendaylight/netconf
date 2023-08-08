@@ -308,8 +308,14 @@ public final class RestconfDataServiceImpl {
         validTopLevelNodeName(path, payload);
         validateListKeysEqualityInPayloadAndUri(payload);
 
-        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
-        return PutDataTransactionUtil.putData(path, payload.getData(), iid.getSchemaContext(), strategy, params);
+        final var strategy = getRestconfStrategy(iid.getMountPoint());
+        final var result = PutDataTransactionUtil.putData(path, payload.getData(), iid.getSchemaContext(), strategy,
+            params);
+        return switch (result) {
+            // Note: no Location header, as it matches the request path
+            case CREATED -> Response.status(Status.CREATED).build();
+            case REPLACED -> Response.noContent().build();
+        };
     }
 
     /**

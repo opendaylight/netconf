@@ -8,8 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
@@ -36,6 +35,22 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * Util class for put data to DS.
  */
 public final class PutDataTransactionUtil {
+    /**
+     * Result of a {@code PUT} request as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>. The definition makes it
+     * clear that the logical operation is {@code create-or-replace}.
+     */
+    public enum CreateOrReplaceResult {
+        /**
+         * A new resource has been created.
+         */
+        CREATED,
+        /*
+         * An existing resources has been replaced.
+         */
+        REPLACED;
+    }
+
     private PutDataTransactionUtil() {
         // Hidden on purpose
     }
@@ -49,14 +64,13 @@ public final class PutDataTransactionUtil {
      * @param schemaContext reference to {@link EffectiveModelContext}
      * @param strategy      object that perform the actual DS operations
      * @param params        {@link WriteDataParams}
-     * @return {@link Response}
+     * @return A {@link CreateOrReplaceResult}
      */
-    public static Response putData(final YangInstanceIdentifier path, final NormalizedNode data,
+    public static @NonNull CreateOrReplaceResult putData(final YangInstanceIdentifier path, final NormalizedNode data,
             final EffectiveModelContext schemaContext, final RestconfStrategy strategy, final WriteDataParams params) {
         final var exists = TransactionUtil.syncAccess(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
         TransactionUtil.syncCommit(submitData(path, schemaContext, strategy, data, params), "PUT", path);
-        // TODO: Status.CREATED implies a location...
-        return exists ? Response.noContent().build() : Response.status(Status.CREATED).build();
+        return exists ? CreateOrReplaceResult.REPLACED : CreateOrReplaceResult.CREATED;
     }
 
     /**
