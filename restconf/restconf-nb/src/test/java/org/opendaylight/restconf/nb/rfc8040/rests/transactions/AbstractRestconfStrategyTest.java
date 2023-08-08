@@ -25,8 +25,7 @@ import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.UriBuilder;
@@ -98,13 +97,8 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         .build();
     static final MapNode PLAYLIST = Builders.mapBuilder()
         .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
-        .withChild(Builders.mapEntryBuilder()
-            .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band"))
-            .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
-            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
-            .build())
+        .withChild(BAND_ENTRY)
         .build();
-    static final YangInstanceIdentifier PLAYLIST_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYLIST_QNAME);
     // instance identifier for accessing container node "player"
     static final YangInstanceIdentifier PLAYER_IID = YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYER_QNAME);
     static final YangInstanceIdentifier ARTIST_IID = YangInstanceIdentifier.builder()
@@ -273,14 +267,12 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     public final void testPostListData() {
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
-        final var entryNode = PLAYLIST.body().iterator().next();
-        final var identifier = entryNode.name();
         final var response = PostDataTransactionUtil.postData(uriInfo, PLAYLIST_IID, PLAYLIST,
-            testPostListDataStrategy(entryNode, PLAYLIST_IID.node(identifier)), JUKEBOX_SCHEMA,
+            testPostListDataStrategy(BAND_ENTRY, PLAYLIST_IID.node(BAND_ENTRY.name())), JUKEBOX_SCHEMA,
             WriteDataParams.empty());
         assertEquals(201, response.getStatus());
-        assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
-            containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
+        assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
+            response.getLocation());
     }
 
     abstract @NonNull RestconfStrategy testPostListDataStrategy(MapEntryNode entryNode, YangInstanceIdentifier node);
