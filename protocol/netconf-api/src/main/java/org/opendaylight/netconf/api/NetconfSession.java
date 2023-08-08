@@ -9,6 +9,7 @@ package org.opendaylight.netconf.api;
 
 import io.netty.channel.ChannelFuture;
 import java.io.Closeable;
+import org.opendaylight.netconf.api.messages.NetconfMessage;
 
 /**
  * Protocol Session represents the finite state machine in underlying protocol, including timers and its purpose is to

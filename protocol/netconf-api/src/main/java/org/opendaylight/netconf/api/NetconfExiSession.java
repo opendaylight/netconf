@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.api;
 
+import org.opendaylight.netconf.api.messages.NetconfMessage;
+
 /**
  * Session capable of exi communication according to http://tools.ietf.org/html/draft-varga-netconf-exi-capability-02.
  */
