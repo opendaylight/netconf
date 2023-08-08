@@ -19,9 +19,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.junit.function.ThrowingRunnable;
@@ -62,15 +60,6 @@ public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierT
     }
 
     protected static void mockPostBodyReader(final String identifier, final AbstractNormalizedNodeBodyReader reader) {
-        mockBodyReader(identifier, reader, HttpMethod.POST);
-    }
-
-    protected static void mockPutBodyReader(final String identifier, final AbstractNormalizedNodeBodyReader reader) {
-        mockBodyReader(identifier, reader, HttpMethod.PUT);
-    }
-
-    private static void mockBodyReader(final String identifier, final AbstractNormalizedNodeBodyReader reader,
-            final String method) {
         final var pathParm = new MultivaluedHashMap<String, String>(2);
         if (!identifier.isEmpty()) {
             pathParm.put("identifier", List.of(identifier));
@@ -81,10 +70,6 @@ public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierT
         doReturn(pathParm).when(uriInfoMock).getPathParameters(false);
         doReturn(pathParm).when(uriInfoMock).getPathParameters(true);
         reader.setUriInfo(uriInfoMock);
-
-        final var request = mock(Request.class);
-        doReturn(method).when(request).getMethod();
-        reader.setRequest(request);
     }
 
     protected static void checkMountPointNormalizedNodePayload(final NormalizedNodePayload nnContext) {
@@ -94,11 +79,12 @@ public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierT
 
     protected static void checkNormalizedNodePayload(final NormalizedNodePayload nnContext) {
         assertNotNull(nnContext.getData());
-        assertNotNull(nnContext.getInstanceIdentifierContext()
-                .getInstanceIdentifier());
-        assertNotNull(nnContext.getInstanceIdentifierContext()
-                .getSchemaContext());
-        assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaNode());
+
+        final var iid = nnContext.getInstanceIdentifierContext();
+        assertNotNull(iid);
+        assertNotNull(iid.getInstanceIdentifier());
+        assertNotNull(iid.getSchemaContext());
+        assertNotNull(iid.getSchemaNode());
     }
 
     protected static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {

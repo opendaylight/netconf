@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Iterables;
 import com.google.gson.stream.JsonReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,7 +30,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
@@ -40,7 +38,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeS
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,28 +56,18 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
     protected NormalizedNodePayload readBody(final InstanceIdentifierContext path, final InputStream entityStream)
             throws WebApplicationException {
         try {
-            return readFrom(path, entityStream, isPost());
+            return readFrom(path, entityStream);
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null;
         }
     }
 
-    public static NormalizedNodePayload readFrom(
-            final InstanceIdentifierContext path, final InputStream entityStream, final boolean isPost) {
+    public static NormalizedNodePayload readFrom(final InstanceIdentifierContext path, final InputStream entityStream) {
         final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final Inference parentSchema;
-        if (isPost) {
-            parentSchema = path.inference();
-        } else {
-            final var stack = path.inference().toSchemaInferenceStack();
-            if (!stack.isEmpty()) {
-                stack.exit();
-            }
-            parentSchema = stack.toInference();
-        }
+        final var parentSchema = path.inference();
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
             JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()), parentSchema);
@@ -93,24 +80,18 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
 
         while (result instanceof ChoiceNode choice) {
             final var childNode = choice.body().iterator().next();
-            if (isPost) {
-                iiToDataList.add(result.name());
-            }
+            iiToDataList.add(result.name());
             result = childNode;
         }
 
-        if (isPost) {
-            if (result instanceof MapEntryNode) {
-                iiToDataList.add(new NodeIdentifier(result.name().getNodeType()));
+        if (result instanceof MapEntryNode) {
+            iiToDataList.add(new NodeIdentifier(result.name().getNodeType()));
+            iiToDataList.add(result.name());
+        } else {
+            final var parentPath = parentSchema.statementPath();
+            if (parentPath.isEmpty() || !(parentPath.get(parentPath.size() - 1) instanceof OperationDefinition)) {
                 iiToDataList.add(result.name());
-            } else {
-                final var parentPath = parentSchema.statementPath();
-                if (parentPath.isEmpty() || !(parentPath.get(parentPath.size() - 1) instanceof OperationDefinition)) {
-                    iiToDataList.add(result.name());
-                }
             }
-        } else if (result instanceof MapNode map) {
-            result = Iterables.getOnlyElement(map.body());
         }
 
         // FIXME: can result really be null?
