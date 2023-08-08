@@ -40,7 +40,6 @@ public final class OperationBuilder {
     public static final String REF_KEY = "$ref";
     public static final String SCHEMA_KEY = "schema";
     public static final String SUMMARY_TEMPLATE = "%s - %s - %s - %s";
-    public static final String TOP = "_TOP";
     public static final String XML_KEY = "xml";
     private static final List<String> MIME_TYPES = List.of(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON);
     private static final String OBJECT = "object";

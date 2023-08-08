@@ -54,13 +54,6 @@ public class JsonModelNameTest {
     }
 
     @Test
-    public void testIfToasterRequestContainsCorrectModelName() {
-        final var schemas = mountPointApi.components().schemas();
-        final var toaster = schemas.get("toaster2_toaster_TOP");
-        assertNotNull(toaster.properties().get("toaster2:toaster"));
-    }
-
-    @Test
     public void testIfFirstNodeInJsonPayloadContainsCorrectModelName() {
         for (final var stringPathEntry : mountPointApi.paths().entrySet()) {
             final var put = stringPathEntry.getValue().put();
