@@ -11,22 +11,14 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
-import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -35,15 +27,12 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class XmlBodyReaderTest extends AbstractBodyReaderTest {
-    private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
-        XMLNamespace.of("instance:identifier:module"), Revision.of("2014-01-17"));
     private static final QName TOP_LEVEL_LIST = QName.create("foo", "2017-08-09", "top-level-list");
     private static final MediaType MEDIA_TYPE = new MediaType(MediaType.APPLICATION_XML, null);
 
@@ -62,12 +51,6 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         testFiles.addAll(loadFiles("/modules"));
         testFiles.addAll(loadFiles("/foo-xml-test/yang"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
-    }
-
-    @Test
-    public void putXmlTest() throws Exception {
-        mockPutBodyReader("foo:top-level-list=key-value", xmlBodyReader);
-        runXmlTest();
     }
 
     @Test
@@ -102,34 +85,6 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
                     fail();
             }
         }
-    }
-
-    @Test
-    public void moduleDataTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext
-                .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName());
-        final String uri = "instance-identifier-module:cont";
-        mockPutBodyReader(uri, xmlBodyReader);
-        final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
-            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmldata.xml"));
-        checkNormalizedNodePayload(payload);
-        checkExpectValueNormalizeNodeContext(dataSchemaNode, payload, dataII);
-    }
-
-    @Test
-    public void moduleSubContainerDataPutTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext
-                .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
-        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
-        final DataSchemaNode dataSchemaNodeOnPath = ((DataNodeContainer) dataSchemaNode).getDataChildByName(cont1QName);
-        final String uri = "instance-identifier-module:cont/cont1";
-        mockPutBodyReader(uri, xmlBodyReader);
-        final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
-            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xml_sub_container.xml"));
-        checkNormalizedNodePayload(payload);
-        checkExpectValueNormalizeNodeContext(dataSchemaNodeOnPath, payload, dataII);
     }
 
     @Test
@@ -241,32 +196,5 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         final var payloadNodeType = payload.getData().name().getNodeType();
         assertEquals("foo-bar-container", payloadNodeType.getLocalName());
         assertEquals("bar:module", payloadNodeType.getNamespace().toString());
-    }
-
-    /**
-     * Test PUT operation when message root element is not the same as the last element in request URI.
-     * PUT operation message should always start with schema node from URI otherwise exception should be
-     * thrown.
-     */
-    @Test
-    public void wrongRootElementTest() throws Exception {
-        mockPutBodyReader("instance-identifier-module:cont", xmlBodyReader);
-        final InputStream inputStream =
-                XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/bug7933.xml");
-
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null, inputStream));
-
-        final RestconfError restconfError = ex.getErrors().get(0);
-        assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
-    }
-
-    @Test
-    public void testRangeViolation() throws Exception {
-        mockPutBodyReader("netconf786:foo", xmlBodyReader);
-
-        assertRangeViolation(() -> xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
-            stringInputStream("<foo xmlns=\"netconf786\"><bar>100</bar></foo>")));
     }
 }
