@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1059b749_6850abd5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-08T08:50:05Z",
+      "side": 1,
+      "message": "The code is incorrectly formatted and the patch itself miss a description what is going on.",
+      "revId": "8580f647f15484151f380ad3a8a08097581325c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
