@@ -24,8 +24,8 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.HelloMessage;
+import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
 

@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.api;
 
 import java.io.EOFException;
+import org.opendaylight.netconf.api.messages.NetconfMessage;
 
 // FIXME: NETCONF-554: rework this interface
 public interface NetconfSessionListener<S extends NetconfSession> {
