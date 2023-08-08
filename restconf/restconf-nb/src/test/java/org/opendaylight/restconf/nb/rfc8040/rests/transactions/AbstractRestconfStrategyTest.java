@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.MERGE;
@@ -25,10 +24,8 @@ import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
-import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -254,25 +251,17 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPostContainerData() {
-        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
-
-        final var response = PostDataTransactionUtil.postData(uriInfo, JUKEBOX_IID, EMPTY_JUKEBOX,
-            testPostContainerDataStrategy(), JUKEBOX_SCHEMA, WriteDataParams.empty());
-        assertEquals(201, response.getStatus());
+        PostDataTransactionUtil.postData(JUKEBOX_IID, EMPTY_JUKEBOX, testPostContainerDataStrategy(), JUKEBOX_SCHEMA,
+            WriteDataParams.empty());
     }
 
     abstract @NonNull RestconfStrategy testPostContainerDataStrategy();
 
     @Test
     public final void testPostListData() {
-        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
-
-        final var response = PostDataTransactionUtil.postData(uriInfo, PLAYLIST_IID, PLAYLIST,
+        PostDataTransactionUtil.postData(PLAYLIST_IID, PLAYLIST,
             testPostListDataStrategy(BAND_ENTRY, PLAYLIST_IID.node(BAND_ENTRY.name())), JUKEBOX_SCHEMA,
             WriteDataParams.empty());
-        assertEquals(201, response.getStatus());
-        assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
-            response.getLocation());
     }
 
     abstract @NonNull RestconfStrategy testPostListDataStrategy(MapEntryNode entryNode, YangInstanceIdentifier node);
@@ -282,7 +271,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         final var domException = new DOMException((short) 414, "Post request failed");
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> PostDataTransactionUtil.postData(uriInfo, JUKEBOX_IID, EMPTY_JUKEBOX,
+            () -> PostDataTransactionUtil.postData(JUKEBOX_IID, EMPTY_JUKEBOX,
                 testPostDataFailStrategy(domException), JUKEBOX_SCHEMA, WriteDataParams.empty()));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
