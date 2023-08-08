@@ -38,25 +38,15 @@ public class OperationalDataTest {
     private static final String OPERATIONS_MP_URI = "/rests/operations/nodes/node=123/yang-ext:mount";
     private static final Set<String> EXPECTED_SCHEMAS = Set.of(
         "action-types_container",
-        "action-types_container_TOP",
         "action-types_list",
-        "action-types_list_TOP",
         "action-types_multi-container",
-        "action-types_multi-container_TOP",
         "action-types_container-action_input",
-        "action-types_container-action_input_TOP",
         "action-types_container-action_output",
-        "action-types_container-action_output_TOP",
-        "action-types_list-action_input_TOP",
-        "action-types_list-action_output_TOP",
         "action-types_list-action_output",
         "action-types_list-action_input",
         "action-types_multi-container_inner-container",
-        "action-types_multi-container_inner-container_TOP",
         "operational_root",
-        "operational_root_TOP",
-        "operational_root_config-container",
-        "operational_root_config-container_TOP");
+        "operational_root_config-container");
     private static final Set<String> EXPECTED_PATHS = Set.of(
         OPERATIONS_MP_URI + "/action-types:list={name}/list-action",
         OPERATIONS_MP_URI + "/action-types:container/container-action",

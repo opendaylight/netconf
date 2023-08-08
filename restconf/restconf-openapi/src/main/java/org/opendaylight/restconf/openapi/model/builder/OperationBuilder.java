@@ -114,13 +114,13 @@ public final class OperationBuilder {
     }
 
     public static Operation buildPut(final DataSchemaNode node, final String parentName, final String moduleName,
-            final @NonNull String deviceName, final List<Parameter> pathParams) {
+            final @NonNull String deviceName, final List<Parameter> pathParams, final String fullName) {
         final String nodeName = node.getQName().getLocalName();
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.PUT, moduleName, deviceName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
-        final ObjectNode requestBody = createRequestBodyParameter(defName, nodeName, node, summary, nodeName);
+        final ObjectNode requestBody = createRequestBodyParameter(defName, fullName, node, summary, nodeName);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),

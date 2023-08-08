@@ -114,46 +114,21 @@ public final class OpenApiGeneratorRFC8040Test {
         final Map<String, Schema> schemas = doc.components().schemas();
         assertNotNull(schemas);
 
-        final Schema configLstTop = schemas.get("toaster2_lst_TOP");
-        assertNotNull(configLstTop);
-        DocGenTestHelper.containsReferences(configLstTop, "toaster2:lst", "#/components/schemas/toaster2_lst");
-
         final Schema configLst = schemas.get("toaster2_lst");
         assertNotNull(configLst);
         DocGenTestHelper.containsReferences(configLst, "lst1", "#/components/schemas/toaster2_lst_lst1");
         DocGenTestHelper.containsReferences(configLst, "cont1", "#/components/schemas/toaster2_lst_cont1");
 
-        final Schema configLst1Top = schemas.get("toaster2_lst_lst1_TOP");
-        assertNotNull(configLst1Top);
-        DocGenTestHelper.containsReferences(configLst1Top, "toaster2:lst1", "#/components/schemas/toaster2_lst_lst1");
-
         final Schema configLst1 = schemas.get("toaster2_lst_lst1");
         assertNotNull(configLst1);
 
-        final Schema configCont1Top = schemas.get("toaster2_lst_cont1_TOP");
-        assertNotNull(configCont1Top);
-        DocGenTestHelper.containsReferences(configCont1Top, "toaster2:cont1",
-            "#/components/schemas/toaster2_lst_cont1");
-
         final Schema configCont1 = schemas.get("toaster2_lst_cont1");
         assertNotNull(configCont1);
-        DocGenTestHelper.containsReferences(configCont1, "cont11",
-            "#/components/schemas/toaster2_lst_cont1_cont11");
-        DocGenTestHelper.containsReferences(configCont1, "lst11",
-            "#/components/schemas/toaster2_lst_cont1_lst11");
-
-        final Schema configCont11Top = schemas.get("toaster2_lst_cont1_cont11_TOP");
-        assertNotNull(configCont11Top);
-        DocGenTestHelper.containsReferences(configCont11Top, "toaster2:cont11",
-            "#/components/schemas/toaster2_lst_cont1_cont11");
+        DocGenTestHelper.containsReferences(configCont1, "cont11", "#/components/schemas/toaster2_lst_cont1_cont11");
+        DocGenTestHelper.containsReferences(configCont1, "lst11", "#/components/schemas/toaster2_lst_cont1_lst11");
 
         final Schema configCont11 = schemas.get("toaster2_lst_cont1_cont11");
         assertNotNull(configCont11);
-
-        final Schema configLst11Top = schemas.get("toaster2_lst_cont1_lst11_TOP");
-        assertNotNull(configLst11Top);
-        DocGenTestHelper.containsReferences(configLst11Top, "toaster2:lst11",
-            "#/components/schemas/toaster2_lst_cont1_lst11");
 
         final Schema configLst11 = schemas.get("toaster2_lst_cont1_lst11");
         assertNotNull(configLst11);
@@ -168,10 +143,6 @@ public final class OpenApiGeneratorRFC8040Test {
         assertNotNull(doc);
 
         final Map<String, Schema> schemas = doc.components().schemas();
-        final Schema inputTop = schemas.get("toaster_make-toast_input_TOP");
-        assertNotNull(inputTop);
-        final String testString = "{\"toaster:input\":{\"$ref\":\"#/components/schemas/toaster_make-toast_input\"}}";
-        assertEquals(testString, inputTop.properties().toString());
         final Schema input = schemas.get("toaster_make-toast_input");
         final JsonNode properties = input.properties();
         assertTrue(properties.has("toasterDoneness"));
@@ -185,8 +156,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final var schemas = doc.components().schemas();
         final var firstContainer = schemas.get("choice-test_first-container");
-        assertEquals("default-value",
-                firstContainer.properties().get("leaf-default").get("default").asText());
+        assertEquals("default-value", firstContainer.properties().get("leaf-default").get("default").asText());
         assertFalse(firstContainer.properties().has("leaf-non-default"));
 
         final var secondContainer = schemas.get("choice-test_second-container");
@@ -320,14 +290,13 @@ public final class OpenApiGeneratorRFC8040Test {
         final var JsonNodeMyYangData = doc.paths().get("/rests/data/my-yang:data");
         verifyPostDataRequestRef(JsonNodeMyYangData.post(), "#/components/schemas/my-yang_data",
             "#/components/schemas/my-yang_data");
-        verifyRequestRef(JsonNodeMyYangData.put(), "#/components/schemas/my-yang_data", "data", CONTAINER);
-        verifyRequestRef(JsonNodeMyYangData.get(), "#/components/schemas/my-yang_data", "data", CONTAINER);
+        verifyRequestRef(JsonNodeMyYangData.put(), "#/components/schemas/my-yang_data", CONTAINER);
+        verifyRequestRef(JsonNodeMyYangData.get(), "#/components/schemas/my-yang_data", CONTAINER);
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
-        assertEquals(3, definitions.size());
+        assertEquals(2, definitions.size());
         assertTrue(definitions.containsKey("my-yang_data"));
-        assertTrue(definitions.containsKey("my-yang_data_TOP"));
         assertTrue(definitions.containsKey("my-yang_module"));
     }
 
@@ -338,42 +307,39 @@ public final class OpenApiGeneratorRFC8040Test {
         final var jsonNodeToaster = doc.paths().get("/rests/data/toaster2:toaster");
         verifyPostDataRequestRef(jsonNodeToaster.post(), "#/components/schemas/toaster2_toaster",
             "#/components/schemas/toaster2_toaster");
-        verifyRequestRef(jsonNodeToaster.put(), "#/components/schemas/toaster2_toaster", "toaster", CONTAINER);
-        verifyRequestRef(jsonNodeToaster.get(), "#/components/schemas/toaster2_toaster", "toaster", CONTAINER);
+        verifyRequestRef(jsonNodeToaster.put(), "#/components/schemas/toaster2_toaster", CONTAINER);
+        verifyRequestRef(jsonNodeToaster.get(), "#/components/schemas/toaster2_toaster", CONTAINER);
 
         final var jsonNodeToasterSlot = doc.paths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
         verifyPostDataRequestRef(jsonNodeToasterSlot.post(), "#/components/schemas/toaster2_toaster_toasterSlot",
             "#/components/schemas/toaster2_toaster_toasterSlot");
-        verifyRequestRef(jsonNodeToasterSlot.put(), "#/components/schemas/toaster2_toaster_toasterSlot", "toasterSlot",
-            LIST);
-        verifyRequestRef(jsonNodeToasterSlot.get(), "#/components/schemas/toaster2_toaster_toasterSlot", "toasterSlot",
-            LIST);
+        verifyRequestRef(jsonNodeToasterSlot.put(), "#/components/schemas/toaster2_toaster_toasterSlot", LIST);
+        verifyRequestRef(jsonNodeToasterSlot.get(), "#/components/schemas/toaster2_toaster_toasterSlot", LIST);
 
         final var jsonNodeSlotInfo = doc.paths().get(
             "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
         verifyPostDataRequestRef(jsonNodeSlotInfo.post(), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
             "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo");
         verifyRequestRef(jsonNodeSlotInfo.put(), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
-            "slotInfo", CONTAINER);
+            CONTAINER);
         verifyRequestRef(jsonNodeSlotInfo.get(), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
-            "slotInfo", CONTAINER);
+            CONTAINER);
 
         final var jsonNodeLst = doc.paths().get("/rests/data/toaster2:lst={lf1}");
         verifyPostDataRequestRef(jsonNodeLst.post(), "#/components/schemas/toaster2_lst",
             "#/components/schemas/toaster2_lst");
-        verifyRequestRef(jsonNodeLst.put(), "#/components/schemas/toaster2_lst", "lst", LIST);
-        verifyRequestRef(jsonNodeLst.get(), "#/components/schemas/toaster2_lst", "lst", LIST);
+        verifyRequestRef(jsonNodeLst.put(), "#/components/schemas/toaster2_lst", LIST);
+        verifyRequestRef(jsonNodeLst.get(), "#/components/schemas/toaster2_lst", LIST);
 
         final var jsonNodeLst1 = doc.paths().get("/rests/data/toaster2:lst={lf1}/lst1={key1},{key2}");
         verifyPostDataRequestRef(jsonNodeLst1.post(), "#/components/schemas/toaster2_lst_lst1",
             "#/components/schemas/toaster2_lst_lst1");
-        verifyRequestRef(jsonNodeLst1.put(), "#/components/schemas/toaster2_lst_lst1", "lst1", LIST);
-        verifyRequestRef(jsonNodeLst1.get(), "#/components/schemas/toaster2_lst_lst1", "lst1", LIST);
+        verifyRequestRef(jsonNodeLst1.put(), "#/components/schemas/toaster2_lst_lst1", LIST);
+        verifyRequestRef(jsonNodeLst1.get(), "#/components/schemas/toaster2_lst_lst1", LIST);
 
         final var jsonNodeMakeToast = doc.paths().get("/rests/operations/toaster2:make-toast");
         assertNull(jsonNodeMakeToast.get());
-        verifyRequestRef(jsonNodeMakeToast.post(), "#/components/schemas/toaster2_make-toast_input", "input",
-            CONTAINER);
+        verifyRequestRef(jsonNodeMakeToast.post(), "#/components/schemas/toaster2_make-toast_input", CONTAINER);
 
         final var jsonNodeCancelToast = doc.paths().get("/rests/operations/toaster2:cancel-toast");
         assertNull(jsonNodeCancelToast.get());
@@ -388,7 +354,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
-        assertEquals(28, definitions.size());
+        assertEquals(18, definitions.size());
     }
 
     /**
@@ -423,7 +389,7 @@ public final class OpenApiGeneratorRFC8040Test {
         assertEquals(expectedXmlRef, postXmlRef.textValue());
     }
 
-    private static void verifyRequestRef(final Operation operation, final String expectedRef, final String nodeName,
+    private static void verifyRequestRef(final Operation operation, final String expectedRef,
             final String nodeType) {
         final JsonNode postContent;
         if (operation.requestBody() != null) {
@@ -434,10 +400,10 @@ public final class OpenApiGeneratorRFC8040Test {
         assertNotNull(postContent);
         final String postJsonRef;
         if (nodeType.equals(CONTAINER)) {
-            postJsonRef = postContent.path("application/json").path("schema").path("properties").path(nodeName)
+            postJsonRef = postContent.path("application/json").path("schema").path("properties").elements().next()
                 .path("$ref").textValue();
         } else {
-            postJsonRef = postContent.path("application/json").path("schema").path("properties").path(nodeName)
+            postJsonRef = postContent.path("application/json").path("schema").path("properties").elements().next()
                 .path("items").path("$ref").textValue();
         }
         assertNotNull(postJsonRef);

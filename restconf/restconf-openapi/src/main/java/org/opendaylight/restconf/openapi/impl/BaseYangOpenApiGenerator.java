@@ -14,6 +14,7 @@ import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.b
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPost;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPostOperation;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPut;
+import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolveFullNameFromNode;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -262,7 +263,9 @@ public abstract class BaseYangOpenApiGenerator {
         if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
             childSchemaNodes = ((DataNodeContainer) node).getChildNodes();
         }
-        paths.put(dataPath, operations(node, moduleName, deviceName, pathParams, parentName, definitionNames));
+        final String fullName = resolveFullNameFromNode(node.getQName(), schemaContext);
+        paths.put(dataPath, operations(node, moduleName, deviceName, pathParams, parentName, definitionNames,
+            fullName));
 
         if (node instanceof ActionNodeContainer actionContainer) {
             actionContainer.getActions().forEach(actionDef -> {
@@ -299,7 +302,7 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static Path operations(final DataSchemaNode node, final String moduleName,
             final String deviceName, final List<Parameter> pathParams, final String parentName,
-            final DefinitionNames definitionNames) {
+            final DefinitionNames definitionNames, final String fullName) {
         final Path.Builder operationsBuilder = new Path.Builder();
 
         final String discriminator = definitionNames.getDiscriminator(node);
@@ -308,7 +311,7 @@ public abstract class BaseYangOpenApiGenerator {
         final Operation get = buildGet(node, parentName, moduleName, deviceName, pathParams, discriminator);
         operationsBuilder.get(get);
 
-        final Operation put = buildPut(node, parentName, moduleName, deviceName, pathParams);
+        final Operation put = buildPut(node, parentName, moduleName, deviceName, pathParams, fullName);
         operationsBuilder.put(put);
 
         final Operation patch = buildPatch(node, parentName, moduleName, deviceName, pathParams);
