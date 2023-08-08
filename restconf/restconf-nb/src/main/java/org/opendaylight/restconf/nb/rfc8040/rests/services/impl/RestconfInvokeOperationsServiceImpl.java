@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Consumes;
@@ -44,10 +45,11 @@ import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.databind.StreamableOperationInput;
+import org.opendaylight.restconf.nb.rfc8040.databind.StreamableRpcInput;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -174,9 +176,26 @@ public final class RestconfInvokeOperationsServiceImpl {
     }
 
     private void invokeRpc(final String identifier, final UriInfo uriInfo, final AsyncResponse ar,
-            final StreamableOperationInput body) {
+            final StreamableRpcInput body) {
+        final ApiPath apiPath;
+        try {
+            apiPath = ApiPath.parse(identifier);
+        } catch (ParseException e) {
+            // FIXME: ErrorType/ErrorTag
+            throw new RestconfDocumentedException("Expecting a RPC name in the form identifier:identifier", e);
+        }
+
+        invokeRpc(apiPath, uriInfo, ar, body);
+    }
+
+    private void invokeRpc(final ApiPath apiPath, final UriInfo uriInfo, final AsyncResponse ar,
+            final StreamableRpcInput body) {
         final var dataBind = databindProvider.currentContext();
         final var schemaContext = dataBind.modelContext();
+
+        final var stack = SchemaInferenceStack.of(schemaContext);
+
+
         final var context = ParserIdentifier.toInstanceIdentifier(identifier, schemaContext, mountPointService);
 
         final var holder = new NormalizationResultHolder();
@@ -191,6 +210,9 @@ public final class RestconfInvokeOperationsServiceImpl {
         final var input = (ContainerNode) holder.getResult().data();
 
         final ListenableFuture<? extends DOMRpcResult> future;
+
+        // FIXME: errr... right! this is at the wrong layer
+
         final var mountPoint = context.getMountPoint();
         if (mountPoint == null) {
             if (CreateDataChangeEventSubscription.QNAME.equals(rpcName)) {
