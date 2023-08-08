@@ -620,7 +620,11 @@ public class DefinitionGenerator {
         } else if (leafTypeDef instanceof StringTypeDefinition stringType) {
             jsonType = processStringType(stringType, property, node.getQName().getLocalName());
         } else if (leafTypeDef instanceof UnionTypeDefinition unionType) {
-            jsonType = processUnionType(unionType, property, node.getQName().getLocalName());
+            // check the default value if present set its type and value
+            //unionType.getDefaultValue()
+
+            // otherwise select first union type and use it as jsonType with example value
+            // jsonType = processTypeDef(unionType.getTypes().iterator().next(), ...)
         } else if (leafTypeDef instanceof EmptyTypeDefinition) {
             jsonType = OBJECT_TYPE;
         } else if (leafTypeDef instanceof LeafrefTypeDefinition leafrefType) {
@@ -844,50 +848,6 @@ public class DefinitionGenerator {
         }
 
         return STRING_TYPE;
-    }
-
-    private static String processUnionType(final UnionTypeDefinition unionType, final ObjectNode property,
-            final String nodeName) {
-        boolean isStringTakePlace = false;
-        boolean isNumberTakePlace = false;
-        boolean isBooleanTakePlace = false;
-        for (final TypeDefinition<?> typeDef : unionType.getTypes()) {
-            if (!isStringTakePlace) {
-                if (typeDef instanceof StringTypeDefinition
-                        || typeDef instanceof BitsTypeDefinition
-                        || typeDef instanceof BinaryTypeDefinition
-                        || typeDef instanceof IdentityrefTypeDefinition
-                        || typeDef instanceof EnumTypeDefinition
-                        || typeDef instanceof LeafrefTypeDefinition
-                        || typeDef instanceof UnionTypeDefinition) {
-                    isStringTakePlace = true;
-                } else if (!isNumberTakePlace && typeDef instanceof RangeRestrictedTypeDefinition) {
-                    isNumberTakePlace = true;
-                } else if (!isBooleanTakePlace && typeDef instanceof BooleanTypeDefinition) {
-                    isBooleanTakePlace = true;
-                }
-            }
-        }
-        if (isStringTakePlace) {
-            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
-            setExampleValue(property, "Some " + nodeName);
-            return STRING_TYPE;
-        }
-        if (isBooleanTakePlace) {
-            if (isNumberTakePlace) {
-                // FIXME deal with other number formats
-                unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Long.valueOf((String) v)));
-                setExampleValue(property, 0);
-                return NUMBER_TYPE;
-            }
-            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Boolean.valueOf((String) v)));
-            setExampleValue(property, true);
-            return BOOLEAN_TYPE;
-        }
-        // FIXME deal with other number formats
-        unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Long.valueOf((String) v)));
-        setExampleValue(property, 0);
-        return NUMBER_TYPE;
     }
 
     private static ObjectNode buildXmlParameter(final SchemaNode node) {
