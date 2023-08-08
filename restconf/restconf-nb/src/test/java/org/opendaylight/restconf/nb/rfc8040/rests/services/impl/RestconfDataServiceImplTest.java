@@ -21,7 +21,10 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -289,29 +292,39 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPutData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, EMPTY_JUKEBOX);
-
         doReturn(immediateTrueFluentFuture()).when(read)
                 .exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
-        final Response response = dataService.putData(null, payload, uriInfo);
+        final var response = dataService.putDataJSON("example-jukebox:jukebox", uriInfo, stringInputStream("""
+            {
+              "example-jukebox:jukebox" : {
+                 "player": {
+                   "gap": "0.2"
+                 }
+              }
+            }"""));
         assertNotNull(response);
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testPutDataWithMountPoint() {
-        final InstanceIdentifierContext iidContext =
-            InstanceIdentifierContext.ofMountPointPath(mountPoint, JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, EMPTY_JUKEBOX);
-
         doReturn(immediateTrueFluentFuture()).when(read)
                 .exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
-        final Response response = dataService.putData(null, payload, uriInfo);
+        final var response = dataService.putDataXML("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox",
+            uriInfo, stringInputStream("""
+                <jukebox xmlns="http://example.com/ns/example-jukebox">
+                  <player>
+                    <gap>0.2</gap>
+                  </player>
+                </jukebox>"""));
         assertNotNull(response);
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
+    private static InputStream stringInputStream(final String str) {
+        return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -462,50 +475,5 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(Optional.of(netconfService)).when(mountPoint).getService(NetconfDataTreeService.class);
         restconfStrategy = dataService.getRestconfStrategy(mountPoint);
         assertTrue(restconfStrategy instanceof NetconfRestconfStrategy);
-    }
-
-    @Test
-    public void testValidInputData() {
-        RestconfDataServiceImpl.validInputData(true, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
-    }
-
-    @Test
-    public void testValidTopLevelNodeName() {
-        RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
-        RestconfDataServiceImpl.validTopLevelNodeName(JUKEBOX_IID, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID), EMPTY_JUKEBOX));
-    }
-
-    @Test
-    public void testValidTopLevelNodeNamePathEmpty() {
-        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
-        final var payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
-
-        // FIXME: more asserts
-        assertThrows(RestconfDocumentedException.class,
-            () -> RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.of(), payload));
-    }
-
-    @Test
-    public void testValidTopLevelNodeNameWrongTopIdentifier() {
-        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
-        final var payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
-
-        // FIXME: more asserts
-        assertThrows(RestconfDocumentedException.class,
-            () -> RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID.getAncestor(1), payload));
-    }
-
-    @Test
-    public void testValidateListKeysEqualityInPayloadAndUri() {
-        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, YangInstanceIdentifier.builder()
-            .node(JUKEBOX_QNAME)
-            .node(PLAYLIST_QNAME)
-            .nodeWithKey(PLAYLIST_QNAME, NAME_QNAME, "name of band")
-            .build());
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, BAND_ENTRY);
-        RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
     }
 }
