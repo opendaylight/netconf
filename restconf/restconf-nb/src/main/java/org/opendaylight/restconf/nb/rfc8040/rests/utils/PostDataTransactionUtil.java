@@ -9,9 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.net.URI;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
@@ -20,17 +17,14 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +33,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class PostDataTransactionUtil {
     private static final Logger LOG = LoggerFactory.getLogger(PostDataTransactionUtil.class);
-    private static final String POST_TX_TYPE = "POST";
 
     private PostDataTransactionUtil() {
         // Hidden on purpose
@@ -49,18 +42,15 @@ public final class PostDataTransactionUtil {
      * Check mount point and prepare variables for post data. Close {@link DOMTransactionChain} if any inside of object
      * {@link RestconfStrategy} provided as a parameter.
      *
-     * @param uriInfo       uri info
      * @param path          path
      * @param data          data
      * @param strategy      Object that perform the actual DS operations
      * @param schemaContext reference to actual {@link EffectiveModelContext}
      * @param params        {@link WriteDataParams}
-     * @return {@link Response}
      */
-    public static Response postData(final UriInfo uriInfo, final YangInstanceIdentifier path, final NormalizedNode data,
+    public static void postData(final YangInstanceIdentifier path, final NormalizedNode data,
             final RestconfStrategy strategy, final EffectiveModelContext schemaContext, final WriteDataParams params) {
-        TransactionUtil.syncCommit(submitData(path, data, strategy, schemaContext, params), POST_TX_TYPE, path);
-        return Response.created(resolveLocation(uriInfo, path, schemaContext, data)).build();
+        TransactionUtil.syncCommit(submitData(path, data, strategy, schemaContext, params), "POST", path);
     }
 
     /**
@@ -167,31 +157,6 @@ public final class PostDataTransactionUtil {
         }
 
         return transaction.commit();
-    }
-
-    /**
-     * Get location from {@link YangInstanceIdentifier} and {@link UriInfo}.
-     *
-     * @param uriInfo       uri info
-     * @param initialPath   data path
-     * @param schemaContext reference to {@link SchemaContext}
-     * @return {@link URI}
-     */
-    private static URI resolveLocation(final UriInfo uriInfo, final YangInstanceIdentifier initialPath,
-                                       final EffectiveModelContext schemaContext, final NormalizedNode data) {
-        if (uriInfo == null) {
-            return null;
-        }
-
-        YangInstanceIdentifier path = initialPath;
-        if (data instanceof MapNode mapData) {
-            final var children = mapData.body();
-            if (!children.isEmpty()) {
-                path = path.node(children.iterator().next().name());
-            }
-        }
-
-        return uriInfo.getBaseUriBuilder().path("data").path(IdentifierCodec.serialize(path, schemaContext)).build();
     }
 
     /**
