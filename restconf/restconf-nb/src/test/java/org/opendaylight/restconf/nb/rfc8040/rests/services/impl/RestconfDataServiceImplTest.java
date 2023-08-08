@@ -25,6 +25,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -71,13 +72,11 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -343,24 +342,35 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPostData() {
-        final var identifier = NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band");
-        final var entryNode = Builders.mapEntryBuilder()
-            .withNodeIdentifier(identifier)
-            .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
-            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
-            .build();
-
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        final var node = JUKEBOX_IID.node(identifier);
+        final var node = JUKEBOX_IID.node(BAND_ENTRY.name());
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
         final var response = dataService.postData(NormalizedNodePayload.of(
             InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID),
-            Builders.mapBuilder().withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME)).withChild(entryNode).build()),
+            Builders.mapBuilder().withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME)).withChild(BAND_ENTRY).build()),
             uriInfo);
         assertEquals(201, response.getStatus());
+        assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox"), response.getLocation());
+    }
+
+    @Test
+    public void testPostMapEntryData() {
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
+        final var node = PLAYLIST_IID.node(BAND_ENTRY.name());
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+
+        final var response = dataService.postData(NormalizedNodePayload.of(
+            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, PLAYLIST_IID),
+            Builders.mapBuilder().withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME)).withChild(BAND_ENTRY).build()),
+            uriInfo);
+        assertEquals(201, response.getStatus());
+        assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
+            response.getLocation());
     }
 
     @Test
