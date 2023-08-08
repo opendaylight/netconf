@@ -332,6 +332,7 @@
                       <descriptors>
                           <descriptor>src/main/assembly/stress-client.xml</descriptor>
                       </descriptors>
+                      <tarLongFileMode>posix</tarLongFileMode>
                       <finalName>stress-client-${project.version}-package</finalName>
                   </configuration>
                   <executions>
