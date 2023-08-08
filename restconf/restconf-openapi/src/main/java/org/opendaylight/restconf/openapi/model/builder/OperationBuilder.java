@@ -24,9 +24,9 @@ import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Schema;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 
@@ -58,12 +58,9 @@ public final class OperationBuilder {
         final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + "_" + nodeName;
         final String defName = cleanDefName + discriminator;
-        final String xmlDefName = cleanDefName + discriminator;
-        ref.put(REF_KEY, COMPONENTS_PREFIX + defName);
-        final ObjectNode requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName, summary);
+        final ObjectNode requestBody = createPostRequestBodyParameter(defName, defName, nodeName);
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
                 buildResponse(Response.Status.CREATED.getReasonPhrase()));
@@ -90,7 +87,7 @@ public final class OperationBuilder {
         parameters.add(buildQueryParameters());
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
 
-        final var response = createRequestBodyParameter1(defName, nodeName, node, summary,
+        final var response = createRequestBodyParameter(defName, nodeName, node, summary,
             String.valueOf(Response.Status.OK.getStatusCode()));
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()), response);
 
@@ -123,7 +120,7 @@ public final class OperationBuilder {
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
-        final ObjectNode requestBody = createRequestBodyParameter1(defName, nodeName, node, summary, nodeName);
+        final ObjectNode requestBody = createRequestBodyParameter(defName, nodeName, node, summary, nodeName);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
@@ -147,7 +144,7 @@ public final class OperationBuilder {
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
-        final ObjectNode requestBody = createRequestBodyParameter1(defName, nodeName, node, summary, nodeName);
+        final ObjectNode requestBody = createRequestBodyParameter(defName, nodeName, node, summary, nodeName);
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
@@ -199,8 +196,9 @@ public final class OperationBuilder {
             final String discriminator = definitionNames.getDiscriminator(input);
             final String clearDefName = parentName + "_" + operationName + INPUT_SUFFIX;
             final String defName = clearDefName + discriminator;
-            final String defTopName = clearDefName + TOP + discriminator;
-            requestBody = createRequestBodyParameter(defTopName, defName, inputName, summary);
+            requestBody = createRequestBodyParameter(defName, "input", null, summary, inputName);
+//            final String defTopName = clearDefName + TOP + discriminator;
+//            requestBody = createPostRequestBodyParameter(defTopName, defName, inputName);
         } else {
             final ObjectNode payload = JsonNodeFactory.instance.objectNode();
             final ObjectNode jsonSchema = JsonNodeFactory.instance.objectNode();
@@ -233,7 +231,7 @@ public final class OperationBuilder {
 
         if (!output.getChildNodes().isEmpty()) {
             final ObjectNode schema = JsonNodeFactory.instance.objectNode();
-            final String defName = parentName + "_" + operationName + OUTPUT_SUFFIX + TOP
+            final String defName = parentName + "_" + operationName + OUTPUT_SUFFIX
                     + definitionNames.getDiscriminator(output);
             schema.put(REF_KEY, COMPONENTS_PREFIX + defName);
             responses.set(String.valueOf(Response.Status.OK.getStatusCode()), buildResponse(description, schema));
@@ -252,40 +250,33 @@ public final class OperationBuilder {
             .build();
     }
 
-    private static ObjectNode createRequestBodyParameter(final String defName, final String xmlDefName,
-            final String name, final String summary) {
+    private static ObjectNode createPostRequestBodyParameter(final String defName, final String xmlDefName,
+            final String name) {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         final ObjectNode content = JsonNodeFactory.instance.objectNode();
-        if (summary != null && summary.contains(HttpMethod.PATCH)) {
-            content.set("application/yang-data+json", buildMimeTypeValue(defName));
-            content.set("application/yang-data+xml", buildMimeTypeValue(xmlDefName));
-        } else {
-            content.set(MediaType.APPLICATION_JSON, buildMimeTypeValue(defName));
-            content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(xmlDefName));
-        }
+        content.set(MediaType.APPLICATION_JSON, buildMimeTypeValue(defName));
+        content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(xmlDefName));
         payload.set(CONTENT_KEY, content);
         payload.put(DESCRIPTION_KEY, name);
         return payload;
     }
 
-    // TODO change name after this method will be finished.(for now it's just PUT and PATCH but there might be more
-    //  in next patches)
-    private static ObjectNode createRequestBodyParameter1(final String defName, final String name,
+    private static ObjectNode createRequestBodyParameter(final String defName, final String name,
             final DataSchemaNode node, final String summary, final String description) {
         final ObjectNode payload = JsonNodeFactory.instance.objectNode();
         final ObjectNode content = JsonNodeFactory.instance.objectNode();
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-        if (node instanceof ContainerSchemaNode) {
-            final ObjectNode container = JsonNodeFactory.instance.objectNode();
-            container.set(name, buildRefSchema(defName));
-            properties.set(PROPERTIES_KEY, container);
-        } else {
+        if (node instanceof ListSchemaNode) {
             final ObjectNode list = JsonNodeFactory.instance.objectNode();
             final ObjectNode listValue = JsonNodeFactory.instance.objectNode();
             listValue.put(TYPE_KEY, ARRAY);
             listValue.set(ITEMS_KEY, buildRefSchema(defName));
             list.set(name, listValue);
             properties.set(PROPERTIES_KEY, list);
+        } else {
+            final ObjectNode container = JsonNodeFactory.instance.objectNode();
+            container.set(name, buildRefSchema(defName));
+            properties.set(PROPERTIES_KEY, container);
         }
         final ObjectNode jsonSchema = JsonNodeFactory.instance.objectNode();
         jsonSchema.set(SCHEMA_KEY, properties);
