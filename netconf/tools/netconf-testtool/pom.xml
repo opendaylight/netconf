@@ -332,6 +332,8 @@
                       <descriptors>
                           <descriptor>src/main/assembly/stress-client.xml</descriptor>
                       </descriptors>
+                      <overrideGid>0</overrideGid>
+                      <overrideUid>0</overrideUid>
                       <finalName>stress-client-${project.version}-package</finalName>
                   </configuration>
                   <executions>
