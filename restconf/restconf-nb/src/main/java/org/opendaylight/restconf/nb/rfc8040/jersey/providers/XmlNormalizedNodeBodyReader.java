@@ -68,8 +68,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
     protected NormalizedNodePayload readBody(final InstanceIdentifierContext path, final InputStream entityStream)
             throws WebApplicationException {
         try {
-            final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
-            return parse(path, doc);
+            return parse(path, UntrustedXML.newDocumentBuilder().parse(entityStream));
         } catch (final RestconfDocumentedException e) {
             throw e;
         } catch (final Exception e) {
