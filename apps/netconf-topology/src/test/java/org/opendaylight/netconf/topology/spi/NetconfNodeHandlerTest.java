@@ -14,6 +14,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -25,6 +26,7 @@ import io.netty.util.concurrent.ImmediateEventExecutor;
 import io.netty.util.concurrent.ScheduledFuture;
 import io.netty.util.concurrent.SucceededFuture;
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -37,8 +39,10 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSession;
+import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
@@ -47,6 +51,7 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemas;
@@ -60,8 +65,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
-
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfNodeHandlerTest {
@@ -110,16 +116,18 @@ public class NetconfNodeHandlerTest {
     private ScheduledFuture<?> scheduleFuture;
     @Captor
     private ArgumentCaptor<Runnable> scheduleCaptor;
+    @Mock
+    private EffectiveModelContext schemaContext;
 
     private NetconfNodeHandler handler;
 
     @BeforeClass
-    public static final void beforeClass() throws Exception {
+    public static void beforeClass() throws Exception {
         BASE_SCHEMAS = new DefaultBaseNetconfSchemas(new DefaultYangParserFactory());
     }
 
     @BeforeClass
-    public static final void afterClass() throws Exception {
+    public static void afterClass() throws Exception {
         BASE_SCHEMAS = null;
     }
 
@@ -153,10 +161,19 @@ public class NetconfNodeHandlerTest {
         assertSuccessfulConnect();
         assertEquals(1, handler.attempts());
 
+        final var schema = new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
+            MountPointContext.of(schemaContext));
+        final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
+        final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
+
         // when the device is connected, we propagate the information
-        // TODO: create non-null values
-        doNothing().when(delegate).onDeviceConnected(null, null, null);
-        handler.onDeviceConnected(null, null, null);
+        doNothing().when(delegate).onDeviceConnected(schemaCaptor.capture(), prefsCaptor.capture(),
+            servicesCaptor.capture());
+        handler.onDeviceConnected(schema, netconfSessionPreferences, deviceServices);
+
+        assertEquals(schema, schemaCaptor.getValue());
+        assertEquals(netconfSessionPreferences, prefsCaptor.getValue());
+        assertEquals(deviceServices, servicesCaptor.getValue());
         assertEquals(0, handler.attempts());
     }
 
