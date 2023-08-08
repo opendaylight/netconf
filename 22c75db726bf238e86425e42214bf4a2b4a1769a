@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca9e3669_17610154",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-08T16:48:25Z",
+      "side": 1,
+      "message": "lets not mix var an types. Use only one of them",
+      "range": {
+        "startLine": 324,
+        "startChar": 1,
+        "endLine": 325,
+        "endChar": 55
+      },
+      "revId": "22c75db726bf238e86425e42214bf4a2b4a1769a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a8f1a0d_2c4fbe6e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/KeysMappingTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-08T16:48:25Z",
+      "side": 1,
+      "message": "missing space",
+      "range": {
+        "startLine": 86,
+        "startChar": 43,
+        "endLine": 86,
+        "endChar": 45
+      },
+      "revId": "22c75db726bf238e86425e42214bf4a2b4a1769a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
