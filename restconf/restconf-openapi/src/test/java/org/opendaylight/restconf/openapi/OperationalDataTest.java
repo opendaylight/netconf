@@ -107,30 +107,27 @@ public class OperationalDataTest {
                 final var content = response.get("content");
                 // In case of 200 no content
                 if (content != null) {
-                    verifyOperationHaveCorrectReference(content.get("application/xml"));
-                    // TODO re-enable it in next patch after refactoring
-//                    verifyOperationHaveCorrectReference(content.get("application/json"));
+                    verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
+                    verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
                 }
             }
             if (path.put() != null) {
                 final var responses = path.put().requestBody();
                 final var content = responses.get("content");
-                verifyOperationHaveCorrectReference(content.get("application/xml"));
-                // TODO this is a bit tricky with new requests - it will be fixed later after refactoring all requests
-//                verifyOperationHaveCorrectReference(content.get("application/json"));
+                verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
+                verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
             }
             if (path.post() != null) {
                 final var responses = path.post().requestBody();
                 final var content = responses.get("content");
-                verifyOperationHaveCorrectReference(content.get("application/xml"));
-                verifyOperationHaveCorrectReference(content.get("application/json"));
+                verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
+                verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
             }
             if (path.patch() != null) {
                 final var responses = path.patch().requestBody();
                 final var content = responses.get("content");
-                verifyOperationHaveCorrectReference(content.get("application/yang-data+xml"));
-                // TODO same as with put
-//                verifyOperationHaveCorrectReference(content.get("application/yang-data+json"));
+                verifyOperationHaveCorrectXmlReference(content.get("application/yang-data+xml").get("schema"));
+                verifyOperationHaveCorrectJsonReference(content.get("application/yang-data+json").get("schema"));
             }
         }
     }
@@ -205,8 +202,7 @@ public class OperationalDataTest {
         assertEquals(Set.of("ca-output"), actualProperties);
     }
 
-    private static void verifyOperationHaveCorrectReference(final JsonNode jsonNode) {
-        final var schema = jsonNode.get("schema");
+    private static void verifyOperationHaveCorrectXmlReference(final JsonNode schema) {
         final var ref = schema.get("$ref");
         // In case of a POST RPC with a direct input body and no reference value
         if (ref != null) {
@@ -219,6 +215,28 @@ public class OperationalDataTest {
             assertNotNull(type);
             assertEquals("object", type.asText());
         }
+    }
+
+    private static void verifyOperationHaveCorrectJsonReference(final JsonNode schema) {
+        final var properties = schema.get("properties");
+        final String refValue;
+        if (properties != null) {
+            final var node = properties.elements().next();
+            final var type = node.get("type");
+            if (type == null) {
+                refValue = node.get("$ref").asText();
+            } else if (type.asText().equals("array")) {
+                refValue = node.get("items").get("$ref").asText();
+            } else {
+                assertEquals("object", type.asText());
+                return;
+            }
+        } else {
+            refValue = schema.get("$ref").asText();
+        }
+        final var schemaElement = refValue.substring(refValue.lastIndexOf("/") + 1);
+        assertTrue("Reference [" + refValue + "] not found in EXPECTED Schemas",
+            EXPECTED_SCHEMAS.contains(schemaElement));
     }
 
     private static Set<String> getSetOfProperties(final Schema schema) {
