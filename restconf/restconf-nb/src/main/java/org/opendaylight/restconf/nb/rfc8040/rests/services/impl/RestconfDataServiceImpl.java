@@ -48,6 +48,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
@@ -64,11 +65,13 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
-import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonPatchBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlPatchBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
@@ -96,7 +99,6 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -105,7 +107,6 @@ import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
@@ -299,28 +300,42 @@ public final class RestconfDataServiceImpl {
     @Path("/data/{identifier:.+}")
     @Consumes({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
+    })
+    public Response putDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo) {
+        try (var jsonBody = new JsonResourceBody(body)) {
+            return putData(identifier, uriInfo, jsonBody);
+        }
+    }
+
+    /**
+     * Create or replace the target data resource.
+     *
+     * @param identifier path to target
+     * @param payload data node for put to config DS
+     * @return {@link Response}
+     */
+    @PUT
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response putData(@Encoded @PathParam("identifier") final String identifier,
-            final NormalizedNodePayload payload, @Context final UriInfo uriInfo) {
-        requireNonNull(payload);
+    public Response putDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo) {
+        try (var xmlBody = new XmlResourceBody(body)) {
+            return putData(identifier, uriInfo, xmlBody);
+        }
+    }
 
-        final WriteDataParams params = QueryParams.newWriteDataParams(uriInfo);
+    @VisibleForTesting
+    Response putData(final String identifier, final UriInfo uriInfo, final ResourceBody body) {
+        final var params = QueryParams.newWriteDataParams(uriInfo);
+        final var req = bindResourceRequest(identifier, body);
 
-        final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
-        final YangInstanceIdentifier path = iid.getInstanceIdentifier();
-
-        validInputData(iid.getSchemaNode() != null, payload);
-        validTopLevelNodeName(path, payload);
-        validateListKeysEqualityInPayloadAndUri(payload);
-
-        final var strategy = getRestconfStrategy(iid.getMountPoint());
-        final var result = PutDataTransactionUtil.putData(path, payload.getData(), iid.getSchemaContext(), strategy,
-            params);
-        return switch (result) {
+        return switch (PutDataTransactionUtil.putData(req.path, req.data, req.modelContext, req.strategy, params)) {
             // Note: no Location header, as it matches the request path
             case CREATED -> Response.status(Status.CREATED).build();
             case REPLACED -> Response.noContent().build();
@@ -430,6 +445,27 @@ public final class RestconfDataServiceImpl {
         }, MoreExecutors.directExecutor());
     }
 
+    /**
+     * Partially modify the target data resource, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
+     *
+     * @param identifier path to target
+     * @param payload data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @PATCH
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void plainPatchDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Suspended final AsyncResponse ar) {
+        try (var xmlBody = new XmlResourceBody(body)) {
+            plainPatchData(identifier, xmlBody, ar);
+        }
+    }
 
     /**
      * Partially modify the target data resource, as defined in
@@ -443,21 +479,28 @@ public final class RestconfDataServiceImpl {
     @Path("/data/{identifier:.+}")
     @Consumes({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.TEXT_XML
     })
-    public void plainPatchData(@Encoded @PathParam("identifier") final String identifier,
-            final NormalizedNodePayload payload, @Suspended final AsyncResponse ar) {
-        final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
-        final YangInstanceIdentifier path = iid.getInstanceIdentifier();
-        validInputData(iid.getSchemaNode() != null, payload);
-        validTopLevelNodeName(path, payload);
-        validateListKeysEqualityInPayloadAndUri(payload);
-        final var strategy = getRestconfStrategy(iid.getMountPoint());
+    public void plainPatchDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Suspended final AsyncResponse ar) {
+        try (var jsonBody = new JsonResourceBody(body)) {
+            plainPatchData(identifier, jsonBody, ar);
+        }
+    }
 
-        Futures.addCallback(strategy.merge(path, payload.getData(), iid.getSchemaContext()), new FutureCallback<>() {
+    /**
+     * Partially modify the target data resource, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
+     *
+     * @param identifier path to target
+     * @param payload data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    private void plainPatchData(final String identifier, final ResourceBody body, @Suspended final AsyncResponse ar) {
+        final var req = bindResourceRequest(identifier, body);
+        final var future = req.strategy.merge(req.path, req.data, req.modelContext);
+
+        Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(final Empty result) {
                 ar.resume(Response.ok().build());
@@ -468,6 +511,34 @@ public final class RestconfDataServiceImpl {
                 ar.resume(failure);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private record ResourceRequest(
+            @NonNull RestconfStrategy strategy,
+            @NonNull EffectiveModelContext modelContext,
+            @NonNull YangInstanceIdentifier path,
+            @NonNull NormalizedNode data) {
+        ResourceRequest {
+            requireNonNull(strategy);
+            requireNonNull(modelContext);
+            requireNonNull(path);
+            requireNonNull(data);
+        }
+    }
+
+    private @NonNull ResourceRequest bindResourceRequest(final String identifier, final ResourceBody body) {
+        final var dataBind = databindProvider.currentContext();
+        final var context = ParserIdentifier.toInstanceIdentifier(identifier, dataBind.modelContext(),
+            mountPointService);
+        final var inference = context.inference();
+        final var data = body.toNormalizedNode(inference);
+
+        validInputData(context.getSchemaNode() != null, data);
+        final var path = validTopLevelNodeName(context.getInstanceIdentifier(), data);
+        validateListKeysEqualityInPayloadAndUri(context, data);
+
+        return new ResourceRequest(getRestconfStrategy(context.getMountPoint()), inference.getEffectiveModelContext(),
+            path, data);
     }
 
     /**
@@ -696,11 +767,11 @@ public final class RestconfDataServiceImpl {
      * Valid input data based on presence of a schema node.
      *
      * @param haveSchemaNode true if there is an underlying schema node
-     * @param payload    input data
+     * @param data           input data
      */
     @VisibleForTesting
-    static void validInputData(final boolean haveSchemaNode, final NormalizedNodePayload payload) {
-        final boolean haveData = payload.getData() != null;
+    static void validInputData(final boolean haveSchemaNode, final @Nullable NormalizedNode data) {
+        final boolean haveData = data != null;
         if (haveSchemaNode) {
             if (!haveData) {
                 throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL,
@@ -714,12 +785,13 @@ public final class RestconfDataServiceImpl {
     /**
      * Valid top level node name.
      *
-     * @param path    path of node
-     * @param payload data
+     * @param path path of node
+     * @param data data
      */
     @VisibleForTesting
-    static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodePayload payload) {
-        final QName dataNodeType = payload.getData().name().getNodeType();
+    static @NonNull YangInstanceIdentifier validTopLevelNodeName(final YangInstanceIdentifier path,
+            final NormalizedNode data) {
+        final QName dataNodeType = data.name().getNodeType();
         if (path.isEmpty()) {
             if (!Data.QNAME.equals(dataNodeType)) {
                 throw new RestconfDocumentedException("Instance identifier has to contain at least one path argument",
@@ -734,6 +806,7 @@ public final class RestconfDataServiceImpl {
                         ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
             }
         }
+        return path;
     }
 
     /**
@@ -743,16 +816,13 @@ public final class RestconfDataServiceImpl {
      * @throws RestconfDocumentedException if key values or key count in payload and URI isn't equal
      */
     @VisibleForTesting
-    static void validateListKeysEqualityInPayloadAndUri(final NormalizedNodePayload payload) {
-        final InstanceIdentifierContext iiWithData = payload.getInstanceIdentifierContext();
-        final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
-        final SchemaNode schemaNode = iiWithData.getSchemaNode();
-        final NormalizedNode data = payload.getData();
-        if (schemaNode instanceof ListSchemaNode listSchema) {
+    static void validateListKeysEqualityInPayloadAndUri(final InstanceIdentifierContext iiWithData,
+            final NormalizedNode data) {
+        if (iiWithData.getSchemaNode() instanceof ListSchemaNode listSchema) {
             final var keyDefinitions = listSchema.getKeyDefinition();
-            if (lastPathArgument instanceof NodeIdentifierWithPredicates && data instanceof MapEntryNode) {
-                final Map<QName, Object> uriKeyValues = ((NodeIdentifierWithPredicates) lastPathArgument).asMap();
-                isEqualUriAndPayloadKeyValues(uriKeyValues, (MapEntryNode) data, keyDefinitions);
+            if (iiWithData.getInstanceIdentifier().getLastPathArgument() instanceof NodeIdentifierWithPredicates nip
+                && data instanceof MapEntryNode mapEntry) {
+                isEqualUriAndPayloadKeyValues(nip.asMap(), mapEntry, keyDefinitions);
             }
         }
     }

@@ -9,19 +9,13 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -55,31 +49,6 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final var testFiles = loadFiles("/instanceidentifier/yang");
         testFiles.addAll(loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
-    }
-
-    @Test
-    public void moduleDataTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext
-                .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont";
-        mockPutBodyReader(uri, xmlBodyReader);
-        final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
-            XmlBodyReaderMountPointTest.class.getResourceAsStream("/instanceidentifier/xml/xmldata.xml"));
-        checkMountPointNormalizedNodePayload(payload);
-        checkExpectValueNormalizeNodeContext(dataSchemaNode, payload);
-    }
-
-    @Test
-    public void moduleSubContainerDataPutTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext
-                .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont/cont1";
-        mockPutBodyReader(uri, xmlBodyReader);
-        final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
-            XmlBodyReaderMountPointTest.class.getResourceAsStream("/instanceidentifier/xml/xml_sub_container.xml"));
-        checkMountPointNormalizedNodePayload(payload);
-        checkExpectValueNormalizeNodeContext(dataSchemaNode, payload,
-                QName.create(dataSchemaNode.getQName(), "cont1"));
     }
 
     @Test
@@ -179,23 +148,5 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final var dataNodeType = payload.getData().name().getNodeType();
         assertEquals("foo-bar-container", dataNodeType.getLocalName());
         assertEquals("bar:module", dataNodeType.getNamespace().toString());
-    }
-
-    /**
-     * Test PUT operation when message root element is not the same as the last element in request URI.
-     * PUT operation message should always start with schema node from URI otherwise exception should be
-     * thrown.
-     */
-    @Test
-    public void wrongRootElementTest() throws Exception {
-        mockPutBodyReader("instance-identifier-module:cont/yang-ext:mount", xmlBodyReader);
-        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
-            "/instanceidentifier/xml/bug7933.xml");
-
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null, inputStream));
-        final RestconfError restconfError = ex.getErrors().get(0);
-        assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
     }
 }
