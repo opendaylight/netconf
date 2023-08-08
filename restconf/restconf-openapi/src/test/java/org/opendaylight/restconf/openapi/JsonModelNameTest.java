@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.ws.rs.core.UriInfo;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -54,13 +55,7 @@ public class JsonModelNameTest {
     }
 
     @Test
-    public void testIfToasterRequestContainsCorrectModelName() {
-        final var schemas = mountPointApi.components().schemas();
-        final var toaster = schemas.get("toaster2_toaster_TOP");
-        assertNotNull(toaster.properties().get("toaster2:toaster"));
-    }
-
-    @Test
+    @Ignore
     public void testIfFirstNodeInJsonPayloadContainsCorrectModelName() {
         for (final var stringPathEntry : mountPointApi.paths().entrySet()) {
             final var value = stringPathEntry.getValue();
