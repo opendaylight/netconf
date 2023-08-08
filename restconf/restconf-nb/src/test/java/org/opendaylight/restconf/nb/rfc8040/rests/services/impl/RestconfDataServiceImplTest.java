@@ -492,36 +492,27 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testValidInputData() {
-        RestconfDataServiceImpl.validInputData(true, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
+        RestconfDataServiceImpl.validInputData(true, GAP_LEAF);
     }
 
     @Test
     public void testValidTopLevelNodeName() {
-        RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF));
-        RestconfDataServiceImpl.validTopLevelNodeName(JUKEBOX_IID, NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID), EMPTY_JUKEBOX));
+        RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID, GAP_LEAF);
+        RestconfDataServiceImpl.validTopLevelNodeName(JUKEBOX_IID, EMPTY_JUKEBOX);
     }
 
     @Test
     public void testValidTopLevelNodeNamePathEmpty() {
-        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
-        final var payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
-
         // FIXME: more asserts
         assertThrows(RestconfDocumentedException.class,
-            () -> RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.of(), payload));
+            () -> RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.of(), GAP_LEAF));
     }
 
     @Test
     public void testValidTopLevelNodeNameWrongTopIdentifier() {
-        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID);
-        final var payload = NormalizedNodePayload.of(iidContext, GAP_LEAF);
-
         // FIXME: more asserts
         assertThrows(RestconfDocumentedException.class,
-            () -> RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID.getAncestor(1), payload));
+            () -> RestconfDataServiceImpl.validTopLevelNodeName(GAP_IID.getAncestor(1), GAP_LEAF));
     }
 
     @Test
@@ -531,7 +522,6 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
             .node(PLAYLIST_QNAME)
             .nodeWithKey(PLAYLIST_QNAME, NAME_QNAME, "name of band")
             .build());
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, BAND_ENTRY);
-        RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
+        RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(iidContext, BAND_ENTRY);
     }
 }
