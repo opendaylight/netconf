@@ -19,6 +19,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -61,7 +63,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
-import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -95,6 +97,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -102,6 +107,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,6 +117,13 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 public final class RestconfDataServiceImpl {
+    @FunctionalInterface
+    public interface StreamablePutBody {
+
+        void streamTo(DatabindContext context, Inference inference, NormalizedNodeStreamWriter writer)
+            throws IOException;
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
@@ -293,28 +306,60 @@ public final class RestconfDataServiceImpl {
     @Path("/data/{identifier:.+}")
     @Consumes({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
+    })
+    public Response putDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo) {
+        return putData(identifier, uriInfo, (context, inference, writer) -> {
+            // FIXME: NETCONF-1128: JSON decode
+        });
+    }
+
+    /**
+     * Create or replace the target data resource.
+     *
+     * @param identifier path to target
+     * @param payload data node for put to config DS
+     * @return {@link Response}
+     */
+    @PUT
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response putData(@Encoded @PathParam("identifier") final String identifier,
-            final NormalizedNodePayload payload, @Context final UriInfo uriInfo) {
-        requireNonNull(payload);
+    public Response putDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo) {
+        return putData(identifier, uriInfo, (context, inference, writer) -> {
+            // FIXME: NETCONF-1128: XML decode
+        });
+    }
 
-        final WriteDataParams params = QueryParams.newWriteDataParams(uriInfo);
+    private Response putData(final String identifier, final UriInfo uriInfo, final StreamablePutBody body) {
+        final var dataBind = databindProvider.currentContext();
+        final var context = ParserIdentifier.toInstanceIdentifier(identifier, dataBind.modelContext(),
+            mountPointService);
+        final var params = QueryParams.newWriteDataParams(uriInfo);
 
-        final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
-        final YangInstanceIdentifier path = iid.getInstanceIdentifier();
+        final var holder = new NormalizationResultHolder();
+        try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
+            body.streamTo(dataBind, context.inference(), streamWriter);
+        } catch (IOException e) {
+            LOG.debug("Error reading input", e);
+            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
+                    ErrorTag.MALFORMED_MESSAGE, e);
+        }
+        final var data = holder.getResult().data();
 
-        validInputData(iid.getSchemaNode() != null, payload);
-        validTopLevelNodeName(path, payload);
-        validateListKeysEqualityInPayloadAndUri(payload);
+        final var path = context.getInstanceIdentifier();
 
-        final var strategy = getRestconfStrategy(iid.getMountPoint());
-        final var result = PutDataTransactionUtil.putData(path, payload.getData(), iid.getSchemaContext(), strategy,
-            params);
-        return switch (result) {
+//        validInputData(context.getSchemaNode() != null, payload);
+//        validTopLevelNodeName(path, payload);
+//        validateListKeysEqualityInPayloadAndUri(payload);
+
+        final var strategy = getRestconfStrategy(context.getMountPoint());
+        return switch (PutDataTransactionUtil.putData(path, data, context.getSchemaContext(), strategy, params)) {
             // Note: no Location header, as it matches the request path
             case CREATED -> Response.status(Status.CREATED).build();
             case REPLACED -> Response.noContent().build();
