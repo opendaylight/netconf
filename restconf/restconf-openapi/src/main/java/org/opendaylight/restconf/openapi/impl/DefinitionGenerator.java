@@ -857,19 +857,19 @@ public class DefinitionGenerator {
     }
 
     private static String processUnionType(final UnionTypeDefinition unionType, final ObjectNode property,
-            final String nodeName) {
+        final String nodeName) {
         boolean isStringTakePlace = false;
         boolean isNumberTakePlace = false;
         boolean isBooleanTakePlace = false;
         for (final TypeDefinition<?> typeDef : unionType.getTypes()) {
             if (!isStringTakePlace) {
                 if (typeDef instanceof StringTypeDefinition
-                        || typeDef instanceof BitsTypeDefinition
-                        || typeDef instanceof BinaryTypeDefinition
-                        || typeDef instanceof IdentityrefTypeDefinition
-                        || typeDef instanceof EnumTypeDefinition
-                        || typeDef instanceof LeafrefTypeDefinition
-                        || typeDef instanceof UnionTypeDefinition) {
+                    || typeDef instanceof BitsTypeDefinition
+                    || typeDef instanceof BinaryTypeDefinition
+                    || typeDef instanceof IdentityrefTypeDefinition
+                    || typeDef instanceof EnumTypeDefinition
+                    || typeDef instanceof LeafrefTypeDefinition
+                    || typeDef instanceof UnionTypeDefinition) {
                     isStringTakePlace = true;
                 } else if (!isNumberTakePlace && typeDef instanceof RangeRestrictedTypeDefinition) {
                     isNumberTakePlace = true;
@@ -885,17 +885,22 @@ public class DefinitionGenerator {
         }
         if (isBooleanTakePlace) {
             if (isNumberTakePlace) {
-                // FIXME deal with other number formats
-                unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Long.valueOf((String) v)));
+                if (unionType.getDefaultValue().isPresent()) {
+                    Object defaultValue = unionType.getDefaultValue().orElseThrow();
+                    try {
+                        Long numericValue = Long.parseLong((String) defaultValue);
+                        setDefaultValue(property, numericValue);
+                    } catch (NumberFormatException e) {
+                        setDefaultValue(property, Boolean.valueOf((String) defaultValue));
+                        setExampleValue(property, 0);
+                    }
+                }
                 setExampleValue(property, 0);
                 return NUMBER_TYPE;
             }
-            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Boolean.valueOf((String) v)));
             setExampleValue(property, true);
             return BOOLEAN_TYPE;
         }
-        // FIXME deal with other number formats
-        unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Long.valueOf((String) v)));
         setExampleValue(property, 0);
         return NUMBER_TYPE;
     }
