@@ -13,10 +13,16 @@ import java.nio.charset.StandardCharsets;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractInstanceIdentifierTest {
+    protected static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
+        XMLNamespace.of("instance:identifier:module"), Revision.of("2014-01-17"));
+
     protected static final QName CASE_LEAF1_QNAME = QName.create("choice:ns", "case-leaf1");
     protected static final QName CHOICE_CONT_QNAME = QName.create("choice:ns", "case-cont1");
 
