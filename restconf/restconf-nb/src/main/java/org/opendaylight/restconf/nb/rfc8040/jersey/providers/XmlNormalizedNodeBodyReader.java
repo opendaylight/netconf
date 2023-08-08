@@ -68,8 +68,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
     protected NormalizedNodePayload readBody(final InstanceIdentifierContext path, final InputStream entityStream)
             throws WebApplicationException {
         try {
-            final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
-            return parse(path, doc);
+            return parse(path, UntrustedXML.newDocumentBuilder().parse(entityStream));
         } catch (final RestconfDocumentedException e) {
             throw e;
         } catch (final Exception e) {
@@ -80,7 +79,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         }
     }
 
-    private NormalizedNodePayload parse(final InstanceIdentifierContext pathContext, final Document doc)
+    private static NormalizedNodePayload parse(final InstanceIdentifierContext pathContext, final Document doc)
             throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
         DataSchemaNode schemaNode;
@@ -97,43 +96,35 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
             final String docRootElm = doc.getDocumentElement().getLocalName();
             final XMLNamespace docRootNamespace = XMLNamespace.of(doc.getDocumentElement().getNamespaceURI());
-            if (isPost()) {
-                final var context = pathContext.getSchemaContext();
-                final var it = context.findModuleStatements(docRootNamespace).iterator();
-                checkState(it.hasNext(), "Failed to find module for %s", docRootNamespace);
-                final var qname = QName.create(it.next().localQNameModule(), docRootElm);
+            final var context = pathContext.getSchemaContext();
+            final var it = context.findModuleStatements(docRootNamespace).iterator();
+            checkState(it.hasNext(), "Failed to find module for %s", docRootNamespace);
+            final var qname = QName.create(it.next().localQNameModule(), docRootElm);
 
-                final var nodeAndStack = DataSchemaContextTree.from(context)
-                    .enterPath(pathContext.getInstanceIdentifier()).orElseThrow();
+            final var nodeAndStack = DataSchemaContextTree.from(context)
+                .enterPath(pathContext.getInstanceIdentifier()).orElseThrow();
 
-                final var stack = nodeAndStack.stack();
-                var current = nodeAndStack.node();
-                do {
-                    final var next = current instanceof DataSchemaContext.Composite compositeCurrent
-                        ? compositeCurrent.enterChild(stack, qname) : null;
-                    if (next == null) {
-                        throw new IllegalStateException(
-                            "Child \"" + qname + "\" was not found in parent schema node \"" + schemaNode + "\"");
-                    }
+            final var stack = nodeAndStack.stack();
+            var current = nodeAndStack.node();
+            do {
+                final var next = current instanceof DataSchemaContext.Composite compositeCurrent
+                    ? compositeCurrent.enterChild(stack, qname) : null;
+                if (next == null) {
+                    throw new IllegalStateException(
+                        "Child \"" + qname + "\" was not found in parent schema node \"" + schemaNode + "\"");
+                }
 
-                    // Careful about steps: for keyed list items the individual item does not have a PathArgument step,
-                    // as we do not know the key values -- we supply that later
-                    final var step = next.pathStep();
-                    if (step != null) {
-                        iiToDataList.add(step);
-                    }
-                    schemaNode = next.dataSchemaNode();
-                    current = next;
-                } while (current instanceof PathMixin);
+                // Careful about steps: for keyed list items the individual item does not have a PathArgument step,
+                // as we do not know the key values -- we supply that later
+                final var step = next.pathStep();
+                if (step != null) {
+                    iiToDataList.add(step);
+                }
+                schemaNode = next.dataSchemaNode();
+                current = next;
+            } while (current instanceof PathMixin);
 
-                inference = stack.toInference();
-            } else {
-                // PUT
-                final QName scQName = schemaNode.getQName();
-                checkState(docRootElm.equals(scQName.getLocalName()) && docRootNamespace.equals(scQName.getNamespace()),
-                    "Not correct message root element \"%s\", should be \"%s\"", docRootElm, scQName);
-                inference = pathContext.inference();
-            }
+            inference = stack.toInference();
         } else {
             throw new IllegalStateException("Unknown SchemaNode " + schemaNodeContext);
         }
@@ -157,7 +148,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                 parsed = mapNode.body().iterator().next();
             }
 
-            if (schemaNode instanceof ListSchemaNode && isPost()) {
+            if (schemaNode instanceof ListSchemaNode) {
                 // Supply the last item
                 iiToDataList.add(parsed.name());
             }
