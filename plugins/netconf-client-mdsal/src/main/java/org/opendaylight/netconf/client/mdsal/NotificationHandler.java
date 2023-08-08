@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;

@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 

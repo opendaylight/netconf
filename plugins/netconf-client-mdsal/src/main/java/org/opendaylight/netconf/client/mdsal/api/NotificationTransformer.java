@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.client.mdsal.api;
 
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NetconfMessage;
 
 /**
  * Interface for transforming NETCONF device {@link NetconfMessage}s to {@link DOMNotification}.
