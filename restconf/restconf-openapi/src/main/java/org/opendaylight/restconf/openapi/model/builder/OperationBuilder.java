@@ -37,7 +37,7 @@ public final class OperationBuilder {
     public static final String PROPERTIES_KEY = "properties";
     public static final String REF_KEY = "$ref";
     public static final String SCHEMA_KEY = "schema";
-    public static final String SUMMARY_SEPARATOR = " - ";
+    public static final String SUMMARY_TEMPLATE = "%s - %s - %s - %s";
     public static final String TOP = "_TOP";
     public static final String XML_KEY = "xml";
     private static final List<String> MIME_TYPES = List.of(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON);
@@ -51,7 +51,7 @@ public final class OperationBuilder {
     public static Operation buildPost(final String parentName, final String nodeName, final String discriminator,
             final String moduleName, final String deviceName, final String description,
             final List<Parameter> pathParams) {
-        final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
+        final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
@@ -77,7 +77,7 @@ public final class OperationBuilder {
     public static Operation buildGet(final DataSchemaNode node, final String moduleName, final String deviceName,
             final List<Parameter> pathParams, final String defName, final String defNameTop) {
         final String description = node.getDescription().orElse("");
-        final String summary = buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
+        final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.GET, moduleName, deviceName,
                 node.getQName().getLocalName());
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
@@ -116,7 +116,7 @@ public final class OperationBuilder {
     public static Operation buildPut(final String parentName, final String nodeName, final String discriminator,
             final String moduleName, final String deviceName, final String description,
             final List<Parameter> pathParams) {
-        final String summary = buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName);
+        final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.PUT, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName + TOP;
@@ -140,7 +140,7 @@ public final class OperationBuilder {
 
     public static Operation buildPatch(final String parentName, final String nodeName, final String moduleName,
             final String deviceName, final String description, final List<Parameter> pathParams) {
-        final String summary = buildSummaryValue(HttpMethod.PATCH, moduleName, deviceName, nodeName);
+        final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.PATCH, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName + TOP;
@@ -164,7 +164,7 @@ public final class OperationBuilder {
 
     public static Operation buildDelete(final DataSchemaNode node, final String moduleName, final String deviceName,
             final List<Parameter> pathParams) {
-        final String summary = buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
+        final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.DELETE, moduleName, deviceName,
                 node.getQName().getLocalName());
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final String description = node.getDescription().orElse("");
@@ -188,7 +188,7 @@ public final class OperationBuilder {
         final List<Parameter> parameters = new ArrayList<>(parentPathParameters);
         final String operationName = operDef.getQName().getLocalName();
         final String inputName = operationName + INPUT_SUFFIX;
-        final String summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, operationName);
+        final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, moduleName, deviceName, operationName);
 
         final InputSchemaNode input = operDef.getInput();
         final OutputSchemaNode output = operDef.getOutput();
@@ -314,12 +314,6 @@ public final class OperationBuilder {
         response.set(CONTENT_KEY, content);
         response.put(DESCRIPTION_KEY, description);
         return response;
-    }
-
-    private static String buildSummaryValue(final String httpMethod, final String moduleName,
-            final String deviceName, final String nodeName) {
-        return httpMethod + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR
-            + moduleName + SUMMARY_SEPARATOR + nodeName;
     }
 
     public static ArrayNode buildTagsValue(final String deviceName, final String moduleName) {
