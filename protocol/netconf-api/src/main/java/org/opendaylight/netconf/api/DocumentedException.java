@@ -11,7 +11,6 @@ import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.RPC_REPLY_KEY
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
-import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -19,8 +18,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -47,9 +44,9 @@ public class DocumentedException extends Exception {
     public static final String ERROR_MESSAGE = "error-message";
     public static final String ERROR_INFO = "error-info";
 
-    @Serial
+    @java.io.Serial
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = LoggerFactory.getLogger(DocumentedException.class);
+
     private static final DocumentBuilderFactory BUILDER_FACTORY;
 
     static {
@@ -226,39 +223,38 @@ public class DocumentedException extends Exception {
 
     // FIXME: this really should be an spi/util method (or even netconf-util-w3c-dom?) as this certainly is not the
     //        primary interface we want to expose -- it is inherently mutable and its API is a pure nightmare.
-    public Document toXMLDocument() {
-        Document doc = null;
+    public final Document toXMLDocument() {
+        final Document doc;
         try {
             doc = BUILDER_FACTORY.newDocumentBuilder().newDocument();
-
-            final var rpcReply = doc.createElementNS(NamespaceURN.BASE, RPC_REPLY_KEY);
-            doc.appendChild(rpcReply);
-
-            final var rpcError = doc.createElementNS(NamespaceURN.BASE, RPC_ERROR);
-            rpcReply.appendChild(rpcError);
-
-            rpcError.appendChild(createTextNode(doc, ERROR_TYPE, getErrorType().elementBody()));
-            rpcError.appendChild(createTextNode(doc, ERROR_TAG, getErrorTag().elementBody()));
-            rpcError.appendChild(createTextNode(doc, ERROR_SEVERITY, getErrorSeverity().elementBody()));
-            rpcError.appendChild(createTextNode(doc, ERROR_MESSAGE, getLocalizedMessage()));
-
-            final var errorInfoMap = getErrorInfo();
-            if (errorInfoMap != null && !errorInfoMap.isEmpty()) {
-                /*
-                 * <error-info> <bad-attribute>message-id</bad-attribute>
-                 * <bad-element>rpc</bad-element> </error-info>
-                 */
-                final var errorInfoNode = doc.createElementNS(NamespaceURN.BASE, ERROR_INFO);
-                errorInfoNode.setPrefix(rpcReply.getPrefix());
-                rpcError.appendChild(errorInfoNode);
-
-                for (var entry : errorInfoMap.entrySet()) {
-                    errorInfoNode.appendChild(createTextNode(doc, entry.getKey(), entry.getValue()));
-                }
-            }
         } catch (final ParserConfigurationException e) {
-            // this shouldn't happen
-            LOG.error("Error outputting to XML document", e);
+            throw new IllegalStateException("Error outputting to XML document", e);
+        }
+
+        final var rpcReply = doc.createElementNS(NamespaceURN.BASE, RPC_REPLY_KEY);
+        doc.appendChild(rpcReply);
+
+        final var rpcError = doc.createElementNS(NamespaceURN.BASE, RPC_ERROR);
+        rpcReply.appendChild(rpcError);
+
+        rpcError.appendChild(createTextNode(doc, ERROR_TYPE, getErrorType().elementBody()));
+        rpcError.appendChild(createTextNode(doc, ERROR_TAG, getErrorTag().elementBody()));
+        rpcError.appendChild(createTextNode(doc, ERROR_SEVERITY, getErrorSeverity().elementBody()));
+        rpcError.appendChild(createTextNode(doc, ERROR_MESSAGE, getLocalizedMessage()));
+
+        final var errorInfoMap = getErrorInfo();
+        if (errorInfoMap != null && !errorInfoMap.isEmpty()) {
+            /*
+             * <error-info> <bad-attribute>message-id</bad-attribute>
+             * <bad-element>rpc</bad-element> </error-info>
+             */
+            final var errorInfoNode = doc.createElementNS(NamespaceURN.BASE, ERROR_INFO);
+            errorInfoNode.setPrefix(rpcReply.getPrefix());
+            rpcError.appendChild(errorInfoNode);
+
+            for (var entry : errorInfoMap.entrySet()) {
+                errorInfoNode.appendChild(createTextNode(doc, entry.getKey(), entry.getValue()));
+            }
         }
 
         return doc;

@@ -58,6 +58,7 @@ public final class SendErrorExceptionUtil {
         channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 
+    // FIXME: this should be handled through RpcMessage.toReply(DocumentedException)
     @SuppressWarnings("checkstyle:IllegalCatch")
     private static void tryToCopyAttributes(final Document incommingDocument, final Document errorDocument,
             final DocumentedException sendErrorException) {
