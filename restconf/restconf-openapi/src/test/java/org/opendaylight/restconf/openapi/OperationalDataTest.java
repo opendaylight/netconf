@@ -107,28 +107,27 @@ public class OperationalDataTest {
                 final var content = response.get("content");
                 // In case of 200 no content
                 if (content != null) {
-                    verifyOperationHaveCorrectReference(content.get("application/xml"));
-                    // TODO re-enable it in next patch after refactoring
-//                    verifyOperationHaveCorrectReference(content.get("application/json"));
+                    verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
+                    verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
                 }
             }
             if (path.put() != null) {
                 final var responses = path.put().requestBody();
                 final var content = responses.get("content");
-                verifyOperationHaveCorrectReference(content.get("application/xml"));
-                verifyOperationHaveCorrectJsonReference(content.get("application/json"));
+                verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
+                verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
             }
             if (path.post() != null) {
                 final var responses = path.post().requestBody();
                 final var content = responses.get("content");
-                verifyOperationHaveCorrectReference(content.get("application/xml"));
-                verifyOperationHaveCorrectReference(content.get("application/json"));
+                verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
+                verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
             }
             if (path.patch() != null) {
                 final var responses = path.patch().requestBody();
                 final var content = responses.get("content");
-                verifyOperationHaveCorrectReference(content.get("application/yang-data+xml"));
-                verifyOperationHaveCorrectJsonReference(content.get("application/yang-data+json"));
+                verifyOperationHaveCorrectXmlReference(content.get("application/yang-data+xml").get("schema"));
+                verifyOperationHaveCorrectJsonReference(content.get("application/yang-data+json").get("schema"));
             }
         }
     }
@@ -203,8 +202,7 @@ public class OperationalDataTest {
         assertEquals(Set.of("ca-output"), actualProperties);
     }
 
-    private static void verifyOperationHaveCorrectReference(final JsonNode jsonNode) {
-        final var schema = jsonNode.get("schema");
+    private static void verifyOperationHaveCorrectXmlReference(final JsonNode schema) {
         final var ref = schema.get("$ref");
         // In case of a POST RPC with a direct input body and no reference value
         if (ref != null) {
