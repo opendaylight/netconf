@@ -78,6 +78,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.restconf.Data;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -92,10 +93,12 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -358,15 +361,40 @@ public final class RestconfDataServiceImpl {
     })
     public Response postData(final NormalizedNodePayload payload, @Context final UriInfo uriInfo) {
         requireNonNull(payload);
-        final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
+        final var iid = payload.getInstanceIdentifierContext();
         if (iid.getSchemaNode() instanceof ActionDefinition) {
             return invokeAction(payload);
         }
 
-        final WriteDataParams params = QueryParams.newWriteDataParams(uriInfo);
-        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
-        return PostDataTransactionUtil.postData(uriInfo, iid.getInstanceIdentifier(), payload.getData(), strategy,
-            iid.getSchemaContext(), params);
+        final var params = QueryParams.newWriteDataParams(uriInfo);
+        final var strategy = getRestconfStrategy(iid.getMountPoint());
+        final var path = iid.getInstanceIdentifier();
+        final var context = iid.getSchemaContext();
+        final var data = payload.getData();
+
+        PostDataTransactionUtil.postData(path, data, strategy, context, params);
+        return Response.created(resolveLocation(uriInfo, path, context, data)).build();
+    }
+
+    /**
+     * Get location from {@link YangInstanceIdentifier} and {@link UriInfo}.
+     *
+     * @param uriInfo       uri info
+     * @param initialPath   data path
+     * @param schemaContext reference to {@link SchemaContext}
+     * @return {@link URI}
+     */
+    private static URI resolveLocation(final UriInfo uriInfo, final YangInstanceIdentifier initialPath,
+                                       final EffectiveModelContext schemaContext, final NormalizedNode data) {
+        YangInstanceIdentifier path = initialPath;
+        if (data instanceof MapNode mapData) {
+            final var children = mapData.body();
+            if (!children.isEmpty()) {
+                path = path.node(children.iterator().next().name());
+            }
+        }
+
+        return uriInfo.getBaseUriBuilder().path("data").path(IdentifierCodec.serialize(path, schemaContext)).build();
     }
 
     /**
