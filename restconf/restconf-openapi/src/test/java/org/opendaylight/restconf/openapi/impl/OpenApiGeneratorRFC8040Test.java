@@ -372,8 +372,8 @@ public final class OpenApiGeneratorRFC8040Test {
         verifyPutRequestRef(jsonNodeLst1.get(), "#/components/schemas/toaster2_lst_lst1", "lst1", LIST);
         final var jsonNodeMakeToast = doc.paths().get("/rests/operations/toaster2:make-toast");
         assertNull(jsonNodeMakeToast.get());
-        verifyRequestRef(jsonNodeMakeToast.post(), "#/components/schemas/toaster2_make-toast_input_TOP",
-            "#/components/schemas/toaster2_make-toast_input");
+        verifyPutRequestRef(jsonNodeMakeToast.post(), "#/components/schemas/toaster2_make-toast_input", "input",
+            CONTAINER);
 
         final var jsonNodeCancelToast = doc.paths().get("/rests/operations/toaster2:cancel-toast");
         assertNull(jsonNodeCancelToast.get());
