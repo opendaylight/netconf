@@ -1,4 +1,56 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49e19f88_6327781f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-08T07:59:01Z",
+      "side": 1,
+      "message": "MateJ Sramcik will addres teh remaining comments.",
+      "revId": "950197562f24cdadcfaf5a6a1e65c4b7df0490c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "053fa351_c92f4405",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-08T07:59:01Z",
+      "side": 1,
+      "message": "One attempt when UInt32.two?",
+      "revId": "950197562f24cdadcfaf5a6a1e65c4b7df0490c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49933033_690bc542",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-08T07:59:01Z",
+      "side": 1,
+      "message": "Please address this todo.",
+      "revId": "950197562f24cdadcfaf5a6a1e65c4b7df0490c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ],
   "submitRequirementResults": []
 }
