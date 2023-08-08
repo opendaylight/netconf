@@ -15,12 +15,10 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -39,8 +37,6 @@ public abstract class AbstractNormalizedNodeBodyReader implements MessageBodyRea
 
     @Context
     private UriInfo uriInfo;
-    @Context
-    private Request request;
 
     AbstractNormalizedNodeBodyReader(final DatabindProvider databindProvider,
             final DOMMountPointService mountPointService) {
@@ -67,7 +63,7 @@ public abstract class AbstractNormalizedNodeBodyReader implements MessageBodyRea
 
         int firstByte = pushbackInputStream.read();
         if (firstByte == -1) {
-            return  NormalizedNodePayload.empty(path);
+            return NormalizedNodePayload.empty(path);
         } else {
             pushbackInputStream.unread(firstByte);
             return readBody(path, pushbackInputStream);
@@ -77,17 +73,8 @@ public abstract class AbstractNormalizedNodeBodyReader implements MessageBodyRea
     protected abstract NormalizedNodePayload readBody(InstanceIdentifierContext path, InputStream entityStream)
         throws WebApplicationException;
 
-    final boolean isPost() {
-        return HttpMethod.POST.equals(request.getMethod());
-    }
-
     @VisibleForTesting
     public final void setUriInfo(final UriInfo uriInfo) {
         this.uriInfo = uriInfo;
-    }
-
-    @VisibleForTesting
-    public final void setRequest(final Request request) {
-        this.request = request;
     }
 }
