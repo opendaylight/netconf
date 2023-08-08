@@ -302,7 +302,7 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static Path operations(final DataSchemaNode node, final String moduleName,
             final String deviceName, final List<Parameter> pathParams, final String parentName,
-            final DefinitionNames definitionNames, String fullName) {
+            final DefinitionNames definitionNames, final String fullName) {
         final Path.Builder operationsBuilder = new Path.Builder();
 
         final String discriminator = definitionNames.getDiscriminator(node);
