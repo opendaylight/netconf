@@ -63,6 +63,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,18 +71,17 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseYangOpenApiGenerator.class);
 
-    public static final String API_VERSION = "1.0.0";
-    public static final String OPEN_API_VERSION = "3.0.3";
+    private static final String API_VERSION = "1.0.0";
+    private static final String OPEN_API_VERSION = "3.0.3";
+    private final DOMSchemaService schemaService;
+    private static Module topLevelModule;
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
-    public static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
-        .put("type", "http")
-        .put("scheme", "basic");
-    public static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
-        .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
-
-    private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
-    private final DOMSchemaService schemaService;
+    private static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
+            .put("type", "http")
+            .put("scheme", "basic");
+    private static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
+            .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
     protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService) {
         this.schemaService = requireNonNull(schemaService);
@@ -192,7 +192,15 @@ public abstract class BaseYangOpenApiGenerator {
 
     public Map<String, Path> getPaths(final Module module, final String context, final String deviceName,
             final EffectiveModelContext schemaContext, final DefinitionNames definitionNames,
-            final boolean isForSingleModule) {
+            final OpenApiObject.Builder docBuilder, final boolean isForSingleModule) {
+        setTopLevelModule(module);
+        try {
+            final Map<String, Schema> schemas = DefinitionGenerator.convertToSchemas(module, schemaContext,
+                definitionNames, isForSingleModule);
+            docBuilder.getComponents().schemas().putAll(schemas);
+        } catch (final IOException e) {
+            LOG.error("Exception occurred in DefinitionGenerator", e);
+        }
         final Map<String, Path> paths = new HashMap<>();
         final String moduleName = module.getName();
 
@@ -420,5 +428,13 @@ public abstract class BaseYangOpenApiGenerator {
             }
         }
         return builder.toString();
+    }
+
+    public static void setTopLevelModule(Module topLevelModule) {
+        BaseYangOpenApiGenerator.topLevelModule = topLevelModule;
+    }
+
+    public static boolean isImported(final IdentityrefTypeDefinition leafTypeDef) {
+        return !leafTypeDef.getQName().getModule().equals(topLevelModule.getQNameModule());
     }
 }
