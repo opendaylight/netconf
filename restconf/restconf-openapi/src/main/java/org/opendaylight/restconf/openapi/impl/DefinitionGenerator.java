@@ -885,19 +885,36 @@ public class DefinitionGenerator {
         }
         if (isBooleanTakePlace) {
             if (isNumberTakePlace) {
-                // FIXME deal with other number formats
-                unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Long.valueOf((String) v)));
+                if (unionType.getDefaultValue().isPresent()) {
+                    Object defaultValue = unionType.getDefaultValue().orElseThrow();
+                    if (isNumeric(String.valueOf(defaultValue).replaceAll("\"", ""))) {
+                        Long numericValue = Long.parseLong((String) defaultValue);
+                        setDefaultValue(property, numericValue);
+                    } else {
+                        setDefaultValue(property, Boolean.valueOf((String) defaultValue));
+                    }
+                }
                 setExampleValue(property, 0);
                 return NUMBER_TYPE;
             }
-            unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Boolean.valueOf((String) v)));
             setExampleValue(property, true);
             return BOOLEAN_TYPE;
         }
-        // FIXME deal with other number formats
-        unionType.getDefaultValue().ifPresent(v -> setDefaultValue(property, Long.valueOf((String) v)));
         setExampleValue(property, 0);
         return NUMBER_TYPE;
+    }
+
+    public static boolean isNumeric(String str) {
+        if (str == null) {
+            return false;
+        }
+        int sz = str.length();
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static ObjectNode buildXmlParameter(final SchemaNode node) {
