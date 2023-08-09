@@ -17,11 +17,11 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public final class RestDocgenUtil {
 
     private RestDocgenUtil() {
+        // Hidden on purpose
     }
 
     private static final Map<XMLNamespace, Map<Optional<Revision>, Module>> NAMESPACE_AND_REVISION_TO_MODULE =
@@ -42,23 +42,6 @@ public final class RestDocgenUtil {
             return node.getLocalName();
         } else {
             return resolveFullNameFromNode(node, schemaContext);
-        }
-    }
-
-    /*
-     * Resolve full name according to module and node namespace and revision equality.
-     *
-     * @deprecated Most likely this method is useless because when we are going from module to its direct children
-     * there is no need for reasoning if we should use full name.
-     */
-    @Deprecated(forRemoval = true)
-    public static String resolveNodesName(final SchemaNode node, final Module module,
-            final SchemaContext schemaContext) {
-        if (node.getQName().getNamespace().equals(module.getQNameModule().getNamespace())
-                && node.getQName().getRevision().equals(module.getQNameModule().getRevision())) {
-            return node.getQName().getLocalName();
-        } else {
-            return resolveFullNameFromNode(node.getQName(), schemaContext);
         }
     }
 
