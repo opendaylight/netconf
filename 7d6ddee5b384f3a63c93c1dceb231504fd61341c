@@ -83,6 +83,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b79ee86_2570b931",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-08-09T10:41:38Z",
+      "side": 1,
+      "message": "resolved",
+      "parentUuid": "f66c0d06_d8f8f97e",
+      "range": {
+        "startLine": 61,
+        "startChar": 14,
+        "endLine": 61,
+        "endChar": 33
+      },
+      "revId": "7d6ddee5b384f3a63c93c1dceb231504fd61341c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f5e1510_34e07e48",
@@ -120,6 +144,30 @@
       "side": 1,
       "message": "done",
       "parentUuid": "9f5e1510_34e07e48",
+      "range": {
+        "startLine": 65,
+        "startChar": 8,
+        "endLine": 65,
+        "endChar": 22
+      },
+      "revId": "7d6ddee5b384f3a63c93c1dceb231504fd61341c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6aed1856_364aa877",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-08-09T10:41:38Z",
+      "side": 1,
+      "message": "resolved",
+      "parentUuid": "124bd7a5_fddec418",
       "range": {
         "startLine": 65,
         "startChar": 8,
