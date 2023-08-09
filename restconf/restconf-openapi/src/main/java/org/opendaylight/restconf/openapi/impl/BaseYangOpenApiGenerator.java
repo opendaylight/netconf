@@ -63,6 +63,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,8 @@ public abstract class BaseYangOpenApiGenerator {
     public static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
         .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
-    private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
+    private static Module topLevelModule;
+
     private final DOMSchemaService schemaService;
 
     protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService) {
@@ -241,7 +243,8 @@ public abstract class BaseYangOpenApiGenerator {
             final DefinitionNames definitionNames, final boolean isForSingleModule) {
         Map<String, Schema> schemas = new HashMap<>();
         try {
-            schemas = jsonConverter.convertToSchemas(module, schemaContext, definitionNames, isForSingleModule);
+            setTopLevelModule(module);
+            schemas = DefinitionGenerator.convertToSchemas(module, schemaContext, definitionNames, isForSingleModule);
         } catch (final IOException e) {
             LOG.error("Exception occurred in DefinitionGenerator", e); // FIXME propagate exception
         }
@@ -420,5 +423,13 @@ public abstract class BaseYangOpenApiGenerator {
             }
         }
         return builder.toString();
+    }
+
+    public static void setTopLevelModule(Module topLevelModule) {
+        BaseYangOpenApiGenerator.topLevelModule = topLevelModule;
+    }
+
+    public static boolean isImported(IdentityrefTypeDefinition leafTypeDef) {
+        return !leafTypeDef.getQName().getModule().equals(topLevelModule.getQNameModule());
     }
 }
