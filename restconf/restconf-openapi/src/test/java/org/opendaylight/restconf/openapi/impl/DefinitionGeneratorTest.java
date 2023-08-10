@@ -34,32 +34,28 @@ public final class DefinitionGeneratorTest {
     @Test
     public void testConvertToSchemas() throws IOException {
         final var module = context.findModule("opflex", Revision.of("2014-05-28")).orElseThrow();
-        final DefinitionGenerator generator = new DefinitionGenerator();
-        final var schemas = generator.convertToSchemas(module, context, new DefinitionNames(), true);
+        final var schemas = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
         assertNotNull(schemas);
     }
 
     @Test
     public void testActionTypes() throws IOException {
         final var module = context.findModule("action-types").orElseThrow();
-        final DefinitionGenerator generator = new DefinitionGenerator();
-        final var schemas = generator.convertToSchemas(module, context, new DefinitionNames(), true);
+        final var schemas = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
         assertNotNull(schemas);
     }
 
     @Test
     public void testStringTypes() throws IOException {
         final var module = context.findModule("string-types").orElseThrow();
-        final DefinitionGenerator generator = new DefinitionGenerator();
-        final var schemas = generator.convertToSchemas(module, context, new DefinitionNames(), true);
+        final var schemas = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
         assertNotNull(schemas);
     }
 
     @Test
     public void testStringFromRegex() throws IOException {
         final var module = context.findModule("strings-from-regex").orElseThrow();
-        final var generator = new DefinitionGenerator();
-        final var jsonObject = generator.convertToSchemas(module, context, new DefinitionNames(), true);
+        final var jsonObject = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
         assertNotNull(jsonObject);
 
         final var properties = jsonObject.get("strings-from-regex_test").properties();
