@@ -16,6 +16,24 @@
       "message": "Please investigate if we can use the proposed solution as and apply it in follow up patch in another task:\n\n@deprecated Most likely this method is useless because when we are going from module to its direct children\n     * there is no need for reasoning if we should use full name.",
       "revId": "f16d48ca8b6034ff23e7a664f501753c48e506ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77ddbdc5_43567bd5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/util/RestDocgenUtil.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-10T08:27:25Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "5d9708a0_fde24557",
+      "revId": "f16d48ca8b6034ff23e7a664f501753c48e506ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
