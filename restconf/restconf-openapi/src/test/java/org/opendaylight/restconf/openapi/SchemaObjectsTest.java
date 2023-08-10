@@ -7,13 +7,13 @@
  */
 package org.opendaylight.restconf.openapi;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.UriInfo;
 import org.junit.BeforeClass;
@@ -28,12 +28,12 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public class JsonModelNameTest {
+public class SchemaObjectsTest {
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
-        .node(QName.create("", "nodes"))
-        .node(QName.create("", "node"))
-        .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
+            .node(QName.create("", "nodes"))
+            .node(QName.create("", "node"))
+            .nodeWithKey(QName.create("", "node"), QName.create("" , "id"), "123").build();
 
     private static OpenApiObject mountPointApi;
 
@@ -55,45 +55,37 @@ public class JsonModelNameTest {
     }
 
     @Test
-    public void testIfFirstNodeInJsonPayloadContainsCorrectModelName() {
-        for (final var stringPathEntry : mountPointApi.paths().entrySet()) {
-            final var put = stringPathEntry.getValue().put();
-            if (put != null) {
-                final var moduleName = getSchemaPutOperationModuleName(put);
-                assertNotNull("PUT module name for [" + put + "] is in wrong format", moduleName);
-                final var key = stringPathEntry.getKey();
-                final var expectedModuleName = extractModuleName(key);
-                assertTrue(moduleName.contains(expectedModuleName));
+    public void testIfOperationsUseOneSchema() {
+        final var schemas = mountPointApi.components().schemas();
+        for (final var pathsEntry : mountPointApi.paths().entrySet()) {
+            final var path = pathsEntry.getValue();
+            if (path.post() == null || path.put() == null || path.patch() == null || path.delete() == null) {
+                // skip operational data
+                continue;
+            }
+            for (final var operation : List.of(path.put(), path.patch(), path.post())) {
+                final var schema = schemas.get(extractSchemaName(operation));
+                assertNotNull("Schema for \"" + operation + "\" is missing.", schema);
             }
         }
     }
 
-    private static String getSchemaPutOperationModuleName(final Operation put) {
-        final var parentName  = put.requestBody().path("content").path("application/json").path("schema")
-            .path("properties").properties().iterator().next().getKey();
-
-        final var doubleDotsIndex = parentName.indexOf(':');
-        if (doubleDotsIndex >= 0 && doubleDotsIndex < parentName.length() - 1) {
-            return parentName.substring(0, doubleDotsIndex + 1);
-        }
-        return null; // Return null if there is no string after the last "/"
-    }
-
     /**
-     * Return last module name in provided path.
+     * Extract schema name used for operation.
      * <p>
-     * For example if path looks like this:
-     * `/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/optional-list={id}/data2:data`
-     * then returned string should look like this: `data2`.
+     * We assume that for all content types of operation (XML, JSON) the same schema is used. We extract its name from
+     * the schema reference used in operation.
      * </p>
-     * @param path String URI path
-     * @return last module name in URI
+     * @param operation for which we want to find schema
+     * @return name of the schema used for operation
      */
-    private static String extractModuleName(final String path) {
-        final var components = Arrays.stream(path.split("/"))
-            .filter(c -> c.contains(":"))
-            .toList();
-        assertFalse("No module name found in path: " + path, components.isEmpty());
-        return components.get(components.size() - 1).split(":")[0];
+    private static String extractSchemaName(final Operation operation) {
+        final var schemas = operation.requestBody().path("content").findValues("schema");
+        // Find distinct schema refs
+        final var references = schemas.stream().map(s -> s.findValues("$ref"))
+                .flatMap(Collection::stream).distinct().toList();
+        // Assert all schema refs are same
+        assertEquals("Inconsistent schemas for operation: " + operation.summary(), 1, references.size());
+        return references.get(0).textValue().replaceAll("#/components/schemas/", "");
     }
 }
