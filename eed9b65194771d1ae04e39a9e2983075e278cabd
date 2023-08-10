@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2c588ee_db5a2be4",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-10T08:10:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a39eaf1_5ea97bc0",
+      "revId": "eed9b65194771d1ae04e39a9e2983075e278cabd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8fb152c7_aafc3c5e",
@@ -48,6 +66,30 @@
       "writtenOn": "2023-08-10T06:53:50Z",
       "side": 1,
       "message": "let\u0027s be consistent within the method and use explicit type here",
+      "range": {
+        "startLine": 385,
+        "startChar": 8,
+        "endLine": 385,
+        "endChar": 17
+      },
+      "revId": "eed9b65194771d1ae04e39a9e2983075e278cabd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d1ae9aa_9a7bb8d9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-10T08:10:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8fb152c7_aafc3c5e",
       "range": {
         "startLine": 385,
         "startChar": 8,
