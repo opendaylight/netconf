@@ -7,13 +7,16 @@
  */
 package org.opendaylight.restconf.openapi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import javax.ws.rs.core.UriInfo;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -63,50 +66,53 @@ public class JsonModelNameTest {
     @Test
     public void testIfFirstNodeInJsonPayloadContainsCorrectModelName() {
         final var schemas = mountPointApi.components().schemas();
-        for (final var stringPathEntry : mountPointApi.paths().entrySet()) {
-            final var value = stringPathEntry.getValue();
-            if (value.put() != null) {
-                final var schemaReference = getSchemaJsonReference(value.put());
-                assertNotNull("PUT reference for [" + value.put() + "] is in wrong format", schemaReference);
-                final var tested = schemas.get(schemaReference);
-                assertNotNull("Reference for [" + value.put() + "] was not found", tested);
-                final var nodeName = tested.properties().fields().next().getKey();
-                final var key = stringPathEntry.getKey();
-                final var expectedModuleName = extractModuleName(key);
-                assertTrue(nodeName.contains(expectedModuleName));
+        for (final var pathsEntry : mountPointApi.paths().entrySet()) {
+            final var path = pathsEntry.getValue();
+            if (path.post() == null || path.put() == null || path.patch() == null || path.delete() == null) {
+                // skip operational data
+                continue;
+            }
+            final var expectedModuleName = extractModuleName(pathsEntry.getKey());
+            for (final var operation : List.of(path.put(), path.patch())) {
+                final var schema = schemas.get(extractSchemaName(operation));
+                assertNotNull("Schema for \"" + operation + "\" is missing.", schema);
+                final var nodeName =  schema.properties().fields().next().getKey();
+                assertTrue(nodeName.startsWith(expectedModuleName));
             }
         }
     }
 
-    private static String getSchemaJsonReference(final Operation put) {
-        final var reference = put.requestBody().path("content")
-            .path("application/json").path("schema").path("$ref").textValue();
-
-        final var lastSlashIndex = reference.lastIndexOf('/');
-        if (lastSlashIndex >= 0 && lastSlashIndex < reference.length() - 1) {
-            return reference.substring(lastSlashIndex + 1);
-        }
-        return null; // Return null if there is no string after the last "/"
+    /**
+     * Extract schema name used for operation.
+     * <p>
+     * We assume that for all content types of operation (XML, JSON) the same schema is used. We extract its name from
+     * the schema reference used in operation.
+     * </p>
+     * @param operation for which we want to find schema
+     * @return name of the schema used for operation
+     */
+    private static String extractSchemaName(final Operation operation) {
+        final var schemas = operation.requestBody().path("content").findValues("schema");
+        final var references = schemas.stream().map(s -> s.path("$ref")).distinct().toList();
+        assertEquals("Inconsistent schemas for operation: " + operation.summary(), 1, references.size());
+        return references.get(0).textValue().replaceAll("#/components/schemas/", "");
     }
 
     /**
-     * Return last module name for path in provided input.
+     * Return last module name in provided path.
      * <p>
-     * For example if input looks like this:
+     * For example if path looks like this:
      * `/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/optional-list={id}/data2:data`
-     * then returned string should look like this: `data2:`.
+     * then returned string should look like this: `data2`.
      * </p>
-     * @param input String URI path
+     * @param path String URI path
      * @return last module name in URI
      */
-    private static String extractModuleName(final String input) {
-        final var pattern = Pattern.compile("\\b([^/:]+):\\b");
-        final var matcher = pattern.matcher(input);
-
-        String result = null;
-        while (matcher.find()) {
-            result = matcher.group(1) + ":";
-        }
-        return result;
+    private static String extractModuleName(final String path) {
+        final var components = Arrays.stream(path.splitA("/"))
+            .filter(c -> c.contains(":"))
+            .toList();
+        assertFalse("No module name found in path: " + path, components.isEmpty());
+        return components.get(components.size() - 1).split(":")[0];
     }
 }
