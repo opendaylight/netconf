@@ -85,7 +85,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Generates JSON Schema for data defined in YANG. This class is not thread-safe.
  */
-public class DefinitionGenerator {
+public final class DefinitionGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefinitionGenerator.class);
 
@@ -125,9 +125,8 @@ public class DefinitionGenerator {
             "\\\\D", "[^0-9]", "\\\\s", "[ \t\n\f\r]", "\\\\S", "[^ \t\n\f\r]",
             "\\\\w", "[a-zA-Z_0-9]", "\\\\W", "[^a-zA-Z_0-9]");
 
-    private Module topLevelModule;
-
-    public DefinitionGenerator() {
+    private DefinitionGenerator() {
+        // Hidden on purpose
     }
 
     /**
@@ -139,10 +138,9 @@ public class DefinitionGenerator {
      * @return {@link Map} containing data used for creating examples and definitions in OpenAPI documentation
      * @throws IOException if I/O operation fails
      */
-    public Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
+    public static Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
             final boolean isForSingleModule) throws IOException {
-        topLevelModule = module;
 
         processIdentities(module, definitions, definitionNames, schemaContext);
         processContainersAndLists(module, definitions, definitionNames, schemaContext);
@@ -155,7 +153,7 @@ public class DefinitionGenerator {
         return definitions;
     }
 
-    public Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
+    public static Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
             final DefinitionNames definitionNames, final boolean isForSingleModule)
             throws IOException {
         final Map<String, Schema> definitions = new HashMap<>();
@@ -165,7 +163,7 @@ public class DefinitionGenerator {
         return convertToSchemas(module, schemaContext, definitions, definitionNames, isForSingleModule);
     }
 
-    private void processModule(final Module module, final Map<String, Schema> definitions,
+    private static void processModule(final Module module, final Map<String, Schema> definitions,
             final DefinitionNames definitionNames, final EffectiveModelContext schemaContext) {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
@@ -211,7 +209,7 @@ public class DefinitionGenerator {
                         of processLeafNode).
                      */
                     final ObjectNode leafNode = processLeafNode((LeafSchemaNode) node, localName, required, stack,
-                            definitions, definitionNames, module.getNamespace());
+                            definitions, definitionNames, module.getNamespace(), module);
                     properties.set(localName, leafNode);
                 }
             }
@@ -249,7 +247,7 @@ public class DefinitionGenerator {
                 > 0;
     }
 
-    private void processContainersAndLists(final Module module, final Map<String, Schema> definitions,
+    private static void processContainersAndLists(final Module module, final Map<String, Schema> definitions,
             final DefinitionNames definitionNames, final EffectiveModelContext schemaContext)  throws IOException {
         final String moduleName = module.getName();
         final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
@@ -259,49 +257,49 @@ public class DefinitionGenerator {
             if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
                 if (childNode.isConfiguration()) {
                     processDataNodeContainer((DataNodeContainer) childNode, moduleName, definitions, definitionNames,
-                        stack);
+                        stack, module);
                 }
-                processActionNodeContainer(childNode, moduleName, definitions, definitionNames, stack);
+                processActionNodeContainer(childNode, moduleName, definitions, definitionNames, stack, module);
             }
             stack.exit();
         }
     }
 
-    private void processActionNodeContainer(final DataSchemaNode childNode, final String moduleName,
+    private static void processActionNodeContainer(final DataSchemaNode childNode, final String moduleName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final SchemaInferenceStack stack) throws IOException {
+            final SchemaInferenceStack stack, final Module topLevelModule) throws IOException {
         for (final ActionDefinition actionDef : ((ActionNodeContainer) childNode).getActions()) {
             stack.enterSchemaTree(actionDef.getQName());
-            processOperations(actionDef, moduleName, definitions, definitionNames, stack);
+            processOperations(actionDef, moduleName, definitions, definitionNames, stack, topLevelModule);
             stack.exit();
         }
     }
 
-    private void processRPCs(final Module module, final Map<String, Schema> definitions,
+    private static void processRPCs(final Module module, final Map<String, Schema> definitions,
             final DefinitionNames definitionNames, final EffectiveModelContext schemaContext) throws IOException {
         final String moduleName = module.getName();
         final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
         for (final RpcDefinition rpcDefinition : module.getRpcs()) {
             stack.enterSchemaTree(rpcDefinition.getQName());
-            processOperations(rpcDefinition, moduleName, definitions, definitionNames, stack);
+            processOperations(rpcDefinition, moduleName, definitions, definitionNames, stack, module);
             stack.exit();
         }
     }
 
-    private void processOperations(final OperationDefinition operationDef, final String parentName,
+    private static void processOperations(final OperationDefinition operationDef, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final SchemaInferenceStack stack) throws IOException {
+            final SchemaInferenceStack stack, final Module topLevelModule) throws IOException {
         final String operationName = operationDef.getQName().getLocalName();
         processOperationInputOutput(operationDef.getInput(), operationName, parentName, true, definitions,
-                definitionNames, stack);
+                definitionNames, stack, topLevelModule);
         processOperationInputOutput(operationDef.getOutput(), operationName, parentName, false, definitions,
-                definitionNames, stack);
+                definitionNames, stack, topLevelModule);
     }
 
-    private void processOperationInputOutput(final ContainerLike container, final String operationName,
+    private static void processOperationInputOutput(final ContainerLike container, final String operationName,
             final String parentName, final boolean isInput, final Map<String, Schema> definitions,
-            final DefinitionNames definitionNames, final SchemaInferenceStack stack)
-            throws IOException {
+            final DefinitionNames definitionNames, final SchemaInferenceStack stack,
+            final Module topLevelModule) throws IOException {
         stack.enterSchemaTree(container.getQName());
         if (!container.getChildNodes().isEmpty()) {
             final String filename = parentName + "_" + operationName + (isInput ? INPUT_SUFFIX : OUTPUT_SUFFIX);
@@ -310,7 +308,7 @@ public class DefinitionGenerator {
                 .type(OBJECT_TYPE)
                 .xml(JsonNodeFactory.instance.objectNode().put(NAME_KEY, isInput ? INPUT : OUTPUT));
             processChildren(childSchemaBuilder, container.getChildNodes(), parentName, definitions, definitionNames,
-                stack);
+                stack, topLevelModule);
             final String discriminator =
                 definitionNames.pickDiscriminator(container, List.of(filename, filename + TOP));
             definitions.put(filename + discriminator, childSchemaBuilder.build());
@@ -386,9 +384,9 @@ public class DefinitionGenerator {
         }
     }
 
-    private ObjectNode processDataNodeContainer(final DataNodeContainer dataNode, final String parentName,
+    private static ObjectNode processDataNodeContainer(final DataNodeContainer dataNode, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final SchemaInferenceStack stack) throws IOException {
+            final SchemaInferenceStack stack, final Module topLevelModule) throws IOException {
         final Collection<? extends DataSchemaNode> containerChildren = dataNode.getChildNodes();
         final SchemaNode schemaNode = (SchemaNode) dataNode;
         final String localName = schemaNode.getQName().getLocalName();
@@ -399,7 +397,7 @@ public class DefinitionGenerator {
             .description(schemaNode.getDescription().orElse(""));
 
         childSchemaBuilder.properties(processChildren(childSchemaBuilder, containerChildren,
-            parentName + "_" + localName, definitions, definitionNames, stack));
+            parentName + "_" + localName, definitions, definitionNames, stack, topLevelModule));
 
         final String discriminator;
         if (!definitionNames.isListedNode(schemaNode)) {
@@ -422,10 +420,10 @@ public class DefinitionGenerator {
     /**
      * Processes the nodes.
      */
-    private ObjectNode processChildren(final Schema.Builder parentNodeBuilder,
+    private static ObjectNode processChildren(final Schema.Builder parentNodeBuilder,
             final Collection<? extends DataSchemaNode> nodes, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final SchemaInferenceStack stack) throws IOException {
+            final SchemaInferenceStack stack, final Module topLevelModule) throws IOException {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         for (final DataSchemaNode node : nodes) {
@@ -433,12 +431,12 @@ public class DefinitionGenerator {
                 if (node instanceof ChoiceSchemaNode choice) {
                     stack.enterSchemaTree(node.getQName());
                     final Map<String, ObjectNode> choiceProperties = processChoiceNodeRecursively(parentName,
-                        definitions, definitionNames, stack, required, choice);
+                        definitions, definitionNames, stack, required, choice, topLevelModule);
                     choiceProperties.forEach(properties::set);
                     stack.exit();
                 } else {
                     final ObjectNode property = processChildNode(node, parentName, definitions, definitionNames,
-                        stack, required);
+                        stack, required, topLevelModule);
                     properties.set(node.getQName().getLocalName(), property);
                 }
             }
@@ -447,10 +445,10 @@ public class DefinitionGenerator {
         return properties;
     }
 
-    private Map<String, ObjectNode> processChoiceNodeRecursively(final String parentName,
+    private static Map<String, ObjectNode> processChoiceNodeRecursively(final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final SchemaInferenceStack stack, final ArrayNode required, final ChoiceSchemaNode choice)
-            throws IOException {
+            final SchemaInferenceStack stack, final ArrayNode required, final ChoiceSchemaNode choice,
+            final Module topLevelModule) throws IOException {
         if (!choice.getCases().isEmpty()) {
             final var properties = new HashMap<String, ObjectNode>();
             final var caseSchemaNode = choice.getDefaultCase().orElse(choice.getCases().stream()
@@ -460,12 +458,12 @@ public class DefinitionGenerator {
                 if (childNode instanceof ChoiceSchemaNode childChoice) {
                     stack.enterSchemaTree(childNode.getQName());
                     final var childProperties = processChoiceNodeRecursively(parentName, definitions, definitionNames,
-                        stack, required, childChoice);
+                        stack, required, childChoice, topLevelModule);
                     properties.putAll(childProperties);
                     stack.exit();
                 } else {
                     final var property = processChildNode(childNode, parentName, definitions, definitionNames, stack,
-                        required);
+                        required, topLevelModule);
                     properties.put(childNode.getQName().getLocalName(), property);
                 }
             }
@@ -475,9 +473,10 @@ public class DefinitionGenerator {
         return Map.of();
     }
 
-    private ObjectNode processChildNode(final DataSchemaNode node, final String parentName,
+    private static ObjectNode processChildNode(final DataSchemaNode node, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final SchemaInferenceStack stack, final ArrayNode required) throws IOException {
+            final SchemaInferenceStack stack, final ArrayNode required,
+            final Module topLevelModule) throws IOException {
         final XMLNamespace parentNamespace = stack.toSchemaNodeIdentifier().lastNodeIdentifier().getNamespace();
         stack.enterSchemaTree(node.getQName());
         /*
@@ -487,7 +486,8 @@ public class DefinitionGenerator {
         final String name = node.getQName().getLocalName();
         final ObjectNode property;
         if (node instanceof LeafSchemaNode leaf) {
-            property = processLeafNode(leaf, name, required, stack, definitions, definitionNames, parentNamespace);
+            property = processLeafNode(leaf, name, required, stack, definitions, definitionNames, parentNamespace,
+                    topLevelModule);
         } else if (node instanceof AnyxmlSchemaNode || node instanceof AnydataSchemaNode) {
             property = processUnknownDataSchemaNode(node, name, required, parentNamespace);
         } else if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
@@ -495,13 +495,13 @@ public class DefinitionGenerator {
                 required.add(name);
             }
             property = processDataNodeContainer((DataNodeContainer) node, parentName, definitions, definitionNames,
-                stack);
-            processActionNodeContainer(node, parentName, definitions, definitionNames, stack);
+                stack, topLevelModule);
+            processActionNodeContainer(node, parentName, definitions, definitionNames, stack, topLevelModule);
         } else if (node instanceof LeafListSchemaNode leafList) {
             if (isSchemaNodeMandatory(node)) {
                 required.add(name);
             }
-            property = processLeafListNode(leafList, stack, definitions, definitionNames);
+            property = processLeafListNode(leafList, stack, definitions, definitionNames, topLevelModule);
         } else {
             throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
         }
@@ -509,8 +509,8 @@ public class DefinitionGenerator {
         return property;
     }
 
-    private ObjectNode processLeafListNode(final LeafListSchemaNode listNode, final SchemaInferenceStack stack,
-            final Map<String, Schema> definitions, final DefinitionNames definitionNames) {
+    private static ObjectNode processLeafListNode(final LeafListSchemaNode listNode, final SchemaInferenceStack stack,
+            final Map<String, Schema> definitions, final DefinitionNames definitionNames, final Module topLevelModule) {
         final ObjectNode props = JsonNodeFactory.instance.objectNode();
         props.put(TYPE_KEY, ARRAY_TYPE);
 
@@ -518,7 +518,7 @@ public class DefinitionGenerator {
         final Optional<ElementCountConstraint> optConstraint = listNode.getElementCountConstraint();
         optConstraint.ifPresent(elementCountConstraint -> processElementCount(elementCountConstraint, props));
 
-        processTypeDef(listNode.getType(), listNode, itemsVal, stack, definitions, definitionNames);
+        processTypeDef(listNode.getType(), listNode, itemsVal, stack, definitions, definitionNames, topLevelModule);
         props.set(ITEMS_KEY, itemsVal);
 
         props.put(DESCRIPTION_KEY, listNode.getDescription().orElse(""));
@@ -543,9 +543,9 @@ public class DefinitionGenerator {
         }
     }
 
-    private ObjectNode processLeafNode(final LeafSchemaNode leafNode, final String jsonLeafName,
+    private static ObjectNode processLeafNode(final LeafSchemaNode leafNode, final String jsonLeafName,
             final ArrayNode required, final SchemaInferenceStack stack, final Map<String, Schema> definitions,
-            final DefinitionNames definitionNames, final XMLNamespace parentNamespace) {
+            final DefinitionNames definitionNames, final XMLNamespace parentNamespace, final Module topLevelModule) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse("");
@@ -557,7 +557,7 @@ public class DefinitionGenerator {
             property.put(DESCRIPTION_KEY, leafDescription);
         }
 
-        processTypeDef(leafNode.getType(), leafNode, property, stack, definitions, definitionNames);
+        processTypeDef(leafNode.getType(), leafNode, property, stack, definitions, definitionNames, topLevelModule);
         if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
             // If the parent is not from the same model, define the child XML namespace.
             property.set(XML_KEY, buildXmlParameter(leafNode));
@@ -586,9 +586,9 @@ public class DefinitionGenerator {
         return property;
     }
 
-    private String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
-            final ObjectNode property, final SchemaInferenceStack stack, final Map<String, Schema> definitions,
-            final DefinitionNames definitionNames) {
+    private static String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
+            final ObjectNode property, final SchemaInferenceStack stack,final Map<String, Schema> definitions,
+            final DefinitionNames definitionNames, final Module topLevelModule) {
         final String jsonType;
         if (leafTypeDef instanceof BinaryTypeDefinition binaryType) {
             jsonType = processBinaryType(binaryType, property);
@@ -598,7 +598,7 @@ public class DefinitionGenerator {
             jsonType = processEnumType(enumType, property);
         } else if (leafTypeDef instanceof IdentityrefTypeDefinition identityrefType) {
             jsonType = processIdentityRefType(identityrefType, property, definitions,
-                    definitionNames, stack.getEffectiveModelContext());
+                    definitionNames, stack.getEffectiveModelContext(), topLevelModule);
         } else if (leafTypeDef instanceof StringTypeDefinition stringType) {
             jsonType = processStringType(stringType, property, node.getQName().getLocalName());
         } else if (leafTypeDef instanceof UnionTypeDefinition unionType) {
@@ -607,7 +607,7 @@ public class DefinitionGenerator {
             jsonType = OBJECT_TYPE;
         } else if (leafTypeDef instanceof LeafrefTypeDefinition leafrefType) {
             return processTypeDef(stack.resolveLeafref(leafrefType), node, property,
-                stack, definitions, definitionNames);
+                stack, definitions, definitionNames, topLevelModule);
         } else if (leafTypeDef instanceof BooleanTypeDefinition) {
             jsonType = BOOLEAN_TYPE;
             leafTypeDef.getDefaultValue().ifPresent(v -> setDefaultValue(property, Boolean.valueOf((String) v)));
@@ -669,11 +669,11 @@ public class DefinitionGenerator {
         return STRING_TYPE;
     }
 
-    private String processIdentityRefType(final IdentityrefTypeDefinition leafTypeDef, final ObjectNode property,
+    private static String processIdentityRefType(final IdentityrefTypeDefinition leafTypeDef, final ObjectNode property,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final EffectiveModelContext schemaContext) {
+            final EffectiveModelContext schemaContext, final Module topLevelModule) {
         final String definitionName;
-        if (isImported(leafTypeDef)) {
+        if (isImported(leafTypeDef, topLevelModule)) {
             definitionName = addImportedIdentity(leafTypeDef, definitions, definitionNames, schemaContext);
         } else {
             final SchemaNode node = leafTypeDef.getIdentities().iterator().next();
@@ -716,7 +716,7 @@ public class DefinitionGenerator {
             .build();
     }
 
-    private boolean isImported(final IdentityrefTypeDefinition leafTypeDef) {
+    private static boolean isImported(final IdentityrefTypeDefinition leafTypeDef, final Module topLevelModule) {
         return !leafTypeDef.getQName().getModule().equals(topLevelModule.getQNameModule());
     }
 
