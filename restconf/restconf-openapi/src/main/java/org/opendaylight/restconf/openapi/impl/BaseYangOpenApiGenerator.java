@@ -80,7 +80,6 @@ public abstract class BaseYangOpenApiGenerator {
     public static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
         .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
-    private final DefinitionGenerator jsonConverter = new DefinitionGenerator();
     private final DOMSchemaService schemaService;
 
     protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService) {
@@ -241,7 +240,7 @@ public abstract class BaseYangOpenApiGenerator {
             final DefinitionNames definitionNames, final boolean isForSingleModule) {
         Map<String, Schema> schemas = new HashMap<>();
         try {
-            schemas = jsonConverter.convertToSchemas(module, schemaContext, definitionNames, isForSingleModule);
+            schemas = DefinitionGenerator.convertToSchemas(module, schemaContext, definitionNames, isForSingleModule);
         } catch (final IOException e) {
             LOG.error("Exception occurred in DefinitionGenerator", e); // FIXME propagate exception
         }
