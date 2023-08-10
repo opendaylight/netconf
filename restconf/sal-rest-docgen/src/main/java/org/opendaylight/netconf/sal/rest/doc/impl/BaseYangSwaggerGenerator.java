@@ -198,15 +198,12 @@ public abstract class BaseYangSwaggerGenerator {
         Preconditions.checkArgument(module != null,
                 "Could not find module by name,revision: " + moduleName + "," + revision);
 
-        return getApiDeclaration(module, uriInfo, context, schemaContext, deviceName, oaversion);
-    }
-
-    private SwaggerObject getApiDeclaration(final Module module, final UriInfo uriInfo, final String context,
-            final EffectiveModelContext schemaContext, final String deviceName, final OAversion oaversion) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
-
-        return getSwaggerDocSpec(module, schema, host, deviceName, BASE_PATH, context, schemaContext, oaversion);
+        final SwaggerObject doc = createSwaggerObject(schema, host, BASE_PATH, module.getName());
+        final DefinitionNames definitionNames = new DefinitionNames();
+        return getSwaggerDocSpec(module, context, Optional.of(deviceName), schemaContext, oaversion, definitionNames,
+                doc, true);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -220,15 +217,6 @@ public abstract class BaseYangSwaggerGenerator {
 
     public String createSchemaFromUriInfo(final UriInfo uriInfo) {
         return uriInfo.getBaseUri().getScheme();
-    }
-
-    public SwaggerObject getSwaggerDocSpec(final Module module, final String schema, final String host,
-            final @NonNull String deviceName, final String basePath, final String context,
-            final EffectiveModelContext schemaContext, final OAversion oaversion) {
-        final SwaggerObject doc = createSwaggerObject(schema, host, basePath, module.getName());
-        final DefinitionNames definitionNames = new DefinitionNames();
-        return getSwaggerDocSpec(module, context, Optional.of(deviceName), schemaContext, oaversion, definitionNames,
-            doc, true);
     }
 
     public SwaggerObject getSwaggerDocSpec(final Module module, final String context, final Optional<String> deviceName,
