@@ -78,6 +78,7 @@ public abstract class BaseYangSwaggerGenerator {
     private static final String API_VERSION = "1.0.0";
     private static final String SWAGGER_VERSION = "2.0";
     private static final String OPEN_API_VERSION = "3.0.3";
+    private static final String CONTROLLER_RESOURCE_NAME = "Controller";
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final List<String> PRODUCES = List.of(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON);
 
@@ -107,7 +108,7 @@ public abstract class BaseYangSwaggerGenerator {
             final OAversion oaversion) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getAllModulesDoc(uriInfo, Optional.empty(), schemaContext, Optional.empty(), "", definitionNames,
+        return getAllModulesDoc(uriInfo, Optional.empty(), schemaContext, Optional.of(CONTROLLER_RESOURCE_NAME), "", definitionNames,
                 oaversion);
     }
 
@@ -116,10 +117,7 @@ public abstract class BaseYangSwaggerGenerator {
             final DefinitionNames definitionNames, final OAversion oaversion) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
-        String name = "Controller";
-        if (deviceName.isPresent()) {
-            name = deviceName.orElseThrow();
-        }
+        final String name = deviceName.orElseThrow(() -> new IllegalArgumentException("deviceName must be present"));
 
         final String title = name + " modules of RESTCONF";
         final SwaggerObject doc = createSwaggerObject(schema, host, BASE_PATH, title);
@@ -180,8 +178,8 @@ public abstract class BaseYangSwaggerGenerator {
             final OAversion oaversion) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        final SwaggerObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "", "Controller",
-            oaversion);
+        final SwaggerObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "",
+            CONTROLLER_RESOURCE_NAME, oaversion);
         return getAppropriateDoc(doc, oaversion);
     }
 

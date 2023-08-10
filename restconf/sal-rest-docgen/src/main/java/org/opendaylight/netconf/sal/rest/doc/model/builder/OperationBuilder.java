@@ -372,14 +372,15 @@ public final class OperationBuilder {
 
     private static String buildSummaryValue(final String httpMethod, final String moduleName,
             final Optional<String> deviceName, final String nodeName) {
-        return httpMethod + SUMMARY_SEPARATOR + deviceName.map(s -> s + SUMMARY_SEPARATOR).orElse("")
-                + moduleName + SUMMARY_SEPARATOR + nodeName;
+        // FIXME eliminate this method
+        final String name = deviceName.orElseThrow(() -> new IllegalArgumentException("deviceName must be present"));
+        return httpMethod + SUMMARY_SEPARATOR + name + SUMMARY_SEPARATOR + moduleName + SUMMARY_SEPARATOR + nodeName;
     }
 
     public static ArrayNode buildTagsValue(final Optional<String> deviceName, final String moduleName) {
-        final ArrayNode tagsValue = JsonNodeFactory.instance.arrayNode();
-        tagsValue.add(deviceName.map(s -> "mounted " + s).orElse("controller") + " " + moduleName);
-        return tagsValue;
+        // FIXME eliminate this method
+        final String name = deviceName.orElseThrow(() -> new IllegalArgumentException("deviceName must be present"));
+        return JsonNodeFactory.instance.arrayNode().add(name + " " + moduleName);
     }
 
     public static String getAppropriateModelPrefix(final OAversion oaversion) {
