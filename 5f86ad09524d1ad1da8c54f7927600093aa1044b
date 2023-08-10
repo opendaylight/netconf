@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e1acab3_cdb8fde3",
+        "filename": "artifacts/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 684,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-10T11:51:47Z",
+      "side": 1,
+      "message": "this document is structured \nmove it to end of \"netconf features\" section\n~ line 503",
+      "revId": "5f86ad09524d1ad1da8c54f7927600093aa1044b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7a40750_c3b1b174",
+        "filename": "features/odl-netconf-mdsal/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-10T11:51:47Z",
+      "side": 1,
+      "message": "pls avoid mess in established dependencies sequence: features before bundles.\nmove this up to end of \"features\" (line 42)",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 21
+      },
+      "revId": "5f86ad09524d1ad1da8c54f7927600093aa1044b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55307646_96702f59",
+        "filename": "features/odl-restconf-nb/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-10T11:51:47Z",
+      "side": 1,
+      "message": "pls avoid mess in established dependencies sequence: features before bundles.\nmove this up to end of \"features\" (line 48)",
+      "revId": "5f86ad09524d1ad1da8c54f7927600093aa1044b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42df5ed4_68e56b80",
+        "filename": "restconf/restconf-nb/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-10T11:51:47Z",
+      "side": 1,
+      "message": "restconf-nb does not require dependency on yanglib-mdsal-writer for now.\nrollback the change of current file as extra",
+      "range": {
+        "startLine": 235,
+        "startChar": 0,
+        "endLine": 240,
+        "endChar": 17
+      },
+      "revId": "5f86ad09524d1ad1da8c54f7927600093aa1044b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
