@@ -7,28 +7,37 @@
  */
 package org.opendaylight.netconf.api.messages;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class NotificationMessageTest {
-    @Test
-    public void testWrapNotification() throws Exception {
+    private static NotificationMessage NOTIFICATION_MESSAGE;
+    private static Instant EVENT_TIME;
+
+    @BeforeAll
+    private static void beforeAll() {
         final Document document = UntrustedXML.newDocumentBuilder().newDocument();
 
         final Element rootElement = document.createElement("test-root");
         document.appendChild(rootElement);
 
-        final Instant eventTime = Instant.ofEpochMilli(10_000_000);
+        EVENT_TIME = Instant.ofEpochMilli(10_000_000);
 
-        final NotificationMessage netconfNotification = new NotificationMessage(document, eventTime);
-        final Document resultDoc = netconfNotification.getDocument();
+        NOTIFICATION_MESSAGE = new NotificationMessage(document, EVENT_TIME);
+    }
+
+    @Test
+    void testWrapNotification() {
+        final Document resultDoc = NOTIFICATION_MESSAGE.getDocument();
         final NodeList nodeList = resultDoc.getElementsByTagNameNS(
             "urn:ietf:params:xml:ns:netconf:notification:1.0", "notification");
 
@@ -46,7 +55,13 @@ public class NotificationMessageTest {
 
         final Element eventTimeElement = (Element) childNodes.item(0);
 
-        assertEquals(eventTime, NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()));
-        assertEquals(eventTime, netconfNotification.getEventTime());
+        assertEquals(EVENT_TIME, NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()));
+        assertEquals(EVENT_TIME, NOTIFICATION_MESSAGE.getEventTime());
+    }
+
+    @Test
+    void testIsNotificationMessage() {
+        final Document notificationDocument = NOTIFICATION_MESSAGE.getDocument();
+        assertTrue(NotificationMessage.isNotificationMessage(notificationDocument));
     }
 }
