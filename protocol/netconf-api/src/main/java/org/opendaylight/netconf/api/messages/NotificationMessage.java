@@ -22,6 +22,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -205,5 +206,18 @@ public final class NotificationMessage extends NetconfMessage {
 
         notificationContent.appendChild(entireNotification);
         return notificationContent;
+    }
+
+    public static boolean isNotificationMessage(final Document document) {
+        final XmlElement element = XmlElement.fromDomElement(document.getDocumentElement());
+        if (!element.getName().equals(XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME)) {
+            return false;
+        }
+        final String namespace = element.namespace();
+        if (namespace == null || !namespace.equals(NamespaceURN.NOTIFICATION)) {
+            return false;
+        }
+        return element.getOnlyChildElementOptionally(XmlNetconfConstants.EVENT_TIME, NamespaceURN.NOTIFICATION)
+            .isPresent();
     }
 }
