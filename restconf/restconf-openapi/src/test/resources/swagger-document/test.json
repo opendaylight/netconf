@@ -1,0 +1,9 @@
+{
+  "employee":
+  {
+    "skills": ["Java", "C++", "Python"],
+    "id": "1212",
+    "age": 34,
+    "fullName": "John Miles"
+  }
+}
