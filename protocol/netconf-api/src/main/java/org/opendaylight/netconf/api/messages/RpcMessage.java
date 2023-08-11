@@ -10,6 +10,7 @@ package org.opendaylight.netconf.api.messages;
 import static java.util.Objects.requireNonNull;
 
 import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -37,5 +38,17 @@ public final class RpcMessage extends NetconfMessage {
 
         rpcContent.appendChild(entireRpc);
         return rpcContent;
+    }
+
+    public static boolean isRpcMessage(final Document document) {
+        final XmlElement element = XmlElement.fromDomElement(document.getDocumentElement());
+        if (!element.getName().equals(XmlNetconfConstants.RPC_KEY)) {
+            return false;
+        }
+        final String namespace = element.namespace();
+        if (namespace == null || !namespace.equals(NamespaceURN.BASE)) {
+            return false;
+        }
+        return !element.getAttribute(XmlNetconfConstants.MESSAGE_ID, NamespaceURN.BASE).isEmpty();
     }
 }
