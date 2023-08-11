@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc2d645f_dfdfc302",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-11T19:53:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d8c6a1b_0c6e1018",
+      "revId": "309fd223bdb03cf1731f7dde6ae60bf683000374",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e181d70_e5a88048",
@@ -49,6 +67,30 @@
       "writtenOn": "2023-08-11T14:27:09Z",
       "side": 1,
       "message": "Add 2 spaces for these pls",
+      "range": {
+        "startLine": 35,
+        "startChar": 1,
+        "endLine": 40,
+        "endChar": 19
+      },
+      "revId": "309fd223bdb03cf1731f7dde6ae60bf683000374",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "188e67ca_35aac667",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/PostPayloadTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-11T19:53:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e181d70_e5a88048",
       "range": {
         "startLine": 35,
         "startChar": 1,
@@ -76,6 +118,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03a1ee8b_5a850bcc",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/PostPayloadTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-11T19:53:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd1fc67f_807e1c63",
+      "revId": "309fd223bdb03cf1731f7dde6ae60bf683000374",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4a3b70a_80898f88",
@@ -99,6 +159,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0305dd24_a0fe768e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/PostPayloadTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-11T19:53:21Z",
+      "side": 1,
+      "message": "There is no path() method, only method get which returns value by key from Map",
+      "parentUuid": "f4a3b70a_80898f88",
+      "range": {
+        "startLine": 143,
+        "startChar": 50,
+        "endLine": 143,
+        "endChar": 53
+      },
+      "revId": "309fd223bdb03cf1731f7dde6ae60bf683000374",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c9223dea_9a732499",
@@ -112,6 +196,30 @@
       "writtenOn": "2023-08-11T14:27:09Z",
       "side": 1,
       "message": "here you can get to the ref if you add .path(\"properties\").elements().next().path(\"$ref\").toString()",
+      "range": {
+        "startLine": 144,
+        "startChar": 45,
+        "endLine": 144,
+        "endChar": 46
+      },
+      "revId": "309fd223bdb03cf1731f7dde6ae60bf683000374",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0f7a471_eb50c9a7",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/PostPayloadTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-11T19:53:21Z",
+      "side": 1,
+      "message": "In that case, I would stop at \u0027properties\u0027 to check the item\u0027s name.",
+      "parentUuid": "c9223dea_9a732499",
       "range": {
         "startLine": 144,
         "startChar": 45,
