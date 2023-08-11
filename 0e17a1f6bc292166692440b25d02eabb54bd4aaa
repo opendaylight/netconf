@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b722b6c_da49eac5",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T12:48:45Z",
+      "side": 1,
+      "message": "These lines are deleted by original patch.",
+      "revId": "0e17a1f6bc292166692440b25d02eabb54bd4aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a36a9a4_7bc5b8e8",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/JsonModelNameTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T12:48:45Z",
+      "side": 1,
+      "message": "The same issues as in https://git.opendaylight.org/gerrit/c/netconf/+/107399",
+      "revId": "0e17a1f6bc292166692440b25d02eabb54bd4aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
