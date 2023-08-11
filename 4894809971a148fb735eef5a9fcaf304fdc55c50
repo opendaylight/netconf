@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbb46751_c570a000",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T12:47:42Z",
+      "side": 1,
+      "message": "These lines are deleted by original patch.",
+      "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8951528_d9e7a298",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/JsonModelNameTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T12:47:42Z",
+      "side": 1,
+      "message": "Test should be as much the same as possible as original.",
+      "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bcf70bb_520030f3",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/JsonModelNameTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T12:47:42Z",
+      "side": 1,
+      "message": "Use beforeClass as in original patch.",
+      "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ec51416_c4dc2ffa",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/JsonModelNameTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T12:47:42Z",
+      "side": 1,
+      "message": "In general, we are working with V3_0",
+      "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7735147c_55b9f4b1",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/JsonModelNameTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T12:47:42Z",
+      "side": 1,
+      "message": "In general, we are working with V3_0",
+      "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
