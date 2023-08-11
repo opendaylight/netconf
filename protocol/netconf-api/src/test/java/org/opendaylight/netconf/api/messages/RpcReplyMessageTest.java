@@ -9,7 +9,9 @@ package org.opendaylight.netconf.api.messages;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.w3c.dom.Document;
@@ -17,6 +19,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class RpcReplyMessageTest {
+    private static RpcReplyMessage RPC_REPLY_MESSAGE;
+
+    @BeforeAll
+    private static void beforeAll() {
+        final Document document = UntrustedXML.newDocumentBuilder().newDocument();
+
+        final Element rootElement = document.createElement("test-root");
+        document.appendChild(rootElement);
+
+        RPC_REPLY_MESSAGE = new RpcReplyMessage(document, 1014);
+    }
+
     @Test
     void wrapRpcReplyTest() {
         final Document document = UntrustedXML.newDocumentBuilder().newDocument();
@@ -34,5 +48,11 @@ public class RpcReplyMessageTest {
         final Element entireRpc = (Element) nodeList.item(0);
         assertEquals("1014", entireRpc.getAttribute("message-id"));
         assertNotNull(entireRpc.getElementsByTagName("test-root"));
+    }
+
+    @Test
+    void testIsRpcReplyMessage() {
+        final Document rpcReplyDocument = RPC_REPLY_MESSAGE.getDocument();
+        assertTrue(RpcReplyMessage.isRpcReplyMessage(rpcReplyDocument));
     }
 }
