@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91dd25f7_e7c3e85e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 1,
+      "message": "for list with keys",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d1ad249_d8219ee2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 1,
+      "message": "for the path that has list as a last element",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f172af7e_30f4230f",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/ListPostRequestsTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 1,
+      "message": "We would like to assert that we have post for /rests/data/list-post:container with expected payload to create list.",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d1d4331_caa62b27",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 1,
+      "message": "Here /rests/data/recursive:container-root is the exceptional case.",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb660e91_dc97fb9b",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 1,
+      "message": "This is doing exactly the same as OpenApiTestUtils#getPathParameters",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4f8641a_bc5252a6",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 1,
+      "message": "The same here.",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8091cccf_9636d073",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 1,
+      "message": "IMO this needs rebase because we should not have lists without keys.",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f13b7b43_3a0705fd",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 1,
+      "message": "Only /rests/data/nodes/node\u003d123/yang-ext:mount/recursive:container-root is exceptional case here.",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ff763d5_8b3ab565",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 1,
+      "message": "Why are you not using OpenApiTestUtils#getPathParameters?",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7613d8fb_f446a4b8",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 1,
+      "message": "Why are you not using OpenApiTestUtils#getPathParameters?",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

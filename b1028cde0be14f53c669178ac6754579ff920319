@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84743a32_604d251e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OpenApiTestUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 0,
+      "message": "This change is not needed - we are removing some paths - not parameters.",
+      "revId": "b1028cde0be14f53c669178ac6754579ff920319",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b67b5103_bd2881ff",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-11T14:13:20Z",
+      "side": 0,
+      "message": "For all other paths except of /rests/data/toaster2:lst/lst1\u003d{key1},{key2} we have all operations. Test it accordingly/separatelly.",
+      "revId": "b1028cde0be14f53c669178ac6754579ff920319",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
