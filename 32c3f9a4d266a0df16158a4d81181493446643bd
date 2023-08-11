@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1194aacb_a5e0c153",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-11T14:45:54Z",
+      "side": 1,
+      "message": "is it possible to solve this in \"nicer\" way than passing null and changing \"default\" outcome of createRequestBodyParameter() ?",
+      "range": {
+        "startLine": 199,
+        "startChar": 71,
+        "endLine": 199,
+        "endChar": 75
+      },
+      "revId": "32c3f9a4d266a0df16158a4d81181493446643bd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef03fdb2_adbc97ae",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-11T14:45:54Z",
+      "side": 1,
+      "message": "use INPUT_KEY here",
+      "range": {
+        "startLine": 199,
+        "startChar": 62,
+        "endLine": 199,
+        "endChar": 69
+      },
+      "revId": "32c3f9a4d266a0df16158a4d81181493446643bd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
