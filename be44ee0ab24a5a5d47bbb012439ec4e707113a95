@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd8ab7ec_46298efb",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-11T13:13:15Z",
+      "side": 1,
+      "message": "final String fullName",
+      "range": {
+        "startLine": 306,
+        "startChar": 51,
+        "endLine": 306,
+        "endChar": 57
+      },
+      "revId": "be44ee0ab24a5a5d47bbb012439ec4e707113a95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
