@@ -69,4 +69,10 @@ public final class RpcReplyMessage extends NetconfMessage {
         final var attr = getDocument().getDocumentElement().getAttributeNode(XmlNetconfConstants.MESSAGE_ID);
         return attr == null ? null : attr.getValue();
     }
+
+    public static boolean isRpcReplyMessage(final Document document) {
+        final var root = document.getDocumentElement();
+        return NamespaceURN.BASE.equals(root.getNamespaceURI())
+            && XmlNetconfConstants.RPC_REPLY_KEY.equals(root.getLocalName());
+    }
 }

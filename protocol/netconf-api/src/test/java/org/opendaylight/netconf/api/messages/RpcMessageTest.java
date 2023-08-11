@@ -8,8 +8,10 @@
 package org.opendaylight.netconf.api.messages;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
@@ -95,5 +97,17 @@ class RpcMessageTest {
                 <test-root/>
             </rpc>
             """, msg.toString());
+    }
+
+    @Test
+    void testIsRpcMessage() {
+        document.appendChild(document.createElementNS("urn:ietf:params:xml:ns:netconf:base:1.0", "rpc"));
+        assertTrue(RpcMessage.isRpcMessage(document));
+    }
+
+    @Test
+    void testIsRpcMessageNegative() {
+        document.appendChild(document.createElementNS("urn:ietf:params:xml:ns:netconf:base:1.0", "other"));
+        assertFalse(RpcMessage.isRpcMessage(document));
     }
 }

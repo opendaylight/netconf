@@ -8,7 +8,9 @@
 package org.opendaylight.netconf.api.messages;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
@@ -84,5 +86,17 @@ class RpcReplyMessageTest {
         assertEquals(ErrorType.PROTOCOL, ex.getErrorType());
         assertEquals(ErrorTag.UNKNOWN_NAMESPACE, ex.getErrorTag());
         assertEquals(ImmutableMap.of("bad-element", "rpc-reply", "bad-namespace", "bad"), ex.getErrorInfo());
+    }
+
+    @Test
+    void testIsRpcReplyMessage() {
+        document.appendChild(document.createElementNS("urn:ietf:params:xml:ns:netconf:base:1.0", "rpc-reply"));
+        assertTrue(RpcReplyMessage.isRpcReplyMessage(document));
+    }
+
+    @Test
+    void testIsRpcReplyMessageNegative() {
+        document.appendChild(document.createElementNS("urn:ietf:params:xml:ns:netconf:base:1.0", "other"));
+        assertFalse(RpcReplyMessage.isRpcReplyMessage(document));
     }
 }

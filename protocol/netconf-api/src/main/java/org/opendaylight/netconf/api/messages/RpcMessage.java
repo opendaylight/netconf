@@ -84,4 +84,10 @@ public final class RpcMessage extends NetconfMessage {
     public @NonNull String messageId() {
         return getDocument().getDocumentElement().getAttribute(XmlNetconfConstants.MESSAGE_ID);
     }
+
+    public static boolean isRpcMessage(final Document document) {
+        final var root = document.getDocumentElement();
+        return NamespaceURN.BASE.equals(root.getNamespaceURI())
+            && XmlNetconfConstants.RPC_KEY.equals(root.getLocalName());
+    }
 }

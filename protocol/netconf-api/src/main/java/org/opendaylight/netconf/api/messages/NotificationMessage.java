@@ -206,4 +206,10 @@ public final class NotificationMessage extends NetconfMessage {
         notificationContent.appendChild(entireNotification);
         return notificationContent;
     }
+
+    public static boolean isNotificationMessage(final Document document) {
+        final var root = document.getDocumentElement();
+        return NamespaceURN.NOTIFICATION.equals(root.getNamespaceURI())
+            && XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME.equals(root.getLocalName());
+    }
 }

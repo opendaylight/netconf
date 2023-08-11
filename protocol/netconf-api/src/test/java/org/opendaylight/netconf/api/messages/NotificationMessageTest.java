@@ -7,46 +7,60 @@
  */
 package org.opendaylight.netconf.api.messages;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
-public class NotificationMessageTest {
+class NotificationMessageTest {
+    private static final Instant EVENT_TIME = Instant.ofEpochMilli(10_000_000);
+
+    private final Document document = UntrustedXML.newDocumentBuilder().newDocument();
+
     @Test
-    public void testWrapNotification() throws Exception {
-        final Document document = UntrustedXML.newDocumentBuilder().newDocument();
-
-        final Element rootElement = document.createElement("test-root");
+    void testWrapNotification() {
+        final var rootElement = document.createElement("test-root");
         document.appendChild(rootElement);
 
-        final Instant eventTime = Instant.ofEpochMilli(10_000_000);
-
-        final NotificationMessage netconfNotification = new NotificationMessage(document, eventTime);
-        final Document resultDoc = netconfNotification.getDocument();
-        final NodeList nodeList = resultDoc.getElementsByTagNameNS(
+        final var netconfNotification = new NotificationMessage(document, EVENT_TIME);
+        final var resultDoc = netconfNotification.getDocument();
+        final var nodeList = resultDoc.getElementsByTagNameNS(
             "urn:ietf:params:xml:ns:netconf:notification:1.0", "notification");
 
         assertNotNull(nodeList);
         // expected only the one NOTIFICATION tag
         assertEquals(1, nodeList.getLength());
 
-        final Element entireNotification = (Element) nodeList.item(0);
-        final NodeList childNodes = entireNotification.getElementsByTagNameNS(
+        final var entireNotification = (Element) nodeList.item(0);
+        final var childNodes = entireNotification.getElementsByTagNameNS(
             "urn:ietf:params:xml:ns:netconf:notification:1.0", "eventTime");
 
         assertNotNull(childNodes);
         // expected only the one EVENT_TIME tag
         assertEquals(1, childNodes.getLength());
 
-        final Element eventTimeElement = (Element) childNodes.item(0);
+        final var eventTimeElement = (Element) childNodes.item(0);
 
-        assertEquals(eventTime, NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()));
-        assertEquals(eventTime, netconfNotification.getEventTime());
+        assertEquals(EVENT_TIME, NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()));
+        assertEquals(EVENT_TIME, netconfNotification.getEventTime());
+    }
+
+    @Test
+    void testIsNotificationMessage() {
+        document.appendChild(document.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
+            "notification"));
+        assertTrue(NotificationMessage.isNotificationMessage(document));
+    }
+
+    @Test
+    void testIsRpcMessageNegative() {
+        document.appendChild(document.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0", "other"));
+        assertFalse(NotificationMessage.isNotificationMessage(document));
     }
 }
