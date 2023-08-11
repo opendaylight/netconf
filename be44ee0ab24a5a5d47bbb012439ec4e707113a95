@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cc07da0_1936c62e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-11T20:10:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd8ab7ec_46298efb",
+      "range": {
+        "startLine": 306,
+        "startChar": 51,
+        "endLine": 306,
+        "endChar": 57
+      },
+      "revId": "be44ee0ab24a5a5d47bbb012439ec4e707113a95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f202b834_4331b795",
@@ -37,6 +61,24 @@
       "writtenOn": "2023-08-11T13:58:51Z",
       "side": 1,
       "message": "Probably we need to use fullName only for Top level nodes, because now it creates not correct payload e.g:\n`curl -X \u0027PUT\u0027 \\\n  \u0027http://localhost:8181/rests/data/network-topology:network-topology/topology\u003dtopology-netconf/node\u003d17830-sim-device/yang-ext:mount/test:cont/cont1\u0027 \\\n  -H \u0027accept: */*\u0027 \\\n  -H \u0027Content-Type: application/json\u0027 \\\n  -d \u0027{\n  \"test:cont1\": {\n    \"list4\": [\n      {\n        \"key4\": \"Some key4\",\n        \"value4\": \"Some value4\",\n        \"list5\": [\n          {\n            \"key5\": \"Some key5\",\n            \"value5\": \"Some value5\"\n          }\n        ],\n        \"cont2\": {\n          \"list6\": [\n            {\n              \"key6\": \"Some key6\",\n              \"value6\": \"Some value6\"\n            }\n          ]\n        }\n      }\n    ]\n  }\n}\u0027`",
+      "revId": "be44ee0ab24a5a5d47bbb012439ec4e707113a95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1748220_0ed6a94e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-11T20:10:22Z",
+      "side": 1,
+      "message": "Hmmm.. I just recreated solution.. I need to look more into that because test for that part is working. Send me your yang model please.",
+      "parentUuid": "f202b834_4331b795",
       "revId": "be44ee0ab24a5a5d47bbb012439ec4e707113a95",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -89,6 +131,24 @@
       "writtenOn": "2023-08-11T14:03:11Z",
       "side": 1,
       "message": "since there are 2 options else if nodeType.equals(LIST) is better here in my oppinion",
+      "revId": "be44ee0ab24a5a5d47bbb012439ec4e707113a95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5063893d_6e1c9125",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-11T20:10:22Z",
+      "side": 1,
+      "message": "No. There only 2 cases if it is not one then another one.",
+      "parentUuid": "a897b55a_e3f245f8",
       "revId": "be44ee0ab24a5a5d47bbb012439ec4e707113a95",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
