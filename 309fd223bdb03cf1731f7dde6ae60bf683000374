@@ -43,6 +43,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bd1fc67f_807e1c63",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/PostPayloadTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-11T14:31:33Z",
+      "side": 1,
+      "message": "Split it in two for list and containers and add tests for all other paths",
+      "revId": "309fd223bdb03cf1731f7dde6ae60bf683000374",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4a3b70a_80898f88",
         "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/PostPayloadTest.java",
         "patchSetId": 9
