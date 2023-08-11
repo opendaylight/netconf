@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a989cda_ad4a4313",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-11T14:27:09Z",
+      "side": 1,
+      "message": "What are we gonna do if first child is not list/container but second child is one?\nFor example:\n  container cont1 {\n    leaf leaf1 {\n      type string;\n    }\n    list list1 {\n      key \"key1\";\n      leaf key1 {\n        type string;\n      }\n      leaf value1 {\n        type string;\n      }}}\nWe still can use second child as payload for POST request and it will work. But your algorithm seems skip such cases.",
+      "revId": "309fd223bdb03cf1731f7dde6ae60bf683000374",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e181d70_e5a88048",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/PostPayloadTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-11T14:27:09Z",
+      "side": 1,
+      "message": "Add 2 spaces for these pls",
+      "range": {
+        "startLine": 35,
+        "startChar": 1,
+        "endLine": 40,
+        "endChar": 19
+      },
+      "revId": "309fd223bdb03cf1731f7dde6ae60bf683000374",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4a3b70a_80898f88",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/PostPayloadTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-11T14:27:09Z",
+      "side": 1,
+      "message": "use path() instead of get()",
+      "range": {
+        "startLine": 143,
+        "startChar": 50,
+        "endLine": 143,
+        "endChar": 53
+      },
+      "revId": "309fd223bdb03cf1731f7dde6ae60bf683000374",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9223dea_9a732499",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/PostPayloadTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-11T14:27:09Z",
+      "side": 1,
+      "message": "here you can get to the ref if you add .path(\"properties\").elements().next().path(\"$ref\").toString()",
+      "range": {
+        "startLine": 144,
+        "startChar": 45,
+        "endLine": 144,
+        "endChar": 46
+      },
+      "revId": "309fd223bdb03cf1731f7dde6ae60bf683000374",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
