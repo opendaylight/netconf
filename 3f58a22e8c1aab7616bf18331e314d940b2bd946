@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82db016f_755155cf",
+        "filename": "restconf/restconf-nb/pom.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-11T09:14:20Z",
+      "side": 1,
+      "message": "this still remains from prior review. \nit\u0027s extra, pls remove",
+      "range": {
+        "startLine": 235,
+        "startChar": 0,
+        "endLine": 240,
+        "endChar": 17
+      },
+      "revId": "3f58a22e8c1aab7616bf18331e314d940b2bd946",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
