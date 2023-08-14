@@ -48,6 +48,7 @@ import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.restconf.openapi.model.SecuritySchemes;
 import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -100,8 +101,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             final SchemaContext context = globalSchema.getGlobalContext();
             for (final Entry<YangInstanceIdentifier, Long> entry : instanceIdToLongId.entrySet()) {
                 final String modName = findModuleName(entry.getKey(), context);
-                urlToId.put(openApiGenerator.generateUrlPrefixFromInstanceID(entry.getKey(), modName),
-                        entry.getValue());
+                urlToId.put(generateUrlPrefixFromInstanceID(entry.getKey(), modName), entry.getValue());
             }
         }
         return urlToId;
@@ -119,7 +119,26 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     private String getYangMountUrl(final YangInstanceIdentifier key) {
         final String modName = findModuleName(key, globalSchema.getGlobalContext());
-        return openApiGenerator.generateUrlPrefixFromInstanceID(key, modName) + "yang-ext:mount";
+        return generateUrlPrefixFromInstanceID(key, modName) + "yang-ext:mount";
+    }
+
+    private static String generateUrlPrefixFromInstanceID(final YangInstanceIdentifier key, final String moduleName) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("/");
+        if (moduleName != null) {
+            builder.append(moduleName).append(':');
+        }
+        for (final PathArgument arg : key.getPathArguments()) {
+            final String name = arg.getNodeType().getLocalName();
+            if (arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates nodeId) {
+                for (final Entry<QName, Object> entry : nodeId.entrySet()) {
+                    builder.deleteCharAt(builder.length() - 1).append("=").append(entry.getValue()).append('/');
+                }
+            } else {
+                builder.append(name).append('/');
+            }
+        }
+        return builder.toString();
     }
 
     private YangInstanceIdentifier getInstanceId(final Long id) {

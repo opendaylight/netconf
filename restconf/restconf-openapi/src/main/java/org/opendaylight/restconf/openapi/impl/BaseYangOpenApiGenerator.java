@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -51,9 +50,6 @@ import org.opendaylight.restconf.openapi.model.SecuritySchemes;
 import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
@@ -390,24 +386,5 @@ public abstract class BaseYangOpenApiGenerator {
         return new Path.Builder()
             .post(buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames, parentPathParams))
             .build();
-    }
-
-    public String generateUrlPrefixFromInstanceID(final YangInstanceIdentifier key, final String moduleName) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("/");
-        if (moduleName != null) {
-            builder.append(moduleName).append(':');
-        }
-        for (final PathArgument arg : key.getPathArguments()) {
-            final String name = arg.getNodeType().getLocalName();
-            if (arg instanceof NodeIdentifierWithPredicates nodeId) {
-                for (final Entry<QName, Object> entry : nodeId.entrySet()) {
-                    builder.deleteCharAt(builder.length() - 1).append("=").append(entry.getValue()).append('/');
-                }
-            } else {
-                builder.append(name).append('/');
-            }
-        }
-        return builder.toString();
     }
 }
