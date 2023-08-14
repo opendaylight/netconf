@@ -18,11 +18,19 @@ import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParamete
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import javax.activation.MimeType;
+import javax.security.auth.callback.Callback;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -155,6 +163,25 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final Schema configLst11 = schemas.get("toaster2_lst_cont1_lst11");
         assertNotNull(configLst11);
+    }
+
+    /**
+     * Test that reference to schema in each path is valid (all referenced schemas exist)
+     */
+    @Test
+    public void testSchemasExistenceSingleModule() {
+        final var document = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
+        assertNotNull(document);
+
+        final var referencedSchemas = new HashSet<String>();
+        for (final var path : document.paths().values()) {
+            referencedSchemas.addAll(extractSchemaRefFromPath(path));
+        }
+        final var schemaNames = document.components().schemas().keySet();
+        for (final var ref : referencedSchemas) {
+            final var refName = ref.substring(ref.lastIndexOf("/") + 1);
+            assertTrue("Referenced schema " + ref + " does not exist", schemaNames.contains(refName));
+        }
     }
 
     /**
@@ -452,5 +479,40 @@ public final class OpenApiGeneratorRFC8040Test {
             .map(JsonNode::textValue)
             .collect(Collectors.toSet());
         assertEquals(expected, actualContainerArray);
+    }
+
+    private static Set<String> extractSchemaRefFromPath(final Path path) {
+        if (path == null) {
+            return Set.of();
+        }
+        final var references = new HashSet<String>();
+        final var get = path.get();
+        if (get != null) {
+            references.addAll(schemaRefFromContent(get.responses().get("200").get("content")));
+        }
+        final var post = path.post();
+        if (post != null) {
+            references.addAll(schemaRefFromContent(post.requestBody().get("content")));
+        }
+        final var put = path.put();
+        if (put != null) {
+            references.addAll(schemaRefFromContent(put.requestBody().get("content")));
+        }
+        final var patch = path.patch();
+        if (patch != null) {
+            references.addAll(schemaRefFromContent(patch.requestBody().get("content")));
+        }
+
+        return Collections.unmodifiableSet(references);
+    }
+    private static Set<String> schemaRefFromContent(final JsonNode content) {
+        final var refs = new HashSet<String>();
+        content.fieldNames().forEachRemaining(mediaType -> {
+            final var ref = content.get(mediaType).get("schema").get("$ref");
+            if (ref != null) {
+                refs.add(ref.asText());
+            }
+        });
+        return refs;
     }
 }
