@@ -242,9 +242,9 @@ public abstract class BaseYangOpenApiGenerator {
             final List<Parameter> pathParams, final String resourcePath, final Map<String, Path> paths) {
         if (containsListOrContainer(module.getChildNodes())) {
             final String moduleName = module.getName();
-            final String name = moduleName + MODULE_NAME_SUFFIX;
             paths.put(resourcePath, new Path.Builder()
-                .post(buildPost("", name, "", moduleName, deviceName, module.getDescription().orElse(""), pathParams))
+                .post(buildPost(moduleName, MODULE_NAME_SUFFIX.replaceFirst("_", ""), "", moduleName, deviceName,
+                    module.getDescription().orElse(""), pathParams))
                 .build());
         }
     }
