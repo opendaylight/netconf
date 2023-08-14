@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84cf4d98_0a44f74d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-14T13:17:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91dd25f7_e7c3e85e",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d1ad249_d8219ee2",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-11T14:13:20Z",
       "side": 1,
       "message": "for the path that has list as a last element",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a74e1fb_c9ba9db7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-14T13:17:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d1ad249_d8219ee2",
       "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab7d0eb0_e0228945",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/ListPostRequestsTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-14T13:17:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f172af7e_30f4230f",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d1d4331_caa62b27",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-08-11T14:13:20Z",
       "side": 1,
       "message": "Here /rests/data/recursive:container-root is the exceptional case.",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e2cf01d_996fe9b8",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-14T13:17:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d1d4331_caa62b27",
       "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09824092_0ac201c6",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-14T13:17:49Z",
+      "side": 1,
+      "message": "Since OpenApiTestUtils#getPathParameters was changed to use PUT requests for checking parameters, we cannot use it for action.",
+      "parentUuid": "fb660e91_dc97fb9b",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4f8641a_bc5252a6",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-08-11T14:13:20Z",
       "side": 1,
       "message": "The same here.",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21b186b7_16f74ed9",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-14T13:17:49Z",
+      "side": 1,
+      "message": "#getParameters use PUT requests for checking parameters for Actions we have only POST requests",
+      "parentUuid": "b4f8641a_bc5252a6",
       "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de290309_a71273ba",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-14T13:17:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8091cccf_9636d073",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f13b7b43_3a0705fd",
@@ -133,6 +259,24 @@
       "writtenOn": "2023-08-11T14:13:20Z",
       "side": 1,
       "message": "Only /rests/data/nodes/node\u003d123/yang-ext:mount/recursive:container-root is exceptional case here.",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3772d55d_071fc05a",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-14T13:17:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f13b7b43_3a0705fd",
       "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3808d7ea_d1648291",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-14T13:17:49Z",
+      "side": 1,
+      "message": "#getParameters use PUT requests for checking parameters for Actions we have only POST requests",
+      "parentUuid": "9ff763d5_8b3ab565",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7613d8fb_f446a4b8",
@@ -167,6 +329,24 @@
       "writtenOn": "2023-08-11T14:13:20Z",
       "side": 1,
       "message": "Why are you not using OpenApiTestUtils#getPathParameters?",
+      "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4ad9eef_b346ad56",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-14T13:17:49Z",
+      "side": 1,
+      "message": "#getParameters use PUT requests for checking parameters for Actions we have only POST requests",
+      "parentUuid": "7613d8fb_f446a4b8",
       "revId": "65a9c59959b18013dc5c1ee35b4aecc29761c2ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
