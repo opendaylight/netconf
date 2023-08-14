@@ -16,6 +16,24 @@
       "message": "final boolean isList \u003d node instanceof ContainerSchemaNode;\nfinal ObjectNode requestBody \u003d createRequestBodyParameter1(defName, nodeName, isList, summary);\n\nlooks better imo",
       "revId": "f7059ab52ca20d1348647c290dd902cfdc6cad72",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ac80b9b_701d9008",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-14T18:16:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb60fd9a_34ed0bd5",
+      "revId": "f7059ab52ca20d1348647c290dd902cfdc6cad72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
