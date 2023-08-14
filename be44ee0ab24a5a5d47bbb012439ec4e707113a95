@@ -83,6 +83,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3f4f8da_c0010058",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-14T14:45:28Z",
+      "side": 1,
+      "message": "It\u0027s ok. We have same now on master and both requests works. Plus even if don\u0027t - we can\u0027t have this only for top level because in theory it can happen at any level. You just need container and child with same name. So this in out new correct payloads for PUT",
+      "parentUuid": "e1748220_0ed6a94e",
+      "revId": "be44ee0ab24a5a5d47bbb012439ec4e707113a95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ded4f932_c99b8e69",
