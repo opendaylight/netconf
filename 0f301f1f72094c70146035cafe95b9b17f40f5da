@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c61bfbe7_76958d17",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-14T15:13:11Z",
+      "side": 1,
+      "message": "Will have its own JIRA ID.",
+      "revId": "0f301f1f72094c70146035cafe95b9b17f40f5da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
