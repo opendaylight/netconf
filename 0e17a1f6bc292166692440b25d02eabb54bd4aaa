@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "988d8b60_213dcd65",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-14T13:02:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b722b6c_da49eac5",
+      "revId": "0e17a1f6bc292166692440b25d02eabb54bd4aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a36a9a4_7bc5b8e8",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-11T12:48:45Z",
       "side": 1,
       "message": "The same issues as in https://git.opendaylight.org/gerrit/c/netconf/+/107399",
+      "revId": "0e17a1f6bc292166692440b25d02eabb54bd4aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4942fdf8_b9255b73",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/JsonModelNameTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-14T13:02:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a36a9a4_7bc5b8e8",
       "revId": "0e17a1f6bc292166692440b25d02eabb54bd4aaa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
