@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4979b450_fd6a9328",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-14T12:41:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fbb46751_c570a000",
+      "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8951528_d9e7a298",
@@ -52,6 +70,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c107a5d1_cbf7ca6a",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/JsonModelNameTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-14T12:41:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8951528_d9e7a298",
+      "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b32b8f94_38c807b6",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/JsonModelNameTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-14T12:41:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7bcf70bb_520030f3",
+      "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ec51416_c4dc2ffa",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2696261_3e68b606",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/JsonModelNameTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-14T12:41:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ec51416_c4dc2ffa",
+      "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7735147c_55b9f4b1",
@@ -82,6 +154,24 @@
       "writtenOn": "2023-08-11T12:47:42Z",
       "side": 1,
       "message": "In general, we are working with V3_0",
+      "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e1370c0_03d27025",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/JsonModelNameTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-14T12:41:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7735147c_55b9f4b1",
       "revId": "4894809971a148fb735eef5a9fcaf304fdc55c50",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
