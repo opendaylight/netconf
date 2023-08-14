@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39ff68a2_57307648",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-14T15:15:07Z",
+      "side": 1,
+      "message": "+ Merge conflict",
+      "revId": "0e02c15a6fe769a2a568b79e91b3eb61123ae65e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdcd7afc_73a75bb2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-14T15:15:07Z",
+      "side": 1,
+      "message": "can be final",
+      "revId": "0e02c15a6fe769a2a568b79e91b3eb61123ae65e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "742be96b_b447cbbc",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-14T15:15:07Z",
+      "side": 1,
+      "message": "you can use \"final var pathParamBuilder \u003d\" here",
+      "revId": "0e02c15a6fe769a2a568b79e91b3eb61123ae65e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97eb2040_b2f8fbe4",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-14T15:15:07Z",
+      "side": 1,
+      "message": "you can use var here",
+      "revId": "0e02c15a6fe769a2a568b79e91b3eb61123ae65e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "034bb665_b984f242",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/KeysMappingTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-14T15:15:07Z",
+      "side": 1,
+      "message": "use Set.of here and use assertEquals again",
+      "revId": "0e02c15a6fe769a2a568b79e91b3eb61123ae65e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6fea5f8_e16c985e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-14T15:15:07Z",
+      "side": 1,
+      "message": "Set.of",
+      "revId": "0e02c15a6fe769a2a568b79e91b3eb61123ae65e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f91ba6d_a3c3d16a",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-14T15:15:07Z",
+      "side": 1,
+      "message": "Set.of",
+      "revId": "0e02c15a6fe769a2a568b79e91b3eb61123ae65e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5e1c682_60f9ad25",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-14T15:15:07Z",
+      "side": 1,
+      "message": "Set.of",
+      "revId": "0e02c15a6fe769a2a568b79e91b3eb61123ae65e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfe813e7_ca416281",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-14T15:15:07Z",
+      "side": 1,
+      "message": "Set.of",
+      "revId": "0e02c15a6fe769a2a568b79e91b3eb61123ae65e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
