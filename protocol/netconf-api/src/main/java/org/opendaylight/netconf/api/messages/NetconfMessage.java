@@ -44,6 +44,20 @@ public class NetconfMessage {
         this.document = requireNonNull(document);
     }
 
+    public static @NonNull NetconfMessage of(final Document document) {
+        if (HelloMessage.isHelloMessage(document)) {
+            return new HelloMessage(document);
+        } else if (NotificationMessage.isNotificationMessage(document)) {
+            return NotificationMessage.unsafeOf(document);
+        } else if (RpcMessage.isRpcMessage(document)) {
+            return RpcMessage.unsafeOf(document);
+        } else if (RpcReplyMessage.isRpcReplyMessage(document)) {
+            return RpcReplyMessage.unsafeOf(document);
+        } else {
+            throw new IllegalArgumentException("Unhandled message " + XmlUtil.toString(document));
+        }
+    }
+
     public final @NonNull Document getDocument() {
         return document;
     }
