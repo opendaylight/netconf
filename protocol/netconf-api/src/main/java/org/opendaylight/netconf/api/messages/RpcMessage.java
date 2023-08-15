@@ -22,10 +22,18 @@ public final class RpcMessage extends NetconfMessage {
     }
 
     /**
-     * Create new RpcMessage with provided message ID.
+     * Create new RpcMessage with provided document as content and message ID.
      */
     public static RpcMessage wrapDocumentAsRpc(final Document document, final String messageId) {
         return new RpcMessage(wrapRpc(document, messageId));
+    }
+
+    /**
+     * Create new RpcMessage with provided document. Only to be used if we know that the document represents a valid
+     * RpcMessage.
+     */
+    public static RpcMessage unsafeOf(final Document document) {
+        return new RpcMessage(document);
     }
 
     private static Document wrapRpc(final Document rpcContent, final String messageId) {
