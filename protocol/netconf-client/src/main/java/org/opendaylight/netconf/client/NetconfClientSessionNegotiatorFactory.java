@@ -23,7 +23,7 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiatorFactory;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
-import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
+import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
 import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
 import org.opendaylight.netconf.shaded.exificient.core.FidelityOptions;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.UnsupportedOption;
@@ -130,7 +130,7 @@ public class NetconfClientSessionNegotiatorFactory
             final Channel channel, final Promise<NetconfClientSession> promise) {
         return new NetconfClientSessionNegotiator(
             HelloMessage.createClientHello(clientCapabilities, additionalHeader),
-            NetconfStartExiMessage.create(options, START_EXI_MESSAGE_ID), promise, channel, timer,
+            NetconfStartExiMessageProvider.create(options, START_EXI_MESSAGE_ID), promise, channel, timer,
                 sessionListenerFactory.getSessionListener(), connectionTimeoutMillis, maximumIncomingChunkSize);
     }
 }
