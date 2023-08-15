@@ -63,7 +63,7 @@ public class NetconfServerSessionTest {
         channel = new EmbeddedChannel();
         session = new NetconfServerSession(listener, channel, new SessionIdType(Uint32.ONE), header);
         doNothing().when(listener).onSessionUp(any());
-        msg = new NetconfMessage(XmlUtil.readXmlToDocument("""
+        msg = NetconfMessage.of(XmlUtil.readXmlToDocument("""
             <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="id"/>"""));
     }
 

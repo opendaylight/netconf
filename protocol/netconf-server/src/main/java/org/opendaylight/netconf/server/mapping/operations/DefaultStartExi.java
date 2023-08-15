@@ -43,7 +43,7 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
         }
 
         try {
-            netconfSession.startExiCommunication(new NetconfMessage(message));
+            netconfSession.startExiCommunication(NetconfMessage.of(message));
         } catch (final IllegalArgumentException e) {
             throw new DocumentedException("Failed to parse EXI parameters", e, ErrorType.PROTOCOL,
                     ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);

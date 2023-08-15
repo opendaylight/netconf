@@ -23,7 +23,7 @@ import org.w3c.dom.Document;
 /**
  * NetconfMessage represents a wrapper around {@link Document}.
  */
-public class NetconfMessage {
+public abstract sealed class NetconfMessage permits HelloMessage, NotificationMessage, RpcMessage, RpcReplyMessage {
     private static final Transformer TRANSFORMER;
 
     static {
@@ -40,7 +40,7 @@ public class NetconfMessage {
 
     private final @NonNull Document document;
 
-    public NetconfMessage(final Document document) {
+    protected NetconfMessage(final Document document) {
         this.document = requireNonNull(document);
     }
 

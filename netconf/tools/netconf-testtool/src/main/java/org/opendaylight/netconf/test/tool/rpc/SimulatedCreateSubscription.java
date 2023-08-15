@@ -112,7 +112,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
         }
 
         try {
-            return new NetconfMessage(XmlUtil.readXmlToDocument(content));
+            return NetconfMessage.of(XmlUtil.readXmlToDocument(content));
         } catch (SAXException | IOException e) {
             throw new IllegalArgumentException("Cannot parse notifications", e);
         }

@@ -346,7 +346,7 @@ public class NetconfMessageTransformer
         final RpcDefinition mappedRpc = checkNotNull(currentMappedRpcs.get(rpc),
                 "Unknown rpc %s, available rpcs: %s", rpc, currentMappedRpcs.keySet());
         if (mappedRpc.getInput().getChildNodes().isEmpty()) {
-            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter)
+            return NetconfMessage.of(NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter)
                 .getNode().getOwnerDocument());
         }
 
@@ -367,7 +367,7 @@ public class NetconfMessageTransformer
 
         final Document node = result.getNode().getOwnerDocument();
 
-        return new NetconfMessage(node);
+        return NetconfMessage.of(node);
     }
 
     @Override
@@ -378,7 +378,7 @@ public class NetconfMessageTransformer
 
         final InputSchemaNode inputDef = actionDef.getInput();
         if (inputDef.getChildNodes().isEmpty()) {
-            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
+            return NetconfMessage.of(NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
                 domDataTreeIdentifier, counter, actionDef.getQName()).getNode().getOwnerDocument());
         }
 
@@ -395,7 +395,7 @@ public class NetconfMessageTransformer
             throw new IllegalStateException("Unable to serialize input of " + action, e);
         }
 
-        return new NetconfMessage(result.getNode().getOwnerDocument());
+        return NetconfMessage.of(result.getNode().getOwnerDocument());
     }
 
     private static boolean isBaseOrNotificationRpc(final QName rpc) {

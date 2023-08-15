@@ -59,7 +59,7 @@ public class SchemalessMessageTransformerTest {
     @Test
     public void toNotification() throws Exception {
         final Document payload = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/notification-payload.xml"));
-        final NetconfMessage netconfMessage = new NetconfMessage(payload);
+        final NetconfMessage netconfMessage = NetconfMessage.of(payload);
         final DOMNotification domNotification = transformer.toNotification(netconfMessage);
         assertEquals(domNotification.getType().lastNodeIdentifier(),
                 SchemalessMessageTransformer.SCHEMALESS_NOTIFICATION_PAYLOAD.getNodeType());
@@ -83,7 +83,7 @@ public class SchemalessMessageTransformerTest {
     @Test
     public void toRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(EXP_REPLY);
-        final NetconfMessage netconfMessage = new NetconfMessage(doc);
+        final NetconfMessage netconfMessage = NetconfMessage.of(doc);
         final DOMSource result = transformer.toRpcResult(RpcResultBuilder.success(netconfMessage).build(), TEST_RPC);
         final Document domSourceDoc = (Document) result.getNode();
         final Diff diff = XMLUnit.compareXML(XmlUtil.readXmlToDocument(EXP_REPLY), domSourceDoc);
@@ -93,7 +93,7 @@ public class SchemalessMessageTransformerTest {
     @Test
     public void toEmptyRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(OK_REPLY);
-        final DOMSource result = transformer.toRpcResult(RpcResultBuilder.success(new NetconfMessage(doc)).build(),
+        final DOMSource result = transformer.toRpcResult(RpcResultBuilder.success(NetconfMessage.of(doc)).build(),
             NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME);
         assertNull(result);
     }
