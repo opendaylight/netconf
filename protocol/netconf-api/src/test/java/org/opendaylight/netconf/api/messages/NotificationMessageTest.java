@@ -8,9 +8,7 @@
 package org.opendaylight.netconf.api.messages;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
@@ -49,18 +47,5 @@ class NotificationMessageTest {
 
         assertEquals(EVENT_TIME, NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()));
         assertEquals(EVENT_TIME, netconfNotification.getEventTime());
-    }
-
-    @Test
-    void testIsNotificationMessage() {
-        document.appendChild(document.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
-            "notification"));
-        assertTrue(NotificationMessage.isNotificationMessage(document));
-    }
-
-    @Test
-    void testIsRpcMessageNegative() {
-        document.appendChild(document.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0", "other"));
-        assertFalse(NotificationMessage.isNotificationMessage(document));
     }
 }

@@ -33,6 +33,8 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -110,7 +112,7 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull NodeIdentifier NETCONF_DATA_NODEID = NodeIdentifier.create(NETCONF_DATA_QNAME);
 
     public static final @NonNull QName NETCONF_RPC_REPLY_QNAME =
-        QName.create(NETCONF_QNAME, XmlNetconfConstants.RPC_REPLY_KEY).intern();
+        QName.create(NETCONF_QNAME, RpcReplyMessage.ELEMENT_NAME).intern();
     public static final @NonNull NodeIdentifier NETCONF_RPC_REPLY_NODEID =
         NodeIdentifier.create(NETCONF_RPC_REPLY_QNAME);
 
@@ -166,7 +168,7 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull NodeIdentifier NETCONF_GET_NODEID = NodeIdentifier.create(NETCONF_GET_QNAME);
     public static final @NonNull Absolute NETCONF_GET_PATH = toPath(NETCONF_GET_QNAME);
     public static final @NonNull QName NETCONF_RPC_QNAME =
-        QName.create(NETCONF_QNAME, XmlNetconfConstants.RPC_KEY).intern();
+        QName.create(NETCONF_QNAME, RpcMessage.ELEMENT_NAME).intern();
 
     public static final @NonNull QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
     public static final @NonNull NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);

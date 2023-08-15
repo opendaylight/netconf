@@ -7,14 +7,13 @@
  */
 package org.opendaylight.netconf.api;
 
-import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.RPC_REPLY_KEY;
-
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -231,7 +230,7 @@ public class DocumentedException extends Exception {
             throw new IllegalStateException("Error outputting to XML document", e);
         }
 
-        final var rpcReply = doc.createElementNS(NamespaceURN.BASE, RPC_REPLY_KEY);
+        final var rpcReply = doc.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
         doc.appendChild(rpcReply);
 
         final var rpcError = doc.createElementNS(NamespaceURN.BASE, RPC_ERROR);
