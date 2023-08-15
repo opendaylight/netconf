@@ -17,8 +17,6 @@ public final class XmlNetconfConstants {
     public static final String OK = "ok";
     public static final String FILTER = "filter";
     public static final String SOURCE_KEY = "source";
-    public static final String RPC_KEY = "rpc";
-    public static final String NOTIFICATION_ELEMENT_NAME = "notification";
     public static final String EVENT_TIME = "eventTime";
     public static final String PREFIX = "prefix";
 
@@ -27,8 +25,6 @@ public final class XmlNetconfConstants {
 
     public static final String GET = "get";
     public static final String GET_CONFIG = "get-config";
-
-    public static final String RPC_REPLY_KEY = "rpc-reply";
 
     private XmlNetconfConstants() {
         // Hidden on purpose

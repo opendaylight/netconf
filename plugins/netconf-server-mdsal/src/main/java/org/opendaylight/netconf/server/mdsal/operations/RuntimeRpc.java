@@ -23,6 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -171,7 +172,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final Map<String, Attr> attributes = requestElement.getAttributes();
 
         final Element response = handle(document, operationElement, subsequentOperation);
-        final Element rpcReply = XmlUtil.createElement(document, XmlNetconfConstants.RPC_REPLY_KEY,
+        final Element rpcReply = XmlUtil.createElement(document, RpcReplyMessage.ELEMENT_NAME,
                 Optional.of(NamespaceURN.BASE));
 
         if (XmlElement.fromDomElement(response).hasNamespace()) {
@@ -196,7 +197,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     private Element transformNormalizedNode(final Document document, final NormalizedNode data,
                                             final Absolute rpcOutputPath) {
-        final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.RPC_REPLY_KEY));
+        final DOMResult result = new DOMResult(document.createElement(RpcReplyMessage.ELEMENT_NAME));
 
         final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
 

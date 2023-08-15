@@ -9,10 +9,10 @@ package org.opendaylight.netconf.api.messages;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableMap;
 import java.text.ParsePosition;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,17 +21,22 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Special kind of netconf message that contains a timestamp.
  */
 public final class NotificationMessage extends NetconfMessage {
+    public static final @NonNull String ELEMENT_NAME = "notification";
+
     private static final Logger LOG = LoggerFactory.getLogger(NotificationMessage.class);
 
     /**
@@ -68,16 +73,16 @@ public final class NotificationMessage extends NetconfMessage {
      */
     public static final Function<String, Instant> RFC3339_DATE_PARSER = time -> {
         try {
-            final ZonedDateTime localDateTime = ZonedDateTime.parse(time, DATE_TIME_FORMATTER);
+            final var localDateTime = ZonedDateTime.parse(time, DATE_TIME_FORMATTER);
             final int startAt = 0;
-            final TemporalAccessor parsed = DATE_TIME_FORMATTER.parse(time, new ParsePosition(startAt));
+            final var parsed = DATE_TIME_FORMATTER.parse(time, new ParsePosition(startAt));
             final int nanoOfSecond = getFieldFromTemporalAccessor(parsed, ChronoField.NANO_OF_SECOND);
             final long reminder = nanoOfSecond % 1000000;
 
             // Log warn in case we rounded the fraction of a second. We need to create a string from the
             // value that was cut. Example -> 1.123750 -> Value that was cut 75
             if (reminder != 0) {
-                final StringBuilder reminderBuilder = new StringBuilder(String.valueOf(reminder));
+                final var reminderBuilder = new StringBuilder(String.valueOf(reminder));
 
                 //add zeros in case we have number like 123056 to make sure 056 is displayed
                 while (reminderBuilder.length() < 6) {
@@ -114,7 +119,7 @@ public final class NotificationMessage extends NetconfMessage {
     private static Instant handlePotentialLeapSecond(final String time) {
         // Parse the string from offset 0, so we get the whole value.
         final int offset = 0;
-        final TemporalAccessor parsed = DATE_TIME_FORMATTER.parseUnresolved(time, new ParsePosition(offset));
+        final var parsed = DATE_TIME_FORMATTER.parseUnresolved(time, new ParsePosition(offset));
         // Bail fast
         if (parsed == null) {
             return null;
@@ -144,15 +149,14 @@ public final class NotificationMessage extends NetconfMessage {
         final int nanoOfSecond = getFieldFromTemporalAccessor(parsed, ChronoField.NANO_OF_SECOND);
         final int offsetSeconds = getFieldFromTemporalAccessor(parsed, ChronoField.OFFSET_SECONDS);
 
-        final LocalDateTime currentTime = LocalDateTime.of(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour,
-                secondOfMinute, nanoOfSecond);
-        final OffsetDateTime dateTimeWithZoneOffset = currentTime.atOffset(ZoneOffset.ofTotalSeconds(offsetSeconds));
-
+        final var currentTime = LocalDateTime.of(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, secondOfMinute,
+            nanoOfSecond);
+        final var dateTimeWithZoneOffset = currentTime.atOffset(ZoneOffset.ofTotalSeconds(offsetSeconds));
         return RFC3339_DATE_PARSER.apply(dateTimeWithZoneOffset.toString());
     }
 
     /**
-     * Get value asociated with {@code ChronoField}.
+     * Get value associated with {@code ChronoField}.
      *
      * @param accessor The {@link TemporalAccessor}
      * @param field The {@link ChronoField} to get
@@ -171,12 +175,17 @@ public final class NotificationMessage extends NetconfMessage {
     }
 
     /**
-     * Get the time of the event.
-     *
-     * @return notification event time
+     * Create new NotificationMessage with provided document. Only to be used if we know that the document represents a
+     * valid NotificationMessage.
      */
-    public @NonNull Instant getEventTime() {
-        return eventTime;
+    static @NonNull NotificationMessage ofChecked(final Document document) throws DocumentedException {
+        final var eventTime = document.getDocumentElement().getElementsByTagNameNS(NamespaceURN.NOTIFICATION,
+            XmlNetconfConstants.EVENT_TIME);
+        if (eventTime.getLength() < 1) {
+            throw new DocumentedException("Missing event-time", ErrorType.PROTOCOL, ErrorTag.MISSING_ELEMENT,
+                ErrorSeverity.ERROR, ImmutableMap.of());
+        }
+        return new NotificationMessage(document, RFC3339_DATE_PARSER.apply(eventTime.item(0).getTextContent()));
     }
 
     /**
@@ -194,27 +203,29 @@ public final class NotificationMessage extends NetconfMessage {
         return ofNotificationContent(notificationContent, Instant.now());
     }
 
+    /**
+     * Get the time of the event.
+     *
+     * @return notification event time
+     */
+    public @NonNull Instant getEventTime() {
+        return eventTime;
+    }
+
     private static Document wrapNotification(final Document notificationContent, final Instant eventTime) {
         requireNonNull(notificationContent);
         requireNonNull(eventTime);
 
-        final Element baseNotification = notificationContent.getDocumentElement();
-        final Element entireNotification = notificationContent.createElementNS(
-            NamespaceURN.NOTIFICATION, XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME);
+        final var baseNotification = notificationContent.getDocumentElement();
+        final var entireNotification = notificationContent.createElementNS(NamespaceURN.NOTIFICATION, ELEMENT_NAME);
         entireNotification.appendChild(baseNotification);
 
-        final Element eventTimeElement = notificationContent.createElementNS(
-            NamespaceURN.NOTIFICATION, XmlNetconfConstants.EVENT_TIME);
+        final var eventTimeElement = notificationContent.createElementNS(NamespaceURN.NOTIFICATION,
+            XmlNetconfConstants.EVENT_TIME);
         eventTimeElement.setTextContent(RFC3339_DATE_FORMATTER.apply(eventTime));
         entireNotification.appendChild(eventTimeElement);
 
         notificationContent.appendChild(entireNotification);
         return notificationContent;
-    }
-
-    public static boolean isNotificationMessage(final Document document) {
-        final var root = document.getDocumentElement();
-        return NamespaceURN.NOTIFICATION.equals(root.getNamespaceURI())
-            && XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME.equals(root.getLocalName());
     }
 }
