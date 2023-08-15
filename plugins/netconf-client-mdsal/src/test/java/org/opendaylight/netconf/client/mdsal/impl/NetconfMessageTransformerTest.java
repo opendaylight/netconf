@@ -223,7 +223,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         transformer.toRpcResult(
-            RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
+            RpcResultBuilder.success(NetconfMessage.of(XmlUtil.readXmlToDocument(result))).build(),
             NETCONF_LOCK_QNAME);
     }
 
@@ -232,7 +232,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         DOMRpcResult domRpcResult = actionNetconfMessageTransformer.toRpcResult(
-            RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
+            RpcResultBuilder.success(NetconfMessage.of(XmlUtil.readXmlToDocument(result))).build(),
             RPC_WITH_OUTPUT_QNAME);
         assertNotNull(domRpcResult);
     }
@@ -242,7 +242,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         DOMRpcResult domRpcResult = actionNetconfMessageTransformer.toRpcResult(
-            RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
+            RpcResultBuilder.success(NetconfMessage.of(XmlUtil.readXmlToDocument(result))).build(),
             RPC_WITHOUT_OUTPUT_QNAME);
         assertNotNull(domRpcResult);
     }
@@ -272,7 +272,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void testGetSchemaResponse() throws Exception {
         final NetconfMessageTransformer transformer = getTransformer(SCHEMA);
-        final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
+        final NetconfMessage response = NetconfMessage.of(XmlUtil.readXmlToDocument(
                 "<rpc-reply message-id=\"101\"\n"
                         + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                         + "<data\n"
@@ -295,7 +295,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testGetConfigResponse() throws Exception {
-        final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\"\n"
+        final NetconfMessage response = NetconfMessage.of(XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\"\n"
                 + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<data>\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
@@ -527,7 +527,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testCommitResponse() throws Exception {
-        final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
+        final NetconfMessage response = NetconfMessage.of(XmlUtil.readXmlToDocument(
                 "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>"
         ));
         final DOMRpcResult compositeNodeRpcResult = netconfMessageTransformer.toRpcResult(
@@ -825,7 +825,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void toActionResultTest() throws Exception {
-        NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
+        NetconfMessage message = NetconfMessage.of(XmlUtil.readXmlToDocument(
                 "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
                 + "<reset-finished-at xmlns=\"urn:example:server-farm\">"
                 + "now"
@@ -840,7 +840,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void toActionEmptyBodyWithOutputDefinedResultTest() throws Exception {
-        NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
+        NetconfMessage message = NetconfMessage.of(XmlUtil.readXmlToDocument(
                 "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
                 + "<ok/>"
                 + "</rpc-reply>"));
@@ -852,7 +852,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void toActionEmptyBodyWithoutOutputDefinedResultTest() throws Exception {
-        NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
+        NetconfMessage message = NetconfMessage.of(XmlUtil.readXmlToDocument(
                 "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
                 + "<ok/>"
                 + "</rpc-reply>"));
@@ -1097,7 +1097,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     // Proof that YANGTOOLS-1362 works on DOM level
     public void testConfigChangeToNotification() throws SAXException, IOException {
-        final var message = new NetconfMessage(XmlUtil.readXmlToDocument(
+        final var message = NetconfMessage.of(XmlUtil.readXmlToDocument(
             "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">\n"
             + " <eventTime>2021-11-11T11:26:16Z</eventTime> \n"
             + "  <netconf-config-change xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-notifications\">\n"
