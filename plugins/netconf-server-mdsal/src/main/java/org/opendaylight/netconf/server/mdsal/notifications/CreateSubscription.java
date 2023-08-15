@@ -138,7 +138,7 @@ final class CreateSubscription extends AbstractSingletonNetconfOperation
                 final Optional<Document> filtered =
                         SubtreeFilter.applySubtreeNotificationFilter(filter, notification.getDocument());
                 if (filtered.isPresent()) {
-                    currentSession.sendMessage(new NotificationMessage(filtered.orElseThrow(),
+                    currentSession.sendMessage(NotificationMessage.wrapDocumentAsNotification(filtered.orElseThrow(),
                         notification.getEventTime()));
                 }
             } catch (DocumentedException e) {
