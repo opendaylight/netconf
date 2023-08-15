@@ -16,6 +16,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
 import org.opendaylight.netconf.shaded.exificient.core.FidelityOptions;
 
@@ -24,16 +25,14 @@ public class NetconfStartExiMessageTest {
 
     @Parameterized.Parameters
     public static Iterable<Object[]> data() throws Exception {
-        final String noChangeXml = "<rpc xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
-                + "ns0:message-id=\"id\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+        final String noChangeXml = "<rpc message-id=\"id\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n"
                 + "<alignment>bit-packed</alignment>\n"
                 + "</start-exi>\n"
                 + "</rpc>";
 
 
-        final String fullOptionsXml = "<rpc xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
-                + "ns0:message-id=\"id\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+        final String fullOptionsXml = "<rpc message-id=\"id\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n"
                 + "<alignment>byte-aligned</alignment>\n"
                 + "<fidelity>\n"
@@ -69,7 +68,7 @@ public class NetconfStartExiMessageTest {
 
     @Test
     public void testCreate() throws Exception {
-        final NetconfStartExiMessage startExiMessage = NetconfStartExiMessage.create(exiOptions, "id");
+        final RpcMessage startExiMessage = NetconfStartExiMessageProvider.create(exiOptions, "id");
 
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
