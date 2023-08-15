@@ -80,7 +80,7 @@ public class DefaultCloseSessionTest {
         close.setNetconfSession(session);
         close.handleWithNoSubsequentOperations(doc, elem);
         // Fake close response to trigger delayed close
-        session.sendMessage(new NetconfMessage(XmlUtil.readXmlToDocument("""
+        session.sendMessage(NetconfMessage.of(XmlUtil.readXmlToDocument("""
             <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
               <ok/>
             </rpc-reply>""")));

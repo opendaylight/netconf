@@ -96,6 +96,6 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
             reader.parse(new InputSource(is));
         }
 
-        out.add(new NetconfMessage((Document) domResult.getNode()));
+        out.add(NetconfMessage.of((Document) domResult.getNode()));
     }
 }
