@@ -25,8 +25,22 @@ import org.w3c.dom.Document;
  * guaranteed to be an {@code <rpc/>} in the {@value NamespaceURN#BASE} namespace.
  */
 public final class RpcMessage extends NetconfMessage {
+    public static final @NonNull String ELEMENT_NAME = "rpc";
+
     private RpcMessage(final Document document) {
         super(document);
+    }
+
+    static @NonNull RpcMessage ofChecked(final Document document) throws DocumentedException {
+        final var root = document.getDocumentElement();
+        final var messageIdAttr = root.getAttributeNode(XmlNetconfConstants.MESSAGE_ID);
+        if (messageIdAttr == null) {
+            throw new DocumentedException("Missing message-id attribute", ErrorType.RPC, ErrorTag.MISSING_ATTRIBUTE,
+                ErrorSeverity.ERROR, ImmutableMap.of(
+                    "bad-attribute", XmlNetconfConstants.MESSAGE_ID,
+                    "bad-element", ELEMENT_NAME));
+        }
+        return new RpcMessage(document);
     }
 
     /**
@@ -40,7 +54,7 @@ public final class RpcMessage extends NetconfMessage {
     public static @NonNull RpcMessage of(final Document document) throws DocumentedException {
         final var root = document.getDocumentElement();
         final var rootName = root.getLocalName();
-        if (!XmlNetconfConstants.RPC_KEY.equals(rootName)) {
+        if (!ELEMENT_NAME.equals(rootName)) {
             throw new DocumentedException("Unexpected element name " + rootName, ErrorType.PROTOCOL,
                 ErrorTag.UNKNOWN_ELEMENT, ErrorSeverity.ERROR, ImmutableMap.of("bad-element", rootName));
         }
@@ -51,18 +65,7 @@ public final class RpcMessage extends NetconfMessage {
                     "bad-element", rootName,
                     "bad-namespace", rootNs));
         }
-
-        final var messageIdAttr = root.getAttributeNode(XmlNetconfConstants.MESSAGE_ID);
-        if (messageIdAttr == null) {
-            throw new DocumentedException("Missing message-id attribute", ErrorType.RPC, ErrorTag.MISSING_ATTRIBUTE,
-                ErrorSeverity.ERROR, ImmutableMap.of(
-                    "bad-attribute", XmlNetconfConstants.MESSAGE_ID,
-                    "bad-element", XmlNetconfConstants.RPC_KEY));
-        }
-        if (!messageIdAttr.getSpecified()) {
-            throw new IllegalArgumentException("Document element's message-id attribute is not specified");
-        }
-        return new RpcMessage(document);
+        return ofChecked(document);
     }
 
     /**
@@ -74,7 +77,7 @@ public final class RpcMessage extends NetconfMessage {
      * @throws NullPointerException if any argument is {@code null}
      */
     public static @NonNull RpcMessage ofOperation(final String messageId, final Document document) {
-        final var rpcElem = document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.RPC_KEY);
+        final var rpcElem = document.createElementNS(NamespaceURN.BASE, ELEMENT_NAME);
         rpcElem.appendChild(document.getDocumentElement());
         rpcElem.setAttribute(XmlNetconfConstants.MESSAGE_ID, requireNonNull(messageId));
         document.appendChild(rpcElem);
@@ -83,11 +86,5 @@ public final class RpcMessage extends NetconfMessage {
 
     public @NonNull String messageId() {
         return getDocument().getDocumentElement().getAttribute(XmlNetconfConstants.MESSAGE_ID);
-    }
-
-    public static boolean isRpcMessage(final Document document) {
-        final var root = document.getDocumentElement();
-        return NamespaceURN.BASE.equals(root.getNamespaceURI())
-            && XmlNetconfConstants.RPC_KEY.equals(root.getLocalName());
     }
 }

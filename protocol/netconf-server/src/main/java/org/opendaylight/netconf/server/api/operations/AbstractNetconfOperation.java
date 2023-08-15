@@ -14,8 +14,9 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.netconf.api.messages.RpcMessage;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.w3c.dom.Attr;
@@ -73,7 +74,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
     }
 
     protected static XmlElement getRequestElementWithCheck(final Document message) throws DocumentedException {
-        return XmlElement.fromDomElementWithExpected(message.getDocumentElement(), XmlNetconfConstants.RPC_KEY,
+        return XmlElement.fromDomElementWithExpected(message.getDocumentElement(), RpcMessage.ELEMENT_NAME,
             NamespaceURN.BASE);
     }
 
@@ -99,7 +100,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
         Map<String, Attr> attributes = requestElement.getAttributes();
 
         Element response = handle(document, operationElement, subsequentOperation);
-        Element rpcReply = XmlUtil.createElement(document, XmlNetconfConstants.RPC_REPLY_KEY,
+        Element rpcReply = XmlUtil.createElement(document, RpcReplyMessage.ELEMENT_NAME,
                 Optional.of(NamespaceURN.BASE));
 
         if (XmlElement.fromDomElement(response).hasNamespace()) {

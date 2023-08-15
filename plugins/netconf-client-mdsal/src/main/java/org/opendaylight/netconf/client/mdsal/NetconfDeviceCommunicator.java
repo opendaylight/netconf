@@ -25,6 +25,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -392,7 +393,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             return false;
         }
         final XmlElement xmle = XmlElement.fromDomDocument(message.getDocument());
-        return XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME.equals(xmle.getName()) ;
+        return NotificationMessage.ELEMENT_NAME.equals(xmle.getName()) ;
     }
 
     private static final class Request {
