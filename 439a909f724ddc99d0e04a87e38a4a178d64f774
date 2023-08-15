@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e66935a_ebc6a321",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-15T10:36:01Z",
+      "side": 1,
+      "message": "Minor code style issue",
+      "revId": "439a909f724ddc99d0e04a87e38a4a178d64f774",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b62d61a_ddc58b17",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-15T10:36:01Z",
+      "side": 1,
+      "message": "final",
+      "range": {
+        "startLine": 203,
+        "startChar": 20,
+        "endLine": 203,
+        "endChar": 25
+      },
+      "revId": "439a909f724ddc99d0e04a87e38a4a178d64f774",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
