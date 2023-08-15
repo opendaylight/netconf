@@ -108,7 +108,7 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
     }
 
     private static NetconfMessage getNetconfMessage(final String additionalHeader, final Document doc) {
-        NetconfMessage msg = new NetconfMessage(doc);
+        NetconfMessage msg = NetconfMessage.of(doc);
         if (HelloMessage.isHelloMessage(msg)) {
             if (additionalHeader != null) {
                 return new HelloMessage(doc, NetconfHelloMessageAdditionalHeader.fromString(additionalHeader));
