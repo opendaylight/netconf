@@ -24,11 +24,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
-import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
@@ -52,9 +52,9 @@ class NetconfClientSessionNegotiator
 
     private static final Interner<Set<String>> INTERNER = Interners.newWeakInterner();
 
-    private final NetconfStartExiMessage startExi;
+    private final RpcMessage startExi;
 
-    NetconfClientSessionNegotiator(final HelloMessage hello, final NetconfStartExiMessage startExi,
+    NetconfClientSessionNegotiator(final HelloMessage hello, final RpcMessage startExi,
             final Promise<NetconfClientSession> promise, final Channel channel, final Timer timer,
             final NetconfClientSessionListener sessionListener, final long connectionTimeoutMillis,
             final @NonNegative int maximumIncomingChunkSize) {
@@ -95,7 +95,7 @@ class NetconfClientSessionNegotiator
      *
      * @param startExiMessage Exi message for initilization of exi communication.
      */
-    void tryToInitiateExi(final NetconfClientSession session, final NetconfStartExiMessage startExiMessage) {
+    void tryToInitiateExi(final NetconfClientSession session, final RpcMessage startExiMessage) {
         channel.pipeline().addAfter(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
                 ExiConfirmationInboundHandler.EXI_CONFIRMED_HANDLER,
                 new ExiConfirmationInboundHandler(session, startExiMessage));
@@ -161,10 +161,10 @@ class NetconfClientSessionNegotiator
         private static final String EXI_CONFIRMED_HANDLER = "exiConfirmedHandler";
 
         private final NetconfClientSession session;
-        private final NetconfStartExiMessage startExiMessage;
+        private final RpcMessage startExiMessage;
 
         ExiConfirmationInboundHandler(final NetconfClientSession session,
-                                      final NetconfStartExiMessage startExiMessage) {
+                                      final RpcMessage startExiMessage) {
             this.session = session;
             this.startExiMessage = startExiMessage;
         }
