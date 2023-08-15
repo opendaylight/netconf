@@ -137,7 +137,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             session.onIncommingRpcSuccess();
 
             responseDocument.appendChild(responseDocument.importNode(rpcReply.getDocumentElement(), true));
-            return new NetconfMessage(responseDocument);
+            return NetconfMessage.of(responseDocument);
         } else {
             // unknown command, send RFC 4741 p.70 unknown-element
             /*
