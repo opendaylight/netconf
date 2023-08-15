@@ -40,7 +40,7 @@ public abstract sealed class NetconfMessage permits HelloMessage, NotificationMe
 
     private final @NonNull Document document;
 
-    public NetconfMessage(final Document document) {
+    protected NetconfMessage(final Document document) {
         this.document = requireNonNull(document);
     }
 

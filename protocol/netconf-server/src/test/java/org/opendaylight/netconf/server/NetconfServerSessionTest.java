@@ -63,7 +63,7 @@ public class NetconfServerSessionTest {
         channel = new EmbeddedChannel();
         session = new NetconfServerSession(listener, channel, new SessionIdType(Uint32.ONE), header);
         doNothing().when(listener).onSessionUp(any());
-        msg = new NetconfMessage(XmlUtil.readXmlToDocument("<rpc-reply></rpc-reply>"));
+        msg = NetconfMessage.of(XmlUtil.readXmlToDocument("<rpc-reply></rpc-reply>"));
     }
 
     @Test

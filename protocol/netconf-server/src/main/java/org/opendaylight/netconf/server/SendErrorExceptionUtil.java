@@ -35,14 +35,14 @@ public final class SendErrorExceptionUtil {
     public static void sendErrorMessage(final NetconfSession session, final DocumentedException sendErrorException) {
         LOG.trace("Sending error", sendErrorException);
         final Document errorDocument = createDocument(sendErrorException);
-        ChannelFuture channelFuture = session.sendMessage(new NetconfMessage(errorDocument));
+        ChannelFuture channelFuture = session.sendMessage(NetconfMessage.of(errorDocument));
         channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 
     public static void sendErrorMessage(final Channel channel, final DocumentedException sendErrorException) {
         LOG.trace("Sending error", sendErrorException);
         final Document errorDocument = createDocument(sendErrorException);
-        ChannelFuture channelFuture = channel.writeAndFlush(new NetconfMessage(errorDocument));
+        ChannelFuture channelFuture = channel.writeAndFlush(NetconfMessage.of(errorDocument));
         channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 
@@ -54,7 +54,7 @@ public final class SendErrorExceptionUtil {
         }
 
         tryToCopyAttributes(incommingMessage.getDocument(), errorDocument, sendErrorException);
-        ChannelFuture channelFuture = session.sendMessage(new NetconfMessage(errorDocument));
+        ChannelFuture channelFuture = session.sendMessage(NetconfMessage.of(errorDocument));
         channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 

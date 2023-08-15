@@ -96,7 +96,7 @@ public class NetconfServerSessionListenerTest {
         final Document reply = XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\" "
                 + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc-reply>");
         doReturn(reply).when(router).onNetconfMessage(any(), any());
-        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument("<rpc message-id=\"101\" "
+        final NetconfMessage msg = NetconfMessage.of(XmlUtil.readXmlToDocument("<rpc message-id=\"101\" "
                 + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc>"));
         listener.onMessage(session, msg);
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_SUCCESS)));
@@ -112,7 +112,7 @@ public class NetconfServerSessionListenerTest {
         final Document reply =
                 XmlUtil.readXmlToDocument("<rpc message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
                         + "<example/></rpc>");
-        final NetconfMessage msg = new NetconfMessage(reply);
+        final NetconfMessage msg = NetconfMessage.of(reply);
         final IllegalStateException ex = assertThrows(IllegalStateException.class,
             () -> listener.onMessage(session, msg));
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
@@ -134,7 +134,7 @@ public class NetconfServerSessionListenerTest {
                         + "</error-info>\n"
                         + "</rpc-error>\n"
                         + "</rpc-reply>");
-        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument("<bad-rpc/>"));
+        final NetconfMessage msg = NetconfMessage.of(XmlUtil.readXmlToDocument("<bad-rpc/>"));
         listener.onMessage(session, msg);
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.OUT_RPC_ERROR)));
