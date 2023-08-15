@@ -16,7 +16,8 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.messages.RpcMessage;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,13 +66,13 @@ public final class SendErrorExceptionUtil {
         try {
             final Element incommingRpc = incommingDocument.getDocumentElement();
             Preconditions.checkState(
-                XmlNetconfConstants.RPC_KEY.equals(incommingRpc.getLocalName())
+                RpcMessage.ELEMENT_NAME.equals(incommingRpc.getLocalName())
                 && NamespaceURN.BASE.equals(incommingRpc.getNamespaceURI()),
-                    "Missing %s element", XmlNetconfConstants.RPC_KEY);
+                    "Missing %s element", RpcMessage.ELEMENT_NAME);
 
             final Element rpcReply = errorDocument.getDocumentElement();
-            Preconditions.checkState(rpcReply.getTagName().equals(XmlNetconfConstants.RPC_REPLY_KEY),
-                    "Missing %s element", XmlNetconfConstants.RPC_REPLY_KEY);
+            Preconditions.checkState(rpcReply.getTagName().equals(RpcReplyMessage.ELEMENT_NAME),
+                    "Missing %s element", RpcReplyMessage.ELEMENT_NAME);
 
             final NamedNodeMap incomingAttributes = incommingRpc.getAttributes();
             for (int i = 0; i < incomingAttributes.getLength(); i++) {

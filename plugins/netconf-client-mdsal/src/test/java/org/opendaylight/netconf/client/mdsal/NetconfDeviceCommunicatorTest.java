@@ -49,6 +49,7 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -252,7 +253,7 @@ public class NetconfDeviceCommunicatorTest {
     private static NetconfMessage createSuccessResponseMessage(final String messageID)
             throws ParserConfigurationException {
         Document doc = UntrustedXML.newDocumentBuilder().newDocument();
-        Element rpcReply = doc.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.RPC_REPLY_KEY);
+        Element rpcReply = doc.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
         rpcReply.setAttribute("message-id", messageID);
         Element element = doc.createElementNS("ns", "data");
         element.setTextContent(messageID);
