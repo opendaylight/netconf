@@ -10,6 +10,7 @@ package org.opendaylight.netconf.api.messages;
 import com.google.common.collect.Sets;
 import java.util.Optional;
 import java.util.Set;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -25,14 +26,18 @@ import org.w3c.dom.Element;
  * @see NetconfHelloMessageAdditionalHeader
  */
 public final class HelloMessage extends NetconfMessage {
-    private static final String HELLO_TAG = "hello";
+    public static final @NonNull String ELEMENT_NAME = "hello";
 
     private final NetconfHelloMessageAdditionalHeader additionalHeader;
 
-    public HelloMessage(final Document doc, final NetconfHelloMessageAdditionalHeader additionalHeader) {
+    private HelloMessage(final NetconfHelloMessageAdditionalHeader additionalHeader, final Document doc) {
         super(doc);
-        checkHelloMessage(doc);
         this.additionalHeader = additionalHeader;
+    }
+
+    public HelloMessage(final Document doc, final NetconfHelloMessageAdditionalHeader additionalHeader) {
+        this(null, doc);
+        checkHelloMessage(doc);
     }
 
     public HelloMessage(final Document doc) {
@@ -46,7 +51,7 @@ public final class HelloMessage extends NetconfMessage {
     private static void checkHelloMessage(final Document doc) {
         if (!isHelloMessage(doc)) {
             throw new IllegalArgumentException(String.format(
-                "Hello message invalid format, should contain %s tag from namespace %s, but is: %s", HELLO_TAG,
+                "Hello message invalid format, should contain %s tag from namespace %s, but is: %s", ELEMENT_NAME,
                 NamespaceURN.BASE, XmlUtil.toString(doc)));
         }
     }
@@ -58,7 +63,7 @@ public final class HelloMessage extends NetconfMessage {
 
     private static Document createHelloMessageDoc(final Iterable<String> capabilities) {
         Document doc = UntrustedXML.newDocumentBuilder().newDocument();
-        Element helloElement = doc.createElementNS(NamespaceURN.BASE, HELLO_TAG);
+        Element helloElement = doc.createElementNS(NamespaceURN.BASE, ELEMENT_NAME);
         Element capabilitiesElement = doc.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.CAPABILITIES);
 
         for (String capability : Sets.newHashSet(capabilities)) {
@@ -87,7 +92,7 @@ public final class HelloMessage extends NetconfMessage {
 
     public static boolean isHelloMessage(final Document document) {
         final XmlElement element = XmlElement.fromDomElement(document.getDocumentElement());
-        if (!HELLO_TAG.equals(element.getName())) {
+        if (!ELEMENT_NAME.equals(element.getName())) {
             return false;
         }
 

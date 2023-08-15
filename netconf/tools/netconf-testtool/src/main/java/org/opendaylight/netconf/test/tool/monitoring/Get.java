@@ -10,6 +10,7 @@ package org.opendaylight.netconf.test.tool.monitoring;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -84,7 +85,7 @@ public class Get extends AbstractNetconfOperation {
 
     private static Element getPlaceholder(final Document innerResult) throws DocumentedException {
         return XmlElement.fromDomElementWithExpected(innerResult.getDocumentElement(),
-            XmlNetconfConstants.RPC_REPLY_KEY, NamespaceURN.BASE)
+            RpcReplyMessage.ELEMENT_NAME, NamespaceURN.BASE)
             .getOnlyChildElement(XmlNetconfConstants.DATA_KEY)
             .getDomElement();
     }
