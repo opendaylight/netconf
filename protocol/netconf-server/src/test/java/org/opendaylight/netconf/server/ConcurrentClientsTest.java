@@ -54,7 +54,7 @@ import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.opendaylight.netconf.client.TestingNetconfClient;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
+import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
@@ -236,7 +236,7 @@ public class ConcurrentClientsTest {
 
         @Override
         public HandlingPriority canHandle(final Document message) {
-            return XmlUtil.toString(message).contains(NetconfStartExiMessage.START_EXI)
+            return XmlUtil.toString(message).contains(NetconfStartExiMessageProvider.START_EXI)
                     ? HandlingPriority.CANNOT_HANDLE :
                     HandlingPriority.HANDLE_WITH_MAX_PRIORITY;
         }
