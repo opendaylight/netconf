@@ -88,7 +88,7 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testRpcResponse() throws Exception {
-        final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
+        final NetconfMessage response = NetconfMessage.of(XmlUtil.readXmlToDocument(
                 "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"m-5\">\n"
                         + "<data xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">"
                         + "module schema"

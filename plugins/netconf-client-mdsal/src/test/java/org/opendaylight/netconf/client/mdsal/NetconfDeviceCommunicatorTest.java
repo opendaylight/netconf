@@ -111,7 +111,7 @@ public class NetconfDeviceCommunicatorTest {
         Element element = doc.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.RPC_KEY);
         element.setAttribute("message-id", messageID);
         doc.appendChild(element);
-        NetconfMessage message = new NetconfMessage(doc);
+        NetconfMessage message = NetconfMessage.of(doc);
 
         ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture)
@@ -260,7 +260,7 @@ public class NetconfDeviceCommunicatorTest {
         rpcReply.appendChild(element);
         doc.appendChild(rpcReply);
 
-        return new NetconfMessage(doc);
+        return NetconfMessage.of(doc);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -443,7 +443,7 @@ public class NetconfDeviceCommunicatorTest {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(xmlStr.getBytes());
         Document doc = UntrustedXML.newDocumentBuilder().parse(bis);
-        return new NetconfMessage(doc);
+        return NetconfMessage.of(doc);
     }
 
     private static NetconfMessage createErrorResponseMessage(final String messageID) throws Exception {
@@ -463,7 +463,7 @@ public class NetconfDeviceCommunicatorTest {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(xmlStr.getBytes());
         Document doc = UntrustedXML.newDocumentBuilder().parse(bis);
-        return new NetconfMessage(doc);
+        return NetconfMessage.of(doc);
     }
 
     private static void verifyResponseMessage(final RpcResult<NetconfMessage> rpcResult, final String dataText) {

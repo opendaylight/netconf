@@ -18,12 +18,12 @@ import org.opendaylight.netconf.test.util.XmlFileLoader;
 public class NetconfMessageUtilTest {
     @Test
     public void testNetconfMessageUtil() throws Exception {
-        final NetconfMessage okMessage = new NetconfMessage(XmlFileLoader.xmlFileToDocument(
+        final NetconfMessage okMessage = NetconfMessage.of(XmlFileLoader.xmlFileToDocument(
             "netconfMessages/rpc-reply_ok.xml"));
         assertTrue(NetconfMessageUtil.isOKMessage(okMessage));
         assertFalse(NetconfMessageUtil.isErrorMessage(okMessage));
 
-        final NetconfMessage errorMessage = new NetconfMessage(XmlFileLoader.xmlFileToDocument(
+        final NetconfMessage errorMessage = NetconfMessage.of(XmlFileLoader.xmlFileToDocument(
             "netconfMessages/communicationError/testClientSendsRpcReply_expectedResponse.xml"));
         assertTrue(NetconfMessageUtil.isErrorMessage(errorMessage));
         assertFalse(NetconfMessageUtil.isOKMessage(errorMessage));

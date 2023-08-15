@@ -70,6 +70,6 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
 
         final Document doc = XmlUtil.readXmlToDocument(notifyPayloadStream);
         assertNotNull(doc);
-        return new NetconfMessage(doc);
+        return NetconfMessage.of(doc);
     }
 }

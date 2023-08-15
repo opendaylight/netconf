@@ -191,7 +191,7 @@ public class NetconfClientSessionNegotiatorTest {
         doReturn(pipeline).when(handlerContext).pipeline();
         negotiator.handleMessage(HelloMessage.createServerHello(Set.of("exi:1.0"), new SessionIdType(Uint32.TEN)));
         Document expectedResult = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc-reply_ok.xml");
-        channelInboundHandlerAdapter.channelRead(handlerContext, new NetconfMessage(expectedResult));
+        channelInboundHandlerAdapter.channelRead(handlerContext, NetconfMessage.of(expectedResult));
 
         verify(promise).setSuccess(any());
 

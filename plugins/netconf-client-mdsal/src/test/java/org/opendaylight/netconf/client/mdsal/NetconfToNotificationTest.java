@@ -42,7 +42,7 @@ public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
 
         final Document doc = XmlUtil.readXmlToDocument(notifyPayloadStream);
         assertNotNull(doc);
-        userNotification = new NetconfMessage(doc);
+        userNotification = NetconfMessage.of(doc);
     }
 
     static EffectiveModelContext getNotificationSchemaContext(final Class<?> loadClass,
