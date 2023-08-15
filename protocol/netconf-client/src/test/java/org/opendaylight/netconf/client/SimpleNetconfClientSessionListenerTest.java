@@ -48,7 +48,7 @@ public class SimpleNetconfClientSessionListenerTest {
         doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
         final var caps = Set.of("a", "b");
         helloMessage = HelloMessage.createServerHello(caps, new SessionIdType(Uint32.TEN));
-        message = new NetconfMessage(helloMessage.getDocument());
+        message = NetconfMessage.of(helloMessage.getDocument());
         sessionListener = mock(NetconfClientSessionListener.class);
         clientSession = new NetconfClientSession(sessionListener, channel, new SessionIdType(Uint32.valueOf(20)), caps);
     }

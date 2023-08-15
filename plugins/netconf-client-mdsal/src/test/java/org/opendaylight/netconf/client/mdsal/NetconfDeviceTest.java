@@ -91,7 +91,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     @BeforeClass
     public static final void setupNotification() throws Exception {
-        NOTIFICATION = new NetconfMessage(XmlUtil.readXmlToDocument(
+        NOTIFICATION = NetconfMessage.of(XmlUtil.readXmlToDocument(
             NetconfDeviceTest.class.getResourceAsStream("/notification-payload.xml")));
     }
 
