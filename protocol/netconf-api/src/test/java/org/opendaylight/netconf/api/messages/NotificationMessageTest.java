@@ -32,7 +32,7 @@ public class NotificationMessageTest {
 
         EVENT_TIME = Instant.ofEpochMilli(10_000_000);
 
-        NOTIFICATION_MESSAGE = new NotificationMessage(document, EVENT_TIME);
+        NOTIFICATION_MESSAGE = NotificationMessage.wrapDocumentAsNotification(document, EVENT_TIME);
     }
 
     @Test

@@ -95,7 +95,7 @@ public class NetconfServerSessionTest {
     public void testSendNotification() throws Exception {
         doNothing().when(listener).onNotification(any(), any());
         final Document msgDoc = XmlUtil.readXmlToDocument("<notification></notification>");
-        final NotificationMessage notif = new NotificationMessage(msgDoc);
+        final NotificationMessage notif = NotificationMessage.wrapDocumentAsNotification(msgDoc);
         session.sendMessage(notif);
         channel.runPendingTasks();
         final Object o = channel.readOutbound();
