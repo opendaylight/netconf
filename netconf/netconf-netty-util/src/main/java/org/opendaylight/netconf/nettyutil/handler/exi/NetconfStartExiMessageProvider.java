@@ -12,28 +12,24 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.netconf.api.NamespaceURN;
-import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Start-exi netconf message.
+ * Start-exi netconf message provider.
  */
-public final class NetconfStartExiMessage extends NetconfMessage {
+public final class NetconfStartExiMessageProvider {
     @VisibleForTesting
     public static final String START_EXI = "start-exi";
 
-
-    private NetconfStartExiMessage(final Document doc) {
-        super(doc);
+    private NetconfStartExiMessageProvider() {
+        //hidden on purpose
     }
 
-    public static NetconfStartExiMessage create(final EXIParameters exiOptions, final String messageId) {
+    public static RpcMessage create(final EXIParameters exiOptions, final String messageId) {
         final Document doc = XmlUtil.newDocument();
-        final Element rpcElement = doc.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.RPC_KEY);
-        rpcElement.setAttributeNS(NamespaceURN.BASE, XmlNetconfConstants.MESSAGE_ID, messageId);
 
         // TODO draft http://tools.ietf.org/html/draft-varga-netconf-exi-capability-02#section-3.5.1 has no namespace
         // for start-exi element in xml
@@ -43,10 +39,8 @@ public final class NetconfStartExiMessage extends NetconfMessage {
         addFidelity(exiOptions, doc, startExiElement);
         addSchema(exiOptions, doc, startExiElement);
 
-        rpcElement.appendChild(startExiElement);
-
-        doc.appendChild(rpcElement);
-        return new NetconfStartExiMessage(doc);
+        doc.appendChild(startExiElement);
+        return RpcMessage.wrapDocumentAsRpc(doc, messageId);
     }
 
     private static void addAlignment(final EXIParameters exiOptions, final Document doc,
