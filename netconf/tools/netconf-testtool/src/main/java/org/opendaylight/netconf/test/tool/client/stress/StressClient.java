@@ -55,7 +55,7 @@ public final class StressClient {
 
     static {
         try {
-            COMMIT_MSG = new NetconfMessage(XmlUtil.readXmlToDocument(
+            COMMIT_MSG = NetconfMessage.of(XmlUtil.readXmlToDocument(
                 "<rpc message-id=\"commit-batch\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                     + "    <commit/>\n"
                     + "</rpc>"));
@@ -203,7 +203,7 @@ public final class StressClient {
         final Document msg = XmlUtil.createDocumentCopy(
             params.candidateDatastore ? EDIT_CANDIDATE_BLUEPRINT : EDIT_RUNNING_BLUEPRINT);
         msg.getDocumentElement().setAttribute("message-id", Integer.toString(id));
-        final NetconfMessage netconfMessage = new NetconfMessage(msg);
+        final NetconfMessage netconfMessage = NetconfMessage.of(msg);
 
         final Element editContentElement;
         try {

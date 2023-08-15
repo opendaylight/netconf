@@ -82,7 +82,7 @@ public class SendErrorExceptionUtilTest {
     private static NetconfMessage readMessage(final String name) throws IOException, SAXException {
         try (InputStream resource =
                 requireNonNull(SendErrorExceptionUtilTest.class.getResourceAsStream("/messages/" + name))) {
-            return new NetconfMessage(XmlUtil.readXmlToDocument(resource));
+            return NetconfMessage.of(XmlUtil.readXmlToDocument(resource));
         }
     }
 }

@@ -57,7 +57,7 @@ public class BaseRpcSchemalessTransformer implements RpcTransformer<NormalizedNo
             "Unknown rpc %s, available rpcs: %s", rpc, mappedRpcs.keySet());
         final DOMResult domResult = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter);
         if (mappedRpc.getInput().getChildNodes().isEmpty()) {
-            return new NetconfMessage(domResult.getNode().getOwnerDocument());
+            return NetconfMessage.of(domResult.getNode().getOwnerDocument());
         }
 
         checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpc);
@@ -74,7 +74,7 @@ public class BaseRpcSchemalessTransformer implements RpcTransformer<NormalizedNo
 
         final Document node = result.getNode().getOwnerDocument();
 
-        return new NetconfMessage(node);
+        return NetconfMessage.of(node);
     }
 
     @Override

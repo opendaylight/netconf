@@ -43,7 +43,7 @@ public class NetconfEXIHandlersTest {
         netconfMessageToEXIEncoder = NetconfMessageToEXIEncoder.create(codec);
         netconfEXIToMessageDecoder = NetconfEXIToMessageDecoder.create(codec);
 
-        msg = new NetconfMessage(XmlUtil.readXmlToDocument(msgAsString));
+        msg = NetconfMessage.of(XmlUtil.readXmlToDocument(msgAsString));
         this.msgAsExi = msgToExi(msg, codec);
     }
 
