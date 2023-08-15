@@ -62,6 +62,7 @@ final class NotificationsTransformUtil {
         }
 
         final var node = (Document) result.getNode();
-        return eventTime != null ? new NotificationMessage(node, eventTime) : new NotificationMessage(node);
+        return eventTime != null ? NotificationMessage.wrapDocumentAsNotification(node, eventTime) :
+            NotificationMessage.wrapDocumentAsNotification(node);
     }
 }

@@ -159,7 +159,7 @@ public class NetconfNotificationManagerTest {
 
         doNothing().when(listener).onNotification(eq(testStreamName), any(NotificationMessage.class));
 
-        final NotificationMessage notification = new NotificationMessage(
+        final NotificationMessage notification = NotificationMessage.wrapDocumentAsNotification(
             XmlUtil.readXmlToDocument("<notification/>"));
         netconfNotificationManager.onNotification(testStream.getName(), notification);
 

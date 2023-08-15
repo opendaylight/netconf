@@ -74,7 +74,8 @@ public class NotificationsTransformUtilTest {
 
     @Test
     public void testTransformFromDOM() throws Exception {
-        final var notification = new NotificationMessage(XmlUtil.readXmlToDocument(INNER_NOTIFICATION), EVENT_TIME);
+        final var notification = NotificationMessage.wrapDocumentAsNotification(
+            XmlUtil.readXmlToDocument(INNER_NOTIFICATION), EVENT_TIME);
 
         compareXml(EXPECTED_NOTIFICATION, notification.toString());
     }
