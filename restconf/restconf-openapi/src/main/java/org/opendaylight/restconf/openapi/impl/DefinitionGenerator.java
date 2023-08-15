@@ -600,7 +600,7 @@ public final class DefinitionGenerator {
             jsonType = processStringType(stringType, property, node.getQName().getLocalName());
         } else if (leafTypeDef instanceof UnionTypeDefinition unionType) {
             jsonType = processTypeDef(unionType.getTypes().iterator().next(), node, property, stack, definitions,
-                definitionNames);
+                definitionNames, module);
         } else if (leafTypeDef instanceof EmptyTypeDefinition) {
             jsonType = OBJECT_TYPE;
         } else if (leafTypeDef instanceof LeafrefTypeDefinition leafrefType) {
