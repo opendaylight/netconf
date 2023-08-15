@@ -9,6 +9,7 @@ package org.opendaylight.netconf.api.messages;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableMap;
 import java.text.ParsePosition;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -21,8 +22,12 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -32,6 +37,8 @@ import org.w3c.dom.Element;
  * Special kind of netconf message that contains a timestamp.
  */
 public final class NotificationMessage extends NetconfMessage {
+    public static final @NonNull String ELEMENT_NAME = "notification";
+
     private static final Logger LOG = LoggerFactory.getLogger(NotificationMessage.class);
 
     /**
@@ -171,12 +178,17 @@ public final class NotificationMessage extends NetconfMessage {
     }
 
     /**
-     * Get the time of the event.
-     *
-     * @return notification event time
+     * Create new NotificationMessage with provided document. Only to be used if we know that the document represents a
+     * valid NotificationMessage.
      */
-    public @NonNull Instant getEventTime() {
-        return eventTime;
+    static @NonNull NotificationMessage ofChecked(final Document document) throws DocumentedException {
+        final var eventTime = document.getDocumentElement().getElementsByTagNameNS(NamespaceURN.NOTIFICATION,
+            XmlNetconfConstants.EVENT_TIME);
+        if (eventTime.getLength() < 1) {
+            throw new DocumentedException("Missing event-time", ErrorType.PROTOCOL, ErrorTag.MISSING_ELEMENT,
+                ErrorSeverity.ERROR, ImmutableMap.of());
+        }
+        return new NotificationMessage(document, RFC3339_DATE_PARSER.apply(eventTime.item(0).getTextContent()));
     }
 
     /**
@@ -194,13 +206,21 @@ public final class NotificationMessage extends NetconfMessage {
         return ofNotificationContent(notificationContent, Instant.now());
     }
 
+    /**
+     * Get the time of the event.
+     *
+     * @return notification event time
+     */
+    public @NonNull Instant getEventTime() {
+        return eventTime;
+    }
+
     private static Document wrapNotification(final Document notificationContent, final Instant eventTime) {
         requireNonNull(notificationContent);
         requireNonNull(eventTime);
 
         final Element baseNotification = notificationContent.getDocumentElement();
-        final Element entireNotification = notificationContent.createElementNS(
-            NamespaceURN.NOTIFICATION, XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME);
+        final Element entireNotification = notificationContent.createElementNS(NamespaceURN.NOTIFICATION, ELEMENT_NAME);
         entireNotification.appendChild(baseNotification);
 
         final Element eventTimeElement = notificationContent.createElementNS(
@@ -210,11 +230,5 @@ public final class NotificationMessage extends NetconfMessage {
 
         notificationContent.appendChild(entireNotification);
         return notificationContent;
-    }
-
-    public static boolean isNotificationMessage(final Document document) {
-        final var root = document.getDocumentElement();
-        return NamespaceURN.NOTIFICATION.equals(root.getNamespaceURI())
-            && XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME.equals(root.getLocalName());
     }
 }

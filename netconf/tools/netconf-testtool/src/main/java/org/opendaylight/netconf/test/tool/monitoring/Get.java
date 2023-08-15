@@ -10,6 +10,7 @@ package org.opendaylight.netconf.test.tool.monitoring;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -51,14 +52,13 @@ public class Get extends AbstractNetconfOperation {
             throws DocumentedException {
         if (subsequentOperation.isExecutionTermination()) {
             throw new DocumentedException(String.format("Subsequent netconf operation expected by %s", this),
-                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
 
         try {
-            final Document innerResult = subsequentOperation.execute(requestMessage);
-
-            final NetconfState netconfMonitoring = new NetconfState(netconfMonitor);
-            Element monitoringXmlElement = new JaxBSerializer().toXml(netconfMonitoring);
+            final var innerResult = subsequentOperation.execute(requestMessage);
+            final var netconfMonitoring = new NetconfState(netconfMonitor);
+            var monitoringXmlElement = JaxBSerializer.toXml(netconfMonitoring);
 
             monitoringXmlElement = (Element) innerResult.importNode(monitoringXmlElement, true);
             final Element monitoringXmlElementPlaceholder = getPlaceholder(innerResult);
@@ -83,8 +83,8 @@ public class Get extends AbstractNetconfOperation {
     }
 
     private static Element getPlaceholder(final Document innerResult) throws DocumentedException {
-        return XmlElement.fromDomElementWithExpected(innerResult.getDocumentElement(),
-            XmlNetconfConstants.RPC_REPLY_KEY, NamespaceURN.BASE)
+        return XmlElement.fromDomElementWithExpected(innerResult.getDocumentElement(), RpcReplyMessage.ELEMENT_NAME,
+                NamespaceURN.BASE)
             .getOnlyChildElement(XmlNetconfConstants.DATA_KEY)
             .getDomElement();
     }
