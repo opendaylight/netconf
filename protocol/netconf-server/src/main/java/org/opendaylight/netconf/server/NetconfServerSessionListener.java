@@ -17,6 +17,7 @@ import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -30,7 +31,6 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class NetconfServerSessionListener implements NetconfSessionListener<NetconfServerSession> {
@@ -126,7 +126,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
         final Document incomingDocument = netconfMessage.getDocument();
         final Node rootNode = incomingDocument.getDocumentElement();
 
-        if (rootNode.getLocalName().equals(XmlNetconfConstants.RPC_KEY)) {
+        if (RpcMessage.ELEMENT_NAME.equals(rootNode.getLocalName())) {
             final Document responseDocument = XmlUtil.newDocument();
             checkMessageId(rootNode);
 
@@ -151,8 +151,9 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
         }
     }
 
+    // FIXME: Duplicate check of RpcMessage.of()
     private static void checkMessageId(final Node rootNode) throws DocumentedException {
-        final NamedNodeMap attributes = rootNode.getAttributes();
+        final var attributes = rootNode.getAttributes();
         if (attributes.getNamedItemNS(NamespaceURN.BASE, XmlNetconfConstants.MESSAGE_ID) != null) {
             return;
         }
@@ -163,6 +164,6 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
         throw new DocumentedException("Missing attribute " + rootNode.getNodeName(),
                 ErrorType.RPC, ErrorTag.MISSING_ATTRIBUTE, ErrorSeverity.ERROR, ImmutableMap.of(
                     "bad-attribute", XmlNetconfConstants.MESSAGE_ID,
-                    "bad-element", XmlNetconfConstants.RPC_KEY));
+                    "bad-element", RpcMessage.ELEMENT_NAME));
     }
 }

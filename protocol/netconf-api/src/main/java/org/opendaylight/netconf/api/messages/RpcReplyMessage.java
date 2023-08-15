@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.api.messages;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -24,7 +26,9 @@ import org.w3c.dom.Document;
  * guaranteed to be an {@code <rpc-reply/>} in the {@value NamespaceURN#BASE} namespace.
  */
 public final class RpcReplyMessage extends NetconfMessage {
-    private RpcReplyMessage(final Document document) {
+    public static final @NonNull String ELEMENT_NAME = "rpc-reply";
+
+    RpcReplyMessage(final Document document) {
         super(document);
     }
 
@@ -39,7 +43,7 @@ public final class RpcReplyMessage extends NetconfMessage {
     public static @NonNull RpcReplyMessage of(final Document document) throws DocumentedException {
         final var root = document.getDocumentElement();
         final var rootName = root.getLocalName();
-        if (!XmlNetconfConstants.RPC_REPLY_KEY.equals(rootName)) {
+        if (!ELEMENT_NAME.equals(rootName)) {
             throw new DocumentedException("Unexpected element name " + rootName, ErrorType.PROTOCOL,
                 ErrorTag.UNKNOWN_ELEMENT, ErrorSeverity.ERROR, ImmutableMap.of("bad-element", rootName));
         }
@@ -65,14 +69,16 @@ public final class RpcReplyMessage extends NetconfMessage {
         return new RpcReplyMessage(ex.toXMLDocument());
     }
 
+    public static @NonNull RpcReplyMessage ofOperation(final String messageId, final Document document) {
+        final var rpcElem = document.createElementNS(NamespaceURN.BASE, ELEMENT_NAME);
+        rpcElem.appendChild(document.getDocumentElement());
+        rpcElem.setAttribute(XmlNetconfConstants.MESSAGE_ID, requireNonNull(messageId));
+        document.appendChild(rpcElem);
+        return new RpcReplyMessage(document);
+    }
+
     public @Nullable String messageId() {
         final var attr = getDocument().getDocumentElement().getAttributeNode(XmlNetconfConstants.MESSAGE_ID);
         return attr == null ? null : attr.getValue();
-    }
-
-    public static boolean isRpcReplyMessage(final Document document) {
-        final var root = document.getDocumentElement();
-        return NamespaceURN.BASE.equals(root.getNamespaceURI())
-            && XmlNetconfConstants.RPC_REPLY_KEY.equals(root.getLocalName());
     }
 }
