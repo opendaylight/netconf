@@ -27,7 +27,7 @@ public final class XmlFileLoader {
 
     public static NetconfMessage xmlFileToNetconfMessage(final String fileName) throws IOException, SAXException,
             ParserConfigurationException {
-        return new NetconfMessage(xmlFileToDocument(fileName));
+        return NetconfMessage.of(xmlFileToDocument(fileName));
     }
 
     public static Element xmlFileToElement(final String fileName) throws IOException, SAXException,

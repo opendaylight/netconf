@@ -109,7 +109,7 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         final Element dataElement = XmlUtil.readXmlToElement(stream);
         final Element element = (Element) doc.importNode(dataElement, true);
         doc.getDocumentElement().appendChild(element);
-        final NetconfMessage msg = new NetconfMessage(doc);
+        final NetconfMessage msg = NetconfMessage.of(doc);
         final DOMRpcResult result = transformer.toRpcResult(RpcResultBuilder.success(msg).build(),
             NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
         assertNotNull(result.value());
