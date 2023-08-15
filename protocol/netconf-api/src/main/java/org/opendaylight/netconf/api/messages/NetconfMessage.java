@@ -40,7 +40,7 @@ public class NetconfMessage {
 
     private final @NonNull Document document;
 
-    public NetconfMessage(final Document document) {
+    protected NetconfMessage(final Document document) {
         this.document = requireNonNull(document);
     }
 

@@ -88,8 +88,8 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     public void setUp() throws Exception {
         final InputStream okStream = getClass().getResourceAsStream("/netconfMessages/rpc-reply_ok.xml");
         final InputStream dataStream = getClass().getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
-        final NetconfMessage ok = new NetconfMessage(XmlUtil.readXmlToDocument(okStream));
-        final NetconfMessage data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
+        final NetconfMessage ok = NetconfMessage.of(XmlUtil.readXmlToDocument(okStream));
+        final NetconfMessage data = NetconfMessage.of(XmlUtil.readXmlToDocument(dataStream));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)))
                 .thenReturn(RpcResultBuilder.success(data).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME)))

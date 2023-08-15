@@ -110,7 +110,7 @@ public class NetconfDeviceCommunicatorTest {
         Element element = doc.createElement("request");
         element.setAttribute("message-id", messageID);
         doc.appendChild(element);
-        NetconfMessage message = new NetconfMessage(doc);
+        NetconfMessage message = NetconfMessage.of(doc);
 
         ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture)
@@ -206,7 +206,7 @@ public class NetconfDeviceCommunicatorTest {
     public void testSendRequest() throws Exception {
         setupSession();
 
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        NetconfMessage message = NetconfMessage.of(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create("", "mockRpc");
 
         ArgumentCaptor<GenericFutureListener> futureListener =
@@ -236,7 +236,7 @@ public class NetconfDeviceCommunicatorTest {
 
     @Test
     public void testSendRequestWithNoSession() throws Exception {
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        NetconfMessage message = NetconfMessage.of(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create("", "mockRpc");
 
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest(message, rpc);
@@ -259,7 +259,7 @@ public class NetconfDeviceCommunicatorTest {
         rpcReply.appendChild(element);
         doc.appendChild(rpcReply);
 
-        return new NetconfMessage(doc);
+        return NetconfMessage.of(doc);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -267,7 +267,7 @@ public class NetconfDeviceCommunicatorTest {
     public void testSendRequestWithWithSendFailure() throws Exception {
         setupSession();
 
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        NetconfMessage message = NetconfMessage.of(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create("", "mockRpc");
 
         ArgumentCaptor<GenericFutureListener> futureListener =
@@ -442,7 +442,7 @@ public class NetconfDeviceCommunicatorTest {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(xmlStr.getBytes());
         Document doc = UntrustedXML.newDocumentBuilder().parse(bis);
-        return new NetconfMessage(doc);
+        return NetconfMessage.of(doc);
     }
 
     private static NetconfMessage createErrorResponseMessage(final String messageID) throws Exception {
@@ -462,7 +462,7 @@ public class NetconfDeviceCommunicatorTest {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(xmlStr.getBytes());
         Document doc = UntrustedXML.newDocumentBuilder().parse(bis);
-        return new NetconfMessage(doc);
+        return NetconfMessage.of(doc);
     }
 
     private static void verifyResponseMessage(final RpcResult<NetconfMessage> rpcResult, final String dataText) {

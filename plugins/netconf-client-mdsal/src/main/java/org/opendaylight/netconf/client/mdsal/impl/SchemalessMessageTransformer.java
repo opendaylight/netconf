@@ -70,7 +70,7 @@ public class SchemalessMessageTransformer implements NotificationTransformer, Rp
     @Override
     public NetconfMessage toRpcRequest(final QName rpc, final DOMSource payload) {
         wrapPayload((Document) payload.getNode());
-        return new NetconfMessage((Document) payload.getNode());
+        return NetconfMessage.of((Document) payload.getNode());
     }
 
     /**

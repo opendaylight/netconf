@@ -80,7 +80,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     public void setUp() throws Exception {
         NetconfMessageTransformer transformer = new NetconfMessageTransformer(
             MountPointContext.of(SCHEMA_CONTEXT), true, BASE_SCHEMAS.getBaseSchema());
-        final NetconfMessage reply = new NetconfMessage(XmlUtil.readXmlToDocument(
+        final NetconfMessage reply = NetconfMessage.of(XmlUtil.readXmlToDocument(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                         + "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"101\">\n"
                         + "<data>\n"
