@@ -34,6 +34,10 @@ public final class RpcReplyMessage extends NetconfMessage {
         return new RpcReplyMessage(wrapRpcReply(document, messageId), messageId);
     }
 
+    public static RpcReplyMessage unsafeOf(final Document document) {
+        return new RpcReplyMessage(document);
+    }
+
     private static Document wrapRpcReply(final Document rpcContent, final String messageId) {
         requireNonNull(rpcContent);
 
