@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Special kind of netconf message that contains a timestamp.
@@ -193,6 +194,20 @@ public final class NotificationMessage extends NetconfMessage {
      */
     public static NotificationMessage wrapDocumentAsNotification(final Document notificationContent) {
         return wrapDocumentAsNotification(notificationContent, Instant.now());
+    }
+
+    /**
+     * Create new NotificationMessage with provided document. Only to be used if we know that the document represents a
+     * valid NotificationMessage.
+     */
+    public static NotificationMessage unsafeOf(final Document document) {
+        final NodeList nodeList = document.getElementsByTagNameNS(NamespaceURN.NOTIFICATION,
+            XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME);
+        final NodeList childNodes = ((Element) nodeList.item(0)).getElementsByTagNameNS(NamespaceURN.NOTIFICATION,
+            XmlNetconfConstants.EVENT_TIME);
+        final Element eventTimeElement = (Element) childNodes.item(0);
+
+        return new NotificationMessage(document, RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()));
     }
 
     private static Document wrapNotification(final Document notificationContent, final Instant eventTime) {

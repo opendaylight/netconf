@@ -23,7 +23,7 @@ import org.w3c.dom.Document;
 /**
  * NetconfMessage represents a wrapper around {@link Document}.
  */
-public class NetconfMessage {
+public sealed class NetconfMessage permits HelloMessage, NotificationMessage, RpcMessage, RpcReplyMessage {
     private static final Transformer TRANSFORMER;
 
     static {
@@ -42,6 +42,20 @@ public class NetconfMessage {
 
     public NetconfMessage(final Document document) {
         this.document = requireNonNull(document);
+    }
+
+    public static @NonNull NetconfMessage of(final Document document) {
+        if (HelloMessage.isHelloMessage(document)) {
+            return new HelloMessage(document);
+        } else if (NotificationMessage.isNotificationMessage(document)) {
+            return NotificationMessage.unsafeOf(document);
+        } else if (RpcMessage.isRpcMessage(document)) {
+            return RpcMessage.unsafeOf(document);
+        } else if (RpcReplyMessage.isRpcReplyMessage(document)) {
+            return RpcReplyMessage.unsafeOf(document);
+        } else {
+            throw new IllegalArgumentException("Unhandled message " + XmlUtil.toString(document));
+        }
     }
 
     public final @NonNull Document getDocument() {
