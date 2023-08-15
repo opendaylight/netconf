@@ -29,10 +29,19 @@ public final class RpcMessage extends NetconfMessage {
     }
 
     /**
-     * Create new RpcMessage with provided message ID.
+     * Create new RpcMessage with provided document as content and message ID.
      */
     public static RpcMessage wrapDocumentAsRpc(final Document document, final String messageId) {
         return new RpcMessage(wrapRpc(document, messageId), messageId);
+    }
+
+    /**
+     * Create new RpcMessage with provided document. Only to be used if we know that the document represents a valid
+     * RpcMessage.
+     */
+    public static RpcMessage unsafeOf(final Document document) {
+        final String messageId = document.getDocumentElement().getAttribute(XmlNetconfConstants.MESSAGE_ID);
+        return new RpcMessage(document, messageId);
     }
 
     private static Document wrapRpc(final Document rpcContent, final String messageId) {

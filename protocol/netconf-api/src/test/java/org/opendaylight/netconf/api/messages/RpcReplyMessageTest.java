@@ -11,14 +11,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class RpcReplyMessageTest {
     private static RpcReplyMessage RPC_REPLY_MESSAGE;
@@ -56,5 +59,16 @@ public class RpcReplyMessageTest {
     void testIsRpcReplyMessage() {
         final Document rpcReplyDocument = RPC_REPLY_MESSAGE.getDocument();
         assertTrue(RpcReplyMessage.isRpcReplyMessage(rpcReplyDocument));
+    }
+
+    @Test
+    void testUnsafeOf() throws IOException, SAXException {
+        final Document rpcDocument = RPC_REPLY_MESSAGE.getDocument();
+        final RpcReplyMessage rpcMessage = RpcReplyMessage.unsafeOf(rpcDocument);
+        assertEquals("1014", rpcMessage.getMessageId());
+
+        final Document invalidDocument = XmlUtil.readXmlToDocument("<foo/>");
+        final RpcReplyMessage invalidMessage = RpcReplyMessage.unsafeOf(invalidDocument);
+        assertEquals("", invalidMessage.getMessageId());
     }
 }
