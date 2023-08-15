@@ -162,7 +162,7 @@ public class TestToolTest {
         NetconfClientConfiguration clientConfig = getClientConfig("localhost", localPort,
             simulatorConfig, sessionListener);
         Document docRequest = XmlUtil.readXmlToDocument(xmlRequest);
-        NetconfMessage request = new NetconfMessage(docRequest);
+        NetconfMessage request = NetconfMessage.of(docRequest);
 
         // WHEN
         NetconfMessage response;
