@@ -28,7 +28,7 @@ class NotificationMessageTest {
         final var rootElement = document.createElement("test-root");
         document.appendChild(rootElement);
 
-        final var netconfNotification = new NotificationMessage(document, EVENT_TIME);
+        final var netconfNotification = NotificationMessage.ofNotificationContent(document, EVENT_TIME);
         final var resultDoc = netconfNotification.getDocument();
         final var nodeList = resultDoc.getElementsByTagNameNS(
             "urn:ietf:params:xml:ns:netconf:notification:1.0", "notification");

@@ -146,7 +146,8 @@ public class NetconfServerSessionListenerTest {
 
     @Test
     public void testOnNotification() throws Exception {
-        listener.onNotification(session, new NotificationMessage(XmlUtil.readXmlToDocument("<notification/>")));
+        listener.onNotification(session, NotificationMessage.ofNotificationContent(
+            XmlUtil.readXmlToDocument("<notification/>")));
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.NOTIFICATION)));
     }
 

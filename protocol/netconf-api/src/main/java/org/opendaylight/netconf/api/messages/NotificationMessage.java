@@ -165,18 +165,8 @@ public final class NotificationMessage extends NetconfMessage {
 
     private final @NonNull Instant eventTime;
 
-    /**
-     * Create new notification and capture the timestamp in the constructor.
-     */
-    public NotificationMessage(final Document notificationContent) {
-        this(notificationContent, Instant.now());
-    }
-
-    /**
-     * Create new notification with provided timestamp.
-     */
-    public NotificationMessage(final Document notificationContent, final Instant eventTime) {
-        super(wrapNotification(notificationContent, eventTime));
+    private NotificationMessage(final Document notificationContent, final Instant eventTime) {
+        super(notificationContent);
         this.eventTime = requireNonNull(eventTime);
     }
 
@@ -187,6 +177,21 @@ public final class NotificationMessage extends NetconfMessage {
      */
     public @NonNull Instant getEventTime() {
         return eventTime;
+    }
+
+    /**
+     * Create new notification with provided timestamp.
+     */
+    public static @NonNull NotificationMessage ofNotificationContent(final Document notificationContent,
+            final Instant eventTime) {
+        return new NotificationMessage(wrapNotification(notificationContent, eventTime), eventTime);
+    }
+
+    /**
+     * Create new notification and capture the timestamp in the method call.
+     */
+    public static @NonNull NotificationMessage ofNotificationContent(final Document notificationContent) {
+        return ofNotificationContent(notificationContent, Instant.now());
     }
 
     private static Document wrapNotification(final Document notificationContent, final Instant eventTime) {
