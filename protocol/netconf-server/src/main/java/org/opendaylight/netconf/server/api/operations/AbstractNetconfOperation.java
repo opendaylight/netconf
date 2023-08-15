@@ -9,19 +9,18 @@ package org.opendaylight.netconf.server.api.operations;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Map;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.netconf.api.messages.RpcMessage;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public abstract class AbstractNetconfOperation implements NetconfOperation {
     private final @NonNull SessionIdType sessionId;
@@ -73,7 +72,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
     }
 
     protected static XmlElement getRequestElementWithCheck(final Document message) throws DocumentedException {
-        return XmlElement.fromDomElementWithExpected(message.getDocumentElement(), XmlNetconfConstants.RPC_KEY,
+        return XmlElement.fromDomElementWithExpected(message.getDocumentElement(), RpcMessage.ELEMENT_NAME,
             NamespaceURN.BASE);
     }
 
@@ -90,31 +89,27 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
     @Override
     public Document handle(final Document requestMessage,
             final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
+        final var requestElement = getRequestElementWithCheck(requestMessage);
+        final var document = XmlUtil.newDocument();
+        final var operationElement = requestElement.getOnlyChildElement();
+        final var attributes = requestElement.getAttributes();
 
-        XmlElement requestElement = getRequestElementWithCheck(requestMessage);
-
-        Document document = XmlUtil.newDocument();
-
-        XmlElement operationElement = requestElement.getOnlyChildElement();
-        Map<String, Attr> attributes = requestElement.getAttributes();
-
-        Element response = handle(document, operationElement, subsequentOperation);
-        Element rpcReply = XmlUtil.createElement(document, XmlNetconfConstants.RPC_REPLY_KEY,
-                Optional.of(NamespaceURN.BASE));
-
+        final var response = handle(document, operationElement, subsequentOperation);
+        final var rpcReply = XmlUtil.createElement(document, RpcReplyMessage.ELEMENT_NAME,
+            Optional.of(NamespaceURN.BASE));
         if (XmlElement.fromDomElement(response).hasNamespace()) {
             rpcReply.appendChild(response);
         } else {
-            Element responseNS = XmlUtil.createElement(document, response.getNodeName(),
+            final var responseNS = XmlUtil.createElement(document, response.getNodeName(),
                     Optional.of(NamespaceURN.BASE));
-            NodeList list = response.getChildNodes();
+            final var list = response.getChildNodes();
             while (list.getLength() != 0) {
                 responseNS.appendChild(list.item(0));
             }
             rpcReply.appendChild(responseNS);
         }
 
-        for (Attr attribute : attributes.values()) {
+        for (var attribute : attributes.values()) {
             rpcReply.setAttributeNode((Attr) document.importNode(attribute, true));
         }
         document.appendChild(rpcReply);
@@ -127,15 +122,16 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder(getClass().getName());
+        final var sb = new StringBuilder(getClass().getName());
         try {
             sb.append("{name=").append(getOperationName());
         } catch (UnsupportedOperationException e) {
             // no problem
         }
-        sb.append(", namespace=").append(getOperationNamespace());
-        sb.append(", session=").append(sessionId.getValue());
-        sb.append('}');
-        return sb.toString();
+        return sb
+            .append(", namespace=").append(getOperationNamespace())
+            .append(", session=").append(sessionId.getValue())
+            .append('}')
+            .toString();
     }
 }

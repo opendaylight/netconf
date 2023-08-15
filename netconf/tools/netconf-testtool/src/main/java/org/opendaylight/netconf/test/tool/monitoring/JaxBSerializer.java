@@ -14,7 +14,8 @@ import javax.xml.transform.dom.DOMResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class JaxBSerializer {
+// FIXME: this is a rather ugly class
+public final class JaxBSerializer {
     private static final JAXBContext JAXB_CONTEXT;
 
     static {
@@ -25,16 +26,17 @@ public class JaxBSerializer {
         }
     }
 
-    public Element toXml(final NetconfState monitoringModel) {
-        final DOMResult res;
+    private JaxBSerializer() {
+        // Hidden on purpose
+    }
+
+    public static Element toXml(final NetconfState monitoringModel) {
+        final var res = new DOMResult();
         try {
-            final Marshaller marshaller = JAXB_CONTEXT.createMarshaller();
-
+            final var marshaller = JAXB_CONTEXT.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
-            res = new DOMResult();
             marshaller.marshal(monitoringModel, res);
-        } catch (final JAXBException e) {
+        } catch (JAXBException e) {
             throw new IllegalStateException("Unable to serialize netconf state " + monitoringModel, e);
         }
         return ((Document) res.getNode()).getDocumentElement();
