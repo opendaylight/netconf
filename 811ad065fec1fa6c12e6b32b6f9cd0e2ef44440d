@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "56b52c28_2f169449",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/KeysMappingTest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-08-16T09:32:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbc0658f_45f640cb",
+      "revId": "811ad065fec1fa6c12e6b32b6f9cd0e2ef44440d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "475c08da_01769ee0",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-16T08:51:12Z",
       "side": 1,
       "message": "IMHO better to change everything to Set",
+      "revId": "811ad065fec1fa6c12e6b32b6f9cd0e2ef44440d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f8047e6_9da25a07",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-08-16T09:32:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "475c08da_01769ee0",
       "revId": "811ad065fec1fa6c12e6b32b6f9cd0e2ef44440d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
