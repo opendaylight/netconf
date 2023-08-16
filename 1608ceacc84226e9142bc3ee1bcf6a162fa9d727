@@ -16,6 +16,29 @@
       "message": "we don\u0027t need to create constant for one use",
       "revId": "1608ceacc84226e9142bc3ee1bcf6a162fa9d727",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de4ee1d0_6d02f350",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-16T07:34:57Z",
+      "side": 1,
+      "message": "Can we move it to OperationaBuilder as we use it there?",
+      "range": {
+        "startLine": 314,
+        "startChar": 4,
+        "endLine": 326,
+        "endChar": 5
+      },
+      "revId": "1608ceacc84226e9142bc3ee1bcf6a162fa9d727",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
