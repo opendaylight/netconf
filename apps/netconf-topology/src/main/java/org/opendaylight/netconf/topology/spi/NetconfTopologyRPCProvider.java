@@ -136,7 +136,22 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final InstanceIdentifier<NetconfNode> niid = topologyPath.child(Node.class,
                 new NodeKey(nodeId)).augmentation(NetconfNode.class);
-        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, niid, node);
+        /**
+         * Now we get:
+         * Caused by: org.opendaylight.yangtools.yang.data.tree.api.SchemaValidationFailedException: Child /(urn:TBD:params:xml:ns:yang:network-topology?revision=2013-10-21)network-topology/topology/topology[{(urn:TBD:params:xml:ns:yang:network-topology?revision=2013-10-21)topology-id=topology-netconf}]/node/node[{(urn:TBD:params:xml:ns:yang:network-topology?revision=2013-10-21)node-id=netconf-test-device}]/(urn:opendaylight:netconf-node-topology?revision=2022-12-25)clustered-connection-status is not present in schema tree.
+         *         at org.opendaylight.yangtools.yang.data.tree.impl.InMemoryDataTreeModification.resolveModificationFor(InMemoryDataTreeModification.java:183) ~[bundleFile:?]
+         *         at org.opendaylight.yangtools.yang.data.tree.impl.InMemoryDataTreeModification.delete(InMemoryDataTreeModification.java:110) ~[bundleFile:?]
+         *         at org.opendaylight.controller.cluster.databroker.actors.dds.LocalReadWriteProxyTransaction.doDelete(LocalReadWriteProxyTransaction.java:156) ~[bundleFile:?]
+         *         at org.opendaylight.controller.cluster.databroker.actors.dds.AbstractProxyTransaction.delete(AbstractProxyTransaction.java:296) ~[bundleFile:?]
+         *         at org.opendaylight.controller.cluster.databroker.actors.dds.ClientTransaction.delete(ClientTransaction.java:79) ~[bundleFile:?]
+         *         at org.opendaylight.controller.cluster.databroker.ClientBackedWriteTransaction.delete(ClientBackedWriteTransaction.java:40) ~[bundleFile:?]
+         *         at org.opendaylight.controller.cluster.databroker.AbstractDOMBrokerWriteTransaction.delete(AbstractDOMBrokerWriteTransaction.java:93) ~[bundleFile:?]
+         *         at org.opendaylight.mdsal.binding.dom.adapter.BindingDOMWriteTransactionAdapter.put(BindingDOMWriteTransactionAdapter.java:55) ~[bundleFile:?]
+         *         at org.opendaylight.mdsal.binding.dom.adapter.BindingDOMWriteTransactionAdapter.mergeParentStructurePut(BindingDOMWriteTransactionAdapter.java:72) ~[bundleFile:?]
+         *         at org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider.writeToConfigDS(NetconfTopologyRPCProvider.java:139) ~[bundleFile:?]
+         *         at org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider.createDevice(NetconfTopologyRPCProvider.java:75) ~[bundleFile:?]
+         */
+        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, niid, node);
         writeTransaction.commit().addCallback(new FutureCallback<CommitInfo>() {
 
             @Override
