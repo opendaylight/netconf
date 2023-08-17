@@ -29,6 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
@@ -121,7 +122,8 @@ public class NetconfServerSessionListenerTest {
     @Test
     public void testOnMessageDocumentedFail() throws Exception {
         final Document reply =
-                XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
+                        + "message-id=\"id\">\n"
                         + "<rpc-error>\n"
                         + "<error-type>protocol</error-type>\n"
                         + "<error-tag>unknown-element</error-tag>\n"
@@ -134,7 +136,7 @@ public class NetconfServerSessionListenerTest {
                         + "</error-info>\n"
                         + "</rpc-error>\n"
                         + "</rpc-reply>");
-        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument("<bad-rpc/>"));
+        final NetconfMessage msg = RpcMessage.unsafeOf(XmlUtil.readXmlToDocument("<bad-rpc/>"));
         listener.onMessage(session, msg);
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.OUT_RPC_ERROR)));
