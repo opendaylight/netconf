@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2023 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
+package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
@@ -13,19 +13,13 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
-import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -43,37 +37,32 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-@Provider
-@Consumes(MediaTypes.APPLICATION_YANG_PATCH_XML)
-public class XmlPatchBodyReader extends AbstractPatchBodyReader {
-    private static final Logger LOG = LoggerFactory.getLogger(XmlPatchBodyReader.class);
+public final class XmlPatchBody extends PatchBody {
+    private static final Logger LOG = LoggerFactory.getLogger(XmlPatchBody.class);
 
-    public XmlPatchBodyReader(final DatabindProvider databindProvider,
-            final DOMMountPointService mountPointService) {
-        super(databindProvider, mountPointService);
+    public XmlPatchBody(final InputStream inputStream) {
+        super(inputStream);
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected PatchContext readBody(final InstanceIdentifierContext path, final InputStream entityStream)
-            throws WebApplicationException {
+    PatchContext toPatchContext(final InstanceIdentifierContext targetResource, final InputStream inputStream)
+            throws IOException {
         try {
-            return parse(path, UntrustedXML.newDocumentBuilder().parse(entityStream));
-        } catch (final RestconfDocumentedException e) {
-            throw e;
-        } catch (final Exception e) {
-            LOG.debug("Error parsing xml input", e);
-
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
+            return parse(targetResource, UntrustedXML.newDocumentBuilder().parse(inputStream));
+        } catch (XMLStreamException | SAXException | URISyntaxException e) {
+            LOG.debug("Failed to parse YANG Patch XML", e);
+            throw new RestconfDocumentedException("Error parsing YANG Patch XML: " + e.getMessage(), ErrorType.PROTOCOL,
+                ErrorTag.MALFORMED_MESSAGE, e);
         }
     }
 
-    private static PatchContext parse(final InstanceIdentifierContext pathContext, final Document doc)
+
+    private static @NonNull PatchContext parse(final InstanceIdentifierContext targetResource, final Document doc)
             throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final var resultCollection = new ArrayList<PatchEntity>();
         final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final var editNodes = doc.getElementsByTagName("edit");
+        final var schemaTree = DataSchemaContextTree.from(targetResource.getSchemaContext());
 
         for (int i = 0; i < editNodes.getLength(); i++) {
             final Element element = (Element) editNodes.item(i);
@@ -85,10 +74,9 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             final Element firstValueElement = values != null ? values.get(0) : null;
 
             // find complete path to target, it can be also empty (only slash)
-            final var targetII = parsePatchTarget(pathContext, target);
+            final var targetII = parsePatchTarget(targetResource, target);
             // move schema node
-            final var lookup = DataSchemaContextTree.from(pathContext.getSchemaContext())
-                .enterPath(targetII).orElseThrow();
+            final var lookup = schemaTree.enterPath(targetII).orElseThrow();
 
             final var stack = lookup.stack();
             final var inference = stack.toInference();
@@ -114,7 +102,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             }
         }
 
-        return new PatchContext(pathContext, ImmutableList.copyOf(resultCollection), patchId);
+        return new PatchContext(targetResource, ImmutableList.copyOf(resultCollection), patchId);
     }
 
     /**
