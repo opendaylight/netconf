@@ -29,6 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
@@ -109,9 +110,8 @@ public class NetconfServerSessionListenerTest {
     @Test
     public void testOnMessageRuntimeFail() throws Exception {
         doThrow(new RuntimeException("runtime fail")).when(router).onNetconfMessage(any(), any());
-        final Document reply =
-                XmlUtil.readXmlToDocument("<rpc message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-                        + "<example/></rpc>");
+        final var reply = XmlUtil.readXmlToDocument(
+            "<rpc message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc>");
         final NetconfMessage msg = new NetconfMessage(reply);
         final IllegalStateException ex = assertThrows(IllegalStateException.class,
             () -> listener.onMessage(session, msg));
@@ -120,27 +120,26 @@ public class NetconfServerSessionListenerTest {
 
     @Test
     public void testOnMessageDocumentedFail() throws Exception {
-        final Document reply =
-                XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                        + "<rpc-error>\n"
-                        + "<error-type>protocol</error-type>\n"
-                        + "<error-tag>unknown-element</error-tag>\n"
-                        + "<error-severity>error</error-severity>\n"
-                        + "<error-message>Unknown tag bad-rpc in message:\n"
-                        + "&lt;bad-rpc/&gt;\n"
-                        + "</error-message>\n"
-                        + "<error-info>\n"
-                        + "<bad-element>bad-rpc</bad-element>\n"
-                        + "</error-info>\n"
-                        + "</rpc-error>\n"
-                        + "</rpc-reply>");
-        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument("<bad-rpc/>"));
+        final var reply = XmlUtil.readXmlToDocument("""
+            <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id=\"id\">
+                <rpc-error>
+                    <error-type>protocol</error-type>
+                    <error-tag>unknown-element</error-tag>
+                    <error-severity>error</error-severity>
+                    <error-message>Unknown tag bad-rpc in message:&lt;bad-rpc/&gt</error-message>
+                    <error-info>
+                        <bad-element>bad-rpc</bad-element>
+                    </error-info>
+                </rpc-error>
+            </rpc-reply>
+            """);
+        final var msg = RpcMessage.of(XmlUtil.readXmlToDocument("<bad-rpc/>"));
         listener.onMessage(session, msg);
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.OUT_RPC_ERROR)));
         channel.runPendingTasks();
-        final NetconfMessage sentMsg = channel.readOutbound();
-        final Diff diff = XMLUnit.compareXML(reply, sentMsg.getDocument());
+        final var sentMsg = channel.<NetconfMessage>readOutbound();
+        final var diff = XMLUnit.compareXML(reply, sentMsg.getDocument());
         assertTrue(diff.toString(), diff.similar());
     }
 
