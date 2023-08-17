@@ -7,13 +7,17 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.io.InputStream;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonPatchBody;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -22,20 +26,9 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
 public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
-    private final JsonPatchBodyReader jsonToPatchBodyReader =
-        new JsonPatchBodyReader(databindProvider, mountPointService);
-
-    @Override
-    protected final MediaType getMediaType() {
-        return new MediaType(APPLICATION_JSON, null);
-    }
-
     @Test
     public final void modulePatchDataTest() throws Exception {
-        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            jsonToPatchBodyReader, false);
-
-        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             {
               "ietf-yang-patch:yang-patch" : {
                 "patch-id" : "test-patch",
@@ -68,7 +61,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                   }
                 ]
               }
-            }""")));
+            }"""));
     }
 
     /**
@@ -76,10 +69,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchCreateAndDeleteTest() throws Exception {
-        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            jsonToPatchBodyReader, false);
-
-        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             {
               "ietf-yang-patch:yang-patch" : {
                 "patch-id" : "test-patch",
@@ -110,7 +100,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                   }
                 ]
               }
-            }""")));
+            }"""));
     }
 
     /**
@@ -119,11 +109,8 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchValueMissingNegativeTest() throws Exception {
-        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            jsonToPatchBodyReader, false);
-
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+            () -> parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 {
                   "ietf-yang-patch:yang-patch" : {
                     "patch-id" : "test-patch",
@@ -137,7 +124,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                       }
                     ]
                   }
-                }""")));
+                }"""));
         assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -147,14 +134,10 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchValueNotSupportedNegativeTest() throws Exception {
-        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            jsonToPatchBodyReader, false);
-
         final var inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
             "/instanceidentifier/json/jsonPATCHdataValueNotSupported.json");
-
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+            () -> parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", inputStream));
         assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -163,9 +146,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchCompleteTargetInURITest() throws Exception {
-        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont", jsonToPatchBodyReader, false);
-
-        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont",
             JsonPatchBodyReaderTest.class.getResourceAsStream(
                 "/instanceidentifier/json/jsonPATCHdataCompleteTargetInURI.json")));
     }
@@ -175,10 +156,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchMergeOperationOnListTest() throws Exception {
-        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            jsonToPatchBodyReader, false);
-
-        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
             JsonPatchBodyReaderTest.class.getResourceAsStream(
                 "/instanceidentifier/json/jsonPATCHMergeOperationOnList.json")));
     }
@@ -188,9 +166,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchMergeOperationOnContainerTest() throws Exception {
-        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont", jsonToPatchBodyReader, false);
-
-        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont", """
             {
               "ietf-yang-patch:yang-patch" : {
                 "patch-id" : "Test merge operation",
@@ -233,7 +209,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                   }
                 ]
               }
-            }""")));
+            }"""));
     }
 
     /**
@@ -241,10 +217,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchSimpleLeafValueTest() throws Exception {
-        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            jsonToPatchBodyReader, false);
-
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+        final var returnValue = parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
             JsonPatchBodyReaderTest.class.getResourceAsStream(
                 "/instanceidentifier/json/jsonPATCHSimpleLeafValue.json"));
         checkPatchContext(returnValue);
@@ -256,9 +229,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
-        mockBodyReader(mountPrefix(), jsonToPatchBodyReader, false);
-
-        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+        checkPatchContext(parse(mountPrefix(),
             JsonPatchBodyReaderTest.class.getResourceAsStream(
                 "/instanceidentifier/json/jsonPATCHTargetTopLevelContainerWithEmptyURI.json")));
     }
@@ -268,9 +239,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchTargetTopLevelContainerWithFullPathURITest() throws Exception {
-        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont", jsonToPatchBodyReader, false);
-
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+        final var returnValue = parse(mountPrefix() + "instance-identifier-patch-module:patch-cont", """
             {
               "ietf-yang-patch:yang-patch": {
                 "patch-id": "test-patch",
@@ -294,7 +263,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                   }
                 ]
               }
-            }"""));
+            }""");
         checkPatchContext(returnValue);
         assertEquals(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(PATCH_CONT_QNAME))
@@ -315,10 +284,8 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchTargetSecondLevelListWithFullPathURITest() throws Exception {
-        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=my-leaf-set",
-            jsonToPatchBodyReader, false);
-
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+        final var returnValue = parse(
+            mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=my-leaf-set", """
             {
               "ietf-yang-patch:yang-patch": {
                 "patch-id": "test-patch",
@@ -340,7 +307,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                   }
                 ]
               }
-            }"""));
+            }""");
         checkPatchContext(returnValue);
         assertEquals(Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(MY_LIST1_QNAME))
@@ -359,9 +326,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchTargetTopLevelAugmentedContainerTest() throws Exception {
-        mockBodyReader(mountPrefix(), jsonToPatchBodyReader, false);
-
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+        final var returnValue = parse(mountPrefix(), """
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "test-patch",
@@ -379,7 +344,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }"""));
+            }""");
         checkPatchContext(returnValue);
         assertEquals(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_AUG_QNAME))
@@ -392,9 +357,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchTargetMapNodeTest() throws Exception {
-        mockBodyReader(mountPrefix(), jsonToPatchBodyReader, false);
-
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+        final var returnValue = parse(mountPrefix(), """
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "map-patch",
@@ -413,7 +376,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }"""));
+            }""");
         checkPatchContext(returnValue);
         assertEquals(Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(MAP_CONT_QNAME))
@@ -430,9 +393,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchTargetLeafSetNodeTest() throws Exception {
-        mockBodyReader(mountPrefix() + "", jsonToPatchBodyReader, false);
-
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+        final var returnValue = parse(mountPrefix(), """
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "set-patch",
@@ -448,7 +409,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }"""));
+            }""");
         checkPatchContext(returnValue);
         assertEquals(Builders.leafSetBuilder()
             .withNodeIdentifier(new NodeIdentifier(LEAF_SET_QNAME))
@@ -464,9 +425,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchTargetUnkeyedListNodeTest() throws Exception {
-        mockBodyReader(mountPrefix(), jsonToPatchBodyReader, false);
-
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+        final var returnValue = parse(mountPrefix(), """
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "list-patch",
@@ -485,7 +444,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }"""));
+            }""");
         checkPatchContext(returnValue);
         assertEquals(Builders.unkeyedListBuilder()
             .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
@@ -502,9 +461,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      */
     @Test
     public final void modulePatchTargetCaseNodeTest() throws Exception {
-        mockBodyReader(mountPrefix(), jsonToPatchBodyReader, false);
-
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+        final var returnValue = parse(mountPrefix(), """
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "choice-patch",
@@ -522,11 +479,22 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }"""));
+            }""");
         checkPatchContext(returnValue);
         assertEquals(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CHOICE_CONT_QNAME))
             .withChild(ImmutableNodes.leafNode(CASE_LEAF1_QNAME, "data"))
             .build(), returnValue.getData().get(0).getNode());
+    }
+
+    private @NonNull PatchContext parse(final String uriPath, final String patchBody) throws IOException {
+        return parse(uriPath, stringInputStream(patchBody));
+    }
+
+    // FIXME: migrate callers to use the above instead of resources
+    @Deprecated
+    private @NonNull PatchContext parse(final String uriPath, final InputStream patchBody) throws IOException {
+        return new JsonPatchBody(patchBody).toPatchContext(
+            ParserIdentifier.toInstanceIdentifier(uriPath, IID_SCHEMA, mountPointService));
     }
 }
