@@ -20,7 +20,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.CapabilityURN;
-import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -48,7 +49,8 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
 
-        final NetconfMessage netconfMessage = mock(NetconfMessage.class);
+        final RpcMessage netconfMessage = RpcMessage.wrapDocumentAsRpc(
+            XmlUtil.readXmlToElement("<test/>").getOwnerDocument(),"id");
 
         device.onRemoteSessionUp(sessionCaps, listener);
         verify(facade).onDeviceConnected(
