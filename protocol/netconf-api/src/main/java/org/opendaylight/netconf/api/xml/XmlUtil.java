@@ -102,7 +102,7 @@ public final class XmlUtil {
         return readXmlToDocument(new FileInputStream(xmlFile)).getDocumentElement();
     }
 
-    public static Element readXmlToElement(final String xmlContent) throws SAXException, IOException {
+    public static Document readXmlToElement(final String xmlContent) throws SAXException, IOException {
         Document doc = readXmlToDocument(xmlContent);
         return doc.getDocumentElement();
     }

@@ -155,7 +155,7 @@ public class AbstractNetconfSessionNegotiatorTest {
     @Test
     public void testReplaceHelloMessageInboundHandler() throws Exception {
         final List<Object> out = new ArrayList<>();
-        final byte[] msg = "<rpc/>".getBytes();
+        final byte[] msg = "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"100\"/>".getBytes();
         final ByteBuf msgBuf = Unpooled.wrappedBuffer(msg);
         final ByteBuf helloBuf = Unpooled.wrappedBuffer(XmlUtil.toString(hello.getDocument()).getBytes());
 
