@@ -121,7 +121,8 @@ public class NetconfServerSessionListenerTest {
     @Test
     public void testOnMessageDocumentedFail() throws Exception {
         final Document reply =
-                XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
+                        + "message-id=\"id\">\n"
                         + "<rpc-error>\n"
                         + "<error-type>protocol</error-type>\n"
                         + "<error-tag>unknown-element</error-tag>\n"

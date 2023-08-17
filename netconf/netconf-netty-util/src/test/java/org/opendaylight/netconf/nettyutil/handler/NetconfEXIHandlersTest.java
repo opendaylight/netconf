@@ -31,7 +31,7 @@ import org.opendaylight.netconf.shaded.exificient.main.api.sax.SAXEncoder;
 
 public class NetconfEXIHandlersTest {
 
-    private final String msgAsString = "<netconf-message/>";
+    private final String msgAsString = "<hello/>";
     private NetconfMessageToEXIEncoder netconfMessageToEXIEncoder;
     private NetconfEXIToMessageDecoder netconfEXIToMessageDecoder;
     private NetconfMessage msg;
