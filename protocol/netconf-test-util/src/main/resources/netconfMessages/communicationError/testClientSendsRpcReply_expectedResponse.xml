@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="id">
     <rpc-error>
         <error-type>protocol</error-type>
         <error-tag>unknown-element</error-tag>

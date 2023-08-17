@@ -25,10 +25,10 @@ import static org.mockito.Mockito.withSettings;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +48,9 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.messages.RpcReplyMessage;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -107,7 +108,7 @@ public class NetconfDeviceCommunicatorTest {
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final String messageID,
                                                                     final boolean doLastTest) throws Exception {
         Document doc = UntrustedXML.newDocumentBuilder().newDocument();
-        Element element = doc.createElement("request");
+        Element element = doc.createElementNS(NamespaceURN.BASE, RpcMessage.ELEMENT_NAME);
         element.setAttribute("message-id", messageID);
         doc.appendChild(element);
         NetconfMessage message = new NetconfMessage(doc);
@@ -206,45 +207,39 @@ public class NetconfDeviceCommunicatorTest {
     public void testSendRequest() throws Exception {
         setupSession();
 
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        final var message = RpcMessage.ofOperation("foo", XmlUtil.readXmlToDocument("<test/>"));
         QName rpc = QName.create("", "mockRpc");
 
-        ArgumentCaptor<GenericFutureListener> futureListener =
-                ArgumentCaptor.forClass(GenericFutureListener.class);
+        final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
 
-        ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
+        final var mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest(message, rpc);
+        final var resultFuture = communicator.sendRequest(message, rpc);
 
         verify(spySession).sendMessage(same(message));
 
         assertNotNull("ListenableFuture is null", resultFuture);
 
         verify(mockChannelFuture).addListener(futureListener.capture());
-        Future<Void> operationFuture = mock(Future.class);
+        final var operationFuture = mock(ChannelFuture.class);
         doReturn(true).when(operationFuture).isSuccess();
         futureListener.getValue().operationComplete(operationFuture);
 
-        try {
-            resultFuture.get(1, TimeUnit.MILLISECONDS); // verify it's not cancelled or has an error set
-        } catch (TimeoutException e) {
-            LOG.info("Operation failed due timeout.");
-        } // expected
+        assertNotNull(Futures.getDone(resultFuture));
     }
 
     @Test
     public void testSendRequestWithNoSession() throws Exception {
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
-        QName rpc = QName.create("", "mockRpc");
+        final var message = RpcMessage.ofOperation("foo", XmlUtil.readXmlToDocument("<test/>"));
+        final var rpc = QName.create("", "mockRpc");
 
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest(message, rpc);
-
-        assertNotNull("ListenableFuture is null", resultFuture);
+        final var resultFuture = communicator.sendRequest(message, rpc);
+        assertNotNull(resultFuture);
 
         // Should have an immediate result
-        RpcResult<NetconfMessage> rpcResult = resultFuture.get(3, TimeUnit.MILLISECONDS);
+        final var rpcResult = Futures.getDone(resultFuture);
 
         verifyErrorRpcResult(rpcResult, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
     }
@@ -267,31 +262,30 @@ public class NetconfDeviceCommunicatorTest {
     public void testSendRequestWithWithSendFailure() throws Exception {
         setupSession();
 
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
-        QName rpc = QName.create("", "mockRpc");
+        final var message = RpcMessage.ofOperation("foo", XmlUtil.readXmlToDocument("<test/>"));
+        final var rpc = QName.create("", "mockRpc");
 
-        ArgumentCaptor<GenericFutureListener> futureListener =
-                ArgumentCaptor.forClass(GenericFutureListener.class);
+        final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
 
-        ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
+        final var mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest(message, rpc);
+        final var resultFuture = communicator.sendRequest(message, rpc);
 
         assertNotNull("ListenableFuture is null", resultFuture);
 
         verify(mockChannelFuture).addListener(futureListener.capture());
 
-        Future<Void> operationFuture = mock(Future.class);
+        final var operationFuture = mock(ChannelFuture.class);
         doReturn(false).when(operationFuture).isSuccess();
         doReturn(new Exception("mock error")).when(operationFuture).cause();
         futureListener.getValue().operationComplete(operationFuture);
 
         // Should have an immediate result
-        RpcResult<NetconfMessage> rpcResult = resultFuture.get(3, TimeUnit.MILLISECONDS);
+        final var rpcResult = resultFuture.get(3, TimeUnit.MILLISECONDS);
 
-        RpcError rpcError = verifyErrorRpcResult(rpcResult, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
+        final var  rpcError = verifyErrorRpcResult(rpcResult, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
         assertEquals("RpcError message contains \"mock error\"", true,
                 rpcError.getMessage().contains("mock error"));
     }

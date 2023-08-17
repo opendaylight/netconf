@@ -220,7 +220,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void tesLockSchemaRequest() throws Exception {
         final NetconfMessageTransformer transformer = getTransformer(PARTIAL_SCHEMA);
-        final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
+        final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"id\"><ok/>"
+            + "</rpc-reply>";
 
         transformer.toRpcResult(
             RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
@@ -229,7 +230,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testRpcEmptyBodyWithOutputDefinedSchemaResult() throws Exception {
-        final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
+        final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"id\"><ok/>"
+            + "</rpc-reply>";
 
         DOMRpcResult domRpcResult = actionNetconfMessageTransformer.toRpcResult(
             RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
@@ -239,7 +241,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testRpcEmptyBodyWithoutOutputDefinedSchemaResult() throws Exception {
-        final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
+        final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"id\"><ok/>"
+            + "</rpc-reply>";
 
         DOMRpcResult domRpcResult = actionNetconfMessageTransformer.toRpcResult(
             RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
@@ -528,8 +531,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void testCommitResponse() throws Exception {
         final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
-                "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>"
-        ));
+                "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"id\"><ok/>"
+                    + "</rpc-reply>"));
         final DOMRpcResult compositeNodeRpcResult = netconfMessageTransformer.toRpcResult(
             RpcResultBuilder.success(response).build(),
             NETCONF_COMMIT_QNAME);

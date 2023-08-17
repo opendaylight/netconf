@@ -27,7 +27,7 @@ public class NetconfXMLToMessageDecoderTest {
     @Test
     public void testDecode() throws Exception {
         final ArrayList<Object> out = new ArrayList<>();
-        new NetconfXMLToMessageDecoder().decode(null, Unpooled.wrappedBuffer("<msg/>".getBytes()), out);
+        new NetconfXMLToMessageDecoder().decode(null, Unpooled.wrappedBuffer("<hello/>".getBytes()), out);
         assertEquals(1, out.size());
     }
 
@@ -39,7 +39,9 @@ public class NetconfXMLToMessageDecoderTest {
          */
         final ArrayList<Object> out = new ArrayList<>();
         new NetconfXMLToMessageDecoder().decode(null,
-                Unpooled.wrappedBuffer("\n<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg/>".getBytes()), out);
+                Unpooled.wrappedBuffer("""
+                    \n<rpc version="1.0" encoding="UTF-8"
+                        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="101"/>""".getBytes()), out);
         assertEquals(1, out.size());
     }
 
@@ -52,7 +54,9 @@ public class NetconfXMLToMessageDecoderTest {
          */
         final ArrayList<Object> out = new ArrayList<>();
         new NetconfXMLToMessageDecoder().decode(null,
-                Unpooled.wrappedBuffer("\r\n<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg/>".getBytes()), out);
+                Unpooled.wrappedBuffer("""
+                    \n\r<rpc version="1.0" encoding="UTF-8"
+                        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="102"/>""".getBytes()), out);
         assertEquals(1, out.size());
     }
 
@@ -85,7 +89,9 @@ public class NetconfXMLToMessageDecoderTest {
                 null,
                 Unpooled.copiedBuffer(
                         Unpooled.wrappedBuffer(whitespaces),
-                        Unpooled.wrappedBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg/>".getBytes())),
+                        Unpooled.wrappedBuffer("""
+                                \n\r<rpc version="1.0" encoding="UTF-8"
+                                    xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="103"/>""".getBytes())),
                 out);
         assertEquals(1, out.size());
     }
