@@ -29,5 +29,7 @@ public sealed interface Capability permits SimpleCapability, ParameterizedCapabi
      *
      * @return A URI
      */
-    URI toURI();
+    default URI toURI() {
+        return URI.create(urn());
+    }
 }

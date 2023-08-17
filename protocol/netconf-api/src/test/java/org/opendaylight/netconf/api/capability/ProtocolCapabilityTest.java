@@ -7,11 +7,13 @@
  */
 package org.opendaylight.netconf.api.capability;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -66,5 +68,32 @@ class ProtocolCapabilityTest {
             arguments("urn:ietf:params:netconf:capability:xpath:1.0", SimpleCapability.XPATH),
             arguments("urn:ietf:params:netconf:capability:yang-library:1.0", SimpleCapability.YANG_LIBRARY),
             arguments("urn:ietf:params:netconf:capability:yang-library:1.1", SimpleCapability.YANG_LIBRARY_1_1));
+    }
+
+    @Test
+    void testExiCapabilityUrn() {
+        var nonParameters = new ExiCapability(null, null);
+        assertEquals("urn:ietf:params:netconf:capability:exi:1.0", nonParameters.urn());
+
+        var someParameters = new ExiCapability(null, ExiCapability.Schemas.BUILTIN);
+        assertEquals("urn:ietf:params:netconf:capability:exi:1.0?schemas=builtin", someParameters.urn());
+
+        var allParameters = new ExiCapability(1000000, ExiCapability.Schemas.BASE_1_1);
+        assertEquals("urn:ietf:params:netconf:capability:exi:1.0?compression=1000000&schemas=base:1.1",
+            allParameters.urn());
+    }
+
+    @Test
+    void testYangModuleCapabilityUrn() {
+        assertThrows(NullPointerException.class, () -> new YangModuleCapability(null, null, null, null,null, null));
+
+        var someParameters = new YangModuleCapability("http://example.com/syslog", null, null, "Some content",null, null);
+        assertEquals("http://example.com/syslog",someParameters.urn());
+
+        var allParameters = new YangModuleCapability("http://example.com/module", "test-module", "2023-08-18",
+            "Some content", List.of("feature"),
+            List.of("deviation1", "deviation2"));
+        assertEquals("http://example.com/module?module=test-module&revision=2023-08-18&features=feature"
+            + "&deviations=deviation1,deviation2", allParameters.urn());
     }
 }
