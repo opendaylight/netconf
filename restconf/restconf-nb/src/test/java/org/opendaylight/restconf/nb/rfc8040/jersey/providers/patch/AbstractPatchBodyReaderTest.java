@@ -9,17 +9,39 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
+import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
-abstract class AbstractPatchBodyReaderTest extends AbstractBodyReaderTest {
+@RunWith(MockitoJUnitRunner.Silent.class)
+abstract class AbstractPatchBodyReaderTest extends AbstractInstanceIdentifierTest {
+    @Mock
+    DOMMountPointService mountPointService;
+    @Mock
+    DOMMountPoint mountPoint;
+
+    @Before
+    public final void before() {
+        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
+        doReturn(Optional.of(FixedDOMSchemaService.of(IID_SCHEMA))).when(mountPoint).getService(DOMSchemaService.class);
+    }
 
     @NonNull String mountPrefix() {
         return "";

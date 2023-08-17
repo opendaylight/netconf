@@ -425,7 +425,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
-        final PatchStatusContext status = dataService.yangPatchData(patch);
+        final PatchStatusContext status = dataService.yangPatchData(iidContext, patch);
         assertTrue(status.ok());
         assertEquals(3, status.editCollection().size());
         assertEquals("replace data", status.editCollection().get(1).getEditId());
@@ -445,7 +445,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
 
-        final PatchStatusContext status = dataService.yangPatchData(patch);
+        final PatchStatusContext status = dataService.yangPatchData(iidContext, patch);
         assertTrue(status.ok());
         assertEquals(3, status.editCollection().size());
         assertNull(status.globalErrors());
@@ -465,7 +465,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(readWrite).cancel();
-        final PatchStatusContext status = dataService.yangPatchData(patch);
+        final PatchStatusContext status = dataService.yangPatchData(iidContext, patch);
 
         assertFalse(status.ok());
         assertEquals(3, status.editCollection().size());
