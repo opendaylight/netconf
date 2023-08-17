@@ -5,11 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
+package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 
-public class JsonPatchBodyReaderMountPointTest extends JsonPatchBodyReaderTest {
+public class XmlPatchBodyMountPointTest extends XmlPatchBodyTest {
     @Override
     String mountPrefix() {
         return "instance-identifier-module:cont/yang-ext:mount/";
