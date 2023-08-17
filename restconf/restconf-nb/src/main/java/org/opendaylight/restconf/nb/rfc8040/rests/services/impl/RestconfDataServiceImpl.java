@@ -19,6 +19,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -45,6 +47,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
@@ -63,6 +66,9 @@ import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonPatchBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
@@ -469,47 +475,102 @@ public final class RestconfDataServiceImpl {
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param identifier path to target
-     * @param context edits
+     * @param body YANG Patch body
      * @return {@link PatchStatusContext}
      */
     @PATCH
     @Path("/data/{identifier:.+}")
-    @Consumes({
-        MediaTypes.APPLICATION_YANG_PATCH_JSON,
-        MediaTypes.APPLICATION_YANG_PATCH_XML
-    })
+    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_XML)
     @Produces({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchData(@Encoded @PathParam("identifier") final String identifier,
-            final PatchContext context) {
-        return yangPatchData(context);
+    public PatchStatusContext yangPatchDataXML(@Encoded @PathParam("identifier") final String identifier,
+            final InputStream body) {
+        return yangPatchData(identifier, new XmlPatchBody(body));
     }
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
-     * @param context edits
+     * @param body YANG Patch body
      * @return {@link PatchStatusContext}
      */
     @PATCH
     @Path("/data")
-    @Consumes({
-        MediaTypes.APPLICATION_YANG_PATCH_JSON,
-        MediaTypes.APPLICATION_YANG_PATCH_XML
-    })
+    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_XML)
     @Produces({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchData(final PatchContext context) {
-        final InstanceIdentifierContext iid = RestconfDocumentedException.throwIfNull(context,
-            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "No patch documented provided")
-            .getInstanceIdentifierContext();
-        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
-        return PatchDataTransactionUtil.patchData(context, strategy, iid.getSchemaContext());
+    public PatchStatusContext yangPatchDataXML(final InputStream body) {
+        return yangPatchData(new XmlPatchBody(body));
+    }
+
+    /**
+     * Ordered list of edits that are applied to the target datastore by the server, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
+     *
+     * @param identifier path to target
+     * @param body YANG Patch body
+     * @return {@link PatchStatusContext}
+     */
+    @PATCH
+    @Path("/data/{identifier:.+}")
+    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_JSON)
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
+    })
+    public PatchStatusContext yangPatchDataJSON(@Encoded @PathParam("identifier") final String identifier,
+            final InputStream body) {
+        return yangPatchData(identifier, new JsonPatchBody(body));
+    }
+
+    /**
+     * Ordered list of edits that are applied to the datastore by the server, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
+     *
+     * @param body YANG Patch body
+     * @return {@link PatchStatusContext}
+     */
+    @PATCH
+    @Path("/data")
+    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_JSON)
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
+    })
+    public PatchStatusContext yangPatchDataJSON(final InputStream body) {
+        return yangPatchData(new JsonPatchBody(body));
+    }
+
+    private PatchStatusContext yangPatchData(final @NonNull PatchBody body) {
+        return yangPatchData(InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext().modelContext()),
+            body);
+    }
+
+    private PatchStatusContext yangPatchData(final String identifier, final @NonNull PatchBody body) {
+        return yangPatchData(ParserIdentifier.toInstanceIdentifier(identifier,
+                databindProvider.currentContext().modelContext(), mountPointService), body);
+    }
+
+    private PatchStatusContext yangPatchData(final @NonNull InstanceIdentifierContext targetResource,
+            final @NonNull PatchBody body) {
+        try {
+            return yangPatchData(targetResource, body.toPatchContext(targetResource));
+        } catch (IOException e) {
+            LOG.debug("Error parsing YANG Patch input", e);
+            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
+                    ErrorTag.MALFORMED_MESSAGE, e);
+        }
+    }
+
+    @VisibleForTesting
+    PatchStatusContext yangPatchData(final InstanceIdentifierContext targetResource, final PatchContext context) {
+        return PatchDataTransactionUtil.patchData(context, getRestconfStrategy(targetResource.getMountPoint()),
+            targetResource.getSchemaContext());
     }
 
     @VisibleForTesting
