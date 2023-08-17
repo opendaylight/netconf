@@ -1,17 +1,17 @@
 /*
  * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2023 PANTHEON.tech, s.r.o.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
+package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -21,17 +21,11 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.ext.Provider;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
-import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -42,63 +36,31 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
-import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-@Provider
-@Consumes(MediaTypes.APPLICATION_YANG_PATCH_JSON)
-public class JsonPatchBodyReader extends AbstractPatchBodyReader {
-    private static final Logger LOG = LoggerFactory.getLogger(JsonPatchBodyReader.class);
-
-    public JsonPatchBodyReader(final DatabindProvider databindProvider,
-            final DOMMountPointService mountPointService) {
-        super(databindProvider, mountPointService);
+public final class JsonPatchBody extends PatchBody {
+    public JsonPatchBody(final InputStream inputStream) {
+        super(inputStream);
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected PatchContext readBody(final InstanceIdentifierContext path, final InputStream entityStream)
-            throws WebApplicationException {
-        try {
-            return readFrom(path, entityStream);
-        } catch (final Exception e) {
-            throw propagateExceptionAs(e);
-        }
-    }
-
-    private static PatchContext readFrom(final InstanceIdentifierContext path, final InputStream entityStream)
+    PatchContext toPatchContext(final InstanceIdentifierContext targetResource, final InputStream inputStream)
             throws IOException {
-        try (var jsonReader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8))) {
+        try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
-            final var resultList = read(jsonReader, path, patchId);
-            return new PatchContext(path, resultList, patchId.get());
+            final var resultList = read(jsonReader, targetResource, patchId);
+            return new PatchContext(targetResource, resultList, patchId.get());
         }
-    }
-
-    private static RestconfDocumentedException propagateExceptionAs(final Exception exception)
-            throws RestconfDocumentedException {
-        Throwables.throwIfInstanceOf(exception, RestconfDocumentedException.class);
-        LOG.debug("Error parsing json input", exception);
-
-        if (exception instanceof ResultAlreadySetException) {
-            throw new RestconfDocumentedException("Error parsing json input: Failed to create new parse result data. ");
-        }
-
-        RestconfDocumentedException.throwIfYangError(exception);
-        throw new RestconfDocumentedException("Error parsing json input: " + exception.getMessage(), ErrorType.PROTOCOL,
-            ErrorTag.MALFORMED_MESSAGE, exception);
     }
 
     private static ImmutableList<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext path,
             final AtomicReference<String> patchId) throws IOException {
         final var schemaTree = DataSchemaContextTree.from(path.getSchemaContext());
         final var edits = ImmutableList.<PatchEntity>builder();
-        final var edit = new JsonPatchBodyReader.PatchEdit();
+        final var edit = new PatchEdit();
 
         while (in.hasNext()) {
             switch (in.peek()) {
@@ -150,10 +112,10 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @throws IOException if operation fails
      */
     private static void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
-                             final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext path,
-                             final @NonNull DataSchemaContextTree schemaTree,
-                             final ImmutableList.@NonNull Builder<PatchEntity> resultCollection,
-                             final @NonNull AtomicReference<String> patchId) throws IOException {
+            final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext path,
+            final @NonNull DataSchemaContextTree schemaTree,
+            final ImmutableList.@NonNull Builder<PatchEntity> resultCollection,
+            final @NonNull AtomicReference<String> patchId) throws IOException {
         switch (name) {
             case "edit":
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
@@ -191,8 +153,8 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @throws IOException if operation fails
      */
     private static void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
-                                    final @NonNull InstanceIdentifierContext path,
-                                    final @NonNull DataSchemaContextTree schemaTree) throws IOException {
+            final @NonNull InstanceIdentifierContext path, final @NonNull DataSchemaContextTree schemaTree)
+                throws IOException {
         String deferredValue = null;
         in.beginObject();
 
@@ -292,7 +254,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @throws IOException if operation fails
      */
     private static void readValueObject(final @NonNull StringBuilder sb, final @NonNull JsonReader in)
-            throws IOException {
+        throws IOException {
         // read simple leaf value
         if (in.peek() == JsonToken.STRING) {
             sb.append('"').append(in.nextString()).append('"');
@@ -346,8 +308,8 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private static NormalizedNode readEditData(final @NonNull JsonReader in,
-             final @NonNull Inference targetSchemaNode, final @NonNull InstanceIdentifierContext path) {
+    private static NormalizedNode readEditData(final @NonNull JsonReader in, final @NonNull Inference targetSchemaNode,
+            final @NonNull InstanceIdentifierContext path) {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()),
@@ -363,7 +325,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      */
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
-                && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
+            && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
             if (!requiresValue(edit.getOperation())) {
                 return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
             }
