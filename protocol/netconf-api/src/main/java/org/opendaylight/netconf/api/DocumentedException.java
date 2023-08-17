@@ -232,6 +232,9 @@ public class DocumentedException extends Exception {
             doc = BUILDER_FACTORY.newDocumentBuilder().newDocument();
 
             final var rpcReply = doc.createElementNS(NamespaceURN.BASE, RPC_REPLY_KEY);
+            // FIXME: A properly formed rpc-reply message must contain message id. This is a bodge that works, but will
+            //  need looking into.
+            rpcReply.setAttribute("message-id", "id");
             doc.appendChild(rpcReply);
 
             final var rpcError = doc.createElementNS(NamespaceURN.BASE, RPC_ERROR);

@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
 import org.opendaylight.netconf.client.NetconfClientSession;
@@ -122,7 +123,7 @@ public class CallHomeMountSessionContextTest {
         when(mockActivator.activate(any(NetconfClientSessionListener.class)))
                 .thenAnswer(invocationOnMock -> {
                     NetconfClientSession mockSession = mock(NetconfClientSession.class);
-                    NetconfMessage mockMsg = mock(NetconfMessage.class);
+                    RpcMessage mockMsg = mock(RpcMessage.class);
 
                     Object arg = invocationOnMock.getArguments()[0];
                     ((NetconfClientSessionListener) arg).onMessage(mockSession, mockMsg);

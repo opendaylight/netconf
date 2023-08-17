@@ -49,6 +49,7 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -107,7 +108,7 @@ public class NetconfDeviceCommunicatorTest {
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final String messageID,
                                                                     final boolean doLastTest) throws Exception {
         Document doc = UntrustedXML.newDocumentBuilder().newDocument();
-        Element element = doc.createElement("request");
+        Element element = doc.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.RPC_KEY);
         element.setAttribute("message-id", messageID);
         doc.appendChild(element);
         NetconfMessage message = new NetconfMessage(doc);
@@ -206,7 +207,7 @@ public class NetconfDeviceCommunicatorTest {
     public void testSendRequest() throws Exception {
         setupSession();
 
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        NetconfMessage message = RpcMessage.unsafeOf(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create("", "mockRpc");
 
         ArgumentCaptor<GenericFutureListener> futureListener =
@@ -236,7 +237,7 @@ public class NetconfDeviceCommunicatorTest {
 
     @Test
     public void testSendRequestWithNoSession() throws Exception {
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        NetconfMessage message = RpcMessage.unsafeOf(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create("", "mockRpc");
 
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest(message, rpc);
@@ -267,7 +268,7 @@ public class NetconfDeviceCommunicatorTest {
     public void testSendRequestWithWithSendFailure() throws Exception {
         setupSession();
 
-        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
+        NetconfMessage message = RpcMessage.unsafeOf(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create("", "mockRpc");
 
         ArgumentCaptor<GenericFutureListener> futureListener =
