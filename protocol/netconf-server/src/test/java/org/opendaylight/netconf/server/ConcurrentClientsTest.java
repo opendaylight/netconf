@@ -247,7 +247,8 @@ public class ConcurrentClientsTest {
             try {
                 LOG.info("Handling netconf message from test {}", XmlUtil.toString(requestMessage));
                 counter.getAndIncrement();
-                return XmlUtil.readXmlToDocument("<test/>");
+                return XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
+                    + "message-id=\"100\"/>");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
