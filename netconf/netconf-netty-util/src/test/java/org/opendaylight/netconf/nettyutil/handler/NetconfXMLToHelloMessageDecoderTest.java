@@ -58,9 +58,11 @@ public class NetconfXMLToHelloMessageDecoderTest {
     @Test
     public void testDecodeCaching() throws Exception {
         final ByteBuf msg1 =
-                Unpooled.wrappedBuffer("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
+                Unpooled.wrappedBuffer("""
+                    <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="100"/>""".getBytes());
         final ByteBuf msg2 =
-                Unpooled.wrappedBuffer("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
+                Unpooled.wrappedBuffer("""
+                    <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="101"/>""".getBytes());
         final ByteBuf src =
                 Unpooled.wrappedBuffer("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
         final List<Object> out = new ArrayList<>();
@@ -77,7 +79,8 @@ public class NetconfXMLToHelloMessageDecoderTest {
     @Test(expected = IllegalStateException.class)
     public void testDecodeNotHelloReceived() throws Exception {
         final ByteBuf msg1 =
-                Unpooled.wrappedBuffer("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
+                Unpooled.wrappedBuffer("""
+                    <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="102"/>""".getBytes());
         final List<Object> out = new ArrayList<>();
         NetconfXMLToHelloMessageDecoder decoder = new NetconfXMLToHelloMessageDecoder();
         decoder.decode(null, msg1, out);
