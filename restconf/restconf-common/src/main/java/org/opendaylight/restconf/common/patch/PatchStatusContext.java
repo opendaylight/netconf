@@ -10,6 +10,8 @@ package org.opendaylight.restconf.common.patch;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -22,7 +24,9 @@ public record PatchStatusContext(
     @NonNull String patchId,
     @NonNull List<PatchStatusEntity> editCollection,
     boolean ok,
-    @Nullable List<RestconfError> globalErrors) {
+    @Nullable List<RestconfError> globalErrors) implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public PatchStatusContext {
         requireNonNull(patchId);
