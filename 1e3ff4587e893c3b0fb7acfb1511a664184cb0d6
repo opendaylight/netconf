@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "97f966e1_084a6b64",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-18T13:55:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b206873_7c7e8060",
+      "range": {
+        "startLine": 34,
+        "startChar": 18,
+        "endLine": 34,
+        "endChar": 25
+      },
+      "revId": "1e3ff4587e893c3b0fb7acfb1511a664184cb0d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd1bb852_3aa4fbf0",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-08-18T13:45:17Z",
       "side": 1,
       "message": "@Nullable?",
+      "range": {
+        "startLine": 36,
+        "startChar": 18,
+        "endLine": 36,
+        "endChar": 25
+      },
+      "revId": "1e3ff4587e893c3b0fb7acfb1511a664184cb0d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78727f08_ae02fe0e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-18T13:55:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd1bb852_3aa4fbf0",
       "range": {
         "startLine": 36,
         "startChar": 18,
@@ -83,6 +131,54 @@
       "writtenOn": "2023-08-18T13:45:17Z",
       "side": 1,
       "message": "rename to moduleNamespace pls",
+      "range": {
+        "startLine": 42,
+        "startChar": 45,
+        "endLine": 42,
+        "endChar": 54
+      },
+      "revId": "1e3ff4587e893c3b0fb7acfb1511a664184cb0d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "095c71be_6ebce70c",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-18T13:55:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9b58bf0_c9102b3c",
+      "range": {
+        "startLine": 42,
+        "startChar": 79,
+        "endLine": 42,
+        "endChar": 85
+      },
+      "revId": "1e3ff4587e893c3b0fb7acfb1511a664184cb0d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c0fd66e_83b0a9dd",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-18T13:55:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "747a1c25_02530579",
       "range": {
         "startLine": 42,
         "startChar": 45,
