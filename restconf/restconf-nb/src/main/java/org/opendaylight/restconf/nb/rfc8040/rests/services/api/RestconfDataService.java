@@ -11,6 +11,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -20,7 +21,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
@@ -157,7 +157,7 @@ public interface RestconfDataService {
      *            URI info
      * @return {@link PatchStatusContext}
      */
-    @Patch
+    @PATCH
     @Path("/data/{identifier:.+}")
     @Consumes({
         MediaTypes.APPLICATION_YANG_PATCH_JSON,
@@ -179,7 +179,7 @@ public interface RestconfDataService {
      *            URI info
      * @return {@link PatchStatusContext}
      */
-    @Patch
+    @PATCH
     @Path("/data")
     @Consumes({
         MediaTypes.APPLICATION_YANG_PATCH_JSON,
@@ -201,7 +201,7 @@ public interface RestconfDataService {
      *            data node for put to config DS
      * @return {@link Response}
      */
-    @Patch
+    @PATCH
     @Path("/data/{identifier:.+}")
     @Consumes({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
