@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ce8ab99_4cd622b7",
+        "filename": "protocol/netconf-client/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-18T14:54:34Z",
+      "side": 1,
+      "message": "is this left here intentionally?",
+      "revId": "bafe830cfc010253710aaaeda8d837ddaf032928",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c04aabfd_68247967",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfChannelSubsystem.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-18T14:54:34Z",
+      "side": 1,
+      "message": "final parameters",
+      "revId": "bafe830cfc010253710aaaeda8d837ddaf032928",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d305734a_f6362874",
+        "filename": "protocol/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientFactoryImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-18T14:54:34Z",
+      "side": 1,
+      "message": "assertNotNull also here?",
+      "revId": "bafe830cfc010253710aaaeda8d837ddaf032928",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c47d2e1_3c28f700",
+        "filename": "protocol/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientFactoryImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-18T14:54:34Z",
+      "side": 1,
+      "message": "wrong indent?",
+      "revId": "bafe830cfc010253710aaaeda8d837ddaf032928",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "055f084e_e01dfc62",
+        "filename": "protocol/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientFactoryImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-18T14:54:34Z",
+      "side": 1,
+      "message": "final",
+      "revId": "bafe830cfc010253710aaaeda8d837ddaf032928",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aae9304c_032a8e61",
+        "filename": "protocol/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientFactoryImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-18T14:54:34Z",
+      "side": 1,
+      "message": "wrong indent?",
+      "revId": "bafe830cfc010253710aaaeda8d837ddaf032928",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29944f68_220ea1af",
+        "filename": "protocol/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientFactoryImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-18T14:54:34Z",
+      "side": 1,
+      "message": "wrong indent?",
+      "revId": "bafe830cfc010253710aaaeda8d837ddaf032928",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "685f19a2_20f9e1b9",
+        "filename": "protocol/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientFactoryImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-08-18T14:54:34Z",
+      "side": 1,
+      "message": "wrong indent?",
+      "revId": "bafe830cfc010253710aaaeda8d837ddaf032928",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
