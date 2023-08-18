@@ -16,6 +16,24 @@
       "message": "order\nChange-Id:\nSigned-off-by:",
       "revId": "53081eee0ffdf631d559cbdfc0747825250a4765",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02fa6bdd_2b449f13",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-18T13:50:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3899179_0391a3ea",
+      "revId": "53081eee0ffdf631d559cbdfc0747825250a4765",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
