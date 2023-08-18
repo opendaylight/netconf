@@ -32,6 +32,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -56,7 +57,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
@@ -432,7 +432,7 @@ public final class RestconfDataServiceImpl {
      * @param uriInfo URI info
      * @return {@link PatchStatusContext}
      */
-    @Patch
+    @PATCH
     @Path("/data/{identifier:.+}")
     @Consumes({
         MediaTypes.APPLICATION_YANG_PATCH_JSON,
@@ -456,7 +456,7 @@ public final class RestconfDataServiceImpl {
      *            URI info
      * @return {@link PatchStatusContext}
      */
-    @Patch
+    @PATCH
     @Path("/data")
     @Consumes({
         MediaTypes.APPLICATION_YANG_PATCH_JSON,
@@ -481,7 +481,7 @@ public final class RestconfDataServiceImpl {
      * @param payload data node for put to config DS
      * @param ar {@link AsyncResponse} which needs to be completed
      */
-    @Patch
+    @PATCH
     @Path("/data/{identifier:.+}")
     @Consumes({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
