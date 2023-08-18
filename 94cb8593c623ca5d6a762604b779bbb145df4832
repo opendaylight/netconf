@@ -1,0 +1,182 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f8600ca_68f4ca99",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ParameterizedCapability.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "Extra empty line",
+      "revId": "94cb8593c623ca5d6a762604b779bbb145df4832",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e31601c0_60a271f3",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ProtocolCapabilityTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "final",
+      "range": {
+        "startLine": 75,
+        "startChar": 8,
+        "endLine": 75,
+        "endChar": 12
+      },
+      "revId": "94cb8593c623ca5d6a762604b779bbb145df4832",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f570348c_0416e043",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ProtocolCapabilityTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "final",
+      "range": {
+        "startLine": 78,
+        "startChar": 8,
+        "endLine": 78,
+        "endChar": 12
+      },
+      "revId": "94cb8593c623ca5d6a762604b779bbb145df4832",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e65b43c_7e0814d9",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ProtocolCapabilityTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "final",
+      "range": {
+        "startLine": 81,
+        "startChar": 8,
+        "endLine": 81,
+        "endChar": 12
+      },
+      "revId": "94cb8593c623ca5d6a762604b779bbb145df4832",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c382a094_a5590220",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ProtocolCapabilityTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "add space here",
+      "range": {
+        "startLine": 88,
+        "startChar": 102,
+        "endLine": 88,
+        "endChar": 103
+      },
+      "revId": "94cb8593c623ca5d6a762604b779bbb145df4832",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51b55003_0686ebf4",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ProtocolCapabilityTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "add space here",
+      "range": {
+        "startLine": 90,
+        "startChar": 109,
+        "endLine": 90,
+        "endChar": 110
+      },
+      "revId": "94cb8593c623ca5d6a762604b779bbb145df4832",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c06d5b7e_887dfd51",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ProtocolCapabilityTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "final",
+      "range": {
+        "startLine": 90,
+        "startChar": 8,
+        "endLine": 90,
+        "endChar": 12
+      },
+      "revId": "94cb8593c623ca5d6a762604b779bbb145df4832",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a0cacc2_5e725538",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ProtocolCapabilityTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "final",
+      "range": {
+        "startLine": 93,
+        "startChar": 8,
+        "endLine": 93,
+        "endChar": 12
+      },
+      "revId": "94cb8593c623ca5d6a762604b779bbb145df4832",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

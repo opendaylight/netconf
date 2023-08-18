@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b206873_7c7e8060",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "@Nullable?",
+      "range": {
+        "startLine": 34,
+        "startChar": 18,
+        "endLine": 34,
+        "endChar": 25
+      },
+      "revId": "1e3ff4587e893c3b0fb7acfb1511a664184cb0d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd1bb852_3aa4fbf0",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "@Nullable?",
+      "range": {
+        "startLine": 36,
+        "startChar": 18,
+        "endLine": 36,
+        "endChar": 25
+      },
+      "revId": "1e3ff4587e893c3b0fb7acfb1511a664184cb0d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9b58bf0_c9102b3c",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "rename to moduleName pls",
+      "range": {
+        "startLine": 42,
+        "startChar": 79,
+        "endLine": 42,
+        "endChar": 85
+      },
+      "revId": "1e3ff4587e893c3b0fb7acfb1511a664184cb0d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "747a1c25_02530579",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-18T13:45:17Z",
+      "side": 1,
+      "message": "rename to moduleNamespace pls",
+      "range": {
+        "startLine": 42,
+        "startChar": 45,
+        "endLine": 42,
+        "endChar": 54
+      },
+      "revId": "1e3ff4587e893c3b0fb7acfb1511a664184cb0d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
