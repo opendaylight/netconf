@@ -8,11 +8,15 @@
 
 package org.opendaylight.restconf.common.patch;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 import org.opendaylight.restconf.common.errors.RestconfError;
 
-public class PatchStatusContext {
+public class PatchStatusContext implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final String patchId;
     private final List<PatchStatusEntity> editCollection;
     private boolean ok;
