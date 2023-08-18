@@ -17,7 +17,9 @@ import javax.ws.rs.HttpMethod;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@HttpMethod("PATCH")
+@HttpMethod(HttpMethod.PATCH)
 @Documented
+@Deprecated(since = "5.0.8", forRemoval = true)
 public @interface Patch {
+    // Empty on purpose
 }
