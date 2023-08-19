@@ -429,7 +429,6 @@ public final class RestconfDataServiceImpl {
      *
      * @param identifier path to target
      * @param context edits
-     * @param uriInfo URI info
      * @return {@link PatchStatusContext}
      */
     @PATCH
@@ -443,17 +442,14 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public PatchStatusContext patchData(@Encoded @PathParam("identifier") final String identifier,
-            final PatchContext context, @Context final UriInfo uriInfo) {
-        return patchData(context, uriInfo);
+            final PatchContext context) {
+        return patchData(context);
     }
 
     /**
      * Ordered list of edits that are applied to the datastore by the server.
      *
-     * @param context
-     *            edits
-     * @param uriInfo
-     *            URI info
+     * @param context edits
      * @return {@link PatchStatusContext}
      */
     @PATCH
@@ -466,7 +462,7 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext patchData(final PatchContext context, @Context final UriInfo uriInfo) {
+    public PatchStatusContext patchData(final PatchContext context) {
         final InstanceIdentifierContext iid = RestconfDocumentedException.throwIfNull(context,
             ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "No patch documented provided")
             .getInstanceIdentifierContext();
@@ -491,7 +487,7 @@ public final class RestconfDataServiceImpl {
         MediaType.TEXT_XML
     })
     public void patchData(@Encoded @PathParam("identifier") final String identifier,
-            final NormalizedNodePayload payload, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+            final NormalizedNodePayload payload, @Suspended final AsyncResponse ar) {
         final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
         final YangInstanceIdentifier path = iid.getInstanceIdentifier();
         validInputData(iid.getSchemaNode() != null, payload);

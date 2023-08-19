@@ -428,7 +428,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
-        final PatchStatusContext status = dataService.patchData(patch, uriInfo);
+        final PatchStatusContext status = dataService.patchData(patch);
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
         assertEquals("replace data", status.getEditCollection().get(1).getEditId());
@@ -448,7 +448,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
 
-        final PatchStatusContext status = dataService.patchData(patch, uriInfo);
+        final PatchStatusContext status = dataService.patchData(patch);
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
         assertNull(status.getGlobalErrors());
@@ -468,7 +468,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(readWrite).cancel();
-        final PatchStatusContext status = dataService.patchData(patch, uriInfo);
+        final PatchStatusContext status = dataService.patchData(patch);
 
         assertFalse(status.isOk());
         assertEquals(3, status.getEditCollection().size());
