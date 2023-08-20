@@ -14,6 +14,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
@@ -43,5 +44,18 @@ abstract class AbstractPatchBodyReader extends AbstractIdentifierAwareJaxRsProvi
         }
 
         return ParserIdentifier.toInstanceIdentifier(targetUrl, schemaContext, null).getInstanceIdentifier();
+    }
+
+    /**
+     * Not all patch operations support value node. Check if operation requires value or not.
+     *
+     * @param operation Patch edit operation
+     * @return true if operation requires value, false otherwise
+     */
+    static final boolean requiresValue(final Operation operation) {
+        return switch (operation) {
+            case Create, Insert, Merge, Replace -> true;
+            case Delete, Move, Remove -> false;
+        };
     }
 }

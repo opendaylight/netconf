@@ -54,7 +54,7 @@ public final class PatchDataTransactionUtil {
         for (final PatchEntity patchEntity : context.getData()) {
             if (noError) {
                 switch (patchEntity.getOperation()) {
-                    case CREATE:
+                    case Create:
                         try {
                             createDataWithinTransaction(patchEntity.getTargetNode(), patchEntity.getNode(),
                                 schemaContext, transaction);
@@ -64,7 +64,7 @@ public final class PatchDataTransactionUtil {
                             noError = false;
                         }
                         break;
-                    case DELETE:
+                    case Delete:
                         try {
                             deleteDataWithinTransaction(patchEntity.getTargetNode(), transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
@@ -73,7 +73,7 @@ public final class PatchDataTransactionUtil {
                             noError = false;
                         }
                         break;
-                    case MERGE:
+                    case Merge:
                         try {
                             mergeDataWithinTransaction(patchEntity.getTargetNode(), patchEntity.getNode(),
                                 schemaContext, transaction);
@@ -83,7 +83,7 @@ public final class PatchDataTransactionUtil {
                             noError = false;
                         }
                         break;
-                    case REPLACE:
+                    case Replace:
                         try {
                             replaceDataWithinTransaction(patchEntity.getTargetNode(), patchEntity.getNode(),
                                 schemaContext, transaction);
@@ -93,7 +93,7 @@ public final class PatchDataTransactionUtil {
                             noError = false;
                         }
                         break;
-                    case REMOVE:
+                    case Remove:
                         try {
                             removeDataWithinTransaction(patchEntity.getTargetNode(), transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));

@@ -17,10 +17,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
-import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
-import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
-import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
@@ -68,6 +64,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -419,9 +416,9 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     public void testPatchData() {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
         final PatchContext patch = new PatchContext(iidContext, List.of(
-            new PatchEntity("create data", CREATE, JUKEBOX_IID, buildBaseCont),
-            new PatchEntity("replace data", REPLACE, JUKEBOX_IID, buildBaseCont),
-            new PatchEntity("delete data", DELETE, GAP_IID)), "test patch id");
+            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, buildBaseCont),
+            new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, buildBaseCont),
+            new PatchEntity("delete data", Operation.Delete, GAP_IID)), "test patch id");
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(immediateFalseFluentFuture())
@@ -439,9 +436,9 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint,
             JUKEBOX_SCHEMA, JUKEBOX_IID);
         final PatchContext patch = new PatchContext(iidContext, List.of(
-            new PatchEntity("create data", CREATE, JUKEBOX_IID, buildBaseCont),
-            new PatchEntity("replace data", REPLACE, JUKEBOX_IID, buildBaseCont),
-            new PatchEntity("delete data", DELETE, GAP_IID)), "test patch id");
+            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, buildBaseCont),
+            new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, buildBaseCont),
+            new PatchEntity("delete data", Operation.Delete, GAP_IID)), "test patch id");
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(immediateFalseFluentFuture())
@@ -458,9 +455,9 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     public void testPatchDataDeleteNotExist() {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
         final PatchContext patch = new PatchContext(iidContext, List.of(
-            new PatchEntity("create data", CREATE, JUKEBOX_IID, buildBaseCont),
-            new PatchEntity("remove data", REMOVE, GAP_IID),
-            new PatchEntity("delete data", DELETE, GAP_IID)), "test patch id");
+            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, buildBaseCont),
+            new PatchEntity("remove data", Operation.Remove, GAP_IID),
+            new PatchEntity("delete data", Operation.Delete, GAP_IID)), "test patch id");
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(immediateFalseFluentFuture())

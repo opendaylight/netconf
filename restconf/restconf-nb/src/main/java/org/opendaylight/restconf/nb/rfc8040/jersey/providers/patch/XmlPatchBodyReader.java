@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
@@ -24,10 +23,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -83,7 +82,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
         for (int i = 0; i < editNodes.getLength(); i++) {
             final Element element = (Element) editNodes.item(i);
             final String operation = element.getElementsByTagName("operation").item(0).getFirstChild().getNodeValue();
-            final PatchEditOperation oper = PatchEditOperation.valueOf(operation.toUpperCase(Locale.ROOT));
+            final Operation oper = Operation.ofName(operation);
             final String editId = element.getElementsByTagName("edit-id").item(0).getFirstChild().getNodeValue();
             final String target = element.getElementsByTagName("target").item(0).getFirstChild().getNodeValue();
             final List<Element> values = readValueNodes(element, oper);
@@ -110,7 +109,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 }
             }
 
-            if (oper.isWithValue()) {
+            if (requiresValue(oper)) {
                 final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                 final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
@@ -138,16 +137,16 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
      * @param operation Name of current operation
      * @return List of value elements
      */
-    private static List<Element> readValueNodes(final @NonNull Element element,
-            final @NonNull PatchEditOperation operation) {
+    private static List<Element> readValueNodes(final @NonNull Element element, final @NonNull Operation operation) {
         final Node valueNode = element.getElementsByTagName("value").item(0);
 
-        if (operation.isWithValue() && valueNode == null) {
+        final boolean isWithValue = requiresValue(operation);
+        if (isWithValue && valueNode == null) {
             throw new RestconfDocumentedException("Error parsing input",
                     ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
 
-        if (!operation.isWithValue() && valueNode != null) {
+        if (!isWithValue && valueNode != null) {
             throw new RestconfDocumentedException("Error parsing input",
                     ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
