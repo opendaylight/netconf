@@ -9,12 +9,12 @@ package org.opendaylight.restconf.common.patch;
 
 import static java.util.Objects.requireNonNull;
 
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public class PatchEntity {
-
-    private final PatchEditOperation operation;
+    private final Operation operation;
     private final String editId;
     private final YangInstanceIdentifier targetNode;
     private final NormalizedNode node;
@@ -26,7 +26,7 @@ public class PatchEntity {
      * @param targetNode Target node for Patch edit operation
      * @param node Data defined by value leaf used by edit operation
      */
-    public PatchEntity(final String editId, final PatchEditOperation operation, final YangInstanceIdentifier targetNode,
+    public PatchEntity(final String editId, final Operation operation, final YangInstanceIdentifier targetNode,
                        final NormalizedNode node) {
         this.editId = requireNonNull(editId);
         this.operation = requireNonNull(operation);
@@ -41,15 +41,14 @@ public class PatchEntity {
      * @param operation Patch edit operation
      * @param targetNode Target node for Patch edit operation
      */
-    public PatchEntity(final String editId, final PatchEditOperation operation,
-            final YangInstanceIdentifier targetNode) {
+    public PatchEntity(final String editId, final Operation operation, final YangInstanceIdentifier targetNode) {
         this.editId = requireNonNull(editId);
         this.operation = requireNonNull(operation);
         this.targetNode = requireNonNull(targetNode);
-        this.node = null;
+        node = null;
     }
 
-    public PatchEditOperation getOperation() {
+    public Operation getOperation() {
         return operation;
     }
 

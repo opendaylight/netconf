@@ -21,7 +21,6 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -31,11 +30,11 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -219,7 +218,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                     edit.setId(in.nextString());
                     break;
                 case "operation":
-                    edit.setOperation(PatchEditOperation.valueOf(in.nextString().toUpperCase(Locale.ROOT)));
+                    edit.setOperation(Operation.ofName(in.nextString()));
                     break;
                 case "target":
                     // target can be specified completely in request URI
@@ -386,7 +385,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
                 && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
-            if (!edit.getOperation().isWithValue()) {
+            if (!requiresValue(edit.getOperation())) {
                 return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
             }
 
@@ -411,8 +410,8 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @return true if data is present when operation requires it or if there are no data when operation does not
      *     allow it, false otherwise
      */
-    private static boolean checkDataPresence(final @NonNull PatchEditOperation operation, final boolean hasData) {
-        return operation.isWithValue() == hasData;
+    private static boolean checkDataPresence(final @NonNull Operation operation, final boolean hasData) {
+        return requiresValue(operation)  == hasData;
     }
 
     /**
@@ -420,7 +419,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      */
     private static final class PatchEdit {
         private String id;
-        private PatchEditOperation operation;
+        private Operation operation;
         private YangInstanceIdentifier target;
         private Inference targetSchemaNode;
         private NormalizedNode data;
@@ -433,11 +432,11 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
             this.id = requireNonNull(id);
         }
 
-        PatchEditOperation getOperation() {
+        Operation getOperation() {
             return operation;
         }
 
-        void setOperation(final PatchEditOperation operation) {
+        void setOperation(final Operation operation) {
             this.operation = requireNonNull(operation);
         }
 

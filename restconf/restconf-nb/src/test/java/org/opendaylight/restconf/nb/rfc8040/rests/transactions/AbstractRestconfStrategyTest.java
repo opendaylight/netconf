@@ -16,11 +16,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
-import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
-import static org.opendaylight.restconf.common.patch.PatchEditOperation.MERGE;
-import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
-import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
@@ -42,6 +37,7 @@ import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -313,9 +309,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
         patch(new PatchContext(
             InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, ARTIST_IID.node(NAME_QNAME)),
-            List.of(new PatchEntity("edit1", REPLACE, ARTIST_IID, buildArtistList),
-                new PatchEntity("edit2", MERGE, ARTIST_IID, buildArtistList),
-                new PatchEntity("edit3", REMOVE, ARTIST_IID)),
+            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_IID, buildArtistList),
+                new PatchEntity("edit2", Operation.Merge, ARTIST_IID, buildArtistList),
+                new PatchEntity("edit3", Operation.Remove, ARTIST_IID)),
             "patchRMRm"), testPatchDataReplaceMergeAndRemoveStrategy(), false);
     }
 
@@ -324,8 +320,8 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     public final void testPatchDataCreateAndDelete() {
         patch(new PatchContext(InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
-            List.of(new PatchEntity("edit1", CREATE, PLAYER_IID, EMPTY_JUKEBOX),
-                new PatchEntity("edit2", DELETE, CREATE_AND_DELETE_TARGET)),
+            List.of(new PatchEntity("edit1", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
+                new PatchEntity("edit2", Operation.Delete, CREATE_AND_DELETE_TARGET)),
             "patchCD"),
             testPatchDataCreateAndDeleteStrategy(), true);
     }
@@ -335,7 +331,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     public final void testPatchMergePutContainer() {
         patch(new PatchContext(InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
-            List.of(new PatchEntity("edit1", MERGE, PLAYER_IID, EMPTY_JUKEBOX)), "patchM"),
+            List.of(new PatchEntity("edit1", Operation.Merge, PLAYER_IID, EMPTY_JUKEBOX)), "patchM"),
             testPatchMergePutContainerStrategy(), false);
     }
 
@@ -345,7 +341,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     public final void testDeleteNonexistentData() {
         final var patchStatusContext = PatchDataTransactionUtil.patchData(new PatchContext(
             InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
-            List.of(new PatchEntity("edit", DELETE, CREATE_AND_DELETE_TARGET)), "patchD"),
+            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET)), "patchD"),
             deleteNonexistentDataTestStrategy(), JUKEBOX_SCHEMA);
         assertFalse(patchStatusContext.isOk());
     }
