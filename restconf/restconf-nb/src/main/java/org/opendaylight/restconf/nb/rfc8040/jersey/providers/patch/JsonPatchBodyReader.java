@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
@@ -111,11 +110,11 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
             ErrorTag.MALFORMED_MESSAGE, exception);
     }
 
-    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext path,
+    private ImmutableList<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext path,
             final AtomicReference<String> patchId) throws IOException {
-        final DataSchemaContextTree schemaTree = DataSchemaContextTree.from(path.getSchemaContext());
-        final List<PatchEntity> resultCollection = new ArrayList<>();
-        final JsonPatchBodyReader.PatchEdit edit = new JsonPatchBodyReader.PatchEdit();
+        final var schemaTree = DataSchemaContextTree.from(path.getSchemaContext());
+        final var edits = ImmutableList.<PatchEntity>builder();
+        final var edit = new JsonPatchBodyReader.PatchEdit();
 
         while (in.hasNext()) {
             switch (in.peek()) {
@@ -138,7 +137,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                 case END_DOCUMENT:
                     break;
                 case NAME:
-                    parseByName(in.nextName(), edit, in, path, schemaTree, resultCollection, patchId);
+                    parseByName(in.nextName(), edit, in, path, schemaTree, edits, patchId);
                     break;
                 case END_OBJECT:
                     in.endObject();
@@ -152,7 +151,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
             }
         }
 
-        return ImmutableList.copyOf(resultCollection);
+        return edits.build();
     }
 
     /**
@@ -169,7 +168,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
     private void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
                              final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext path,
                              final @NonNull DataSchemaContextTree schemaTree,
-                             final @NonNull List<PatchEntity> resultCollection,
+                             final ImmutableList.@NonNull Builder<PatchEntity> resultCollection,
                              final @NonNull AtomicReference<String> patchId) throws IOException {
         switch (name) {
             case "edit":
