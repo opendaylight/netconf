@@ -12,6 +12,9 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
  * Common superclass for readers producing {@link PatchContext}.
@@ -27,5 +30,18 @@ abstract class AbstractPatchBodyReader extends AbstractIdentifierAwareJaxRsProvi
     @Override
     protected final PatchContext emptyBody(final InstanceIdentifierContext path) {
         return new PatchContext(path, null, null);
+    }
+
+    static final YangInstanceIdentifier parsePatchTarget(final InstanceIdentifierContext context, final String target) {
+        final var schemaContext = context.getSchemaContext();
+        final var urlPath = context.getInstanceIdentifier();
+        final String targetUrl;
+        if (urlPath.isEmpty()) {
+            targetUrl = target.startsWith("/") ? target.substring(1) : target;
+        } else {
+            targetUrl = IdentifierCodec.serialize(urlPath, schemaContext) + target;
+        }
+
+        return ParserIdentifier.toInstanceIdentifier(targetUrl, schemaContext, null).getInstanceIdentifier();
     }
 }
