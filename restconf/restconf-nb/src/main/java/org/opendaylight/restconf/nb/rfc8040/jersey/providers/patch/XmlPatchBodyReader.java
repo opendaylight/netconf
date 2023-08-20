@@ -28,7 +28,6 @@ import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -98,7 +97,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 inference = pathContext.inference();
             } else {
                 // interpret as simple context
-                targetII = ParserIdentifier.parserPatchTarget(pathContext, target);
+                targetII = parsePatchTarget(pathContext, target);
 
                 // move schema node
                 final var lookup = DataSchemaContextTree.from(pathContext.getSchemaContext())
