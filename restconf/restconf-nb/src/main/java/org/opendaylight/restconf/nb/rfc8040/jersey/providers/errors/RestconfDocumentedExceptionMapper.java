@@ -133,7 +133,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * @param restconfError Error details.
      * @return Built list entry.
      */
-    private static UnkeyedListEntryNode createErrorEntry(final RestconfError restconfError) {
+    static UnkeyedListEntryNode createErrorEntry(final RestconfError restconfError) {
         // filling in mandatory leafs
         final var entryBuilder = Builders.unkeyedListEntryBuilder()
             .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
