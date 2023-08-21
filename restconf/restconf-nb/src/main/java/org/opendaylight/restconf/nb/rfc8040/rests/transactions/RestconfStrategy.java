@@ -39,6 +39,7 @@ import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
+import org.opendaylight.restconf.common.patch.YangPatchDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -494,7 +495,8 @@ public abstract class RestconfStrategy {
             return new PatchStatusContext(modelContext, patchId, List.copyOf(editCollection), true, null);
         } else {
             tx.cancel();
-            return new PatchStatusContext(modelContext, patchId, List.copyOf(editCollection), false, null);
+            throw new YangPatchDocumentedException(new PatchStatusContext(modelContext, patchId,
+                List.copyOf(editCollection), false, null));
         }
     }
 
