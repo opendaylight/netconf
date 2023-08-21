@@ -112,7 +112,7 @@ public class RestconfSchemaServiceTest {
         // verify
         assertNotNull("Export context should not be null", exportContext);
 
-        final Module module = exportContext.getModule();
+        final Module module = exportContext.module();
         assertNotNull("Existing module should be found", module);
 
         assertEquals("Not expected module name", "module1", module.getName());
@@ -134,7 +134,7 @@ public class RestconfSchemaServiceTest {
 
         // verify
         assertNotNull("Export context should not be null", exportContext);
-        assertNull("Not-existing module should not be found", exportContext.getModule());
+        assertNull("Not-existing module should not be found", exportContext.module());
     }
 
     /**
@@ -152,7 +152,7 @@ public class RestconfSchemaServiceTest {
         // verify
         assertNotNull("Export context should not be null", exportContext);
 
-        final Module module = exportContext.getModule();
+        final Module module = exportContext.module();
         assertNotNull("Existing module should be found", module);
 
         assertEquals("Not expected module name", "module1-behind-mount-point", module.getName());
@@ -174,7 +174,7 @@ public class RestconfSchemaServiceTest {
 
         // verify
         assertNotNull("Export context should not be null", exportContext);
-        assertNull("Not-existing module should not be found", exportContext.getModule());
+        assertNull("Not-existing module should not be found", exportContext.module());
     }
 
     /**
