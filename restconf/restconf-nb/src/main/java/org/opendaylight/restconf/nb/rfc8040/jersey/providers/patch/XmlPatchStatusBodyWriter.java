@@ -55,17 +55,17 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             throws XMLStreamException {
         writer.writeStartElement("", "yang-patch-status", XML_NAMESPACE);
         writer.writeStartElement("patch-id");
-        writer.writeCharacters(context.getPatchId());
+        writer.writeCharacters(context.patchId());
         writer.writeEndElement();
 
-        if (context.isOk()) {
+        if (context.ok()) {
             writer.writeEmptyElement("ok");
         } else {
-            if (context.getGlobalErrors() != null) {
-                reportErrors(context.getGlobalErrors(), writer);
+            if (context.globalErrors() != null) {
+                reportErrors(context.globalErrors(), writer);
             }
             writer.writeStartElement("edit-status");
-            for (final PatchStatusEntity patchStatusEntity : context.getEditCollection()) {
+            for (final PatchStatusEntity patchStatusEntity : context.editCollection()) {
                 writer.writeStartElement("edit");
                 writer.writeStartElement("edit-id");
                 writer.writeCharacters(patchStatusEntity.getEditId());

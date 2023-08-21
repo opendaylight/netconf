@@ -347,7 +347,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
             InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
             List.of(new PatchEntity("edit", DELETE, CREATE_AND_DELETE_TARGET)), "patchD"),
             deleteNonexistentDataTestStrategy(), JUKEBOX_SCHEMA);
-        assertFalse(patchStatusContext.isOk());
+        assertFalse(patchStatusContext.ok());
     }
 
     abstract @NonNull RestconfStrategy deleteNonexistentDataTestStrategy();
@@ -485,13 +485,13 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
         final var patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, strategy, JUKEBOX_SCHEMA);
-        for (var entity : patchStatusContext.getEditCollection()) {
+        for (var entity : patchStatusContext.editCollection()) {
             if (failed) {
                 assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());
             } else {
                 assertTrue(entity.isOk());
             }
         }
-        assertTrue(patchStatusContext.isOk());
+        assertTrue(patchStatusContext.ok());
     }
 }

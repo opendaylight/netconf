@@ -206,7 +206,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
 
     @Override
     void assertTestDeleteNonexistentData(final PatchStatusContext status) {
-        final var editCollection = status.getEditCollection();
+        final var editCollection = status.editCollection();
         assertEquals(1, editCollection.size());
         final var editErrors = editCollection.get(0).getEditErrors();
         assertEquals(1, editErrors.size());
