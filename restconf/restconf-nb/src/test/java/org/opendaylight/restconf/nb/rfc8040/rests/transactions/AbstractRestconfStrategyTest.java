@@ -338,19 +338,6 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     abstract @NonNull RestconfStrategy testPatchMergePutContainerStrategy();
 
-    @Test
-    @Ignore
-    //FIXME: This test is fixed by another patch
-    public final void testDeleteNonexistentData() {
-        final var patchStatusContext = PatchDataTransactionUtil.patchData(new PatchContext(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
-            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET)), "patchD"),
-            deleteNonexistentDataTestStrategy(), JUKEBOX_SCHEMA);
-        assertFalse(patchStatusContext.ok());
-    }
-
-    abstract @NonNull RestconfStrategy deleteNonexistentDataTestStrategy();
-
     abstract void assertTestDeleteNonexistentData(@NonNull PatchStatusContext status);
 
     @Test
