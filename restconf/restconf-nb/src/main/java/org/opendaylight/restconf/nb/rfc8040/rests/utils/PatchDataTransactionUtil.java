@@ -17,6 +17,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
+import org.opendaylight.restconf.common.patch.YangPatchDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -126,7 +127,8 @@ public final class PatchDataTransactionUtil {
             return new PatchStatusContext(context.getPatchId(), List.copyOf(editCollection), true, null);
         } else {
             transaction.cancel();
-            return new PatchStatusContext(context.getPatchId(), List.copyOf(editCollection), false, null);
+            throw new YangPatchDocumentedException(new PatchStatusContext(context.getPatchId(),
+                List.copyOf(editCollection), false, null));
         }
     }
 
