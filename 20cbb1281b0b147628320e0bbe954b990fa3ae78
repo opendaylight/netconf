@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9577c1de_2942e841",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-21T13:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee6b80cd_8a071629",
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "78dcbe66_d12c8d7e",
@@ -31,6 +49,30 @@
       "writtenOn": "2023-08-21T09:04:03Z",
       "side": 1,
       "message": "the value is based on final inputs, it never changes.\nthere should not be a possibility to calculate same value more then once\n\n- make urn private final field\n- move urn value construction to constructor or private method invoked from constructor.",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 29
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "916807a2_56888d52",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-21T13:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78dcbe66_d12c8d7e",
       "range": {
         "startLine": 62,
         "startChar": 0,
@@ -64,6 +106,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "45440dfa_a5bac64c",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-21T13:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca7364d7_43bbeac2",
+      "range": {
+        "startLine": 29,
+        "startChar": 59,
+        "endLine": 29,
+        "endChar": 62
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd82bca2_fa084c77",
@@ -77,6 +143,30 @@
       "writtenOn": "2023-08-21T09:04:03Z",
       "side": 1,
       "message": "content is not expected to be used here\nremove as extra, also remove all TODOs, these are outdated",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 21
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afb29d6a_79fc9dfd",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-21T13:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd82bca2_fa084c77",
       "range": {
         "startLine": 31,
         "startChar": 0,
@@ -110,6 +200,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccd2e7be_e413a092",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-21T13:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "955f5ffa_cd7df9ea",
+      "range": {
+        "startLine": 55,
+        "startChar": 14,
+        "endLine": 55,
+        "endChar": 20
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af060f72_3758f4b2",
@@ -123,6 +237,30 @@
       "writtenOn": "2023-08-21T09:04:03Z",
       "side": 1,
       "message": "incorrect logic here\nall params (except namespace) are optional \nif first param missing there will be no \u0027?\u0027 in urn, only \u0027\u0026\u0027\nthe urn should be valid no mater which parameter is missing",
+      "range": {
+        "startLine": 57,
+        "startChar": 22,
+        "endLine": 57,
+        "endChar": 25
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c819b4fb_ac985e62",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-21T13:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af060f72_3758f4b2",
       "range": {
         "startLine": 57,
         "startChar": 22,
@@ -156,6 +294,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "28a8dd6b_99f45b83",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-21T13:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "288bf59c_4f98120f",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 5
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d3f0eae_65bca3cb",
@@ -169,6 +331,30 @@
       "writtenOn": "2023-08-21T09:04:03Z",
       "side": 1,
       "message": "ExiCapability and YangModuleCpability do not belong to ProtocolCapabilities\n\nMove both to new test file ParameterisedCapabilityTest\n\nconvert tests to @ParameterizedTest to simplify a number the cases:\n- all optional parameters are null\n- all optional parameters exist, lists are not-empty\n- each optional parameter is null (for list param +case when list is empty)\n\nnote: for test you can shorten values, for example \"workspace\" is a valid workspace value, but shorter, no need to use long values",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 5
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32acf2e4_cb61b036",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ProtocolCapabilityTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-21T13:24:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d3f0eae_65bca3cb",
       "range": {
         "startLine": 73,
         "startChar": 0,
