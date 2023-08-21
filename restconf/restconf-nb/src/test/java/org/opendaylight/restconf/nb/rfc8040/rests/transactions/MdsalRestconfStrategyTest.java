@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -17,6 +19,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -32,10 +35,16 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.YangPatchDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -197,7 +206,16 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         return new MdsalRestconfStrategy(mockDataBroker);
     }
 
-    @Override
+    @Test
+    public void testDeleteNonexistentData() {
+        YangPatchDocumentedException exception = assertThrows(YangPatchDocumentedException.class,
+            () -> PatchDataTransactionUtil.patchData(new PatchContext(
+                    InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
+                    List.of(new PatchEntity("edit", Edit.Operation.Delete, CREATE_AND_DELETE_TARGET)), "patchD"),
+                deleteNonexistentDataTestStrategy(), JUKEBOX_SCHEMA));
+        assertFalse(exception.getPatchStatusContext().ok());
+    }
+
     RestconfStrategy deleteNonexistentDataTestStrategy() {
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             CREATE_AND_DELETE_TARGET);
