@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -16,6 +17,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.util.concurrent.Futures;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,9 +29,14 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -227,7 +234,15 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         return new NetconfRestconfStrategy(netconfService);
     }
 
-    @Override
+    @Test
+    public void testDeleteNonexistentData() {
+        final var patchStatusContext = PatchDataTransactionUtil.patchData(new PatchContext(
+                InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
+                List.of(new PatchEntity("edit", Edit.Operation.Delete, CREATE_AND_DELETE_TARGET)), "patchD"),
+            deleteNonexistentDataTestStrategy(), JUKEBOX_SCHEMA);
+        assertFalse(patchStatusContext.ok());
+    }
+
     RestconfStrategy deleteNonexistentDataTestStrategy() {
         doReturn(Futures.immediateFailedFuture(
             new TransactionCommitFailedException("Commit of transaction " + this + " failed",
