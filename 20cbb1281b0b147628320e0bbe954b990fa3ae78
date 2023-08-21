@@ -1,0 +1,182 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee6b80cd_8a071629",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-21T09:04:03Z",
+      "side": 1,
+      "message": "validating value in enum is useless bc\nvalues passed are predefined constants.\nremove as extra",
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78dcbe66_d12c8d7e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-21T09:04:03Z",
+      "side": 1,
+      "message": "the value is based on final inputs, it never changes.\nthere should not be a possibility to calculate same value more then once\n\n- make urn private final field\n- move urn value construction to constructor or private method invoked from constructor.",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 29
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca7364d7_43bbeac2",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-21T09:04:03Z",
+      "side": 1,
+      "message": "replace with google\u0027s ImmutableSet.of() to preserve the order",
+      "range": {
+        "startLine": 29,
+        "startChar": 59,
+        "endLine": 29,
+        "endChar": 62
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd82bca2_fa084c77",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-21T09:04:03Z",
+      "side": 1,
+      "message": "content is not expected to be used here\nremove as extra, also remove all TODOs, these are outdated",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 21
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "955f5ffa_cd7df9ea",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-21T09:04:03Z",
+      "side": 1,
+      "message": "urn should be constructed on object initialization.\nurn() should return pre-built value to avoid unnecessary calculations\nbc urn() could be invoked multiple times incl for logging purposes\n\n- make urn private final field\n- move urn value construction either to constructor or to private method invoked from constructor",
+      "range": {
+        "startLine": 55,
+        "startChar": 14,
+        "endLine": 55,
+        "endChar": 20
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af060f72_3758f4b2",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-21T09:04:03Z",
+      "side": 1,
+      "message": "incorrect logic here\nall params (except namespace) are optional \nif first param missing there will be no \u0027?\u0027 in urn, only \u0027\u0026\u0027\nthe urn should be valid no mater which parameter is missing",
+      "range": {
+        "startLine": 57,
+        "startChar": 22,
+        "endLine": 57,
+        "endChar": 25
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "288bf59c_4f98120f",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-21T09:04:03Z",
+      "side": 1,
+      "message": "remove this as extra, no content will be used",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 5
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d3f0eae_65bca3cb",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ProtocolCapabilityTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-21T09:04:03Z",
+      "side": 1,
+      "message": "ExiCapability and YangModuleCpability do not belong to ProtocolCapabilities\n\nMove both to new test file ParameterisedCapabilityTest\n\nconvert tests to @ParameterizedTest to simplify a number the cases:\n- all optional parameters are null\n- all optional parameters exist, lists are not-empty\n- each optional parameter is null (for list param +case when list is empty)\n\nnote: for test you can shorten values, for example \"workspace\" is a valid workspace value, but shorter, no need to use long values",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 5
+      },
+      "revId": "20cbb1281b0b147628320e0bbe954b990fa3ae78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
