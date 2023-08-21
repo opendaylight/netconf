@@ -16,6 +16,24 @@
       "message": "final parameters",
       "revId": "7e1ab614c9a3054df1b38d065a437307490b3fe2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e71a8c1_2101e515",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSubsystemSessionListener.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-21T11:09:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e12c4f4f_738729e8",
+      "revId": "7e1ab614c9a3054df1b38d065a437307490b3fe2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
