@@ -36,7 +36,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -59,6 +58,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.YangPatchDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -444,8 +444,6 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    @Ignore
-    //FIXME: This test is fixed by another patch
     public void testPatchDataDeleteNotExist() {
         final PatchContext patch = new PatchContext("test patch id", List.of(
             new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
@@ -459,7 +457,9 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(readWrite).cancel();
 
-        final PatchStatusContext status = dataService.yangPatchData(JUKEBOX_SCHEMA, patch, null);
+        final YangPatchDocumentedException exception = assertThrows(YangPatchDocumentedException.class,
+            () -> dataService.yangPatchData(JUKEBOX_SCHEMA, patch, null));
+        final PatchStatusContext status = exception.getPatchStatusContext();
 
         assertFalse(status.ok());
         assertEquals(3, status.editCollection().size());
