@@ -36,7 +36,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -58,7 +57,7 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.YangPatchDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -444,8 +443,6 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    @Ignore
-    //FIXME: This test is fixed by another patch
     public void testPatchDataDeleteNotExist() {
         final PatchContext patch = new PatchContext("test patch id", List.of(
             new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
@@ -459,15 +456,16 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(readWrite).cancel();
 
-        final PatchStatusContext status = dataService.yangPatchData(JUKEBOX_SCHEMA, patch, null);
+        final YangPatchDocumentedException exception = assertThrows(YangPatchDocumentedException.class,
+            () -> dataService.yangPatchData(JUKEBOX_SCHEMA, patch, null));
 
-        assertFalse(status.ok());
-        assertEquals(3, status.editCollection().size());
-        assertTrue(status.editCollection().get(0).isOk());
-        assertTrue(status.editCollection().get(1).isOk());
-        assertFalse(status.editCollection().get(2).isOk());
-        assertFalse(status.editCollection().get(2).getEditErrors().isEmpty());
-        final String errorMessage = status.editCollection().get(2).getEditErrors().get(0).getErrorMessage();
+        assertFalse(exception.ok());
+        assertEquals(3, exception.editCollection().size());
+        assertTrue(exception.editCollection().get(0).isOk());
+        assertTrue(exception.editCollection().get(1).isOk());
+        assertFalse(exception.editCollection().get(2).isOk());
+        assertFalse(exception.editCollection().get(2).getEditErrors().isEmpty());
+        final String errorMessage = exception.editCollection().get(2).getEditErrors().get(0).getErrorMessage();
         assertEquals("Data does not exist", errorMessage);
     }
 

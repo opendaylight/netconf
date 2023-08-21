@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
@@ -24,7 +23,6 @@ import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.restconf.api.query.ContentParam;
@@ -326,17 +324,6 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     abstract @NonNull RestconfStrategy testPatchMergePutContainerStrategy();
-
-    @Test
-    @Ignore
-    //FIXME: This test is fixed by another patch
-    public final void testDeleteNonexistentData() {
-        final var patchStatusContext = deleteNonexistentDataTestStrategy().patchData(new PatchContext("patchD",
-            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))), JUKEBOX_SCHEMA);
-        assertFalse(patchStatusContext.ok());
-    }
-
-    abstract @NonNull RestconfStrategy deleteNonexistentDataTestStrategy();
 
     abstract void assertTestDeleteNonexistentData(@NonNull PatchStatusContext status);
 
