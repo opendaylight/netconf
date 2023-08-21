@@ -22,6 +22,7 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBo
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YangSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YinSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.YangPatchDocumentedExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonPatchBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonPatchStatusBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlPatchBodyReader;
@@ -52,13 +53,14 @@ abstract class AbstractRestconfApplication extends Application {
 
     @Override
     public final Set<Object> getSingletons() {
-        return ImmutableSet.<Object>builderWithExpectedSize(services.size() + 5)
+        return ImmutableSet.<Object>builderWithExpectedSize(services.size() + 6)
             .addAll(services)
             .add(new JsonNormalizedNodeBodyReader(databindProvider, mountPointService))
             .add(new JsonPatchBodyReader(databindProvider, mountPointService))
             .add(new XmlNormalizedNodeBodyReader(databindProvider, mountPointService))
             .add(new XmlPatchBodyReader(databindProvider, mountPointService))
             .add(new RestconfDocumentedExceptionMapper(databindProvider))
+            .add(new YangPatchDocumentedExceptionMapper())
             .build();
     }
 }

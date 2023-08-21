@@ -60,6 +60,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.YangPatchDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -468,7 +469,10 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(readWrite).cancel();
-        final PatchStatusContext status = dataService.patchData(patch, uriInfo);
+
+        YangPatchDocumentedException exception = assertThrows(YangPatchDocumentedException.class,
+            () -> dataService.patchData(patch, uriInfo));
+        final PatchStatusContext status = exception.getPatchStatusContext();
 
         assertFalse(status.isOk());
         assertEquals(3, status.getEditCollection().size());
