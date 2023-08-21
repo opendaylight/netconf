@@ -19,6 +19,7 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBo
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YangSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YinSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.YangPatchDocumentedExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonPatchStatusBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlPatchStatusBodyWriter;
 
@@ -44,9 +45,10 @@ abstract class AbstractRestconfApplication extends Application {
 
     @Override
     public final Set<Object> getSingletons() {
-        return ImmutableSet.<Object>builderWithExpectedSize(services.size() + 1)
+        return ImmutableSet.<Object>builderWithExpectedSize(services.size() + 2)
             .addAll(services)
             .add(new RestconfDocumentedExceptionMapper(databindProvider))
+            .add(new YangPatchDocumentedExceptionMapper())
             .build();
     }
 }
