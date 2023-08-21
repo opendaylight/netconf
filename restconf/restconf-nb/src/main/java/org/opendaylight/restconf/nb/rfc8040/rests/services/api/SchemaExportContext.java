@@ -7,31 +7,24 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 
+import static java.util.Objects.requireNonNull;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
-public final class SchemaExportContext {
-    private final EffectiveModelContext schemaContext;
-    private final Module module;
-    private final DOMYangTextSourceProvider sourceProvider;
+/**
+ * Holder of schema export context.
+ */
+public record SchemaExportContext(
+    @NonNull EffectiveModelContext schemaContext,
+    @Nullable Module module,
+    @NonNull DOMYangTextSourceProvider sourceProvider) {
 
-    public SchemaExportContext(final EffectiveModelContext schemaContext, final Module module,
-                               final DOMYangTextSourceProvider sourceProvider) {
-        this.schemaContext = schemaContext;
-        this.module = module;
-        this.sourceProvider = sourceProvider;
-    }
-
-    public EffectiveModelContext getSchemaContext() {
-        return schemaContext;
-    }
-
-    public Module getModule() {
-        return module;
-    }
-
-    public DOMYangTextSourceProvider getSourceProvider() {
-        return sourceProvider;
+    public SchemaExportContext {
+        requireNonNull(schemaContext);
+        requireNonNull(sourceProvider);
     }
 }

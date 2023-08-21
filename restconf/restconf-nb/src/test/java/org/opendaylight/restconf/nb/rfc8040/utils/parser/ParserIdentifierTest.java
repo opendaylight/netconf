@@ -393,7 +393,7 @@ public class ParserIdentifierTest {
 
         assertNotNull("Export context should be parsed", exportContext);
 
-        final Module module = exportContext.getModule();
+        final Module module = exportContext.module();
         assertNotNull("Export context should contains test module", module);
 
         assertEquals("Returned not expected module name", TEST_MODULE_NAME, module.getName());
@@ -414,7 +414,7 @@ public class ParserIdentifierTest {
                 null, sourceProvider);
 
         assertNotNull("Export context should be parsed", exportContext);
-        assertNull("Not-existing module should be null", exportContext.getModule());
+        assertNull("Not-existing module should be null", exportContext.module());
     }
 
     /**
@@ -443,7 +443,7 @@ public class ParserIdentifierTest {
                 MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
                 mountPointService, sourceProvider);
 
-        final Module module = exportContext.getModule();
+        final Module module = exportContext.module();
         assertNotNull("Export context should contains test module", module);
 
         assertEquals("Returned not expected module name",
@@ -466,7 +466,7 @@ public class ParserIdentifierTest {
                 mountPointService, sourceProvider);
 
         assertNotNull("Export context should be parsed", exportContext);
-        assertNull("Not-existing module should be null", exportContext.getModule());
+        assertNull("Not-existing module should be null", exportContext.module());
     }
 
     /**
