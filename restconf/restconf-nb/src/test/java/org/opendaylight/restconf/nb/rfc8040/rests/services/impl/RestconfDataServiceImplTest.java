@@ -426,9 +426,9 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         final PatchStatusContext status = dataService.patchData(patch);
-        assertTrue(status.isOk());
-        assertEquals(3, status.getEditCollection().size());
-        assertEquals("replace data", status.getEditCollection().get(1).getEditId());
+        assertTrue(status.ok());
+        assertEquals(3, status.editCollection().size());
+        assertEquals("replace data", status.editCollection().get(1).getEditId());
     }
 
     @Test
@@ -446,9 +446,9 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
 
         final PatchStatusContext status = dataService.patchData(patch);
-        assertTrue(status.isOk());
-        assertEquals(3, status.getEditCollection().size());
-        assertNull(status.getGlobalErrors());
+        assertTrue(status.ok());
+        assertEquals(3, status.editCollection().size());
+        assertNull(status.globalErrors());
     }
 
     @Test
@@ -467,13 +467,13 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(true).when(readWrite).cancel();
         final PatchStatusContext status = dataService.patchData(patch);
 
-        assertFalse(status.isOk());
-        assertEquals(3, status.getEditCollection().size());
-        assertTrue(status.getEditCollection().get(0).isOk());
-        assertTrue(status.getEditCollection().get(1).isOk());
-        assertFalse(status.getEditCollection().get(2).isOk());
-        assertFalse(status.getEditCollection().get(2).getEditErrors().isEmpty());
-        final String errorMessage = status.getEditCollection().get(2).getEditErrors().get(0).getErrorMessage();
+        assertFalse(status.ok());
+        assertEquals(3, status.editCollection().size());
+        assertTrue(status.editCollection().get(0).isOk());
+        assertTrue(status.editCollection().get(1).isOk());
+        assertFalse(status.editCollection().get(2).isOk());
+        assertFalse(status.editCollection().get(2).getEditErrors().isEmpty());
+        final String errorMessage = status.editCollection().get(2).getEditErrors().get(0).getErrorMessage();
         assertEquals("Data does not exist", errorMessage);
     }
 
