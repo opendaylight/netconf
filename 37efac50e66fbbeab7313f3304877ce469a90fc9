@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc91e538_8fdb93db",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/SimpleCapability.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-08-22T11:30:03Z",
+      "side": 1,
+      "message": "remove as duplicate of ExiCapability",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 35
+      },
+      "revId": "37efac50e66fbbeab7313f3304877ce469a90fc9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
