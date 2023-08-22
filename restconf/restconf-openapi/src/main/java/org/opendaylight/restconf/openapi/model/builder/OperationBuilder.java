@@ -46,6 +46,12 @@ public final class OperationBuilder {
     private static final List<String> MIME_TYPES = List.of(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON);
     private static final String OBJECT = "object";
     private static final String TYPE_KEY = "type";
+    private static final String POST_DESCRIPTION = """
+        \n
+        Note:
+        In example payload, you can see only the first data node child of the resource to be created, following the
+        guidelines of RFC 8040, which allows us to create only one resource in POST request.
+        """;
 
     private OperationBuilder() {
         // Hidden on purpose
@@ -78,7 +84,7 @@ public final class OperationBuilder {
             .parameters(parameters)
             .requestBody(requestBody)
             .responses(responses)
-            .description(description)
+            .description(description + POST_DESCRIPTION)
             .summary(summary)
             .build();
     }
