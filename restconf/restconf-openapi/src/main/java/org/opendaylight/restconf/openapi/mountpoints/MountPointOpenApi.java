@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.API_VERSION;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASE_PATH;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASIC_AUTH_NAME;
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.DESCRIPTION;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.OPEN_API_BASIC_AUTH;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.OPEN_API_VERSION;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
@@ -206,7 +207,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var title = deviceName + " modules of RESTCONF";
-        final var info = new Info(API_VERSION, title);
+        final var info = new Info(API_VERSION, title, DESCRIPTION);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
 
         final var modules = getSortedModules(context);
@@ -232,7 +233,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     private OpenApiObject generateDataStoreOpenApi(final UriInfo uriInfo, final String context,
             final String deviceName) {
-        final var info = new Info(API_VERSION, context);
+        final var info = new Info(API_VERSION, context, DESCRIPTION);
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
