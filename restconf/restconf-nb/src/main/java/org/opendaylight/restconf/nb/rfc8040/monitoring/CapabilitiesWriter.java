@@ -162,7 +162,7 @@ public final class CapabilitiesWriter
         }
 
         final var tx = txChain.newWriteOnlyTransaction();
-        tx.put(LogicalDatastoreType.OPERATIONAL, PATH, mapCapabilites());
+        tx.put(LogicalDatastoreType.OPERATIONAL, PATH, mapCapabilities());
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -192,8 +192,8 @@ public final class CapabilitiesWriter
      * @return A container holding capabilities
      */
     @VisibleForTesting
-    static @NonNull LeafSetNode<String> mapCapabilites() {
-        return Builders.<String>orderedLeafSetBuilder()
+    static @NonNull LeafSetNode<String> mapCapabilities() {
+        return Builders.<String>leafSetBuilder()
             .withNodeIdentifier(CAPABILITY)
             .withChildValue(DepthParam.capabilityUri().toString())
             .withChildValue(FieldsParam.capabilityUri().toString())
