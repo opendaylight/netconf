@@ -37,19 +37,19 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         final JsonWriter jsonWriter = createJsonWriter(entityStream);
         jsonWriter.beginObject().name("ietf-yang-patch:yang-patch-status");
         jsonWriter.beginObject();
-        jsonWriter.name("patch-id").value(patchStatusContext.getPatchId());
-        if (patchStatusContext.isOk()) {
+        jsonWriter.name("patch-id").value(patchStatusContext.patchId());
+        if (patchStatusContext.ok()) {
             reportSuccess(jsonWriter);
         } else {
-            if (patchStatusContext.getGlobalErrors() != null) {
-                reportErrors(patchStatusContext.getGlobalErrors(), jsonWriter);
+            if (patchStatusContext.globalErrors() != null) {
+                reportErrors(patchStatusContext.globalErrors(), jsonWriter);
             }
 
             jsonWriter.name("edit-status");
             jsonWriter.beginObject();
             jsonWriter.name("edit");
             jsonWriter.beginArray();
-            for (final PatchStatusEntity patchStatusEntity : patchStatusContext.getEditCollection()) {
+            for (final PatchStatusEntity patchStatusEntity : patchStatusContext.editCollection()) {
                 jsonWriter.beginObject();
                 jsonWriter.name("edit-id").value(patchStatusEntity.getEditId());
                 if (patchStatusEntity.getEditErrors() != null) {

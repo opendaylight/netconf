@@ -240,7 +240,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     void assertTestDeleteNonexistentData(final PatchStatusContext status) {
-        final var globalErrors = status.getGlobalErrors();
+        final var globalErrors = status.globalErrors();
         assertEquals(1, globalErrors.size());
         final var globalError = globalErrors.get(0);
         assertEquals(ErrorType.PROTOCOL, globalError.getErrorType());
