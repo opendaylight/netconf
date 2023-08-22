@@ -187,7 +187,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var title = deviceName + " modules of RESTCONF";
-        final var info = new Info(API_VERSION, title);
+        final var info = new Info(API_VERSION, title, null);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
 
         final var modules = getSortedModules(context);
@@ -213,7 +213,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     private OpenApiObject generateDataStoreOpenApi(final UriInfo uriInfo, final String context,
             final String deviceName) {
-        final var info = new Info(API_VERSION, context);
+        final var info = new Info(API_VERSION, context, null);
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));

@@ -12,11 +12,13 @@ import static java.util.Objects.requireNonNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 @JsonInclude(Include.NON_NULL)
 public record Info(
         @NonNull String version,
-        @NonNull String title) {
+        @NonNull String title,
+        @Nullable String description) {
 
     public Info {
         requireNonNull(version);
