@@ -45,6 +45,12 @@ public final class OperationBuilder {
     private static final String OBJECT = "object";
     private static final String TYPE_KEY = "type";
 
+    private static final String POST_DESCRIPTION = """
+        \n
+        In example payload, you can see only the first data node child of the resource to be created, following the
+        guidelines of RFC 8040, which allows us to create only one resource in POST request.
+        """;
+
     private OperationBuilder() {
         // Hidden on purpose
     }
@@ -64,13 +70,14 @@ public final class OperationBuilder {
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
         responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
                 buildResponse(Response.Status.CREATED.getReasonPhrase()));
+        final String postDescription = description + POST_DESCRIPTION;
 
         return new Operation.Builder()
             .tags(tags)
             .parameters(parameters)
             .requestBody(requestBody)
             .responses(responses)
-            .description(description)
+            .description(postDescription)
             .summary(summary)
             .build();
     }
