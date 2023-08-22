@@ -8,37 +8,24 @@
 
 package org.opendaylight.restconf.common.patch;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfError;
 
-public class PatchStatusContext {
+/**
+ * Holder of patch status context.
+ */
+public record PatchStatusContext(
+    @NonNull String patchId,
+    @NonNull List<PatchStatusEntity> editCollection,
+    boolean ok,
+    @Nullable List<RestconfError> globalErrors) {
 
-    private final String patchId;
-    private final List<PatchStatusEntity> editCollection;
-    private boolean ok;
-    private List<RestconfError> globalErrors;
-
-    public PatchStatusContext(final String patchId, final List<PatchStatusEntity> editCollection,
-                              final boolean ok, final List<RestconfError> globalErrors) {
-        this.patchId = patchId;
-        this.editCollection = editCollection;
-        this.ok = ok;
-        this.globalErrors = globalErrors;
-    }
-
-    public String getPatchId() {
-        return patchId;
-    }
-
-    public List<PatchStatusEntity> getEditCollection() {
-        return editCollection;
-    }
-
-    public boolean isOk() {
-        return ok;
-    }
-
-    public List<RestconfError> getGlobalErrors() {
-        return globalErrors;
+    public PatchStatusContext {
+        requireNonNull(patchId);
+        requireNonNull(editCollection);
     }
 }
