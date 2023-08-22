@@ -16,6 +16,24 @@
       "message": "@Nullable",
       "revId": "807e48aaa3929bab1b7980df24e9e50957520add",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cf3bd06_7fdcfba5",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/SchemaExportContext.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-08-22T15:11:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5f09b78_4316d688",
+      "revId": "807e48aaa3929bab1b7980df24e9e50957520add",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
