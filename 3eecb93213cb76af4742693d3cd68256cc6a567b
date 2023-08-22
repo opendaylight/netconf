@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6489b34b_14fac70f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 32
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-22T15:07:45Z",
+      "side": 1,
+      "message": "Can you explain more as its done is previous commits?",
+      "revId": "3eecb93213cb76af4742693d3cd68256cc6a567b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
