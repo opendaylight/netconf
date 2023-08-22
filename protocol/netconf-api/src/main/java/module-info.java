@@ -13,6 +13,7 @@ module org.opendaylight.netconf.api {
     requires transitive io.netty.transport;
     requires transitive java.xml;
     requires transitive org.opendaylight.yangtools.yang.common;
+    requires transitive org.opendaylight.yangtools.yang.model.api;
     requires transitive org.opendaylight.yang.gen.ietf.netconf.rfc6241;
     requires com.google.common;
     requires org.opendaylight.yangtools.util;
