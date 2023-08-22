@@ -16,6 +16,24 @@
       "message": "unused",
       "revId": "29113e9956fe147e24447628298b84deb3c43076",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ac9b2ca_0f023ecc",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/SimpleCapability.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-22T12:00:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ba8bd80_21a95272",
+      "revId": "29113e9956fe147e24447628298b84deb3c43076",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

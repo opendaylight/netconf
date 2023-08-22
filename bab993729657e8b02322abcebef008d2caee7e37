@@ -51,6 +51,24 @@
       "message": "missed this one",
       "revId": "bab993729657e8b02322abcebef008d2caee7e37",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2747561_467013a4",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ProtocolCapabilityTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-22T12:00:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44dc00d0_056d5f4e",
+      "revId": "bab993729657e8b02322abcebef008d2caee7e37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
