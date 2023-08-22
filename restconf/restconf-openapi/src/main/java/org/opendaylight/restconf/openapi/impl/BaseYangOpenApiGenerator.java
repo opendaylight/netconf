@@ -78,6 +78,11 @@ public abstract class BaseYangOpenApiGenerator {
     public static final ObjectNode OPEN_API_BASIC_AUTH = JsonNodeFactory.instance.objectNode()
         .put("type", "http")
         .put("scheme", "basic");
+    public static final String DESCRIPTION = "We are providing full API for configurational data which can be edited "
+        + "(by POST, PUT, PATCH and DELETE). For operational data we only provide GET API." + "\n" + "\n"
+        + "For majority of request you can see only config data in examples. That’s because we can show only one "
+        + "example per request. The exception when you can see operational data in example is when data are "
+        + "representing operational (config false) container with no config data in it.";
     public static final ArrayNode SECURITY = JsonNodeFactory.instance.arrayNode()
         .add(JsonNodeFactory.instance.objectNode().set("basicAuth", JsonNodeFactory.instance.arrayNode()));
 
@@ -93,7 +98,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
         final var title = "Controller modules of RESTCONF";
-        final var info = new Info(API_VERSION, title);
+        final var info = new Info(API_VERSION, title, DESCRIPTION);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
 
         final var paths = new HashMap<String, Path>();
@@ -158,7 +163,7 @@ public abstract class BaseYangOpenApiGenerator {
 
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
-        final var info = new Info(API_VERSION, module.getName());
+        final var info = new Info(API_VERSION, module.getName(), DESCRIPTION);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
         final var definitionNames = new DefinitionNames();
         final var schemas = getSchemas(module, schemaContext, definitionNames, true);
