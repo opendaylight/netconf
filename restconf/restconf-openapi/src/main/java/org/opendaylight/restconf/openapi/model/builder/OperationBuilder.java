@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -60,7 +59,7 @@ public final class OperationBuilder {
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final ObjectNode requestBody;
-        final DataSchemaNode childNode = getListOrContainerChildNode(Optional.ofNullable(node));
+        final DataSchemaNode childNode = node == null ? null : getListOrContainerChildNode(node);
         if (childNode != null && childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
             final String childDefName = parentName + "_" + nodeName + "_" + childNodeName + discriminator;
@@ -315,24 +314,6 @@ public final class OperationBuilder {
         return mimeTypeValue;
     }
 
-    public static ObjectNode buildResponse(final String description, final ObjectNode schema,
-            final ObjectNode xmlSchema) {
-        final ObjectNode response = JsonNodeFactory.instance.objectNode();
-        final ObjectNode content = JsonNodeFactory.instance.objectNode();
-        final ObjectNode body = JsonNodeFactory.instance.objectNode();
-        final ObjectNode xmlBody = JsonNodeFactory.instance.objectNode();
-
-        body.set(SCHEMA_KEY, schema);
-        xmlBody.set(SCHEMA_KEY, xmlSchema);
-        content.set(MediaType.APPLICATION_JSON, body);
-        content.set(MediaType.APPLICATION_XML, xmlBody);
-
-        response.set(CONTENT_KEY, content);
-
-        response.put(DESCRIPTION_KEY, description);
-        return response;
-    }
-
     private static ObjectNode buildResponse(final String description) {
         final ObjectNode response = JsonNodeFactory.instance.objectNode();
         response.put(DESCRIPTION_KEY, description);
@@ -352,9 +333,9 @@ public final class OperationBuilder {
         return response;
     }
 
-    private static DataSchemaNode getListOrContainerChildNode(final Optional<DataSchemaNode> node) {
-        return node.flatMap(schemaNode -> ((DataNodeContainer) schemaNode).getChildNodes().stream()
+    private static DataSchemaNode getListOrContainerChildNode(final DataSchemaNode node) {
+        return ((DataNodeContainer) node).getChildNodes().stream()
             .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
-            .findFirst()).orElse(null);
+            .findFirst().orElse(null);
     }
 }
