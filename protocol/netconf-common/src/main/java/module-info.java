@@ -8,8 +8,12 @@
 module org.opendaylight.netconf.common {
     exports org.opendaylight.netconf.common;
     exports org.opendaylight.netconf.common.impl;
+    exports org.opendaylight.netconf.common.util;
 
     requires transitive io.netty.common;
+    requires transitive org.opendaylight.yangtools.yang.common;
+    requires transitive org.opendaylight.yangtools.yang.model.api;
+    requires transitive org.opendaylight.netconf.api;
     requires com.google.common;
     requires org.slf4j;
 
