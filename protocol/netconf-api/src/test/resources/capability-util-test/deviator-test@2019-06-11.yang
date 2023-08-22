@@ -1,0 +1,32 @@
+module deviator-test {
+  yang-version 1.1;
+  namespace "http://tech/pantheon/deviator-test";
+  prefix dev;
+
+  import capabilities-test {
+    prefix cp;
+    revision-date 2019-06-11;
+  }
+
+  organization
+      "PANTHEON.tech s.r.o.";
+
+  description
+    "Prepared to set deviations";
+
+  revision 2019-06-11 {
+    description
+      "Deviation test";
+  }
+
+  deviation "/cp:test-container/cp:comment" {
+    deviate add {
+      must
+        "(../cp:comment = 'TEST' or ../cp:comment = 'TEST2')" {
+        error-message "Invalid comment for Deviation test";
+        description
+          "This is just a simple deviation test";
+      }
+    }
+  }
+}
