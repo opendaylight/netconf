@@ -1,0 +1,30 @@
+module capabilities-test {
+  yang-version 1.1;
+  namespace "http://tech/pantheon/capabilities-test";
+  prefix dev;
+
+  organization
+    "PANTHEON.tech s.r.o.";
+
+  description
+    "Capabilities with features and deviations";
+
+  revision 2019-06-11 {
+    description
+      "Capabilities test";
+  }
+
+  feature first-feature;
+
+  feature second-feature;
+
+  container test-container {
+    leaf comment {
+      type string {
+        length "0 .. 60";
+    }
+    description
+     "Just for Deviation testing";
+    }
+  }
+}
