@@ -32,6 +32,7 @@ public class YangSchemaExportBodyWriter extends AbstractSchemaExportBodyWriter {
     public void writeTo(final SchemaExportContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException {
+        // FIXME module can be null
         final Module module = context.module();
         final SourceIdentifier sourceId = new SourceIdentifier(module.getName(),
                 module.getQNameModule().getRevision().map(Revision::toString).orElse(null));
