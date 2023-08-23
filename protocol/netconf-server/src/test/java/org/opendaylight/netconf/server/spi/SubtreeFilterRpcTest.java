@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,8 @@ public class SubtreeFilterRpcTest {
         Document requestDocument = getDocument("request.xml");
         Document preFilterDocument = getDocument("pre-filter.xml");
         Document postFilterDocument = getDocument("post-filter.xml");
-        Document actualPostFilterDocument = SubtreeFilter.applyRpcSubtreeFilter(requestDocument, preFilterDocument);
+        Document actualPostFilterDocument = SubtreeFilter.applyRpcSubtreeFilter(requestDocument,
+            RpcReplyMessage.unsafeOf(preFilterDocument));
         LOG.info("Actual document: {}", XmlUtil.toString(actualPostFilterDocument));
         Diff diff = XMLUnit.compareXML(postFilterDocument, actualPostFilterDocument);
         assertTrue(diff.toString(), diff.similar());
