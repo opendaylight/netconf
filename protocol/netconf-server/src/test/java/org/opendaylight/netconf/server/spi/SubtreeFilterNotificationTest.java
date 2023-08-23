@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class SubtreeFilterNotificationTest {
         Document preFilterDocument = getDocument("pre-filter.xml");
         Document postFilterDocument = getDocument("post-filter.xml");
         Optional<Document> actualPostFilterDocumentOpt =
-                SubtreeFilter.applySubtreeNotificationFilter(filter, preFilterDocument);
+                SubtreeFilter.applySubtreeNotificationFilter(filter, NotificationMessage.unsafeOf(preFilterDocument));
         if (actualPostFilterDocumentOpt.isPresent()) {
             Document actualPostFilterDocument = actualPostFilterDocumentOpt.orElseThrow();
             LOG.info("Actual document: {}", XmlUtil.toString(actualPostFilterDocument));
