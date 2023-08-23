@@ -13,6 +13,9 @@ import java.util.Optional;
 import javax.xml.XMLConstants;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -34,7 +37,17 @@ public final class SubtreeFilter {
         // Hidden on purpose
     }
 
-    public static Document applyRpcSubtreeFilter(final Document requestDocument,
+    public static Document applyRpcSubtreeFilter(final Document requestDoc, final RpcMessage rpcReplyMessage)
+        throws DocumentedException {
+        return applyRpcSubtreeFilter(requestDoc, rpcReplyMessage.getDocument());
+    }
+
+    public static Document applyRpcSubtreeFilter(final Document requestDoc, final RpcReplyMessage rpcReplyMessage)
+        throws DocumentedException {
+        return applyRpcSubtreeFilter(requestDoc, rpcReplyMessage.getDocument());
+    }
+
+    private static Document applyRpcSubtreeFilter(final Document requestDocument,
                                                  final Document rpcReply) throws DocumentedException {
         OperationNameAndNamespace operationNameAndNamespace = new OperationNameAndNamespace(requestDocument);
         if (NamespaceURN.BASE.equals(operationNameAndNamespace.getNamespace())
@@ -67,6 +80,11 @@ public final class SubtreeFilter {
      * @throws DocumentedException if operation fails
      */
     public static Optional<Document> applySubtreeNotificationFilter(final XmlElement filter,
+        final NotificationMessage notification) throws DocumentedException {
+        return applySubtreeNotificationFilter(filter, notification.getDocument());
+    }
+
+    private static Optional<Document> applySubtreeNotificationFilter(final XmlElement filter,
             final Document notification) throws DocumentedException {
         removeEventTimeNode(notification);
         if (isSupported(filter)) {
