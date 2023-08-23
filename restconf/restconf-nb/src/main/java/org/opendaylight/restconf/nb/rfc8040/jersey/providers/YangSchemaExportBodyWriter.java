@@ -32,15 +32,20 @@ public class YangSchemaExportBodyWriter extends AbstractSchemaExportBodyWriter {
     public void writeTo(final SchemaExportContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException {
-        final Module module = context.module();
-        final SourceIdentifier sourceId = new SourceIdentifier(module.getName(),
+        if (context.module() != null) {
+            final Module module = context.module();
+            final SourceIdentifier sourceId = new SourceIdentifier(module.getName(),
                 module.getQNameModule().getRevision().map(Revision::toString).orElse(null));
-        final YangTextSchemaSource yangTextSchemaSource;
-        try {
-            yangTextSchemaSource = context.sourceProvider().getSource(sourceId).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new WebApplicationException("Unable to retrieve source from SourceProvider.", e);
+            final YangTextSchemaSource yangTextSchemaSource;
+            try {
+                yangTextSchemaSource = context.sourceProvider().getSource(sourceId).get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new WebApplicationException("Unable to retrieve source from SourceProvider.", e);
+            }
+            yangTextSchemaSource.asByteSource(StandardCharsets.UTF_8).copyTo(entityStream);
         }
-        yangTextSchemaSource.asByteSource(StandardCharsets.UTF_8).copyTo(entityStream);
+        else {
+            throw new IOException("Module is null. Unable to write Yang Schema export.");
+        }
     }
 }
