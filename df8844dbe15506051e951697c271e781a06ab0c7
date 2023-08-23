@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "650352e3_d053d428",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfSchemaSourceUrlProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-23T13:28:35Z",
+      "side": 1,
+      "message": "Why Optional?",
+      "revId": "df8844dbe15506051e951697c271e781a06ab0c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fefc00d8_ab638e7c",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfSchemaSourceUrlProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-23T13:28:35Z",
+      "side": 1,
+      "message": "4 more spaces please.",
+      "revId": "df8844dbe15506051e951697c271e781a06ab0c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
