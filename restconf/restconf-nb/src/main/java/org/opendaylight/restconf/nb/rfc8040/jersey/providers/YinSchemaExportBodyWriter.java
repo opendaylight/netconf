@@ -27,10 +27,14 @@ public class YinSchemaExportBodyWriter extends AbstractSchemaExportBodyWriter {
     public void writeTo(final SchemaExportContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException {
-        try {
-            YinExportUtils.writeModuleAsYinText(context.module().asEffectiveStatement(), entityStream);
-        } catch (final XMLStreamException e) {
-            throw new IOException("Failed to export module", e);
+        if (context.module() != null) {
+            try {
+                YinExportUtils.writeModuleAsYinText(context.module().asEffectiveStatement(), entityStream);
+            } catch (final XMLStreamException e) {
+                throw new IOException("Failed to export module", e);
+            }
+        } else {
+            throw new IOException("Module is null. Unable to write Yin Schema export");
         }
     }
 }
