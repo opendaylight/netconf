@@ -92,7 +92,7 @@ public final class OperationBuilder {
         final DataSchemaNode childNode = getListOrContainerChildNode(Optional.ofNullable(node));
         if (childNode != null && childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
-            final String cleanChildDefName = parentName + "_" + nodeName + CONFIG + "_" + childNodeName + POST_SUFFIX;
+            final String cleanChildDefName = parentName + "_" + nodeName + CONFIG + "_" + childNodeName;
             final String childDefName = cleanChildDefName + discriminator;
             final String childXmlDefName = cleanChildDefName + XML_SUFFIX + discriminator;
             insertPostRequestBodyParameter(childNode, parameters, value, childDefName, childXmlDefName, childNodeName,
