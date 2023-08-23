@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bd880ff_3da96485",
+        "filename": "artifacts/pom.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 691,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-23T14:31:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "945a4712_9298ba8f",
+      "revId": "ddfa9159f92260e8f826e7ab05885c9df2dc6180",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9cad653a_f2944b63",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-23T13:26:30Z",
       "side": 1,
       "message": "Redundant line.",
+      "revId": "ddfa9159f92260e8f826e7ab05885c9df2dc6180",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "596274fb_65b58f76",
+        "filename": "features/odl-yanglib-mdsal-writer/pom.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-23T14:31:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9cad653a_f2944b63",
       "revId": "ddfa9159f92260e8f826e7ab05885c9df2dc6180",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
