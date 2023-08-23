@@ -17,6 +17,7 @@ import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -132,7 +133,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
 
             Document rpcReply = operationRouter.onNetconfMessage(incomingDocument, session);
 
-            rpcReply = SubtreeFilter.applyRpcSubtreeFilter(incomingDocument, rpcReply);
+            rpcReply = SubtreeFilter.applyRpcSubtreeFilter(incomingDocument, RpcReplyMessage.unsafeOf(rpcReply));
 
             session.onIncommingRpcSuccess();
 
