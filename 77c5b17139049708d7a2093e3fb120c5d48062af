@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "142aae7f_7512eec0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-23T15:01:15Z",
+      "side": 1,
+      "message": "Let\u0027s rebase it on last master",
+      "revId": "77c5b17139049708d7a2093e3fb120c5d48062af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "372387c9_c4985c99",
