@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "372387c9_c4985c99",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-23T15:00:11Z",
+      "side": 1,
+      "message": "I would paraphrase it bc sometimes we don\u0027t have lists or containers in child nodes but have leaf",
+      "revId": "77c5b17139049708d7a2093e3fb120c5d48062af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
