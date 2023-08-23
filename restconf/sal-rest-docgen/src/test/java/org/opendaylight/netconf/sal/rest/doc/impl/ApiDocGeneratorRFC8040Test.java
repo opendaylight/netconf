@@ -338,8 +338,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
             ApiDocServiceImpl.OAversion.V3_0);
         final var jsonNodeToaster = doc.getPaths().get("/rests/data/toaster2:toaster");
         verifyPostRequestRef(jsonNodeToaster.path("post"),
-            "#/components/schemas/toaster2_toaster_config_toasterSlot_post",
-            "#/components/schemas/toaster2_toaster_config_toasterSlot_post_xml", LIST);
+            "#/components/schemas/toaster2_toaster_config_toasterSlot",
+            "#/components/schemas/toaster2_toaster_config_toasterSlot_xml", LIST);
         verifyRequestRef(jsonNodeToaster.path("put"), "#/components/schemas/toaster2_config_toaster_TOP",
                 "#/components/schemas/toaster2_config_toaster");
         verifyRequestRef(jsonNodeToaster.path("get"), "#/components/schemas/toaster2_toaster_TOP",
@@ -347,8 +347,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         final var jsonNodeToasterSlot = doc.getPaths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
         verifyPostRequestRef(jsonNodeToasterSlot.path("post"),
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_post",
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_post_xml", CONTAINER);
+                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo",
+                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_xml", CONTAINER);
         verifyRequestRef(jsonNodeToasterSlot.path("put"),
                 "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
                 "#/components/schemas/toaster2_toaster_config_toasterSlot");
@@ -367,8 +367,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo");
 
         final var jsonNodeLst = doc.getPaths().get("/rests/data/toaster2:lst");
-        verifyPostRequestRef(jsonNodeLst.path("post"), "#/components/schemas/toaster2_lst_config_cont1_post",
-                "#/components/schemas/toaster2_lst_config_cont1_post_xml", CONTAINER);
+        verifyPostRequestRef(jsonNodeLst.path("post"), "#/components/schemas/toaster2_lst_config_cont1",
+                "#/components/schemas/toaster2_lst_config_cont1_xml", CONTAINER);
         verifyRequestRef(jsonNodeLst.path("put"), "#/components/schemas/toaster2_config_lst_TOP",
                 "#/components/schemas/toaster2_config_lst");
         verifyRequestRef(jsonNodeLst.path("get"), "#/components/schemas/toaster2_lst_TOP",

@@ -46,34 +46,34 @@ public class PostPayloadTest extends AbstractApiDocTest {
         final var path1 = "/rests/data/container-test:cont";
         assertNotNull(containerDoc.getPaths().get(path1));
         final var jsonRef1 = getJsonRef(containerDoc, path1);
-        assertEquals("{\"cont1\":{\"$ref\":\"#/components/schemas/container-test_cont_config_cont1_post\"}}",
+        assertEquals("{\"cont1\":{\"$ref\":\"#/components/schemas/container-test_cont_config_cont1\"}}",
             jsonRef1);
         final var xmlRef1 = getXmlRef(containerDoc, path1);
-        assertEquals("#/components/schemas/container-test_cont_config_cont1_post_xml", xmlRef1);
+        assertEquals("#/components/schemas/container-test_cont_config_cont1_xml", xmlRef1);
 
         final var path2 = "/rests/data/container-test:cont/cont1";
         assertNotNull(containerDoc.getPaths().get(path2));
         final var jsonRef2 = getJsonRef(containerDoc, path2);
         assertEquals("{\"list4\":{\"type\":\"array\",\"items\":{\"$ref\":\""
-            + "#/components/schemas/container-test_cont_cont1_config_list4_post\"}}}", jsonRef2);
+            + "#/components/schemas/container-test_cont_cont1_config_list4\"}}}", jsonRef2);
         final var xmlRef2 = getXmlRef(containerDoc, path2);
-        assertEquals("#/components/schemas/container-test_cont_cont1_config_list4_post_xml", xmlRef2);
+        assertEquals("#/components/schemas/container-test_cont_cont1_config_list4_xml", xmlRef2);
 
         final var path3 = "/rests/data/container-test:cont/cont1/list4={key4}";
         assertNotNull(containerDoc.getPaths().get(path3));
         final var jsonRef3 = getJsonRef(containerDoc, path3);
         assertEquals("{\"cont2\":{\"$ref\":\"#/components/schemas/"
-                + "container-test_cont_cont1_list4_config_cont2_post\"}}", jsonRef3);
+                + "container-test_cont_cont1_list4_config_cont2\"}}", jsonRef3);
         final var xmlRef3 = getXmlRef(containerDoc, path3);
-        assertEquals("#/components/schemas/container-test_cont_cont1_list4_config_cont2_post_xml", xmlRef3);
+        assertEquals("#/components/schemas/container-test_cont_cont1_list4_config_cont2_xml", xmlRef3);
 
         final var path4 = "/rests/data/container-test:cont/cont1/list4={key4}/cont2";
         assertNotNull(containerDoc.getPaths().get(path4));
         final var jsonRef4 = getJsonRef(containerDoc, path4);
         assertEquals("{\"list5\":{\"type\":\"array\",\"items\":{\"$ref\":\""
-                + "#/components/schemas/container-test_cont_cont1_list4_cont2_config_list5_post\"}}}", jsonRef4);
+                + "#/components/schemas/container-test_cont_cont1_list4_cont2_config_list5\"}}}", jsonRef4);
         final var xmlRef4 = getXmlRef(containerDoc, path4);
-        assertEquals("#/components/schemas/container-test_cont_cont1_list4_cont2_config_list5_post_xml", xmlRef4);
+        assertEquals("#/components/schemas/container-test_cont_cont1_list4_cont2_config_list5_xml", xmlRef4);
     }
 
     @Test
@@ -82,17 +82,17 @@ public class PostPayloadTest extends AbstractApiDocTest {
         assertNotNull(listDoc.getPaths().get(path1));
         final var jsonRef1 = getJsonRef(listDoc, path1);
         assertEquals("{\"list1\":{\"type\":\"array\",\"items\":{\"$ref\":\""
-            + "#/components/schemas/list-test_cont_config_list1_post\"}}}", jsonRef1);
+            + "#/components/schemas/list-test_cont_config_list1\"}}}", jsonRef1);
         final var xmlRef1 = getXmlRef(listDoc, path1);
-        assertEquals("#/components/schemas/list-test_cont_config_list1_post_xml", xmlRef1);
+        assertEquals("#/components/schemas/list-test_cont_config_list1_xml", xmlRef1);
 
         final var path2 = "/rests/data/list-test:cont/list2={key2}";
         assertNotNull(listDoc.getPaths().get(path2));
         final var jsonRef2 = getJsonRef(listDoc, path2);
         assertEquals("{\"list3\":{\"type\":\"array\",\"items\":{\"$ref\":\""
-            + "#/components/schemas/list-test_cont_list2_config_list3_post\"}}}", jsonRef2);
+            + "#/components/schemas/list-test_cont_list2_config_list3\"}}}", jsonRef2);
         final var xmlRef2 = getXmlRef(listDoc, path2);
-        assertEquals("#/components/schemas/list-test_cont_list2_config_list3_post_xml", xmlRef2);
+        assertEquals("#/components/schemas/list-test_cont_list2_config_list3_xml", xmlRef2);
     }
 
     private static String getJsonRef(final OpenApiObject openApiObject, final String path) {
