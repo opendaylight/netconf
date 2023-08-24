@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb5e79c8_18bbeb3e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-24T10:19:51Z",
+      "side": 1,
+      "message": "Set.of",
+      "revId": "83e87e1761d5dd7a3f8c7c69a9892ffadc4264c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c0f320e_1b2ea561",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-24T10:19:51Z",
+      "side": 1,
+      "message": "Is this working for PUT in JSON?",
+      "revId": "83e87e1761d5dd7a3f8c7c69a9892ffadc4264c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
