@@ -10,6 +10,7 @@ package org.opendaylight.restconf.openapi.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -19,8 +20,10 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
+import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.MountPointInstance;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
+import org.opendaylight.restconf.openapi.model.SchemaEntity;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -78,7 +81,22 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public synchronized Response getAllModulesDoc(final UriInfo uriInfo) {
         final DefinitionNames definitionNames = new DefinitionNames();
         final OpenApiObject doc = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, definitionNames);
-        return Response.ok(doc).build();
+
+        // simulation of "we have schema" event
+        // in the future we will rework logic to iterate over EffectiveModelContext directly
+        final var inputStream = new OpenApiInputStream();
+        final var outputStream = new OpenApiOutputStream(inputStream);
+        final var writer = new OpenApiBodyWriter();
+        try {
+            for (final var schema : doc.components().schemas().values()) {
+                final var entity = new SchemaEntity(schema);
+                writer.writeTo(entity, null, null, null, null, null, outputStream);
+            }
+        } catch (IOException e) {
+            // FIXME
+        }
+
+        return Response.ok(inputStream).build();
     }
 
     /**
