@@ -13,15 +13,18 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
  * Archetype for a Schema.
  */
 public final class SchemaEntity extends OpenApiEntity {
+    private final @NonNull SchemaNode value;
     private final @NonNull String title;
     private final @NonNull String type;
 
-    public SchemaEntity(final @NonNull String title, final @NonNull String type) {
+    public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title, @NonNull final String type) {
+        this.value = requireNonNull(value);
         this.title = requireNonNull(title);
         this.type = requireNonNull(type);
     }
@@ -58,7 +61,7 @@ public final class SchemaEntity extends OpenApiEntity {
     }
 
     private @Nullable String description() {
-        return null;
+        return value.getDescription().orElse(null);
     }
 
     private @Nullable String reference() {
