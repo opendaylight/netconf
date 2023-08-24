@@ -94,7 +94,21 @@ public abstract class BaseYangOpenApiGenerator {
 
         final var paths = new HashMap<String, Path>();
         final var schemas = new HashMap<String, Schema>();
+
+        /**
+        for modules:
+            for identities:
+                yield: Iterable<OpenApiEntity>
+            for childNodes:
+                yield: Iterable<OpenApiEntity>
+            for rpcs:
+                yield: Iterable<OpenApiEntity>
+
+        return new OpenApiInputStream(List.of(iterable, iterable, ...))
+         */
+
         for (final var module : getSortedModules(context)) {
+            final var formatter = new OpenApiFormatter();
             LOG.debug("Working on [{},{}]...", module.getName(), module.getQNameModule().getRevision().orElse(null));
             schemas.putAll(getSchemas(module, context, definitionNames, false));
             paths.putAll(getPaths(module, "", CONTROLLER_RESOURCE_NAME, context, definitionNames, false));
