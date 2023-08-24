@@ -161,7 +161,7 @@ public class DefinitionGenerator {
             throws IOException {
         final ObjectNode definitions = JsonNodeFactory.instance.objectNode();
         if (isForSingleModule) {
-            definitionNames.addUnlinkedName(module.getName() + MODULE_NAME_SUFFIX);
+            definitionNames.addUnlinkedName(module.getName() + CONFIG + MODULE_NAME_SUFFIX);
         }
         return convertToJsonSchema(module, schemaContext, definitions, definitionNames, oaversion, isForSingleModule);
     }
@@ -172,7 +172,7 @@ public class DefinitionGenerator {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         final String moduleName = module.getName();
-        final String definitionName = moduleName + MODULE_NAME_SUFFIX;
+        final String definitionName = moduleName + CONFIG + MODULE_NAME_SUFFIX;
         final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
         for (final DataSchemaNode node : module.getChildNodes()) {
             stack.enterSchemaTree(node.getQName());
