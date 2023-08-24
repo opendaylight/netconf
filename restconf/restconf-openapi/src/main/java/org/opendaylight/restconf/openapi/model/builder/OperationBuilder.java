@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -62,11 +64,15 @@ public final class OperationBuilder {
         final DataSchemaNode childNode = node == null ? null : getListOrContainerChildNode(node);
         if (childNode != null && childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
-            final String childDefName = parentName + "_" + nodeName + "_" + childNodeName + discriminator;
+            final String childDefName = Stream.of(parentName, nodeName, childNodeName + discriminator)
+                .filter(s -> s != null && !s.isEmpty())
+                .collect(Collectors.joining("_"));
             requestBody = createRequestBodyParameter(childDefName, childNodeName, childNode instanceof ListSchemaNode,
                 summary, childNodeName);
         } else {
-            final String defName = parentName + "_" + nodeName + discriminator;
+            final String defName = Stream.of(parentName, nodeName + discriminator)
+                .filter(s -> s != null && !s.isEmpty())
+                .collect(Collectors.joining("_"));
             requestBody = createPostDataRequestBodyParameter(defName, nodeName);
         }
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
