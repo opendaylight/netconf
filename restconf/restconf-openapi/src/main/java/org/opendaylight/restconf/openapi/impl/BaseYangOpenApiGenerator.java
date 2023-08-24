@@ -236,7 +236,7 @@ public abstract class BaseYangOpenApiGenerator {
             final String moduleName = module.getName();
             final String name = moduleName + MODULE_NAME_SUFFIX;
             paths.put(resourcePath, new Path.Builder()
-                .post(buildPost(null, "", name, "", moduleName, deviceName,
+                .post(buildPost(null, null, name, "", moduleName, deviceName,
                     module.getDescription().orElse(""), pathParams))
                 .build());
         }
