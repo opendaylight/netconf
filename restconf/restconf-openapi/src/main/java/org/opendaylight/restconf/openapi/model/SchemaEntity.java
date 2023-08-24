@@ -11,13 +11,22 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
  * Archetype for a Schema.
  */
-public abstract non-sealed class SchemaEntity extends OpenApiEntity {
+public final class SchemaEntity extends OpenApiEntity {
+    private final SchemaNode value;
+    private final String type;
+
+    public SchemaEntity(final @NonNull SchemaNode value, final String type) {
+        this.value = value;
+        this.type = type;
+    }
+
     @Override
-    public final void generate(final JsonGenerator generator) throws IOException {
+    public void generate(final JsonGenerator generator) throws IOException {
         generator.writeStartObject();
         final var title = title();
         if (title != null) {
@@ -44,47 +53,47 @@ public abstract non-sealed class SchemaEntity extends OpenApiEntity {
         generator.writeEndObject();
     }
 
-    protected @Nullable String title() {
+    @Nullable String title() {
+        return value.getQName().getLocalName();
+    }
+
+    @Nullable String type() {
+        return type;
+    }
+
+    @Nullable String description() {
+        return value.getDescription().orElse("");
+    }
+
+    @Nullable String reference() {
         return null;
     }
 
-    protected @Nullable String type() {
-        return null;
-    }
-
-    protected @Nullable String description() {
-        return null;
-    }
-
-    protected @Nullable String reference() {
-        return null;
-    }
-
-    protected void generateEnum(final @NonNull JsonGenerator generator) throws IOException {
+    void generateEnum(final @NonNull JsonGenerator generator) throws IOException {
         // No-op
     }
 
-    protected void generateRequired(final @NonNull JsonGenerator generator) throws IOException {
+    void generateRequired(final @NonNull JsonGenerator generator) throws IOException {
         // No-op
     }
 
-    protected void generateDiscriminator(final @NonNull JsonGenerator generator) throws IOException {
+    void generateDiscriminator(final @NonNull JsonGenerator generator) throws IOException {
         // No-op
     }
 
-    protected void generateExamples(final @NonNull JsonGenerator generator) throws IOException {
+    void generateExamples(final @NonNull JsonGenerator generator) throws IOException {
         // No-op
     }
 
-    protected void generateExternalDocs(final @NonNull JsonGenerator generator) throws IOException {
+    void generateExternalDocs(final @NonNull JsonGenerator generator) throws IOException {
         // No-op
     }
 
-    protected void generateProperties(final @NonNull JsonGenerator generator) throws IOException {
+    void generateProperties(final @NonNull JsonGenerator generator) throws IOException {
         // No-op
     }
 
-    protected void generateXml(final @NonNull JsonGenerator generator) throws IOException {
+    void generateXml(final @NonNull JsonGenerator generator) throws IOException {
         // No-op
     }
 }
