@@ -15,6 +15,7 @@ import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.OUTPUT_
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.HttpMethod;
@@ -70,18 +71,30 @@ public final class OperationBuilder {
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
         final String cleanDefName = parentName + CONFIG + "_" + nodeName;
-        final String defName = cleanDefName + discriminator;
-        final String xmlDefName = cleanDefName + discriminator;
-        ref.put(REF_KEY, COMPONENTS_PREFIX + defName);
+        final String definitionName = cleanDefName + discriminator;
+        ref.put(REF_KEY, COMPONENTS_PREFIX + definitionName);
 
         final ObjectNode requestBody;
         final DataSchemaNode childNode = getListOrContainerChildNode(Optional.ofNullable(node));
+        final List<String> nameElements = new ArrayList<>();
+        if (parentName != null) {
+            nameElements.add(parentName);
+        }
         if (childNode != null && childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
-            final String childDefName = parentName + "_" + nodeName + CONFIG + "_" + childNodeName + discriminator;
+            nameElements.add(nodeName + CONFIG);
+            nameElements.add(childNodeName + discriminator);
+            final String childDefName = String.join("_", nameElements);
             requestBody = createPostRequestBodyParameter(childNode, childDefName, childNodeName);
         } else {
-            requestBody = createRequestBodyParameter(defName, xmlDefName, nodeName + CONFIG, summary);
+            if (node != null) {
+                // we are passing null node only when creating root POST,
+                //  in that case we do not want "_config" to be present, but we want it in all other cases
+                nameElements.add(CONFIG.replaceFirst("_", ""));
+            }
+            nameElements.add(nodeName);
+            final String defName = String.join("_", nameElements);
+            requestBody = createRequestBodyParameter(defName, defName, nodeName + CONFIG, summary);
         }
 
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
