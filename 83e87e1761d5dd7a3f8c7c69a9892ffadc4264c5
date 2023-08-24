@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb555e4f_d72a6e72",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T12:18:44Z",
+      "side": 1,
+      "message": "wanted make UnmodifiableSet from HashSet and return it like that.\nHowever, it is not needed (only used to populate another set) -\u003e returning `references` (the HashSet) as is.",
+      "parentUuid": "eb5e79c8_18bbeb3e",
+      "revId": "83e87e1761d5dd7a3f8c7c69a9892ffadc4264c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c0f320e_1b2ea561",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-24T10:19:51Z",
       "side": 1,
       "message": "Is this working for PUT in JSON?",
+      "revId": "83e87e1761d5dd7a3f8c7c69a9892ffadc4264c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c4026eb_1d02ae20",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T12:18:44Z",
+      "side": 1,
+      "message": "It is. The PUT has \"requestBody\" element with \"content\" element with the the app/json and app/xml just like the POST does.\nThe logic had to be changed however, for the retrieval of \"$ref\" from \"schema\" element, since now we have 3 possible \u0027structures\u0027 of that:\n\n- schema/$ref/{reference}\n- schema/properties/{nodeName}/$ref/{reference}\n- schema/properties/{nodeName}/items/$ref/{reference}",
+      "parentUuid": "3c0f320e_1b2ea561",
       "revId": "83e87e1761d5dd7a3f8c7c69a9892ffadc4264c5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
