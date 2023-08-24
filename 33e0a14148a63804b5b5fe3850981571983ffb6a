@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fd19a72_6aca2ba1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T10:08:33Z",
+      "side": 1,
+      "message": "IMO, better worded would be: `, following the guidelines of RFC 8040, which ...`\n\nor maybe even better: `, in accordance with RFC 8040, which ...`",
+      "range": {
+        "startLine": 68,
+        "startChar": 61,
+        "endLine": 68,
+        "endChar": 84
+      },
+      "revId": "33e0a14148a63804b5b5fe3850981571983ffb6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
