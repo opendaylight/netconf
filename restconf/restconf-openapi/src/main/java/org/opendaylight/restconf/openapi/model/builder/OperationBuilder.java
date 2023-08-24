@@ -51,8 +51,7 @@ public final class OperationBuilder {
         // Hidden on purpose
     }
 
-    public static Operation buildPost(final DataSchemaNode node, final String parentName,
-        final String nodeName,
+    public static Operation buildPost(final DataSchemaNode node, final String parentName, final String nodeName,
             final String discriminator, final String moduleName, final @NonNull String deviceName,
             final String description, final List<Parameter> pathParams) {
         final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
@@ -60,13 +59,20 @@ public final class OperationBuilder {
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final ObjectNode requestBody;
         final DataSchemaNode childNode = node == null ? null : getListOrContainerChildNode(node);
+        final List<String> nameElements = new ArrayList<>();
+        if (parentName != null) {
+            nameElements.add(parentName);
+        }
         if (childNode != null && childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
-            final String childDefName = parentName + "_" + nodeName + "_" + childNodeName + discriminator;
+            nameElements.add(nodeName);
+            nameElements.add(childNodeName + discriminator);
+            final String childDefName = String.join("_", nameElements);
             requestBody = createRequestBodyParameter(childDefName, childNodeName, childNode instanceof ListSchemaNode,
                 summary, childNodeName);
         } else {
-            final String defName = parentName + "_" + nodeName + discriminator;
+            nameElements.add(nodeName + discriminator);
+            final String defName = String.join("_", nameElements);
             requestBody = createPostDataRequestBodyParameter(defName, nodeName);
         }
         final ObjectNode responses = JsonNodeFactory.instance.objectNode();
