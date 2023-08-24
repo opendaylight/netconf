@@ -1,0 +1,159 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52a9a724_96ffb4e3",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T14:17:03Z",
+      "side": 1,
+      "message": "this empty line can be removed",
+      "revId": "d6d49157b91b3ad1b54630c9582ce8614132a591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eeca300f_5c6ef70e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T14:17:03Z",
+      "side": 1,
+      "message": "can be `final`",
+      "range": {
+        "startLine": 63,
+        "startChar": 75,
+        "endLine": 63,
+        "endChar": 96
+      },
+      "revId": "d6d49157b91b3ad1b54630c9582ce8614132a591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adf25584_1cfa8270",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T14:17:03Z",
+      "side": 1,
+      "message": "this can be simplified to `.toList()`, which also returns unmodifiable list",
+      "range": {
+        "startLine": 90,
+        "startChar": 12,
+        "endLine": 90,
+        "endChar": 55
+      },
+      "revId": "d6d49157b91b3ad1b54630c9582ce8614132a591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce53dd79_6524c96f",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T14:17:03Z",
+      "side": 1,
+      "message": "this can be `final`",
+      "range": {
+        "startLine": 93,
+        "startChar": 68,
+        "endLine": 93,
+        "endChar": 89
+      },
+      "revId": "d6d49157b91b3ad1b54630c9582ce8614132a591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e4b4721_ddef48fa",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T14:17:03Z",
+      "side": 1,
+      "message": "can be simlpy `.toList()`",
+      "range": {
+        "startLine": 117,
+        "startChar": 12,
+        "endLine": 117,
+        "endChar": 54
+      },
+      "revId": "d6d49157b91b3ad1b54630c9582ce8614132a591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44ba8004_89fb7e61",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T14:17:03Z",
+      "side": 1,
+      "message": "var",
+      "range": {
+        "startLine": 151,
+        "startChar": 19,
+        "endLine": 151,
+        "endChar": 25
+      },
+      "revId": "d6d49157b91b3ad1b54630c9582ce8614132a591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5641c419_54fc2c2b",
+        "filename": "protocol/netconf-api/src/test/resources/capability-util-test/deviator-test@2019-06-11.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T14:17:03Z",
+      "side": 1,
+      "message": "import should be before organization according to rfcs",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 3
+      },
+      "revId": "d6d49157b91b3ad1b54630c9582ce8614132a591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
