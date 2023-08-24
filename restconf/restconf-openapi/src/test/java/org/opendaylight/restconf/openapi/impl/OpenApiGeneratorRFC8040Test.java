@@ -15,9 +15,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParameters;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.COMPONENTS_PREFIX;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -161,6 +163,23 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final Schema configLst11 = schemas.get("toaster2_lst_cont1_config_lst11");
         assertNotNull(configLst11);
+    }
+
+    /**
+     * Test that reference to schema in each path is valid (all referenced schemas exist).
+     */
+    @Test
+    public void testSchemasExistenceSingleModule() {
+        final var document = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
+        assertNotNull(document);
+        final var referencedSchemas = new HashSet<String>();
+        for (final var path : document.paths().values()) {
+            referencedSchemas.addAll(extractSchemaRefFromPath(path));
+        }
+        final var schemaNames = document.components().schemas().keySet();
+        for (final var ref : referencedSchemas) {
+            assertTrue("Referenced schema " + ref + " does not exist", schemaNames.contains(ref));
+        }
     }
 
     /**
@@ -490,5 +509,66 @@ public final class OpenApiGeneratorRFC8040Test {
             .map(JsonNode::textValue)
             .collect(Collectors.toSet());
         assertEquals(expected, actualContainerArray);
+    }
+
+    private static Set<String> extractSchemaRefFromPath(final Path path) {
+        if (path == null) {
+            return Set.of();
+        }
+        final var references = new HashSet<String>();
+        final var get = path.get();
+        if (get != null) {
+            references.addAll(schemaRefFromContent(get.responses().path("200").path("content")));
+        }
+        final var post = path.post();
+        if (post != null) {
+            references.addAll(schemaRefFromContent(post.requestBody().path("content")));
+        }
+        final var put = path.put();
+        if (put != null) {
+            references.addAll(schemaRefFromContent(put.requestBody().path("content")));
+        }
+        final var patch = path.patch();
+        if (patch != null) {
+            references.addAll(schemaRefFromContent(patch.requestBody().path("content")));
+        }
+        return references;
+    }
+
+    /**
+     * The schema node does not have 1 specific structure and the "$ref" child is not always the first child after
+     * schema. Possible schema structures include:
+     * <ul>
+     *   <li>schema/$ref/{reference}</li>
+     *   <li>schema/properties/{nodeName}/$ref/{reference}</li>
+     *   <li>schema/properties/{nodeName}/items/$ref/{reference}</li>
+     * </ul>
+     * @param content the element identified with key "content"
+     * @return the set of referenced schemas
+     */
+    private static Set<String> schemaRefFromContent(final JsonNode content) {
+        final HashSet<String> refs = new HashSet<>();
+        content.fieldNames().forEachRemaining(mediaType -> {
+            final JsonNode schema = content.path(mediaType).path("schema");
+            final JsonNode props = schema.path("properties");
+            final JsonNode nameNode = props.isMissingNode() ? props : props.elements().next().path("items");
+            final JsonNode ref;
+            if (props.isMissingNode()) {
+                // either there is no node with the key "properties", try to find immediate child of schema
+                ref = schema.path("$ref");
+            } else if (nameNode.path("items").isMissingNode()) {
+                // or the "properties" is defined and under that we didn't find the "items" node
+                // try to get "$ref" as immediate child under nameNode
+                ref = nameNode.path("$ref");
+            } else {
+                // or the "items" node is defined, in which case we try to get the "$ref" from this node
+                ref = nameNode.path("items").path("$ref");
+            }
+
+            if (ref != null && !ref.isMissingNode()) {
+                refs.add(ref.asText().replaceFirst(COMPONENTS_PREFIX, ""));
+            }
+        });
+        return refs;
     }
 }
