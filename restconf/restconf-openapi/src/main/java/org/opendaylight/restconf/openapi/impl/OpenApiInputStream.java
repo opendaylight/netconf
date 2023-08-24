@@ -7,25 +7,25 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-public class OpenApiInputStream extends InputStream implements Iterator<JsonNode> {
+public class OpenApiInputStream extends InputStream implements Iterable<Integer> {
+    private final EffectiveModelContext context;
+
+    public OpenApiInputStream(final EffectiveModelContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return new OpenApiModelIterator(context);
+    }
 
     @Override
     public int read() throws IOException {
-        return 0;
-    }
-
-    @Override
-    public boolean hasNext() {
-        return false;
-    }
-
-    @Override
-    public JsonNode next() {
-        return null;
+        return iterator().next();
     }
 }
