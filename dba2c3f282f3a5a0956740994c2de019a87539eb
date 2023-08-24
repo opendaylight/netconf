@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "437bbc1d_b171f94b",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/Capability.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T14:16:56Z",
+      "side": 1,
+      "message": "Replace with up to date copyright",
+      "revId": "dba2c3f282f3a5a0956740994c2de019a87539eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ef19e60_a43b8cef",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/Capability.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T14:16:56Z",
+      "side": 1,
+      "message": "advertisement",
+      "revId": "dba2c3f282f3a5a0956740994c2de019a87539eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7980f70c_6960b0cf",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T14:16:56Z",
+      "side": 1,
+      "message": "moduleName is annotated with `@Nullable`, this should be `ofNullable` as the others",
+      "range": {
+        "startLine": 78,
+        "startChar": 24,
+        "endLine": 78,
+        "endChar": 38
+      },
+      "revId": "dba2c3f282f3a5a0956740994c2de019a87539eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
