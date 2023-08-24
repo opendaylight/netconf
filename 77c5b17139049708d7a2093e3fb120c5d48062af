@@ -33,6 +33,24 @@
       "message": "I would paraphrase it bc sometimes we don\u0027t have lists or containers in child nodes but have leaf",
       "revId": "77c5b17139049708d7a2093e3fb120c5d48062af",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec53e1b6_b138679e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-08-24T06:22:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "372387c9_c4985c99",
+      "revId": "77c5b17139049708d7a2093e3fb120c5d48062af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
