@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5de5893_432d1ceb",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-08-24T08:40:21Z",
+      "side": 1,
+      "message": "resolved",
+      "parentUuid": "00d94cf7_de27f979",
+      "revId": "a11bb0e6474508b4469bf6c91b0468efc27f262b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "511faabb_ab34e8fc",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-23T07:45:02Z",
       "side": 1,
       "message": "Preserve some-session as var please.",
+      "revId": "a11bb0e6474508b4469bf6c91b0468efc27f262b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0aac0c7c_be98c1ab",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-08-24T08:40:21Z",
+      "side": 1,
+      "message": "resolved",
+      "parentUuid": "511faabb_ab34e8fc",
       "revId": "a11bb0e6474508b4469bf6c91b0468efc27f262b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
