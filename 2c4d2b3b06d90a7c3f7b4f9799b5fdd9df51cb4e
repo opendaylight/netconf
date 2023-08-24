@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac021520_803c5eb6",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T12:42:30Z",
+      "side": 1,
+      "message": "This might not be necessary as we are creating a fresh HashSet in the `buildPathParameters()` method. No need to recreate it here again.",
+      "range": {
+        "startLine": 250,
+        "startChar": 45,
+        "endLine": 250,
+        "endChar": 58
+      },
+      "revId": "2c4d2b3b06d90a7c3f7b4f9799b5fdd9df51cb4e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
