@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1287ae86_305f537b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 9171
+      },
+      "writtenOn": "2023-08-24T10:21:30Z",
+      "side": 1,
+      "message": "We might want that description everywhere. Not only when requesting doc for all controller modules.\nIf we do want it with each info, it might be better to define it in the `Info` record, to avoid repetition",
+      "range": {
+        "startLine": 166,
+        "startChar": 63,
+        "endLine": 166,
+        "endChar": 69
+      },
+      "revId": "e7355562b94c01ad40751a43b2d78a9329362804",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
