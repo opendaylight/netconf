@@ -90,7 +90,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var host = createHostFromUriInfo(uriInfo);
         final var title = "Controller modules of RESTCONF";
         final var info = new Info(API_VERSION, title, DESCRIPTION);
-        final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
+        final var servers = List.of(new Server(schema + "://" + host + BASE_PATH, null, null));
 
         final var paths = new HashMap<String, Path>();
         final var schemas = new HashMap<String, Schema>();
@@ -155,7 +155,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
         final var info = new Info(API_VERSION, module.getName(), DESCRIPTION);
-        final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
+        final var servers = List.of(new Server(schema + "://" + host + BASE_PATH, null, null));
         final var definitionNames = new DefinitionNames();
         final var schemas = getSchemas(module, schemaContext, definitionNames, true);
         final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
