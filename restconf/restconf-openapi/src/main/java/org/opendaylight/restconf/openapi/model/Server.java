@@ -7,9 +7,25 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.eclipse.jdt.annotation.NonNull;
 
+/**
+ * Represents a Server. The target host is indicated by the {@link Server#url} field.
+ *
+ * <p>
+ * In the example URL: <b>http://localhost:8181/openapi/api/v3/mounts/{id}</b>,
+ *
+ * @param url <b>Required</b> {@link String} representing the URL to the target host.
+ */
 @JsonInclude(Include.NON_NULL)
-public record Server(String url) {
+public record Server(
+        @NonNull String url) {
+
+    public Server {
+        requireNonNull(url);
+    }
 }
