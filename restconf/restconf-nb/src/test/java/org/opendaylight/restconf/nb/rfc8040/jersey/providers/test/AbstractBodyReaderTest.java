@@ -69,8 +69,7 @@ public abstract class AbstractBodyReaderTest {
     protected final DatabindProvider databindProvider;
     protected final DOMMountPointService mountPointService;
 
-    protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext) throws NoSuchFieldException,
-            IllegalAccessException {
+    protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext) {
         mediaType = getMediaType();
 
         final var databindContext = DatabindContext.ofModel(schemaContext);

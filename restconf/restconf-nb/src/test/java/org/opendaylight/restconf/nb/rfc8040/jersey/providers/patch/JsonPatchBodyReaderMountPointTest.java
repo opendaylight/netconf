@@ -27,7 +27,7 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     private final JsonPatchBodyReader jsonToPatchBodyReader;
 
-    public JsonPatchBodyReaderMountPointTest() throws Exception {
+    public JsonPatchBodyReaderMountPointTest() {
         super(schemaContext);
         jsonToPatchBodyReader = new JsonPatchBodyReader(databindProvider, mountPointService);
     }
