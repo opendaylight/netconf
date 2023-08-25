@@ -13,17 +13,13 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -44,42 +40,17 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public final class TestUtils {
-
     private static final Logger LOG = LoggerFactory.getLogger(TestUtils.class);
 
     private TestUtils() {
-
-    }
-
-    public static EffectiveModelContext loadSchemaContext(final String... yangPath)
-            throws FileNotFoundException {
-        final List<File> files = new ArrayList<>();
-        for (final String path : yangPath) {
-            final String pathToFile = TestUtils.class.getResource(path).getPath();
-            final File testDir = new File(pathToFile);
-            final String[] fileList = testDir.list();
-            if (fileList == null) {
-                throw new FileNotFoundException(pathToFile);
-            }
-
-            for (final String fileName : fileList) {
-                final File file = new File(testDir, fileName);
-                if (file.isDirectory() == false) {
-                    files.add(file);
-                }
-            }
-        }
-
-        return YangParserTestUtils.parseYangFiles(files);
+        // Hidden on purpose
     }
 
     public static Module findModule(final Set<Module> modules, final String moduleName) {
