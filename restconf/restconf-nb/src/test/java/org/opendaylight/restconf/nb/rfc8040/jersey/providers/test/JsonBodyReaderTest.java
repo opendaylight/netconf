@@ -46,7 +46,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
 
-    public JsonBodyReaderTest() throws Exception {
+    public JsonBodyReaderTest() {
         super(schemaContext);
         jsonBodyReader = new JsonNormalizedNodeBodyReader(databindProvider, mountPointService);
     }
