@@ -12,35 +12,25 @@ import static org.junit.Assert.assertThrows;
 
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
     private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount/";
 
-    private static EffectiveModelContext schemaContext;
-
     private final XmlPatchBodyReader xmlToPatchBodyReader;
 
     public XmlPatchBodyReaderMountPointTest() {
-        super(schemaContext);
         xmlToPatchBodyReader = new XmlPatchBodyReader(databindProvider, mountPointService);
     }
 
     @Override
     protected MediaType getMediaType() {
         return new MediaType(MediaType.APPLICATION_XML, null);
-    }
-
-    @BeforeClass
-    public static void initialization() {
-        schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
     }
 
     @Test
