@@ -33,7 +33,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
 
     private final XmlPatchBodyReader xmlToPatchBodyReader;
 
-    public XmlPatchBodyReaderTest() throws Exception {
+    public XmlPatchBodyReaderTest() {
         super(schemaContext);
         xmlToPatchBodyReader = new XmlPatchBodyReader(databindProvider, mountPointService);
     }

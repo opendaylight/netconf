@@ -34,7 +34,7 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
     private final JsonPatchBodyReader jsonToPatchBodyReader;
     private static EffectiveModelContext schemaContext;
 
-    public JsonPatchBodyReaderTest() throws Exception {
+    public JsonPatchBodyReaderTest() {
         super(schemaContext);
         jsonToPatchBodyReader = new JsonPatchBodyReader(databindProvider, mountPointService);
     }

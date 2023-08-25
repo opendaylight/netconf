@@ -28,7 +28,7 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     private final XmlPatchBodyReader xmlToPatchBodyReader;
 
-    public XmlPatchBodyReaderMountPointTest() throws Exception {
+    public XmlPatchBodyReaderMountPointTest() {
         super(schemaContext);
         xmlToPatchBodyReader = new XmlPatchBodyReader(databindProvider, mountPointService);
     }
