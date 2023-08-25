@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "92e411ed_30f8b406",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-08-25T13:21:26Z",
+      "side": 1,
+      "message": "In addition, please test if we need to address branches 6.0.x, 5.0.x and 4.0.x.",
+      "revId": "2646cafa62cad0729911b9f7c812dd80c74510c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76643c56_1348577c",
