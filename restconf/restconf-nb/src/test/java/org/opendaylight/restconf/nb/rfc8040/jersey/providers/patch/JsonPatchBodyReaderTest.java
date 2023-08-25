@@ -11,13 +11,9 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.MediaType;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -26,42 +22,34 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
 public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
-    private final JsonPatchBodyReader jsonToPatchBodyReader;
-
-    public JsonPatchBodyReaderTest() {
-        jsonToPatchBodyReader = new JsonPatchBodyReader(databindProvider, mountPointService);
-    }
+    private final JsonPatchBodyReader jsonToPatchBodyReader =
+        new JsonPatchBodyReader(databindProvider, mountPointService);
 
     @Override
-    protected MediaType getMediaType() {
+    protected final MediaType getMediaType() {
         return new MediaType(APPLICATION_JSON, null);
     }
 
     @Test
-    public void modulePatchDataTest() throws Exception {
-        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
-        mockBodyReader(uri, jsonToPatchBodyReader, false);
+    public final void modulePatchDataTest() throws Exception {
+        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
+            jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
-            "/instanceidentifier/json/jsonPATCHdata.json");
-
-        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContext(returnValue);
+        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            JsonPatchBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/jsonPATCHdata.json")));
     }
 
     /**
      * Test of successful Patch consisting of create and delete Patch operations.
      */
     @Test
-    public void modulePatchCreateAndDeleteTest() throws Exception {
-        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
-        mockBodyReader(uri, jsonToPatchBodyReader, false);
+    public final void modulePatchCreateAndDeleteTest() throws Exception {
+        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
+            jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
-            "/instanceidentifier/json/jsonPATCHdataCreateAndDelete.json");
-
-        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContext(returnValue);
+        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            JsonPatchBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHdataCreateAndDelete.json")));
     }
 
     /**
@@ -69,14 +57,14 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      * {@link RestconfDocumentedException} with error code 400.
      */
     @Test
-    public void modulePatchValueMissingNegativeTest() throws Exception {
-        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
-        mockBodyReader(uri, jsonToPatchBodyReader, false);
+    public final void modulePatchValueMissingNegativeTest() throws Exception {
+        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
+            jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
+        final var inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
             "/instanceidentifier/json/jsonPATCHdataValueMissing.json");
 
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
         assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
@@ -86,14 +74,14 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      * {@link RestconfDocumentedException} with error code 400.
      */
     @Test
-    public void modulePatchValueNotSupportedNegativeTest() throws Exception {
-        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
-        mockBodyReader(uri, jsonToPatchBodyReader, false);
+    public final void modulePatchValueNotSupportedNegativeTest() throws Exception {
+        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
+            jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
+        final var inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
             "/instanceidentifier/json/jsonPATCHdataValueNotSupported.json");
 
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
         assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
@@ -102,87 +90,74 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      * Test using Patch when target is completely specified in request URI and thus target leaf contains only '/' sign.
      */
     @Test
-    public void modulePatchCompleteTargetInURITest() throws Exception {
-        final String uri = "instance-identifier-patch-module:patch-cont";
-        mockBodyReader(uri, jsonToPatchBodyReader, false);
+    public final void modulePatchCompleteTargetInURITest() throws Exception {
+        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont", jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
-            "/instanceidentifier/json/jsonPATCHdataCompleteTargetInURI.json");
-
-        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContext(returnValue);
+        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            JsonPatchBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHdataCompleteTargetInURI.json")));
     }
 
     /**
-     * Test of Yang Patch merge operation on list. Test consists of two edit operations - replace and merge.
+     * Test of YANG Patch merge operation on list. Test consists of two edit operations - replace and merge.
      */
     @Test
-    public void modulePatchMergeOperationOnListTest() throws Exception {
-        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
-        mockBodyReader(uri, jsonToPatchBodyReader, false);
+    public final void modulePatchMergeOperationOnListTest() throws Exception {
+        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
+            jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
-            "/instanceidentifier/json/jsonPATCHMergeOperationOnList.json");
-
-        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContext(returnValue);
+        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            JsonPatchBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHMergeOperationOnList.json")));
     }
 
     /**
-     * Test of Yang Patch merge operation on container. Test consists of two edit operations - create and merge.
+     * Test of YANG Patch merge operation on container. Test consists of two edit operations - create and merge.
      */
     @Test
-    public void modulePatchMergeOperationOnContainerTest() throws Exception {
-        final String uri = "instance-identifier-patch-module:patch-cont";
-        mockBodyReader(uri, jsonToPatchBodyReader, false);
+    public final void modulePatchMergeOperationOnContainerTest() throws Exception {
+        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont", jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
-            "/instanceidentifier/json/jsonPATCHMergeOperationOnContainer.json");
-
-        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContext(returnValue);
+        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            JsonPatchBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHMergeOperationOnContainer.json")));
     }
 
     /**
      * Test reading simple leaf value.
      */
     @Test
-    public void modulePatchSimpleLeafValueTest() throws Exception {
-        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
-        mockBodyReader(uri, jsonToPatchBodyReader, false);
+    public final void modulePatchSimpleLeafValueTest() throws Exception {
+        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
+            jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
-            "/instanceidentifier/json/jsonPATCHSimpleLeafValue.json");
-
-        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            JsonPatchBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHSimpleLeafValue.json"));
         checkPatchContext(returnValue);
-        final var data = returnValue.getData().get(0).getNode();
-        assertEquals(LEAF_NAME_QNAME, data.name().getNodeType());
-        assertEquals(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf20"), data);
+        assertEquals(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf20"), returnValue.getData().get(0).getNode());
     }
 
     /**
-     * Test of Yang Patch on the top-level container with empty URI for data root.
+     * Test of YANG Patch on the top-level container with empty URI for data root.
      */
     @Test
-    public void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
-        final String uri = "";
-        mockBodyReader(uri, jsonToPatchBodyReader, false);
+    public final void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
+        mockBodyReader(mountPrefix(), jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
-                "/instanceidentifier/json/jsonPATCHTargetTopLevelContainerWithEmptyURI.json");
-
-        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContext(returnValue);
+        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            JsonPatchBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHTargetTopLevelContainerWithEmptyURI.json")));
     }
 
     /**
-     * Test of Yang Patch on the top-level container with the full path in the URI and "/" in 'target'.
+     * Test of YANG Patch on the top-level container with the full path in the URI and "/" in 'target'.
      */
     @Test
-    public void modulePatchTargetTopLevelContainerWithFullPathURITest() throws Exception {
-        mockBodyReader("instance-identifier-patch-module:patch-cont", jsonToPatchBodyReader, false);
-        final var inputStream = new ByteArrayInputStream("""
+    public final void modulePatchTargetTopLevelContainerWithFullPathURITest() throws Exception {
+        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont", jsonToPatchBodyReader, false);
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "test-patch",
@@ -206,8 +181,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }""".getBytes(StandardCharsets.UTF_8));
-        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+            }"""));
         checkPatchContext(returnValue);
         assertEquals(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(PATCH_CONT_QNAME))
@@ -224,13 +198,14 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
     }
 
     /**
-     * Test of Yang Patch on the second-level list with the full path in the URI and "/" in 'target'.
+     * Test of YANG Patch on the second-level list with the full path in the URI and "/" in 'target'.
      */
     @Test
-    public void modulePatchTargetSecondLevelListWithFullPathURITest() throws Exception {
-        mockBodyReader("instance-identifier-patch-module:patch-cont/my-list1=my-leaf-set",
-                jsonToPatchBodyReader, false);
-        final var inputStream = new ByteArrayInputStream("""
+    public final void modulePatchTargetSecondLevelListWithFullPathURITest() throws Exception {
+        mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=my-leaf-set",
+            jsonToPatchBodyReader, false);
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "test-patch",
@@ -252,8 +227,7 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }""".getBytes(StandardCharsets.UTF_8));
-        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+            }"""));
         checkPatchContext(returnValue);
         assertEquals(Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(MY_LIST1_QNAME))
@@ -271,9 +245,10 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
      * Test of Yang Patch on the top augmented element.
      */
     @Test
-    public void modulePatchTargetTopLevelAugmentedContainerTest() throws Exception {
-        mockBodyReader("", jsonToPatchBodyReader, false);
-        final var inputStream = new ByteArrayInputStream("""
+    public final void modulePatchTargetTopLevelAugmentedContainerTest() throws Exception {
+        mockBodyReader(mountPrefix(), jsonToPatchBodyReader, false);
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "test-patch",
@@ -291,26 +266,22 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }
-            """.getBytes(StandardCharsets.UTF_8));
-        final var expectedData = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(CONT_AUG_QNAME))
-                .withChild(ImmutableNodes.leafNode(LEAF_AUG_QNAME, "data"))
-                .build();
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+            }"""));
         checkPatchContext(returnValue);
-        final var data = returnValue.getData().get(0).getNode();
-        assertEquals(CONT_AUG_QNAME, data.name().getNodeType());
-        assertEquals(expectedData, data);
+        assertEquals(Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(CONT_AUG_QNAME))
+            .withChild(ImmutableNodes.leafNode(LEAF_AUG_QNAME, "data"))
+            .build(), returnValue.getData().get(0).getNode());
     }
 
     /**
-     * Test of Yang Patch on the system map node element.
+     * Test of YANG Patch on the system map node element.
      */
     @Test
-    public void modulePatchTargetMapNodeTest() throws Exception {
-        mockBodyReader("", jsonToPatchBodyReader, false);
-        final var inputStream = new ByteArrayInputStream("""
+    public final void modulePatchTargetMapNodeTest() throws Exception {
+        mockBodyReader(mountPrefix(), jsonToPatchBodyReader, false);
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "map-patch",
@@ -329,30 +300,26 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }
-            """.getBytes(StandardCharsets.UTF_8));
-        final var expectedData = Builders.mapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(MAP_CONT_QNAME))
-                .withChild(Builders.mapEntryBuilder()
-                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(MAP_CONT_QNAME, KEY_LEAF_QNAME, "key"))
-                        .withChild(ImmutableNodes.leafNode(KEY_LEAF_QNAME, "key"))
-                        .withChild(ImmutableNodes.leafNode(DATA_LEAF_QNAME, "data"))
-                        .build())
-                .build();
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+            }"""));
         checkPatchContext(returnValue);
-        final var data = returnValue.getData().get(0).getNode();
-        assertEquals(MAP_CONT_QNAME, data.name().getNodeType());
-        assertEquals(expectedData, data);
+        assertEquals(Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(MAP_CONT_QNAME))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(MAP_CONT_QNAME, KEY_LEAF_QNAME, "key"))
+                .withChild(ImmutableNodes.leafNode(KEY_LEAF_QNAME, "key"))
+                .withChild(ImmutableNodes.leafNode(DATA_LEAF_QNAME, "data"))
+                .build())
+            .build(), returnValue.getData().get(0).getNode());
     }
 
     /**
      * Test of Yang Patch on the leaf set node element.
      */
     @Test
-    public void modulePatchTargetLeafSetNodeTest() throws Exception {
-        mockBodyReader("", jsonToPatchBodyReader, false);
-        final var inputStream = new ByteArrayInputStream("""
+    public final void modulePatchTargetLeafSetNodeTest() throws Exception {
+        mockBodyReader(mountPrefix() + "", jsonToPatchBodyReader, false);
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "set-patch",
@@ -368,29 +335,25 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }
-            """.getBytes(StandardCharsets.UTF_8));
-        final var expectedData = Builders.leafSetBuilder()
-                .withNodeIdentifier(new NodeIdentifier(LEAF_SET_QNAME))
-                .withChild(Builders.leafSetEntryBuilder()
-                        .withNodeIdentifier(new NodeWithValue<>(LEAF_SET_QNAME, "data1"))
-                        .withValue("data1")
-                        .build())
-                .build();
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+            }"""));
         checkPatchContext(returnValue);
-        final var data = returnValue.getData().get(0).getNode();
-        assertEquals(LEAF_SET_QNAME, data.name().getNodeType());
-        assertEquals(expectedData, data);
+        assertEquals(Builders.leafSetBuilder()
+            .withNodeIdentifier(new NodeIdentifier(LEAF_SET_QNAME))
+            .withChild(Builders.leafSetEntryBuilder()
+                .withNodeIdentifier(new NodeWithValue<>(LEAF_SET_QNAME, "data1"))
+                .withValue("data1")
+                .build())
+            .build(), returnValue.getData().get(0).getNode());
     }
 
     /**
      * Test of Yang Patch on the unkeyed list node element.
      */
     @Test
-    public void modulePatchTargetUnkeyedListNodeTest() throws Exception {
-        mockBodyReader("", jsonToPatchBodyReader, false);
-        final var inputStream = new ByteArrayInputStream("""
+    public final void modulePatchTargetUnkeyedListNodeTest() throws Exception {
+        mockBodyReader(mountPrefix(), jsonToPatchBodyReader, false);
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "list-patch",
@@ -409,30 +372,26 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }
-            """.getBytes(StandardCharsets.UTF_8));
-        final var expectedData = Builders.unkeyedListBuilder()
-                .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
-                .withChild(Builders.unkeyedListEntryBuilder()
-                        .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
-                        .withChild(ImmutableNodes.leafNode(LIST_LEAF1_QNAME, "data1"))
-                        .withChild(ImmutableNodes.leafNode(LIST_LEAF2_QNAME, "data2"))
-                        .build())
-                .build();
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+            }"""));
         checkPatchContext(returnValue);
-        final var data = returnValue.getData().get(0).getNode();
-        assertEquals(LIST_QNAME, data.name().getNodeType());
-        assertEquals(expectedData, data);
+        assertEquals(Builders.unkeyedListBuilder()
+            .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+            .withChild(Builders.unkeyedListEntryBuilder()
+                .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+                .withChild(ImmutableNodes.leafNode(LIST_LEAF1_QNAME, "data1"))
+                .withChild(ImmutableNodes.leafNode(LIST_LEAF2_QNAME, "data2"))
+                .build())
+            .build(), returnValue.getData().get(0).getNode());
     }
 
     /**
      * Test of Yang Patch on the case node element.
      */
     @Test
-    public void modulePatchTargetCaseNodeTest() throws Exception {
-        mockBodyReader("", jsonToPatchBodyReader, false);
-        final var inputStream = new ByteArrayInputStream("""
+    public final void modulePatchTargetCaseNodeTest() throws Exception {
+        mockBodyReader(mountPrefix(), jsonToPatchBodyReader, false);
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
             {
                 "ietf-yang-patch:yang-patch": {
                     "patch-id": "choice-patch",
@@ -450,16 +409,11 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
                         }
                     ]
                 }
-            }
-            """.getBytes(StandardCharsets.UTF_8));
-        final var expectedData = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(CHOICE_CONT_QNAME))
-                .withChild(ImmutableNodes.leafNode(CASE_LEAF1_QNAME, "data"))
-                .build();
-        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+            }"""));
         checkPatchContext(returnValue);
-        final var data = returnValue.getData().get(0).getNode();
-        assertEquals(CHOICE_CONT_QNAME, data.name().getNodeType());
-        assertEquals(expectedData, data);
+        assertEquals(Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(CHOICE_CONT_QNAME))
+            .withChild(ImmutableNodes.leafNode(CASE_LEAF1_QNAME, "data"))
+            .build(), returnValue.getData().get(0).getNode());
     }
 }

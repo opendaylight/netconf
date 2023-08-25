@@ -8,13 +8,28 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 
 abstract class AbstractPatchBodyReaderTest extends AbstractBodyReaderTest {
 
-    static final void checkPatchContext(final PatchContext patchContext) {
+    @NonNull String mountPrefix() {
+        return "";
+    }
+
+    @Nullable DOMMountPoint mountPoint() {
+        return null;
+    }
+
+    final void checkPatchContext(final PatchContext patchContext) {
         assertNotNull(patchContext.getData());
 
         final var iid = patchContext.getInstanceIdentifierContext();
@@ -23,10 +38,10 @@ abstract class AbstractPatchBodyReaderTest extends AbstractBodyReaderTest {
         assertNotNull(iid.getInstanceIdentifier());
         assertNotNull(iid.getSchemaContext());
         assertNotNull(iid.getSchemaNode());
+        assertSame(mountPoint(), iid.getMountPoint());
     }
 
-    static final void checkPatchContextMountPoint(final PatchContext patchContext) {
-        checkPatchContext(patchContext);
-        assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint());
+    static final @NonNull InputStream stringInputStream(final String str) {
+        return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
     }
 }
