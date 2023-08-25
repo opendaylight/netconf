@@ -23,6 +23,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import org.junit.BeforeClass;
 import org.junit.function.ThrowingRunnable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -31,7 +32,6 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
@@ -41,6 +41,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractBodyReaderTest {
     protected static final QName CONT_AUG_QNAME = QName.create("test-ns-aug", "container-aug").intern();
@@ -65,9 +66,15 @@ public abstract class AbstractBodyReaderTest {
     protected static final QName MY_LEAF12_QNAME = QName.create("instance:identifier:patch:module",
             "2015-11-21", "my-leaf12").intern();
 
+    private static EffectiveModelContext BASELINE_CONTEXT;
+
     protected final MediaType mediaType;
     protected final DatabindProvider databindProvider;
     protected final DOMMountPointService mountPointService;
+
+    protected AbstractBodyReaderTest() {
+        this(BASELINE_CONTEXT);
+    }
 
     protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext) {
         mediaType = getMediaType();
@@ -82,12 +89,12 @@ public abstract class AbstractBodyReaderTest {
             .getService(DOMSchemaService.class);
     }
 
-    protected abstract MediaType getMediaType();
-
-    protected static EffectiveModelContext schemaContextLoader(final String yangPath,
-            final EffectiveModelContext schemaContext) {
-        return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
+    @BeforeClass
+    public static final void initBaselineContext() {
+        BASELINE_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/instanceidentifier/yang");
     }
+
+    protected abstract MediaType getMediaType();
 
     protected static <T extends AbstractIdentifierAwareJaxRsProvider<?>> void mockBodyReader(
             final String identifier, final T normalizedNodeProvider, final boolean isPost) {

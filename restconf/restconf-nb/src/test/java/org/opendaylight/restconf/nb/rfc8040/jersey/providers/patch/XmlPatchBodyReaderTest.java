@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.MediaType;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
@@ -26,26 +25,17 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
-    private static EffectiveModelContext schemaContext;
-
     private final XmlPatchBodyReader xmlToPatchBodyReader;
 
     public XmlPatchBodyReaderTest() {
-        super(schemaContext);
         xmlToPatchBodyReader = new XmlPatchBodyReader(databindProvider, mountPointService);
     }
 
     @Override
     protected MediaType getMediaType() {
         return new MediaType(MediaType.APPLICATION_XML, null);
-    }
-
-    @BeforeClass
-    public static void initialization() {
-        schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
     }
 
     @Test
