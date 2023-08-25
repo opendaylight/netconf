@@ -22,6 +22,30 @@
       },
       "revId": "b1c37555e8b3b2cbc25aebee2a8c7a4d758e7fb0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c15f2665_895b0e9b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9172
+      },
+      "writtenOn": "2023-08-25T15:01:47Z",
+      "side": 1,
+      "message": "Yop, typo",
+      "parentUuid": "17bb95fb_1c21c02f",
+      "range": {
+        "startLine": 9,
+        "startChar": 53,
+        "endLine": 9,
+        "endChar": 63
+      },
+      "revId": "b1c37555e8b3b2cbc25aebee2a8c7a4d758e7fb0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
