@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -33,7 +32,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -75,22 +73,10 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
 
     private PatchContext readFrom(final InstanceIdentifierContext path, final InputStream entityStream)
             throws IOException {
-        final JsonReader jsonReader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
-        AtomicReference<String> patchId = new AtomicReference<>();
-        final List<PatchEntity> resultList = read(jsonReader, path, patchId);
-        jsonReader.close();
-
-        return new PatchContext(path, resultList, patchId.get());
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    public PatchContext readFrom(final String uriPath, final InputStream entityStream)
-            throws RestconfDocumentedException {
-        try {
-            return readFrom(ParserIdentifier.toInstanceIdentifier(uriPath, getSchemaContext(), getMountPointService()),
-                entityStream);
-        } catch (final Exception e) {
-            throw propagateExceptionAs(e);
+        final var patchId = new AtomicReference<String>();
+        try (var jsonReader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8))) {
+            final var resultList = read(jsonReader, path, patchId);
+            return new PatchContext(path, resultList, patchId.get());
         }
     }
 
