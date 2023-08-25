@@ -33,7 +33,6 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -104,10 +103,9 @@ public class ParserIdentifierTest {
     private DOMYangTextSourceProvider sourceProvider;
 
     @BeforeClass
-    public static void beforeClass() throws Exception {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/parser-identifier"));
-        SCHEMA_CONTEXT_ON_MOUNT_POINT =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/parser-identifier"));
+    public static void beforeClass() {
+        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/parser-identifier");
+        SCHEMA_CONTEXT_ON_MOUNT_POINT = YangParserTestUtils.parseYangResourceDirectory("/parser-identifier");
     }
 
     @AfterClass
