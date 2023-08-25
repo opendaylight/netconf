@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d9db341_704ee227",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/Capability.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-25T14:07:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "437bbc1d_b171f94b",
+      "revId": "dba2c3f282f3a5a0956740994c2de019a87539eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ef19e60_a43b8cef",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6791a40_e237b16e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/Capability.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-25T14:07:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ef19e60_a43b8cef",
+      "revId": "dba2c3f282f3a5a0956740994c2de019a87539eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7980f70c_6960b0cf",
@@ -48,6 +84,30 @@
       "writtenOn": "2023-08-24T14:16:56Z",
       "side": 1,
       "message": "moduleName is annotated with `@Nullable`, this should be `ofNullable` as the others",
+      "range": {
+        "startLine": 78,
+        "startChar": 24,
+        "endLine": 78,
+        "endChar": 38
+      },
+      "revId": "dba2c3f282f3a5a0956740994c2de019a87539eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91105543_24cb6909",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-25T14:07:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7980f70c_6960b0cf",
       "range": {
         "startLine": 78,
         "startChar": 24,
