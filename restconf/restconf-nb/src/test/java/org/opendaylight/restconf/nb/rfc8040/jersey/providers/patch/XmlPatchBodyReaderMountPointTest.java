@@ -7,117 +7,16 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 
-import java.io.InputStream;
-import javax.ws.rs.core.MediaType;
-import org.junit.Test;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-
-public class XmlPatchBodyReaderMountPointTest extends AbstractPatchBodyReaderTest {
-    private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount/";
-
-    private final XmlPatchBodyReader xmlToPatchBodyReader;
-
-    public XmlPatchBodyReaderMountPointTest() {
-        xmlToPatchBodyReader = new XmlPatchBodyReader(databindProvider, mountPointService);
+public class XmlPatchBodyReaderMountPointTest extends XmlPatchBodyReaderTest {
+    @Override
+    String mountPrefix() {
+        return "instance-identifier-module:cont/yang-ext:mount/";
     }
 
     @Override
-    protected MediaType getMediaType() {
-        return new MediaType(MediaType.APPLICATION_XML, null);
-    }
-
-    @Test
-    public void moduleDataTest() throws Exception {
-        mockBodyReader(MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", xmlToPatchBodyReader,
-            false);
-        checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlPatchBodyReaderMountPointTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdata.xml")));
-    }
-
-    /**
-     * Test trying to use Patch create operation which requires value without value. Error code 400 should be returned.
-     */
-    @Test
-    public void moduleDataValueMissingNegativeTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
-        mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlPatchBodyReaderMountPointTest.class.getResourceAsStream(
-            "/instanceidentifier/xml/xmlPATCHdataValueMissing.xml");
-
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
-    }
-
-    /**
-     * Test trying to use value with Patch delete operation which does not support value. Error code 400 should be
-     * returned.
-     */
-    @Test
-    public void moduleDataNotValueNotSupportedNegativeTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
-        mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlPatchBodyReaderMountPointTest.class.getResourceAsStream(
-            "/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml");
-
-        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
-    }
-
-    /**
-     * Test of Yang Patch with absolute target path.
-     */
-    @Test
-    public void moduleDataAbsoluteTargetPathTest() throws Exception {
-        final String uri = MOUNT_POINT;
-        mockBodyReader(uri, xmlToPatchBodyReader, false);
-
-        checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlPatchBodyReaderMountPointTest.class.getResourceAsStream(
-                "/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml")));
-    }
-
-    /**
-     * Test using Patch when target is completely specified in request URI and thus target leaf contains only '/' sign.
-     */
-    @Test
-    public void modulePatchCompleteTargetInURITest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont";
-        mockBodyReader(uri, xmlToPatchBodyReader, false);
-
-        checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlPatchBodyReaderMountPointTest.class.getResourceAsStream(
-                "/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml")));
-    }
-
-    /**
-     * Test of Yang Patch merge operation on list. Test consists of two edit operations - replace and merge.
-     */
-    @Test
-    public void moduleDataMergeOperationOnListTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
-        mockBodyReader(uri, xmlToPatchBodyReader, false);
-
-        checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlPatchBodyReaderMountPointTest.class.getResourceAsStream(
-                "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml")));
-    }
-
-    /**
-     * Test of Yang Patch merge operation on container. Test consists of two edit operations - create and merge.
-     */
-    @Test
-    public void moduleDataMergeOperationOnContainerTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont";
-        mockBodyReader(uri, xmlToPatchBodyReader, false);
-
-        checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlPatchBodyReaderMountPointTest.class.getResourceAsStream(
-                "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml")));
+    DOMMountPoint mountPoint() {
+        return mountPoint;
     }
 }

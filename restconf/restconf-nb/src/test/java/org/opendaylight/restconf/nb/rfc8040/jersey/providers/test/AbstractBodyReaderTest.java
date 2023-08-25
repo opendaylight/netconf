@@ -74,6 +74,7 @@ public abstract class AbstractBodyReaderTest {
     protected final MediaType mediaType;
     protected final DatabindProvider databindProvider;
     protected final DOMMountPointService mountPointService;
+    protected final DOMMountPoint mountPoint;
 
     protected AbstractBodyReaderTest() {
         this(BASELINE_CONTEXT);
@@ -86,7 +87,7 @@ public abstract class AbstractBodyReaderTest {
         databindProvider = () -> databindContext;
 
         mountPointService = mock(DOMMountPointService.class);
-        final var mountPoint = mock(DOMMountPoint.class);
+        mountPoint = mock(DOMMountPoint.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(schemaContext))).when(mountPoint)
             .getService(DOMSchemaService.class);
