@@ -25,7 +25,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.messages.NotificationMessage;
+import org.opendaylight.netconf.api.messages.RpcMessage;
+import org.opendaylight.netconf.api.messages.RpcReplyMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfClientSession;
@@ -212,8 +214,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
          * Dispatch between notifications and messages. Messages need to be processed
          * with lock held, notifications do not.
          */
-        if (isNotification(message)) {
-            processNotification(message);
+        if (message instanceof NotificationMessage notificationMessage) {
+            processNotification(notificationMessage);
         } else {
             processMessage(message);
         }
@@ -268,10 +270,20 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.trace("{}: Matched request: {} to response: {}", id, msgToS(request.request), msgToS(message));
         }
 
-        final String inputMsgId = request.request.getDocument().getDocumentElement()
-            .getAttribute(XmlNetconfConstants.MESSAGE_ID);
-        final String outputMsgId = message.getDocument().getDocumentElement()
-            .getAttribute(XmlNetconfConstants.MESSAGE_ID);
+        final String outputMsgId;
+        if (message instanceof RpcMessage rpcMessage) {
+            outputMsgId = rpcMessage.getMessageId();
+        } else if (message instanceof RpcReplyMessage replyMessage) {
+            outputMsgId = replyMessage.getMessageId();
+        } else {
+            LOG.warn("{}: Invalid type of response message. Response: {}", id, msgToS(message));
+
+            //Ignoring message of wrong type
+            return;
+        }
+
+        final String inputMsgId = request.request.getMessageId();
+
         if (!inputMsgId.equals(outputMsgId)) {
             // FIXME: we should be able to transform directly to RpcError without an intermediate exception
             final var ex = new DocumentedException("Response message contained unknown \"message-id\"", null,
@@ -327,7 +339,13 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     @Override
     public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
         sessionLock.lock();
+
         try {
+            if (!(message instanceof RpcMessage)) {
+                LOG.warn("Wrong request type. Expected RpcMessage, but was: {}", message.getClass().getName());
+                return Futures.immediateFailedFuture(new DocumentedException(
+                    "Wrong request type. Expected RpcMessage, but was: " + message.getClass().getName()));
+            }
             if (semaphore != null && !semaphore.tryAcquire()) {
                 LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
                     + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.name());
@@ -336,13 +354,13 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                         + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
             }
 
-            return sendRequestWithLock(message, rpc);
+            return sendRequestWithLock((RpcMessage) message, rpc);
         } finally {
             sessionLock.unlock();
         }
     }
 
-    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message,
+    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final RpcMessage message,
                                                                             final QName rpc) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Sending message {}", id, msgToS(message));
@@ -378,7 +396,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         return req.future;
     }
 
-    private void processNotification(final NetconfMessage notification) {
+    private void processNotification(final NotificationMessage notification) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Notification received: {}", id, notification);
         }
@@ -386,21 +404,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         remoteDevice.onNotification(notification);
     }
 
-    private static boolean isNotification(final NetconfMessage message) {
-        if (message.getDocument() == null) {
-            // We have no message, which mean we have a FailedNetconfMessage
-            return false;
-        }
-        final XmlElement xmle = XmlElement.fromDomDocument(message.getDocument());
-        return XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME.equals(xmle.getName()) ;
-    }
-
     private static final class Request {
         final UncancellableFuture<RpcResult<NetconfMessage>> future;
-        final NetconfMessage request;
+        final RpcMessage request;
 
         private Request(final UncancellableFuture<RpcResult<NetconfMessage>> future,
-                        final NetconfMessage request) {
+                        final RpcMessage request) {
             this.future = future;
             this.request = request;
         }
