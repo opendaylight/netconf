@@ -424,54 +424,10 @@ public final class RestconfDataServiceImpl {
         }, MoreExecutors.directExecutor());
     }
 
-    /**
-     * Ordered list of edits that are applied to the target datastore by the server.
-     *
-     * @param identifier path to target
-     * @param context edits
-     * @return {@link PatchStatusContext}
-     */
-    @PATCH
-    @Path("/data/{identifier:.+}")
-    @Consumes({
-        MediaTypes.APPLICATION_YANG_PATCH_JSON,
-        MediaTypes.APPLICATION_YANG_PATCH_XML
-    })
-    @Produces({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML
-    })
-    public PatchStatusContext patchData(@Encoded @PathParam("identifier") final String identifier,
-            final PatchContext context) {
-        return patchData(context);
-    }
 
     /**
-     * Ordered list of edits that are applied to the datastore by the server.
-     *
-     * @param context edits
-     * @return {@link PatchStatusContext}
-     */
-    @PATCH
-    @Path("/data")
-    @Consumes({
-        MediaTypes.APPLICATION_YANG_PATCH_JSON,
-        MediaTypes.APPLICATION_YANG_PATCH_XML
-    })
-    @Produces({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML
-    })
-    public PatchStatusContext patchData(final PatchContext context) {
-        final InstanceIdentifierContext iid = RestconfDocumentedException.throwIfNull(context,
-            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "No patch documented provided")
-            .getInstanceIdentifierContext();
-        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
-        return PatchDataTransactionUtil.patchData(context, strategy, iid.getSchemaContext());
-    }
-
-    /**
-     * Partially modify the target data resource.
+     * Partially modify the target data resource, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
      *
      * @param identifier path to target
      * @param payload data node for put to config DS
@@ -486,7 +442,7 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void patchData(@Encoded @PathParam("identifier") final String identifier,
+    public void plainPatchData(@Encoded @PathParam("identifier") final String identifier,
             final NormalizedNodePayload payload, @Suspended final AsyncResponse ar) {
         final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
         final YangInstanceIdentifier path = iid.getInstanceIdentifier();
@@ -506,6 +462,54 @@ public final class RestconfDataServiceImpl {
                 ar.resume(failure);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    /**
+     * Ordered list of edits that are applied to the target datastore by the server, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
+     *
+     * @param identifier path to target
+     * @param context edits
+     * @return {@link PatchStatusContext}
+     */
+    @PATCH
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_PATCH_JSON,
+        MediaTypes.APPLICATION_YANG_PATCH_XML
+    })
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
+    })
+    public PatchStatusContext yangPatchData(@Encoded @PathParam("identifier") final String identifier,
+            final PatchContext context) {
+        return yangPatchData(context);
+    }
+
+    /**
+     * Ordered list of edits that are applied to the datastore by the server, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
+     *
+     * @param context edits
+     * @return {@link PatchStatusContext}
+     */
+    @PATCH
+    @Path("/data")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_PATCH_JSON,
+        MediaTypes.APPLICATION_YANG_PATCH_XML
+    })
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
+    })
+    public PatchStatusContext yangPatchData(final PatchContext context) {
+        final InstanceIdentifierContext iid = RestconfDocumentedException.throwIfNull(context,
+            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "No patch documented provided")
+            .getInstanceIdentifierContext();
+        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
+        return PatchDataTransactionUtil.patchData(context, strategy, iid.getSchemaContext());
     }
 
     @VisibleForTesting
