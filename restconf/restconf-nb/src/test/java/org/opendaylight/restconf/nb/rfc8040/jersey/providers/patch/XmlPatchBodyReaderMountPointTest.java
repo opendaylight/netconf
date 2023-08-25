@@ -14,7 +14,6 @@ import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -35,13 +34,10 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     @Test
     public void moduleDataTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
-        mockBodyReader(uri, xmlToPatchBodyReader, false);
-
-        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
-            "/instanceidentifier/xml/xmlPATCHdata.xml");
-        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContextMountPoint(returnValue);
+        mockBodyReader(MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", xmlToPatchBodyReader,
+            false);
+        checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdata.xml")));
     }
 
     /**
