@@ -35,8 +35,40 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
         mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
             jsonToPatchBodyReader, false);
 
-        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            JsonPatchBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/jsonPATCHdata.json")));
+        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test-patch",
+                "comment" : "this is test patch",
+                "edit" : [
+                  {
+                    "edit-id": "edit1",
+                    "operation": "replace",
+                    "target": "/my-list2=my-leaf20",
+                    "value": {
+                      "my-list2": {
+                        "name": "my-leaf20",
+                        "my-leaf21": "I am leaf21-0",
+                        "my-leaf22": "I am leaf22-0"
+                       }
+                    }
+                  },
+                  {
+                    "edit-id": "edit2",
+                    "operation": "replace",
+                    "target": "/my-list2=my-leaf20",
+                    "value": {
+                      "my-list2": {
+                        "name": "my-leaf20",
+                        "my-leaf21": "I am leaf21-1",
+                        "my-leaf22": "I am leaf22-1",
+                        "my-leaf-list": ["listelement"]
+                      }
+                    }
+                  }
+                ]
+              }
+            }""")));
     }
 
     /**
@@ -47,9 +79,38 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
         mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
             jsonToPatchBodyReader, false);
 
-        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            JsonPatchBodyReaderTest.class.getResourceAsStream(
-                "/instanceidentifier/json/jsonPATCHdataCreateAndDelete.json")));
+        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test-patch",
+                "comment" : "this is test patch",
+                "edit" : [
+                  {
+                    "edit-id": "edit1",
+                    "value": {
+                      "my-list2": [
+                        {
+                          "name": "my-leaf20",
+                          "my-leaf21": "I am leaf20"
+                        },
+                        {
+                          "name": "my-leaf21",
+                          "my-leaf21": "I am leaf21-1",
+                          "my-leaf22": "I am leaf21-2"
+                        }
+                      ]
+                    },
+                    "target": "/my-list2=my-leaf20",
+                    "operation": "create"
+                  },
+                  {
+                    "edit-id": "edit2",
+                    "operation": "delete",
+                    "target": "/my-list2=my-leaf20"
+                  }
+                ]
+              }
+            }""")));
     }
 
     /**
@@ -61,11 +122,22 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
         mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
             jsonToPatchBodyReader, false);
 
-        final var inputStream = JsonPatchBodyReaderTest.class.getResourceAsStream(
-            "/instanceidentifier/json/jsonPATCHdataValueMissing.json");
-
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+            () -> jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+                {
+                  "ietf-yang-patch:yang-patch" : {
+                    "patch-id" : "test-patch",
+                    "comment" : "this is test patch",
+                    "edit" : [
+                      {
+                        "edit-id": "edit1",
+                        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name=\
+'my-leaf20']",
+                        "operation": "create"
+                      }
+                    ]
+                  }
+                }""")));
         assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -118,9 +190,50 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
     public final void modulePatchMergeOperationOnContainerTest() throws Exception {
         mockBodyReader(mountPrefix() + "instance-identifier-patch-module:patch-cont", jsonToPatchBodyReader, false);
 
-        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            JsonPatchBodyReaderTest.class.getResourceAsStream(
-                "/instanceidentifier/json/jsonPATCHMergeOperationOnContainer.json")));
+        checkPatchContext(jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "Test merge operation",
+                "comment" : "This is test patch for merge operation on container",
+                "edit" : [
+                  {
+                    "edit-id": "edit1",
+                    "operation": "create",
+                    "target": "/",
+                    "value": {
+                      "patch-cont": {
+                        "my-list1": [
+                          {
+                            "name": "my-list1 - A",
+                            "my-leaf11": "I am leaf11-0",
+                            "my-leaf12": "I am leaf12-1"
+                          },
+                          {
+                            "name": "my-list1 - B",
+                            "my-leaf11": "I am leaf11-0",
+                            "my-leaf12": "I am leaf12-1"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "edit-id": "edit2",
+                    "operation": "merge",
+                    "target": "/",
+                    "value": {
+                      "patch-cont": {
+                        "my-list1": {
+                          "name": "my-list1 - Merged",
+                          "my-leaf11": "I am leaf11-0",
+                          "my-leaf12": "I am leaf12-1"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }""")));
     }
 
     /**
@@ -159,28 +272,28 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
 
         final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
             {
-                "ietf-yang-patch:yang-patch": {
-                    "patch-id": "test-patch",
-                    "comment": "Test patch applied to the top-level container with '/' in target",
-                    "edit": [
-                        {
-                            "edit-id": "edit1",
-                            "operation": "replace",
-                            "target": "/",
-                            "value": {
-                                "patch-cont": {
-                                    "my-list1": [
-                                        {
-                                            "name": "my-leaf-set",
-                                            "my-leaf11": "leaf-a",
-                                            "my-leaf12": "leaf-b"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    ]
-                }
+              "ietf-yang-patch:yang-patch": {
+                "patch-id": "test-patch",
+                "comment": "Test patch applied to the top-level container with '/' in target",
+                "edit": [
+                  {
+                    "edit-id": "edit1",
+                    "operation": "replace",
+                    "target": "/",
+                    "value": {
+                      "patch-cont": {
+                        "my-list1": [
+                          {
+                            "name": "my-leaf-set",
+                            "my-leaf11": "leaf-a",
+                            "my-leaf12": "leaf-b"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
             }"""));
         checkPatchContext(returnValue);
         assertEquals(Builders.containerBuilder()
@@ -207,26 +320,26 @@ public class JsonPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
 
         final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, stringInputStream("""
             {
-                "ietf-yang-patch:yang-patch": {
-                    "patch-id": "test-patch",
-                    "comment": "Test patch applied to the second-level list with '/' in target",
-                    "edit": [
+              "ietf-yang-patch:yang-patch": {
+                "patch-id": "test-patch",
+                "comment": "Test patch applied to the second-level list with '/' in target",
+                "edit": [
+                  {
+                    "edit-id": "edit1",
+                    "operation": "replace",
+                    "target": "/",
+                    "value": {
+                      "my-list1": [
                         {
-                            "edit-id": "edit1",
-                            "operation": "replace",
-                            "target": "/",
-                            "value": {
-                                "my-list1": [
-                                    {
-                                        "name": "my-leaf-set",
-                                        "my-leaf11": "leaf-a",
-                                        "my-leaf12": "leaf-b"
-                                    }
-                                ]
-                            }
+                          "name": "my-leaf-set",
+                          "my-leaf11": "leaf-a",
+                          "my-leaf12": "leaf-b"
                         }
-                    ]
-                }
+                      ]
+                    }
+                  }
+                ]
+              }
             }"""));
         checkPatchContext(returnValue);
         assertEquals(Builders.mapBuilder()
