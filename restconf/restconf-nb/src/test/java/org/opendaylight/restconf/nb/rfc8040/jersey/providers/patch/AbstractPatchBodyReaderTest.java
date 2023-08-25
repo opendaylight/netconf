@@ -8,13 +8,25 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 
 abstract class AbstractPatchBodyReaderTest extends AbstractBodyReaderTest {
 
-    static final void checkPatchContext(final PatchContext patchContext) {
+    @NonNull String mountPrefix() {
+        return "";
+    }
+
+    @Nullable DOMMountPoint mountPoint() {
+        return null;
+    }
+
+    final void checkPatchContext(final PatchContext patchContext) {
         assertNotNull(patchContext.getData());
 
         final var iid = patchContext.getInstanceIdentifierContext();
@@ -23,10 +35,6 @@ abstract class AbstractPatchBodyReaderTest extends AbstractBodyReaderTest {
         assertNotNull(iid.getInstanceIdentifier());
         assertNotNull(iid.getSchemaContext());
         assertNotNull(iid.getSchemaNode());
-    }
-
-    static final void checkPatchContextMountPoint(final PatchContext patchContext) {
-        checkPatchContext(patchContext);
-        assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint());
+        assertSame(mountPoint(), iid.getMountPoint());
     }
 }
