@@ -17,8 +17,6 @@ import javax.ws.rs.core.MediaType;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -26,7 +24,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
-public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
+public class XmlPatchBodyReaderTest extends AbstractPatchBodyReaderTest {
     private final XmlPatchBodyReader xmlToPatchBodyReader;
 
     public XmlPatchBodyReaderTest() {
@@ -42,7 +40,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     public void moduleDataTest() throws Exception {
         mockBodyReader("instance-identifier-patch-module:patch-cont/my-list1=leaf1", xmlToPatchBodyReader, false);
         checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdata.xml")));
+            XmlPatchBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdata.xml")));
     }
 
     /**
@@ -51,7 +49,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     @Test
     public void moduleDataValueMissingNegativeTest() throws Exception {
         mockBodyReader("instance-identifier-patch-module:patch-cont/my-list1=leaf1", xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
+        final InputStream inputStream = XmlPatchBodyReaderTest.class.getResourceAsStream(
             "/instanceidentifier/xml/xmlPATCHdataValueMissing.xml");
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
@@ -65,7 +63,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     @Test
     public void moduleDataNotValueNotSupportedNegativeTest() throws Exception {
         mockBodyReader("instance-identifier-patch-module:patch-cont/my-list1=leaf1", xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
+        final InputStream inputStream = XmlPatchBodyReaderTest.class.getResourceAsStream(
             "/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml");
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
@@ -79,7 +77,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     public void moduleDataAbsoluteTargetPathTest() throws Exception {
         mockBodyReader("", xmlToPatchBodyReader, false);
         checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml")));
+            XmlPatchBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml")));
     }
 
     /**
@@ -89,7 +87,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     public void modulePatchCompleteTargetInURITest() throws Exception {
         mockBodyReader("instance-identifier-patch-module:patch-cont", xmlToPatchBodyReader, false);
         checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlBodyReaderTest.class.getResourceAsStream(
+            XmlPatchBodyReaderTest.class.getResourceAsStream(
                 "/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml")));
     }
 
@@ -99,7 +97,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     @Test
     public void moduleDataMergeOperationOnListTest() throws Exception {
         mockBodyReader("instance-identifier-patch-module:patch-cont/my-list1=leaf1", xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
+        final InputStream inputStream = XmlPatchBodyReaderTest.class.getResourceAsStream(
             "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml");
         checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
     }
@@ -110,7 +108,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     @Test
     public void moduleDataMergeOperationOnContainerTest() throws Exception {
         mockBodyReader("instance-identifier-patch-module:patch-cont", xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class
+        final InputStream inputStream = XmlPatchBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml");
         checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
     }
@@ -121,7 +119,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     @Test
     public void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
         mockBodyReader("", xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class
+        final InputStream inputStream = XmlPatchBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHTargetTopLevelContainerWithEmptyURI.xml");
         checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
     }

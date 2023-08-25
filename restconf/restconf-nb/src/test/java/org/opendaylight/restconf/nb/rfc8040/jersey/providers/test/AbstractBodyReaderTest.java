@@ -34,7 +34,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
@@ -136,18 +135,6 @@ public abstract class AbstractBodyReaderTest {
         assertNotNull(nnContext.getInstanceIdentifierContext()
                 .getSchemaContext());
         assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaNode());
-    }
-
-    protected static void checkPatchContext(final PatchContext patchContext) {
-        assertNotNull(patchContext.getData());
-        assertNotNull(patchContext.getInstanceIdentifierContext().getInstanceIdentifier());
-        assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaContext());
-        assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaNode());
-    }
-
-    protected static void checkPatchContextMountPoint(final PatchContext patchContext) {
-        checkPatchContext(patchContext);
-        assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint());
     }
 
     protected static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
