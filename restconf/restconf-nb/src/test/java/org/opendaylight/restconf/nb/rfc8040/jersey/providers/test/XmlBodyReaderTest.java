@@ -15,17 +15,14 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -68,9 +65,9 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
 
     @BeforeClass
     public static void initialization() throws Exception {
-        final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
-        testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
-        testFiles.addAll(TestRestconfUtils.loadFiles("/foo-xml-test/yang"));
+        final var testFiles = loadFiles("/instanceidentifier/yang");
+        testFiles.addAll(loadFiles("/modules"));
+        testFiles.addAll(loadFiles("/foo-xml-test/yang"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
     }
 
