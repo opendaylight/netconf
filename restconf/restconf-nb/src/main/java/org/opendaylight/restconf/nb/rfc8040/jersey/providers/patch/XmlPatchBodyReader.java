@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 @Provider
@@ -59,8 +58,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
     protected PatchContext readBody(final InstanceIdentifierContext path, final InputStream entityStream)
             throws WebApplicationException {
         try {
-            final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
-            return parse(path, doc);
+            return parse(path, UntrustedXML.newDocumentBuilder().parse(entityStream));
         } catch (final RestconfDocumentedException e) {
             throw e;
         } catch (final Exception e) {
@@ -73,9 +71,9 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
 
     private static PatchContext parse(final InstanceIdentifierContext pathContext, final Document doc)
             throws XMLStreamException, IOException, SAXException, URISyntaxException {
-        final List<PatchEntity> resultCollection = new ArrayList<>();
-        final String patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
-        final NodeList editNodes = doc.getElementsByTagName("edit");
+        final var resultCollection = new ArrayList<PatchEntity>();
+        final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
+        final var editNodes = doc.getElementsByTagName("edit");
 
         for (int i = 0; i < editNodes.getLength(); i++) {
             final Element element = (Element) editNodes.item(i);
@@ -144,11 +142,11 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             return null;
         }
 
-        final List<Element> result = new ArrayList<>();
-        final NodeList childNodes = valueNode.getChildNodes();
+        final var result = new ArrayList<Element>();
+        final var childNodes = valueNode.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
-            if (childNodes.item(i) instanceof Element) {
-                result.add((Element) childNodes.item(i));
+            if (childNodes.item(i) instanceof Element childElement) {
+                result.add(childElement);
             }
         }
 
