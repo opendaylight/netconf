@@ -16,6 +16,24 @@
       "message": "So, are we removing something unnecessary or fixing? Is problem caused by NETCONF-1054 patches or is it separate bug?",
       "revId": "a72819343f4d09c0b2781f0270d86a5543d6a236",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a134261a_85a877ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-08-25T08:21:31Z",
+      "side": 1,
+      "message": "We are finxing problem caused be NETCONF0-1054.",
+      "parentUuid": "7578907d_20e5ab6c",
+      "revId": "a72819343f4d09c0b2781f0270d86a5543d6a236",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
