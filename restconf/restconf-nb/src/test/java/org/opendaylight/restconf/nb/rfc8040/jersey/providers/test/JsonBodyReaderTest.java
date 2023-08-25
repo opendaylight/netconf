@@ -14,15 +14,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -58,8 +55,8 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
     @BeforeClass
     public static void initialization() throws FileNotFoundException {
-        final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
-        testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
+        final var testFiles = loadFiles("/instanceidentifier/yang");
+        testFiles.addAll(loadFiles("/modules"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
     }
 

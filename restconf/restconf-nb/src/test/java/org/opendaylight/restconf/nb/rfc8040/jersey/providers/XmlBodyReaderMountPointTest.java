@@ -12,16 +12,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.InputStream;
-import java.util.Collection;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -61,8 +58,8 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     @BeforeClass
     public static void initialization() throws Exception {
-        final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
-        testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
+        final var testFiles = loadFiles("/instanceidentifier/yang");
+        testFiles.addAll(loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
     }
 
