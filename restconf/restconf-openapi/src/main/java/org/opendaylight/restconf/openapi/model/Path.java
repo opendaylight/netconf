@@ -10,12 +10,22 @@ package org.opendaylight.restconf.openapi.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
 
 @JsonInclude(Include.NON_NULL)
-public record Path(@JsonProperty("$ref") String ref, String summary, String description, Operation get,
-        Operation put, Operation post, Operation delete, Operation options, Operation head, Operation patch,
-        Operation trace, ObjectNode servers) {
+public record Path(
+    @JsonProperty("$ref") String ref,
+    String summary,
+    String description,
+    Operation get,
+    Operation put,
+    Operation post,
+    Operation delete,
+    Operation options,
+    Operation head,
+    Operation patch,
+    Operation trace,
+    List<Server> servers) {
 
     private Path(final Builder builder) {
         this(builder.ref, builder.summary, builder.description, builder.get, builder.put, builder.post,
@@ -35,7 +45,7 @@ public record Path(@JsonProperty("$ref") String ref, String summary, String desc
         private Operation head;
         private Operation patch;
         private Operation trace;
-        private ObjectNode servers;
+        private List<Server> servers;
 
         public Builder ref(final String ref) {
             this.ref = ref;
@@ -92,7 +102,7 @@ public record Path(@JsonProperty("$ref") String ref, String summary, String desc
             return this;
         }
 
-        public Builder servers(final ObjectNode servers) {
+        public Builder servers(final List<Server> servers) {
             this.servers = servers;
             return this;
         }
