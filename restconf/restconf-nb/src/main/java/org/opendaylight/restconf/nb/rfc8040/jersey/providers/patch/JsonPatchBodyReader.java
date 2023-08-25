@@ -71,7 +71,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
         }
     }
 
-    private PatchContext readFrom(final InstanceIdentifierContext path, final InputStream entityStream)
+    private static PatchContext readFrom(final InstanceIdentifierContext path, final InputStream entityStream)
             throws IOException {
         try (var jsonReader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
@@ -94,7 +94,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
             ErrorTag.MALFORMED_MESSAGE, exception);
     }
 
-    private ImmutableList<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext path,
+    private static ImmutableList<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext path,
             final AtomicReference<String> patchId) throws IOException {
         final var schemaTree = DataSchemaContextTree.from(path.getSchemaContext());
         final var edits = ImmutableList.<PatchEntity>builder();
@@ -149,7 +149,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @param resultCollection collection of parsed edits
      * @throws IOException if operation fails
      */
-    private void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
+    private static void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
                              final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext path,
                              final @NonNull DataSchemaContextTree schemaTree,
                              final ImmutableList.@NonNull Builder<PatchEntity> resultCollection,
@@ -190,7 +190,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @param codec Draft11StringModuleInstanceIdentifierCodec codec
      * @throws IOException if operation fails
      */
-    private void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
+    private static void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
                                     final @NonNull InstanceIdentifierContext path,
                                     final @NonNull DataSchemaContextTree schemaTree) throws IOException {
         String deferredValue = null;
@@ -253,7 +253,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private String readValueNode(final @NonNull JsonReader in) throws IOException {
+    private static String readValueNode(final @NonNull JsonReader in) throws IOException {
         in.beginObject();
         final StringBuilder sb = new StringBuilder().append("{\"").append(in.nextName()).append("\":");
 
@@ -291,7 +291,8 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueObject(final @NonNull StringBuilder sb, final @NonNull JsonReader in) throws IOException {
+    private static void readValueObject(final @NonNull StringBuilder sb, final @NonNull JsonReader in)
+            throws IOException {
         // read simple leaf value
         if (in.peek() == JsonToken.STRING) {
             sb.append('"').append(in.nextString()).append('"');
