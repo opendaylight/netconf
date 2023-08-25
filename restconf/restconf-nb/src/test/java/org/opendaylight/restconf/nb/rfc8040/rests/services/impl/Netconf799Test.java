@@ -25,6 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
@@ -37,12 +38,10 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class Netconf799Test {
+public class Netconf799Test extends AbstractInstanceIdentifierTest {
     private static final QName CONT_QNAME = QName.create("instance:identifier:module", "2014-01-17", "cont");
     private static final QName CONT1_QNAME = QName.create(CONT_QNAME, "cont1");
     private static final QName RESET_QNAME = QName.create(CONT_QNAME, "reset");
@@ -54,9 +53,6 @@ public class Netconf799Test {
 
     @Test
     public void testInvokeAction() {
-        final EffectiveModelContext contextRef =
-            YangParserTestUtils.parseYangResourceDirectory("/instanceidentifier/yang");
-
         final DOMDataBroker mockDataBroker = mock(DOMDataBroker.class);
 
         final DOMActionService actionService = mock(DOMActionService.class);
@@ -65,10 +61,10 @@ public class Netconf799Test {
             .when(actionService).invokeAction(eq(Absolute.of(CONT_QNAME, CONT1_QNAME, RESET_QNAME)), any(), any());
 
         final RestconfDataServiceImpl dataService = new RestconfDataServiceImpl(
-            () -> DatabindContext.ofModel(contextRef), mockDataBroker, mock(DOMMountPointService.class),
+            () -> DatabindContext.ofModel(IID_SCHEMA), mockDataBroker, mock(DOMMountPointService.class),
             mock(RestconfStreamsSubscriptionService.class), actionService, new StreamsConfiguration(0, 1, 0, false));
 
-        final var nodeAndStack = DataSchemaContextTree.from(contextRef).enterPath(ACTION_YII).orElseThrow();
+        final var nodeAndStack = DataSchemaContextTree.from(IID_SCHEMA).enterPath(ACTION_YII).orElseThrow();
         final var node = nodeAndStack.node().dataSchemaNode();
         assertThat(node, instanceOf(ActionNodeContainer.class));
         final var actionNode = ((ActionNodeContainer) node).findAction(RESET_QNAME).orElseThrow();

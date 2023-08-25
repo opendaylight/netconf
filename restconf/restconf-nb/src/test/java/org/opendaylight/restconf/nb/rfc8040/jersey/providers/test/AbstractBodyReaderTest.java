@@ -26,7 +26,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import org.junit.BeforeClass;
 import org.junit.function.ThrowingRunnable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -34,50 +33,25 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public abstract class AbstractBodyReaderTest {
-    protected static final QName CONT_AUG_QNAME = QName.create("test-ns-aug", "container-aug").intern();
-    protected static final QName LEAF_AUG_QNAME = QName.create("test-ns-aug", "leaf-aug").intern();
-    protected static final QName MAP_CONT_QNAME = QName.create("map:ns", "my-map").intern();
-    protected static final QName KEY_LEAF_QNAME = QName.create("map:ns", "key-leaf").intern();
-    protected static final QName DATA_LEAF_QNAME = QName.create("map:ns", "data-leaf").intern();
-    protected static final QName LEAF_SET_QNAME = QName.create("set:ns", "my-set").intern();
-    protected static final QName LIST_QNAME = QName.create("list:ns", "unkeyed-list").intern();
-    protected static final QName LIST_LEAF1_QNAME = QName.create("list:ns", "leaf1").intern();
-    protected static final QName LIST_LEAF2_QNAME = QName.create("list:ns", "leaf2").intern();
-    protected static final QName CHOICE_CONT_QNAME = QName.create("choice:ns", "case-cont1").intern();
-    protected static final QName CASE_LEAF1_QNAME = QName.create("choice:ns", "case-leaf1").intern();
-    protected static final QName PATCH_CONT_QNAME = QName.create("instance:identifier:patch:module",
-            "2015-11-21", "patch-cont").intern();
-    protected static final QName MY_LIST1_QNAME = QName.create("instance:identifier:patch:module",
-            "2015-11-21", "my-list1").intern();
-    protected static final QName LEAF_NAME_QNAME = QName.create("instance:identifier:patch:module",
-            "2015-11-21", "name").intern();
-    protected static final QName MY_LEAF11_QNAME = QName.create("instance:identifier:patch:module",
-            "2015-11-21", "my-leaf11").intern();
-    protected static final QName MY_LEAF12_QNAME = QName.create("instance:identifier:patch:module",
-            "2015-11-21", "my-leaf12").intern();
-
-    private static EffectiveModelContext BASELINE_CONTEXT;
-
+public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierTest {
     protected final MediaType mediaType;
     protected final DatabindProvider databindProvider;
     protected final DOMMountPointService mountPointService;
     protected final DOMMountPoint mountPoint;
 
     protected AbstractBodyReaderTest() {
-        this(BASELINE_CONTEXT);
+        this(IID_SCHEMA);
     }
 
     protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext) {
@@ -93,10 +67,6 @@ public abstract class AbstractBodyReaderTest {
             .getService(DOMSchemaService.class);
     }
 
-    @BeforeClass
-    public static final void initBaselineContext() {
-        BASELINE_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/instanceidentifier/yang");
-    }
 
     protected abstract MediaType getMediaType();
 
