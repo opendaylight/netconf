@@ -36,7 +36,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.AbstractNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -70,8 +70,8 @@ public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierT
 
     protected abstract MediaType getMediaType();
 
-    protected static <T extends AbstractIdentifierAwareJaxRsProvider<?>> void mockBodyReader(
-            final String identifier, final T normalizedNodeProvider, final boolean isPost) {
+    protected static void mockBodyReader(final String identifier,
+            final AbstractNormalizedNodeBodyReader normalizedNodeProvider, final boolean isPost) {
         final UriInfo uriInfoMock = mock(UriInfo.class);
         final MultivaluedMap<String, String> pathParm = new MultivaluedHashMap<>(1);
 
