@@ -61,8 +61,16 @@ public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierT
             .getService(DOMSchemaService.class);
     }
 
-    protected static void mockBodyReader(final String identifier,
-            final AbstractNormalizedNodeBodyReader normalizedNodeProvider, final boolean isPost) {
+    protected static void mockPostBodyReader(final String identifier, final AbstractNormalizedNodeBodyReader reader) {
+        mockBodyReader(identifier, reader, HttpMethod.POST);
+    }
+
+    protected static void mockPutBodyReader(final String identifier, final AbstractNormalizedNodeBodyReader reader) {
+        mockBodyReader(identifier, reader, HttpMethod.PUT);
+    }
+
+    private static void mockBodyReader(final String identifier, final AbstractNormalizedNodeBodyReader reader,
+            final String method) {
         final var pathParm = new MultivaluedHashMap<String, String>(2);
         if (!identifier.isEmpty()) {
             pathParm.put("identifier", List.of(identifier));
@@ -72,11 +80,11 @@ public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierT
         doReturn(pathParm).when(uriInfoMock).getPathParameters();
         doReturn(pathParm).when(uriInfoMock).getPathParameters(false);
         doReturn(pathParm).when(uriInfoMock).getPathParameters(true);
-        normalizedNodeProvider.setUriInfo(uriInfoMock);
+        reader.setUriInfo(uriInfoMock);
 
         final var request = mock(Request.class);
-        doReturn(isPost ? HttpMethod.POST : HttpMethod.PUT).when(request).getMethod();
-        normalizedNodeProvider.setRequest(request);
+        doReturn(method).when(request).getMethod();
+        reader.setRequest(request);
     }
 
     protected static void checkMountPointNormalizedNodePayload(final NormalizedNodePayload nnContext) {
