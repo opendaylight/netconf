@@ -12,13 +12,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -189,13 +187,15 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
     @Test
     public void wrongRootElementTest() throws Exception {
         mockPutBodyReader("instance-identifier-module:cont/yang-ext:mount", xmlBodyReader);
-        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
+        final var inputStream = XmlBodyReaderTest.class.getResourceAsStream(
             "/instanceidentifier/xml/bug7933.xml");
 
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null, inputStream));
-        final RestconfError restconfError = ex.getErrors().get(0);
-        assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
+        final var error = ex.getErrors().get(0);
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+        assertEquals("Error parsing input: Not correct message root element \"cont1\", should be "
+            + "\"(urn:ietf:params:xml:ns:netconf:base:1.0)data\"", error.getErrorMessage());
     }
 }
