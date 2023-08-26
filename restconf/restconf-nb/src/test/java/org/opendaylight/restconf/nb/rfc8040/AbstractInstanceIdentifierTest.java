@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -47,5 +50,9 @@ public abstract class AbstractInstanceIdentifierTest {
     @AfterClass
     public static final void afterClass() {
         IID_SCHEMA = null;
+    }
+
+    protected static final InputStream stringInputStream(final String str) {
+        return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
     }
 }

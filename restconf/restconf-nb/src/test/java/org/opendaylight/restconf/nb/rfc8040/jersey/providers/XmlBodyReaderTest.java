@@ -14,9 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -268,9 +266,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
     public void testRangeViolation() throws Exception {
         mockPutBodyReader("netconf786:foo", xmlBodyReader);
 
-        final InputStream inputStream = new ByteArrayInputStream(
-            "<foo xmlns=\"netconf786\"><bar>100</bar></foo>".getBytes(StandardCharsets.UTF_8));
-
-        assertRangeViolation(() -> xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null, inputStream));
+        assertRangeViolation(() -> xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
+            stringInputStream("<foo xmlns=\"netconf786\"><bar>100</bar></foo>")));
     }
 }

@@ -13,10 +13,8 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
@@ -74,7 +72,7 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
     }
 
     final @NonNull PatchContext parse(final String uriPath, final String patchBody) throws IOException {
-        try (var body = bodyConstructor.apply(new ByteArrayInputStream(patchBody.getBytes(StandardCharsets.UTF_8)))) {
+        try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
             return body.toPatchContext(ParserIdentifier.toInstanceIdentifier(uriPath, IID_SCHEMA, mountPointService));
         }
     }

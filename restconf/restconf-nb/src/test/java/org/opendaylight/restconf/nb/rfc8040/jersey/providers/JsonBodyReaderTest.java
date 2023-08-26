@@ -12,10 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -149,13 +146,12 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
     public void testRangeViolation() throws Exception {
         mockPutBodyReader("netconf786:foo", jsonBodyReader);
 
-        final InputStream inputStream = new ByteArrayInputStream(("{\n"
-            + "  \"netconf786:foo\": {\n"
-            + "    \"bar\": 100\n"
-            + "  }\n"
-            + "}").getBytes(StandardCharsets.UTF_8));
-
-        assertRangeViolation(() -> jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null, inputStream));
+        assertRangeViolation(() -> jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null, stringInputStream("""
+              {
+                "netconf786:foo": {
+                  "bar": 100
+                }
+              }""")));
     }
 
     private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
