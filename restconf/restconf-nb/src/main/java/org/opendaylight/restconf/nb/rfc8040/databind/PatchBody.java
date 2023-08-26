@@ -8,14 +8,10 @@
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static com.google.common.base.Verify.verify;
-import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
@@ -26,43 +22,15 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 /**
  * A YANG Patch body.
  */
-public abstract class PatchBody implements AutoCloseable {
-    private static final VarHandle INPUT_STREAM;
-
-    static {
-        try {
-            INPUT_STREAM = MethodHandles.lookup().findVarHandle(PatchBody.class, "inputStream", InputStream.class);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private volatile InputStream inputStream;
-
+public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBody, XmlPatchBody {
     PatchBody(final InputStream inputStream) {
-        this.inputStream = requireNonNull(inputStream);
-    }
-
-    @Override
-    public final void close() throws IOException {
-        final var is = acquireStream();
-        if (is != null) {
-            is.close();
-        }
+        super(inputStream);
     }
 
     public final @NonNull PatchContext toPatchContext(final @NonNull InstanceIdentifierContext targetResource)
             throws IOException {
-        final var is = acquireStream();
-        if (is == null) {
-            throw new IllegalStateException("Input stream has already been consumed");
-        }
-
-        try {
+        try (var is = acquireStream()) {
             return toPatchContext(targetResource, is);
-        } finally {
-            is.close();
         }
     }
 
@@ -100,9 +68,5 @@ public abstract class PatchBody implements AutoCloseable {
             case Create, Insert, Merge, Replace -> true;
             case Delete, Move, Remove -> false;
         };
-    }
-
-    private @Nullable InputStream acquireStream() {
-        return (InputStream) INPUT_STREAM.getAndSet(this, null);
     }
 }

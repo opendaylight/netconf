@@ -15,12 +15,8 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.google.gson.JsonParseException;
-import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Consumes;
@@ -36,7 +32,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -47,26 +42,23 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.databind.StreamableOperationInput;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
-import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
-import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
-import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
-import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,24 +109,9 @@ public final class RestconfInvokeOperationsServiceImpl {
     })
     public void invokeRpcXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        invokeRpc(identifier, uriInfo, ar, (inference, writer) -> {
-            // Adjust inference to point to input
-            final var stack = inference.toSchemaInferenceStack();
-            if (stack.currentStatement() instanceof RpcEffectiveStatement rpcStmt) {
-                stack.enterSchemaTree(rpcStmt.input().argument());
-            } else {
-                throw new IllegalStateException(inference + " does not identify an 'rpc' statement");
-            }
-
-            try {
-                XmlParserStream.create(writer, stack.toInference()).parse(UntrustedXML.createXMLStreamReader(body));
-            } catch (XMLStreamException e) {
-                LOG.debug("Error parsing XML input", e);
-                RestconfDocumentedException.throwIfYangError(e);
-                throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                        ErrorTag.MALFORMED_MESSAGE, e);
-            }
-        });
+        try (var xmlBody = new XmlOperationInputBody(body)) {
+            invokeRpc(identifier, uriInfo, ar, xmlBody);
+        }
     }
 
     /**
@@ -161,21 +138,13 @@ public final class RestconfInvokeOperationsServiceImpl {
     })
     public void invokeRpcJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        invokeRpc(identifier, uriInfo, ar, (inference, writer) -> {
-            try {
-                JsonParserStream.create(writer,
-                    JSONCodecFactorySupplier.RFC7951.getShared(inference.getEffectiveModelContext()), inference)
-                    .parse(new JsonReader(new InputStreamReader(body, StandardCharsets.UTF_8)));
-            } catch (JsonParseException e) {
-                LOG.debug("Error parsing JSON input", e);
-                throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                        ErrorTag.MALFORMED_MESSAGE, e);
-            }
-        });
+        try (var jsonBody = new JsonOperationInputBody(body)) {
+            invokeRpc(identifier, uriInfo, ar, jsonBody);
+        }
     }
 
     private void invokeRpc(final String identifier, final UriInfo uriInfo, final AsyncResponse ar,
-            final StreamableOperationInput body) {
+            final OperationInputBody body) {
         final var dataBind = databindProvider.currentContext();
         final var schemaContext = dataBind.modelContext();
         final var context = ParserIdentifier.toInstanceIdentifier(identifier, schemaContext, mountPointService);
