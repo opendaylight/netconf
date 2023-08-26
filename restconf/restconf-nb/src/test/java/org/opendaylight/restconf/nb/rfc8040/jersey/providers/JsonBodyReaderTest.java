@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -61,7 +60,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName());
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, jsonBodyReader, false);
+        mockPutBodyReader(uri, jsonBodyReader);
         final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             JsonBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/jsondata.json"));
         checkNormalizedNodePayload(payload);
@@ -76,7 +75,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
         final DataSchemaNode dataSchemaNodeOnPath = ((DataNodeContainer) dataSchemaNode).getDataChildByName(cont1QName);
         final String uri = "instance-identifier-module:cont/cont1";
-        mockBodyReader(uri, jsonBodyReader, false);
+        mockPutBodyReader(uri, jsonBodyReader);
         final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             JsonBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_sub_container.json"));
         checkNormalizedNodePayload(payload);
@@ -90,7 +89,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, jsonBodyReader, true);
+        mockPostBodyReader(uri, jsonBodyReader);
         final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             JsonBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_sub_container.json"));
         checkNormalizedNodePayload(payload);
@@ -106,7 +105,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
             .node(cont1QName).node(actionQName);
         final String uri = "instance-identifier-module:cont/cont1/reset";
-        mockBodyReader(uri, jsonBodyReader, true);
+        mockPostBodyReader(uri, jsonBodyReader);
         final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             JsonBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_cont_action.json"));
         checkNormalizedNodePayload(payload);
@@ -121,7 +120,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final QName contAugmentQName = QName.create(augmentModule.getQNameModule(), "cont-augment");
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName(), contAugmentQName);
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, jsonBodyReader, true);
+        mockPostBodyReader(uri, jsonBodyReader);
         final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_augment_container.json"));
         checkNormalizedNodePayload(payload);
@@ -139,7 +138,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
                 .node(augmentChoice1QName).node(augmentChoice2QName).node(containerQName);
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, jsonBodyReader, true);
+        mockPostBodyReader(uri, jsonBodyReader);
         final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_augment_choice_container.json"));
         checkNormalizedNodePayload(payload);
@@ -148,7 +147,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
     @Test
     public void testRangeViolation() throws Exception {
-        mockBodyReader("netconf786:foo", jsonBodyReader, false);
+        mockPutBodyReader("netconf786:foo", jsonBodyReader);
 
         final InputStream inputStream = new ByteArrayInputStream(("{\n"
             + "  \"netconf786:foo\": {\n"

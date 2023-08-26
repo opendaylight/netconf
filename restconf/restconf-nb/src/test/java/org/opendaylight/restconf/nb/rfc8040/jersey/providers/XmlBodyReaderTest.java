@@ -68,16 +68,17 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
 
     @Test
     public void putXmlTest() throws Exception {
-        runXmlTest(false, "foo:top-level-list=key-value");
+        mockPutBodyReader("foo:top-level-list=key-value", xmlBodyReader);
+        runXmlTest();
     }
 
     @Test
     public void postXmlTest() throws Exception {
-        runXmlTest(true, "");
+        mockPostBodyReader("", xmlBodyReader);
+        runXmlTest();
     }
 
-    private void runXmlTest(final boolean isPost, final String path) throws Exception {
-        mockBodyReader(path, xmlBodyReader, isPost);
+    private void runXmlTest() throws Exception {
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/foo-xml-test/foo.xml"));
         assertNotNull(payload);
@@ -111,7 +112,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName());
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, xmlBodyReader, false);
+        mockPutBodyReader(uri, xmlBodyReader);
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmldata.xml"));
         checkNormalizedNodePayload(payload);
@@ -126,7 +127,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
         final DataSchemaNode dataSchemaNodeOnPath = ((DataNodeContainer) dataSchemaNode).getDataChildByName(cont1QName);
         final String uri = "instance-identifier-module:cont/cont1";
-        mockBodyReader(uri, xmlBodyReader, false);
+        mockPutBodyReader(uri, xmlBodyReader);
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xml_sub_container.xml"));
         checkNormalizedNodePayload(payload);
@@ -140,7 +141,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         final QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, xmlBodyReader, true);
+        mockPostBodyReader(uri, xmlBodyReader);
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xml_sub_container.xml"));
         checkNormalizedNodePayload(payload);
@@ -156,7 +157,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
             .node(cont1QName).node(actionQName);
         final String uri = "instance-identifier-module:cont/cont1/reset";
-        mockBodyReader(uri, xmlBodyReader, true);
+        mockPostBodyReader(uri, xmlBodyReader);
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xml_cont_action.xml"));
         checkNormalizedNodePayload(payload);
@@ -171,7 +172,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         final QName contAugmentQName = QName.create(augmentModule.getQNameModule(), "cont-augment");
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName(), contAugmentQName);
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, xmlBodyReader, true);
+        mockPostBodyReader(uri, xmlBodyReader);
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xml_augment_container.xml"));
         checkNormalizedNodePayload(payload);
@@ -190,7 +191,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
             .node(augmentChoice2QName)
             .node(QName.create(augmentChoice1QName, "case-choice-case-container1"));
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, xmlBodyReader, true);
+        mockPostBodyReader(uri, xmlBodyReader);
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xml_augment_choice_container.xml"));
         checkNormalizedNodePayload(payload);
@@ -212,7 +213,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
      */
     @Test
     public void findFooContainerUsingNamespaceTest() throws Exception {
-        mockBodyReader("", xmlBodyReader, true);
+        mockPostBodyReader("", xmlBodyReader);
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlDataFindFooContainer.xml"));
 
@@ -232,7 +233,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
      */
     @Test
     public void findBarContainerUsingNamespaceTest() throws Exception {
-        mockBodyReader("", xmlBodyReader, true);
+        mockPostBodyReader("", xmlBodyReader);
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlDataFindBarContainer.xml"));
 
@@ -251,7 +252,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
      */
     @Test
     public void wrongRootElementTest() throws Exception {
-        mockBodyReader("instance-identifier-module:cont", xmlBodyReader, false);
+        mockPutBodyReader("instance-identifier-module:cont", xmlBodyReader);
         final InputStream inputStream =
                 XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/bug7933.xml");
 
@@ -265,7 +266,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
 
     @Test
     public void testRangeViolation() throws Exception {
-        mockBodyReader("netconf786:foo", xmlBodyReader, false);
+        mockPutBodyReader("netconf786:foo", xmlBodyReader);
 
         final InputStream inputStream = new ByteArrayInputStream(
             "<foo xmlns=\"netconf786\"><bar>100</bar></foo>".getBytes(StandardCharsets.UTF_8));
