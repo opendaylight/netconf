@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -38,6 +37,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class JsonBodyReaderTest extends AbstractBodyReaderTest {
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
         XMLNamespace.of("instance:identifier:module"), Revision.of("2014-01-17"));
+    private static final MediaType MEDIA_TYPE = new MediaType(MediaType.APPLICATION_JSON, null);
 
     private static EffectiveModelContext schemaContext;
 
@@ -46,11 +46,6 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
     public JsonBodyReaderTest() {
         super(schemaContext);
         jsonBodyReader = new JsonNormalizedNodeBodyReader(databindProvider, mountPointService);
-    }
-
-    @Override
-    protected MediaType getMediaType() {
-        return new MediaType(MediaType.APPLICATION_XML, null);
     }
 
     @BeforeClass
@@ -67,7 +62,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName());
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, jsonBodyReader, false);
-        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, mediaType, null,
+        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             JsonBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/jsondata.json"));
         checkNormalizedNodePayload(payload);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, payload, dataII);
@@ -82,7 +77,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final DataSchemaNode dataSchemaNodeOnPath = ((DataNodeContainer) dataSchemaNode).getDataChildByName(cont1QName);
         final String uri = "instance-identifier-module:cont/cont1";
         mockBodyReader(uri, jsonBodyReader, false);
-        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, mediaType, null,
+        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             JsonBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_sub_container.json"));
         checkNormalizedNodePayload(payload);
         checkExpectValueNormalizeNodeContext(dataSchemaNodeOnPath, payload, dataII);
@@ -96,7 +91,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, jsonBodyReader, true);
-        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, mediaType, null,
+        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             JsonBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_sub_container.json"));
         checkNormalizedNodePayload(payload);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, payload, dataII);
@@ -112,7 +107,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
             .node(cont1QName).node(actionQName);
         final String uri = "instance-identifier-module:cont/cont1/reset";
         mockBodyReader(uri, jsonBodyReader, true);
-        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, mediaType, null,
+        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             JsonBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_cont_action.json"));
         checkNormalizedNodePayload(payload);
         assertThat(payload.getInstanceIdentifierContext().getSchemaNode(), instanceOf(ActionDefinition.class));
@@ -127,7 +122,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName(), contAugmentQName);
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, jsonBodyReader, true);
-        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, mediaType, null,
+        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_augment_container.json"));
         checkNormalizedNodePayload(payload);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, payload, dataII);
@@ -145,7 +140,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
                 .node(augmentChoice1QName).node(augmentChoice2QName).node(containerQName);
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, jsonBodyReader, true);
-        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, mediaType, null,
+        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_augment_choice_container.json"));
         checkNormalizedNodePayload(payload);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, payload, dataII);
@@ -161,7 +156,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
             + "  }\n"
             + "}").getBytes(StandardCharsets.UTF_8));
 
-        assertRangeViolation(() -> jsonBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+        assertRangeViolation(() -> jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null, inputStream));
     }
 
     private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
