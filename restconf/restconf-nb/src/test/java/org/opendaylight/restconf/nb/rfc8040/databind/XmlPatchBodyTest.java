@@ -26,8 +26,35 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
 
     @Test
     public final void moduleDataTest() throws Exception {
-        checkPatchContext(parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            "/instanceidentifier/xml/xmlPATCHdata.xml"));
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                <patch-id>test-patch</patch-id>
+                <comment>this is test patch</comment>
+                <edit>
+                    <edit-id>edit1</edit-id>
+                    <operation>create</operation>
+                    <target>/my-list2=my-leaf20</target>
+                    <value>
+                        <my-list2 xmlns="instance:identifier:patch:module">
+                            <name>my-leaf20</name>
+                            <my-leaf21>I am leaf21-0</my-leaf21>
+                            <my-leaf22>I am leaf22-0</my-leaf22>
+                        </my-list2>
+                    </value>
+                </edit>
+                <edit>
+                    <edit-id>edit2</edit-id>
+                    <operation>create</operation>
+                    <target>/my-list2=my-leaf21</target>
+                    <value>
+                        <my-list2 xmlns="instance:identifier:patch:module">
+                            <name>my-leaf21</name>
+                            <my-leaf21>I am leaf21-1</my-leaf21>
+                            <my-leaf22>I am leaf22-1</my-leaf22>
+                        </my-list2>
+                    </value>
+                </edit>
+            </yang-patch>"""));
     }
 
     /**
@@ -36,8 +63,16 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
     @Test
     public final void moduleDataValueMissingNegativeTest() throws Exception {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-                "/instanceidentifier/xml/xmlPATCHdataValueMissing.xml"));
+            () -> parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+                <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                    <patch-id>test-patch</patch-id>
+                    <comment>Test patch with missing value node for create operation</comment>
+                    <edit>
+                        <edit-id>edit1</edit-id>
+                        <operation>create</operation>
+                        <target>/my-list2</target>
+                    </edit>
+                </yang-patch>"""));
         assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -48,8 +83,23 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
     @Test
     public final void moduleDataNotValueNotSupportedNegativeTest() throws Exception {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-                "/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml"));
+            () -> parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+                <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                    <patch-id>test-patch</patch-id>
+                    <comment>Test patch with not allowed value node for delete operation</comment>
+                    <edit>
+                        <edit-id>edit1</edit-id>
+                        <operation>delete</operation>
+                        <target>/my-list2/my-leaf21</target>
+                        <value>
+                            <my-list2 xmlns="instance:identifier:patch:module">
+                                <name>my-leaf20</name>
+                                <my-leaf21>I am leaf21-0</my-leaf21>
+                                <my-leaf22>I am leaf22-0</my-leaf22>
+                            </my-list2>
+                        </value>
+                    </edit>
+                </yang-patch>"""));
         assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -58,7 +108,35 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataAbsoluteTargetPathTest() throws Exception {
-        checkPatchContext(parseResource(mountPrefix(), "/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml"));
+        checkPatchContext(parse(mountPrefix(), """
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                <patch-id>test-patch</patch-id>
+                <comment>Test patch with absolute target path</comment>
+                <edit>
+                    <edit-id>edit1</edit-id>
+                    <operation>create</operation>
+                    <target>/instance-identifier-patch-module:patch-cont/my-list1=leaf1/my-list2=my-leaf20</target>
+                    <value>
+                        <my-list2 xmlns="instance:identifier:patch:module">
+                            <name>my-leaf20</name>
+                            <my-leaf21>I am leaf21-0</my-leaf21>
+                            <my-leaf22>I am leaf22-0</my-leaf22>
+                        </my-list2>
+                    </value>
+                </edit>
+                <edit>
+                    <edit-id>edit2</edit-id>
+                    <operation>create</operation>
+                    <target>/instance-identifier-patch-module:patch-cont/my-list1=leaf1/my-list2=my-leaf21</target>
+                    <value>
+                        <my-list2 xmlns="instance:identifier:patch:module">
+                            <name>my-leaf21</name>
+                            <my-leaf21>I am leaf21-1</my-leaf21>
+                            <my-leaf22>I am leaf22-1</my-leaf22>
+                        </my-list2>
+                    </value>
+                </edit>
+            </yang-patch>"""));
     }
 
     /**
@@ -66,8 +144,44 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchCompleteTargetInURITest() throws Exception {
-        checkPatchContext(parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont",
-            "/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml"));
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont", """
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                <patch-id>test-patch</patch-id>
+                <comment>Test to create and replace data in container directly using / sign as a target</comment>
+                <edit>
+                    <edit-id>edit1</edit-id>
+                    <operation>create</operation>
+                    <target>/</target>
+                    <value>
+                        <patch-cont xmlns="instance:identifier:patch:module">
+                            <my-list1>
+                                <name>my-list1 - A</name>
+                                <my-leaf11>I am leaf11-0</my-leaf11>
+                                <my-leaf12>I am leaf12-1</my-leaf12>
+                            </my-list1>
+                            <my-list1>
+                                <name>my-list1 - B</name>
+                                <my-leaf11>I am leaf11-0</my-leaf11>
+                                <my-leaf12>I am leaf12-1</my-leaf12>
+                            </my-list1>
+                        </patch-cont>
+                    </value>
+                </edit>
+                <edit>
+                    <edit-id>edit2</edit-id>
+                    <operation>replace</operation>
+                    <target>/</target>
+                    <value>
+                        <patch-cont xmlns="instance:identifier:patch:module">
+                            <my-list1>
+                                <name>my-list1 - Replacing</name>
+                                <my-leaf11>I am leaf11-0</my-leaf11>
+                                <my-leaf12>I am leaf12-1</my-leaf12>
+                            </my-list1>
+                        </patch-cont>
+                    </value>
+                </edit>
+            </yang-patch>"""));
     }
 
     /**
@@ -75,8 +189,35 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataMergeOperationOnListTest() throws Exception {
-        checkPatchContext(parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml"));
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                <patch-id>Test merge operation</patch-id>
+                <comment>This is test patch for merge operation on list</comment>
+                <edit>
+                    <edit-id>edit1</edit-id>
+                    <operation>replace</operation>
+                    <target>/my-list2=my-leaf20</target>
+                    <value>
+                        <my-list2 xmlns="instance:identifier:patch:module">
+                            <name>my-leaf20</name>
+                            <my-leaf21>I am leaf21-0</my-leaf21>
+                            <my-leaf22>I am leaf22-0</my-leaf22>
+                        </my-list2>
+                    </value>
+                </edit>
+                <edit>
+                    <edit-id>edit2</edit-id>
+                    <operation>merge</operation>
+                    <target>/my-list2=my-leaf21</target>
+                    <value>
+                        <my-list2 xmlns="instance:identifier:patch:module">
+                            <name>my-leaf21</name>
+                            <my-leaf21>I am leaf21-1</my-leaf21>
+                            <my-leaf22>I am leaf22-1</my-leaf22>
+                        </my-list2>
+                    </value>
+                </edit>
+            </yang-patch>"""));
     }
 
     /**
@@ -84,8 +225,44 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataMergeOperationOnContainerTest() throws Exception {
-        checkPatchContext(parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont",
-            "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml"));
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont", """
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                <patch-id>Test merge operation</patch-id>
+                <comment>This is test patch for merge operation on container</comment>
+                <edit>
+                    <edit-id>edit1</edit-id>
+                    <operation>create</operation>
+                    <target>/</target>
+                    <value>
+                        <patch-cont xmlns="instance:identifier:patch:module">
+                            <my-list1>
+                                <name>my-list1 - A</name>
+                                <my-leaf11>I am leaf11-0</my-leaf11>
+                                <my-leaf12>I am leaf12-1</my-leaf12>
+                            </my-list1>
+                            <my-list1>
+                                <name>my-list1 - B</name>
+                                <my-leaf11>I am leaf11-0</my-leaf11>
+                                <my-leaf12>I am leaf12-1</my-leaf12>
+                            </my-list1>
+                        </patch-cont>
+                    </value>
+                </edit>
+                <edit>
+                    <edit-id>edit2</edit-id>
+                    <operation>merge</operation>
+                    <target>/</target>
+                    <value>
+                        <patch-cont xmlns="instance:identifier:patch:module">
+                            <my-list1>
+                                <name>my-list1 - Merged</name>
+                                <my-leaf11>I am leaf11-0</my-leaf11>
+                                <my-leaf12>I am leaf12-1</my-leaf12>
+                            </my-list1>
+                        </patch-cont>
+                    </value>
+                </edit>
+            </yang-patch>"""));
     }
 
     /**
@@ -93,8 +270,23 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
-        checkPatchContext(parseResource(mountPrefix(),
-            "/instanceidentifier/xml/xmlPATCHTargetTopLevelContainerWithEmptyURI.xml"));
+        checkPatchContext(parse(mountPrefix(), """
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                <patch-id>test-patch</patch-id>
+                <comment>Test patch applied to the top-level container with empty URI</comment>
+                <edit>
+                    <edit-id>edit1</edit-id>
+                    <operation>replace</operation>
+                    <target>/instance-identifier-patch-module:patch-cont</target>
+                    <value>
+                        <patch-cont xmlns="instance:identifier:patch:module">
+                            <my-list1>
+                                <name>my-leaf10</name>
+                            </my-list1>
+                        </patch-cont>
+                    </value>
+                </edit>
+            </yang-patch>"""));
     }
 
     /**
