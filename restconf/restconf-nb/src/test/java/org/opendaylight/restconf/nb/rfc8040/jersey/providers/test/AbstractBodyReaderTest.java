@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
@@ -45,7 +44,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierTest {
-    protected final MediaType mediaType;
     protected final DatabindProvider databindProvider;
     protected final DOMMountPointService mountPointService;
     protected final DOMMountPoint mountPoint;
@@ -55,8 +53,6 @@ public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierT
     }
 
     protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext) {
-        mediaType = getMediaType();
-
         final var databindContext = DatabindContext.ofModel(schemaContext);
         databindProvider = () -> databindContext;
 
@@ -66,9 +62,6 @@ public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierT
         doReturn(Optional.of(FixedDOMSchemaService.of(schemaContext))).when(mountPoint)
             .getService(DOMSchemaService.class);
     }
-
-
-    protected abstract MediaType getMediaType();
 
     protected static void mockBodyReader(final String identifier,
             final AbstractNormalizedNodeBodyReader normalizedNodeProvider, final boolean isPost) {
