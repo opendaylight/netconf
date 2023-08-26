@@ -7,19 +7,21 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import com.google.common.annotations.Beta;
 import java.io.IOException;
-import org.eclipse.jdt.annotation.NonNullByDefault;
+import java.io.InputStream;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * Access to an {code rpc}'s or an {@code action}'s input.
  */
-@Beta
-@NonNullByDefault
-@FunctionalInterface
-public interface StreamableOperationInput {
+public abstract sealed class OperationInputBody extends AbstractBody
+        permits JsonOperationInputBody, XmlOperationInputBody {
+    OperationInputBody(final InputStream inputStream) {
+        super(inputStream);
+    }
+
     /**
      * Stream the {@code input} into a {@link NormalizedNodeStreamWriter}.
      *
@@ -28,5 +30,11 @@ public interface StreamableOperationInput {
      * @throws IOException when an I/O error occurs
      */
     // TODO: pass down DatabindContext corresponding to inference
-    void streamTo(Inference inference, NormalizedNodeStreamWriter writer) throws IOException;
+    public final void streamTo(final @NonNull Inference inference, final @NonNull NormalizedNodeStreamWriter writer)
+            throws IOException {
+        streamTo(acquireStream(), inference, writer);
+    }
+
+    abstract void streamTo(@NonNull InputStream inputStream, @NonNull Inference inference,
+        @NonNull NormalizedNodeStreamWriter writer) throws IOException;
 }

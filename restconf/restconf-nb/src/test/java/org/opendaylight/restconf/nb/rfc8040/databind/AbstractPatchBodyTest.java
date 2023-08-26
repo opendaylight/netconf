@@ -80,7 +80,8 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
     // FIXME: migrate callers to use the above instead of resources
     @Deprecated
     final @NonNull PatchContext parse(final String uriPath, final InputStream patchBody) throws IOException {
-        return bodyConstructor.apply(patchBody).toPatchContext(
-            ParserIdentifier.toInstanceIdentifier(uriPath, IID_SCHEMA, mountPointService));
+        try (var body = bodyConstructor.apply(patchBody)) {
+            return body.toPatchContext(ParserIdentifier.toInstanceIdentifier(uriPath, IID_SCHEMA, mountPointService));
+        }
     }
 }

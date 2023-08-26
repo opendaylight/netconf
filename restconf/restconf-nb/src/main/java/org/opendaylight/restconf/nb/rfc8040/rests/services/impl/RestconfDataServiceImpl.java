@@ -487,7 +487,9 @@ public final class RestconfDataServiceImpl {
     })
     public PatchStatusContext yangPatchDataXML(@Encoded @PathParam("identifier") final String identifier,
             final InputStream body) {
-        return yangPatchData(identifier, new XmlPatchBody(body));
+        try (var xmlBody = new XmlPatchBody(body)) {
+            return yangPatchData(identifier, xmlBody);
+        }
     }
 
     /**
@@ -505,7 +507,9 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public PatchStatusContext yangPatchDataXML(final InputStream body) {
-        return yangPatchData(new XmlPatchBody(body));
+        try (var xmlBody = new XmlPatchBody(body)) {
+            return yangPatchData(xmlBody);
+        }
     }
 
     /**
@@ -525,7 +529,9 @@ public final class RestconfDataServiceImpl {
     })
     public PatchStatusContext yangPatchDataJSON(@Encoded @PathParam("identifier") final String identifier,
             final InputStream body) {
-        return yangPatchData(identifier, new JsonPatchBody(body));
+        try (var jsonBody = new JsonPatchBody(body)) {
+            return yangPatchData(identifier, jsonBody);
+        }
     }
 
     /**
@@ -543,7 +549,9 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public PatchStatusContext yangPatchDataJSON(final InputStream body) {
-        return yangPatchData(new JsonPatchBody(body));
+        try (var jsonBody = new JsonPatchBody(body)) {
+            return yangPatchData(jsonBody);
+        }
     }
 
     private PatchStatusContext yangPatchData(final @NonNull PatchBody body) {
