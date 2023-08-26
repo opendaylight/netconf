@@ -71,20 +71,29 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
-    private ContainerNode buildBaseCont;
-    private ContainerNode buildBaseContConfig;
-    private ContainerNode buildBaseContOperational;
+    private static final NodeIdentifier PLAYLIST_NID = new NodeIdentifier(PLAYLIST_QNAME);
+    private static final NodeIdentifier LIBRARY_NID = new NodeIdentifier(LIBRARY_QNAME);
+
+    // config contains one child the same as in operational and one additional
+    private static final ContainerNode CONFIG_JUKEBOX = Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
+            .withChild(CONT_PLAYER)
+            .withChild(Builders.containerBuilder().withNodeIdentifier(LIBRARY_NID).build())
+            .build();
+    // operational contains one child the same as in config and one additional
+    private static final ContainerNode OPER_JUKEBOX = Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
+            .withChild(CONT_PLAYER)
+            .withChild(Builders.mapBuilder().withNodeIdentifier(PLAYLIST_NID).build())
+            .build();
+
     private RestconfDataServiceImpl dataService;
-    private ContainerNode buildPlayerCont;
-    private ContainerNode buildLibraryCont;
-    private MapNode buildPlaylistList;
 
     @Mock
     private DOMTransactionChain domTransactionChain;
@@ -118,45 +127,13 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(Set.of()).when(queryParamenters).entrySet();
         doReturn(queryParamenters).when(uriInfo).getQueryParameters();
 
-        buildPlayerCont = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
-                .withChild(GAP_LEAF)
-                .build();
-
-        buildLibraryCont = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(LIBRARY_QNAME))
-                .build();
-
-        buildPlaylistList = Builders.mapBuilder()
-                .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
-                .build();
-
-        buildBaseCont = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-                .withChild(buildPlayerCont)
-                .build();
-
-        // config contains one child the same as in operational and one additional
-        buildBaseContConfig = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-                .withChild(buildPlayerCont)
-                .withChild(buildLibraryCont)
-                .build();
-
-        // operational contains one child the same as in config and one additional
-        buildBaseContOperational = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-                .withChild(buildPlayerCont)
-                .withChild(buildPlaylistList)
-                .build();
-
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        DOMDataBroker mockDataBroker = mock(DOMDataBroker.class);
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
-        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        final var dataBroker = mock(DOMDataBroker.class);
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
 
-        dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA), mockDataBroker,
+        dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA), dataBroker,
                 mountPointService, delegRestconfSubscrService, actionService, new StreamsConfiguration(0, 1, 0, false));
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
@@ -171,23 +148,23 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     @Test
     public void testReadData() {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        doReturn(immediateFluentFuture(Optional.of(buildBaseCont))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(EMPTY_JUKEBOX))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(read).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
         final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
         assertNotNull(response);
         assertEquals(200, response.getStatus());
-        assertEquals(buildBaseCont, ((NormalizedNodePayload) response.getEntity()).getData());
+        assertEquals(EMPTY_JUKEBOX, ((NormalizedNodePayload) response.getEntity()).getData());
     }
 
     @Test
     public void testReadRootData() {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(buildBaseContConfig))))
+        doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(CONFIG_JUKEBOX))))
                 .when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
-        doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(buildBaseContOperational))))
+        doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(OPER_JUKEBOX))))
                 .when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
         final Response response = dataService.readData(uriInfo);
@@ -216,9 +193,9 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     @Test
     public void testReadDataMountPoint() {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        doReturn(immediateFluentFuture(Optional.of(buildBaseContConfig))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(CONFIG_JUKEBOX))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        doReturn(immediateFluentFuture(Optional.of(buildBaseContOperational))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(OPER_JUKEBOX))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
         final Response response = dataService.readData(
@@ -231,9 +208,9 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
         assertTrue(data instanceof ContainerNode);
         assertEquals(3, ((ContainerNode) data).size());
-        assertNotNull(((ContainerNode) data).childByArg(buildPlayerCont.name()));
-        assertNotNull(((ContainerNode) data).childByArg(buildLibraryCont.name()));
-        assertNotNull(((ContainerNode) data).childByArg(buildPlaylistList.name()));
+        assertNotNull(((ContainerNode) data).childByArg(CONT_PLAYER.name()));
+        assertNotNull(((ContainerNode) data).childByArg(LIBRARY_NID));
+        assertNotNull(((ContainerNode) data).childByArg(PLAYLIST_NID));
     }
 
     @Test
@@ -263,7 +240,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         parameters.put("content", List.of("config"));
 
         doReturn(parameters).when(uriInfo).getQueryParameters();
-        doReturn(immediateFluentFuture(Optional.of(buildBaseContConfig))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(CONFIG_JUKEBOX))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
 
         final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
@@ -275,11 +252,11 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
 
         // config data present
-        assertNotNull(((ContainerNode) data).childByArg(buildPlayerCont.name()));
-        assertNotNull(((ContainerNode) data).childByArg(buildLibraryCont.name()));
+        assertNotNull(((ContainerNode) data).childByArg(CONT_PLAYER.name()));
+        assertNotNull(((ContainerNode) data).childByArg(LIBRARY_NID));
 
         // state data absent
-        assertNull(((ContainerNode) data).childByArg(buildPlaylistList.name()));
+        assertNull(((ContainerNode) data).childByArg(PLAYLIST_NID));
     }
 
     /**
@@ -291,7 +268,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         parameters.put("content", List.of("nonconfig"));
 
         doReturn(parameters).when(uriInfo).getQueryParameters();
-        doReturn(immediateFluentFuture(Optional.of(buildBaseContOperational))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(OPER_JUKEBOX))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
         final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
@@ -303,21 +280,21 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
 
         // state data present
-        assertNotNull(((ContainerNode) data).childByArg(buildPlayerCont.name()));
-        assertNotNull(((ContainerNode) data).childByArg(buildPlaylistList.name()));
+        assertNotNull(((ContainerNode) data).childByArg(CONT_PLAYER.name()));
+        assertNotNull(((ContainerNode) data).childByArg(PLAYLIST_NID));
 
         // config data absent
-        assertNull(((ContainerNode) data).childByArg(buildLibraryCont.name()));
+        assertNull(((ContainerNode) data).childByArg(LIBRARY_NID));
     }
 
     @Test
     public void testPutData() {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, EMPTY_JUKEBOX);
 
         doReturn(immediateTrueFluentFuture()).when(read)
                 .exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, payload.getData());
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         final Response response = dataService.putData(null, payload, uriInfo);
         assertNotNull(response);
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
@@ -327,11 +304,11 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     public void testPutDataWithMountPoint() {
         final InstanceIdentifierContext iidContext =
             InstanceIdentifierContext.ofMountPointPath(mountPoint, JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, EMPTY_JUKEBOX);
 
         doReturn(immediateTrueFluentFuture()).when(read)
                 .exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, payload.getData());
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         final Response response = dataService.putData(null, payload, uriInfo);
         assertNotNull(response);
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
@@ -347,7 +324,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
         final var response = dataService.postData(NormalizedNodePayload.of(
             InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID),
-            Builders.mapBuilder().withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME)).withChild(BAND_ENTRY).build()),
+            Builders.mapBuilder().withNodeIdentifier(PLAYLIST_NID).withChild(BAND_ENTRY).build()),
             uriInfo);
         assertEquals(201, response.getStatus());
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox"), response.getLocation());
@@ -363,7 +340,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
         final var response = dataService.postData(NormalizedNodePayload.of(
             InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, PLAYLIST_IID),
-            Builders.mapBuilder().withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME)).withChild(BAND_ENTRY).build()),
+            Builders.mapBuilder().withNodeIdentifier(PLAYLIST_NID).withChild(BAND_ENTRY).build()),
             uriInfo);
         assertEquals(201, response.getStatus());
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
@@ -416,8 +393,8 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     public void testPatchData() {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
         final PatchContext patch = new PatchContext(iidContext, List.of(
-            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, buildBaseCont),
-            new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, buildBaseCont),
+            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
+            new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, EMPTY_JUKEBOX),
             new PatchEntity("delete data", Operation.Delete, GAP_IID)), "test patch id");
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
@@ -436,8 +413,8 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint,
             JUKEBOX_SCHEMA, JUKEBOX_IID);
         final PatchContext patch = new PatchContext(iidContext, List.of(
-            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, buildBaseCont),
-            new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, buildBaseCont),
+            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
+            new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, EMPTY_JUKEBOX),
             new PatchEntity("delete data", Operation.Delete, GAP_IID)), "test patch id");
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
@@ -455,7 +432,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     public void testPatchDataDeleteNotExist() {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
         final PatchContext patch = new PatchContext(iidContext, List.of(
-            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, buildBaseCont),
+            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
             new PatchEntity("remove data", Operation.Remove, GAP_IID),
             new PatchEntity("delete data", Operation.Delete, GAP_IID)), "test patch id");
 

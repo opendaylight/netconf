@@ -52,12 +52,13 @@ public abstract class AbstractJukeboxTest {
         YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYER_QNAME, GAP_QNAME);
 
     protected static final LeafNode<?> GAP_LEAF = ImmutableNodes.leafNode(GAP_QNAME, Decimal64.valueOf("0.2"));
+    protected static final ContainerNode CONT_PLAYER = Builders.containerBuilder()
+        .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
+        .withChild(GAP_LEAF)
+        .build();
     protected static final ContainerNode EMPTY_JUKEBOX = Builders.containerBuilder()
         .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-        .withChild(Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
-            .withChild(GAP_LEAF)
-            .build())
+        .withChild(CONT_PLAYER)
         .build();
     protected static final MapEntryNode BAND_ENTRY = Builders.mapEntryBuilder()
         .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band"))
