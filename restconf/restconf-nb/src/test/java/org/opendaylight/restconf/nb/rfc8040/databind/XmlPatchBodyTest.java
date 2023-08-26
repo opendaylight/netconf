@@ -26,8 +26,8 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
 
     @Test
     public final void moduleDataTest() throws Exception {
-        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            XmlPatchBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdata.xml")));
+        checkPatchContext(parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
+            "/instanceidentifier/xml/xmlPATCHdata.xml"));
     }
 
     /**
@@ -35,10 +35,9 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataValueMissingNegativeTest() throws Exception {
-        final var inputStream = XmlPatchBodyTest.class.getResourceAsStream(
-            "/instanceidentifier/xml/xmlPATCHdataValueMissing.xml");
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", inputStream));
+            () -> parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
+                "/instanceidentifier/xml/xmlPATCHdataValueMissing.xml"));
         assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -48,10 +47,9 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataNotValueNotSupportedNegativeTest() throws Exception {
-        final var inputStream = XmlPatchBodyTest.class.getResourceAsStream(
-            "/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml");
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", inputStream));
+            () -> parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
+                "/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml"));
         assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -60,8 +58,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataAbsoluteTargetPathTest() throws Exception {
-        checkPatchContext(parse(mountPrefix(), XmlPatchBodyTest.class.getResourceAsStream(
-            "/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml")));
+        checkPatchContext(parseResource(mountPrefix(), "/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml"));
     }
 
     /**
@@ -69,8 +66,8 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchCompleteTargetInURITest() throws Exception {
-        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont",
-            XmlPatchBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml")));
+        checkPatchContext(parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont",
+            "/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml"));
     }
 
     /**
@@ -78,9 +75,8 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataMergeOperationOnListTest() throws Exception {
-        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            XmlPatchBodyTest.class.getResourceAsStream(
-                "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml")));
+        checkPatchContext(parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
+            "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml"));
     }
 
     /**
@@ -88,9 +84,8 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataMergeOperationOnContainerTest() throws Exception {
-        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont",
-            XmlPatchBodyTest.class.getResourceAsStream(
-                "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml")));
+        checkPatchContext(parseResource(mountPrefix() + "instance-identifier-patch-module:patch-cont",
+            "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml"));
     }
 
     /**
@@ -98,9 +93,8 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
-        checkPatchContext(parse(mountPrefix(),
-            XmlPatchBodyTest.class.getResourceAsStream(
-                "/instanceidentifier/xml/xmlPATCHTargetTopLevelContainerWithEmptyURI.xml")));
+        checkPatchContext(parseResource(mountPrefix(),
+            "/instanceidentifier/xml/xmlPATCHTargetTopLevelContainerWithEmptyURI.xml"));
     }
 
     /**

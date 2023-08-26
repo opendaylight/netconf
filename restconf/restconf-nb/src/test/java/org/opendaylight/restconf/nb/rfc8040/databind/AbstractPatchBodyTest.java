@@ -73,13 +73,17 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
         assertSame(mountPoint(), iid.getMountPoint());
     }
 
+    // FIXME: migrate callers to use the below instead of resources
+    @Deprecated
+    final @NonNull PatchContext parseResource(final String uriPath, final String resourceName) throws IOException {
+        return parse(uriPath, AbstractPatchBodyTest.class.getResourceAsStream(resourceName));
+    }
+
     final @NonNull PatchContext parse(final String uriPath, final String patchBody) throws IOException {
         return parse(uriPath, new ByteArrayInputStream(patchBody.getBytes(StandardCharsets.UTF_8)));
     }
 
-    // FIXME: migrate callers to use the above instead of resources
-    @Deprecated
-    final @NonNull PatchContext parse(final String uriPath, final InputStream patchBody) throws IOException {
+    private @NonNull PatchContext parse(final String uriPath, final InputStream patchBody) throws IOException {
         try (var body = bodyConstructor.apply(patchBody)) {
             return body.toPatchContext(ParserIdentifier.toInstanceIdentifier(uriPath, IID_SCHEMA, mountPointService));
         }
