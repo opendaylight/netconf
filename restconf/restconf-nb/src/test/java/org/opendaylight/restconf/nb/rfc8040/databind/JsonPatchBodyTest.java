@@ -132,10 +132,29 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchValueNotSupportedNegativeTest() throws Exception {
-        final var inputStream = JsonPatchBodyTest.class.getResourceAsStream(
-            "/instanceidentifier/json/jsonPATCHdataValueNotSupported.json");
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", inputStream));
+            () -> parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+                {
+                  "ietf-yang-patch:yang-patch" : {
+                    "patch-id" : "test-patch",
+                    "comment" : "this is test patch",
+                    "edit" : [
+                      {
+                        "edit-id": "edit2",
+                        "operation": "delete",
+                        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name=\
+'my-leaf20']",
+                        "value": {
+                          "my-list2": [
+                            {
+                              "name": "my-leaf20"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }"""));
         assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -144,9 +163,50 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchCompleteTargetInURITest() throws Exception {
-        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont",
-            JsonPatchBodyTest.class.getResourceAsStream(
-                "/instanceidentifier/json/jsonPATCHdataCompleteTargetInURI.json")));
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont", """
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test-patch",
+                "comment" : "Test to create and replace data in container directly using / sign as a target",
+                "edit" : [
+                  {
+                    "edit-id": "edit1",
+                    "operation": "create",
+                    "target": "/",
+                    "value": {
+                      "patch-cont": {
+                        "my-list1": [
+                          {
+                            "name": "my-list1 - A",
+                            "my-leaf11": "I am leaf11-0",
+                            "my-leaf12": "I am leaf12-1"
+                          },
+                          {
+                            "name": "my-list1 - B",
+                            "my-leaf11": "I am leaf11-0",
+                            "my-leaf12": "I am leaf12-1"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "edit-id": "edit2",
+                    "operation": "replace",
+                    "target": "/",
+                    "value": {
+                      "patch-cont": {
+                        "my-list1": {
+                          "name": "my-list1 - Replacing",
+                          "my-leaf11": "I am leaf11-0",
+                          "my-leaf12": "I am leaf12-1"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""));
     }
 
     /**
@@ -154,9 +214,39 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchMergeOperationOnListTest() throws Exception {
-        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            JsonPatchBodyTest.class.getResourceAsStream(
-                "/instanceidentifier/json/jsonPATCHMergeOperationOnList.json")));
+        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "Test merge operation",
+                "comment" : "This is test patch for merge operation on list",
+                "edit" : [
+                  {
+                    "edit-id": "edit1",
+                    "operation": "replace",
+                    "target": "/my-list2=my-leaf20",
+                    "value": {
+                      "my-list2": {
+                        "name": "my-leaf20",
+                        "my-leaf21": "I am leaf21-0",
+                        "my-leaf22": "I am leaf22-0"
+                      }
+                    }
+                  },
+                  {
+                    "edit-id": "edit2",
+                    "operation": "merge",
+                    "target": "/my-list2=my-leaf21",
+                    "value": {
+                      "my-list2": {
+                        "name": "my-leaf21",
+                        "my-leaf21": "I am leaf21-1",
+                        "my-leaf22": "I am leaf22-1"
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""));
     }
 
     /**
@@ -215,8 +305,23 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchSimpleLeafValueTest() throws Exception {
-        final var returnValue = parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1",
-            JsonPatchBodyTest.class.getResourceAsStream("/instanceidentifier/json/jsonPATCHSimpleLeafValue.json"));
+        final var returnValue = parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test-patch",
+                "comment" : "this is test patch for simple leaf value",
+                "edit" : [
+                  {
+                    "edit-id": "edit1",
+                    "operation": "replace",
+                    "target": "/my-list2=my-leaf20/name",
+                    "value": {
+                      "name": "my-leaf20"
+                    }
+                  }
+                ]
+              }
+            }""");
         checkPatchContext(returnValue);
         assertEquals(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf20"), returnValue.getData().get(0).getNode());
     }
@@ -226,9 +331,29 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
-        checkPatchContext(parse(mountPrefix(),
-            JsonPatchBodyTest.class.getResourceAsStream(
-                "/instanceidentifier/json/jsonPATCHTargetTopLevelContainerWithEmptyURI.json")));
+        checkPatchContext(parse(mountPrefix(), """
+            {
+              "ietf-yang-patch:yang-patch" : {
+                "patch-id" : "test-patch",
+                "comment" : "Test patch applied to the top-level container with empty URI",
+                "edit" : [
+                  {
+                    "edit-id": "edit1",
+                    "operation": "replace",
+                    "target": "/instance-identifier-patch-module:patch-cont",
+                    "value": {
+                      "patch-cont": {
+                        "my-list1": [
+                          {
+                            "name": "my-leaf10"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }"""));
     }
 
     /**
