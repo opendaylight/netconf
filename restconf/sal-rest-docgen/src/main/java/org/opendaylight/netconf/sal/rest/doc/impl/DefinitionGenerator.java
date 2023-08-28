@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.COMPONENTS_PREFIX;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.NAME_KEY;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.POST_SUFFIX;
@@ -168,7 +169,9 @@ public class DefinitionGenerator {
             throws IOException {
         final ObjectNode definitions = JsonNodeFactory.instance.objectNode();
         if (isForSingleModule) {
-            definitionNames.addUnlinkedName(module.getName() + MODULE_NAME_SUFFIX);
+            final String defName = module.getName() + CONFIG + MODULE_NAME_SUFFIX + POST_SUFFIX;
+            definitionNames.addUnlinkedName(defName);
+            definitionNames.addUnlinkedName(defName + XML_SUFFIX);
         }
         return convertToJsonSchema(module, schemaContext, definitions, definitionNames, oaversion, isForSingleModule);
     }
@@ -179,7 +182,7 @@ public class DefinitionGenerator {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         final String moduleName = module.getName();
-        final String definitionName = moduleName + MODULE_NAME_SUFFIX;
+        final String definitionName = moduleName + CONFIG + MODULE_NAME_SUFFIX + POST_SUFFIX;
         final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
         for (final DataSchemaNode node : module.getChildNodes()) {
             stack.enterSchemaTree(node.getQName());
@@ -232,6 +235,9 @@ public class DefinitionGenerator {
         setRequiredIfNotEmpty(definition, required);
 
         definitions.set(definitionName, definition);
+        final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
+        xmlSchema.put(REF_KEY, COMPONENTS_PREFIX + definitionName);
+        definitions.set(definitionName + XML_SUFFIX, xmlSchema);
     }
 
     private static boolean isSchemaNodeMandatory(final DataSchemaNode node) {
@@ -457,6 +463,11 @@ public class DefinitionGenerator {
             final String defName = nodeName + discriminator;
             childSchema.set(XML_KEY, buildXmlParameter(schemaNode));
             definitions.set(defName, childSchema);
+
+            final String defNameXml = nodeName + XML_SUFFIX + discriminator;
+            final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
+            xmlSchema.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
+            definitions.set(defNameXml, xmlSchema);
 
             return processTopData(nodeName, discriminator, definitions, schemaNode, oaversion,
                 stack.getEffectiveModelContext());
