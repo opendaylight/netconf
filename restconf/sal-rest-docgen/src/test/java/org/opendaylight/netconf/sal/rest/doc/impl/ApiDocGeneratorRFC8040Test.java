@@ -12,11 +12,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.COMPONENTS_PREFIX;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.CONTENT_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.REF_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.REQUEST_BODY_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.RESPONSES_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SCHEMA_KEY;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -403,6 +411,26 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     }
 
     /**
+     * Test that reference to schema in each path is valid (all referenced schemas exist).
+     */
+    @Test
+    public void testSchemasExistenceSingleModule() {
+        final var document = (OpenApiObject) generator.getApiDeclaration(NAME, REVISION_DATE, URI_INFO,
+            ApiDocServiceImpl.OAversion.V3_0);
+        assertNotNull(document);
+        final var referencedSchemas = new HashSet<String>();
+        for (final var elements = document.getPaths().elements(); elements.hasNext(); ) {
+            final var path = elements.next();
+            referencedSchemas.addAll(extractSchemaRefFromPath(path));
+        }
+        final var schemaNamesIterator = document.getComponents().getSchemas().fieldNames();
+        final var schemaNames = Sets.newHashSet(schemaNamesIterator);
+        for (final var ref : referencedSchemas) {
+            assertTrue("Referenced schema " + ref + " does not exist", schemaNames.contains(ref));
+        }
+    }
+
+    /**
      *  Test JSON and XML references for request operation.
      */
     private static void verifyRequestRef(final JsonNode path, final String expectedJsonRef,
@@ -443,5 +471,40 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var postXmlRef = postContent.get("application/xml").get("schema").get("$ref");
         assertNotNull(postXmlRef);
         assertEquals(expectedXmlRef, postXmlRef.textValue());
+    }
+
+    private static Set<String> extractSchemaRefFromPath(final JsonNode path) {
+        if (path == null || path.isMissingNode()) {
+            return Set.of();
+        }
+        final var references = new HashSet<String>();
+        final var get = path.path("get");
+        if (!get.isMissingNode()) {
+            references.addAll(schemaRefFromContent(get.path(RESPONSES_KEY).path("200").path(CONTENT_KEY)));
+        }
+        final var post = path.path("post");
+        if (!post.isMissingNode()) {
+            references.addAll(schemaRefFromContent(post.path(REQUEST_BODY_KEY).path(CONTENT_KEY)));
+        }
+        final var put = path.path("put");
+        if (!put.isMissingNode()) {
+            references.addAll(schemaRefFromContent(put.path(REQUEST_BODY_KEY).path(CONTENT_KEY)));
+        }
+        final var patch = path.path("patch");
+        if (!patch.isMissingNode()) {
+            references.addAll(schemaRefFromContent(patch.path(REQUEST_BODY_KEY).path(CONTENT_KEY)));
+        }
+        return references;
+    }
+
+    private static Set<String> schemaRefFromContent(final JsonNode content) {
+        final HashSet<String> refs = new HashSet<>();
+        content.fieldNames().forEachRemaining(mediaType -> {
+            final JsonNode ref = content.path(mediaType).path(SCHEMA_KEY).path(REF_KEY);
+            if (ref != null && !ref.isMissingNode()) {
+                refs.add(ref.asText().replaceFirst(COMPONENTS_PREFIX, ""));
+            }
+        });
+        return refs;
     }
 }
