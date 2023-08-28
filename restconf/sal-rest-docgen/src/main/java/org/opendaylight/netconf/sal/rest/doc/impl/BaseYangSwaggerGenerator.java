@@ -318,8 +318,7 @@ public abstract class BaseYangSwaggerGenerator {
         if (containsListOrContainer(module.getChildNodes())) {
             final ObjectNode post = JsonNodeFactory.instance.objectNode();
             final String moduleName = module.getName();
-            final String name = moduleName + MODULE_NAME_SUFFIX;
-            post.set("post", buildPost(null, "", name, "", moduleName, deviceName,
+            post.set("post", buildPost(null, moduleName, "module", "", moduleName, deviceName,
                     module.getDescription().orElse(""), pathParams, oaversion));
             paths.set(resourcePath, post);
         }
