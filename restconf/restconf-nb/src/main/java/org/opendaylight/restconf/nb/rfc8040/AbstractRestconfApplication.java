@@ -13,11 +13,8 @@ import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.Application;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YangSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YinSchemaExportBodyWriter;
@@ -30,13 +27,10 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlPatchStatu
  */
 abstract class AbstractRestconfApplication extends Application {
     private final DatabindProvider databindProvider;
-    private final DOMMountPointService mountPointService;
     private final List<Object> services;
 
-    AbstractRestconfApplication(final DatabindProvider databindProvider, final DOMMountPointService mountPointService,
-            final List<Object> services) {
+    AbstractRestconfApplication(final DatabindProvider databindProvider, final List<Object> services) {
         this.databindProvider = requireNonNull(databindProvider);
-        this.mountPointService = requireNonNull(mountPointService);
         this.services = requireNonNull(services);
     }
 
@@ -50,10 +44,8 @@ abstract class AbstractRestconfApplication extends Application {
 
     @Override
     public final Set<Object> getSingletons() {
-        return ImmutableSet.<Object>builderWithExpectedSize(services.size() + 5)
+        return ImmutableSet.<Object>builderWithExpectedSize(services.size() + 1)
             .addAll(services)
-            .add(new JsonNormalizedNodeBodyReader(databindProvider, mountPointService))
-            .add(new XmlNormalizedNodeBodyReader(databindProvider, mountPointService))
             .add(new RestconfDocumentedExceptionMapper(databindProvider))
             .build();
     }

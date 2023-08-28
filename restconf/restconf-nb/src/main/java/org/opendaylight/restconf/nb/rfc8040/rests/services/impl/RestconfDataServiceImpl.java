@@ -63,11 +63,17 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonResourceBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlChildBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
@@ -87,7 +93,6 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.restconf.Data;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -380,10 +385,9 @@ public final class RestconfDataServiceImpl {
     }
 
     /**
-     * Create a data resource in target.
+     * Create a top-level data resource.
      *
-     * @param identifier path to target
-     * @param payload new data
+     * @param body data node for put to config DS
      * @param uriInfo URI info
      * @return {@link Response}
      */
@@ -391,44 +395,109 @@ public final class RestconfDataServiceImpl {
     @Path("/data/{identifier:.+}")
     @Consumes({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.TEXT_XML
     })
-    public Response postData(@Encoded @PathParam("identifier") final String identifier,
-            final NormalizedNodePayload payload, @Context final UriInfo uriInfo) {
-        return postData(payload, uriInfo);
+    public Response postDataJSON(final InputStream body, @Context final UriInfo uriInfo) {
+        try (var jsonBody = new JsonChildBody(body)) {
+            return postData(jsonBody, uriInfo);
+        }
     }
 
     /**
-     * Create a data resource.
+     * Create a data resource in target.
      *
-     * @param payload new data
+     * @param identifier path to target
+     * @param body data node for put to config DS
+     * @param uriInfo URI info
+     * @return {@link Response}
+     */
+    @POST
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaType.APPLICATION_JSON,
+    })
+    public Response postDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo) {
+        final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
+            databindProvider.currentContext().modelContext(), mountPointService);
+        if (instanceIdentifier.getSchemaNode() instanceof ActionDefinition) {
+            try (var jsonBody = new JsonOperationInputBody(body)) {
+                return invokeAction(instanceIdentifier, jsonBody);
+            }
+        }
+
+        try (var jsonBody = new JsonChildBody(body)) {
+            return postData(instanceIdentifier, jsonBody, uriInfo);
+        }
+    }
+
+    /**
+     * Create a top-level data resource.
+     *
+     * @param body data node for put to config DS
      * @param uriInfo URI info
      * @return {@link Response}
      */
     @POST
     @Path("/data")
     @Consumes({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML,
-        MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response postData(final NormalizedNodePayload payload, @Context final UriInfo uriInfo) {
-        requireNonNull(payload);
-        final var iid = payload.getInstanceIdentifierContext();
-        if (iid.getSchemaNode() instanceof ActionDefinition) {
-            return invokeAction(payload);
+    public Response postDataXML(final InputStream body, @Context final UriInfo uriInfo) {
+        try (var xmlBody = new XmlChildBody(body)) {
+            return postData(xmlBody, uriInfo);
+        }
+    }
+
+    /**
+     * Create a data resource in target.
+     *
+     * @param identifier path to target
+     * @param body data node for put to config DS
+     * @param uriInfo URI info
+     * @return {@link Response}
+     */
+    @POST
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public Response postDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo) {
+        final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
+            databindProvider.currentContext().modelContext(), mountPointService);
+        if (instanceIdentifier.getSchemaNode() instanceof ActionDefinition) {
+            try (var xmlBody = new XmlOperationInputBody(body)) {
+                return invokeAction(instanceIdentifier, xmlBody);
+            }
         }
 
+        try (var xmlBody = new XmlChildBody(body)) {
+            return postData(instanceIdentifier, xmlBody, uriInfo);
+        }
+    }
+
+    private Response postData(final ChildBody body, final UriInfo uriInfo) {
+        return postData(InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext().modelContext()), body,
+            uriInfo);
+    }
+
+    private Response postData(final InstanceIdentifierContext iid, final ChildBody body, final UriInfo uriInfo) {
         final var params = QueryParams.newWriteDataParams(uriInfo);
         final var strategy = getRestconfStrategy(iid.getMountPoint());
-        final var path = iid.getInstanceIdentifier();
         final var context = iid.getSchemaContext();
-        final var data = payload.getData();
+        var path = iid.getInstanceIdentifier();
+        final var payload = body.toPayload(path, iid.inference());
+        final var data = payload.body();
+
+        for (var arg : payload.prefix()) {
+            path = path.node(arg);
+        }
 
         PostDataTransactionUtil.postData(path, data, strategy, context, params);
         return Response.created(resolveLocation(uriInfo, path, context, data)).build();
@@ -731,38 +800,28 @@ public final class RestconfDataServiceImpl {
      * @param payload {@link NormalizedNodePayload} - the body of the operation
      * @return {@link NormalizedNodePayload} wrapped in {@link Response}
      */
-    public Response invokeAction(final NormalizedNodePayload payload) {
-        final InstanceIdentifierContext context = payload.getInstanceIdentifierContext();
-        final YangInstanceIdentifier yangIIdContext = context.getInstanceIdentifier();
-        final NormalizedNode data = payload.getData();
-
-        if (yangIIdContext.isEmpty() && !Data.QNAME.equals(data.name().getNodeType())) {
-            throw new RestconfDocumentedException("Instance identifier need to contain at least one path argument",
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+    private Response invokeAction(final InstanceIdentifierContext context, final OperationInputBody body) {
+        final var yangIIdContext = context.getInstanceIdentifier();
+        final ContainerNode input;
+        try {
+            input = body.toContainerNode(context.inference());
+        } catch (IOException e) {
+            LOG.debug("Error reading input", e);
+            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
+                    ErrorTag.MALFORMED_MESSAGE, e);
         }
 
-        final DOMMountPoint mountPoint = context.getMountPoint();
-        final Absolute schemaPath = context.inference().toSchemaInferenceStack().toSchemaNodeIdentifier();
-        final DOMActionResult response;
-        if (mountPoint != null) {
-            response = invokeAction((ContainerNode) data, schemaPath, yangIIdContext, mountPoint);
-        } else {
-            response = invokeAction((ContainerNode) data, schemaPath, yangIIdContext, actionService);
-        }
-        final DOMActionResult result = checkActionResponse(response);
+        final var mountPoint = context.getMountPoint();
+        final var schemaPath = context.inference().toSchemaInferenceStack().toSchemaNodeIdentifier();
+        final var response = mountPoint != null ? invokeAction(input, schemaPath, yangIIdContext, mountPoint)
+            : invokeAction(input, schemaPath, yangIIdContext, actionService);
+        final var result = checkActionResponse(response);
 
-        ContainerNode resultData = null;
-        if (result != null) {
-            resultData = result.getOutput().orElse(null);
-        }
-
+        final var resultData = result != null ? result.getOutput().orElse(null) : null;
         if (resultData != null && resultData.isEmpty()) {
             return Response.status(Status.NO_CONTENT).build();
         }
-
-        return Response.status(Status.OK)
-            .entity(NormalizedNodePayload.ofNullable(context, resultData))
-            .build();
+        return Response.status(Status.OK).entity(NormalizedNodePayload.ofNullable(context, resultData)).build();
     }
 
     /**

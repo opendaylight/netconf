@@ -33,7 +33,7 @@ public class RestconfApplication extends AbstractRestconfApplication {
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
             final StreamsConfiguration configuration) {
-        super(databindProvider, mountPointService, List.of(
+        super(databindProvider, List.of(
             streamSubscription,
             new RestconfDataServiceImpl(databindProvider, dataBroker, mountPointService, streamSubscription,
                 actionService, configuration),
