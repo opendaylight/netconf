@@ -11,13 +11,10 @@ import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterables;
-import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -48,12 +45,6 @@ public abstract class InstanceIdentifierContext {
         public Inference inference() {
             return SchemaInferenceStack.of(context).toInference();
         }
-
-        @Override
-        InstanceIdentifierContext createWithConcapt(final List<PathArgument> concatArgs) {
-            return new DataPath(context, getMountPoint(), SchemaInferenceStack.of(context),
-                YangInstanceIdentifier.of(concatArgs));
-        }
     }
 
     private static final class DataPath extends InstanceIdentifierContext {
@@ -82,14 +73,6 @@ public abstract class InstanceIdentifierContext {
         public Inference inference() {
             return stack.toInference();
         }
-
-        @Override
-        @NonNull
-        InstanceIdentifierContext createWithConcapt(final List<PathArgument> concatArgs) {
-            final var newInstanceIdentifier = YangInstanceIdentifier.of(
-                Iterables.concat(path.getPathArguments(), concatArgs));
-            return new DataPath(getSchemaNode(), getMountPoint(), stack, newInstanceIdentifier);
-        }
     }
 
     private static final class WithoutDataPath extends InstanceIdentifierContext {
@@ -109,11 +92,6 @@ public abstract class InstanceIdentifierContext {
         @Override
         public @Nullable YangInstanceIdentifier getInstanceIdentifier() {
             return null;
-        }
-
-        @Override
-        InstanceIdentifierContext createWithConcapt(final List<PathArgument> concatArgs) {
-            return this;
         }
     }
 
@@ -216,13 +194,6 @@ public abstract class InstanceIdentifierContext {
         stack.enterSchemaTree(rpc.getOutput().getQName());
         return new WithoutDataPath(rpc, requireNonNull(mountPoint), stack);
     }
-
-    // FIXME: what the heck are the callers of this doing?!
-    public final @NonNull InstanceIdentifierContext withConcatenatedArgs(final List<PathArgument> concatArgs) {
-        return concatArgs.isEmpty() ? this : createWithConcapt(concatArgs);
-    }
-
-    abstract @NonNull InstanceIdentifierContext createWithConcapt(List<PathArgument> concatArgs);
 
     public final @NonNull SchemaNode getSchemaNode() {
         return schemaNode;

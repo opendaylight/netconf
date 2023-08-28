@@ -330,15 +330,16 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     @Test
     public void testPostData() {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        final var node = JUKEBOX_IID.node(BAND_ENTRY.name());
-        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
+        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
+            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME)).build());
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
-        final var response = dataService.postData(NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID),
-            Builders.mapBuilder().withNodeIdentifier(PLAYLIST_NID).withChild(BAND_ENTRY).build()),
-            uriInfo);
+        final var response = dataService.postDataJSON(new ByteArrayInputStream("""
+            {
+              "example-jukebox:jukebox" : {
+              }
+            }""".getBytes(StandardCharsets.UTF_8)), uriInfo);
         assertEquals(201, response.getStatus());
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox"), response.getLocation());
     }
@@ -351,9 +352,13 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
-        final var response = dataService.postData(NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, PLAYLIST_IID),
-            Builders.mapBuilder().withNodeIdentifier(PLAYLIST_NID).withChild(BAND_ENTRY).build()),
+        final var response = dataService.postDataJSON("example-jukebox:jukebox", new ByteArrayInputStream("""
+            {
+              "example-jukebox:playlist" : {
+                "name" : "name of band",
+                "description" : "band description"
+              }
+            }""".getBytes(StandardCharsets.UTF_8)),
             uriInfo);
         assertEquals(201, response.getStatus());
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
