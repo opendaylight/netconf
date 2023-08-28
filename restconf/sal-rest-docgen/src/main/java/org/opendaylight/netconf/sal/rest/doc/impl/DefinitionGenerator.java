@@ -168,7 +168,9 @@ public class DefinitionGenerator {
             throws IOException {
         final ObjectNode definitions = JsonNodeFactory.instance.objectNode();
         if (isForSingleModule) {
-            definitionNames.addUnlinkedName(module.getName() + MODULE_NAME_SUFFIX);
+            final String defName = module.getName() + CONFIG + MODULE_NAME_SUFFIX + POST_SUFFIX;
+            definitionNames.addUnlinkedName(defName);
+            definitionNames.addUnlinkedName(defName + XML_SUFFIX);
         }
         return convertToJsonSchema(module, schemaContext, definitions, definitionNames, oaversion, isForSingleModule);
     }
@@ -179,7 +181,7 @@ public class DefinitionGenerator {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         final ArrayNode required = JsonNodeFactory.instance.arrayNode();
         final String moduleName = module.getName();
-        final String definitionName = moduleName + MODULE_NAME_SUFFIX;
+        final String definitionName = moduleName + CONFIG + MODULE_NAME_SUFFIX + POST_SUFFIX;
         final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
         for (final DataSchemaNode node : module.getChildNodes()) {
             stack.enterSchemaTree(node.getQName());
@@ -232,6 +234,9 @@ public class DefinitionGenerator {
         setRequiredIfNotEmpty(definition, required);
 
         definitions.set(definitionName, definition);
+        final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
+        xmlSchema.put(REF_KEY, getAppropriateModelPrefix(oaversion) + definitionName);
+        definitions.set(definitionName + XML_SUFFIX, xmlSchema);
     }
 
     private static boolean isSchemaNodeMandatory(final DataSchemaNode node) {

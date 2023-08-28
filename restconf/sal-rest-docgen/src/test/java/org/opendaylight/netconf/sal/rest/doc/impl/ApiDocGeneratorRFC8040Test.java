@@ -12,16 +12,28 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.CONTENT_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.REF_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.REQUEST_BODY_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.RESPONSES_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SCHEMA_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.XML_SUFFIX;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getAppropriateModelPrefix;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import javax.ws.rs.core.MediaType;
 import org.junit.Test;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.swagger.OpenApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 
@@ -44,7 +56,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_config_mandatory-list";
     private static final String CONFIG_MANDATORY_LIST_POST = "mandatory-test_root-container_config_mandatory-list_post";
     private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
-    private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
+    private static final String MANDATORY_TEST_MODULE = "mandatory-test_config_module_post";
     private static final String CHOICE_TEST_MODULE = "choice-test";
     private static final String PROPERTIES = "properties";
     private static final String CONTAINER = "container";
@@ -322,14 +334,14 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(7, definitions.size());
+        assertEquals(8, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
         assertTrue(definitions.has("my-yang_config_data_post"));
         assertTrue(definitions.has("my-yang_config_data_post_xml"));
         assertTrue(definitions.has("my-yang_config_data_TOP"));
         assertTrue(definitions.has("my-yang_data"));
         assertTrue(definitions.has("my-yang_data_TOP"));
-        assertTrue(definitions.has("my-yang_module"));
+        assertTrue(definitions.has("my-yang_config_module_post"));
     }
 
     @Test
@@ -399,7 +411,60 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertEquals(2, xmlSchema.size());
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(60, definitions.size());
+        assertEquals(61, definitions.size());
+    }
+
+    /**
+     * Test that reference to schema in each path is valid (all referenced schemas exist).
+     */
+    @Test
+    public void testRootPostSchemaReference() {
+        final var document = (OpenApiObject) generator.getApiDeclaration(NAME, REVISION_DATE, URI_INFO, OAversion.V3_0);
+        assertNotNull(document);
+
+        final var rootPostBodyContent = document.getPaths().path("/rests/data").path("post")
+                .path(REQUEST_BODY_KEY).path(CONTENT_KEY);
+        final var expectedSchema = "toaster2_config_module_post";
+        final var expectedXmlSchema = expectedSchema + XML_SUFFIX;
+
+        // verify schema reference itself for json
+        final var jsonSchemaRef = rootPostBodyContent.path(MediaType.APPLICATION_JSON).path("schema").path("$ref");
+        assertFalse(jsonSchemaRef.isMissingNode());
+        assertEquals(getAppropriateModelPrefix(OAversion.V3_0) + expectedSchema, jsonSchemaRef.asText());
+
+        // verify schema reference itself for xml
+        final var xmlSchemaRef = rootPostBodyContent.path(MediaType.APPLICATION_XML).path("schema").path("$ref");
+        assertFalse(xmlSchemaRef.isMissingNode());
+        assertEquals(getAppropriateModelPrefix(OAversion.V3_0) + expectedXmlSchema, xmlSchemaRef.asText());
+
+        // verify existence of the schemas being referenced
+        assertTrue("The expected referenced schema (" + expectedSchema + ") is not created",
+            document.getComponents().getSchemas().has(expectedSchema));
+        assertTrue("The expected referenced schema (" + expectedXmlSchema +  ") is not created",
+            document.getComponents().getSchemas().has(expectedXmlSchema));
+    }
+
+    /**
+     * Test that reference to schema in each path is valid (all referenced schemas exist).
+     */
+    @Test
+    public void testSchemasExistenceSingleModule() {
+        final var document = (OpenApiObject) generator.getApiDeclaration(NAME, REVISION_DATE, URI_INFO, OAversion.V3_0);
+        assertNotNull(document);
+
+        // FIXME: NETCONF-1144 after fixing incorrect references to nonexistent schemas, enable this test
+        //  by removing the "assumeTrue(false);"
+        assumeTrue(false);
+        final var referencedSchemas = new HashSet<String>();
+        for (final var elements = document.getPaths().elements(); elements.hasNext(); ) {
+            final var path = elements.next();
+            referencedSchemas.addAll(extractSchemaRefFromPath(path, OAversion.V3_0));
+        }
+        final var schemaNamesIterator = document.getComponents().getSchemas().fieldNames();
+        final var schemaNames = Sets.newHashSet(schemaNamesIterator);
+        for (final var ref : referencedSchemas) {
+            assertTrue("Referenced schema " + ref + " does not exist", schemaNames.contains(ref));
+        }
     }
 
     /**
@@ -443,5 +508,41 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var postXmlRef = postContent.get("application/xml").get("schema").get("$ref");
         assertNotNull(postXmlRef);
         assertEquals(expectedXmlRef, postXmlRef.textValue());
+    }
+
+    private static Set<String> extractSchemaRefFromPath(final JsonNode path, final OAversion oaversion) {
+        if (path == null || path.isMissingNode()) {
+            return Set.of();
+        }
+        final var references = new HashSet<String>();
+        final var get = path.path("get");
+        if (!get.isMissingNode()) {
+            references.addAll(
+                schemaRefFromContent(get.path(RESPONSES_KEY).path("200").path(CONTENT_KEY), oaversion));
+        }
+        final var post = path.path("post");
+        if (!post.isMissingNode()) {
+            references.addAll(schemaRefFromContent(post.path(REQUEST_BODY_KEY).path(CONTENT_KEY), oaversion));
+        }
+        final var put = path.path("put");
+        if (!put.isMissingNode()) {
+            references.addAll(schemaRefFromContent(put.path(REQUEST_BODY_KEY).path(CONTENT_KEY), oaversion));
+        }
+        final var patch = path.path("patch");
+        if (!patch.isMissingNode()) {
+            references.addAll(schemaRefFromContent(patch.path(REQUEST_BODY_KEY).path(CONTENT_KEY), oaversion));
+        }
+        return references;
+    }
+
+    private static Set<String> schemaRefFromContent(final JsonNode content, final OAversion oaversion) {
+        final HashSet<String> refs = new HashSet<>();
+        content.fieldNames().forEachRemaining(mediaType -> {
+            final JsonNode ref = content.path(mediaType).path(SCHEMA_KEY).path(REF_KEY);
+            if (ref != null && !ref.isMissingNode()) {
+                refs.add(ref.asText().replaceFirst(getAppropriateModelPrefix(oaversion), ""));
+            }
+        });
+        return refs;
     }
 }
