@@ -7,40 +7,29 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.FileNotFoundException;
-import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
-import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class JsonBodyReaderTest extends AbstractBodyReaderTest {
-    private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
-        XMLNamespace.of("instance:identifier:module"), Revision.of("2014-01-17"));
-    private static final MediaType MEDIA_TYPE = new MediaType(MediaType.APPLICATION_JSON, null);
-
     private static EffectiveModelContext schemaContext;
-
-    private final JsonNormalizedNodeBodyReader jsonBodyReader;
 
     public JsonBodyReaderTest() {
         super(schemaContext);
-        jsonBodyReader = new JsonNormalizedNodeBodyReader(databindProvider, mountPointService);
     }
 
     @BeforeClass
@@ -52,44 +41,29 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
     @Test
     public void moduleSubContainerDataPostTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext
-                .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
+        final var dataSchemaNode = schemaContext.getDataChildByName(CONT_QNAME);
         final QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
         final String uri = "instance-identifier-module:cont";
-        mockPostBodyReader(uri, jsonBodyReader);
-        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
+
+        final var body = new JsonChildBody(
             JsonBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_sub_container.json"));
+        final var payload = body.toPayload(
+            SchemaInferenceStack.ofDataTreePath(schemaContext, CONT_QNAME).toInference());
+
         checkNormalizedNodePayload(payload);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, payload, dataII);
     }
 
     @Test
-    public void moduleSubContainerDataPostActionTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext
-            .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
-        final QName actionQName = QName.create(dataSchemaNode.getQName(), "reset");
-        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
-            .node(cont1QName).node(actionQName);
-        final String uri = "instance-identifier-module:cont/cont1/reset";
-        mockPostBodyReader(uri, jsonBodyReader);
-        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
-            JsonBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_cont_action.json"));
-        checkNormalizedNodePayload(payload);
-        assertThat(payload.getInstanceIdentifierContext().getSchemaNode(), instanceOf(ActionDefinition.class));
-    }
-
-    @Test
     public void moduleSubContainerAugmentDataPostTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext
-                .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
+        final DataSchemaNode dataSchemaNode = schemaContext.getDataChildByName(CONT_QNAME);
         final Module augmentModule = schemaContext.findModules(XMLNamespace.of("augment:module")).iterator().next();
         final QName contAugmentQName = QName.create(augmentModule.getQNameModule(), "cont-augment");
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName(), contAugmentQName);
         final String uri = "instance-identifier-module:cont";
-        mockPostBodyReader(uri, jsonBodyReader);
-        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
+
+        final var body = new JsonChildBody(
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_augment_container.json"));
         checkNormalizedNodePayload(payload);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, payload, dataII);
@@ -97,8 +71,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
     @Test
     public void moduleSubContainerChoiceAugmentDataPostTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext
-                .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
+        final DataSchemaNode dataSchemaNode = schemaContext.getDataChildByName(CONT_QNAME);
         final Module augmentModule = schemaContext.findModules(XMLNamespace.of("augment:module")).iterator().next();
         final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
         final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
@@ -106,8 +79,8 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
                 .node(augmentChoice1QName).node(augmentChoice2QName).node(containerQName);
         final String uri = "instance-identifier-module:cont";
-        mockPostBodyReader(uri, jsonBodyReader);
-        final NormalizedNodePayload payload = jsonBodyReader.readFrom(null, null, null, MEDIA_TYPE, null,
+
+        final var body = new JsonChildBody(
             XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/json/json_augment_choice_container.json"));
         checkNormalizedNodePayload(payload);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, payload, dataII);

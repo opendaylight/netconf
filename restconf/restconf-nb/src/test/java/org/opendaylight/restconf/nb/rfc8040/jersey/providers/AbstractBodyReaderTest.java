@@ -19,9 +19,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 import org.junit.function.ThrowingRunnable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -57,19 +55,6 @@ public abstract class AbstractBodyReaderTest extends AbstractInstanceIdentifierT
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(schemaContext))).when(mountPoint)
             .getService(DOMSchemaService.class);
-    }
-
-    protected static void mockPostBodyReader(final String identifier, final AbstractNormalizedNodeBodyReader reader) {
-        final var pathParm = new MultivaluedHashMap<String, String>(2);
-        if (!identifier.isEmpty()) {
-            pathParm.put("identifier", List.of(identifier));
-        }
-
-        final var uriInfoMock = mock(UriInfo.class);
-        doReturn(pathParm).when(uriInfoMock).getPathParameters();
-        doReturn(pathParm).when(uriInfoMock).getPathParameters(false);
-        doReturn(pathParm).when(uriInfoMock).getPathParameters(true);
-        reader.setUriInfo(uriInfoMock);
     }
 
     protected static void checkMountPointNormalizedNodePayload(final NormalizedNodePayload nnContext) {

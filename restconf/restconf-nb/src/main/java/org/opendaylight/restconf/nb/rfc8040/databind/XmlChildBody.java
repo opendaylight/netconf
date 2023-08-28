@@ -1,31 +1,21 @@
 /*
- * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2023 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
+package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -34,7 +24,6 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
@@ -53,22 +42,17 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-@Provider
-@Consumes({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReader {
-    private static final Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
+public final class XmlChildBody extends ChildBody {
+    private static final Logger LOG = LoggerFactory.getLogger(XmlChildBody.class);
 
-    public XmlNormalizedNodeBodyReader(final DatabindProvider databindProvider,
-            final DOMMountPointService mountPointService) {
-        super(databindProvider, mountPointService);
+    public XmlChildBody(final InputStream inputStream) {
+        super(inputStream);
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected NormalizedNodePayload readBody(final InstanceIdentifierContext path, final InputStream entityStream)
-            throws WebApplicationException {
+    PrefixAndBody toPayload(final InputStream inputStream, final Inference inference) {
         try {
-            return parse(path, UntrustedXML.newDocumentBuilder().parse(entityStream));
+            return parse(path, UntrustedXML.newDocumentBuilder().parse(inputStream));
         } catch (final RestconfDocumentedException e) {
             throw e;
         } catch (final Exception e) {
@@ -77,18 +61,23 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, e);
         }
+
+
+
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    private static NormalizedNodePayload parse(final InstanceIdentifierContext pathContext, final Document doc)
+    private static PrefixAndBody parse(final Inference path, final Document doc)
             throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
         DataSchemaNode schemaNode;
-        final List<PathArgument> iiToDataList = new ArrayList<>();
+        final var iiToDataList = ImmutableList.<PathArgument>builder();
         Inference inference;
         if (schemaNodeContext instanceof OperationDefinition oper) {
             schemaNode = oper.getInput();
 
-            final var stack = pathContext.inference().toSchemaInferenceStack();
+            final var stack = path.toSchemaInferenceStack();
             stack.enterSchemaTree(schemaNode.getQName());
             inference = stack.toInference();
         } else if (schemaNodeContext instanceof DataSchemaNode data) {
@@ -96,7 +85,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
             final String docRootElm = doc.getDocumentElement().getLocalName();
             final XMLNamespace docRootNamespace = XMLNamespace.of(doc.getDocumentElement().getNamespaceURI());
-            final var context = pathContext.getSchemaContext();
+            final var context = path.getSchemaContext();
             final var it = context.findModuleStatements(docRootNamespace).iterator();
             checkState(it.hasNext(), "Failed to find module for %s", docRootNamespace);
             final var qname = QName.create(it.next().localQNameModule(), docRootElm);
@@ -130,12 +119,12 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         }
 
         NormalizedNode parsed;
-        final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
-        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+        final var resultHolder = new NormalizationResultHolder();
+        final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
-                || schemaNode instanceof LeafSchemaNode) {
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
+            || schemaNode instanceof LeafSchemaNode) {
+            final var xmlParser = XmlParserStream.create(writer, inference);
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             parsed = resultHolder.getResult().data();
 
@@ -157,8 +146,6 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             parsed = null;
         }
 
-        // FIXME: can result really be null?
-        return NormalizedNodePayload.ofNullable(pathContext.withConcatenatedArgs(iiToDataList), parsed);
+        return new PrefixAndBody(iiToDataList.build(), parsed);
     }
 }
-
