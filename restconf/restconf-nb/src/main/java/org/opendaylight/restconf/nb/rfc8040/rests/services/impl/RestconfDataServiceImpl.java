@@ -63,11 +63,14 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.AbstractBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
@@ -382,6 +385,25 @@ public final class RestconfDataServiceImpl {
     /**
      * Create a data resource in target.
      *
+     * @param payload new data
+     * @param uriInfo URI info
+     * @return {@link Response}
+     */
+    @POST
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaType.APPLICATION_JSON,
+    })
+    public Response postDataJSON(final InputStream body, @Context final UriInfo uriInfo) {
+        try (var jsonBody = new JsonChildBody(body)) {
+            return postData(YangInstanceIdentifier.of(), jsonBody, uriInfo);
+        }
+    }
+
+    /**
+     * Create a data resource in target.
+     *
      * @param identifier path to target
      * @param payload new data
      * @param uriInfo URI info
@@ -391,14 +413,56 @@ public final class RestconfDataServiceImpl {
     @Path("/data/{identifier:.+}")
     @Consumes({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
+    })
+    public Response postDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo) {
+        return postData(identifier, body, uriInfo);
+    }
+
+    /**
+     * Create a data resource in target.
+     *
+     * @param identifier path to target
+     * @param payload new data
+     * @param uriInfo URI info
+     * @return {@link Response}
+     */
+    @POST
+    @Path("/data")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response postData(@Encoded @PathParam("identifier") final String identifier,
-            final NormalizedNodePayload payload, @Context final UriInfo uriInfo) {
-        return postData(payload, uriInfo);
+    public Response postDataXML(final InputStream body, @Context final UriInfo uriInfo) {
+        try (var xmlBody = new XmlChildBody(body)) {
+            return postData(YangInstanceIdentifier.of(), xmlBody, uriInfo);
+        }
+    }
+
+    /**
+     * Create a data resource in target.
+     *
+     * @param identifier path to target
+     * @param payload new data
+     * @param uriInfo URI info
+     * @return {@link Response}
+     */
+    @POST
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public Response postDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo) {
+        return postData(identifier, body, uriInfo);
+    }
+
+    private Response postData(final YangInstanceIdentifier parentPath, final AbstractBody body, final UriInfo uriInfo) {
+
     }
 
     /**
