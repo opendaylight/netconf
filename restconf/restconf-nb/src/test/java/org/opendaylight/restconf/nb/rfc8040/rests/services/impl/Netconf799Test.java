@@ -42,11 +42,6 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class Netconf799Test extends AbstractInstanceIdentifierTest {
-    private static final QName CONT_QNAME = QName.create("instance:identifier:module", "2014-01-17", "cont");
-    private static final QName CONT1_QNAME = QName.create(CONT_QNAME, "cont1");
-    private static final QName RESET_QNAME = QName.create(CONT_QNAME, "reset");
-
-    private static final QName DELAY_QNAME = QName.create(CONT_QNAME, "delay");
     private static final QName INPUT_QNAME = QName.create(CONT_QNAME, "input");
     private static final QName OUTPUT_QNAME = QName.create(CONT_QNAME, "output");
     private static final YangInstanceIdentifier ACTION_YII = YangInstanceIdentifier.of(CONT_QNAME).node(CONT1_QNAME);

@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
 
@@ -20,8 +19,8 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStre
 @Singleton
 public class DataStreamApplication extends AbstractRestconfApplication {
     @Inject
-    public DataStreamApplication(final DatabindProvider databindProvider, final DOMMountPointService mountPointService,
+    public DataStreamApplication(final DatabindProvider databindProvider,
             final RestconfDataStreamServiceImpl dataStreamService) {
-        super(databindProvider, mountPointService, List.of(dataStreamService));
+        super(databindProvider, List.of(dataStreamService));
     }
 }

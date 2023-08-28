@@ -8,14 +8,21 @@
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static java.util.Objects.requireNonNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Function;
+import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.BeforeClass;
+import org.junit.function.ThrowingRunnable;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -67,5 +74,19 @@ abstract class AbstractResourceBodyTest extends AbstractBodyReaderTest {
             final var context = ParserIdentifier.toInstanceIdentifier(uriPath, MODEL_CONTEXT, mountPointService);
             return body.toNormalizedNode(context.getInstanceIdentifier(), context.inference(), context.getSchemaNode());
         }
+    }
+
+    static final void assertRangeViolation(final ThrowingRunnable runnable) {
+        final var ex = assertThrows(RestconfDocumentedException.class, runnable);
+        assertEquals(Status.BAD_REQUEST, ex.getResponse().getStatusInfo());
+
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+
+        final var error = errors.get(0);
+        assertEquals(ErrorType.APPLICATION, error.getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals("bar error app tag", error.getErrorAppTag());
+        assertEquals("bar error message", error.getErrorMessage());
     }
 }
