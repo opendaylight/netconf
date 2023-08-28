@@ -16,7 +16,6 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
-import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +32,7 @@ public final class XmlOperationInputBody extends OperationInputBody {
             throws IOException {
         // Adjust inference to point to input
         final var stack = inference.toSchemaInferenceStack();
-        if (stack.currentStatement() instanceof RpcEffectiveStatement rpcStmt) {
-            stack.enterSchemaTree(rpcStmt.input().argument());
-        } else {
-            throw new IllegalStateException(inference + " does not identify an 'rpc' statement");
-        }
+        stack.enterDataTree(extractInputQName(stack));
 
         try {
             XmlParserStream.create(writer, stack.toInference()).parse(UntrustedXML.createXMLStreamReader(inputStream));
