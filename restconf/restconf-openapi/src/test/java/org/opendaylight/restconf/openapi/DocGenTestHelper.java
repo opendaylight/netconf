@@ -13,11 +13,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
+import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
+import org.opendaylight.restconf.openapi.model.Property;
 import org.opendaylight.restconf.openapi.model.Schema;
 
 public final class DocGenTestHelper {
@@ -47,18 +48,14 @@ public final class DocGenTestHelper {
      */
     public static void containsReferences(final Schema mainObject, final String childObject,
             final String expectedRef) {
-        final JsonNode properties = mainObject.properties();
+        final Map<String, Property> properties = mainObject.properties();
         assertNotNull(properties);
 
-        final JsonNode childNode = properties.get(childObject);
+        final Property childNode = properties.get(childObject);
         assertNotNull(childNode);
 
         //list case
-        JsonNode refWrapper = childNode.get("items");
-        if (refWrapper == null) {
-            //container case
-            refWrapper = childNode;
-        }
-        assertEquals(expectedRef, refWrapper.get("$ref").asText());
+        String refWrapper = childNode.items() == null ? childNode.ref() : childNode.items().ref();
+        assertEquals(expectedRef, refWrapper);
     }
 }
