@@ -24,8 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import javax.ws.rs.core.UriInfo;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,6 +32,7 @@ import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
+import org.opendaylight.restconf.openapi.model.Property;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -153,9 +152,9 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final Map<String, Schema> schemas = doc.components().schemas();
         final Schema input = schemas.get("toaster_make-toast_input");
-        final JsonNode properties = input.properties();
-        assertTrue(properties.has("toasterDoneness"));
-        assertTrue(properties.has("toasterToastType"));
+        final Map<String, Property> properties = input.properties();
+        assertTrue(properties.containsKey("toasterDoneness"));
+        assertTrue(properties.containsKey("toasterToastType"));
     }
 
     @Test
@@ -165,12 +164,12 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final var schemas = doc.components().schemas();
         final var firstContainer = schemas.get("choice-test_first-container");
-        assertEquals("default-value", firstContainer.properties().get("leaf-default").get("default").asText());
-        assertFalse(firstContainer.properties().has("leaf-non-default"));
+        assertEquals("default-value", firstContainer.properties().get("leaf-default").defaultValue().toString());
+        assertFalse(firstContainer.properties().containsKey("leaf-non-default"));
 
         final var secondContainer = schemas.get("choice-test_second-container");
-        assertTrue(secondContainer.properties().has("leaf-first-case"));
-        assertFalse(secondContainer.properties().has("leaf-second-case"));
+        assertTrue(secondContainer.properties().containsKey("leaf-first-case"));
+        assertFalse(secondContainer.properties().containsKey("leaf-second-case"));
     }
 
     @Test
@@ -180,20 +179,20 @@ public final class OpenApiGeneratorRFC8040Test {
         final var schemas = doc.components().schemas();
         final var containersWithRequired = new ArrayList<String>();
 
-        final var reqRootContainerElements = Set.of("mandatory-root-leaf", "mandatory-container",
+        final var reqRootContainerElements = List.of("mandatory-root-leaf", "mandatory-container",
             "mandatory-first-choice", "mandatory-list");
         verifyRequiredField(schemas.get(CONFIG_ROOT_CONTAINER), reqRootContainerElements);
         containersWithRequired.add(CONFIG_ROOT_CONTAINER);
 
-        final var reqMandatoryContainerElements = Set.of("mandatory-leaf", "leaf-list-with-min-elements");
+        final var reqMandatoryContainerElements = List.of("mandatory-leaf", "leaf-list-with-min-elements");
         verifyRequiredField(schemas.get(CONFIG_MANDATORY_CONTAINER), reqMandatoryContainerElements);
         containersWithRequired.add(CONFIG_MANDATORY_CONTAINER);
 
-        final var reqMandatoryListElements = Set.of("mandatory-list-field");
+        final var reqMandatoryListElements = List.of("mandatory-list-field");
         verifyRequiredField(schemas.get(CONFIG_MANDATORY_LIST), reqMandatoryListElements);
         containersWithRequired.add(CONFIG_MANDATORY_LIST);
 
-        final var testModuleMandatoryArray = Set.of("root-container", "root-mandatory-list");
+        final var testModuleMandatoryArray = List.of("root-container", "root-mandatory-list");
         verifyRequiredField(schemas.get(MANDATORY_TEST_MODULE), testModuleMandatoryArray);
         containersWithRequired.add(MANDATORY_TEST_MODULE);
 
@@ -440,14 +439,10 @@ public final class OpenApiGeneratorRFC8040Test {
         }
     }
 
-    private static void verifyRequiredField(final Schema rootContainer, final Set<String> expected) {
+    private static void verifyRequiredField(final Schema rootContainer, final List<String> expected) {
         assertNotNull(rootContainer);
         final var required = rootContainer.required();
         assertNotNull(required);
-        assertTrue(required.isArray());
-        final var actualContainerArray = StreamSupport.stream(required.spliterator(), false)
-            .map(JsonNode::textValue)
-            .collect(Collectors.toSet());
-        assertEquals(expected, actualContainerArray);
+        assertEquals(expected, required);
     }
 }
