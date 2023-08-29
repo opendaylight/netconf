@@ -39,6 +39,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -130,14 +131,14 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
         return credentials;
     }
 
-    private void writeToConfigDS(final NetconfNode node, final NodeId nodeId,
+    private void writeToConfigDS(final NetconfNode netconfNode, final NodeId nodeId,
             final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult) {
 
-        final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final InstanceIdentifier<NetconfNode> niid = topologyPath.child(Node.class,
-                new NodeKey(nodeId)).augmentation(NetconfNode.class);
-        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, niid, node);
-        writeTransaction.commit().addCallback(new FutureCallback<CommitInfo>() {
+        final var node = new NodeBuilder().withKey(new NodeKey(nodeId)).addAugmentation(netconfNode).build();
+        final var instanceIdentifier = topologyPath.child(Node.class, node.key());
+        final var wtx = dataBroker.newWriteOnlyTransaction();
+        wtx.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, instanceIdentifier, node);
+        wtx.commit().addCallback(new FutureCallback<CommitInfo>() {
 
             @Override
             public void onSuccess(final CommitInfo result) {
