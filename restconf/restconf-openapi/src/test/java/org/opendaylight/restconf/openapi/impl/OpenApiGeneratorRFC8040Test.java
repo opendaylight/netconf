@@ -34,6 +34,7 @@ import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
+import org.opendaylight.restconf.openapi.model.Property;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -153,9 +154,9 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final Map<String, Schema> schemas = doc.components().schemas();
         final Schema input = schemas.get("toaster_make-toast_input");
-        final JsonNode properties = input.properties();
-        assertTrue(properties.has("toasterDoneness"));
-        assertTrue(properties.has("toasterToastType"));
+        final Map<String, Property> properties = input.properties();
+        assertTrue(properties.containsKey("toasterDoneness"));
+        assertTrue(properties.containsKey("toasterToastType"));
     }
 
     @Test
@@ -165,12 +166,12 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final var schemas = doc.components().schemas();
         final var firstContainer = schemas.get("choice-test_first-container");
-        assertEquals("default-value", firstContainer.properties().get("leaf-default").get("default").asText());
-        assertFalse(firstContainer.properties().has("leaf-non-default"));
+        assertEquals("default-value", firstContainer.properties().get("leaf-default").defaultValue().toString());
+        assertFalse(firstContainer.properties().containsKey("leaf-non-default"));
 
         final var secondContainer = schemas.get("choice-test_second-container");
-        assertTrue(secondContainer.properties().has("leaf-first-case"));
-        assertFalse(secondContainer.properties().has("leaf-second-case"));
+        assertTrue(secondContainer.properties().containsKey("leaf-first-case"));
+        assertFalse(secondContainer.properties().containsKey("leaf-second-case"));
     }
 
     @Test
@@ -444,9 +445,7 @@ public final class OpenApiGeneratorRFC8040Test {
         assertNotNull(rootContainer);
         final var required = rootContainer.required();
         assertNotNull(required);
-        assertTrue(required.isArray());
         final var actualContainerArray = StreamSupport.stream(required.spliterator(), false)
-            .map(JsonNode::textValue)
             .collect(Collectors.toSet());
         assertEquals(expected, actualContainerArray);
     }
