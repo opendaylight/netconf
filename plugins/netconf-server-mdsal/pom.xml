@@ -26,6 +26,25 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.guicedee.services</groupId>
+      <artifactId>javax.inject</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jdt</groupId>
+      <artifactId>org.eclipse.jdt.annotation</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>concepts</artifactId>
     </dependency>
@@ -136,17 +155,6 @@
     <dependency>
       <groupId>org.opendaylight.netconf.model</groupId>
       <artifactId>rfc6470</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.guicedee.services</groupId>
-      <artifactId>javax.inject</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
-      <scope>provided</scope>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
