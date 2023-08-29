@@ -9,26 +9,23 @@ package org.opendaylight.restconf.openapi.impl;
 
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.MODULE_NAME_SUFFIX;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.COMPONENTS_PREFIX;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.NAME_KEY;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.XML_KEY;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import dk.brics.automaton.RegExp;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import org.opendaylight.restconf.openapi.model.Property;
 import org.opendaylight.restconf.openapi.model.Schema;
+import org.opendaylight.restconf.openapi.model.Xml;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
@@ -89,22 +86,8 @@ public final class DefinitionGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefinitionGenerator.class);
 
-    private static final String UNIQUE_ITEMS_KEY = "uniqueItems";
-    private static final String MAX_ITEMS = "maxItems";
-    private static final String MIN_ITEMS = "minItems";
-    private static final String MAX_LENGTH_KEY = "maxLength";
-    private static final String MIN_LENGTH_KEY = "minLength";
-    private static final String REF_KEY = "$ref";
-    private static final String ITEMS_KEY = "items";
     private static final String TYPE_KEY = "type";
-    private static final String DESCRIPTION_KEY = "description";
     private static final String ARRAY_TYPE = "array";
-    private static final String ENUM_KEY = "enum";
-    private static final String TITLE_KEY = "title";
-    private static final String DEFAULT_KEY = "default";
-    private static final String EXAMPLE_KEY = "example";
-    private static final String FORMAT_KEY = "format";
-    private static final String NAMESPACE_KEY = "namespace";
     public static final String INPUT = "input";
     public static final String INPUT_SUFFIX = "_input";
     public static final String OUTPUT = "output";
@@ -165,8 +148,8 @@ public final class DefinitionGenerator {
 
     private static void processModule(final Module module, final Map<String, Schema> definitions,
             final DefinitionNames definitionNames, final EffectiveModelContext schemaContext) {
-        final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-        final ArrayNode required = JsonNodeFactory.instance.arrayNode();
+        final Map<String, Property> properties = new HashMap<>();
+        final List<String> required = new ArrayList<>();
         final String moduleName = module.getName();
         final String definitionName = moduleName + MODULE_NAME_SUFFIX;
         final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
@@ -179,7 +162,7 @@ public final class DefinitionGenerator {
                         required.add(localName);
                     }
                     for (final DataSchemaNode childNode : ((DataNodeContainer) node).getChildNodes()) {
-                        final ObjectNode childNodeProperties = JsonNodeFactory.instance.objectNode();
+                        final Property.Builder childNodeProperty = new Property.Builder();
 
                         final String ref = COMPONENTS_PREFIX
                                 + moduleName
@@ -187,30 +170,29 @@ public final class DefinitionGenerator {
                                 + definitionNames.getDiscriminator(node);
 
                         if (node instanceof ListSchemaNode) {
-                            childNodeProperties.put(TYPE_KEY, ARRAY_TYPE);
-                            final ObjectNode items = JsonNodeFactory.instance.objectNode();
-                            items.put(REF_KEY, ref);
-                            childNodeProperties.set(ITEMS_KEY, items);
-                            childNodeProperties.put(DESCRIPTION_KEY, childNode.getDescription().orElse(""));
-                            childNodeProperties.put(TITLE_KEY, localName);
+                            childNodeProperty.type(ARRAY_TYPE);
+                            final Property items = new Property.Builder().ref(ref).build();
+                            childNodeProperty.items(items);
+                            childNodeProperty.description(childNode.getDescription().orElse(""));
+                            childNodeProperty.title(localName);
                         } else {
                          /*
                             Description can't be added, because nothing allowed alongside $ref.
                             allOf is not an option, because ServiceNow can't parse it.
                           */
-                            childNodeProperties.put(REF_KEY, ref);
+                            childNodeProperty.ref(ref);
                         }
                         //add module name prefix to property name, when ServiceNow can process colons
-                        properties.set(localName, childNodeProperties);
+                        properties.put(localName, childNodeProperty.build());
                     }
                 } else if (node instanceof LeafSchemaNode) {
                     /*
                         Add module name prefix to property name, when ServiceNow can process colons(second parameter
                         of processLeafNode).
                      */
-                    final ObjectNode leafNode = processLeafNode((LeafSchemaNode) node, localName, required, stack,
+                    final Property leafNode = processLeafNode((LeafSchemaNode) node, localName, required, stack,
                             definitions, definitionNames, module.getNamespace(), module);
-                    properties.set(localName, leafNode);
+                    properties.put(localName, leafNode);
                 }
             }
             stack.exit();
@@ -304,7 +286,7 @@ public final class DefinitionGenerator {
             final Schema.Builder childSchemaBuilder = new Schema.Builder()
                 .title(filename)
                 .type(OBJECT_TYPE)
-                .xml(JsonNodeFactory.instance.objectNode().put(NAME_KEY, isInput ? INPUT : OUTPUT));
+                .xml(new Xml(isInput ? INPUT : OUTPUT, null, null));
             processChildren(childSchemaBuilder, container.getChildNodes(), parentName, definitions, definitionNames,
                 stack, module, false);
             final String discriminator =
@@ -314,27 +296,26 @@ public final class DefinitionGenerator {
         stack.exit();
     }
 
-    private static ObjectNode processRef(final String filename, final String discriminator,
+    private static Property processRef(final String filename, final String discriminator,
             final SchemaNode schemaNode) {
-        final ObjectNode dataNodeProperties = JsonNodeFactory.instance.objectNode();
+        final Property.Builder dataNodeProperties = new Property.Builder();
         final String name = filename + discriminator;
         final String ref = COMPONENTS_PREFIX + name;
 
         if (schemaNode instanceof ListSchemaNode) {
-            dataNodeProperties.put(TYPE_KEY, ARRAY_TYPE);
-            final ObjectNode items = JsonNodeFactory.instance.objectNode();
-            items.put(REF_KEY, ref);
-            dataNodeProperties.set(ITEMS_KEY, items);
-            dataNodeProperties.put(DESCRIPTION_KEY, schemaNode.getDescription().orElse(""));
+            dataNodeProperties.type(ARRAY_TYPE);
+            final Property items = new Property.Builder().ref(ref).build();
+            dataNodeProperties.items(items);
+            dataNodeProperties.description(schemaNode.getDescription().orElse(""));
         } else {
              /*
                 Description can't be added, because nothing allowed alongside $ref.
                 allOf is not an option, because ServiceNow can't parse it.
               */
-            dataNodeProperties.put(REF_KEY, ref);
+            dataNodeProperties.ref(ref);
         }
 
-        return dataNodeProperties;
+        return dataNodeProperties.build();
     }
 
     /**
@@ -359,14 +340,14 @@ public final class DefinitionGenerator {
     }
 
     private static void populateEnumWithDerived(final Collection<? extends IdentitySchemaNode> derivedIds,
-            final ArrayNode enumPayload, final EffectiveModelContext context) {
+            final List<String> enumPayload, final EffectiveModelContext context) {
         for (final IdentitySchemaNode derivedId : derivedIds) {
             enumPayload.add(derivedId.getQName().getLocalName());
             populateEnumWithDerived(context.getDerivedIdentities(derivedId), enumPayload, context);
         }
     }
 
-    private static ObjectNode processDataNodeContainer(final DataNodeContainer dataNode, final String parentName,
+    private static Property processDataNodeContainer(final DataNodeContainer dataNode, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
             final SchemaInferenceStack stack, final Module module, final boolean isParentConfig) throws IOException {
         final Collection<? extends DataSchemaNode> containerChildren = dataNode.getChildNodes();
@@ -400,25 +381,29 @@ public final class DefinitionGenerator {
     /**
      * Processes the nodes.
      */
-    private static ObjectNode processChildren(final Schema.Builder parentNodeBuilder,
+    private static Map<String, Property> processChildren(final Schema.Builder parentNodeBuilder,
             final Collection<? extends DataSchemaNode> nodes, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
             final SchemaInferenceStack stack, final Module module, final boolean isParentConfig) throws IOException {
-        final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-        final ArrayNode required = JsonNodeFactory.instance.arrayNode();
+        final Map<String, Property> properties = new HashMap<>();
+        final List<String> required = new ArrayList<>();
         for (final DataSchemaNode node : nodes) {
             if (node instanceof ChoiceSchemaNode choice) {
                 stack.enterSchemaTree(node.getQName());
                 final boolean isConfig = isParentConfig && node.isConfiguration();
-                final Map<String, ObjectNode> choiceProperties = processChoiceNodeRecursively(parentName,
+                final Map<String, Property> choiceProperties = processChoiceNodeRecursively(parentName,
                     definitions, definitionNames, isConfig, stack, required, choice, module);
-                choiceProperties.forEach(properties::set);
+                for (Map.Entry<String, Property> entry : choiceProperties.entrySet()) {
+                    String key = entry.getKey();
+                    Property value = entry.getValue();
+                    properties.put(key, value);
+                }
                 stack.exit();
             } else {
-                final ObjectNode property = processChildNode(node, parentName, definitions, definitionNames,
+                final Property property = processChildNode(node, parentName, definitions, definitionNames,
                     stack, required, module, isParentConfig);
                 if (property != null) {
-                    properties.set(node.getQName().getLocalName(), property);
+                    properties.put(node.getQName().getLocalName(), property);
                 }
             }
         }
@@ -426,12 +411,12 @@ public final class DefinitionGenerator {
         return properties;
     }
 
-    private static Map<String, ObjectNode> processChoiceNodeRecursively(final String parentName,
+    private static Map<String, Property> processChoiceNodeRecursively(final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames, final boolean isConfig,
-            final SchemaInferenceStack stack, final ArrayNode required, final ChoiceSchemaNode choice,
+            final SchemaInferenceStack stack, final List<String> required, final ChoiceSchemaNode choice,
             final Module module) throws IOException {
         if (!choice.getCases().isEmpty()) {
-            final var properties = new HashMap<String, ObjectNode>();
+            final var properties = new HashMap<String, Property>();
             final var caseSchemaNode = choice.getDefaultCase().orElse(choice.getCases().stream()
                 .findFirst().orElseThrow());
             stack.enterSchemaTree(caseSchemaNode.getQName());
@@ -457,9 +442,9 @@ public final class DefinitionGenerator {
         return Map.of();
     }
 
-    private static ObjectNode processChildNode(final DataSchemaNode node, final String parentName,
+    private static Property processChildNode(final DataSchemaNode node, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final SchemaInferenceStack stack, final ArrayNode required, final Module module,
+            final SchemaInferenceStack stack, final List<String> required, final Module module,
             final boolean isParentConfig) throws IOException {
         final XMLNamespace parentNamespace = stack.toSchemaNodeIdentifier().lastNodeIdentifier().getNamespace();
         stack.enterSchemaTree(node.getQName());
@@ -475,9 +460,9 @@ public final class DefinitionGenerator {
             node.isConfiguration()==true.
         */
         final boolean shouldBeAddedAsChild = !isParentConfig || node.isConfiguration();
-        ObjectNode property = null;
+        Property property = null;
         if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-            final ObjectNode dataNodeContainer = processDataNodeContainer((DataNodeContainer) node, parentName,
+            final Property dataNodeContainer = processDataNodeContainer((DataNodeContainer) node, parentName,
                 definitions, definitionNames, stack, module, isParentConfig);
             if (shouldBeAddedAsChild) {
                 if (isSchemaNodeMandatory(node)) {
@@ -505,44 +490,46 @@ public final class DefinitionGenerator {
         return property;
     }
 
-    private static ObjectNode processLeafListNode(final LeafListSchemaNode listNode, final SchemaInferenceStack stack,
-            final Map<String, Schema> definitions, final DefinitionNames definitionNames, final Module module) {
-        final ObjectNode props = JsonNodeFactory.instance.objectNode();
-        props.put(TYPE_KEY, ARRAY_TYPE);
+    private static Property processLeafListNode(final LeafListSchemaNode listNode,
+            final SchemaInferenceStack stack, final Map<String, Schema> definitions,
+            final DefinitionNames definitionNames, final Module module) {
+        final Property.Builder props = new Property.Builder();
+        props.type(ARRAY_TYPE);
 
-        final ObjectNode itemsVal = JsonNodeFactory.instance.objectNode();
+        final Property.Builder itemsVal = new Property.Builder();
         final Optional<ElementCountConstraint> optConstraint = listNode.getElementCountConstraint();
         optConstraint.ifPresent(elementCountConstraint -> processElementCount(elementCountConstraint, props));
 
         processTypeDef(listNode.getType(), listNode, itemsVal, stack, definitions, definitionNames, module);
-        props.set(ITEMS_KEY, itemsVal);
 
-        props.put(DESCRIPTION_KEY, listNode.getDescription().orElse(""));
+        props.items(itemsVal.build());
+        props.description(listNode.getDescription().orElse(""));
 
-        return props;
+        return props.build();
     }
 
-    private static void processElementCount(final ElementCountConstraint constraint, final ObjectNode props) {
+    private static void processElementCount(final ElementCountConstraint constraint, final Property.Builder props) {
         final Integer minElements = constraint.getMinElements();
         if (minElements != null) {
-            props.put(MIN_ITEMS, minElements);
+            props.minItems(minElements);
         }
         final Integer maxElements = constraint.getMaxElements();
         if (maxElements != null) {
-            props.put(MAX_ITEMS, maxElements);
+            props.maxItems(maxElements);
         }
     }
 
-    private static void processMandatory(final MandatoryAware node, final String nodeName, final ArrayNode required) {
+    private static void processMandatory(final MandatoryAware node, final String nodeName,
+            final List<String> required) {
         if (node.isMandatory()) {
             required.add(nodeName);
         }
     }
 
-    private static ObjectNode processLeafNode(final LeafSchemaNode leafNode, final String jsonLeafName,
-            final ArrayNode required, final SchemaInferenceStack stack, final Map<String, Schema> definitions,
+    private static Property processLeafNode(final LeafSchemaNode leafNode, final String jsonLeafName,
+            final List<String> required, final SchemaInferenceStack stack, final Map<String, Schema> definitions,
             final DefinitionNames definitionNames, final XMLNamespace parentNamespace, final Module module) {
-        final ObjectNode property = JsonNodeFactory.instance.objectNode();
+        final Property.Builder property = new Property.Builder();
 
         final String leafDescription = leafNode.getDescription().orElse("");
         /*
@@ -550,40 +537,40 @@ public final class DefinitionGenerator {
             allOf is not an option, because ServiceNow can't parse it.
         */
         if (!(leafNode.getType() instanceof IdentityrefTypeDefinition)) {
-            property.put(DESCRIPTION_KEY, leafDescription);
+            property.description(leafDescription);
         }
 
         processTypeDef(leafNode.getType(), leafNode, property, stack, definitions, definitionNames, module);
         if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
             // If the parent is not from the same model, define the child XML namespace.
-            property.set(XML_KEY, buildXmlParameter(leafNode));
+            property.xml(buildXmlParameter(leafNode));
         }
         processMandatory(leafNode, jsonLeafName, required);
-        return property;
+        return property.build();
     }
 
-    private static ObjectNode processUnknownDataSchemaNode(final DataSchemaNode leafNode, final String name,
-            final ArrayNode required, final XMLNamespace parentNamespace) {
+    private static Property processUnknownDataSchemaNode(final DataSchemaNode leafNode, final String name,
+            final List<String> required, final XMLNamespace parentNamespace) {
         assert (leafNode instanceof AnydataSchemaNode || leafNode instanceof AnyxmlSchemaNode);
 
-        final ObjectNode property = JsonNodeFactory.instance.objectNode();
+        final Property.Builder property = new Property.Builder();
 
         final String leafDescription = leafNode.getDescription().orElse("");
-        property.put(DESCRIPTION_KEY, leafDescription);
+        property.description(leafDescription);
 
         final String localName = leafNode.getQName().getLocalName();
-        setExampleValue(property, String.format("<%s> ... </%s>", localName, localName));
-        property.put(TYPE_KEY, STRING_TYPE);
+        property.example(String.format("<%s> ... </%s>", localName, localName));
+        property.type(STRING_TYPE);
         if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
             // If the parent is not from the same model, define the child XML namespace.
-            property.set(XML_KEY, buildXmlParameter(leafNode));
+            property.xml(buildXmlParameter(leafNode));
         }
         processMandatory((MandatoryAware) leafNode, name, required);
-        return property;
+        return property.build();
     }
 
     private static String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
-            final ObjectNode property, final SchemaInferenceStack stack,final Map<String, Schema> definitions,
+            final Property.Builder property, final SchemaInferenceStack stack,final Map<String, Schema> definitions,
             final DefinitionNames definitionNames, final Module module) {
         final String jsonType;
         if (leafTypeDef instanceof BinaryTypeDefinition binaryType) {
@@ -607,8 +594,8 @@ public final class DefinitionGenerator {
                 stack, definitions, definitionNames, module);
         } else if (leafTypeDef instanceof BooleanTypeDefinition) {
             jsonType = BOOLEAN_TYPE;
-            leafTypeDef.getDefaultValue().ifPresent(v -> setDefaultValue(property, Boolean.valueOf((String) v)));
-            setExampleValue(property, true);
+            leafTypeDef.getDefaultValue().ifPresent(v -> property.defaultValue(Boolean.valueOf((String) v)));
+            property.example(true);
         } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) {
             jsonType = processNumberType(rangeRestrictedType, property);
         } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition instanceIdentifierType) {
@@ -619,57 +606,56 @@ public final class DefinitionGenerator {
         }
         if (!(leafTypeDef instanceof IdentityrefTypeDefinition)) {
             if (TYPE_KEY != null && jsonType != null) {
-                property.put(TYPE_KEY, jsonType);
+                property.type(jsonType);
             }
             if (leafTypeDef.getDefaultValue().isPresent()) {
                 final Object defaultValue = leafTypeDef.getDefaultValue().orElseThrow();
                 if (defaultValue instanceof String stringDefaultValue) {
                     if (leafTypeDef instanceof BooleanTypeDefinition) {
-                        setDefaultValue(property, Boolean.valueOf(stringDefaultValue));
+                        property.defaultValue(Boolean.valueOf(stringDefaultValue));
                     } else if (leafTypeDef instanceof DecimalTypeDefinition
                             || leafTypeDef instanceof Uint64TypeDefinition) {
-                        setDefaultValue(property, new BigDecimal(stringDefaultValue));
+                        property.defaultValue(new BigDecimal(stringDefaultValue));
                     } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) {
                         //uint8,16,32 int8,16,32,64
                         if (isHexadecimalOrOctal(rangeRestrictedType)) {
-                            setDefaultValue(property, stringDefaultValue);
+                            property.defaultValue(stringDefaultValue);
                         } else {
-                            setDefaultValue(property, Long.valueOf(stringDefaultValue));
+                            property.defaultValue(Long.valueOf(stringDefaultValue));
                         }
                     } else {
-                        setDefaultValue(property, stringDefaultValue);
+                        property.defaultValue(stringDefaultValue);
                     }
                 } else {
                     //we should never get here. getDefaultValue always gives us string
-                    setDefaultValue(property, defaultValue.toString());
+                    property.defaultValue(defaultValue.toString());
                 }
             }
         }
         return jsonType;
     }
 
-    private static String processBinaryType(final BinaryTypeDefinition definition, final ObjectNode property) {
-        definition.getDefaultValue().ifPresent(v -> setDefaultValue(property, ((String) v)));
-        property.put(FORMAT_KEY, "byte");
+    private static String processBinaryType(final BinaryTypeDefinition definition, final Property.Builder property) {
+        definition.getDefaultValue().ifPresent(property::defaultValue);
+        property.format("byte");
         return STRING_TYPE;
     }
 
-    private static String processEnumType(final EnumTypeDefinition enumLeafType, final ObjectNode property) {
+    private static String processEnumType(final EnumTypeDefinition enumLeafType, final Property.Builder property) {
         final List<EnumPair> enumPairs = enumLeafType.getValues();
-        final ArrayNode enumNames = new ArrayNode(JsonNodeFactory.instance);
-        for (final EnumPair enumPair : enumPairs) {
-            enumNames.add(new TextNode(enumPair.getName()));
-        }
+        final List<String> enumNames = enumPairs.stream()
+            .map(EnumPair::getName)
+            .toList();
 
-        property.set(ENUM_KEY, enumNames);
-        enumLeafType.getDefaultValue().ifPresent(v -> setDefaultValue(property, ((String) v)));
-        setExampleValue(property, enumLeafType.getValues().iterator().next().getName());
+        property.enums(enumNames);
+        enumLeafType.getDefaultValue().ifPresent(property::defaultValue);
+        property.example(enumLeafType.getValues().iterator().next().getName());
         return STRING_TYPE;
     }
 
-    private static String processIdentityRefType(final IdentityrefTypeDefinition leafTypeDef, final ObjectNode property,
-            final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final EffectiveModelContext schemaContext, final Module module) {
+    private static String processIdentityRefType(final IdentityrefTypeDefinition leafTypeDef,
+            final Property.Builder property, final Map<String, Schema> definitions,
+            final DefinitionNames definitionNames, final EffectiveModelContext schemaContext, final Module module) {
         final String definitionName;
         if (isImported(leafTypeDef, module)) {
             definitionName = addImportedIdentity(leafTypeDef, definitions, definitionNames, schemaContext);
@@ -677,7 +663,7 @@ public final class DefinitionGenerator {
             final SchemaNode node = leafTypeDef.getIdentities().iterator().next();
             definitionName = node.getQName().getLocalName() + definitionNames.getDiscriminator(node);
         }
-        property.put(REF_KEY, COMPONENTS_PREFIX + definitionName);
+        property.ref(COMPONENTS_PREFIX + definitionName);
         return STRING_TYPE;
     }
 
@@ -702,14 +688,16 @@ public final class DefinitionGenerator {
         LOG.debug("Processing Identity: {}", identityName);
 
         final Collection<? extends IdentitySchemaNode> derivedIds = context.getDerivedIdentities(idNode);
-        final ArrayNode enumPayload = JsonNodeFactory.instance.arrayNode();
+        final List<String> enumPayload = new ArrayList<>();
         enumPayload.add(identityName);
         populateEnumWithDerived(derivedIds, enumPayload, context);
+        List<String> schemaEnum = new ArrayList<>();
+        schemaEnum.addAll(enumPayload);
 
         return new Schema.Builder()
             .title(identityName)
             .description(idNode.getDescription().orElse(""))
-            .schemaEnum(enumPayload)
+            .schemaEnum(schemaEnum)
             .type(STRING_TYPE)
             .build();
     }
@@ -718,21 +706,20 @@ public final class DefinitionGenerator {
         return !leafTypeDef.getQName().getModule().equals(module.getQNameModule());
     }
 
-    private static String processBitsType(final BitsTypeDefinition bitsType, final ObjectNode property) {
-        property.put(MIN_ITEMS, 0);
-        property.put(UNIQUE_ITEMS_KEY, true);
-        final ArrayNode enumNames = new ArrayNode(JsonNodeFactory.instance);
+    private static String processBitsType(final BitsTypeDefinition bitsType, final Property.Builder property) {
+        property.minItems(0);
+        property.uniqueItems(true);
         final Collection<? extends Bit> bits = bitsType.getBits();
-        for (final Bit bit : bits) {
-            enumNames.add(new TextNode(bit.getName()));
-        }
-        property.set(ENUM_KEY, enumNames);
-        property.put(DEFAULT_KEY, enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1));
-        bitsType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
+        final List<String> enumNames = bits.stream()
+            .map(Bit::getName)
+            .toList();
+        property.enums(enumNames);
+        property.defaultValue(enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1));
+        bitsType.getDefaultValue().ifPresent(property::defaultValue);
         return STRING_TYPE;
     }
 
-    private static String processStringType(final StringTypeDefinition stringType, final ObjectNode property,
+    private static String processStringType(final StringTypeDefinition stringType, final Property.Builder property,
             final String nodeName) {
         var type = stringType;
         while (type.getLengthConstraint().isEmpty() && type.getBaseType() != null) {
@@ -741,8 +728,8 @@ public final class DefinitionGenerator {
 
         type.getLengthConstraint().ifPresent(constraint -> {
             final Range<Integer> range = constraint.getAllowedRanges().span();
-            property.put(MIN_LENGTH_KEY, range.lowerEndpoint());
-            property.put(MAX_LENGTH_KEY, range.upperEndpoint());
+            property.minLength(range.lowerEndpoint());
+            property.maxLength(range.upperEndpoint());
         });
 
         if (type.getPatternConstraints().iterator().hasNext()) {
@@ -760,17 +747,17 @@ public final class DefinitionGenerator {
             } catch (IllegalArgumentException ex) {
                 LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
             }
-            setExampleValue(property, defaultValue);
+            property.example(defaultValue);
         } else {
-            setExampleValue(property, "Some " + nodeName);
+            property.example("Some " + nodeName);
         }
 
-        stringType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
+        stringType.getDefaultValue().ifPresent(property::defaultValue);
         return STRING_TYPE;
     }
 
     private static String processNumberType(final RangeRestrictedTypeDefinition<?, ?> leafTypeDef,
-            final ObjectNode property) {
+            final Property.Builder property) {
         final Optional<Number> maybeLower = leafTypeDef.getRangeConstraint()
                 .map(RangeConstraint::getAllowedRanges).map(RangeSet::span).map(Range::lowerEndpoint);
 
@@ -779,9 +766,9 @@ public final class DefinitionGenerator {
         }
 
         if (leafTypeDef instanceof DecimalTypeDefinition) {
-            leafTypeDef.getDefaultValue().ifPresent(number ->
-                    setDefaultValue(property, Decimal64.valueOf((String) number).decimalValue()));
-            maybeLower.ifPresent(number -> setExampleValue(property, ((Decimal64) number).decimalValue()));
+            leafTypeDef.getDefaultValue().ifPresent(number -> property.defaultValue(Decimal64.valueOf((String) number)
+                .decimalValue()));
+            maybeLower.ifPresent(number -> property.example(((Decimal64) number).decimalValue()));
             return NUMBER_TYPE;
         }
         if (leafTypeDef instanceof Uint8TypeDefinition
@@ -790,22 +777,19 @@ public final class DefinitionGenerator {
                 || leafTypeDef instanceof Int16TypeDefinition
                 || leafTypeDef instanceof Int32TypeDefinition) {
 
-            property.put(FORMAT_KEY, INT32_FORMAT);
-            leafTypeDef.getDefaultValue().ifPresent(number -> setDefaultValue(property,
-                Integer.valueOf((String) number)));
-            maybeLower.ifPresent(number -> setExampleValue(property, Integer.valueOf(number.toString())));
+            property.format(INT32_FORMAT);
+            leafTypeDef.getDefaultValue().ifPresent(number -> property.defaultValue(Integer.valueOf((String) number)));
+            maybeLower.ifPresent(number -> property.example(Integer.valueOf(number.toString())));
         } else if (leafTypeDef instanceof Uint32TypeDefinition
                 || leafTypeDef instanceof Int64TypeDefinition) {
 
-            property.put(FORMAT_KEY, INT64_FORMAT);
-            leafTypeDef.getDefaultValue().ifPresent(number -> setDefaultValue(property,
-                Long.valueOf((String) number)));
-            maybeLower.ifPresent(number -> setExampleValue(property, Long.valueOf(number.toString())));
+            property.format(INT64_FORMAT);
+            leafTypeDef.getDefaultValue().ifPresent(number -> property.defaultValue(Long.valueOf((String) number)));
+            maybeLower.ifPresent(number -> property.example(Long.valueOf(number.toString())));
         } else {
             //uint64
-            leafTypeDef.getDefaultValue().ifPresent(number -> setDefaultValue(property,
-                new BigInteger((String) number)));
-            setExampleValue(property, 0);
+            leafTypeDef.getDefaultValue().ifPresent(number -> property.defaultValue(new BigInteger((String) number)));
+            property.example(0);
         }
         return INTEGER_TYPE;
     }
@@ -820,71 +804,23 @@ public final class DefinitionGenerator {
     }
 
     private static String processInstanceIdentifierType(final InstanceIdentifierTypeDefinition iidType,
-            final DataSchemaNode node, final ObjectNode property, final EffectiveModelContext schemaContext) {
+            final DataSchemaNode node, final Property.Builder property, final EffectiveModelContext schemaContext) {
         // create example instance-identifier to the first container of node's module if exists or leave it empty
         final var module = schemaContext.findModule(node.getQName().getModule());
         if (module.isPresent()) {
             final var container = module.orElseThrow().getChildNodes().stream()
                     .filter(n -> n instanceof ContainerSchemaNode)
                     .findFirst();
-            container.ifPresent(c -> setExampleValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
-                    c.getQName().getLocalName())));
+            container.ifPresent(c -> property.example(String.format("/%s:%s", module.orElseThrow().getPrefix(),
+                c.getQName().getLocalName())));
         }
         // set default value
-        iidType.getDefaultValue().ifPresent(c -> setDefaultValue(property, (String) c));
+        iidType.getDefaultValue().ifPresent(property::defaultValue);
         return STRING_TYPE;
     }
 
-    private static ObjectNode buildXmlParameter(final SchemaNode node) {
-        final ObjectNode xml = JsonNodeFactory.instance.objectNode();
+    private static Xml buildXmlParameter(final SchemaNode node) {
         final QName qName = node.getQName();
-        xml.put(NAME_KEY, qName.getLocalName());
-        xml.put(NAMESPACE_KEY, qName.getNamespace().toString());
-        return xml;
+        return new Xml(qName.getLocalName(), qName.getNamespace().toString(), null);
     }
-
-    private static void setExampleValue(final ObjectNode property, final String value) {
-        property.put(EXAMPLE_KEY, value);
-    }
-
-    private static void setExampleValue(final ObjectNode property, final Integer value) {
-        property.put(EXAMPLE_KEY, value);
-    }
-
-    private static void setExampleValue(final ObjectNode property, final Long value) {
-        property.put(EXAMPLE_KEY, value);
-    }
-
-    private static void setExampleValue(final ObjectNode property, final BigDecimal value) {
-        property.put(EXAMPLE_KEY, value);
-    }
-
-    private static void setExampleValue(final ObjectNode property, final Boolean value) {
-        property.put(EXAMPLE_KEY, value);
-    }
-
-    private static void setDefaultValue(final ObjectNode property, final String value) {
-        property.put(DEFAULT_KEY, value);
-    }
-
-    private static void setDefaultValue(final ObjectNode property, final Integer value) {
-        property.put(DEFAULT_KEY, value);
-    }
-
-    private static void setDefaultValue(final ObjectNode property, final Long value) {
-        property.put(DEFAULT_KEY, value);
-    }
-
-    private static void setDefaultValue(final ObjectNode property, final BigInteger value) {
-        property.put(DEFAULT_KEY, value);
-    }
-
-    private static void setDefaultValue(final ObjectNode property, final BigDecimal value) {
-        property.put(DEFAULT_KEY, value);
-    }
-
-    private static void setDefaultValue(final ObjectNode property, final Boolean value) {
-        property.put(DEFAULT_KEY, value);
-    }
-
 }
