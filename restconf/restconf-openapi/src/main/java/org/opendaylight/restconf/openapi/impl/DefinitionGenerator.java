@@ -22,6 +22,7 @@ import dk.brics.automaton.RegExp;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.opendaylight.restconf.openapi.model.Schema;
+import org.opendaylight.restconf.openapi.model.Xml;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
@@ -166,7 +168,7 @@ public final class DefinitionGenerator {
     private static void processModule(final Module module, final Map<String, Schema> definitions,
             final DefinitionNames definitionNames, final EffectiveModelContext schemaContext) {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-        final ArrayNode required = JsonNodeFactory.instance.arrayNode();
+        final List<String> required = new ArrayList<>();
         final String moduleName = module.getName();
         final String definitionName = moduleName + MODULE_NAME_SUFFIX;
         final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
@@ -304,7 +306,7 @@ public final class DefinitionGenerator {
             final Schema.Builder childSchemaBuilder = new Schema.Builder()
                 .title(filename)
                 .type(OBJECT_TYPE)
-                .xml(JsonNodeFactory.instance.objectNode().put(NAME_KEY, isInput ? INPUT : OUTPUT));
+                .xml(new Xml(isInput ? INPUT : OUTPUT, null, null));
             processChildren(childSchemaBuilder, container.getChildNodes(), parentName, definitions, definitionNames,
                 stack, module, false);
             final String discriminator =
@@ -359,7 +361,7 @@ public final class DefinitionGenerator {
     }
 
     private static void populateEnumWithDerived(final Collection<? extends IdentitySchemaNode> derivedIds,
-            final ArrayNode enumPayload, final EffectiveModelContext context) {
+            final List<String> enumPayload, final EffectiveModelContext context) {
         for (final IdentitySchemaNode derivedId : derivedIds) {
             enumPayload.add(derivedId.getQName().getLocalName());
             populateEnumWithDerived(context.getDerivedIdentities(derivedId), enumPayload, context);
@@ -405,7 +407,7 @@ public final class DefinitionGenerator {
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
             final SchemaInferenceStack stack, final Module module, final boolean isParentConfig) throws IOException {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-        final ArrayNode required = JsonNodeFactory.instance.arrayNode();
+        final List<String> required = new ArrayList<>();
         for (final DataSchemaNode node : nodes) {
             if (node instanceof ChoiceSchemaNode choice) {
                 stack.enterSchemaTree(node.getQName());
@@ -428,7 +430,7 @@ public final class DefinitionGenerator {
 
     private static Map<String, ObjectNode> processChoiceNodeRecursively(final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames, final boolean isConfig,
-            final SchemaInferenceStack stack, final ArrayNode required, final ChoiceSchemaNode choice,
+            final SchemaInferenceStack stack, final List<String> required, final ChoiceSchemaNode choice,
             final Module module) throws IOException {
         if (!choice.getCases().isEmpty()) {
             final var properties = new HashMap<String, ObjectNode>();
@@ -459,7 +461,7 @@ public final class DefinitionGenerator {
 
     private static ObjectNode processChildNode(final DataSchemaNode node, final String parentName,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final SchemaInferenceStack stack, final ArrayNode required, final Module module,
+            final SchemaInferenceStack stack, final List<String> required, final Module module,
             final boolean isParentConfig) throws IOException {
         final XMLNamespace parentNamespace = stack.toSchemaNodeIdentifier().lastNodeIdentifier().getNamespace();
         stack.enterSchemaTree(node.getQName());
@@ -533,14 +535,15 @@ public final class DefinitionGenerator {
         }
     }
 
-    private static void processMandatory(final MandatoryAware node, final String nodeName, final ArrayNode required) {
+    private static void processMandatory(final MandatoryAware node, final String nodeName,
+            final List<String> required) {
         if (node.isMandatory()) {
             required.add(nodeName);
         }
     }
 
     private static ObjectNode processLeafNode(final LeafSchemaNode leafNode, final String jsonLeafName,
-            final ArrayNode required, final SchemaInferenceStack stack, final Map<String, Schema> definitions,
+            final List<String> required, final SchemaInferenceStack stack, final Map<String, Schema> definitions,
             final DefinitionNames definitionNames, final XMLNamespace parentNamespace, final Module module) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
@@ -556,14 +559,14 @@ public final class DefinitionGenerator {
         processTypeDef(leafNode.getType(), leafNode, property, stack, definitions, definitionNames, module);
         if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
             // If the parent is not from the same model, define the child XML namespace.
-            property.set(XML_KEY, buildXmlParameter(leafNode));
+            property.set(XML_KEY, buildXmlParameter1(leafNode));
         }
         processMandatory(leafNode, jsonLeafName, required);
         return property;
     }
 
     private static ObjectNode processUnknownDataSchemaNode(final DataSchemaNode leafNode, final String name,
-            final ArrayNode required, final XMLNamespace parentNamespace) {
+            final List<String> required, final XMLNamespace parentNamespace) {
         assert (leafNode instanceof AnydataSchemaNode || leafNode instanceof AnyxmlSchemaNode);
 
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
@@ -576,7 +579,7 @@ public final class DefinitionGenerator {
         property.put(TYPE_KEY, STRING_TYPE);
         if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
             // If the parent is not from the same model, define the child XML namespace.
-            property.set(XML_KEY, buildXmlParameter(leafNode));
+            property.set(XML_KEY, buildXmlParameter1(leafNode));
         }
         processMandatory((MandatoryAware) leafNode, name, required);
         return property;
@@ -702,14 +705,16 @@ public final class DefinitionGenerator {
         LOG.debug("Processing Identity: {}", identityName);
 
         final Collection<? extends IdentitySchemaNode> derivedIds = context.getDerivedIdentities(idNode);
-        final ArrayNode enumPayload = JsonNodeFactory.instance.arrayNode();
+        final List<String> enumPayload = new ArrayList<>();
         enumPayload.add(identityName);
         populateEnumWithDerived(derivedIds, enumPayload, context);
+        List<String> schemaEnum = new ArrayList<>();
+        schemaEnum.addAll(enumPayload);
 
         return new Schema.Builder()
             .title(identityName)
             .description(idNode.getDescription().orElse(""))
-            .schemaEnum(enumPayload)
+            .schemaEnum(schemaEnum)
             .type(STRING_TYPE)
             .build();
     }
@@ -835,7 +840,12 @@ public final class DefinitionGenerator {
         return STRING_TYPE;
     }
 
-    private static ObjectNode buildXmlParameter(final SchemaNode node) {
+    private static Xml buildXmlParameter(final SchemaNode node) {
+        final QName qName = node.getQName();
+        return new Xml(qName.getLocalName(), qName.getNamespace().toString(), null);
+    }
+
+    private static ObjectNode buildXmlParameter1(final SchemaNode node) {
         final ObjectNode xml = JsonNodeFactory.instance.objectNode();
         final QName qName = node.getQName();
         xml.put(NAME_KEY, qName.getLocalName());

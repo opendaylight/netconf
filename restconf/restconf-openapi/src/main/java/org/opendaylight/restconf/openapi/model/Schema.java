@@ -10,13 +10,23 @@ package org.opendaylight.restconf.openapi.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import org.eclipse.jdt.annotation.Nullable;
 
 @JsonInclude(value = Include.NON_NULL)
-public record Schema(@JsonProperty("enum") ArrayNode schemaEnum, ArrayNode required, ObjectNode discriminator,
-        ObjectNode examples, ObjectNode externalDocs, ObjectNode properties, ObjectNode xml, String description,
-        @JsonProperty("$ref") String ref, String title, String type) {
+public record Schema(
+        @JsonProperty("enum") List<String> schemaEnum,
+        @Nullable List<String> required,
+        @Nullable Discriminator discriminator,
+        @Nullable String examples,
+        @Nullable ExternalDocumentation externalDocs,
+        @Nullable ObjectNode properties,
+        @Nullable Xml xml,
+        @Nullable String description,
+        @JsonProperty("$ref") String ref,
+        @Nullable String title,
+        @Nullable String type) {
 
     private Schema(final Builder builder) {
         this(builder.schemaEnum, builder.required, builder.discriminator, builder.examples, builder.externalDocs,
@@ -25,39 +35,39 @@ public record Schema(@JsonProperty("enum") ArrayNode schemaEnum, ArrayNode requi
 
     @SuppressWarnings("checkstyle:hiddenField")
     public static class Builder {
-        private ArrayNode schemaEnum;
-        private ArrayNode required;
-        private ObjectNode discriminator;
-        private ObjectNode examples;
-        private ObjectNode externalDocs;
+        private List<String> schemaEnum;
+        private List<String> required;
+        private Discriminator discriminator;
+        private String examples;
+        private ExternalDocumentation externalDocs;
         private ObjectNode properties;
-        private ObjectNode xml;
+        private Xml xml;
         private String description;
         private String ref;
         private String title;
         private String type;
 
-        public Builder schemaEnum(final ArrayNode schemaEnum) {
+        public Builder schemaEnum(final List<String> schemaEnum) {
             this.schemaEnum = schemaEnum;
             return this;
         }
 
-        public Builder required(final ArrayNode required) {
+        public Builder required(final List<String> required) {
             this.required = required;
             return this;
         }
 
-        public Builder discriminator(final ObjectNode discriminator) {
+        public Builder discriminator(final Discriminator discriminator) {
             this.discriminator = discriminator;
             return this;
         }
 
-        public Builder examples(final ObjectNode examples) {
+        public Builder examples(final String examples) {
             this.examples = examples;
             return this;
         }
 
-        public Builder externalDocs(final ObjectNode externalDocs) {
+        public Builder externalDocs(final ExternalDocumentation externalDocs) {
             this.externalDocs = externalDocs;
             return this;
         }
@@ -67,7 +77,7 @@ public record Schema(@JsonProperty("enum") ArrayNode schemaEnum, ArrayNode requi
             return this;
         }
 
-        public Builder xml(final ObjectNode xml) {
+        public Builder xml(final Xml xml) {
             this.xml = xml;
             return this;
         }

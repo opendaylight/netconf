@@ -440,9 +440,7 @@ public final class OpenApiGeneratorRFC8040Test {
         assertNotNull(rootContainer);
         final var required = rootContainer.required();
         assertNotNull(required);
-        assertTrue(required.isArray());
         final var actualContainerArray = StreamSupport.stream(required.spliterator(), false)
-            .map(JsonNode::textValue)
             .collect(Collectors.toSet());
         assertEquals(expected, actualContainerArray);
     }
