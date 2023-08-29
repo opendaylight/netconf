@@ -11,7 +11,6 @@ import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.INPUT;
 import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.INPUT_SUFFIX;
 import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.OUTPUT_SUFFIX;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
@@ -116,10 +115,7 @@ public final class OperationBuilder {
     }
 
     private static Parameter buildQueryParameters(final boolean isConfig) {
-        final ArrayNode cases = JsonNodeFactory.instance.arrayNode()
-            .add("config")
-            .add("nonconfig")
-            .add("all");
+        final List<String> cases = List.of("config", "nonconfig", "all");
 
         return new Parameter.Builder()
             .in("query")

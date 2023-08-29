@@ -17,10 +17,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -140,7 +136,7 @@ public class OperationalDataTest {
     public void testOperationalConfigRootSchemaProperties() {
         final var configRoot = schemas.get("operational_root");
         assertNotNull(configRoot);
-        final var actualProperties = getSetOfProperties(configRoot);
+        final var actualProperties = configRoot.properties().keySet();
         assertEquals(Set.of("leaf-config", "config-container"), actualProperties);
     }
 
@@ -149,7 +145,7 @@ public class OperationalDataTest {
         final var configContOperList = schemas.get(
             "operational_root_config-container_config-container-oper-list");
         assertNotNull(configContOperList);
-        final var actualProperties = getSetOfProperties(configContOperList);
+        final var actualProperties = configContOperList.properties().keySet();
         assertEquals(Set.of("oper-container-list-leaf"), actualProperties);
     }
 
@@ -157,7 +153,7 @@ public class OperationalDataTest {
     public void testOperationalContListSchemaProperties() {
         final var operContList = schemas.get("operational_root_oper-container_oper-container-list");
         assertNotNull(operContList);
-        final var actualProperties = getSetOfProperties(operContList);
+        final var actualProperties = operContList.properties().keySet();
         assertEquals(Set.of("oper-container-list-leaf"), actualProperties);
     }
 
@@ -165,7 +161,7 @@ public class OperationalDataTest {
     public void testOperationalConConfigContSchemaProperties() {
         final var operConConfigCont = schemas.get("operational_root_oper-container_config-container");
         assertNotNull(operConConfigCont);
-        final var actualProperties = getSetOfProperties(operConConfigCont);
+        final var actualProperties = operConConfigCont.properties().keySet();
         assertEquals(Set.of("config-container-config-leaf", "opconfig-container-oper-leaf"), actualProperties);
     }
 
@@ -173,7 +169,7 @@ public class OperationalDataTest {
     public void testOperationalConfigContSchemaProperties() {
         final var configCont = schemas.get("operational_root_config-container");
         assertNotNull(configCont);
-        final var actualProperties = getSetOfProperties(configCont);
+        final var actualProperties = configCont.properties().keySet();
         assertEquals(Set.of("config-container-config-leaf", "leaf-second-case"), actualProperties);
     }
 
@@ -181,7 +177,7 @@ public class OperationalDataTest {
     public void testOperationalContSchemaProperties() {
         final var operCont = schemas.get("operational_root_oper-container");
         assertNotNull(operCont);
-        final var actualProperties = getSetOfProperties(operCont);
+        final var actualProperties = operCont.properties().keySet();
         assertEquals(Set.of("config-container", "oper-container-list", "leaf-first-case", "oper-leaf-first-case",
             "oper-container-config-leaf-list"), actualProperties);
     }
@@ -190,7 +186,7 @@ public class OperationalDataTest {
     public void testListActionSchemaProperties() {
         final var configRoot = schemas.get("action-types_list");
         assertNotNull(configRoot);
-        final var actualProperties = getSetOfProperties(configRoot);
+        final var actualProperties = configRoot.properties().keySet();
         assertEquals(Set.of("name"), actualProperties);
     }
 
@@ -198,7 +194,7 @@ public class OperationalDataTest {
     public void testListActionInputSchemaProperties() {
         final var configRoot = schemas.get("action-types_list-action_input");
         assertNotNull(configRoot);
-        final var actualProperties = getSetOfProperties(configRoot);
+        final var actualProperties = configRoot.properties().keySet();
         assertEquals(Set.of("la-input"), actualProperties);
     }
 
@@ -206,7 +202,7 @@ public class OperationalDataTest {
     public void testListActionOutputSchemaProperties() {
         final var configRoot = schemas.get("action-types_list-action_output");
         assertNotNull(configRoot);
-        final var actualProperties = getSetOfProperties(configRoot);
+        final var actualProperties = configRoot.properties().keySet();
         assertEquals(Set.of("la-output"), actualProperties);
     }
 
@@ -214,7 +210,7 @@ public class OperationalDataTest {
     public void testContainerActionSchemaProperties() {
         final var configRoot = schemas.get("action-types_container");
         assertNotNull(configRoot);
-        final var actualProperties = getSetOfProperties(configRoot);
+        final var actualProperties = configRoot.properties().keySet();
         assertEquals(Set.of(), actualProperties);
     }
 
@@ -222,7 +218,7 @@ public class OperationalDataTest {
     public void testContainerActionInputSchemaProperties() {
         final var configRoot = schemas.get("action-types_container-action_input");
         assertNotNull(configRoot);
-        final var actualProperties = getSetOfProperties(configRoot);
+        final var actualProperties = configRoot.properties().keySet();
         assertEquals(Set.of("ca-input"), actualProperties);
     }
 
@@ -230,7 +226,7 @@ public class OperationalDataTest {
     public void testContainerActionOutputSchemaProperties() {
         final var configRoot = schemas.get("action-types_container-action_output");
         assertNotNull(configRoot);
-        final var actualProperties = getSetOfProperties(configRoot);
+        final var actualProperties = configRoot.properties().keySet();
         assertEquals(Set.of("ca-output"), actualProperties);
     }
 
@@ -269,12 +265,5 @@ public class OperationalDataTest {
         final var schemaElement = refValue.substring(refValue.lastIndexOf("/") + 1);
         assertTrue("Reference [" + refValue + "] not found in EXPECTED Schemas",
                 EXPECTED_SCHEMAS.contains(schemaElement));
-    }
-
-    private static Set<String> getSetOfProperties(final Schema schema) {
-        final var fieldNames = schema.properties().fieldNames();
-        final var fieldNamesSpliterator = Spliterators.spliteratorUnknownSize(fieldNames, Spliterator.ORDERED);
-        return StreamSupport.stream(fieldNamesSpliterator, false)
-            .collect(Collectors.toSet());
     }
 }
