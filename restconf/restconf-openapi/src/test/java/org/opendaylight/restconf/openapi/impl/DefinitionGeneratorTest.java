@@ -59,8 +59,8 @@ public final class DefinitionGeneratorTest {
         assertNotNull(jsonObject);
 
         final var properties = jsonObject.get("strings-from-regex_test").properties();
-        assertEquals("00:00:00:00:00:00", properties.get("mac-address").get("example").asText());
-        assertEquals("0000-00-00T00:00:00Z", properties.get("login-date-time").get("example").asText());
-        assertEquals("0.0.0.0", properties.get("ipv4-address").get("example").asText());
+        assertEquals("00:00:00:00:00:00", properties.get("mac-address").example().toString());
+        assertEquals("0000-00-00T00:00:00Z", properties.get("login-date-time").example().toString());
+        assertEquals("0.0.0.0", properties.get("ipv4-address").example().toString());
     }
 }
