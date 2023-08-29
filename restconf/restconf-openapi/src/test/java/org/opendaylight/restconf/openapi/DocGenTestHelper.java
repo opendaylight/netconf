@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Brocade Communications Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2023 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -13,11 +13,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
+import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
+import org.opendaylight.restconf.openapi.model.Property;
 import org.opendaylight.restconf.openapi.model.Schema;
 
 public final class DocGenTestHelper {
@@ -47,18 +48,14 @@ public final class DocGenTestHelper {
      */
     public static void containsReferences(final Schema mainObject, final String childObject,
             final String expectedRef) {
-        final JsonNode properties = mainObject.properties();
+        final Map<String, Property> properties = mainObject.properties();
         assertNotNull(properties);
 
-        final JsonNode childNode = properties.get(childObject);
+        final Property childNode = properties.get(childObject);
         assertNotNull(childNode);
 
         //list case
-        JsonNode refWrapper = childNode.get("items");
-        if (refWrapper == null) {
-            //container case
-            refWrapper = childNode;
-        }
-        assertEquals(expectedRef, refWrapper.get("$ref").asText());
+        String refWrapper = childNode.items() == null ? childNode.ref() : childNode.items().ref();
+        assertEquals(expectedRef, refWrapper);
     }
 }

@@ -17,10 +17,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -272,9 +268,6 @@ public class OperationalDataTest {
     }
 
     private static Set<String> getSetOfProperties(final Schema schema) {
-        final var fieldNames = schema.properties().fieldNames();
-        final var fieldNamesSpliterator = Spliterators.spliteratorUnknownSize(fieldNames, Spliterator.ORDERED);
-        return StreamSupport.stream(fieldNamesSpliterator, false)
-            .collect(Collectors.toSet());
+        return schema.properties().keySet();
     }
 }
