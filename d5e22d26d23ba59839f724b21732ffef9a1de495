@@ -1,0 +1,234 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "409059b6_058966ed",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-30T08:04:56Z",
+      "side": 1,
+      "message": "javadocs are mandatory for utility classes bc these are expected for intensive use.\nprovide javadocs for class and public methods.",
+      "range": {
+        "startLine": 27,
+        "startChar": 19,
+        "endLine": 27,
+        "endChar": 33
+      },
+      "revId": "d5e22d26d23ba59839f724b21732ffef9a1de495",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc6fcd61_53bd3598",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-30T08:04:56Z",
+      "side": 1,
+      "message": "no reason to annotate private constants, remove as extra",
+      "range": {
+        "startLine": 28,
+        "startChar": 25,
+        "endLine": 28,
+        "endChar": 33
+      },
+      "revId": "d5e22d26d23ba59839f724b21732ffef9a1de495",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b97cb7c2_7b3232d6",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-30T08:04:56Z",
+      "side": 1,
+      "message": "public static @NonNull Capability parse(final @NonNull String urn) {\n\nDont place TODO if the described can be done now\nrequireNonnull(urn); // NPE\ncheckArgument(!urn.isEmty(), \"\"urn is empty\"); // IllegalArgumentException",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 43
+      },
+      "revId": "d5e22d26d23ba59839f724b21732ffef9a1de495",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "321ea06d_cff38eed",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-30T08:04:56Z",
+      "side": 1,
+      "message": "public static @NonNull List\u003cYangModuleCapability\u003e extractYangModuleCapabilities(final @NonNull EffectiveModelContext context){\n\nrequireNonnull(context)",
+      "range": {
+        "startLine": 61,
+        "startChar": 74,
+        "endLine": 61,
+        "endChar": 110
+      },
+      "revId": "d5e22d26d23ba59839f724b21732ffef9a1de495",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a02d57a_aab4a4e6",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-30T08:04:56Z",
+      "side": 1,
+      "message": "1. return result is recommended to be immutable. ArrayList is mutable\n2. array based collections are bad when size isn\u0027t predefined, bc each time backing array needs expansion the resources are taken to create new array and move the data.\n\nsuggested using immutable list (builder) initially with predefined size\n\nfinal var modules \u003d context.getModules();\nfinal var builder \u003d ImmutableList.\u003cYangModuleCapability\u003ebuilder(modules.size());\n... builder.add(...)...\nreturn builder.build();",
+      "range": {
+        "startLine": 62,
+        "startChar": 31,
+        "endLine": 62,
+        "endChar": 40
+      },
+      "revId": "d5e22d26d23ba59839f724b21732ffef9a1de495",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64de532d_5eea1e7e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-30T08:04:56Z",
+      "side": 1,
+      "message": "\u003d module.getRevision().map(Revision::toString).orElse(null);",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 71
+      },
+      "revId": "d5e22d26d23ba59839f724b21732ffef9a1de495",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed14836b_b2eaaab0",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/CapabilityUtilTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-30T08:04:56Z",
+      "side": 1,
+      "message": "junit 5 recommends package level visibility for classes and methods\ndrop \u0027public\u0027 modifiers (incl methods)",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 6
+      },
+      "revId": "d5e22d26d23ba59839f724b21732ffef9a1de495",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46bb9c18_25c5f0e1",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/CapabilityUtilTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-30T08:04:56Z",
+      "side": 1,
+      "message": "why it\u0027s TODO, it\u0027s expected in delivery \u003d less lines of code\n\nall the types (except Simple see below) can be combined into single test\n\n@ParameterizedTest(name\u003d\"parse: {0}\")\n@MethodSource(...)\nvoid parseParameterized(final String urn, final Capability expected) {\n    assertSame(expected, CapabilityUtil.parse(urn))\n}\n\nexamples\n- ErrorTagsTest in current project\n- InstanceIdentifierParserTest in yangtools\n\ntutorial: https://www.baeldung.com/parameterized-tests-junit-5",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 53
+      },
+      "revId": "d5e22d26d23ba59839f724b21732ffef9a1de495",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93b773fb_3480ce6d",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/CapabilityUtilTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-30T08:04:56Z",
+      "side": 1,
+      "message": "all SimpleCapacity values are in scope, not just one\neasy with parameterized test\n\n@ParameterizedTest(name \u003d \"parse: {0}\")\n@EnumSource(SimpleCapability.class)\nvoid parseSimple(SimpleCapability simple){\n   assertSame(simple, CapabilityUtil.parse(simple.urn()));\n}",
+      "range": {
+        "startLine": 22,
+        "startChar": 8,
+        "endLine": 22,
+        "endChar": 68
+      },
+      "revId": "d5e22d26d23ba59839f724b21732ffef9a1de495",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dec79318_9c89cb9a",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/CapabilityUtilTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-08-30T08:04:56Z",
+      "side": 1,
+      "message": "context contains 2 modules, both expected to be invalidated\n- dont compare just urn but objects \n- due to returned items order is not predictable, compare via contains\n\nfinal var expected \u003d Set.of(new YangModuleCapability(...), // first\nnew YangModuleCapability(.... )); // second\n\nassertNotNull(capList);\nassertEquals(2, capList.size());\nassertTrue(capList.containsAll(expected));",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 63
+      },
+      "revId": "d5e22d26d23ba59839f724b21732ffef9a1de495",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
