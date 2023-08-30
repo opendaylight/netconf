@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6922830d_f9065f2c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-08-30T08:22:58Z",
+      "side": 1,
+      "message": "There is nothing wrong this code, this should be fixed in MD-SAL",
+      "revId": "92a5ee94d5029d75e8c60cd1eb23e4384eae61d2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
