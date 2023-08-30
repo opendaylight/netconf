@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e62214e7_88140c5c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7231
+      },
+      "writtenOn": "2023-08-30T13:20:35Z",
+      "side": 1,
+      "message": "Hello,\n\nI re-based and corrected my patch according to Simon \u0026 Ivan reviews.\n\nRegards\n\nOlivier",
+      "revId": "7e18f0b0d7bab987e97ee49353e6f01676c6bc2d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

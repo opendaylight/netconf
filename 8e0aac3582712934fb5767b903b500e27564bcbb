@@ -65,6 +65,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9bdee19_fdb20cb7",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/NotificationQueryParams.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7231
+      },
+      "writtenOn": "2023-08-30T13:20:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70106a8a_554e45c6",
+      "range": {
+        "startLine": 60,
+        "startChar": 22,
+        "endLine": 60,
+        "endChar": 101
+      },
+      "revId": "8e0aac3582712934fb5767b903b500e27564bcbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "17390b8f_1a855190",
@@ -78,6 +102,30 @@
       "writtenOn": "2023-07-17T09:31:58Z",
       "side": 1,
       "message": "deprecated, use `modificationType()`",
+      "range": {
+        "startLine": 125,
+        "startChar": 20,
+        "endLine": 125,
+        "endChar": 41
+      },
+      "revId": "8e0aac3582712934fb5767b903b500e27564bcbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57af3e9f_75ec71d7",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 7231
+      },
+      "writtenOn": "2023-08-30T13:20:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17390b8f_1a855190",
       "range": {
         "startLine": 125,
         "startChar": 20,
@@ -111,6 +159,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b05c605f_61832246",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 7231
+      },
+      "writtenOn": "2023-08-30T13:20:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28c2cb78_023e3e2c",
+      "range": {
+        "startLine": 126,
+        "startChar": 37,
+        "endLine": 126,
+        "endChar": 52
+      },
+      "revId": "8e0aac3582712934fb5767b903b500e27564bcbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8959953f_1370b79f",
@@ -124,6 +196,30 @@
       "writtenOn": "2023-07-17T09:31:58Z",
       "side": 1,
       "message": "deprecated, use `name()`",
+      "range": {
+        "startLine": 127,
+        "startChar": 31,
+        "endLine": 127,
+        "endChar": 46
+      },
+      "revId": "8e0aac3582712934fb5767b903b500e27564bcbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b17567a_36b404a7",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractWebsocketSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 7231
+      },
+      "writtenOn": "2023-08-30T13:20:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8959953f_1370b79f",
       "range": {
         "startLine": 127,
         "startChar": 31,
