@@ -723,7 +723,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         return rpcDefinition;
     }
 
-    private static class TopDOMRpcImplementation implements DOMRpcImplementation {
+    private static final class TopDOMRpcImplementation implements DOMRpcImplementation {
         private volatile SettableFuture<Entry<DOMRpcIdentifier, NormalizedNode>> rpcInvokedFuture;
         private volatile ListenableFuture<DOMRpcResult> returnFuture;
 

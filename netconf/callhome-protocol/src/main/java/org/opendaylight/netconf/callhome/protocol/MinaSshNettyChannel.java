@@ -173,7 +173,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         }
     }
 
-    private class SshUnsafe extends AbstractUnsafe {
+    private final class SshUnsafe extends AbstractUnsafe {
         @Override
         public void connect(final SocketAddress remoteAddress, final SocketAddress localAddress,
                 final ChannelPromise promise) {

@@ -191,7 +191,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         abstract void removeDevice(String publicKey, Device device);
     }
 
-    private static class DeviceConfig extends AbstractDeviceListener {
+    private static final class DeviceConfig extends AbstractDeviceListener {
         private final ConcurrentMap<PublicKey, Device> byPublicKey = new ConcurrentHashMap<>();
         private final AuthorizedKeysDecoder keyDecoder = new AuthorizedKeysDecoder();
 
@@ -225,7 +225,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         }
     }
 
-    private static class DeviceOp extends AbstractDeviceListener {
+    private static final class DeviceOp extends AbstractDeviceListener {
         private final ConcurrentMap<String, Device> byPublicKey = new ConcurrentHashMap<>();
 
         Device get(final PublicKey serverKey) {
@@ -251,7 +251,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         }
     }
 
-    private static class GlobalConfig implements DataTreeChangeListener<Global> {
+    private static final class GlobalConfig implements DataTreeChangeListener<Global> {
         private volatile Global current = null;
 
         @Override
