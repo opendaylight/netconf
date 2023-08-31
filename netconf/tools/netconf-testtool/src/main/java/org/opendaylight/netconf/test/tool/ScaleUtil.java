@@ -294,7 +294,7 @@ public final class ScaleUtil {
         }
     }
 
-    private static class TimeoutGuard implements Callable<Void> {
+    private static final class TimeoutGuard implements Callable<Void> {
         @Override
         public Void call() {
             resultsLog.warn("Timeout for scale test reached after: {} ..aborting", STOPWATCH);

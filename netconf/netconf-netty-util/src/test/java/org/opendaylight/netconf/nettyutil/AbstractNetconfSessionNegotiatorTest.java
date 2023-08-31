@@ -185,7 +185,7 @@ public class AbstractNetconfSessionNegotiatorTest {
         doReturn(timeout).when(timer).newTimeout(any(), eq(100L), eq(TimeUnit.MILLISECONDS));
     }
 
-    private static class CloseDetector extends ChannelOutboundHandlerAdapter {
+    private static final class CloseDetector extends ChannelOutboundHandlerAdapter {
         @Override
         public void close(final ChannelHandlerContext ctx, final ChannelPromise promise) {
             // Override needed so @Skip from superclass is not effective
