@@ -230,8 +230,7 @@ public class ConcurrentClientsTest {
     /**
      * Responds to all operations except start-exi and counts all requests.
      */
-    private static class TestingNetconfOperation implements NetconfOperation {
-
+    private static final class TestingNetconfOperation implements NetconfOperation {
         private final AtomicLong counter = new AtomicLong();
 
         @Override
@@ -262,7 +261,7 @@ public class ConcurrentClientsTest {
     /**
      * Hardcoded operation service factory.
      */
-    private static class TestingOperationServiceFactory implements NetconfOperationServiceFactory {
+    private static final class TestingOperationServiceFactory implements NetconfOperationServiceFactory {
         private final NetconfOperation[] operations;
 
         TestingOperationServiceFactory(final NetconfOperation... operations) {

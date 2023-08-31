@@ -131,7 +131,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         throw new IllegalStateException("Outbound writes to SSH should be done by SSH Write handler");
     }
 
-    private class SshUnsafe extends AbstractUnsafe {
+    private final class SshUnsafe extends AbstractUnsafe {
         @Override
         public void connect(final SocketAddress remoteAddress, final SocketAddress localAddress,
                 final ChannelPromise promise) {
