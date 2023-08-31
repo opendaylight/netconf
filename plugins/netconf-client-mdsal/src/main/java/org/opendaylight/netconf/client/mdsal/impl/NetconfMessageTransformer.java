@@ -25,7 +25,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Streams;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.AbstractMap;
 import java.util.ArrayDeque;
@@ -99,7 +98,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class NetconfMessageTransformer
         implements ActionTransformer, NotificationTransformer, RpcTransformer<ContainerNode, DOMRpcResult> {
@@ -206,8 +204,7 @@ public class NetconfMessageTransformer
                     SchemaInferenceStack.of(mountContext.getEffectiveModelContext(), notificationPath).toInference(),
                     strictParsing);
             xmlParser.traverse(new DOMSource(element));
-        } catch (XMLStreamException | URISyntaxException | IOException | SAXException
-                | UnsupportedOperationException e) {
+        } catch (XMLStreamException | IOException | UnsupportedOperationException e) {
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
         }
         return (ContainerNode) resultHolder.getResult().data();
@@ -482,7 +479,7 @@ public class NetconfMessageTransformer
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext, inference, strictParsing);
             xmlParser.traverse(new DOMSource(element));
-        } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
+        } catch (XMLStreamException | IOException e) {
             throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
         }
         return (ContainerNode) resultHolder.getResult().data();
