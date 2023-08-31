@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -327,7 +326,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             final XmlParserStream xmlParser = XmlParserStream.create(writer, MODULES_STATE_INFERENCE);
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             return Optional.of(resultHolder.getResult().data());
-        } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
+        } catch (XMLStreamException | IOException | SAXException e) {
             LOG.warn("Unable to parse yang library xml content", e);
         }
 

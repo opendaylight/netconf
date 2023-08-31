@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.server.mdsal.operations;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -53,7 +52,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpc.class);
@@ -255,7 +253,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
         try {
             xmlParser.traverse(new DOMSource(element.getDomElement()));
-        } catch (final XMLStreamException | URISyntaxException | IOException | SAXException ex) {
+        } catch (final XMLStreamException | IOException ex) {
             throw new NetconfDocumentedException("Error parsing input: " + ex.getMessage(), ex,
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }

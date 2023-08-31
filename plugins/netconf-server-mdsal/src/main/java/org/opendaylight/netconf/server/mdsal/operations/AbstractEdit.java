@@ -9,7 +9,6 @@ package org.opendaylight.netconf.server.mdsal.operations;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Iterator;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
@@ -36,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 abstract class AbstractEdit extends AbstractConfigOperation {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEdit.class);
@@ -63,7 +61,7 @@ abstract class AbstractEdit extends AbstractConfigOperation {
         final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
         try {
             xmlParser.traverse(new DOMSource(element.getDomElement()));
-        } catch (final XMLStreamException | URISyntaxException | IOException | SAXException ex) {
+        } catch (final XMLStreamException | IOException ex) {
             throw new NetconfDocumentedException("Error parsing input: " + ex.getMessage(), ex,
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }
