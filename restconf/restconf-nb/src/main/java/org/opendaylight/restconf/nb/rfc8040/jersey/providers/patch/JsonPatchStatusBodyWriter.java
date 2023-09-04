@@ -43,30 +43,30 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         } else {
             if (patchStatusContext.getGlobalErrors() != null) {
                 reportErrors(patchStatusContext.getGlobalErrors(), jsonWriter);
-            }
-
-            jsonWriter.name("edit-status");
-            jsonWriter.beginObject();
-            jsonWriter.name("edit");
-            jsonWriter.beginArray();
-            for (final PatchStatusEntity patchStatusEntity : patchStatusContext.getEditCollection()) {
+            } else {
+                jsonWriter.name("edit-status");
                 jsonWriter.beginObject();
-                jsonWriter.name("edit-id").value(patchStatusEntity.getEditId());
-                if (patchStatusEntity.getEditErrors() != null) {
-                    reportErrors(patchStatusEntity.getEditErrors(), jsonWriter);
-                } else {
-                    if (patchStatusEntity.isOk()) {
-                        reportSuccess(jsonWriter);
+                jsonWriter.name("edit");
+                jsonWriter.beginArray();
+                for (final PatchStatusEntity patchStatusEntity : patchStatusContext.getEditCollection()) {
+                    jsonWriter.beginObject();
+                    jsonWriter.name("edit-id").value(patchStatusEntity.getEditId());
+                    if (patchStatusEntity.getEditErrors() != null) {
+                        reportErrors(patchStatusEntity.getEditErrors(), jsonWriter);
+                    } else {
+                        if (patchStatusEntity.isOk()) {
+                            reportSuccess(jsonWriter);
+                        }
                     }
+                    jsonWriter.endObject();
                 }
+                jsonWriter.endArray();
                 jsonWriter.endObject();
             }
-            jsonWriter.endArray();
             jsonWriter.endObject();
+            jsonWriter.endObject();
+            jsonWriter.flush();
         }
-        jsonWriter.endObject();
-        jsonWriter.endObject();
-        jsonWriter.flush();
     }
 
     private static void reportSuccess(final JsonWriter jsonWriter) throws IOException {
