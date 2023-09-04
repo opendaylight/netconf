@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
+import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
@@ -48,8 +49,17 @@ public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
     }
 
     @Override
-    public void close() {
-        datastoreAdapter.close();
+    public synchronized void close() {
+        final var future = datastoreAdapter.shutdown();
         super.close();
+
+        try {
+            future.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while waiting for datastore adapter shutdown", e);
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("Datastore adapter shutdown failed", e);
+        }
     }
 }
