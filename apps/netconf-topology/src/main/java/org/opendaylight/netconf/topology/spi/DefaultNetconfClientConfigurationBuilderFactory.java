@@ -59,6 +59,8 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
             final NetconfNode node) {
         final var builder  = NetconfClientConfigurationBuilder.create();
 
+        requireNonNull(node.getHost(), "Host must be specified.");
+        requireNonNull(node.getPort(), "Port must be specified.");
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
             builder.withProtocol(NetconfClientProtocol.TCP)
