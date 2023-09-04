@@ -57,7 +57,10 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
     @Override
     public NetconfClientConfigurationBuilder createClientConfigurationBuilder(final NodeId nodeId,
             final NetconfNode node) {
-        final var builder  = NetconfClientConfigurationBuilder.create();
+        final var builder = NetconfClientConfigurationBuilder.create();
+
+        requireNonNull(node.getHost());
+        requireNonNull(node.getPort());
 
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
