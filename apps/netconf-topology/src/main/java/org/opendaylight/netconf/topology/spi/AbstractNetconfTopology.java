@@ -11,11 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.*;
 import io.netty.util.concurrent.EventExecutor;
 import java.net.URL;
 import java.util.ArrayList;
@@ -175,14 +171,16 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final NetconfNode netconfNode = configNode.augmentation(NetconfNode.class);
         final NetconfNodeAugmentedOptional nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
 
-        requireNonNull(netconfNode.getHost());
-        requireNonNull(netconfNode.getPort());
-
         final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, nodeOptional);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
-        final NetconfReconnectingClientConfiguration clientConfig =
-                getClientConfig(netconfClientSessionListener, netconfNode, nodeId);
+        NetconfReconnectingClientConfiguration clientConfig = null;
+        try {
+            clientConfig = getClientConfig(netconfClientSessionListener, netconfNode, nodeId);
+        } catch (final Exception exception) {
+            LOG.warn("Error initialization configuration for device {}, using null instead.",
+                NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode), exception);
+        }
         final ListenableFuture<Empty> future =
                 deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
 
@@ -302,6 +300,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 node.requireMaxConnectionAttempts().toJava(), node.requireBetweenAttemptsTimeoutMillis().toJava(),
                 node.requireSleepFactor().decimalValue());
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
+
+        requireNonNull(node.getHost());
+        requireNonNull(node.getPort());
+
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
