@@ -136,10 +136,71 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         LOG.debug("Topology {} initialized", topologyId);
     }
 
+<<<<<<< HEAD   (14a6d8 Bump versions to 5.0.9-SNAPSHOT)
     @Override
     public ListenableFuture<Empty> connectNode(final NodeId nodeId, final Node configNode) {
         LOG.info("Connecting RemoteDevice{{}} , with config {}", nodeId, hideCredentials(configNode));
         return setupConnection(nodeId, configNode);
+=======
+    // Non-final for testing
+    protected void ensureNode(final Node node) {
+        lockedEnsureNode(node);
+    }
+
+    private synchronized void lockedEnsureNode(final Node node) {
+        final var nodeId = node.requireNodeId();
+        final var prev = activeConnectors.remove(nodeId);
+        if (prev != null) {
+            LOG.info("RemoteDevice{{}} was already configured, disconnecting", nodeId);
+            prev.close();
+        }
+
+        LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(node));
+        setupConnection(nodeId, node);
+    }
+
+    // Non-final for testing
+    protected void deleteNode(final NodeId nodeId) {
+        lockedDeleteNode(nodeId);
+    }
+
+    private synchronized void lockedDeleteNode(final NodeId nodeId) {
+        final var nodeName = nodeId.getValue();
+        LOG.debug("Disconnecting RemoteDevice{{}}", nodeName);
+
+        final var connectorDTO = activeConnectors.remove(nodeId);
+        if (connectorDTO != null) {
+            connectorDTO.close();
+        }
+    }
+
+    protected final synchronized void deleteAllNodes() {
+        activeConnectors.values().forEach(NetconfNodeHandler::close);
+        activeConnectors.clear();
+    }
+
+    @Holding("this")
+    protected final void setupConnection(final NodeId nodeId, final Node configNode) {
+        final var netconfNode = configNode.augmentation(NetconfNode.class);
+        final var nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
+
+        // Instantiate the handler ...
+        final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
+        final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
+        final var nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor,
+            baseSchemas, schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade,
+            deviceId, nodeId, netconfNode, nodeOptional);
+
+        // ... record it ...
+        activeConnectors.put(nodeId, nodeHandler);
+
+        // ... and start it
+        nodeHandler.connect();
+    }
+
+    protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final boolean lockDatastore) {
+        return new NetconfTopologyDeviceSalFacade(deviceId, mountPointService, lockDatastore, dataBroker);
+>>>>>>> CHANGE (9b34de Fix incorrect operational state of device configuration)
     }
 
     /**
