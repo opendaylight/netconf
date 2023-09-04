@@ -63,28 +63,29 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         } else {
             if (context.getGlobalErrors() != null) {
                 reportErrors(context.getGlobalErrors(), writer);
-            }
-            writer.writeStartElement("edit-status");
-            for (final PatchStatusEntity patchStatusEntity : context.getEditCollection()) {
-                writer.writeStartElement("edit");
-                writer.writeStartElement("edit-id");
-                writer.writeCharacters(patchStatusEntity.getEditId());
-                writer.writeEndElement();
-                if (patchStatusEntity.getEditErrors() != null) {
-                    reportErrors(patchStatusEntity.getEditErrors(), writer);
-                } else {
-                    if (patchStatusEntity.isOk()) {
-                        writer.writeEmptyElement("ok");
+            } else {
+                writer.writeStartElement("edit-status");
+                for (final PatchStatusEntity patchStatusEntity : context.getEditCollection()) {
+                    writer.writeStartElement("edit");
+                    writer.writeStartElement("edit-id");
+                    writer.writeCharacters(patchStatusEntity.getEditId());
+                    writer.writeEndElement();
+                    if (patchStatusEntity.getEditErrors() != null) {
+                        reportErrors(patchStatusEntity.getEditErrors(), writer);
+                    } else {
+                        if (patchStatusEntity.isOk()) {
+                            writer.writeEmptyElement("ok");
+                        }
                     }
+                    writer.writeEndElement();
                 }
                 writer.writeEndElement();
+
             }
             writer.writeEndElement();
 
+            writer.flush();
         }
-        writer.writeEndElement();
-
-        writer.flush();
     }
 
     private static void reportErrors(final List<RestconfError> errors, final XMLStreamWriter writer)
