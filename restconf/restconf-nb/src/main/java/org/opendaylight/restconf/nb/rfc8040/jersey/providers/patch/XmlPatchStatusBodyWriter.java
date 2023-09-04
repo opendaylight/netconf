@@ -60,10 +60,9 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
         if (context.ok()) {
             writer.writeEmptyElement("ok");
+        } else if (context.globalErrors() != null) {
+            reportErrors(context.globalErrors(), writer);
         } else {
-            if (context.globalErrors() != null) {
-                reportErrors(context.globalErrors(), writer);
-            }
             writer.writeStartElement("edit-status");
             for (final PatchStatusEntity patchStatusEntity : context.editCollection()) {
                 writer.writeStartElement("edit");
@@ -72,10 +71,8 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
                 writer.writeEndElement();
                 if (patchStatusEntity.getEditErrors() != null) {
                     reportErrors(patchStatusEntity.getEditErrors(), writer);
-                } else {
-                    if (patchStatusEntity.isOk()) {
-                        writer.writeEmptyElement("ok");
-                    }
+                } else if (patchStatusEntity.isOk()) {
+                    writer.writeEmptyElement("ok");
                 }
                 writer.writeEndElement();
             }
@@ -83,7 +80,6 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
         }
         writer.writeEndElement();
-
         writer.flush();
     }
 

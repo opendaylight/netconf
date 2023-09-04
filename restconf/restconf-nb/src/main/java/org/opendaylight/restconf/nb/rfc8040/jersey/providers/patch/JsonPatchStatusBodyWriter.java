@@ -40,11 +40,9 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         jsonWriter.name("patch-id").value(patchStatusContext.patchId());
         if (patchStatusContext.ok()) {
             reportSuccess(jsonWriter);
+        } else if (patchStatusContext.globalErrors() != null) {
+            reportErrors(patchStatusContext.globalErrors(), jsonWriter);
         } else {
-            if (patchStatusContext.globalErrors() != null) {
-                reportErrors(patchStatusContext.globalErrors(), jsonWriter);
-            }
-
             jsonWriter.name("edit-status");
             jsonWriter.beginObject();
             jsonWriter.name("edit");
@@ -54,10 +52,8 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
                 jsonWriter.name("edit-id").value(patchStatusEntity.getEditId());
                 if (patchStatusEntity.getEditErrors() != null) {
                     reportErrors(patchStatusEntity.getEditErrors(), jsonWriter);
-                } else {
-                    if (patchStatusEntity.isOk()) {
-                        reportSuccess(jsonWriter);
-                    }
+                } else if (patchStatusEntity.isOk()) {
+                    reportSuccess(jsonWriter);
                 }
                 jsonWriter.endObject();
             }
