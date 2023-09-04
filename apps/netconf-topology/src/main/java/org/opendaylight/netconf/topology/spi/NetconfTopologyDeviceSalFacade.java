@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
+import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
@@ -15,11 +16,15 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceSalFacade;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link NetconfDeviceSalFacade} specialization for netconf topology.
  */
 public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyDeviceSalFacade.class);
+
     private final NetconfDeviceTopologyAdapter datastoreAdapter;
 
     public NetconfTopologyDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
@@ -48,8 +53,17 @@ public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
     }
 
     @Override
-    public void close() {
-        datastoreAdapter.close();
+    public synchronized void close() {
+        final var future = datastoreAdapter.shutdown();
         super.close();
+
+        try {
+            future.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while waiting for datastore adapter shutdown", e);
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("Datastore adapter shutdown failed", e);
+        }
     }
 }
