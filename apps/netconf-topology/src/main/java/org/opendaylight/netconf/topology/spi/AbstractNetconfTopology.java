@@ -133,9 +133,6 @@ public abstract class AbstractNetconfTopology {
         final var netconfNode = configNode.augmentation(NetconfNode.class);
         final var nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
 
-        requireNonNull(netconfNode.getHost());
-        requireNonNull(netconfNode.getPort());
-
         // Instantiate the handler ...
         final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
