@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -14,7 +17,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +44,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -110,12 +116,47 @@ public class NetconfDeviceTopologyAdapterTest {
         // FIXME: exact match
         doNothing().when(mockTx).delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
         doNothing().when(mockChain).close();
-        listeners.getValue().onTransactionChainSuccessful(mockChain);
-        adapter.close();
 
+        final var future = adapter.shutdown();
         verify(mockChain, times(2)).newWriteOnlyTransaction();
         verify(mockTx).delete(LogicalDatastoreType.OPERATIONAL,
             TEST_TOPOLOGY_ID.child(Node.class, new NodeKey(new NodeId(id.name()))));
         verify(mockTx, times(2)).commit();
+        verify(mockChain).close();
+
+        assertFalse(future.isDone());
+
+        // Idempotent
+        assertSame(future, adapter.shutdown());
+
+        // future completes
+        listeners.getValue().onTransactionChainSuccessful(mockChain);
+        assertSame(Empty.value(), Futures.getDone(future));
+    }
+
+
+    @Test
+    public void testShutdownCompletion() throws Exception {
+        // FIXME: exact match
+        doNothing().when(mockTx).delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
+        doNothing().when(mockChain).close();
+
+        final var future = adapter.shutdown();
+        verify(mockChain, times(2)).newWriteOnlyTransaction();
+        verify(mockTx).delete(LogicalDatastoreType.OPERATIONAL,
+            TEST_TOPOLOGY_ID.child(Node.class, new NodeKey(new NodeId(id.name()))));
+        verify(mockTx, times(2)).commit();
+        verify(mockChain).close();
+
+        assertFalse(future.isDone());
+
+        // Idempotent
+        assertSame(future, adapter.shutdown());
+
+        // future completes
+        final var cause = new Throwable();
+        listeners.getValue().onTransactionChainFailed(mockChain, mockTx, cause);
+        final var ex = assertThrows(ExecutionException.class, () -> Futures.getDone(future));
+        assertSame(cause, ex.getCause());
     }
 }
