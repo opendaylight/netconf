@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9286f7dc_29057063",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-09-04T20:04:35Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem to comply with RFC 8072:\nhttps://www.rfc-editor.org/rfc/rfc8072.html#page-20\n\u003e          container edit-status {\n\u003e           description\n\u003e             \"This container will be present if there are\n\u003e              edit-specific status responses to report.\n\u003e              If all edits succeeded and the \u0027global-status\u0027\n\u003e              returned is \u0027ok\u0027, then a server MAY omit this\n\u003e              container.\";\n\nSo `edit-status` can be omitted if `global-status` is `ok`, otherwise the status of the edits, I think, should be reported as long as there is edit-specific status.",
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
