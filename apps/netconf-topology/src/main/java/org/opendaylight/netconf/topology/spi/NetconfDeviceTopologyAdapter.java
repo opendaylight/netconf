@@ -11,9 +11,10 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import java.util.concurrent.ExecutionException;
+import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.Transaction;
@@ -47,14 +48,16 @@ import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfDeviceTopologyAdapter implements TransactionChainListener, AutoCloseable {
+public final class NetconfDeviceTopologyAdapter implements TransactionChainListener {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceTopologyAdapter.class);
 
-    private final SettableFuture<Empty> closeFuture = SettableFuture.create();
     private final @NonNull KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath;
     private final DataBroker dataBroker;
     private final RemoteDeviceId id;
 
+    @GuardedBy("this")
+    private SettableFuture<Empty> closeFuture;
+    @GuardedBy("this")
     private TransactionChain txChain;
 
     public NetconfDeviceTopologyAdapter(final DataBroker dataBroker,
@@ -64,20 +67,78 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         this.id = requireNonNull(id);
         txChain = dataBroker.createMergingTransactionChain(this);
 
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
+        final var tx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Init device state transaction {} putting if absent operational data started.", id,
-            writeTx.getIdentifier());
+            tx.getIdentifier());
         final var nodePath = nodePath();
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, nodePath, new NodeBuilder()
+        tx.put(LogicalDatastoreType.OPERATIONAL, nodePath, new NodeBuilder()
             .withKey(nodePath.getKey())
             .addAugmentation(new NetconfNodeBuilder()
                 .setConnectionStatus(ConnectionStatus.Connecting)
                 .setHost(id.host())
                 .setPort(new PortNumber(Uint16.valueOf(id.address().getPort()))).build())
             .build());
-        LOG.trace("{}: Init device state transaction {} putting operational data ended.", id, writeTx.getIdentifier());
+        LOG.trace("{}: Init device state transaction {} putting operational data ended.", id, tx.getIdentifier());
+        commitTransaction(tx, "init");
+    }
 
-        commitTransaction(writeTx, "init");
+    public synchronized void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities,
+            final SessionIdType sessionId) {
+        final var tx = txChain.newWriteOnlyTransaction();
+        LOG.trace("{}: Update device state transaction {} merging operational data started.", id, tx.getIdentifier());
+
+        // FIXME: this needs to be tied together with node's operational existence
+        tx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
+            newNetconfNodeBuilder(up, capabilities, sessionId).build());
+        LOG.trace("{}: Update device state transaction {} merging operational data ended.", id, tx.getIdentifier());
+        commitTransaction(tx, "update");
+    }
+
+    public synchronized void updateClusteredDeviceData(final boolean up, final String masterAddress,
+            final NetconfDeviceCapabilities capabilities, final SessionIdType sessionId) {
+        final var tx = txChain.newWriteOnlyTransaction();
+        LOG.trace("{}: Update device state transaction {} merging operational data started.", id, tx.getIdentifier());
+        tx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
+            newNetconfNodeBuilder(up, capabilities, sessionId)
+                .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
+                    .setNetconfMasterNode(masterAddress)
+                    .build())
+                .build());
+        LOG.trace("{}: Update device state transaction {} merging operational data ended.", id, tx.getIdentifier());
+
+        commitTransaction(tx, "update");
+    }
+
+    public synchronized void setDeviceAsFailed(final Throwable throwable) {
+        final var data = new NetconfNodeBuilder()
+                .setHost(id.host())
+                .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))
+                .setConnectionStatus(ConnectionStatus.UnableToConnect)
+                .setConnectedMessage(extractReason(throwable))
+                .build();
+
+        final var tx = txChain.newWriteOnlyTransaction();
+        LOG.trace("{}: Setting device state as failed {} putting operational data started.", id, tx.getIdentifier());
+        tx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(), data);
+        LOG.trace("{}: Setting device state as failed {} putting operational data ended.", id, tx.getIdentifier());
+        commitTransaction(tx, "update-failed-device");
+    }
+
+    public synchronized ListenableFuture<Empty> shutdown() {
+        if (closeFuture != null) {
+            return closeFuture;
+        }
+
+        closeFuture = SettableFuture.create();
+
+        final var tx = txChain.newWriteOnlyTransaction();
+        LOG.trace("{}: Close device state transaction {} removing all data started.", id, tx.getIdentifier());
+        tx.delete(LogicalDatastoreType.OPERATIONAL, nodePath());
+        LOG.trace("{}: Close device state transaction {} removing all data ended.", id, tx.getIdentifier());
+        commitTransaction(tx, "close");
+
+        txChain.close();
+        return closeFuture;
     }
 
     private @NonNull KeyedInstanceIdentifier<Node, NodeKey> nodePath() {
@@ -86,75 +147,6 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
 
     private @NonNull InstanceIdentifier<NetconfNode> netconfNodePath() {
         return nodePath().augmentation(NetconfNode.class);
-    }
-
-    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities,
-            final SessionIdType sessionId) {
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
-        LOG.trace("{}: Update device state transaction {} merging operational data started.",
-                id, writeTx.getIdentifier());
-
-        // FIXME: this needs to be tied together with node's operational existence
-        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
-            newNetconfNodeBuilder(up, capabilities, sessionId).build());
-        LOG.trace("{}: Update device state transaction {} merging operational data ended.",
-                id, writeTx.getIdentifier());
-
-        commitTransaction(writeTx, "update");
-    }
-
-    public void updateClusteredDeviceData(final boolean up, final String masterAddress,
-            final NetconfDeviceCapabilities capabilities, final SessionIdType sessionId) {
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
-        LOG.trace("{}: Update device state transaction {} merging operational data started.",
-                id, writeTx.getIdentifier());
-        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
-            newNetconfNodeBuilder(up, capabilities, sessionId)
-                .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
-                    .setNetconfMasterNode(masterAddress)
-                    .build())
-                .build());
-        LOG.trace("{}: Update device state transaction {} merging operational data ended.",
-                id, writeTx.getIdentifier());
-
-        commitTransaction(writeTx, "update");
-    }
-
-    @Override
-    public void onTransactionChainFailed(final TransactionChain chain, final Transaction transaction,
-            final Throwable cause) {
-        LOG.warn("{}: TransactionChain({}) {} FAILED!", id, chain, transaction.getIdentifier(), cause);
-        chain.close();
-
-        txChain = dataBroker.createMergingTransactionChain(this);
-        LOG.info("{}: TransactionChain reset to {}", id, txChain);
-        // FIXME: restart last update
-    }
-
-    @Override
-    public void onTransactionChainSuccessful(final TransactionChain chain) {
-        LOG.trace("{}: TransactionChain({}) SUCCESSFUL", id, chain);
-        closeFuture.set(Empty.value());
-    }
-
-    public void setDeviceAsFailed(final Throwable throwable) {
-        String reason = throwable != null && throwable.getMessage() != null ? throwable.getMessage() : "Unknown reason";
-
-        final NetconfNode data = new NetconfNodeBuilder()
-                .setHost(id.host())
-                .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))
-                .setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
-
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
-        LOG.trace(
-                "{}: Setting device state as failed {} putting operational data started.",
-                id, writeTx.getIdentifier());
-        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(), data);
-        LOG.trace(
-                "{}: Setting device state as failed {} putting operational data ended.",
-                id, writeTx.getIdentifier());
-
-        commitTransaction(writeTx, "update-failed-device");
     }
 
     private NetconfNodeBuilder newNetconfNodeBuilder(final boolean up, final NetconfDeviceCapabilities capabilities,
@@ -198,20 +190,35 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
     }
 
     @Override
-    public void close() {
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
-        LOG.trace("{}: Close device state transaction {} removing all data started.", id, writeTx.getIdentifier());
-        writeTx.delete(LogicalDatastoreType.OPERATIONAL, nodePath());
-        LOG.trace("{}: Close device state transaction {} removing all data ended.", id, writeTx.getIdentifier());
-        commitTransaction(writeTx, "close");
-
-        txChain.close();
-
-        try {
-            closeFuture.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error("{}: Transaction(close) {} FAILED!", id, writeTx.getIdentifier(), e);
-            throw new IllegalStateException(id + "  Transaction(close) not committed correctly", e);
+    public synchronized void onTransactionChainFailed(final TransactionChain chain, final Transaction transaction,
+            final Throwable cause) {
+        LOG.warn("{}: TransactionChain({}) {} FAILED!", id, chain, transaction.getIdentifier(), cause);
+        if (closeFuture != null) {
+            closeFuture.setException(cause);
+            return;
         }
+
+        // FIXME: move this up once we have MDSAL-838 fixed
+        chain.close();
+
+        txChain = dataBroker.createMergingTransactionChain(this);
+        LOG.info("{}: TransactionChain reset to {}", id, txChain);
+        // FIXME: restart last update
+    }
+
+    @Override
+    public synchronized void onTransactionChainSuccessful(final TransactionChain chain) {
+        LOG.trace("{}: TransactionChain({}) SUCCESSFUL", id, chain);
+        closeFuture.set(Empty.value());
+    }
+
+    private static @NonNull String extractReason(final Throwable throwable) {
+        if (throwable != null) {
+            final var message = throwable.getMessage();
+            if (message != null) {
+                return message;
+            }
+        }
+        return "Unknown reason";
     }
 }
