@@ -16,6 +16,7 @@ import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -122,8 +123,17 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     @Override
     public void close() {
-        datastoreAdapter.close();
+        final var future = datastoreAdapter.shutdown();
         mount.close();
+
+        try {
+            future.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while waiting for datastore adapter shutdown");
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("Datastore adapter shutdown failed", e);
+        }
     }
 
     private void registerMasterMountPoint() {
