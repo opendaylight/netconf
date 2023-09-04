@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -59,7 +61,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     private final @NonNull List<SchemaSourceRegistration<?>> yanglibRegistrations;
     private final @NonNull NetconfClientDispatcher clientDispatcher;
-    private final @NonNull NetconfClientConfiguration clientConfig;
+    private @Nullable NetconfClientConfiguration clientConfig;
     private final @NonNull NetconfDeviceCommunicator communicator;
     private final @NonNull RemoteDeviceHandler delegate;
     private final @NonNull EventExecutor eventExecutor;
@@ -76,6 +78,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     @GuardedBy("this")
     private Future<?> currentTask;
 
+    @SuppressFBWarnings(value = "DCN_NULLPOINTER_EXCEPTION")
     public NetconfNodeHandler(final NetconfClientDispatcher clientDispatcher, final EventExecutor eventExecutor,
             final ScheduledExecutorService keepaliveExecutor, final BaseNetconfSchemas baseSchemas,
             final SchemaResourceManager schemaManager, final Executor processingExecutor,
@@ -140,13 +143,22 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         if (keepAliveFacade != null) {
             keepAliveFacade.setListener(communicator);
         }
-
-        clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
-            .withSessionListener(communicator)
-            .build();
+        try {
+            clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
+                .withSessionListener(communicator)
+                .build();
+        } catch (IllegalArgumentException | NullPointerException exception) {
+            LOG.error("Error initialization clientConfig for {}", deviceId, exception);
+            delegate.onDeviceFailed(exception);
+            clientConfig = null;
+        }
     }
 
     public synchronized void connect() {
+        if (clientConfig == null) {
+            LOG.info("Connection attempt has been skipped for {}", deviceId);
+            return;
+        }
         attempts = 1;
         lastSleep = minSleep;
         lockedConnect();
