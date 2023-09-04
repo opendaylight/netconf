@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
 import com.google.common.base.Strings;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
@@ -151,6 +152,10 @@ public class NetconfDeviceCommunicator
     public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection(
             final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
 
+        if (config == null) {
+            LOG.warn("Connection attempts are skipped for device because of missing configuration");
+            return Futures.immediateFuture(null);
+        }
         final Future<?> connectFuture;
         if (config instanceof NetconfReconnectingClientConfiguration) {
             // FIXME: This is weird. If I understand it correctly we want to know about the first connection so as to
