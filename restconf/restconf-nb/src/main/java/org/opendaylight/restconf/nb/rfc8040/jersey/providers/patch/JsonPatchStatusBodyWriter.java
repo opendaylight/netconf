@@ -39,29 +39,29 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
         if (patchStatusContext.ok()) {
             reportSuccess(jsonWriter);
-            jsonWriter.endObject().endObject().flush();
-        }
+        } else {
+            final var modelContext = patchStatusContext.context();
+            final var globalErrors = patchStatusContext.globalErrors();
+            if (globalErrors != null) {
+                reportErrors(modelContext, globalErrors, jsonWriter);
+            } else {
+                jsonWriter.name("edit-status").beginObject()
+                    .name("edit").beginArray();
+                for (var editStatus : patchStatusContext.editCollection()) {
+                    jsonWriter.beginObject().name("edit-id").value(editStatus.getEditId());
 
-        final var modelContext = patchStatusContext.context();
-        final var globalErrors = patchStatusContext.globalErrors();
-        if (globalErrors != null) {
-            reportErrors(modelContext, globalErrors, jsonWriter);
-        }
-
-        jsonWriter.name("edit-status").beginObject()
-        .name("edit").beginArray();
-        for (var editStatus : patchStatusContext.editCollection()) {
-            jsonWriter.beginObject().name("edit-id").value(editStatus.getEditId());
-
-            final var editErrors = editStatus.getEditErrors();
-            if (editErrors != null) {
-                reportErrors(modelContext, editErrors, jsonWriter);
-            } else if (editStatus.isOk()) {
-                reportSuccess(jsonWriter);
+                    final var editErrors = editStatus.getEditErrors();
+                    if (editErrors != null) {
+                        reportErrors(modelContext, editErrors, jsonWriter);
+                    } else if (editStatus.isOk()) {
+                        reportSuccess(jsonWriter);
+                    }
+                    jsonWriter.endObject();
+                }
+                jsonWriter.endArray().endObject();
             }
-            jsonWriter.endObject();
         }
-        jsonWriter.endArray().endObject().endObject().endObject().flush();
+        jsonWriter.endObject().endObject().flush();
     }
 
     private static void reportSuccess(final JsonWriter jsonWriter) throws IOException {
