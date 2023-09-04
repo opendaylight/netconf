@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -59,7 +60,6 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     private final @NonNull List<SchemaSourceRegistration<?>> yanglibRegistrations;
     private final @NonNull NetconfClientDispatcher clientDispatcher;
-    private final @NonNull NetconfClientConfiguration clientConfig;
     private final @NonNull NetconfDeviceCommunicator communicator;
     private final @NonNull RemoteDeviceHandler delegate;
     private final @NonNull EventExecutor eventExecutor;
@@ -69,6 +69,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final int minSleep;
     private final double sleepFactor;
 
+    private @Nullable NetconfClientConfiguration clientConfig;
     @GuardedBy("this")
     private long attempts;
     @GuardedBy("this")
@@ -140,13 +141,21 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         if (keepAliveFacade != null) {
             keepAliveFacade.setListener(communicator);
         }
-
-        clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
-            .withSessionListener(communicator)
-            .build();
+        try {
+            clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
+                .withSessionListener(communicator)
+                .build();
+        } catch (IllegalArgumentException exception) {
+            LOG.error("Error initialization clientConfig", exception);
+            delegate.onDeviceFailed(exception);
+            clientConfig = null;
+        }
     }
 
     public synchronized void connect() {
+        if (clientConfig == null) {
+            return;
+        }
         attempts = 1;
         lastSleep = minSleep;
         lockedConnect();

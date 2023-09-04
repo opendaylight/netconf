@@ -196,6 +196,32 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
+    public void testClientConfigInitializationFailure() {
+        doNothing().when(delegate).onDeviceFailed(any(RuntimeException.class));
+        final var netconfNode = new NetconfNodeBuilder()
+            .setReconnectOnChangedSchema(true)
+            .setSchemaless(true)
+            .setTcpOnly(true)
+            .setSleepFactor(Decimal64.valueOf("1.5"))
+            .setConcurrentRpcLimit(Uint16.ONE)
+            // One reconnection attempt
+            .setMaxConnectionAttempts(Uint32.TWO)
+            .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+            .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+            .setKeepaliveDelay(Uint32.valueOf(1000))
+            .setConnectionTimeoutMillis(Uint32.valueOf(1000))
+            .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
+            .build();
+        handler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor, BASE_SCHEMAS,
+            schemaManager, processingExecutor, new DefaultNetconfClientConfigurationBuilderFactory(encryptionService,
+            credentialProvider,
+            sslHandlerFactoryProvider), deviceActionFactory, delegate, DEVICE_ID, NODE_ID,
+            netconfNode, null);
+        handler.connect();
+        assertEquals(0, handler.attempts());
+    }
+
+    @Test
     public void downAfterUpCausesReconnect() {
         // Let's borrow common bits
         successfullOnDeviceConnectedPropagates();
