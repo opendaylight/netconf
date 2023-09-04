@@ -40,11 +40,9 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         jsonWriter.name("patch-id").value(patchStatusContext.patchId());
         if (patchStatusContext.ok()) {
             reportSuccess(jsonWriter);
+        } else if (patchStatusContext.globalErrors() != null) {
+            reportErrors(patchStatusContext.globalErrors(), jsonWriter);
         } else {
-            if (patchStatusContext.globalErrors() != null) {
-                reportErrors(patchStatusContext.globalErrors(), jsonWriter);
-            }
-
             jsonWriter.name("edit-status");
             jsonWriter.beginObject();
             jsonWriter.name("edit");
