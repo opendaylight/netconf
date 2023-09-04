@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e19d8ce2_a8e950e0",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-04T15:01:51Z",
+      "side": 1,
+      "message": "Please override methods equals/hashCode for this class and add test that tries to compare two capabilities that was created with same parameters. I have troubles in next patch with comparing two capabilities despite them having same initial data and urn.",
+      "range": {
+        "startLine": 22,
+        "startChar": 19,
+        "endLine": 22,
+        "endChar": 33
+      },
+      "revId": "f0cdd54833a38ad58d5522b902dd77a8c8ff0d1c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c05e1059_f7574ead",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-04T15:01:51Z",
+      "side": 1,
+      "message": "Please override methods equals/hashCode for this class and add test that tries to compare two capabilities that was created with same parameters. I have troubles in next patch with comparing two capabilities despite them having same initial data and urn.",
+      "range": {
+        "startLine": 23,
+        "startChar": 19,
+        "endLine": 23,
+        "endChar": 40
+      },
+      "revId": "f0cdd54833a38ad58d5522b902dd77a8c8ff0d1c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
