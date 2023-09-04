@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.google.common.net.InetAddresses;
 import io.netty.util.concurrent.DefaultPromise;
@@ -60,6 +61,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.common.Decimal64;
@@ -88,6 +90,11 @@ public class NetconfNodeHandlerTest {
     private DeviceActionFactory deviceActionFactory;
     @Mock
     private RemoteDeviceHandler delegate;
+
+    @Mock
+    private NetconfNode netconfNode;
+    @Mock
+    private NodeId nodeId;
 
     // DefaultNetconfClientConfigurationBuilderFactory setup
     @Mock
@@ -118,6 +125,8 @@ public class NetconfNodeHandlerTest {
     private ArgumentCaptor<Runnable> scheduleCaptor;
     @Mock
     private EffectiveModelContext schemaContext;
+    @Mock
+    private DefaultNetconfClientConfigurationBuilderFactory builderFactory;
 
     private NetconfNodeHandler handler;
 
@@ -193,6 +202,19 @@ public class NetconfNodeHandlerTest {
         scheduleCaptor.getValue().run();
         verify(clientDispatcher, times(2)).createClient(any());
         assertEquals(2, handler.attempts());
+    }
+
+    @Test
+    public void testClientConfigInitializationFailure() {
+        doNothing().when(delegate).onDeviceFailed(new RuntimeException("Mocked RuntimeException"));
+        when(builderFactory.createClientConfigurationBuilder(any(NodeId.class), any(NetconfNode.class)))
+            .thenThrow(new RuntimeException("Mocked RuntimeException"));
+        handler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor, BASE_SCHEMAS,
+            schemaManager, processingExecutor, builderFactory, deviceActionFactory, delegate, DEVICE_ID, NODE_ID,
+            netconfNode, null);
+        handler.connect();
+        assertEquals(0, handler.attempts());
+
     }
 
     @Test
