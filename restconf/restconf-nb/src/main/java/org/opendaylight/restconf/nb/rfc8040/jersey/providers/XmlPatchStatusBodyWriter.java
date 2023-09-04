@@ -65,27 +65,26 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             final var globalErrors = context.globalErrors();
             if (globalErrors != null) {
                 reportErrors(context.context(), globalErrors, writer);
-            }
-            writer.writeStartElement("edit-status");
-            for (var patchStatusEntity : context.editCollection()) {
-                writer.writeStartElement("edit");
-                writer.writeStartElement("edit-id");
-                writer.writeCharacters(patchStatusEntity.getEditId());
-                writer.writeEndElement();
+            } else {
+                writer.writeStartElement("edit-status");
+                for (var patchStatusEntity : context.editCollection()) {
+                    writer.writeStartElement("edit");
+                    writer.writeStartElement("edit-id");
+                    writer.writeCharacters(patchStatusEntity.getEditId());
+                    writer.writeEndElement();
 
-                final var editErrors = patchStatusEntity.getEditErrors();
-                if (editErrors != null) {
-                    reportErrors(context.context(),editErrors, writer);
-                } else if (patchStatusEntity.isOk()) {
-                    writer.writeEmptyElement("ok");
+                    final var editErrors = patchStatusEntity.getEditErrors();
+                    if (editErrors != null) {
+                        reportErrors(context.context(), editErrors, writer);
+                    } else if (patchStatusEntity.isOk()) {
+                        writer.writeEmptyElement("ok");
+                    }
+                    writer.writeEndElement();
                 }
                 writer.writeEndElement();
             }
-            writer.writeEndElement();
-
         }
         writer.writeEndElement();
-
         writer.flush();
     }
 
