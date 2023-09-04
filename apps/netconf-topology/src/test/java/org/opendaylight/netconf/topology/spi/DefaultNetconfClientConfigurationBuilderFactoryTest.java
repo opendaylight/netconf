@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doReturn;
 
 import org.junit.Before;
@@ -108,6 +109,18 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
         assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
         assertNull(config.getAuthHandler());
         assertSame(sslHandlerFactory, config.getSslHandlerFactory());
+    }
+
+    @Test
+    public void testPort() {
+        assertThrows("Port must be specified.", NullPointerException.class, () ->
+            createConfig(nodeBuilder.setPort(null).build()));
+    }
+
+    @Test
+    public void testHost() {
+        assertThrows("Host must be specified.", NullPointerException.class, () ->
+            createConfig(nodeBuilder.setHost(null).build()));
     }
 
     private NetconfClientConfiguration createConfig(final NetconfNode netconfNode) {
