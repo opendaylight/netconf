@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -98,31 +97,31 @@ public class OperationalDataTest {
         for (final var path : paths.values()) {
             if (path.get() != null) {
                 final var responses = path.get().responses();
-                final var response = responses.elements().next();
-                final var content = response.get("content");
+                final var response = responses.values().iterator().next();
+                final var content = response.content();
                 // In case of 200 no content
                 if (content != null) {
-                    verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
-                    verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
+                    verifyOperationHaveCorrectXmlReference(content.get("application/xml").schema());
+                    verifyOperationHaveCorrectJsonReference(content.get("application/json").schema());
                 }
             }
             if (path.put() != null) {
                 final var responses = path.put().requestBody();
-                final var content = responses.get("content");
-                verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
-                verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
+                final var content = responses.content();
+                verifyOperationHaveCorrectXmlReference(content.get("application/xml").schema());
+                verifyOperationHaveCorrectJsonReference(content.get("application/json").schema());
             }
             if (path.post() != null) {
                 final var responses = path.post().requestBody();
-                final var content = responses.get("content");
-                verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
-                verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
+                final var content = responses.content();
+                verifyOperationHaveCorrectXmlReference(content.get("application/xml").schema());
+                verifyOperationHaveCorrectJsonReference(content.get("application/json").schema());
             }
             if (path.patch() != null) {
                 final var responses = path.patch().requestBody();
-                final var content = responses.get("content");
-                verifyOperationHaveCorrectXmlReference(content.get("application/yang-data+xml").get("schema"));
-                verifyOperationHaveCorrectJsonReference(content.get("application/yang-data+json").get("schema"));
+                final var content = responses.content();
+                verifyOperationHaveCorrectXmlReference(content.get("application/yang-data+xml").schema());
+                verifyOperationHaveCorrectJsonReference(content.get("application/yang-data+json").schema());
             }
         }
     }
@@ -230,37 +229,36 @@ public class OperationalDataTest {
         assertEquals(Set.of("ca-output"), actualProperties);
     }
 
-    private static void verifyOperationHaveCorrectXmlReference(final JsonNode schema) {
-        final var ref = schema.get("$ref");
+    private static void verifyOperationHaveCorrectXmlReference(final Schema schema) {
+        final var refValue = schema.ref();
         // In case of a POST RPC with a direct input body and no reference value
-        if (ref != null) {
-            final var refValue = ref.textValue();
+        if (refValue != null) {
             final var schemaElement = refValue.substring(refValue.lastIndexOf("/") + 1);
             assertTrue("Reference [" + refValue + "] not found in EXPECTED Schemas",
                 EXPECTED_SCHEMAS.contains(schemaElement));
         } else {
-            final var type = schema.get("type");
+            final var type = schema.type();
             assertNotNull(type);
-            assertEquals("object", type.asText());
+            assertEquals("object", type);
         }
     }
 
-    private static void verifyOperationHaveCorrectJsonReference(final JsonNode schema) {
-        final var properties = schema.findPath("properties");
+    private static void verifyOperationHaveCorrectJsonReference(final Schema schema) {
+        final var properties = schema.properties();
         final String refValue;
-        if (!properties.isMissingNode()) {
-            final var node = properties.elements().next();
-            final var type = node.path("type");
-            if (type.isMissingNode()) {
-                refValue = node.path("$ref").asText();
-            } else if (type.asText().equals("array")) {
-                refValue = node.path("items").path("$ref").asText();
+        if (properties != null) {
+            final var node = properties.values().iterator().next();
+            final var type = node.type();
+            if (type == null) {
+                refValue = node.ref();
+            } else if (type.equals("array")) {
+                refValue = node.items().ref();
             } else {
-                assertEquals("object", type.asText());
+                assertEquals("object", type);
                 return;
             }
         } else {
-            refValue = schema.path("$ref").asText();
+            refValue = schema.ref();
         }
         final var schemaElement = refValue.substring(refValue.lastIndexOf("/") + 1);
         assertTrue("Reference [" + refValue + "] not found in EXPECTED Schemas",
