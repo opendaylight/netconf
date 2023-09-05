@@ -90,6 +90,30 @@
       },
       "revId": "6f9a89d418cb23ef8d6b214f2be5bc20d03ffff7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4adb0b6_58319c6e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-05T14:33:12Z",
+      "side": 1,
+      "message": "Sorry my mistake. It is done",
+      "parentUuid": "c01467f4_9ffc4d12",
+      "range": {
+        "startLine": 45,
+        "startChar": 7,
+        "endLine": 46,
+        "endChar": 89
+      },
+      "revId": "6f9a89d418cb23ef8d6b214f2be5bc20d03ffff7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
