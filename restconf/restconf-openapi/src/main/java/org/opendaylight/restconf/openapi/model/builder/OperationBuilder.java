@@ -15,14 +15,19 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
+import org.opendaylight.restconf.openapi.model.MediaTypeObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
+import org.opendaylight.restconf.openapi.model.RequestBody;
+import org.opendaylight.restconf.openapi.model.ResponseObject;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
@@ -58,7 +63,7 @@ public final class OperationBuilder {
         final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
-        final ObjectNode requestBody;
+        final RequestBody requestBody;
         final DataSchemaNode childNode = node == null ? null : getListOrContainerChildNode(node);
         if (childNode != null && childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
@@ -69,8 +74,8 @@ public final class OperationBuilder {
             final String defName = parentName + "_" + nodeName + discriminator;
             requestBody = createPostDataRequestBodyParameter(defName, nodeName);
         }
-        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
-        responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
+        final Map<String, ResponseObject> responses = new HashMap<>();
+        responses.put(String.valueOf(Response.Status.CREATED.getStatusCode()),
                 buildResponse(Response.Status.CREATED.getReasonPhrase()));
 
         return new Operation.Builder()
@@ -93,12 +98,12 @@ public final class OperationBuilder {
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         parameters.add(buildQueryParameters(isConfig));
-        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
+        final Map<String, ResponseObject> responses = new HashMap<>();
 
         final boolean isList = node instanceof ListSchemaNode;
-        final ObjectNode response = createRequestBodyParameter(defName, nodeName, isList, summary,
-                String.valueOf(Response.Status.OK.getStatusCode()));
-        responses.set(String.valueOf(Response.Status.OK.getStatusCode()), response);
+        final ResponseObject response = createResponse(defName, nodeName, isList,
+                String.valueOf(Response.Status.OK.getStatusCode()), summary);
+        responses.put(String.valueOf(Response.Status.OK.getStatusCode()), response);
 
         return new Operation.Builder()
             .tags(tags)
@@ -131,12 +136,12 @@ public final class OperationBuilder {
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
         final boolean isList = node instanceof ListSchemaNode;
-        final ObjectNode requestBody = createRequestBodyParameter(defName, fullName, isList, summary, nodeName);
+        final RequestBody requestBody = createRequestBodyParameter(defName, fullName, isList, summary, nodeName);
 
-        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
-        responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
+        final Map<String, ResponseObject> responses = new HashMap<>();
+        responses.put(String.valueOf(Response.Status.CREATED.getStatusCode()),
             buildResponse(Response.Status.CREATED.getReasonPhrase()));
-        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Updated"));
+        responses.put(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Updated"));
 
         return new Operation.Builder()
             .tags(tags)
@@ -156,12 +161,12 @@ public final class OperationBuilder {
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final String defName = parentName + "_" + nodeName;
         final boolean isList = node instanceof ListSchemaNode;
-        final ObjectNode requestBody = createRequestBodyParameter(defName, fullName, isList, summary, nodeName);
+        final RequestBody requestBody = createRequestBodyParameter(defName, fullName, isList, summary, nodeName);
 
-        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
-        responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
+        final Map<String, ResponseObject> responses = new HashMap<>();
+        responses.put(String.valueOf(Response.Status.OK.getStatusCode()),
                 buildResponse(Response.Status.OK.getReasonPhrase()));
-        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Updated"));
+        responses.put(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Updated"));
 
         return new Operation.Builder()
             .tags(tags)
@@ -181,8 +186,8 @@ public final class OperationBuilder {
         final String description = node.getDescription().orElse("");
         final List<Parameter> parameters = new ArrayList<>(pathParams);
 
-        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
-        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Deleted"));
+        final Map<String, ResponseObject> responses = new HashMap<>();
+        responses.put(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse("Deleted"));
 
         return new Operation.Builder()
             .tags(tags)
@@ -203,50 +208,54 @@ public final class OperationBuilder {
 
         final InputSchemaNode input = operDef.getInput();
         final OutputSchemaNode output = operDef.getOutput();
-        ObjectNode requestBody;
+        final RequestBody requestBody;
         if (!input.getChildNodes().isEmpty()) {
             final String discriminator = definitionNames.getDiscriminator(input);
             final String clearDefName = parentName + "_" + operationName + INPUT_SUFFIX;
             final String defName = clearDefName + discriminator;
             requestBody = createRequestBodyParameter(defName, INPUT_KEY, false, summary, inputName);
         } else {
-            final ObjectNode payload = JsonNodeFactory.instance.objectNode();
-            final ObjectNode jsonSchema = JsonNodeFactory.instance.objectNode();
             final ObjectNode properties = JsonNodeFactory.instance.objectNode();
             final ObjectNode inputSchema = JsonNodeFactory.instance.objectNode();
             inputSchema.put(TYPE_KEY, OBJECT);
             properties.set(INPUT_KEY, inputSchema);
-            jsonSchema.put(TYPE_KEY, OBJECT);
-            jsonSchema.set(PROPERTIES_KEY, properties);
-            final ObjectNode content = JsonNodeFactory.instance.objectNode();
-            final ObjectNode jsonTypeValue = JsonNodeFactory.instance.objectNode();
-            jsonTypeValue.set(SCHEMA_KEY, jsonSchema);
-            content.set(MediaType.APPLICATION_JSON, jsonTypeValue);
+            final Schema jsonSchema = new Schema.Builder()
+                .type(OBJECT)
+                .properties(properties)
+                .build();
+            final Map<String, MediaTypeObject> content = new HashMap<>();
+            final MediaTypeObject jsonTypeValue = new MediaTypeObject.Builder()
+                .schema(jsonSchema)
+                .build();
+            content.put(MediaType.APPLICATION_JSON, jsonTypeValue);
 
-            final ObjectNode xmlSchema = JsonNodeFactory.instance.objectNode();
-            xmlSchema.put(TYPE_KEY, OBJECT);
             final ObjectNode xml = JsonNodeFactory.instance.objectNode();
             xml.put(NAME_KEY, INPUT);
-            xmlSchema.set(XML_KEY, xml);
-            final ObjectNode xmlTypeValue = JsonNodeFactory.instance.objectNode();
-            xmlTypeValue.set(SCHEMA_KEY, xmlSchema);
-            content.set(MediaType.APPLICATION_XML, xmlTypeValue);
-
-            payload.set(CONTENT_KEY, content);
-            payload.put(DESCRIPTION_KEY, inputName);
-            requestBody = payload;
+            final Schema xmlSchema = new Schema.Builder()
+                .type(OBJECT)
+                .xml(xml)
+                .build();
+            final MediaTypeObject xmlTypeValue = new MediaTypeObject.Builder()
+                .schema(xmlSchema)
+                .build();
+            content.put(MediaType.APPLICATION_XML, xmlTypeValue);
+            requestBody = new RequestBody.Builder()
+                .content(content)
+                .description(inputName)
+                .build();
         }
-        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
+        final Map<String, ResponseObject> responses = new HashMap<>();
         final String description = String.format("RPC %s success", operationName);
 
         if (!output.getChildNodes().isEmpty()) {
-            final ObjectNode schema = JsonNodeFactory.instance.objectNode();
             final String defName = parentName + "_" + operationName + OUTPUT_SUFFIX
-                    + definitionNames.getDiscriminator(output);
-            schema.put(REF_KEY, COMPONENTS_PREFIX + defName);
-            responses.set(String.valueOf(Response.Status.OK.getStatusCode()), buildResponse(description, schema));
+                + definitionNames.getDiscriminator(output);
+            final Schema schema = new Schema.Builder()
+                .ref(COMPONENTS_PREFIX + defName)
+                .build();
+            responses.put(String.valueOf(Response.Status.OK.getStatusCode()), buildResponse(description, schema));
         } else {
-            responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse(description));
+            responses.put(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse(description));
         }
         final String desc = operDef.getDescription().orElse("");
         final List<String> tags = List.of(deviceName + " " + moduleName);
@@ -260,77 +269,99 @@ public final class OperationBuilder {
             .build();
     }
 
-    private static ObjectNode createPostDataRequestBodyParameter(final String defName, final String name) {
-        final ObjectNode payload = JsonNodeFactory.instance.objectNode();
-        final ObjectNode content = JsonNodeFactory.instance.objectNode();
-        final ObjectNode value = buildMimeTypeValue(defName);
-        content.set(MediaType.APPLICATION_JSON, value);
-        content.set(MediaType.APPLICATION_XML, value);
-        payload.set(CONTENT_KEY, content);
-        payload.put(DESCRIPTION_KEY, name);
-        return payload;
+    private static RequestBody createPostDataRequestBodyParameter(final String defName, final String name) {
+        final Map<String, MediaTypeObject> content = new HashMap<>();
+        final MediaTypeObject value = buildMediaTypeObject(defName);
+        content.put(MediaType.APPLICATION_JSON, value);
+        content.put(MediaType.APPLICATION_XML, value);
+        return new RequestBody.Builder()
+            .content(content)
+            .description(name)
+            .build();
     }
 
-    private static ObjectNode createRequestBodyParameter(final String defName, final String name,
+    private static RequestBody createRequestBodyParameter(final String defName, final String name,
             final boolean isList, final String summary, final String description) {
-        final ObjectNode payload = JsonNodeFactory.instance.objectNode();
-        final ObjectNode content = JsonNodeFactory.instance.objectNode();
-        final ObjectNode properties = JsonNodeFactory.instance.objectNode();
+        final Map<String, MediaTypeObject> content = getStringMediaTypeObjectMap(defName, name, isList, summary);
+        return new RequestBody.Builder()
+            .content(content)
+            .description(description)
+            .build();
+    }
+
+    private static ResponseObject createResponse(final String defName, final String name,
+        final boolean isList, final String description, final String summary) {
+        final Map<String, MediaTypeObject> content = getStringMediaTypeObjectMap(defName, name, isList, summary);
+        return new ResponseObject.Builder()
+            .content(content)
+            .description(description)
+            .build();
+    }
+
+    private static Map<String, MediaTypeObject> getStringMediaTypeObjectMap(final String defName, final String name,
+            final boolean isList, final String summary) {
+        final Map<String, MediaTypeObject> content = new HashMap<>();
+        final Schema.Builder schemaBuilder = new Schema.Builder();
         if (isList) {
             final ObjectNode list = JsonNodeFactory.instance.objectNode();
             final ObjectNode listValue = JsonNodeFactory.instance.objectNode();
             listValue.put(TYPE_KEY, "array");
             listValue.set("items", buildRefSchema(defName));
             list.set(name, listValue);
-            properties.set(PROPERTIES_KEY, list);
+            schemaBuilder.properties(list);
         } else {
             final ObjectNode container = JsonNodeFactory.instance.objectNode();
             container.set(name, buildRefSchema(defName));
-            properties.set(PROPERTIES_KEY, container);
+            schemaBuilder.properties(container);
         }
-        final ObjectNode jsonSchema = JsonNodeFactory.instance.objectNode();
-        jsonSchema.set(SCHEMA_KEY, properties);
+        final MediaTypeObject jsonSchema = new MediaTypeObject.Builder()
+            .schema(schemaBuilder.build())
+            .build();
         if (summary != null && summary.contains(HttpMethod.PATCH)) {
-            content.set("application/yang-data+json", jsonSchema);
-            content.set("application/yang-data+xml", buildMimeTypeValue(defName));
+            content.put("application/yang-data+json", jsonSchema);
+            content.put("application/yang-data+xml", buildMediaTypeObject(defName));
         } else {
-            content.set(MediaType.APPLICATION_JSON, jsonSchema);
-            content.set(MediaType.APPLICATION_XML, buildMimeTypeValue(defName));
+            content.put(MediaType.APPLICATION_JSON, jsonSchema);
+            content.put(MediaType.APPLICATION_XML, buildMediaTypeObject(defName));
         }
-        payload.set(CONTENT_KEY, content);
-        payload.put(DESCRIPTION_KEY, description);
-        return payload;
+        return content;
     }
 
     private static ObjectNode buildRefSchema(final String defName) {
+        //TODO this should return Schema object but this can't be done now because wo don't have Properties object
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         schema.put(REF_KEY, COMPONENTS_PREFIX + defName);
         return schema;
     }
 
-    private static ObjectNode buildMimeTypeValue(final String defName) {
-        final ObjectNode mimeTypeValue = JsonNodeFactory.instance.objectNode();
-        mimeTypeValue.set(SCHEMA_KEY, buildRefSchema(defName));
-        return mimeTypeValue;
+    private static MediaTypeObject buildMediaTypeObject(final String defName) {
+        final ObjectNode refSchema = buildRefSchema(defName);
+        final Schema schema = new Schema.Builder()
+            .ref(refSchema.path("$ref").textValue())
+            .build();
+        return new MediaTypeObject.Builder()
+            .schema(schema)
+            .build();
     }
 
-    private static ObjectNode buildResponse(final String description) {
-        final ObjectNode response = JsonNodeFactory.instance.objectNode();
-        response.put(DESCRIPTION_KEY, description);
-        return response;
+    private static ResponseObject buildResponse(final String description) {
+        return new ResponseObject.Builder()
+            .description(description)
+            .build();
     }
 
-    private static ObjectNode buildResponse(final String description, final ObjectNode schema) {
-        final ObjectNode response = JsonNodeFactory.instance.objectNode();
-        final ObjectNode content = JsonNodeFactory.instance.objectNode();
-        final ObjectNode body = JsonNodeFactory.instance.objectNode();
+    private static ResponseObject buildResponse(final String description, final Schema schema) {
+        final Map<String, MediaTypeObject> content = new HashMap<>();
+        final MediaTypeObject body = new MediaTypeObject.Builder()
+            .schema(schema)
+            .build();
         for (final String mimeType : MIME_TYPES) {
-            content.set(mimeType, body);
+            content.put(mimeType, body);
         }
-        body.set(SCHEMA_KEY, schema);
-        response.set(CONTENT_KEY, content);
-        response.put(DESCRIPTION_KEY, description);
-        return response;
+        return new ResponseObject.Builder()
+            .content(content)
+            .description(description)
+            .build();
     }
 
     private static DataSchemaNode getListOrContainerChildNode(final DataSchemaNode node) {
