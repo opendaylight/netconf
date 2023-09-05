@@ -103,8 +103,6 @@ public class PostPayloadTest {
                 }
               }
             }""";
-    private static final String CONTENT_KEY = "content";
-    private static final String SCHEMA_KEY = "schema";
 
     private static OpenApiObject containerDoc;
     private static OpenApiObject listDoc;
@@ -127,24 +125,21 @@ public class PostPayloadTest {
         final var path1 = "/rests/data/container-test:cont";
         assertTrue(containerDoc.paths().containsKey(path1));
         final var jsonRef1 = getJsonRef(containerDoc, path1);
-        assertEquals("{\"cont1\":{\"$ref\":\"#/components/schemas/container-test_cont_cont1\"}}",
-            jsonRef1);
+        assertEquals("#/components/schemas/container-test_cont_cont1", jsonRef1);
         final var xmlRef1 = getXmlRef(containerDoc, path1);
         assertEquals("#/components/schemas/container-test_cont_cont1", xmlRef1);
 
         final var path2 = "/rests/data/container-test:cont/cont1";
         assertTrue(containerDoc.paths().containsKey(path2));
         final var jsonRef2 = getJsonRef(containerDoc, path2);
-        assertEquals("{\"list4\":{\"type\":\"array\",\"items\":{\"$ref\":\""
-                + "#/components/schemas/container-test_cont_cont1_list4\"}}}", jsonRef2);
+        assertEquals("#/components/schemas/container-test_cont_cont1_list4", jsonRef2);
         final var xmlRef2 = getXmlRef(containerDoc, path2);
         assertEquals("#/components/schemas/container-test_cont_cont1_list4", xmlRef2);
 
         final var path4 = "/rests/data/container-test:cont/cont1/list4={key4}/cont2";
         assertTrue(containerDoc.paths().containsKey(path4));
         final var jsonRef4 = getJsonRef(containerDoc, path4);
-        assertEquals("{\"list5\":{\"type\":\"array\",\"items\":{\"$ref\":\""
-                + "#/components/schemas/container-test_cont_cont1_list4_cont2_list5\"}}}", jsonRef4);
+        assertEquals("#/components/schemas/container-test_cont_cont1_list4_cont2_list5", jsonRef4);
         final var xmlRef4 = getXmlRef(containerDoc, path4);
         assertEquals("#/components/schemas/container-test_cont_cont1_list4_cont2_list5", xmlRef4);
     }
@@ -154,19 +149,23 @@ public class PostPayloadTest {
         final var path1 = "/rests/data/list-test:cont";
         assertTrue(listDoc.paths().containsKey(path1));
         final var jsonRef1 = getJsonRef(listDoc, path1);
-        assertEquals("{\"list1\":{\"type\":\"array\",\"items\":{\"$ref\":\""
-            + "#/components/schemas/list-test_cont_list1\"}}}", jsonRef1);
+        assertEquals("#/components/schemas/list-test_cont_list1", jsonRef1);
         final var xmlRef1 = getXmlRef(listDoc, path1);
         assertEquals("#/components/schemas/list-test_cont_list1", xmlRef1);
     }
 
     private static String getJsonRef(final OpenApiObject openApiObject, final String path) {
-        return openApiObject.paths().get(path).post().requestBody().get(CONTENT_KEY).get("application/json")
-            .get(SCHEMA_KEY).get("properties").toString();
+        final var property = openApiObject.paths().get(path).post().requestBody().content().get("application/json")
+            .schema().properties().values().iterator().next();
+        if (property.type().equals("object")) {
+            return property.ref();
+        } else {
+            return property.items().ref();
+        }
     }
 
     private static String getXmlRef(final OpenApiObject openApiObject, final String path) {
-        return openApiObject.paths().get(path).post().requestBody().get(CONTENT_KEY).get(
-            "application/xml").get(SCHEMA_KEY).get("$ref").asText();
+        return openApiObject.paths().get(path).post().requestBody().content().get(
+            "application/xml").schema().ref();
     }
 }
