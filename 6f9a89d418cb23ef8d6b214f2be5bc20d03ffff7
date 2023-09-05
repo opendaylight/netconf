@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0797efbe_04cbe27f",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-05T14:25:10Z",
+      "side": 1,
+      "message": "Please remove this empty space between constants",
+      "revId": "6f9a89d418cb23ef8d6b214f2be5bc20d03ffff7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d219cc0_a2425721",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-05T14:25:10Z",
+      "side": 1,
+      "message": "IMO Set.of() looks better and use only java.util dependency instead of Guava. So this is an unnecessary change from patchset 3.",
+      "revId": "6f9a89d418cb23ef8d6b214f2be5bc20d03ffff7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d50ad882_0d16b4ac",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-05T14:25:10Z",
+      "side": 1,
+      "message": "final",
+      "revId": "6f9a89d418cb23ef8d6b214f2be5bc20d03ffff7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16b084b6_011dc948",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-05T14:25:10Z",
+      "side": 1,
+      "message": "Please keep same codestyle:\nfinal @Nullable List\u003cString\u003e deviations",
+      "revId": "6f9a89d418cb23ef8d6b214f2be5bc20d03ffff7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c01467f4_9ffc4d12",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-05T14:25:10Z",
+      "side": 1,
+      "message": "This can produce NullPointerException if feature or deviation is null.\n\nUse rather this:\n```\nthis.features \u003d features !\u003d null \u0026\u0026 features.isEmpty() ? null : features;\nthis.deviations \u003d deviations !\u003d null \u0026\u0026 deviations.isEmpty() ? null : deviations;\n```\nIf first operand in \u0026\u0026 is true, second will not be executed. However, this rule does not apply to the logical OR (||) operator.\n\nAnd my last question is, what will happen if feature or deviation will be empty list?",
+      "range": {
+        "startLine": 45,
+        "startChar": 7,
+        "endLine": 46,
+        "endChar": 89
+      },
+      "revId": "6f9a89d418cb23ef8d6b214f2be5bc20d03ffff7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
