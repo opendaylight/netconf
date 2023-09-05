@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.UriInfo;
@@ -22,8 +21,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
+import org.opendaylight.restconf.openapi.model.MediaTypeObject;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
+import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -80,12 +81,34 @@ public class SchemaObjectsTest {
      * @return name of the schema used for operation
      */
     private static String extractSchemaName(final Operation operation) {
-        final var schemas = operation.requestBody().path("content").findValues("schema");
         // Find distinct schema refs
-        final var references = schemas.stream().map(s -> s.findValues("$ref"))
-                .flatMap(Collection::stream).distinct().toList();
+        final var references = operation.requestBody().content().values().stream()
+            .map(MediaTypeObject::schema)
+            .map(SchemaObjectsTest::getRef)
+            .distinct()
+            .toList();
         // Assert all schema refs are same
         assertEquals("Inconsistent schemas for operation: " + operation.summary(), 1, references.size());
-        return references.get(0).textValue().replaceAll("#/components/schemas/", "");
+        return references.get(0).replaceAll("#/components/schemas/", "");
+    }
+
+    private static String getRef(final Schema schema) {
+        final String ref;
+        if (schema.ref() != null) {
+            ref = schema.ref();
+        } else {
+            final var properties = schema.properties();
+            if (properties != null && !properties.isEmpty()) {
+                final var property = schema.properties().values().iterator().next();
+                if (property.type().equals("array")) {
+                    ref = property.items().ref();
+                } else {
+                    ref = property.ref();
+                }
+            } else {
+                ref = null;
+            }
+        }
+        return ref;
     }
 }
