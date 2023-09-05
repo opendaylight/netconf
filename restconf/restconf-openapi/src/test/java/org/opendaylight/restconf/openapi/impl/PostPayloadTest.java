@@ -103,8 +103,6 @@ public class PostPayloadTest {
                 }
               }
             }""";
-    private static final String CONTENT_KEY = "content";
-    private static final String SCHEMA_KEY = "schema";
 
     private static OpenApiObject containerDoc;
     private static OpenApiObject listDoc;
@@ -161,12 +159,12 @@ public class PostPayloadTest {
     }
 
     private static String getJsonRef(final OpenApiObject openApiObject, final String path) {
-        return openApiObject.paths().get(path).post().requestBody().get(CONTENT_KEY).get("application/json")
-            .get(SCHEMA_KEY).get("properties").toString();
+        return openApiObject.paths().get(path).post().requestBody().content().get("application/json")
+            .schema().properties().toString();
     }
 
     private static String getXmlRef(final OpenApiObject openApiObject, final String path) {
-        return openApiObject.paths().get(path).post().requestBody().get(CONTENT_KEY).get(
-            "application/xml").get(SCHEMA_KEY).get("$ref").asText();
+        return openApiObject.paths().get(path).post().requestBody().content().get(
+            "application/xml").schema().ref();
     }
 }
