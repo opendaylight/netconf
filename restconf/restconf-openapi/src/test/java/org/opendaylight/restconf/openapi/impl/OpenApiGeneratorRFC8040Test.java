@@ -18,7 +18,6 @@ import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathGetParam
 import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathPostParameters;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASIC_AUTH_NAME;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
+import org.opendaylight.restconf.openapi.model.MediaTypeObject;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
@@ -347,13 +347,11 @@ public final class OpenApiGeneratorRFC8040Test {
         final var jsonNodeCancelToast = doc.paths().get("/rests/operations/toaster2:cancel-toast");
         assertNull(jsonNodeCancelToast.get());
         // Test RPC with empty input
-        final var postContent = jsonNodeCancelToast.post().requestBody().get("content");
-        final var jsonSchema = postContent.get("application/json").get("schema");
-        assertNull(jsonSchema.get("$ref"));
-        assertEquals(2, jsonSchema.size());
-        final var xmlSchema = postContent.get("application/xml").get("schema");
-        assertNull(xmlSchema.get("$ref"));
-        assertEquals(2, xmlSchema.size());
+        final var postContent = jsonNodeCancelToast.post().requestBody().content();
+        final var jsonSchema = postContent.get("application/json").schema();
+        assertNull(jsonSchema.ref());
+        final var xmlSchema = postContent.get("application/xml").schema();
+        assertNull(xmlSchema.ref());
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
@@ -390,42 +388,41 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     private static void verifyPostDataRequestRef(final Operation operation, final String expectedJsonRef,
             final String expectedXmlRef) {
-        final JsonNode postContent;
+        final Map<String, MediaTypeObject> postContent;
         if (operation.requestBody() != null) {
-            postContent = operation.requestBody().get("content");
+            postContent = operation.requestBody().content();
         } else {
-            postContent = operation.responses().get("200").get("content");
+            postContent = operation.responses().get("200").content();
         }
         assertNotNull(postContent);
-        final var postJsonRef = postContent.get("application/json").get("schema").get("$ref");
+        final var postJsonRef = postContent.get("application/json").schema().ref();
         assertNotNull(postJsonRef);
-        assertEquals(expectedJsonRef, postJsonRef.textValue());
-        final var postXmlRef = postContent.get("application/xml").get("schema").get("$ref");
+        assertEquals(expectedJsonRef, postJsonRef);
+        final var postXmlRef = postContent.get("application/xml").schema().ref();
         assertNotNull(postXmlRef);
-        assertEquals(expectedXmlRef, postXmlRef.textValue());
+        assertEquals(expectedXmlRef, postXmlRef);
     }
 
     private static void verifyRequestRef(final Operation operation, final String expectedRef, final String nodeType) {
-        final JsonNode postContent;
+        final Map<String, MediaTypeObject> postContent;
         if (operation.requestBody() != null) {
-            postContent = operation.requestBody().path("content");
+            postContent = operation.requestBody().content();
         } else {
-            postContent = operation.responses().path("200").path("content");
+            postContent = operation.responses().get("200").content();
         }
         assertNotNull(postContent);
         final String postJsonRef;
         if (nodeType.equals(CONTAINER)) {
-            postJsonRef = postContent.path("application/json").path("schema").path("properties").elements().next()
-                .path("$ref").textValue();
+            postJsonRef = postContent.get("application/json").schema().properties().values().iterator().next().ref();
         } else {
-            postJsonRef = postContent.path("application/json").path("schema").path("properties").elements().next()
-                .path("items").path("$ref").textValue();
+            postJsonRef = postContent.get("application/json").schema().properties().values().iterator().next().items()
+                .ref();
         }
         assertNotNull(postJsonRef);
         assertEquals(expectedRef, postJsonRef);
-        final var postXmlRef = postContent.path("application/xml").path("schema").path("$ref");
+        final var postXmlRef = postContent.get("application/xml").schema().ref();
         assertNotNull(postXmlRef);
-        assertEquals(expectedRef, postXmlRef.textValue());
+        assertEquals(expectedRef, postXmlRef);
     }
 
     private static void verifyThatOthersNodeDoesNotHaveRequiredField(final List<String> expected,
