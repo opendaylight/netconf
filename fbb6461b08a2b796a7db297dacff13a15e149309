@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2b480237_36bcab91",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-05T14:50:34Z",
+      "side": 1,
+      "message": "You can fix this TODO now.\nfinal List\u003cString\u003e enumNames \u003d enumPairs.stream().map(EnumPair::getName).collect(Collectors.toList());",
+      "revId": "fbb6461b08a2b796a7db297dacff13a15e149309",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8734057f_c3e19940",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 716,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-05T14:50:34Z",
+      "side": 1,
+      "message": "You can fix it",
+      "revId": "fbb6461b08a2b796a7db297dacff13a15e149309",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a0a691bd_dd912158",
         "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OperationalDataTest.java",
         "patchSetId": 4
