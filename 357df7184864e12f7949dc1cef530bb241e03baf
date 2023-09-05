@@ -76,6 +76,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93b16f06_29c80e5a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchStatusBodyWriter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-05T08:28:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d807825_3282ea1d",
+      "range": {
+        "startLine": 43,
+        "startChar": 7,
+        "endLine": 47,
+        "endChar": 0
+      },
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b084b11c_1187d6ff",
@@ -89,6 +113,30 @@
       "writtenOn": "2023-09-05T07:40:19Z",
       "side": 1,
       "message": "dont nest conditions if you can avoid these\nelse { if { }} -\u003e else if { }",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 21
+      },
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "929a8c7a_ffa3a304",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchStatusBodyWriter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-05T08:28:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b084b11c_1187d6ff",
       "range": {
         "startLine": 56,
         "startChar": 0,
@@ -122,6 +170,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0e7cc26_124edbce",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchStatusBodyWriter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-05T08:28:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba5dd3cf_61d1b19a",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 31
+      },
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7ef27d90_6cc4a386",
@@ -135,6 +207,30 @@
       "writtenOn": "2023-09-05T07:40:19Z",
       "side": 1,
       "message": "exact same issues as for json writer please update accordingly",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 9
+      },
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c08285e_ca57963a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchStatusBodyWriter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-05T08:28:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ef27d90_6cc4a386",
       "range": {
         "startLine": 61,
         "startChar": 0,
@@ -168,6 +264,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65e51e33_fad1b125",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchStatusBodyWriterTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-05T08:28:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ebd0ab55_8ffa283a",
+      "range": {
+        "startLine": 33,
+        "startChar": 71,
+        "endLine": 33,
+        "endChar": 104
+      },
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "37c5bbc7_dcc25f99",
@@ -191,6 +311,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31000247_875a996a",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchStatusBodyWriterTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-05T08:28:28Z",
+      "side": 1,
+      "message": "created statusEntity without error for this input",
+      "parentUuid": "37c5bbc7_dcc25f99",
+      "range": {
+        "startLine": 35,
+        "startChar": 75,
+        "endLine": 36,
+        "endChar": 52
+      },
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f6a46e5_0e4262ed",
@@ -204,6 +348,24 @@
       "writtenOn": "2023-09-05T07:40:19Z",
       "side": 1,
       "message": "exact same set of issues as for json writer test, pls update",
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "062c5215_0bfe1605",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchStatusBodyWriterTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-05T08:28:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f6a46e5_0e4262ed",
       "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
