@@ -69,7 +69,7 @@ public class JsonModelNameTest {
     }
 
     private static String getSchemaPutOperationModuleName(final Operation put) {
-        final var parentName  = put.requestBody().path("content").path("application/json").path("schema")
+        final var parentName  = put.requestBody().content().path("application/json").path("schema")
             .path("properties").properties().iterator().next().getKey();
 
         final var doubleDotsIndex = parentName.indexOf(':');

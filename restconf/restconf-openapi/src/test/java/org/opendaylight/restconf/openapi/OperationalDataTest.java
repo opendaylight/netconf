@@ -102,8 +102,8 @@ public class OperationalDataTest {
         for (final var path : paths.values()) {
             if (path.get() != null) {
                 final var responses = path.get().responses();
-                final var response = responses.elements().next();
-                final var content = response.get("content");
+                final var response = responses.values().iterator().next();
+                final var content = response.content();
                 // In case of 200 no content
                 if (content != null) {
                     verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
@@ -112,19 +112,19 @@ public class OperationalDataTest {
             }
             if (path.put() != null) {
                 final var responses = path.put().requestBody();
-                final var content = responses.get("content");
+                final var content = responses.content();
                 verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
                 verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
             }
             if (path.post() != null) {
                 final var responses = path.post().requestBody();
-                final var content = responses.get("content");
+                final var content = responses.content();
                 verifyOperationHaveCorrectXmlReference(content.get("application/xml").get("schema"));
                 verifyOperationHaveCorrectJsonReference(content.get("application/json").get("schema"));
             }
             if (path.patch() != null) {
                 final var responses = path.patch().requestBody();
-                final var content = responses.get("content");
+                final var content = responses.content();
                 verifyOperationHaveCorrectXmlReference(content.get("application/yang-data+xml").get("schema"));
                 verifyOperationHaveCorrectJsonReference(content.get("application/yang-data+json").get("schema"));
             }
