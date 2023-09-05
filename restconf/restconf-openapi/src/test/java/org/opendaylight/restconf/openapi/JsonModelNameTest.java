@@ -69,8 +69,8 @@ public class JsonModelNameTest {
     }
 
     private static String getSchemaPutOperationModuleName(final Operation put) {
-        final var parentName  = put.requestBody().path("content").path("application/json").path("schema")
-            .path("properties").properties().iterator().next().getKey();
+        final var parentName  = put.requestBody().content().get("application/json").schema().properties()
+            .properties().iterator().next().getKey();
 
         final var doubleDotsIndex = parentName.indexOf(':');
         if (doubleDotsIndex >= 0 && doubleDotsIndex < parentName.length() - 1) {
