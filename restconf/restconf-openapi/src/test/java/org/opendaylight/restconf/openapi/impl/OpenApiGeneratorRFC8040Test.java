@@ -19,7 +19,6 @@ import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathPostPara
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BASIC_AUTH_NAME;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.COMPONENTS_PREFIX;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
+import org.opendaylight.restconf.openapi.model.MediaTypeObject;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
@@ -365,13 +365,11 @@ public final class OpenApiGeneratorRFC8040Test {
         final var jsonNodeCancelToast = doc.paths().get("/rests/operations/toaster2:cancel-toast");
         assertNull(jsonNodeCancelToast.get());
         // Test RPC with empty input
-        final var postContent = jsonNodeCancelToast.post().requestBody().get("content");
-        final var jsonSchema = postContent.get("application/json").get("schema");
-        assertNull(jsonSchema.get("$ref"));
-        assertEquals(2, jsonSchema.size());
-        final var xmlSchema = postContent.get("application/xml").get("schema");
-        assertNull(xmlSchema.get("$ref"));
-        assertEquals(2, xmlSchema.size());
+        final var postContent = jsonNodeCancelToast.post().requestBody().content();
+        final var jsonSchema = postContent.get("application/json").schema();
+        assertNull(jsonSchema.ref());
+        final var xmlSchema = postContent.get("application/xml").schema();
+        assertNull(xmlSchema.ref());
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
@@ -408,42 +406,41 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     private static void verifyPostDataRequestRef(final Operation operation, final String expectedJsonRef,
             final String expectedXmlRef) {
-        final JsonNode postContent;
+        final Map<String, MediaTypeObject> postContent;
         if (operation.requestBody() != null) {
-            postContent = operation.requestBody().get("content");
+            postContent = operation.requestBody().content();
         } else {
-            postContent = operation.responses().get("200").get("content");
+            postContent = operation.responses().get("200").content();
         }
         assertNotNull(postContent);
-        final var postJsonRef = postContent.get("application/json").get("schema").get("$ref");
+        final var postJsonRef = postContent.get("application/json").schema().ref();
         assertNotNull(postJsonRef);
-        assertEquals(expectedJsonRef, postJsonRef.textValue());
-        final var postXmlRef = postContent.get("application/xml").get("schema").get("$ref");
+        assertEquals(expectedJsonRef, postJsonRef);
+        final var postXmlRef = postContent.get("application/xml").schema().ref();
         assertNotNull(postXmlRef);
-        assertEquals(expectedXmlRef, postXmlRef.textValue());
+        assertEquals(expectedXmlRef, postXmlRef);
     }
 
     private static void verifyRequestRef(final Operation operation, final String expectedRef, final String nodeType) {
-        final JsonNode postContent;
+        final Map<String, MediaTypeObject> postContent;
         if (operation.requestBody() != null) {
-            postContent = operation.requestBody().path("content");
+            postContent = operation.requestBody().content();
         } else {
-            postContent = operation.responses().path("200").path("content");
+            postContent = operation.responses().get("200").content();
         }
         assertNotNull(postContent);
         final String postJsonRef;
         if (nodeType.equals(CONTAINER)) {
-            postJsonRef = postContent.path("application/json").path("schema").path("properties").elements().next()
-                .path("$ref").textValue();
+            postJsonRef = postContent.get("application/json").schema().properties().values().iterator().next().ref();
         } else {
-            postJsonRef = postContent.path("application/json").path("schema").path("properties").elements().next()
-                .path("items").path("$ref").textValue();
+            postJsonRef = postContent.get("application/json").schema().properties().values().iterator().next().items()
+                .ref();
         }
         assertNotNull(postJsonRef);
         assertEquals(expectedRef, postJsonRef);
-        final var postXmlRef = postContent.path("application/xml").path("schema").path("$ref");
+        final var postXmlRef = postContent.get("application/xml").schema().ref();
         assertNotNull(postXmlRef);
-        assertEquals(expectedRef, postXmlRef.textValue());
+        assertEquals(expectedRef, postXmlRef);
     }
 
     private static void verifyThatOthersNodeDoesNotHaveRequiredField(final List<String> expected,
@@ -471,19 +468,19 @@ public final class OpenApiGeneratorRFC8040Test {
         final var references = new HashSet<String>();
         final var get = path.get();
         if (get != null) {
-            references.addAll(schemaRefFromContent(get.responses().path("200").path("content")));
+            references.addAll(schemaRefFromContent(get.responses().get("200").content()));
         }
         final var post = path.post();
         if (post != null) {
-            references.addAll(schemaRefFromContent(post.requestBody().path("content")));
+            references.addAll(schemaRefFromContent(post.requestBody().content()));
         }
         final var put = path.put();
         if (put != null) {
-            references.addAll(schemaRefFromContent(put.requestBody().path("content")));
+            references.addAll(schemaRefFromContent(put.requestBody().content()));
         }
         final var patch = path.patch();
         if (patch != null) {
-            references.addAll(schemaRefFromContent(patch.requestBody().path("content")));
+            references.addAll(schemaRefFromContent(patch.requestBody().content()));
         }
         return references;
     }
@@ -499,27 +496,26 @@ public final class OpenApiGeneratorRFC8040Test {
      * @param content the element identified with key "content"
      * @return the set of referenced schemas
      */
-    private static Set<String> schemaRefFromContent(final JsonNode content) {
+    private static Set<String> schemaRefFromContent(final Map<String, MediaTypeObject> content) {
         final HashSet<String> refs = new HashSet<>();
-        content.fieldNames().forEachRemaining(mediaType -> {
-            final JsonNode schema = content.path(mediaType).path("schema");
-            final JsonNode props = schema.path("properties");
-            final JsonNode nameNode = props.isMissingNode() ? props : props.elements().next().path("items");
-            final JsonNode ref;
-            if (props.isMissingNode()) {
+        content.values().forEach(mediaType -> {
+            final var schema = mediaType.schema();
+            final var props = mediaType.schema().properties();
+            final String ref;
+            if (props == null) {
                 // either there is no node with the key "properties", try to find immediate child of schema
-                ref = schema.path("$ref");
-            } else if (nameNode.path("items").isMissingNode()) {
+                ref = schema.ref();
+            } else if (props.values().iterator().next().items() == null) {
                 // or the "properties" is defined and under that we didn't find the "items" node
-                // try to get "$ref" as immediate child under nameNode
-                ref = nameNode.path("$ref");
+                // try to get "$ref" as immediate child under properties
+                ref = props.values().iterator().next().ref();
             } else {
                 // or the "items" node is defined, in which case we try to get the "$ref" from this node
-                ref = nameNode.path("items").path("$ref");
+                ref = props.values().iterator().next().items().ref();
             }
 
-            if (ref != null && !ref.isMissingNode()) {
-                refs.add(ref.asText().replaceFirst(COMPONENTS_PREFIX, ""));
+            if (ref != null) {
+                refs.add(ref.replaceFirst(COMPONENTS_PREFIX, ""));
             }
         });
         return refs;

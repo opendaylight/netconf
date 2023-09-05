@@ -8,8 +8,6 @@
 package org.opendaylight.restconf.openapi.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 import java.util.Map;
 
@@ -19,14 +17,23 @@ public record Operation(
         List<String> tags,
         List<Parameter> parameters,
         List<Map<String, List<String>>> security,
-        ArrayNode servers,
-        ObjectNode callbacks,
-        ObjectNode externalDocs,
-        ObjectNode requestBody,
-        ObjectNode responses,
+        List<Server> servers,
+        Map<String, Path> callbacks,
+        ExternalDocumentation externalDocs,
+        RequestBody requestBody,
+        Map<String, ResponseObject> responses,
         String description,
         String operationId,
         String summary) {
+
+    public Operation {
+        tags = tags == null ? null : List.copyOf(tags);
+        parameters = parameters == null ? null : List.copyOf(parameters);
+        security = security == null ? null : List.copyOf(security);
+        servers = servers == null ? null : List.copyOf(servers);
+        callbacks = callbacks == null ? null : Map.copyOf(callbacks);
+        responses = responses == null ? null : Map.copyOf(responses);
+    }
 
     private Operation(final Builder builder) {
         this(builder.deprecated, builder.tags, builder.parameters, builder.security, builder.servers, builder.callbacks,
@@ -40,11 +47,11 @@ public record Operation(
         private List<String> tags;
         private List<Parameter> parameters;
         private List<Map<String, List<String>>> security;
-        private ArrayNode servers;
-        private ObjectNode callbacks;
-        private ObjectNode externalDocs;
-        private ObjectNode requestBody;
-        private ObjectNode responses;
+        private List<Server> servers;
+        private Map<String, Path> callbacks;
+        private ExternalDocumentation externalDocs;
+        private RequestBody requestBody;
+        private Map<String, ResponseObject> responses;
         private String description;
         private String operationId;
         private String summary;
@@ -69,27 +76,27 @@ public record Operation(
             return this;
         }
 
-        public Builder servers(final ArrayNode servers) {
+        public Builder servers(final List<Server> servers) {
             this.servers = servers;
             return this;
         }
 
-        public Builder callbacks(final ObjectNode callbacks) {
+        public Builder callbacks(final Map<String, Path> callbacks) {
             this.callbacks = callbacks;
             return this;
         }
 
-        public Builder externalDocs(final ObjectNode externalDocs) {
+        public Builder externalDocs(final ExternalDocumentation externalDocs) {
             this.externalDocs = externalDocs;
             return this;
         }
 
-        public Builder requestBody(final ObjectNode requestBody) {
+        public Builder requestBody(final RequestBody requestBody) {
             this.requestBody = requestBody;
             return this;
         }
 
-        public Builder responses(final ObjectNode responses) {
+        public Builder responses(final Map<String, ResponseObject> responses) {
             this.responses = responses;
             return this;
         }
