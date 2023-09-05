@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7499d3ec_d96419bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-05T13:16:20Z",
+      "side": 1,
+      "message": "RFC uses special words to signify the requirements in specification.\nThere is no `MUST` or `SHOULD` within quoted description but only `MAY`.\n\nAccording to https://datatracker.ietf.org/doc/html/rfc2119#section-5\nMAY means \"that an item is truly optional\" and it\u0027s up to implementation either to include container or not. \n\nIn our implementation if there is a global error (transaction commit failed), __each__ edit-specific status will be __always__ a success (transaction operation before commit was successful). So it seems reasonable to omit this section as useless and confusing (some operation failed but it\u0027s also shown as being successful).\n\nOmitting `edit-status` container seems legit enough",
+      "parentUuid": "c6a95328_d1e61699",
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3d807825_3282ea1d",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchStatusBodyWriter.java",
         "patchSetId": 3
