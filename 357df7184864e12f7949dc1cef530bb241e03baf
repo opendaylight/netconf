@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c6a95328_d1e61699",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-09-05T08:51:35Z",
+      "side": 1,
+      "message": "My point here is that `edit-status` should exist regardless of global errors when the status of individual edit exists. The only exception when `edit-status` may be omitted is when `global-status` is okay. So global-errors \u0026 edit-status are not mutually exclusive and this change shouldn\u0027t be made.",
+      "parentUuid": "7132f546_26bcb647",
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3d807825_3282ea1d",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchStatusBodyWriter.java",
         "patchSetId": 3
