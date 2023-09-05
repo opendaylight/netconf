@@ -1,0 +1,176 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9db678bf_06b1facc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-05T12:23:18Z",
+      "side": 1,
+      "message": "Required some refactoring. Try avoid returning Builder where it is not necessary.",
+      "revId": "e3a75303c615ad7e85d81a311497559a1412f54f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0d3fac2_e6c36b56",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-05T12:23:18Z",
+      "side": 1,
+      "message": "Return Property here and in other places. Try avoid returning builder if it is not necessary",
+      "range": {
+        "startLine": 313,
+        "startChar": 19,
+        "endLine": 313,
+        "endChar": 35
+      },
+      "revId": "e3a75303c615ad7e85d81a311497559a1412f54f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c27a14f5_d3676cbc",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-05T12:23:18Z",
+      "side": 1,
+      "message": "dataNodeProperties.build()",
+      "range": {
+        "startLine": 332,
+        "startChar": 15,
+        "endLine": 332,
+        "endChar": 33
+      },
+      "revId": "e3a75303c615ad7e85d81a311497559a1412f54f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4eb9b29e_e3c3cb1c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 543,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-05T12:23:18Z",
+      "side": 1,
+      "message": "Do not return Builder if you can build object inside method.",
+      "revId": "e3a75303c615ad7e85d81a311497559a1412f54f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdbb6619_ee854809",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-05T12:23:18Z",
+      "side": 1,
+      "message": "property.build()",
+      "range": {
+        "startLine": 563,
+        "startChar": 15,
+        "endLine": 563,
+        "endChar": 23
+      },
+      "revId": "e3a75303c615ad7e85d81a311497559a1412f54f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbb9b2ed_de74243b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-05T12:23:18Z",
+      "side": 1,
+      "message": "Just return Property object here.",
+      "range": {
+        "startLine": 566,
+        "startChar": 19,
+        "endLine": 566,
+        "endChar": 35
+      },
+      "revId": "e3a75303c615ad7e85d81a311497559a1412f54f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96e772de_7c224844",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/DocGenTestHelper.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-05T12:23:18Z",
+      "side": 1,
+      "message": "Revert it",
+      "range": {
+        "startLine": 2,
+        "startChar": 19,
+        "endLine": 2,
+        "endChar": 42
+      },
+      "revId": "e3a75303c615ad7e85d81a311497559a1412f54f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b98ade3_d101879d",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-05T12:23:18Z",
+      "side": 1,
+      "message": "Revert it",
+      "range": {
+        "startLine": 2,
+        "startChar": 20,
+        "endLine": 2,
+        "endChar": 21
+      },
+      "revId": "e3a75303c615ad7e85d81a311497559a1412f54f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
