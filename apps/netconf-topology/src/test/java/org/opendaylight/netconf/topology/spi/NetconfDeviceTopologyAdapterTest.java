@@ -89,8 +89,8 @@ public class NetconfDeviceTopologyAdapterTest {
     @Test
     public void testFailedDevice() {
         // FIXME: exact match
-        doNothing().when(mockTx).mergeParentStructurePut(eq(LogicalDatastoreType.OPERATIONAL),
-            any(InstanceIdentifier.class), any(NetconfNode.class));
+        doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class),
+            any(NetconfNode.class));
 
         adapter.setDeviceAsFailed(null);
 
@@ -102,8 +102,9 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testDeviceUpdate() throws Exception {
-        doNothing().when(mockTx).mergeParentStructurePut(eq(LogicalDatastoreType.OPERATIONAL),
-            any(InstanceIdentifier.class), any(NetconfNode.class));
+        // FIXME: exact match
+        doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class),
+            any(NetconfNode.class));
         adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), new SessionIdType(Uint32.ONE));
 
         verify(mockChain, times(2)).newWriteOnlyTransaction();
@@ -133,7 +134,6 @@ public class NetconfDeviceTopologyAdapterTest {
         listeners.getValue().onTransactionChainSuccessful(mockChain);
         assertSame(Empty.value(), Futures.getDone(future));
     }
-
 
     @Test
     public void testShutdownCompletion() throws Exception {
