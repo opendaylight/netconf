@@ -91,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c5cbf115_c5d40c42",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-09-05T17:57:34Z",
+      "side": 1,
+      "message": "The current implementation for NETCONF puts errors into the global error even for the one that occurred for a specific edit operation, so it is actually confusing to see the ok\u0027s in `edit-status`. But it\u0027s because the error is in the wrong place.\n\nLet\u0027s assume a case where all the edits are successful and an error actually occurs during the commit phase. In that case seeing the ok\u0027s in the `edit-status` would make it more clear that the edit operations took place and they were successful but there was an error after. Not sure this would be clear to the people not very familiar with the implementation without `edit-status`.",
+      "parentUuid": "7499d3ec_d96419bd",
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3d807825_3282ea1d",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchStatusBodyWriter.java",
         "patchSetId": 3
