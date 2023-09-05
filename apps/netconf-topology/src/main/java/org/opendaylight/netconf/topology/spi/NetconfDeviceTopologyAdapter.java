@@ -88,7 +88,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         LOG.trace("{}: Update device state transaction {} merging operational data started.", id, tx.getIdentifier());
 
         // FIXME: this needs to be tied together with node's operational existence
-        tx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
+        tx.put(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
             newNetconfNodeBuilder(up, capabilities, sessionId).build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.", id, tx.getIdentifier());
         commitTransaction(tx, "update");
@@ -98,12 +98,11 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
             final NetconfDeviceCapabilities capabilities, final SessionIdType sessionId) {
         final var tx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.", id, tx.getIdentifier());
-        tx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
-            newNetconfNodeBuilder(up, capabilities, sessionId)
-                .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
-                    .setNetconfMasterNode(masterAddress)
-                    .build())
-                .build());
+        tx.put(LogicalDatastoreType.OPERATIONAL, netconfNodePath(), newNetconfNodeBuilder(up, capabilities, sessionId)
+            .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
+                .setNetconfMasterNode(masterAddress)
+                .build())
+            .build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.", id, tx.getIdentifier());
 
         commitTransaction(tx, "update");
@@ -119,7 +118,7 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
 
         final var tx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Setting device state as failed {} putting operational data started.", id, tx.getIdentifier());
-        tx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(), data);
+        tx.put(LogicalDatastoreType.OPERATIONAL, netconfNodePath(), data);
         LOG.trace("{}: Setting device state as failed {} putting operational data ended.", id, tx.getIdentifier());
         commitTransaction(tx, "update-failed-device");
     }
