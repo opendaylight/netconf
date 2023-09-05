@@ -19,11 +19,8 @@ import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SE
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.filterByRange;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.getSortedModules;
 import static org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
-import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.DESCRIPTION_KEY;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_TEMPLATE;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Range;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +43,7 @@ import org.opendaylight.restconf.openapi.model.Info;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
+import org.opendaylight.restconf.openapi.model.ResponseObject;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -259,10 +257,11 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             final String deviceName) {
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.GET, deviceName, "datastore", resourceType);
         final List<String> tags = List.of(deviceName + " GET root");
-        final ObjectNode okResponse = JsonNodeFactory.instance.objectNode();
-        okResponse.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
-        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
-        responses.set(String.valueOf(Response.Status.OK.getStatusCode()), okResponse);
+        final ResponseObject okResponse = new ResponseObject.Builder()
+            .description(Response.Status.OK.getReasonPhrase())
+            .build();
+        final Map<String, ResponseObject> responses = new HashMap<>();
+        responses.put(String.valueOf(Response.Status.OK.getStatusCode()), okResponse);
         return new Operation.Builder()
             .tags(tags)
             .responses(responses)

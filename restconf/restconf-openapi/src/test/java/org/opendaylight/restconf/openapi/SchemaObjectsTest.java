@@ -80,7 +80,7 @@ public class SchemaObjectsTest {
      * @return name of the schema used for operation
      */
     private static String extractSchemaName(final Operation operation) {
-        final var schemas = operation.requestBody().path("content").findValues("schema");
+        final var schemas = operation.requestBody().content().findValues("schema");
         // Find distinct schema refs
         final var references = schemas.stream().map(s -> s.findValues("$ref"))
                 .flatMap(Collection::stream).distinct().toList();

@@ -344,7 +344,7 @@ public final class OpenApiGeneratorRFC8040Test {
         final var jsonNodeCancelToast = doc.paths().get("/rests/operations/toaster2:cancel-toast");
         assertNull(jsonNodeCancelToast.get());
         // Test RPC with empty input
-        final var postContent = jsonNodeCancelToast.post().requestBody().get("content");
+        final var postContent = jsonNodeCancelToast.post().requestBody().content();
         final var jsonSchema = postContent.get("application/json").get("schema");
         assertNull(jsonSchema.get("$ref"));
         assertEquals(2, jsonSchema.size());
@@ -389,9 +389,9 @@ public final class OpenApiGeneratorRFC8040Test {
             final String expectedXmlRef) {
         final JsonNode postContent;
         if (operation.requestBody() != null) {
-            postContent = operation.requestBody().get("content");
+            postContent = operation.requestBody().content();
         } else {
-            postContent = operation.responses().get("200").get("content");
+            postContent = operation.responses().get("200").content();
         }
         assertNotNull(postContent);
         final var postJsonRef = postContent.get("application/json").get("schema").get("$ref");
@@ -405,9 +405,9 @@ public final class OpenApiGeneratorRFC8040Test {
     private static void verifyRequestRef(final Operation operation, final String expectedRef, final String nodeType) {
         final JsonNode postContent;
         if (operation.requestBody() != null) {
-            postContent = operation.requestBody().path("content");
+            postContent = operation.requestBody().content();
         } else {
-            postContent = operation.responses().path("200").path("content");
+            postContent = operation.responses().get("200").content();
         }
         assertNotNull(postContent);
         final String postJsonRef;
