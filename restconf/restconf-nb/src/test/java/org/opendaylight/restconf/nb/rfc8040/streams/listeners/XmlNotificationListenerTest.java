@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -168,9 +168,8 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
 
     private static String prepareXmlResult(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
-        final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
-                schemaPathNotifi, "xml-stream", NotificationOutputTypeGrouping.NotificationOutputType.XML);
-        return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false,
-                false, false, false).orElseThrow();
+        final var notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
+                schemaPathNotifi, "xml-stream", NotificationOutputType.XML);
+        return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }
 }

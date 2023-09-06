@@ -23,36 +23,36 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 final class JSONNotificationFormatter extends NotificationFormatter {
     private final JSONCodecFactorySupplier codecSupplier;
 
-    private JSONNotificationFormatter(final JSONCodecFactorySupplier codecSupplier) {
+    private JSONNotificationFormatter(final TextParameters textParams, final JSONCodecFactorySupplier codecSupplier) {
+        super(textParams);
         this.codecSupplier = requireNonNull(codecSupplier);
     }
 
-    private JSONNotificationFormatter(final String xpathFilter, final JSONCodecFactorySupplier codecSupplier)
-            throws XPathExpressionException {
-        super(xpathFilter);
+    private JSONNotificationFormatter(final TextParameters textParams, final String xpathFilter,
+            final JSONCodecFactorySupplier codecSupplier) throws XPathExpressionException {
+        super(textParams, xpathFilter);
         this.codecSupplier = requireNonNull(codecSupplier);
     }
 
     static NotificationFormatterFactory createFactory(final JSONCodecFactorySupplier codecSupplier) {
-        requireNonNull(codecSupplier);
-        return new NotificationFormatterFactory() {
+        final var empty = new JSONNotificationFormatter(TextParameters.EMPTY, codecSupplier);
+        return new NotificationFormatterFactory(empty) {
             @Override
-            public JSONNotificationFormatter getFormatter(final String xpathFilter)
+            JSONNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
                     throws XPathExpressionException {
-                return new JSONNotificationFormatter(xpathFilter, codecSupplier);
+                return new JSONNotificationFormatter(textParams, xpathFilter, codecSupplier);
             }
 
             @Override
-            public JSONNotificationFormatter getFormatter() {
-                return new JSONNotificationFormatter(codecSupplier);
+            JSONNotificationFormatter newFormatter(final TextParameters textParams) {
+                return new JSONNotificationFormatter(textParams, codecSupplier);
             }
         };
     }
 
     @Override
-    String createText(final EffectiveModelContext schemaContext, final DOMNotification input, final Instant now,
-            final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly,
-            final boolean childNodesOnly) throws IOException {
+    String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+            final DOMNotification input, final Instant now) throws IOException {
         final Writer writer = new StringWriter();
         final JsonWriter jsonWriter = new JsonWriter(writer).beginObject();
         jsonWriter.name("ietf-restconf:notification").beginObject();

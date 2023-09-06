@@ -61,13 +61,9 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
     private Registration registration;
 
     // FIXME: these should be final
+    private @NonNull EventFormatter<T> formatter;
     private Instant start = null;
     private Instant stop = null;
-    private boolean leafNodesOnly = false;
-    private boolean skipNotificationData = false;
-    private boolean changedLeafNodesOnly = false;
-    private boolean childNodesOnly = false;
-    private EventFormatter<T> formatter;
 
     AbstractCommonSubscriber(final String streamName, final NotificationOutputType outputType,
             final EventFormatterFactory<T> formatterFactory) {
@@ -76,7 +72,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
 
         this.outputType = requireNonNull(outputType);
         this.formatterFactory = requireNonNull(formatterFactory);
-        formatter = formatterFactory.getFormatter();
+        formatter = formatterFactory.emptyFormatter();
     }
 
     @Override
@@ -143,67 +139,35 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
         stop = stopTime == null ? null : parseDateAndTime(stopTime.value());
 
         final var leafNodes = params.leafNodesOnly();
-        leafNodesOnly = leafNodes != null && leafNodes.value();
-
         final var skipData = params.skipNotificationData();
-        skipNotificationData = skipData != null && skipData.value();
-
         final var changedLeafNodes = params.changedLeafNodesOnly();
-        changedLeafNodesOnly = changedLeafNodes != null && changedLeafNodes.value();
-
         final var childNodes = params.childNodesOnly();
-        childNodesOnly = childNodes != null && childNodes.value();
+
+        final var textParams = new TextParameters(
+            leafNodes != null && leafNodes.value(),
+            skipData != null && skipData.value(),
+            changedLeafNodes != null && changedLeafNodes.value(),
+            childNodes != null && childNodes.value());
 
         final var filter = params.filter();
-        final String filterValue = filter == null ? null : filter.paramValue();
+        final var filterValue = filter == null ? null : filter.paramValue();
+
+        final EventFormatter<T> newFormatter;
         if (filterValue != null && !filterValue.isEmpty()) {
             try {
-                formatter = formatterFactory.getFormatter(filterValue);
+                newFormatter = formatterFactory.getFormatter(textParams, filterValue);
             } catch (XPathExpressionException e) {
                 throw new IllegalArgumentException("Failed to get filter", e);
             }
         } else {
-            formatter = formatterFactory.getFormatter();
+            newFormatter = formatterFactory.getFormatter(textParams);
         }
+
+        // Single assign
+        formatter = newFormatter;
     }
 
-    /**
-     * Check whether this query should only notify about leaf node changes.
-     *
-     * @return true if this query should only notify about leaf node changes
-     */
-    final boolean getLeafNodesOnly() {
-        return leafNodesOnly;
-    }
-
-    /**
-     * Check whether this query should only notify about leaf node changes and report only changed nodes.
-     *
-     * @return true if this query should only notify about leaf node changes and report only changed nodes
-     */
-    final boolean getChangedLeafNodesOnly() {
-        return changedLeafNodesOnly;
-    }
-
-    /**
-     * Check whether this query should notify changes without data.
-     *
-     * @return true if this query should notify about changes with  data
-     */
-    final boolean isSkipNotificationData() {
-        return skipNotificationData;
-    }
-
-    /**
-     * Check whether this query should only notify about child node changes.
-     *
-     * @return true if this query should only notify about child node changes
-     */
-    final boolean getChildNodesOnly() {
-        return childNodesOnly;
-    }
-
-    final EventFormatter<T> formatter() {
+    final @NonNull EventFormatter<T> formatter() {
         return formatter;
     }
 

@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -52,13 +54,17 @@ abstract class EventFormatter<T> implements Immutable {
         DBF = f;
     }
 
+    private final TextParameters textParams;
     private final XPathExpression filter;
 
-    EventFormatter()  {
+    EventFormatter(final TextParameters textParams)  {
+        this.textParams = requireNonNull(textParams);
         filter = null;
     }
 
-    EventFormatter(final String xpathFilter)  throws XPathExpressionException {
+    EventFormatter(final TextParameters params, final String xpathFilter) throws XPathExpressionException {
+        textParams = requireNonNull(params);
+
         final XPath xpath;
         synchronized (XPF) {
             xpath = XPF.newXPath();
@@ -67,14 +73,12 @@ abstract class EventFormatter<T> implements Immutable {
         filter = xpath.compile(xpathFilter);
     }
 
-    final Optional<String> eventData(final EffectiveModelContext schemaContext, final T input, final Instant now,
-            final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly,
-            final boolean childNodeOnly) throws Exception {
+    final Optional<String> eventData(final EffectiveModelContext schemaContext, final T input, final Instant now)
+            throws Exception {
         if (!filterMatches(schemaContext, input, now)) {
             return Optional.empty();
         }
-        return Optional.ofNullable(
-                createText(schemaContext, input, now, leafNodesOnly, skipData, changedLeafNodesOnly, childNodeOnly));
+        return Optional.ofNullable(createText(textParams, schemaContext, input, now));
     }
 
     /**
@@ -90,18 +94,15 @@ abstract class EventFormatter<T> implements Immutable {
     /**
      * Format the input data into string representation of the data provided.
      *
+     * @param params output text parameters
      * @param schemaContext context to use for the export
      * @param input input data
      * @param now time the event happened
-     * @param leafNodesOnly option to include only leaves in the result
-     * @param skipData option to skip data in the result, only paths would be included
-     * @param changedLeafNodesOnly  option to include only changed leaves in the result
-     * @param childNodesOnly option to include only children in the result
      * @return String representation of the formatted data
      * @throws Exception if the underlying formatters fail to export the data to the requested format
      */
-    abstract String createText(EffectiveModelContext schemaContext, T input, Instant now, boolean leafNodesOnly,
-        boolean skipData, boolean changedLeafNodesOnly, boolean childNodeOnly) throws Exception;
+    abstract String createText(TextParameters params, EffectiveModelContext schemaContext, T input, Instant now)
+        throws Exception;
 
     private boolean filterMatches(final EffectiveModelContext schemaContext, final T input, final Instant now)
             throws IOException {
