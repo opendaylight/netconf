@@ -1,9 +1,10 @@
 {
-    "urn-ietf-params-xml-ns-netconf-notification-1.0:notification":{
-        "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification":{
+    "ietf-restconf:notification":{
+        "event-time":"2020-10-14T11:16:51.111635+02:00",
+        "sal-remote:data-changed-notification":{
             "data-change-event":[
                 {
-                    "path":"/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']",
+                    "path":"/instance-identifier-patch-module:patch-cont/my-list1[name='Althea']",
                     "operation":"updated",
                     "data":{
                         "instance-identifier-patch-module:my-list1":[
@@ -15,7 +16,6 @@
                     }
                 }
             ]
-        },
-        "event-time":"2020-10-14T11:16:51.111635+02:00"
+        }
     }
 }

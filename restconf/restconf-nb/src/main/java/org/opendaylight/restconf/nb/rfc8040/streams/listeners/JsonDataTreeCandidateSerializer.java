@@ -8,19 +8,28 @@
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter.createNestedWriter;
 
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Collection;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
+import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<IOException> {
+    private static final XMLNamespace SAL_REMOTE_NS = DataChangedNotification.QNAME.getNamespace();
+    private static final Absolute DATA_CHANGE_EVENT = Absolute.of(DataChangedNotification.QNAME, DataChangeEvent.QNAME);
+
     private final JSONCodecFactorySupplier codecSupplier;
     private final JsonWriter jsonWriter;
 
@@ -36,35 +45,31 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
             final DataTreeCandidateNode candidate, final boolean skipData) throws IOException {
         jsonWriter.beginObject();
 
-        final var codecs = codecSupplier.getShared(parent.getEffectiveModelContext());
-        try (var nestedWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, parent, null, jsonWriter)) {
-            serializePath(dataPath);
+        final var modificationType = candidate.modificationType();
+        if (modificationType != ModificationType.UNMODIFIED) {
+            final var codecs = codecSupplier.getShared(parent.getEffectiveModelContext());
+            try (var writer = createNestedWriter(codecs, DATA_CHANGE_EVENT, SAL_REMOTE_NS, jsonWriter)) {
+                writer.startLeafNode(PATH_NID);
+                writer.scalarValue(YangInstanceIdentifier.of(dataPath));
+                writer.endNode();
+
+                writer.startLeafNode(OPERATION_NID);
+                writer.scalarValue(modificationTypeToOperation(candidate));
+                writer.endNode();
+            }
 
             if (!skipData) {
                 final var dataAfter = getDataAfter(candidate);
                 if (dataAfter != null) {
                     jsonWriter.name("data").beginObject();
-                    NormalizedNodeWriter.forStreamWriter(nestedWriter).write(dataAfter).flush();
+                    try (var writer = createNestedWriter(codecs, parent, SAL_REMOTE_NS, jsonWriter)) {
+                        NormalizedNodeWriter.forStreamWriter(writer).write(dataAfter).flush();
+                    }
                     jsonWriter.endObject();
                 }
             }
-
-            serializeOperation(candidate);
         }
 
         jsonWriter.endObject();
-    }
-
-    @Override
-    void serializeOperation(final DataTreeCandidateNode candidate)
-            throws IOException {
-        jsonWriter.name("operation").value(modificationTypeToOperation(candidate, candidate.modificationType()));
-    }
-
-    @Override
-    void serializePath(final Collection<PathArgument> pathArguments)
-            throws IOException {
-        // FIXME: use proper JSON codec for YangInstanceIdentifier
-        jsonWriter.name("path").value(convertPath(pathArguments));
     }
 }
