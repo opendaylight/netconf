@@ -9,21 +9,15 @@ package org.opendaylight.netconf.topology.spi;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.LoginPwBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.login.pw.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceOutputBuilder;
@@ -51,13 +45,10 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyRPCProvider.class);
 
     private final @NonNull InstanceIdentifier<Topology> topologyPath;
-    private final @NonNull AAAEncryptionService encryptionService;
     private final @NonNull DataBroker dataBroker;
 
-    public NetconfTopologyRPCProvider(final DataBroker dataBroker, final AAAEncryptionService encryptionService,
-                                      final String topologyId) {
+    public NetconfTopologyRPCProvider(final DataBroker dataBroker, final String topologyId) {
         this.dataBroker = requireNonNull(dataBroker);
-        this.encryptionService = requireNonNull(encryptionService);
         topologyPath = InstanceIdentifier.builder(NetworkTopology.class)
                 .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
                 .build();
@@ -69,7 +60,9 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
 
     @Override
     public final ListenableFuture<RpcResult<CreateDeviceOutput>> createDevice(final CreateDeviceInput input) {
-        final NetconfNode node = encryptPassword(input);
+        final NetconfNodeBuilder builder = new NetconfNodeBuilder();
+        builder.fieldsFrom(input);
+        final NetconfNode node = builder.build();
         final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult = SettableFuture.create();
         final NodeId nodeId = new NodeId(input.getNodeId());
         writeToConfigDS(node, nodeId, futureResult);
@@ -103,31 +96,6 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
         }, MoreExecutors.directExecutor());
 
         return rpcFuture;
-    }
-
-    @VisibleForTesting
-    NetconfNode encryptPassword(final CreateDeviceInput input) {
-        final NetconfNodeBuilder builder = new NetconfNodeBuilder();
-        builder.fieldsFrom(input);
-
-        return builder.setCredentials(handleEncryption(input.getCredentials()))
-            .build();
-    }
-
-    private Credentials handleEncryption(final Credentials credentials) {
-        if (credentials instanceof LoginPw loginPw) {
-            final var loginPassword = loginPw.getLoginPassword();
-
-            return new LoginPwBuilder()
-                .setLoginPassword(new LoginPasswordBuilder()
-                    .setUsername(loginPassword.getUsername())
-                    .setPassword(encryptionService.encrypt(loginPassword.getPassword()))
-                    .build())
-                .build();
-        }
-
-        // nothing else needs to be encrypted
-        return credentials;
     }
 
     private void writeToConfigDS(final NetconfNode node, final NodeId nodeId,

@@ -61,5 +61,11 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-test-models</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
