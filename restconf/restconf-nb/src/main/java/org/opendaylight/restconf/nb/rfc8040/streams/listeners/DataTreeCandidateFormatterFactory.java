@@ -8,14 +8,10 @@
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import java.util.Collection;
-import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 
-interface DataTreeCandidateFormatterFactory extends EventFormatterFactory<Collection<DataTreeCandidate>> {
-
-    @Override
-    DataTreeCandidateFormatter getFormatter();
-
-    @Override
-    DataTreeCandidateFormatter getFormatter(String xpathFilter) throws XPathExpressionException;
+abstract class DataTreeCandidateFormatterFactory extends EventFormatterFactory<Collection<DataTreeCandidate>> {
+    DataTreeCandidateFormatterFactory(final DataTreeCandidateFormatter emptyFormatter) {
+        super(emptyFormatter);
+    }
 }

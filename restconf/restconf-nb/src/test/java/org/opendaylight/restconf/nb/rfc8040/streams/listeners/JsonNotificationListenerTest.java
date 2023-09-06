@@ -183,9 +183,8 @@ public class JsonNotificationListenerTest {
 
     private static String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
-        final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
+        final var notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
                 schemaPathNotifi, "json-stream", NotificationOutputType.JSON);
-        return notifiAdapter.formatter()
-                .eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false, false, false, false).orElseThrow();
+        return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }
 }
