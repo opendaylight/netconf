@@ -57,8 +57,6 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,16 +147,15 @@ public final class RestconfInvokeOperationsServiceImpl {
         final var schemaContext = dataBind.modelContext();
         final var context = ParserIdentifier.toInstanceIdentifier(identifier, schemaContext, mountPointService);
 
-        final var holder = new NormalizationResultHolder();
-        try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
-            body.streamTo(context.inference(), streamWriter);
+        final ContainerNode input;
+        try {
+            input = body.toContainerNode(context.inference());
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, e);
         }
         final var rpcName = context.getSchemaNode().getQName();
-        final var input = (ContainerNode) holder.getResult().data();
 
         final ListenableFuture<? extends DOMRpcResult> future;
         final var mountPoint = context.getMountPoint();
