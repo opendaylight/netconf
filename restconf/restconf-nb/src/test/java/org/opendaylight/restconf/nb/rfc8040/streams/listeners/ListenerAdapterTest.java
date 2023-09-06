@@ -461,8 +461,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     static String withFakeDate(final String in) throws JSONException {
         final JSONObject doc = new JSONObject(in);
-        final JSONObject notification =
-                doc.getJSONObject("urn-ietf-params-xml-ns-netconf-notification-1.0:notification");
+        final JSONObject notification = doc.getJSONObject("ietf-restconf:notification");
         if (notification == null) {
             return in;
         }

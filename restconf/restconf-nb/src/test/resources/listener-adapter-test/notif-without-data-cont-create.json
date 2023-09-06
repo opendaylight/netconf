@@ -1,6 +1,6 @@
 {
-    "urn-ietf-params-xml-ns-netconf-notification-1.0:notification":{
-        "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification":{
+    "ietf-restconf:notification":{
+        "sal-remote:data-changed-notification":{
             "data-change-event":[
                 {
                     "path":"/instance-identifier-patch-module:patch-cont",
