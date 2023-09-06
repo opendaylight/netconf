@@ -109,7 +109,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
         dtclReg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(
             LogicalDatastoreType.CONFIGURATION, createTopologyListPath(topologyId).child(Node.class)), this);
         rpcReg = rpcProviderService.registerRpcImplementation(NetconfNodeTopologyService.class,
-            new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId));
+            new NetconfTopologyRPCProvider(dataBroker, topologyId));
     }
 
     @PreDestroy
