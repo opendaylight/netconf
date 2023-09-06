@@ -16,28 +16,22 @@ import java.time.Instant;
 import java.util.Collection;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
-    private static final @NonNull String NOTIFICATION_NAME;
+    private static final @NonNull String NOTIFICATION_NAME = "ietf-restconf:notification";
+
     private static final @NonNull String DATA_CHANGED_NOTIFICATION_NAME;
     private static final @NonNull String DATA_CHANGED_EVENT_NAME = DataChangeEvent.QNAME.getLocalName();
 
-    // FIXME: JSON codec operating on XMLNamespace values?! This really should be module names, right?
     static {
-        final var sb = new StringBuilder();
-        AbstractWebsocketSerializer.appendQName(sb, QName.create(NamespaceURN.NOTIFICATION, "notification"));
-        NOTIFICATION_NAME = sb.toString();
-
-        sb.setLength(0);
-        AbstractWebsocketSerializer.appendQName(sb, DataChangedNotification.QNAME);
-        DATA_CHANGED_NOTIFICATION_NAME = sb.toString();
+        final var salRemoteName = $YangModuleInfoImpl.getInstance().getName().getLocalName();
+        DATA_CHANGED_NOTIFICATION_NAME = salRemoteName + ":" + DataChangedNotification.QNAME.getLocalName();
     }
 
     private final JSONCodecFactorySupplier codecSupplier;

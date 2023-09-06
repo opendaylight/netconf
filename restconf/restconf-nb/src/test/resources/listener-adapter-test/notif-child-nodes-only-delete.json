@@ -1,13 +1,13 @@
 {
-    "urn-ietf-params-xml-ns-netconf-notification-1.0:notification":{
-        "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification":{
+    "ietf-restconf:notification":{
+        "event-time":"2020-10-14T11:20:33.271836+02:00",
+        "sal-remote:data-changed-notification":{
             "data-change-event":[
                 {
                     "path":"/instance-identifier-patch-module:patch-cont",
                     "operation":"deleted"
                 }
             ]
-        },
-        "event-time":"2020-10-14T11:20:33.271836+02:00"
+        }
     }
 }
