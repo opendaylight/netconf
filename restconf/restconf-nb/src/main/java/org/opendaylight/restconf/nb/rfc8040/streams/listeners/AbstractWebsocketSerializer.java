@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
@@ -37,6 +39,8 @@ import org.slf4j.LoggerFactory;
 
 abstract class AbstractWebsocketSerializer<T extends Exception> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractWebsocketSerializer.class);
+    static final @NonNull QName PATH_QNAME = QName.create(DataChangeEvent.QNAME, "path").intern();
+    static final @NonNull NodeIdentifier PATH_NID = NodeIdentifier.create(PATH_QNAME);
 
     private final EffectiveModelContext context;
 
@@ -166,8 +170,6 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         return before != null && after != null && before.body().equals(after.body());
     }
 
-    abstract void serializePath(Collection<PathArgument> pathArguments) throws T;
-
     abstract void serializeOperation(DataTreeCandidateNode candidate) throws T;
 
     static final @Nullable NormalizedNode getDataAfter(final DataTreeCandidateNode candidate) {
@@ -176,37 +178,6 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
             return ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).withChild(mapEntry).build();
         }
         return data;
-    }
-
-    // FIXME: What is this method doing, really?!
-    //        It seems to be encoding the YangInstanceIdentifier equivalent of the path, which we have expressed as
-    //        a Deque.
-    //
-    //        The output looks like a mutant version of XML encoding, but the QNames are encoded in a very bad
-    //        <namespace>:<localName>, with the actual namespace additionally having converted all ':'s to '-'s.
-    //
-    //        Who is interpreting this output? Can we eliminate the replacement with the acknowledgement that
-    //        a localName cannot hold a ':' so the string is split using String.lastIndexOf(':')?
-    @Deprecated
-    static final String convertPath(final Collection<PathArgument> path) {
-        final var sb = new StringBuilder();
-
-        for (var pathArgument : path) {
-            sb.append('/');
-            appendQName(sb, pathArgument.getNodeType());
-
-            if (pathArgument instanceof NodeIdentifierWithPredicates nip) {
-                sb.append("[");
-                for (var key : nip.entrySet()) {
-                    appendQName(sb, key.getKey());
-                    // FIXME: no escaping here?
-                    sb.append("='").append(key.getValue().toString()).append('\'');
-                }
-                sb.append(']');
-            }
-        }
-
-        return sb.toString();
     }
 
     @Deprecated

@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Collection;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
@@ -36,9 +37,11 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
             final DataTreeCandidateNode candidate, final boolean skipData) throws IOException {
         jsonWriter.beginObject();
 
-        final var codecs = codecSupplier.getShared(parent.getEffectiveModelContext());
-        try (var nestedWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, parent, null, jsonWriter)) {
-            serializePath(dataPath);
+        try (var nestedWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
+                codecSupplier.getShared(parent.getEffectiveModelContext()), parent, null, jsonWriter)) {
+            nestedWriter.startLeafNode(PATH_NID);
+            nestedWriter.scalarValue(YangInstanceIdentifier.of(dataPath));
+            nestedWriter.endNode();
 
             if (!skipData) {
                 final var dataAfter = getDataAfter(candidate);
@@ -59,12 +62,5 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     void serializeOperation(final DataTreeCandidateNode candidate)
             throws IOException {
         jsonWriter.name("operation").value(modificationTypeToOperation(candidate, candidate.modificationType()));
-    }
-
-    @Override
-    void serializePath(final Collection<PathArgument> pathArguments)
-            throws IOException {
-        // FIXME: use proper JSON codec for YangInstanceIdentifier
-        jsonWriter.name("path").value(convertPath(pathArguments));
     }
 }
