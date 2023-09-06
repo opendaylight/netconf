@@ -8,8 +8,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.base.MoreObjects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -48,10 +46,14 @@ public final class NotificationQueryParams implements Immutable {
             final FilterParam filter, final LeafNodesOnlyParam leafNodesOnly,
             final SkipNotificationDataParam skipNotificationData,
             final ChangedLeafNodesOnlyParam changedLeafNodesOnly) {
-        checkArgument(stopTime == null || startTime != null,
-            "Stop-time parameter has to be used with start-time parameter.");
-        checkArgument(changedLeafNodesOnly == null || leafNodesOnly == null,
-            "ChangedLeafNodesOnly parameter cannot be used with leafNodesOnlyParameter.");
+        if (stopTime != null && startTime == null) {
+            throw new IllegalArgumentException(StopTimeParam.uriName + " parameter has to be used with "
+                + StartTimeParam.uriName + " parameter");
+        }
+        if (changedLeafNodesOnly != null && leafNodesOnly != null) {
+            throw new IllegalArgumentException(ChangedLeafNodesOnlyParam.uriName + " parameter cannot be used with "
+                + LeafNodesOnlyParam.uriName + " parameter");
+        }
         return new NotificationQueryParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
                 changedLeafNodesOnly);
     }
