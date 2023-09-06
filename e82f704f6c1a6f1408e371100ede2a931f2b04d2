@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fb8f450_3880de7a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-06T12:14:34Z",
+      "side": 1,
+      "message": "Can we use this?\n\n```\n    private static Set\u003cParameter\u003e buildPathParameters(final Map\u003cString, String\u003e param) {\n        return param.entrySet().stream()\n            .map(entry -\u003e new Parameter.Builder()\n                .name(entry.getKey())\n                .schema(new Schema.Builder().type(\"string\").build())\n                .in(\"path\")\n                .required(true)\n                .description(entry.getValue())\n                .build())\n            .collect(Collectors.toSet());\n    }\n```\n\n- This method will return an immutable set, so no need for creating a copy of set\u003cParameters\u003e.\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/106941/28/restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java#77\n\nAnd others...\n\n- It will be initialized with fixed size e.g. \n\"final Set\u003cParameter\u003e parameters \u003d new HashSet\u003c\u003e(param.size());\"",
+      "revId": "e82f704f6c1a6f1408e371100ede2a931f2b04d2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
