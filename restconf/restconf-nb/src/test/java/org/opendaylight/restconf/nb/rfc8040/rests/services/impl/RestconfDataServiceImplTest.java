@@ -331,6 +331,21 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
+    public void testPostExistingData() {
+        doReturn(immediateTrueFluentFuture())
+            .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
+
+        final var ex = assertThrows(RestconfDocumentedException.class, () -> {
+            dataService.postData(NormalizedNodePayload.of(
+                InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID), GAP_LEAF),
+                uriInfo);
+        });
+        final var error = ex.getErrors().get(0);
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.DATA_EXISTS, error.getErrorTag());
+    }
+
+    @Test
     public void testPostMapEntryData() {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         final var node = PLAYLIST_IID.node(BAND_ENTRY.name());

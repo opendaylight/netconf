@@ -139,11 +139,11 @@ public final class TransactionUtil {
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
                         return new RestconfDocumentedException(ex, new RestconfError(ErrorType.PROTOCOL,
-                            ErrorTag.DATA_EXISTS, "Data already exists", path));
+                            ErrorTag.DATA_EXISTS, "Data already exists at path: " + path));
                     } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
                         return new RestconfDocumentedException(ex, new RestconfError(ErrorType.PROTOCOL,
-                            ErrorTag.DATA_MISSING, "Data does not exist", path));
+                            ErrorTag.DATA_MISSING, "Data does not exist at path: " + path));
                     }
                 } else if (error instanceof NetconfDocumentedException netconfError) {
                     return new RestconfDocumentedException(netconfError.getMessage(), netconfError.getErrorType(),

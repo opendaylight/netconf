@@ -170,8 +170,8 @@ public final class PostDataTransactionUtil {
                                               final YangInstanceIdentifier path) {
         if (TransactionUtil.syncAccess(existsFuture, path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
-            throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
-                path);
+            throw new RestconfDocumentedException("Data already exists at path: " + path, ErrorType.PROTOCOL,
+                ErrorTag.DATA_EXISTS);
         }
     }
 }
