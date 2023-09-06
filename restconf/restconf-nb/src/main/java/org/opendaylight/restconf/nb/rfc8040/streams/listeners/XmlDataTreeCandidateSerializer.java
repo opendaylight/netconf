@@ -54,6 +54,7 @@ final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<E
     @Override
     public void serializePath(final Collection<PathArgument> pathArguments) throws XMLStreamException {
         xmlWriter.writeStartElement("path");
+        // FIXME: use proper XML codec for YangInstanceIdentifier
         xmlWriter.writeCharacters(convertPath(pathArguments));
         xmlWriter.writeEndElement();
     }

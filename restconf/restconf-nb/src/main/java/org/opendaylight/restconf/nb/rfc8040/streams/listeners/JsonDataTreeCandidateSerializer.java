@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Collection;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -64,8 +63,9 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     }
 
     @Override
-    void serializePath(final Collection<YangInstanceIdentifier.PathArgument> pathArguments)
+    void serializePath(final Collection<PathArgument> pathArguments)
             throws IOException {
+        // FIXME: use proper JSON codec for YangInstanceIdentifier
         jsonWriter.name("path").value(convertPath(pathArguments));
     }
 }
