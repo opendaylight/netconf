@@ -402,6 +402,19 @@ public class RestconfDataServiceImplTest {
     }
 
     @Test
+    public void testPostExistingData() {
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
+        doReturn(immediateTrueFluentFuture())
+            .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
+
+        final var ex = assertThrows(RestconfDocumentedException.class, () -> dataService.postData(payload, uriInfo));
+        final var error = ex.getErrors().get(0);
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.DATA_EXISTS, error.getErrorTag());
+    }
+
+    @Test
     public void testDeleteData() {
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidBase);
         doReturn(immediateTrueFluentFuture())
