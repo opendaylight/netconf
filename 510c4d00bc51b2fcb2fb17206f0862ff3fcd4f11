@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9905790d_d51131d0",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-06T19:35:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5336582b_537180d5",
+      "revId": "510c4d00bc51b2fcb2fb17206f0862ff3fcd4f11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f471a7bd_29fd38af",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-06T14:57:45Z",
       "side": 1,
       "message": "Is correct that this test throws?\n```\nbuilderFactory.createClientConfigurationBuilder(\n    Uri{value\u003dtesting-node},\n    NetconfNode{betweenAttemptsTimeoutMillis\u003d100, concurrentRpcLimit\u003d1, connectionTimeoutMillis\u003d1000, credentials\u003dLoginPassword{password\u003dtestpassword, username\u003dtestuser}, defaultRequestTimeoutMillis\u003d1000, keepaliveDelay\u003d1000, maxConnectionAttempts\u003d2, reconnectOnChangedSchema\u003dtrue, schemaless\u003dtrue, sleepFactor\u003d1.5, tcpOnly\u003dtrue}\n); was not stubbed\n```",
+      "revId": "510c4d00bc51b2fcb2fb17206f0862ff3fcd4f11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76061890_e7368f5f",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-06T19:35:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f471a7bd_29fd38af",
       "revId": "510c4d00bc51b2fcb2fb17206f0862ff3fcd4f11",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
