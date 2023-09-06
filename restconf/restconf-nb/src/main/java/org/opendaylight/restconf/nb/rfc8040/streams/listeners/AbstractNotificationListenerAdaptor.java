@@ -50,8 +50,7 @@ abstract class AbstractNotificationListenerAdaptor extends AbstractCommonSubscri
 
         final Optional<String> maybeOutput;
         try {
-            maybeOutput = formatter().eventData(effectiveModel(), notification, eventInstant, getLeafNodesOnly(),
-                isSkipNotificationData(), getChangedLeafNodesOnly(), getChildNodesOnly());
+            maybeOutput = formatter().eventData(effectiveModel(), notification, eventInstant);
         } catch (Exception e) {
             LOG.error("Failed to process notification {}", notification, e);
             return;

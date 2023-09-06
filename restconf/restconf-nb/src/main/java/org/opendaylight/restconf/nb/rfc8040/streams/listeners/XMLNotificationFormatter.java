@@ -18,32 +18,33 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStr
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 final class XMLNotificationFormatter extends NotificationFormatter {
-    private static final XMLNotificationFormatter INSTANCE = new XMLNotificationFormatter();
+    private static final XMLNotificationFormatter EMPTY = new XMLNotificationFormatter(TextParameters.EMPTY);
 
-    static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory() {
+    static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory(EMPTY) {
         @Override
-        public XMLNotificationFormatter getFormatter(final String xpathFilter) throws XPathExpressionException {
-            return new XMLNotificationFormatter(xpathFilter);
+        XMLNotificationFormatter newFormatter(final TextParameters textParams) {
+            return new XMLNotificationFormatter(textParams);
         }
 
         @Override
-        public XMLNotificationFormatter getFormatter() {
-            return INSTANCE;
+        XMLNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+                throws XPathExpressionException {
+            return new XMLNotificationFormatter(textParams, xpathFilter);
         }
     };
 
-    XMLNotificationFormatter() {
-
+    XMLNotificationFormatter(final TextParameters textParams) {
+        super(textParams);
     }
 
-    XMLNotificationFormatter(final String xpathFilter) throws XPathExpressionException {
-        super(xpathFilter);
+    XMLNotificationFormatter(final TextParameters textParams, final String xpathFilter)
+            throws XPathExpressionException {
+        super(textParams, xpathFilter);
     }
 
     @Override
-    String createText(final EffectiveModelContext schemaContext, final DOMNotification input, final Instant now,
-            final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly,
-            final boolean childNodesOnly) throws IOException {
+    String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+            final DOMNotification input, final Instant now) throws IOException {
         final var writer = new StringWriter();
 
         try {

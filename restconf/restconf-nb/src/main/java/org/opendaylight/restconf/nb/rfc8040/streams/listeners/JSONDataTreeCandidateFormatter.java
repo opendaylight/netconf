@@ -25,37 +25,38 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
     public static final String NETCONF_NOTIFICATION_NAMESPACE = "urn-ietf-params-xml-ns-netconf-notification-1.0";
     private final JSONCodecFactorySupplier codecSupplier;
 
-    private JSONDataTreeCandidateFormatter(final JSONCodecFactorySupplier codecSupplier) {
+    private JSONDataTreeCandidateFormatter(final TextParameters textParams,
+            final JSONCodecFactorySupplier codecSupplier) {
+        super(textParams);
         this.codecSupplier = requireNonNull(codecSupplier);
     }
 
-    private JSONDataTreeCandidateFormatter(final String xpathFilter, final JSONCodecFactorySupplier codecSupplier)
-            throws XPathExpressionException {
-        super(xpathFilter);
+    private JSONDataTreeCandidateFormatter(final TextParameters textParams, final String xpathFilter,
+            final JSONCodecFactorySupplier codecSupplier) throws XPathExpressionException {
+        super(textParams, xpathFilter);
         this.codecSupplier = requireNonNull(codecSupplier);
     }
 
     public static DataTreeCandidateFormatterFactory createFactory(
             final JSONCodecFactorySupplier codecSupplier) {
-        requireNonNull(codecSupplier);
-        return new DataTreeCandidateFormatterFactory() {
+        final var empty = new JSONDataTreeCandidateFormatter(TextParameters.EMPTY, codecSupplier);
+        return new DataTreeCandidateFormatterFactory(empty) {
             @Override
-            public DataTreeCandidateFormatter getFormatter(final String xpathFilter)
-                    throws XPathExpressionException {
-                return new JSONDataTreeCandidateFormatter(xpathFilter, codecSupplier);
+            DataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
+                return new JSONDataTreeCandidateFormatter(textParams, codecSupplier);
             }
 
             @Override
-            public DataTreeCandidateFormatter getFormatter() {
-                return new JSONDataTreeCandidateFormatter(codecSupplier);
+            DataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+                    throws XPathExpressionException {
+                return new JSONDataTreeCandidateFormatter(textParams, xpathFilter, codecSupplier);
             }
         };
     }
 
     @Override
-    String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
-            final Instant now, final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly,
-            final boolean childNodesOnly) throws IOException {
+    String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+            final Collection<DataTreeCandidate> input, final Instant now) throws IOException {
         final Writer writer = new StringWriter();
         final JsonWriter jsonWriter = new JsonWriter(writer).beginObject();
 
@@ -66,7 +67,7 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
         final var serializer = new JsonDataTreeCandidateSerializer(schemaContext, codecSupplier, jsonWriter);
         boolean nonEmpty = false;
         for (var candidate : input) {
-            nonEmpty |= serializer.serialize(candidate, leafNodesOnly, skipData, changedLeafNodesOnly, childNodesOnly);
+            nonEmpty |= serializer.serialize(candidate, params);
         }
 
         // data-change-event

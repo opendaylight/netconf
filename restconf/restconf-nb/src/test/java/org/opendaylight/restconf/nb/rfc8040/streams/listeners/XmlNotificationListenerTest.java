@@ -168,9 +168,8 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
 
     private static String prepareXmlResult(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
-        final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
+        final var notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
                 schemaPathNotifi, "xml-stream", NotificationOutputTypeGrouping.NotificationOutputType.XML);
-        return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false,
-                false, false, false).orElseThrow();
+        return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }
 }
