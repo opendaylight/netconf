@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -51,7 +50,7 @@ public final class XmlResourceBody extends ResourceBody {
             }
 
             xmlParser.traverse(new DOMSource(docRoot));
-        } catch (SAXException | URISyntaxException | XMLStreamException e) {
+        } catch (SAXException | XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
             RestconfDocumentedException.throwIfYangError(e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
