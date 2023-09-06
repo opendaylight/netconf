@@ -20,34 +20,33 @@ import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
-    private static final XMLDataTreeCandidateFormatter INSTANCE = new XMLDataTreeCandidateFormatter();
+    private static final XMLDataTreeCandidateFormatter EMPTY = new XMLDataTreeCandidateFormatter(TextParameters.EMPTY);
 
-    static final DataTreeCandidateFormatterFactory FACTORY =
-        new DataTreeCandidateFormatterFactory() {
-            @Override
-            public XMLDataTreeCandidateFormatter getFormatter(final String xpathFilter)
-                    throws XPathExpressionException {
-                return new XMLDataTreeCandidateFormatter(xpathFilter);
-            }
+    static final DataTreeCandidateFormatterFactory FACTORY = new DataTreeCandidateFormatterFactory(EMPTY) {
+        @Override
+        XMLDataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+                throws XPathExpressionException {
+            return new XMLDataTreeCandidateFormatter(textParams, xpathFilter);
+        }
 
-            @Override
-            public XMLDataTreeCandidateFormatter getFormatter() {
-                return INSTANCE;
-            }
-        };
+        @Override
+        XMLDataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
+            return new XMLDataTreeCandidateFormatter(textParams);
+        }
+    };
 
-    private XMLDataTreeCandidateFormatter() {
-
+    private XMLDataTreeCandidateFormatter(final TextParameters textParams) {
+        super(textParams);
     }
 
-    private XMLDataTreeCandidateFormatter(final String xpathFilter) throws XPathExpressionException {
-        super(xpathFilter);
+    private XMLDataTreeCandidateFormatter(final TextParameters textParams, final String xpathFilter)
+            throws XPathExpressionException {
+        super(textParams, xpathFilter);
     }
 
     @Override
-    String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
-            final Instant now, final boolean leafNodesOnly, final boolean skipData, final boolean changedLeafNodesOnly,
-            final boolean childNodeOnly) throws Exception {
+    String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+            final Collection<DataTreeCandidate> input, final Instant now) throws Exception {
         final var writer = new StringWriter();
         boolean nonEmpty = false;
         try {
@@ -58,8 +57,7 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
             final var serializer = new XmlDataTreeCandidateSerializer(schemaContext, xmlStreamWriter);
             for (var candidate : input) {
-                nonEmpty |= serializer.serialize(candidate, leafNodesOnly, skipData, changedLeafNodesOnly,
-                    childNodeOnly);
+                nonEmpty |= serializer.serialize(candidate, params);
             }
 
             // data-changed-notification

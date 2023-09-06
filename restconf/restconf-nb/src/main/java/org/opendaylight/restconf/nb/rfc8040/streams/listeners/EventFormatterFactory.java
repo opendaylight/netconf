@@ -7,11 +7,30 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static java.util.Objects.requireNonNull;
+
 import javax.xml.xpath.XPathExpressionException;
+import org.eclipse.jdt.annotation.NonNull;
 
-interface EventFormatterFactory<T> {
+abstract class EventFormatterFactory<T> {
+    private final @NonNull EventFormatter<T> emptyFormatter;
 
-    EventFormatter<T> getFormatter();
+    EventFormatterFactory(final EventFormatter<T> emptyFormatter) {
+        this.emptyFormatter = requireNonNull(emptyFormatter);
+    }
 
-    EventFormatter<T> getFormatter(String xpathFilter) throws XPathExpressionException;
+    final @NonNull EventFormatter<T> emptyFormatter() {
+        return emptyFormatter;
+    }
+
+    final @NonNull EventFormatter<T> getFormatter(final @NonNull TextParameters textParamaters) {
+        return textParamaters.equals(TextParameters.EMPTY) ? emptyFormatter : newFormatter(textParamaters);
+    }
+
+    abstract @NonNull EventFormatter<T> getFormatter(@NonNull TextParameters textParamaters, String xpathFilter)
+        throws XPathExpressionException;
+
+    abstract @NonNull EventFormatter<T> newFormatter(@NonNull TextParameters textParamaters);
+
+
 }
