@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f6b21f5_999bf61d",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 871,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-06T10:17:19Z",
+      "side": 1,
+      "message": "Please can you remove this method. Now they are not required.",
+      "range": {
+        "startLine": 829,
+        "startChar": 0,
+        "endLine": 871,
+        "endChar": 37
+      },
+      "revId": "72d12afbe4c25c7d70376996a6ce32ac2db653ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb14aae2_b7c385f4",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/OperationalDataTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-06T10:17:19Z",
+      "side": 1,
+      "message": "Can you please remove this method. Now it is not required.",
+      "revId": "72d12afbe4c25c7d70376996a6ce32ac2db653ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
