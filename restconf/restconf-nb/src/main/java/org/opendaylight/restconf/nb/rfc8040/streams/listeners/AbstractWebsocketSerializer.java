@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -176,30 +177,39 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         return data;
     }
 
+    // FIXME: What is this method doing, really?!
+    //        It seems to be encoding the YangInstanceIdentifier equivalent of the path, which we have expressed as
+    //        a Deque.
+    //
+    //        The output looks like a mutant version of XML encoding, but the QNames are encoded in a very bad
+    //        <namespace>:<localName>, with the actual namespace additionally having converted all ':'s to '-'s.
+    //
+    //        Who is interpreting this output? Can we eliminate the replacement with the acknowledgement that
+    //        a localName cannot hold a ':' so the string is split using String.lastIndexOf(':')?
     static final String convertPath(final Collection<PathArgument> path) {
-        final StringBuilder pathBuilder = new StringBuilder();
+        final var sb = new StringBuilder();
 
         for (var pathArgument : path) {
-            pathBuilder.append('/');
-            pathBuilder.append(pathArgument.getNodeType().getNamespace().toString().replace(':', '-'));
-            pathBuilder.append(':');
-            pathBuilder.append(pathArgument.getNodeType().getLocalName());
+            sb.append('/');
+            appendQName(sb, pathArgument.getNodeType());
 
             if (pathArgument instanceof NodeIdentifierWithPredicates nip) {
-                pathBuilder.append("[");
+                sb.append("[");
                 for (var key : nip.entrySet()) {
-                    pathBuilder.append(key.getKey().getNamespace().toString().replace(':', '-'));
-                    pathBuilder.append(':');
-                    pathBuilder.append(key.getKey().getLocalName());
-                    pathBuilder.append("='");
-                    pathBuilder.append(key.getValue().toString());
-                    pathBuilder.append('\'');
+                    appendQName(sb, key.getKey());
+                    // FIXME: no escaping here?
+                    sb.append("='").append(key.getValue().toString()).append('\'');
                 }
-                pathBuilder.append(']');
+                sb.append(']');
             }
         }
 
-        return pathBuilder.toString();
+        return sb.toString();
+    }
+
+    private static void appendQName(final StringBuilder sb, final QName qname) {
+        // FIXME: err: what?! what is this replacement?!
+        sb.append(qname.getNamespace().toString().replace(':', '-')).append(':').append(qname.getLocalName());
     }
 
     static final String modificationTypeToOperation(final DataTreeCandidateNode candidate,
