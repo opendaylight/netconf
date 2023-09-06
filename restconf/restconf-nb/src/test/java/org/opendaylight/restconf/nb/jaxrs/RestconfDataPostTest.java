@@ -7,12 +7,17 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import java.net.URI;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
@@ -33,7 +39,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
 
     @BeforeEach
     void beforeEach() {
-        doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
+        lenient().doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
         doReturn(tx).when(dataBroker).newReadWriteTransaction();
     }
 
@@ -69,5 +75,22 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                     "description" : "band description"
                   }
                 }"""), uriInfo, ar)).getLocation());
+    }
+
+    @Test
+    public void testPostExistingData() {
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
+        doReturn(immediateTrueFluentFuture())
+            .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        final var mockAsyncResponse = mock(AsyncResponse.class);
+
+        final var ex = assertThrows(RestconfDocumentedException.class, () -> {
+            restconf.postDataJSON(stringInputStream("""
+                    {
+                      "example-jukebox:jukebox" : {
+                      }
+                    }"""),
+                uriInfo, mockAsyncResponse);
+        });
     }
 }
