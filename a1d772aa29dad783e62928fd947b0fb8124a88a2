@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0e86412_db7011ea",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-06T07:13:31Z",
+      "side": 1,
+      "message": "key construction is not required for deviations in capabilities\nsee below",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 5
+      },
+      "revId": "a1d772aa29dad783e62928fd947b0fb8124a88a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5574ef45_09bfecaf",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-06T07:13:31Z",
+      "side": 1,
+      "message": "deviations for capabilities are not the same as for yang-library\nwhich is leaf-ref, just a reference to existing key\n\nfor capabilities we use just a module name\nsee https://datatracker.ietf.org/doc/html/rfc6020#section-5.6.4\n \nso mapping would look like `.map(Module::getName)`\nbut i\u0027d recommend to update deviation map building \n\nso map will contains list of module names ready to use \ndeviationsMap Map\u003cQNameModule, List\u003cString\u003e\u003e then it will be simple \n\n`return Optional.ofNullable(deviationsMap.get(module.getQnameModule()))`",
+      "range": {
+        "startLine": 110,
+        "startChar": 12,
+        "endLine": 110,
+        "endChar": 60
+      },
+      "revId": "a1d772aa29dad783e62928fd947b0fb8124a88a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "766ca1bd_6e7adb5e",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/CapabilityUtilTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-06T07:13:31Z",
+      "side": 1,
+      "message": "expected module name only",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 53
+      },
+      "revId": "a1d772aa29dad783e62928fd947b0fb8124a88a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
