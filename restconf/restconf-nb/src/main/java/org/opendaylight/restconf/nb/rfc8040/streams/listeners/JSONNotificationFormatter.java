@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.time.Instant;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -53,14 +52,14 @@ final class JSONNotificationFormatter extends NotificationFormatter {
     @Override
     String createText(final TextParameters params, final EffectiveModelContext schemaContext,
             final DOMNotification input, final Instant now) throws IOException {
-        final Writer writer = new StringWriter();
-        final JsonWriter jsonWriter = new JsonWriter(writer).beginObject();
-        jsonWriter.name("ietf-restconf:notification").beginObject();
-        writeNotificationBody(JSONNormalizedNodeStreamWriter.createNestedWriter(
-                codecSupplier.getShared(schemaContext), input.getType(), null, jsonWriter), input.getBody());
-        jsonWriter.endObject();
-        jsonWriter.name("event-time").value(toRFC3339(now)).endObject();
-        jsonWriter.close();
-        return writer.toString();
+        try (var writer = new StringWriter()) {
+            try (var jsonWriter = new JsonWriter(writer)) {
+                jsonWriter.beginObject().name("ietf-restconf:notification").beginObject();
+                writeNotificationBody(JSONNormalizedNodeStreamWriter.createNestedWriter(
+                    codecSupplier.getShared(schemaContext), input.getType(), null, jsonWriter), input.getBody());
+                jsonWriter.endObject().name("event-time").value(toRFC3339(now)).endObject();
+            }
+            return writer.toString();
+        }
     }
 }
