@@ -7,13 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
-import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 
-interface NotificationFormatterFactory extends EventFormatterFactory<DOMNotification> {
-    @Override
-    NotificationFormatter getFormatter();
-
-    @Override
-    NotificationFormatter getFormatter(String xpathFilter) throws XPathExpressionException;
+abstract class NotificationFormatterFactory extends EventFormatterFactory<DOMNotification> {
+    NotificationFormatterFactory(final EventFormatter<DOMNotification> emptyFormatter) {
+        super(emptyFormatter);
+    }
 }
