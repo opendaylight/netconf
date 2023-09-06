@@ -109,6 +109,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d7a1fabe_9406ec7a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-06T13:45:47Z",
+      "side": 1,
+      "message": "So there are three possibilities:\n1. choice global-status is present as \u003cok\u003e (which is an implicit case!)\n2. choice global-status is present as \u003cglobal-errors\u003e\n3. choice global-status is not present\n\nIn case 1: edit-status MAY be present, but if it present it would have to contain just success reports (and therefore it can be omitted)\n\nIn case 2: edit-status MAY be present, but may also be absent (e.g. the patch failed, but we may not have information why)\n\nIn case 3: edit-status MUST be present\n\nThe overall spirit is:\n- it MUST be possible to ascertain whether the entire patch request succeeded or failed\n- the server MAY provide additional information as to which particular operation failed\n\nAlso the server is free to provide very flexible information. As an example, an edit may be validated in two steps, as we do it for MD-SAL\u0027s create operation. We have SATB and check if the data does not exist -- which we could carry as a per-edit status. But after that we need to commit the transaction, which in turn may end up being rebased due to concurrent transactions happening -- and if the commit fails, that translates to a global status -- and untangling that back to individual edits is impossible simply because edits may overlap (and hence there may be fewer logical operations in the transaction than the number of edits).",
+      "parentUuid": "c5cbf115_c5d40c42",
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3d807825_3282ea1d",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchStatusBodyWriter.java",
         "patchSetId": 3
