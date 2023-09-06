@@ -12,9 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Collection;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
@@ -36,24 +34,24 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     @Override
     void serializeData(final Inference parent, final Collection<PathArgument> dataPath,
             final DataTreeCandidateNode candidate, final boolean skipData) throws IOException {
-        NormalizedNodeStreamWriter nestedWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
-            codecSupplier.getShared(parent.getEffectiveModelContext()), parent, null, jsonWriter);
         jsonWriter.beginObject();
-        serializePath(dataPath);
 
-        if (!skipData) {
-            final var dataAfter = getDataAfter(candidate);
-            if (dataAfter != null) {
-                jsonWriter.name("data").beginObject();
-                NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(nestedWriter);
-                nodeWriter.write(dataAfter);
-                nodeWriter.flush();
-                // end data
-                jsonWriter.endObject();
+        final var codecs = codecSupplier.getShared(parent.getEffectiveModelContext());
+        try (var nestedWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, parent, null, jsonWriter)) {
+            serializePath(dataPath);
+
+            if (!skipData) {
+                final var dataAfter = getDataAfter(candidate);
+                if (dataAfter != null) {
+                    jsonWriter.name("data").beginObject();
+                    NormalizedNodeWriter.forStreamWriter(nestedWriter).write(dataAfter).flush();
+                    jsonWriter.endObject();
+                }
             }
+
+            serializeOperation(candidate);
         }
 
-        serializeOperation(candidate);
         jsonWriter.endObject();
     }
 
@@ -64,8 +62,9 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     }
 
     @Override
-    void serializePath(final Collection<YangInstanceIdentifier.PathArgument> pathArguments)
+    void serializePath(final Collection<PathArgument> pathArguments)
             throws IOException {
+        // FIXME: use proper JSON codec for YangInstanceIdentifier
         jsonWriter.name("path").value(convertPath(pathArguments));
     }
 }

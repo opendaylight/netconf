@@ -12,17 +12,34 @@ import static java.util.Objects.requireNonNull;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.time.Instant;
 import java.util.Collection;
 import javax.xml.xpath.XPathExpressionException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
-    public static final String SAL_REMOTE_NAMESPACE = "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote";
-    public static final String NETCONF_NOTIFICATION_NAMESPACE = "urn-ietf-params-xml-ns-netconf-notification-1.0";
+    private static final @NonNull String NOTIFICATION_NAME;
+    private static final @NonNull String DATA_CHANGED_NOTIFICATION_NAME;
+    private static final @NonNull String DATA_CHANGED_EVENT_NAME = DataChangeEvent.QNAME.getLocalName();
+
+    // FIXME: JSON codec operating on XMLNamespace values?! This really should be module names, right?
+    static {
+        final var sb = new StringBuilder();
+        AbstractWebsocketSerializer.appendQName(sb, QName.create(NamespaceURN.NOTIFICATION, "notification"));
+        NOTIFICATION_NAME = sb.toString();
+
+        sb.setLength(0);
+        AbstractWebsocketSerializer.appendQName(sb, DataChangedNotification.QNAME);
+        DATA_CHANGED_NOTIFICATION_NAME = sb.toString();
+    }
+
     private final JSONCodecFactorySupplier codecSupplier;
 
     private JSONDataTreeCandidateFormatter(final TextParameters textParams,
@@ -57,30 +74,24 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
     @Override
     String createText(final TextParameters params, final EffectiveModelContext schemaContext,
             final Collection<DataTreeCandidate> input, final Instant now) throws IOException {
-        final Writer writer = new StringWriter();
-        final JsonWriter jsonWriter = new JsonWriter(writer).beginObject();
+        try (var writer = new StringWriter()) {
+            boolean nonEmpty = false;
+            try (var jsonWriter = new JsonWriter(writer)) {
+                jsonWriter.beginObject()
+                    .name(NOTIFICATION_NAME).beginObject()
+                        .name("event-time").value(toRFC3339(now))
+                        .name(DATA_CHANGED_NOTIFICATION_NAME).beginObject()
+                            .name(DATA_CHANGED_EVENT_NAME).beginArray();
 
-        jsonWriter.name(NETCONF_NOTIFICATION_NAMESPACE + ":notification").beginObject();
-        jsonWriter.name(SAL_REMOTE_NAMESPACE + ":data-changed-notification").beginObject();
-        jsonWriter.name("data-change-event").beginArray();
+                final var serializer = new JsonDataTreeCandidateSerializer(schemaContext, codecSupplier, jsonWriter);
+                for (var candidate : input) {
+                    nonEmpty |= serializer.serialize(candidate, params);
+                }
 
-        final var serializer = new JsonDataTreeCandidateSerializer(schemaContext, codecSupplier, jsonWriter);
-        boolean nonEmpty = false;
-        for (var candidate : input) {
-            nonEmpty |= serializer.serialize(candidate, params);
+                jsonWriter.endArray().endObject().endObject().endObject();
+            }
+
+            return nonEmpty ? writer.toString() : null;
         }
-
-        // data-change-event
-        jsonWriter.endArray();
-        // data-changed-notification
-        jsonWriter.endObject();
-
-        jsonWriter.name("event-time").value(toRFC3339(now));
-        jsonWriter.endObject();
-
-        // notification
-        jsonWriter.endObject();
-
-        return nonEmpty ? writer.toString() : null;
     }
 }
