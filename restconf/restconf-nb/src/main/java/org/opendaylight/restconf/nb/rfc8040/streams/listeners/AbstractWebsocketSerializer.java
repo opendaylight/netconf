@@ -136,6 +136,7 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     //
     //        Who is interpreting this output? Can we eliminate the replacement with the acknowledgement that
     //        a localName cannot hold a ':' so the string is split using String.lastIndexOf(':')?
+    @Deprecated
     static final String convertPath(final Collection<PathArgument> path) {
         final var sb = new StringBuilder();
 
@@ -160,7 +161,8 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         return sb.toString();
     }
 
-    private static void appendQName(final StringBuilder sb, final QName qname) {
+    @Deprecated
+    static void appendQName(final StringBuilder sb, final QName qname) {
         // FIXME: err: what?! what is this replacement?!
         sb.append(qname.getNamespace().toString().replace(':', '-')).append(':').append(qname.getLocalName());
     }
