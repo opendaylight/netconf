@@ -10,14 +10,19 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.base.VerifyException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent.Operation;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.data.change.event.Data;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
@@ -26,7 +31,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
-import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -37,6 +41,11 @@ import org.slf4j.LoggerFactory;
 
 abstract class AbstractWebsocketSerializer<T extends Exception> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractWebsocketSerializer.class);
+    static final @NonNull QName PATH_QNAME = QName.create(DataChangeEvent.QNAME, "path").intern();
+    static final @NonNull NodeIdentifier PATH_NID = NodeIdentifier.create(PATH_QNAME);
+    static final @NonNull QName OPERATION_QNAME = QName.create(DataChangeEvent.QNAME, "operation").intern();
+    static final @NonNull NodeIdentifier OPERATION_NID = NodeIdentifier.create(OPERATION_QNAME);
+    static final @NonNull String DATA_NAME = Data.QNAME.getLocalName();
 
     private final EffectiveModelContext context;
 
@@ -166,10 +175,6 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         return before != null && after != null && before.body().equals(after.body());
     }
 
-    abstract void serializePath(Collection<PathArgument> pathArguments) throws T;
-
-    abstract void serializeOperation(DataTreeCandidateNode candidate) throws T;
-
     static final @Nullable NormalizedNode getDataAfter(final DataTreeCandidateNode candidate) {
         final var data = candidate.dataAfter();
         if (data instanceof MapEntryNode mapEntry) {
@@ -178,53 +183,22 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         return data;
     }
 
-    // FIXME: What is this method doing, really?!
-    //        It seems to be encoding the YangInstanceIdentifier equivalent of the path, which we have expressed as
-    //        a Deque.
-    //
-    //        The output looks like a mutant version of XML encoding, but the QNames are encoded in a very bad
-    //        <namespace>:<localName>, with the actual namespace additionally having converted all ':'s to '-'s.
-    //
-    //        Who is interpreting this output? Can we eliminate the replacement with the acknowledgement that
-    //        a localName cannot hold a ':' so the string is split using String.lastIndexOf(':')?
-    @Deprecated
-    static final String convertPath(final Collection<PathArgument> path) {
-        final var sb = new StringBuilder();
-
-        for (var pathArgument : path) {
-            sb.append('/');
-            appendQName(sb, pathArgument.getNodeType());
-
-            if (pathArgument instanceof NodeIdentifierWithPredicates nip) {
-                sb.append("[");
-                for (var key : nip.entrySet()) {
-                    appendQName(sb, key.getKey());
-                    // FIXME: no escaping here?
-                    sb.append("='").append(key.getValue().toString()).append('\'');
-                }
-                sb.append(']');
-            }
-        }
-
-        return sb.toString();
-    }
-
     @Deprecated
     static void appendQName(final StringBuilder sb, final QName qname) {
         // FIXME: err: what?! what is this replacement?!
         sb.append(qname.getNamespace().toString().replace(':', '-')).append(':').append(qname.getLocalName());
     }
 
-    static final String modificationTypeToOperation(final DataTreeCandidateNode candidate,
-            final ModificationType modificationType) {
-        return switch (modificationType) {
-            case APPEARED, SUBTREE_MODIFIED, WRITE -> candidate.dataBefore() != null ? "updated" : "created";
-            case DELETE, DISAPPEARED -> "deleted";
+    static final @NonNull String modificationTypeToOperation(final DataTreeCandidateNode candidate) {
+        final var operation = switch (candidate.modificationType()) {
+            case APPEARED, SUBTREE_MODIFIED, WRITE -> candidate.dataBefore() != null ? Operation.Updated
+                : Operation.Created;
+            case DELETE, DISAPPEARED -> Operation.Deleted;
             case UNMODIFIED -> {
-                // shouldn't ever happen since the root of a modification is only triggered by some event
-                LOG.warn("DataTreeCandidate for a notification is unmodified. Candidate: {}", candidate);
-                yield "none";
+                throw new VerifyException("DataTreeCandidate for a notification is unmodified. Candidate: "
+                    + candidate);
             }
         };
+        return operation.getName();
     }
 }
