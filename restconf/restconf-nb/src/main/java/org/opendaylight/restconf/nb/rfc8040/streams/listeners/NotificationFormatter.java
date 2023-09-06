@@ -43,12 +43,12 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
         XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
     }
 
-    NotificationFormatter() {
-
+    NotificationFormatter(final TextParameters textParams) {
+        super(textParams);
     }
 
-    NotificationFormatter(final String xpathFilter) throws XPathExpressionException {
-        super(xpathFilter);
+    NotificationFormatter(final TextParameters textParams, final String xpathFilter) throws XPathExpressionException {
+        super(textParams, xpathFilter);
     }
 
     @Override

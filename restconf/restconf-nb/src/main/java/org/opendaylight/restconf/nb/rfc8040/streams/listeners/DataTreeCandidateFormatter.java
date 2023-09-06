@@ -30,12 +30,13 @@ import org.w3c.dom.Element;
  * Base formatter for DataTreeCandidates which only handles exporting to a document for filter checking purpose.
  */
 abstract class DataTreeCandidateFormatter extends EventFormatter<Collection<DataTreeCandidate>> {
-    DataTreeCandidateFormatter() {
-
+    DataTreeCandidateFormatter(final TextParameters textParams) {
+        super(textParams);
     }
 
-    DataTreeCandidateFormatter(final String xpathFilter) throws XPathExpressionException {
-        super(xpathFilter);
+    DataTreeCandidateFormatter(final TextParameters textParams, final String xpathFilter)
+            throws XPathExpressionException {
+        super(textParams, xpathFilter);
     }
 
     @Override

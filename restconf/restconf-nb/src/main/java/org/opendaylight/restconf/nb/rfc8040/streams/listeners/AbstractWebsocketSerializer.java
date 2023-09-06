@@ -42,9 +42,10 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         this.context = requireNonNull(context);
     }
 
-    public final boolean serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly,
-            final boolean skipData, final boolean changedLeafNodesOnly) throws T {
-        if (leafNodesOnly || changedLeafNodesOnly) {
+    public final boolean serialize(final DataTreeCandidate candidate, final TextParameters params) throws T {
+        final var skipData = params.skipData();
+        final var changedLeafNodesOnly = params.changedLeafNodesOnly();
+        if (changedLeafNodesOnly || params.leafNodesOnly()) {
             final var path = new ArrayDeque<PathArgument>();
             path.addAll(candidate.getRootPath().getPathArguments());
             return serializeLeafNodesOnly(path, candidate.getRootNode(), skipData, changedLeafNodesOnly);
