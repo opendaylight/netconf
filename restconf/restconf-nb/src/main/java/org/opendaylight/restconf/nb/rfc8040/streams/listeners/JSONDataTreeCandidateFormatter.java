@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.time.Instant;
 import java.util.Collection;
 import javax.xml.xpath.XPathExpressionException;
@@ -57,30 +56,24 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
     @Override
     String createText(final TextParameters params, final EffectiveModelContext schemaContext,
             final Collection<DataTreeCandidate> input, final Instant now) throws IOException {
-        final Writer writer = new StringWriter();
-        final JsonWriter jsonWriter = new JsonWriter(writer).beginObject();
+        try (var writer = new StringWriter()) {
+            boolean nonEmpty = false;
+            try (var jsonWriter = new JsonWriter(writer)) {
+                jsonWriter.beginObject()
+                    .name(NETCONF_NOTIFICATION_NAMESPACE + ":notification").beginObject()
+                        .name("event-time").value(toRFC3339(now))
+                        .name(SAL_REMOTE_NAMESPACE + ":data-changed-notification").beginObject()
+                            .name("data-change-event").beginArray();
 
-        jsonWriter.name(NETCONF_NOTIFICATION_NAMESPACE + ":notification").beginObject();
-        jsonWriter.name(SAL_REMOTE_NAMESPACE + ":data-changed-notification").beginObject();
-        jsonWriter.name("data-change-event").beginArray();
+                final var serializer = new JsonDataTreeCandidateSerializer(schemaContext, codecSupplier, jsonWriter);
+                for (var candidate : input) {
+                    nonEmpty |= serializer.serialize(candidate, params);
+                }
 
-        final var serializer = new JsonDataTreeCandidateSerializer(schemaContext, codecSupplier, jsonWriter);
-        boolean nonEmpty = false;
-        for (var candidate : input) {
-            nonEmpty |= serializer.serialize(candidate, params);
+                jsonWriter.endArray().endObject().endObject().endObject();
+            }
+
+            return nonEmpty ? writer.toString() : null;
         }
-
-        // data-change-event
-        jsonWriter.endArray();
-        // data-changed-notification
-        jsonWriter.endObject();
-
-        jsonWriter.name("event-time").value(toRFC3339(now));
-        jsonWriter.endObject();
-
-        // notification
-        jsonWriter.endObject();
-
-        return nonEmpty ? writer.toString() : null;
     }
 }
