@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.MountPointService;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.NcmountService;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -28,8 +27,8 @@ public class EndtoendTestService implements AutoCloseable {
     @Activate
     public EndtoendTestService(final @Reference RpcProviderService rpcProviderService,
                                final @Reference MountPointService mountPointService) {
-        registration = rpcProviderService.registerRpcImplementation(NcmountService.class,
-                new NcmountServiceImpl(mountPointService));
+        final var ncmountRpcs = new NcmountRpcs(mountPointService);
+        registration = rpcProviderService.registerRpcImplementations(ncmountRpcs.getRpcClassToInstanceMap());
     }
 
     @Override
