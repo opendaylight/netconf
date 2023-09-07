@@ -18,6 +18,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -29,7 +30,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
-    private static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:xml:ns:netconf:notification:1.0";
     private static final String NOTIFICATION_ELEMENT = "notification";
 
     static final String SAL_REMOTE_NAMESPACE = DataChangedNotification.QNAME.getNamespace().toString();
@@ -92,7 +92,7 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
     }
 
     static @NonNull Element createNotificationElement(final Document doc, final Instant now) {
-        final var notificationElement = doc.createElementNS(NOTIFICATION_NAMESPACE, NOTIFICATION_ELEMENT);
+        final var notificationElement = doc.createElementNS(NamespaceURN.NOTIFICATION, NOTIFICATION_ELEMENT);
         final Element eventTimeElement = doc.createElement("eventTime");
         eventTimeElement.setTextContent(toRFC3339(now));
         notificationElement.appendChild(eventTimeElement);
@@ -102,10 +102,10 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
     static @NonNull XMLStreamWriter createStreamWriterWithNotification(final Writer writer, final Instant now)
             throws XMLStreamException {
         final var xmlStreamWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(writer);
-        xmlStreamWriter.setDefaultNamespace(NOTIFICATION_NAMESPACE);
+        xmlStreamWriter.setDefaultNamespace(NamespaceURN.NOTIFICATION);
 
-        xmlStreamWriter.writeStartElement(NOTIFICATION_NAMESPACE, NOTIFICATION_ELEMENT);
-        xmlStreamWriter.writeDefaultNamespace(NOTIFICATION_NAMESPACE);
+        xmlStreamWriter.writeStartElement(NamespaceURN.NOTIFICATION, NOTIFICATION_ELEMENT);
+        xmlStreamWriter.writeDefaultNamespace(NamespaceURN.NOTIFICATION);
 
         xmlStreamWriter.writeStartElement("eventTime");
         xmlStreamWriter.writeCharacters(toRFC3339(now));
