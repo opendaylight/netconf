@@ -32,7 +32,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev22
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.DeleteDeviceOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -47,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
-public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
+public class NetconfTopologyRPCProvider {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyRPCProvider.class);
 
     private final @NonNull InstanceIdentifier<Topology> topologyPath;
@@ -55,19 +54,18 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     private final @NonNull DataBroker dataBroker;
 
     public NetconfTopologyRPCProvider(final DataBroker dataBroker, final AAAEncryptionService encryptionService,
-                                      final String topologyId) {
+            final String topologyId) {
         this.dataBroker = requireNonNull(dataBroker);
         this.encryptionService = requireNonNull(encryptionService);
         topologyPath = InstanceIdentifier.builder(NetworkTopology.class)
-                .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
-                .build();
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .build();
     }
 
     protected final @NonNull InstanceIdentifier<Topology> topologyPath() {
         return topologyPath;
     }
 
-    @Override
     public final ListenableFuture<RpcResult<CreateDeviceOutput>> createDevice(final CreateDeviceInput input) {
         final NetconfNode node = encryptPassword(input);
         final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult = SettableFuture.create();
@@ -76,7 +74,6 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
         return futureResult;
     }
 
-    @Override
     public final ListenableFuture<RpcResult<DeleteDeviceOutput>> deleteDevice(final DeleteDeviceInput input) {
         final NodeId nodeId = new NodeId(input.getNodeId());
 
