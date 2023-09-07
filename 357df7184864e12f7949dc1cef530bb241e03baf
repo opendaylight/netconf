@@ -125,6 +125,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e01293ef_58032368",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-09-07T01:20:14Z",
+      "side": 1,
+      "message": "I agree that skipping the status of individual edit when the PATCH request fails is not incompliant with the standard but my reading is that the status information should be provided whenever it is available except when the request is fully successful.\n\nBut at the end of the day the difference probably is not critical and I guess there is pros/cons either way.",
+      "parentUuid": "d7a1fabe_9406ec7a",
+      "revId": "357df7184864e12f7949dc1cef530bb241e03baf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d807825_3282ea1d",
