@@ -8,19 +8,27 @@
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
 
 import java.util.Collection;
 import javax.xml.stream.XMLStreamWriter;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<Exception> {
+    private static final @NonNull NodeIdentifier DATA_CHANGE_EVENT_NID = NodeIdentifier.create(DataChangeEvent.QNAME);
+
     private final XMLStreamWriter xmlWriter;
 
     XmlDataTreeCandidateSerializer(final EffectiveModelContext context, final XMLStreamWriter xmlWriter) {
@@ -33,20 +41,27 @@ final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<E
             final DataTreeCandidateNode candidate, final boolean skipData) throws Exception {
         final var modificationType = candidate.modificationType();
         if (modificationType != ModificationType.UNMODIFIED) {
-            xmlWriter.writeStartElement(DATA_CHANGE_EVENT_ELEMENT);
-            xmlWriter.writeStartElement("path");
-            // FIXME: use proper XML codec for YangInstanceIdentifier
-            xmlWriter.writeCharacters(convertPath(dataPath));
-            xmlWriter.writeEndElement();
+            final var stack = SchemaInferenceStack.of(parent.getEffectiveModelContext());
+            stack.enterSchemaTree(DataChangedNotification.QNAME);
 
-            xmlWriter.writeStartElement("operation");
-            xmlWriter.writeCharacters(modificationTypeToOperation(candidate));
-            xmlWriter.writeEndElement();
+            final var writer = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, stack.toInference());
+            writer.startMapNode(DATA_CHANGE_EVENT_NID, 1);
+
+            final var path = YangInstanceIdentifier.of(dataPath);
+            writer.startMapEntryNode(NodeIdentifierWithPredicates.of(DataChangeEvent.QNAME, PATH_QNAME, path), 4);
+            writer.startLeafNode(PATH_NID);
+            writer.scalarValue(path);
+            writer.endNode();
+
+            writer.startLeafNode(OPERATION_NID);
+            writer.scalarValue(modificationTypeToOperation(candidate));
+            writer.endNode();
 
             if (!skipData) {
                 final var dataAfter = getDataAfter(candidate);
                 if (dataAfter != null) {
-                    xmlWriter.writeStartElement("data");
+                    writer.flush();
+                    xmlWriter.writeStartElement(DATA_NAME);
                     final var nnWriter = NormalizedNodeWriter.forStreamWriter(
                         XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, parent));
                     nnWriter.write(dataAfter);
@@ -55,7 +70,8 @@ final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<E
                 }
             }
 
-            xmlWriter.writeEndElement();
+            writer.endNode();
+            writer.endNode();
         }
     }
 }
