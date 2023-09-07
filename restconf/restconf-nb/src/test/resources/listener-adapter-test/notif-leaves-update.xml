@@ -2,38 +2,32 @@
     <eventTime>2022-02-18T18:04:25.214583+01:00</eventTime>
     <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
         <data-change-event>
-            <path>
-                /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name
-            </path>
+            <path xmlns:a="instance:identifier:patch:module">/a:patch-cont/a:my-list1[a:name='Althea']/a:name</path>
+            <operation>updated</operation>
             <data>
                 <name xmlns="instance:identifier:patch:module">Althea</name>
             </data>
-            <operation>updated</operation>
         </data-change-event>
         <data-change-event>
-            <path>
-                /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12
-            </path>
+            <path xmlns:a="instance:identifier:patch:module">/a:patch-cont/a:my-list1[a:name='Althea']/a:my-leaf12</path>
+            <operation>created</operation>
             <data>
                 <my-leaf12 xmlns="instance:identifier:patch:module">Bertha</my-leaf12>
             </data>
-            <operation>created</operation>
         </data-change-event>
         <data-change-event>
-            <path>/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:leaf1</path>
+            <path xmlns:a="instance:identifier:patch:module" xmlns:b="augment:instance:identifier:patch:module">/a:patch-cont/b:leaf1</path>
+            <operation>updated</operation>
             <data>
                 <leaf1 xmlns="augment:instance:identifier:patch:module">AugmentLeaf</leaf1>
             </data>
-            <operation>updated</operation>
         </data-change-event>
         <data-change-event>
-            <path>
-                /instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice1/augment-instance-identifier-patch-module:case-leaf1
-            </path>
+            <path xmlns:a="instance:identifier:patch:module" xmlns:b="augment:instance:identifier:patch:module">/a:patch-cont/b:case-leaf1</path>
+            <operation>updated</operation>
             <data>
                 <case-leaf1 xmlns="augment:instance:identifier:patch:module">ChoiceUpdate</case-leaf1>
             </data>
-            <operation>updated</operation>
         </data-change-event>
     </data-changed-notification>
 </notification>

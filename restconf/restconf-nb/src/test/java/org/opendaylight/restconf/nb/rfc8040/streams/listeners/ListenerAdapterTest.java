@@ -7,7 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -395,11 +397,17 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
         // xmlunit cannot compare deeper children it seems out of the box so just check the iid encoding
         final String notification = adapter.awaitUntilNotification("");
-        assertTrue(notification.contains("instance-identifier-patch-module:my-leaf12"));
-        assertTrue(notification.contains("instance-identifier-patch-module:my-leaf11"));
-        assertTrue(notification.contains("instance-identifier-patch-module:name"));
-        assertTrue(notification.contains("augment-instance-identifier-patch-module:case-leaf1"));
-        assertTrue(notification.contains("augment-instance-identifier-patch-module:leaf1"));
+        assertThat(notification, allOf(
+            containsString("<path xmlns:a=\"instance:identifier:patch:module\">/a:patch-cont"
+                + "/a:my-list1[a:name='Althea']/a:my-leaf11</path>"),
+            containsString("<path xmlns:a=\"instance:identifier:patch:module\">/a:patch-cont"
+                + "/a:my-list1[a:name='Althea']/a:my-leaf12</path>"),
+            containsString("<path xmlns:a=\"instance:identifier:patch:module\">/a:patch-cont"
+                + "/a:my-list1[a:name='Althea']/a:name</path>"),
+            containsString("<path xmlns:a=\"instance:identifier:patch:module\" "
+                + "xmlns:b=\"augment:instance:identifier:patch:module\">/a:patch-cont/b:leaf1</path>"),
+            containsString("<path xmlns:a=\"instance:identifier:patch:module\" "
+                + "xmlns:b=\"augment:instance:identifier:patch:module\">/a:patch-cont/b:case-leaf1</path>")));
     }
 
     @Test
@@ -446,17 +454,20 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
         writeTransaction.commit();
+
         // xmlunit cannot compare deeper children it seems out of the box so just check the iid encoding
         final String notification = adapter.awaitUntilNotification("");
-
-        assertTrue(notification.contains("instance-identifier-patch-module:my-leaf11"));
-        assertTrue(notification.contains("instance-identifier-patch-module:my-leaf12"));
-        assertTrue(notification.contains("instance-identifier-patch-module:name"));
-        assertTrue(notification.contains("augment-instance-identifier-patch-module:case-leaf11"));
-        assertTrue(notification.contains("augment-instance-identifier-patch-module:patch-choice2"));
-        assertTrue(notification.contains("augment-instance-identifier-patch-module:patch-sub-choice11"));
-        assertTrue(notification.contains("augment-instance-identifier-patch-module:patch-sub-sub-choice11"));
-        assertTrue(notification.contains("augment-instance-identifier-patch-module:leaf1"));
+        assertThat(notification, allOf(
+            containsString("<path xmlns:a=\"instance:identifier:patch:module\">/a:patch-cont"
+                + "/a:my-list1[a:name='Althea']/a:my-leaf11</path>"),
+            containsString("<path xmlns:a=\"instance:identifier:patch:module\">/a:patch-cont"
+                + "/a:my-list1[a:name='Althea']/a:my-leaf12</path>"),
+            containsString("<path xmlns:a=\"instance:identifier:patch:module\">/a:patch-cont"
+                + "/a:my-list1[a:name='Althea']/a:name</path>"),
+            containsString("<path xmlns:a=\"instance:identifier:patch:module\" "
+                + "xmlns:b=\"augment:instance:identifier:patch:module\">/a:patch-cont/b:leaf1</path>"),
+            containsString("<path xmlns:a=\"instance:identifier:patch:module\" "
+                + "xmlns:b=\"augment:instance:identifier:patch:module\">/a:patch-cont/b:case-leaf11</path>")));
     }
 
     @Test

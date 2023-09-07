@@ -36,12 +36,7 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
     static final String DATA_CHANGED_NOTIFICATION_ELEMENT = DataChangedNotification.QNAME.getLocalName();
     static final String DATA_CHANGE_EVENT_ELEMENT = DataChangeEvent.QNAME.getLocalName();
 
-    static final XMLOutputFactory XML_OUTPUT_FACTORY;
-
-    static {
-        XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
-        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-    }
+    static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
 
     NotificationFormatter(final TextParameters textParams) {
         super(textParams);
