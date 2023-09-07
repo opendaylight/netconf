@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b252a5fd_cea47e30",
+        "filename": "protocol/netconf-api/pom.xml",
+        "patchSetId": 15
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-07T15:20:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d964c404_58ee38a8",
+      "range": {
+        "startLine": 55,
+        "startChar": 24,
+        "endLine": 55,
+        "endChar": 38
+      },
+      "revId": "ebc8bdf507293a5cf53e2c37d91af9d7f1ac8972",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87a83e67_1cd8c378",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3abbd5e2_46fc51b7",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/CapabilityUtil.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-07T15:20:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87a83e67_1cd8c378",
+      "range": {
+        "startLine": 33,
+        "startChar": 19,
+        "endLine": 33,
+        "endChar": 33
+      },
+      "revId": "ebc8bdf507293a5cf53e2c37d91af9d7f1ac8972",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72ac372e_2275afb3",
@@ -60,6 +108,30 @@
       "writtenOn": "2023-09-06T09:54:28Z",
       "side": 1,
       "message": "List.Of()",
+      "range": {
+        "startLine": 102,
+        "startChar": 20,
+        "endLine": 102,
+        "endChar": 41
+      },
+      "revId": "ebc8bdf507293a5cf53e2c37d91af9d7f1ac8972",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bb70e4e_f01ae81a",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/CapabilityUtilTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-07T15:20:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72ac372e_2275afb3",
       "range": {
         "startLine": 102,
         "startChar": 20,
