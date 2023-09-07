@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Instant;
 import java.util.Collection;
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
@@ -51,9 +52,9 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
         boolean nonEmpty = false;
         try {
             final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now);
-
-            xmlStreamWriter.setDefaultNamespace(SAL_REMOTE_NAMESPACE);
-            xmlStreamWriter.writeStartElement(SAL_REMOTE_NAMESPACE, DATA_CHANGED_NOTIFICATION_ELEMENT);
+            xmlStreamWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, DATA_CHANGED_NOTIFICATION_ELEMENT,
+                SAL_REMOTE_NAMESPACE);
+            xmlStreamWriter.writeDefaultNamespace(SAL_REMOTE_NAMESPACE);
 
             final var serializer = new XmlDataTreeCandidateSerializer(schemaContext, xmlStreamWriter);
             for (var candidate : input) {
