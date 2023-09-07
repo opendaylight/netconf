@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -30,11 +29,12 @@ import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.NetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyKey;
@@ -50,7 +50,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfSalKeystoreServiceTest {
+public class NetconfSalKeystoreRpcsTest {
     private static final String XML_ELEMENT_PRIVATE_KEY = "private-key";
     private static final String XML_ELEMENT_NAME = "name";
     private static final String XML_ELEMENT_DATA = "data";
@@ -74,16 +74,16 @@ public class NetconfSalKeystoreServiceTest {
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(writeTx)
             .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
-        doReturn(rpcReg).when(rpcProvider).registerRpcImplementation(eq(NetconfKeystoreService.class), any());
+        doReturn(rpcReg).when(rpcProvider).registerRpcImplementations(any());
         doNothing().when(rpcReg).close();
     }
 
     @Test
     public void testAddPrivateKey() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
-        try (var keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService, rpcProvider)) {
+        try (var keystoreService = new NetconfSalKeystoreRpcs(dataBroker, encryptionService, rpcProvider)) {
             final AddPrivateKeyInput input = getPrivateKeyInput();
-            keystoreService.addPrivateKey(input);
+            keystoreService.getRpcClassToInstanceMap().getInstance(AddPrivateKey.class).invoke(input).get();
 
             verify(writeTx, times(input.nonnullPrivateKey().size()))
                 .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
@@ -93,9 +93,9 @@ public class NetconfSalKeystoreServiceTest {
     @Test
     public void testAddTrustedCertificate() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
-        try (var keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService, rpcProvider)) {
-            final AddTrustedCertificateInput input = getTrustedCertificateInput();
-            keystoreService.addTrustedCertificate(input);
+        try (var keystoreService = new NetconfSalKeystoreRpcs(dataBroker, encryptionService, rpcProvider)) {
+            final var input = getTrustedCertificateInput();
+            keystoreService.getRpcClassToInstanceMap().getInstance(AddTrustedCertificate.class).invoke(input).get();
 
             verify(writeTx, times(input.nonnullTrustedCertificate().size()))
                 .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));

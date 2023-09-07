@@ -9,6 +9,8 @@ package org.opendaylight.test.endtoend;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Map;
@@ -36,11 +38,13 @@ import org.opendaylight.yang.gen.v1.http.cisco.com.ns.yang.cisco.ios.xr.ip._stat
 import org.opendaylight.yang.gen.v1.http.cisco.com.ns.yang.cisco.ios.xr.ip._static.cfg.rev130722.vrf.unicast.VrfUnicastBuilder;
 import org.opendaylight.yang.gen.v1.http.cisco.com.ns.yang.cisco.xr.types.rev150119.CiscoIosXrString;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ListNodes;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ListNodesInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ListNodesOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.NcmountService;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ShowNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ShowNodeInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ShowNodeOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.WriteRoutes;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.WriteRoutesInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.WriteRoutesOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.WriteRoutesOutputBuilder;
@@ -48,20 +52,20 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.Rpc;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
-public class NcmountServiceImpl implements NcmountService {
+public class NcmountRpcs {
     private final MountPointService mountPointService;
 
-    public NcmountServiceImpl(final MountPointService mountPointService) {
+    public NcmountRpcs(final MountPointService mountPointService) {
         this.mountPointService = requireNonNull(mountPointService);
     }
 
-    @Override
-    public ListenableFuture<RpcResult<WriteRoutesOutput>> writeRoutes(final WriteRoutesInput input) {
+    private ListenableFuture<RpcResult<WriteRoutesOutput>> writeRoutes(final WriteRoutesInput input) {
         final Optional<MountPoint> optMountPoint = mountPointService.getMountPoint(
             NetconfNodeUtils.DEFAULT_TOPOLOGY_IID.child(Node.class, new NodeKey(new NodeId(input.getMountName()))));
         if (optMountPoint.isEmpty()) {
@@ -114,17 +118,23 @@ public class NcmountServiceImpl implements NcmountService {
             MoreExecutors.directExecutor());
     }
 
-    @Override
-    public ListenableFuture<RpcResult<ShowNodeOutput>> showNode(final ShowNodeInput input) {
+    private ListenableFuture<RpcResult<ShowNodeOutput>> showNode(final ShowNodeInput input) {
         return RpcResultBuilder.<ShowNodeOutput>failed()
             .withError(ErrorType.APPLICATION, "Not implemented")
             .buildFuture();
     }
 
-    @Override
-    public ListenableFuture<RpcResult<ListNodesOutput>> listNodes(final ListNodesInput input) {
+    private ListenableFuture<RpcResult<ListNodesOutput>> listNodes(final ListNodesInput input) {
         return RpcResultBuilder.<ListNodesOutput>failed()
             .withError(ErrorType.APPLICATION, "Not implemented")
             .buildFuture();
+    }
+
+    public ClassToInstanceMap<Rpc<?, ?>> getRpcClassToInstanceMap() {
+        return ImmutableClassToInstanceMap.<Rpc<?, ?>>builder()
+            .put(WriteRoutes.class, this::writeRoutes)
+            .put(ShowNode.class, this::showNode)
+            .put(ListNodes.class, this::listNodes)
+            .build();
     }
 }
