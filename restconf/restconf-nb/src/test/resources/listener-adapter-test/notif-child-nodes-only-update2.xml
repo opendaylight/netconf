@@ -2,7 +2,7 @@
     <eventTime>2020-10-19T12:21:02.876756+02:00</eventTime>
     <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
         <data-change-event>
-            <path>/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11</path>
+            <path xmlns:a="instance:identifier:patch:module">/a:patch-cont/a:my-list1[a:name='Althea']/a:my-leaf11</path>
             <operation>updated</operation>
             <data>
                 <my-leaf11 xmlns="instance:identifier:patch:module">Jed</my-leaf11>
