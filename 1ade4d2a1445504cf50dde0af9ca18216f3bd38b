@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7f21534_4fbcf771",
+        "filename": "restconf/restconf-openapi/src/test/resources/swagger-document/controller-all.json",
+        "patchSetId": 18
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-09-07T14:01:41Z",
+      "side": 1,
+      "message": "In netconf-1138 was added global description, please add to resources.\n\n{\n  \"openapi\": \"3.0.3\",\n  \"info\": {\n    \"version\": \"1.0.0\",\n    \"title\": \"Controller modules of RESTCONF\",\n    \"description\": \"We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\\nFor operational data we only provide GET API.\\n\\nFor majority of request you can see only config data in examples. That’s because we can show only one example\\nper request. The exception when you can see operational data in example is when data are representing\\noperational (config false) container with no config data in it.\"\n  },",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 4
+      },
+      "revId": "1ade4d2a1445504cf50dde0af9ca18216f3bd38b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43b1bd56_a6b2a879",
+        "filename": "restconf/restconf-openapi/src/test/resources/swagger-document/controller-toaster.json",
+        "patchSetId": 18
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-09-07T14:01:41Z",
+      "side": 1,
+      "message": "here",
+      "revId": "1ade4d2a1445504cf50dde0af9ca18216f3bd38b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3324980_e38e33b7",
+        "filename": "restconf/restconf-openapi/src/test/resources/swagger-document/device-all.json",
+        "patchSetId": 18
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-09-07T14:01:41Z",
+      "side": 1,
+      "message": "here",
+      "revId": "1ade4d2a1445504cf50dde0af9ca18216f3bd38b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d457c24a_2a96c6b0",
+        "filename": "restconf/restconf-openapi/src/test/resources/swagger-document/device-toaster.json",
+        "patchSetId": 18
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-09-07T14:01:41Z",
+      "side": 1,
+      "message": "here",
+      "revId": "1ade4d2a1445504cf50dde0af9ca18216f3bd38b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
