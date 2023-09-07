@@ -38,7 +38,6 @@ import org.opendaylight.yang.gen.v1.http.cisco.com.ns.yang.cisco.xr.types.rev150
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ListNodesInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ListNodesOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.NcmountService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ShowNodeInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ShowNodeOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.WriteRoutesInput;
@@ -53,15 +52,14 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
-public class NcmountServiceImpl implements NcmountService {
+public class NcmountRpcs {
     private final MountPointService mountPointService;
 
-    public NcmountServiceImpl(final MountPointService mountPointService) {
+    public NcmountRpcs(final MountPointService mountPointService) {
         this.mountPointService = requireNonNull(mountPointService);
     }
 
-    @Override
-    public ListenableFuture<RpcResult<WriteRoutesOutput>> writeRoutes(final WriteRoutesInput input) {
+    ListenableFuture<RpcResult<WriteRoutesOutput>> writeRoutes(final WriteRoutesInput input) {
         final Optional<MountPoint> optMountPoint = mountPointService.getMountPoint(
             NetconfNodeUtils.DEFAULT_TOPOLOGY_IID.child(Node.class, new NodeKey(new NodeId(input.getMountName()))));
         if (optMountPoint.isEmpty()) {
@@ -114,15 +112,13 @@ public class NcmountServiceImpl implements NcmountService {
             MoreExecutors.directExecutor());
     }
 
-    @Override
-    public ListenableFuture<RpcResult<ShowNodeOutput>> showNode(final ShowNodeInput input) {
+    ListenableFuture<RpcResult<ShowNodeOutput>> showNode(final ShowNodeInput input) {
         return RpcResultBuilder.<ShowNodeOutput>failed()
             .withError(ErrorType.APPLICATION, "Not implemented")
             .buildFuture();
     }
 
-    @Override
-    public ListenableFuture<RpcResult<ListNodesOutput>> listNodes(final ListNodesInput input) {
+    ListenableFuture<RpcResult<ListNodesOutput>> listNodes(final ListNodesInput input) {
         return RpcResultBuilder.<ListNodesOutput>failed()
             .withError(ErrorType.APPLICATION, "Not implemented")
             .buildFuture();

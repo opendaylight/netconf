@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -54,7 +55,6 @@ import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFa
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -186,8 +186,8 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         this.builderFactory = requireNonNull(builderFactory);
 
         dataChangeListenerRegistration = registerDataTreeChangeListener();
-        rpcReg = rpcProviderService.registerRpcImplementation(NetconfNodeTopologyService.class,
-            new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId));
+        final var nodeTopologyRpcs = new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId);
+        rpcReg = rpcProviderService.registerRpcImplementations(nodeTopologyRpcs.getRpcClassToInstanceMap());
     }
 
     @Override

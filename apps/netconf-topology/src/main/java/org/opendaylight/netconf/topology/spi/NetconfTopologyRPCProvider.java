@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -24,15 +25,16 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.LoginPwBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev230430.credentials.credentials.login.pw.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDevice;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.DeleteDevice;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.DeleteDeviceInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.DeleteDeviceOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.DeleteDeviceOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -41,13 +43,14 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.Rpc;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
-public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
+public class NetconfTopologyRPCProvider {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyRPCProvider.class);
 
     private final @NonNull InstanceIdentifier<Topology> topologyPath;
@@ -55,20 +58,19 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     private final @NonNull DataBroker dataBroker;
 
     public NetconfTopologyRPCProvider(final DataBroker dataBroker, final AAAEncryptionService encryptionService,
-                                      final String topologyId) {
+            final String topologyId) {
         this.dataBroker = requireNonNull(dataBroker);
         this.encryptionService = requireNonNull(encryptionService);
         topologyPath = InstanceIdentifier.builder(NetworkTopology.class)
-                .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
-                .build();
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .build();
     }
 
     protected final @NonNull InstanceIdentifier<Topology> topologyPath() {
         return topologyPath;
     }
 
-    @Override
-    public final ListenableFuture<RpcResult<CreateDeviceOutput>> createDevice(final CreateDeviceInput input) {
+    private final ListenableFuture<RpcResult<CreateDeviceOutput>> createDevice(final CreateDeviceInput input) {
         final NetconfNode node = encryptPassword(input);
         final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult = SettableFuture.create();
         final NodeId nodeId = new NodeId(input.getNodeId());
@@ -76,8 +78,7 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
         return futureResult;
     }
 
-    @Override
-    public final ListenableFuture<RpcResult<DeleteDeviceOutput>> deleteDevice(final DeleteDeviceInput input) {
+    private final ListenableFuture<RpcResult<DeleteDeviceOutput>> deleteDevice(final DeleteDeviceInput input) {
         final NodeId nodeId = new NodeId(input.getNodeId());
 
         final InstanceIdentifier<Node> niid = topologyPath.child(Node.class, new NodeKey(nodeId));
@@ -151,5 +152,12 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
                 futureResult.setException(exception);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    public ImmutableClassToInstanceMap getRpcClassToInstanceMap() {
+        return ImmutableClassToInstanceMap.<Rpc<?, ?>>builder()
+            .put(CreateDevice.class, this::createDevice)
+            .put(DeleteDevice.class, this::deleteDevice)
+            .build();
     }
 }

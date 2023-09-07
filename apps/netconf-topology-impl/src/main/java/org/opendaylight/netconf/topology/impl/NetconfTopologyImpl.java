@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.topology.impl;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
@@ -33,7 +34,6 @@ import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -108,8 +108,8 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
         LOG.debug("Registering datastore listener");
         dtclReg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(
             LogicalDatastoreType.CONFIGURATION, createTopologyListPath(topologyId).child(Node.class)), this);
-        rpcReg = rpcProviderService.registerRpcImplementation(NetconfNodeTopologyService.class,
-            new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId));
+        final var nodeTopologyRpcs = new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId);
+        rpcReg = rpcProviderService.registerRpcImplementations(nodeTopologyRpcs.getRpcClassToInstanceMap());
     }
 
     @PreDestroy
