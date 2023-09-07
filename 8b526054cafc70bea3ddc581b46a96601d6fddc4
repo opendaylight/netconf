@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aec3f7fc_da6ade82",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/TransactionUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-07T10:32:22Z",
+      "side": 1,
+      "message": "This will change also response from MdsalRestconfTransaction which was correct.",
+      "revId": "8b526054cafc70bea3ddc581b46a96601d6fddc4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
