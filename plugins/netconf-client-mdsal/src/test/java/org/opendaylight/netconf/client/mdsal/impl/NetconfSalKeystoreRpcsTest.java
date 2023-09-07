@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -34,7 +33,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.NetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyKey;
@@ -50,7 +48,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfSalKeystoreServiceTest {
+public class NetconfSalKeystoreRpcsTest {
     private static final String XML_ELEMENT_PRIVATE_KEY = "private-key";
     private static final String XML_ELEMENT_NAME = "name";
     private static final String XML_ELEMENT_DATA = "data";
@@ -74,14 +72,14 @@ public class NetconfSalKeystoreServiceTest {
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(writeTx)
             .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
-        doReturn(rpcReg).when(rpcProvider).registerRpcImplementation(eq(NetconfKeystoreService.class), any());
+        doReturn(rpcReg).when(rpcProvider).registerRpcImplementations(any());
         doNothing().when(rpcReg).close();
     }
 
     @Test
     public void testAddPrivateKey() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
-        try (var keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService, rpcProvider)) {
+        try (var keystoreService = new NetconfSalKeystoreRpcs(dataBroker, encryptionService, rpcProvider)) {
             final AddPrivateKeyInput input = getPrivateKeyInput();
             keystoreService.addPrivateKey(input);
 
@@ -93,7 +91,7 @@ public class NetconfSalKeystoreServiceTest {
     @Test
     public void testAddTrustedCertificate() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
-        try (var keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService, rpcProvider)) {
+        try (var keystoreService = new NetconfSalKeystoreRpcs(dataBroker, encryptionService, rpcProvider)) {
             final AddTrustedCertificateInput input = getTrustedCertificateInput();
             keystoreService.addTrustedCertificate(input);
 
