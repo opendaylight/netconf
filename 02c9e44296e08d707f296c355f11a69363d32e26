@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9efca7d_91c88f5b",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/DefaultNetconfClientConfigurationBuilderFactory.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-07T10:23:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7afe6bb9_2e8fa9b8",
+      "revId": "02c9e44296e08d707f296c355f11a69363d32e26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4cf6fd8e_bfb63d40",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-07T08:50:04Z",
       "side": 1,
       "message": "Please use IllegalArgumentException instead of MissingConfigurationException.",
+      "revId": "02c9e44296e08d707f296c355f11a69363d32e26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f77edc3e_7b84a0b4",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/DefaultNetconfClientConfigurationBuilderFactory.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-07T10:23:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4cf6fd8e_bfb63d40",
       "revId": "02c9e44296e08d707f296c355f11a69363d32e26",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
