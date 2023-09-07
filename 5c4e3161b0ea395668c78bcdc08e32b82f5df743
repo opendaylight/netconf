@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40ef458f_edd58a2c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7231
+      },
+      "writtenOn": "2023-09-07T08:50:44Z",
+      "side": 1,
+      "message": "LGTM. Thanks for the backport to 6.0.X branch",
+      "revId": "5c4e3161b0ea395668c78bcdc08e32b82f5df743",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
