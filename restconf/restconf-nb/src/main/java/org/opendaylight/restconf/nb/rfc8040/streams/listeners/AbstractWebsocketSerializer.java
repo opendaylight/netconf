@@ -52,8 +52,7 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
                 changedLeafNodesOnly);
         }
         if (params.childNodesOnly()) {
-            serializeChildNodesOnly(mutableRootPath(candidate), candidate.getRootNode(), skipData);
-            return true;
+            return serializeChildNodesOnly(mutableRootPath(candidate), candidate.getRootNode(), skipData);
         }
 
         serializeData(candidate.getRootPath().getPathArguments(), candidate.getRootNode(), skipData);
@@ -122,20 +121,28 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         return ret;
     }
 
-    private void serializeChildNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode current,
+    private boolean serializeChildNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode current,
             final boolean skipData) throws T {
-        switch (current.modificationType()) {
+        return switch (current.modificationType()) {
             // just a subtree modification, recurse
             case SUBTREE_MODIFIED -> {
+                var updated = false;
                 for (var child : current.childNodes()) {
                     path.add(child.name());
-                    serializeChildNodesOnly(path, child, skipData);
+                    updated |= serializeChildNodesOnly(path, child, skipData);
                     path.removeLast();
                 }
+                yield updated;
             }
-            // other modification, serialize it
-            default -> serializeData(path, current, skipData);
-        }
+            // other modification, serialize it if updated
+            default -> {
+                final var updated = !isNotUpdate(current);
+                if (updated) {
+                    serializeData(path, current, skipData);
+                }
+                yield updated;
+            }
+        };
     }
 
     private void serializeData(final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate,
