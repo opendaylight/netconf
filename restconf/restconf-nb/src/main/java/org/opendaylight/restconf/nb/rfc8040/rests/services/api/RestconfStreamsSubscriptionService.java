@@ -31,7 +31,7 @@ public interface RestconfStreamsSubscriptionService {
     //        https://datatracker.ietf.org/doc/html/rfc8639#section-2.4, i.e. when we have that, aggressively deprecate
     //        and remove this special case. Besides it routes to a very bad thing in RestconfDataServiceImpl
     @GET
-    @Path("data/" + RestconfStreamsConstants.STREAMS_PATH  + "/{identifier:.+}")
+    @Path("data/" + RestconfStreamsConstants.STREAMS_PATH  + "/stream/{identifier:.+}")
     NormalizedNodePayload subscribeToStream(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 }
