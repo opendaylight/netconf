@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe073a2e_aea0c62a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/RequestBody.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-08T12:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d62ac3_d79d3fa1",
+      "revId": "1db0f397305e169167272f048f620c64b22a334b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a84c9d60_e0e7ce69",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4336d3c8_33f9d5ca",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/ResponseObject.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-08T12:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a84c9d60_e0e7ce69",
+      "revId": "1db0f397305e169167272f048f620c64b22a334b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b6820f75_92bf8095",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-09-08T12:09:22Z",
       "side": 1,
       "message": "wrong indent?",
+      "revId": "1db0f397305e169167272f048f620c64b22a334b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdec965b_5fac602c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-08T12:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6820f75_92bf8095",
       "revId": "1db0f397305e169167272f048f620c64b22a334b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
