@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8bf24d2_d9c3f15d",
+        "filename": "restconf/restconf-openapi/src/test/resources/swagger-document/controller-all.json",
+        "patchSetId": 18
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-09-08T07:32:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7f21534_4fbcf771",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 4
+      },
+      "revId": "1ade4d2a1445504cf50dde0af9ca18216f3bd38b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43b1bd56_a6b2a879",
@@ -37,6 +61,24 @@
       "writtenOn": "2023-09-07T14:01:41Z",
       "side": 1,
       "message": "here",
+      "revId": "1ade4d2a1445504cf50dde0af9ca18216f3bd38b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2b8b7da_5943a213",
+        "filename": "restconf/restconf-openapi/src/test/resources/swagger-document/controller-toaster.json",
+        "patchSetId": 18
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-09-08T07:32:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43b1bd56_a6b2a879",
       "revId": "1ade4d2a1445504cf50dde0af9ca18216f3bd38b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -58,6 +100,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a26fbdf_928a4653",
+        "filename": "restconf/restconf-openapi/src/test/resources/swagger-document/device-all.json",
+        "patchSetId": 18
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-09-08T07:32:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3324980_e38e33b7",
+      "revId": "1ade4d2a1445504cf50dde0af9ca18216f3bd38b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d457c24a_2a96c6b0",
@@ -71,6 +131,24 @@
       "writtenOn": "2023-09-07T14:01:41Z",
       "side": 1,
       "message": "here",
+      "revId": "1ade4d2a1445504cf50dde0af9ca18216f3bd38b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0306778_7d8e5910",
+        "filename": "restconf/restconf-openapi/src/test/resources/swagger-document/device-toaster.json",
+        "patchSetId": 18
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-09-08T07:32:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d457c24a_2a96c6b0",
       "revId": "1ade4d2a1445504cf50dde0af9ca18216f3bd38b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
