@@ -227,6 +227,7 @@ public final class OperationBuilder {
             xmlSchema.put(TYPE_KEY, OBJECT);
             final ObjectNode xml = JsonNodeFactory.instance.objectNode();
             xml.put(NAME_KEY, INPUT);
+            xml.put("namespace",input.getQName().getNamespace().toString());
             xmlSchema.set(XML_KEY, xml);
             final ObjectNode xmlTypeValue = JsonNodeFactory.instance.objectNode();
             xmlTypeValue.set(SCHEMA_KEY, xmlSchema);
