@@ -38,6 +38,7 @@ public final class OperationBuilder {
     public static final String DESCRIPTION_KEY = "description";
     public static final String INPUT_KEY = "input";
     public static final String NAME_KEY = "name";
+    public static final String NAMESPACE_KEY = "name";
     public static final String PROPERTIES_KEY = "properties";
     public static final String REF_KEY = "$ref";
     public static final String SCHEMA_KEY = "schema";
@@ -227,6 +228,7 @@ public final class OperationBuilder {
             xmlSchema.put(TYPE_KEY, OBJECT);
             final ObjectNode xml = JsonNodeFactory.instance.objectNode();
             xml.put(NAME_KEY, INPUT);
+            xml.put(NAMESPACE_KEY,input.getQName().getNamespace().toString());
             xmlSchema.set(XML_KEY, xml);
             final ObjectNode xmlTypeValue = JsonNodeFactory.instance.objectNode();
             xmlTypeValue.set(SCHEMA_KEY, xmlSchema);
