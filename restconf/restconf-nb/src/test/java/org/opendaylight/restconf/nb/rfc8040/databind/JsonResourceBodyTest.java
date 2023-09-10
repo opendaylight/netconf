@@ -44,7 +44,23 @@ public class JsonResourceBodyTest extends AbstractResourceBodyTest {
                         .build())
                     .build())
                 .build())
-            .build(), parseResource("instance-identifier-module:cont", "/instanceidentifier/json/jsondata.json"));
+            .build(), parse("instance-identifier-module:cont", """
+                {
+                  "instance-identifier-module:cont": {
+                    "cont1": {
+                      "augment-module:lst11": [
+                        {
+                          "keyvalue111":"value1",
+                          "keyvalue112":"value2",
+                          "augment-augment-module:lf111": "/instance-identifier-module:cont/cont1\
+                /augment-module:lst11[keyvalue111=\\"value1\\"][keyvalue112=\\"value2\\"]/augment-augment-module:lf112",
+                          "augment-augment-module:lf112": "lf112 value"
+                        }
+                      ]
+                    }
+                  }
+                }"""));
+
     }
 
     @Test
