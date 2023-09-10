@@ -53,7 +53,8 @@ public class XmlResourceBodyTest extends AbstractResourceBodyTest {
 
     private void assertThrowsException(final String uriPath, final String expectedErrorMessage) {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> parseResource(uriPath, "/instanceidentifier/xml/bug7933.xml"));
+            () -> parse(uriPath, """
+                <cont1 xmlns="instance:identifier:module"/>"""));
         final var restconfError = ex.getErrors().get(0);
         assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
         assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
