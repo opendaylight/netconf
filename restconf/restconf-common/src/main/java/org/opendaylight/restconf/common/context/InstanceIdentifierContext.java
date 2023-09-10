@@ -17,7 +17,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
@@ -113,25 +112,6 @@ public abstract class InstanceIdentifierContext {
         return DataPath.of(context, path, null);
     }
 
-    // Legacy bierman02 invokeRpc()
-    public static @NonNull InstanceIdentifierContext ofRpcInput(final EffectiveModelContext context,
-            // FIXME: this this method really needed?
-            final RpcDefinition rpc, final @Nullable DOMMountPoint mountPoint) {
-        final var stack = SchemaInferenceStack.of(context);
-        stack.enterSchemaTree(rpc.getQName());
-        stack.enterSchemaTree(rpc.getInput().getQName());
-        return new WithoutDataPath(rpc, mountPoint, stack);
-    }
-
-    public static @NonNull InstanceIdentifierContext ofRpcOutput(final EffectiveModelContext context,
-            // FIXME: this this method really needed?
-            final RpcDefinition rpc, final @Nullable DOMMountPoint mountPoint) {
-        final var stack = SchemaInferenceStack.of(context);
-        stack.enterSchemaTree(rpc.getQName());
-        stack.enterSchemaTree(rpc.getOutput().getQName());
-        return new WithoutDataPath(rpc, mountPoint, stack);
-    }
-
     // Invocations of various identifier-less details
     public static @NonNull InstanceIdentifierContext ofStack(final SchemaInferenceStack stack) {
         return ofStack(stack, null);
@@ -152,24 +132,6 @@ public abstract class InstanceIdentifierContext {
         return new WithoutDataPath(schemaNode, mountPoint, stack);
     }
 
-    public static @NonNull InstanceIdentifierContext ofLocalRpcInput(final EffectiveModelContext context,
-            // FIXME: this this method really needed?
-            final RpcDefinition rpc) {
-        final var stack = SchemaInferenceStack.of(context);
-        stack.enterSchemaTree(rpc.getQName());
-        stack.enterSchemaTree(rpc.getInput().getQName());
-        return new WithoutDataPath(rpc.getInput(), null, stack);
-    }
-
-    public static @NonNull InstanceIdentifierContext ofLocalRpcOutput(final EffectiveModelContext context,
-            // FIXME: we want to re-validate this, so might as well take a QName
-            final RpcDefinition rpc) {
-        final var stack = SchemaInferenceStack.of(context);
-        stack.enterSchemaTree(rpc.getQName());
-        stack.enterSchemaTree(rpc.getOutput().getQName());
-        return new WithoutDataPath(rpc, null, stack);
-    }
-
     public static @NonNull InstanceIdentifierContext ofPath(final SchemaInferenceStack stack,
             final SchemaNode schemaNode, final YangInstanceIdentifier path,
             final @Nullable DOMMountPoint mountPoint) {
@@ -185,14 +147,6 @@ public abstract class InstanceIdentifierContext {
     public static @NonNull InstanceIdentifierContext ofMountPointPath(final DOMMountPoint mountPoint,
             final EffectiveModelContext context, final YangInstanceIdentifier path) {
         return DataPath.of(context, path, requireNonNull(mountPoint));
-    }
-
-    public static @NonNull InstanceIdentifierContext ofMountPointRpcOutput(final DOMMountPoint mountPoint,
-            final EffectiveModelContext mountContext, final RpcDefinition rpc) {
-        final var stack = SchemaInferenceStack.of(mountContext);
-        stack.enterSchemaTree(rpc.getQName());
-        stack.enterSchemaTree(rpc.getOutput().getQName());
-        return new WithoutDataPath(rpc, requireNonNull(mountPoint), stack);
     }
 
     public final @NonNull SchemaNode getSchemaNode() {
