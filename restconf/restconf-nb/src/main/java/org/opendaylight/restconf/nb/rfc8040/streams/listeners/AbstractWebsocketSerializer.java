@@ -19,9 +19,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
@@ -124,25 +126,36 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
     private boolean serializeChildNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode current,
             final boolean skipData) throws T {
         return switch (current.modificationType()) {
-            // just a subtree modification, recurse
-            case SUBTREE_MODIFIED -> {
-                var updated = false;
-                for (var child : current.childNodes()) {
-                    path.add(child.name());
-                    updated |= serializeChildNodesOnly(path, child, skipData);
-                    path.removeLast();
-                }
-                yield updated;
-            }
-            // other modification, serialize it if updated
-            default -> {
-                final var updated = !isNotUpdate(current);
-                if (updated) {
-                    serializeData(path, current, skipData);
-                }
-                yield updated;
-            }
+            case APPEARED, WRITE -> serializeChildNodesOnlyTerminal(path, current, skipData, current.getDataAfter());
+            case DISAPPEARED, DELETE -> serializeChildNodesOnlyTerminal(path, current, skipData,
+                current.getDataBefore());
+            case SUBTREE_MODIFIED -> serializeChildNodesOnlyChildren(path, current, skipData);
+            case UNMODIFIED -> false;
         };
+    }
+
+    private boolean serializeChildNodesOnlyTerminal(final Deque<PathArgument> path, final DataTreeCandidateNode current,
+            final boolean skipData, final NormalizedNode data) throws T {
+        if (data instanceof ChoiceNode || data instanceof LeafSetNode || data instanceof MapNode) {
+            return serializeChildNodesOnlyChildren(path, current, skipData);
+        }
+
+        final var updated = !isNotUpdate(current);
+        if (updated) {
+            serializeData(path, current, skipData);
+        }
+        return updated;
+    }
+
+    private boolean serializeChildNodesOnlyChildren(final Deque<PathArgument> path, final DataTreeCandidateNode current,
+            final boolean skipData) throws T {
+        var updated = false;
+        for (var child : current.childNodes()) {
+            path.add(child.name());
+            updated |= serializeChildNodesOnly(path, child, skipData);
+            path.removeLast();
+        }
+        return updated;
     }
 
     private void serializeData(final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate,
