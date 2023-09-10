@@ -30,6 +30,8 @@ import org.xmlunit.assertj.XmlAssert;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class XmlNotificationListenerTest extends AbstractNotificationListenerTest {
+    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+
     @Test
     public void notifi_leafTest() throws Exception {
         final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-leaf"));
@@ -166,10 +168,10 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
         return ImmutableNodes.leafNode(leafQName, "value");
     }
 
-    private static String prepareXmlResult(final DOMNotification notificationData, final Absolute schemaPathNotifi)
+    private String prepareXmlResult(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
-        final var notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
-                schemaPathNotifi, "xml-stream", NotificationOutputType.XML);
+        final var notifiAdapter = listenersBroker.registerNotificationListener(schemaPathNotifi, "xml-stream",
+            NotificationOutputType.XML);
         return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }
 }

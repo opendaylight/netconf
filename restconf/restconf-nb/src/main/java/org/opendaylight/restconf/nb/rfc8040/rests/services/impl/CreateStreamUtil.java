@@ -108,7 +108,7 @@ final class CreateStreamUtil {
      *     </pre>
      */
     // FIXME: this really should be a normal RPC implementation
-    static DOMRpcResult createDataChangeNotifiStream(final ContainerNode input,
+    static DOMRpcResult createDataChangeNotifiStream(final ListenersBroker listenersBroker, final ContainerNode input,
             final EffectiveModelContext refSchemaCtx) {
         // parsing out of container with settings and path
         final YangInstanceIdentifier path = preparePath(input);
@@ -123,7 +123,7 @@ final class CreateStreamUtil {
         final String streamName = streamNameBuilder.toString();
 
         // registration of the listener
-        ListenersBroker.getInstance().registerDataChangeListener(path, streamName, outputType);
+        listenersBroker.registerDataChangeListener(path, streamName, outputType);
 
         // building of output
         return new DefaultDOMRpcResult(Builders.containerBuilder()
@@ -182,7 +182,7 @@ final class CreateStreamUtil {
                 ErrorTag.OPERATION_FAILED);
         }
 
-        final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
+        final DeviceNotificationListenerAdaptor notificationListenerAdapter = streamUtil.listenersBroker()
             .registerDeviceNotificationListener(deviceName, prepareOutputType(input), mountModelContext,
                 mountPointService, mountPoint.getIdentifier());
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);

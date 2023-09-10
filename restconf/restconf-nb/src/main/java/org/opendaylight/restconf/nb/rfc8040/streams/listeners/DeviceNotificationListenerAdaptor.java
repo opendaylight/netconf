@@ -33,6 +33,7 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
     private final @NonNull EffectiveModelContext effectiveModel;
     private final @NonNull DOMMountPointService mountPointService;
     private final @NonNull YangInstanceIdentifier instanceIdentifier;
+    private final @NonNull ListenersBroker listenersBroker = ListenersBroker.getInstance();
 
     private ListenerRegistration<DOMMountPointListener> reg;
 
@@ -84,7 +85,7 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
                     }
                 }
             });
-            ListenersBroker.getInstance().removeAndCloseDeviceNotificationListener(this);
+            listenersBroker.removeAndCloseDeviceNotificationListener(this);
             resetListenerRegistration();
         }
     }
