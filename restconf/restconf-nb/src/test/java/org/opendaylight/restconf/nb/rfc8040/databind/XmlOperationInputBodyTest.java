@@ -38,8 +38,12 @@ public class XmlOperationInputBodyTest extends AbstractOperationInputBodyTest {
         final var stack = SchemaInferenceStack.of(YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc"));
         stack.enterSchemaTree(rpcTest);
 
-        final var body = new XmlOperationInputBody(
-            XmlOperationInputBodyTest.class.getResourceAsStream("/invoke-rpc/xml/rpc-input.xml"));
+        final var body = new XmlOperationInputBody(stringInputStream("""
+            <input xmlns="invoke:rpc:module">
+              <cont>
+                <lf>lf-test</lf>
+              </cont>
+            </input>"""));
 
         assertEquals(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(QName.create(rpcTest, "input")))
