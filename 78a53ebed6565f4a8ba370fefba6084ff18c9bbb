@@ -52,6 +52,24 @@
       "parentUuid": "84969f7b_c7b23772",
       "revId": "78a53ebed6565f4a8ba370fefba6084ff18c9bbb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec1e5ca4_5a78dd6f",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/JsonDataTreeCandidateSerializer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-09-10T22:02:17Z",
+      "side": 1,
+      "message": "RESTCONF is broken because of duplicate annotations for `postDataJSON()`:\n```\n20:17:31.042 ERROR [qtp1306137091-425] Following issues have been detected:\nWARNING: A resource model has ambiguous (sub-)resource method for HTTP method POST and input mime-types as defined by\"@Consumes\" and \"@Produces\" annotations at Java methods public javax.ws.rs.core.Response org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl.postDataJSON(java.io.InputStream,javax.ws.rs.core.UriInfo) and public javax.ws.rs.core.Response org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl.postDataJSON(java.lang.String,java.io.InputStream,javax.ws.rs.core.UriInfo) at matching regular expression /data/(.+). These two methods produces and consumes exactly the same mime-types and therefore their invocation as a resource methods will always fail.\n```",
+      "parentUuid": "d394e76a_0b55bb68",
+      "revId": "78a53ebed6565f4a8ba370fefba6084ff18c9bbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
