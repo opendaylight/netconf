@@ -129,6 +129,7 @@ public final class RestconfDataServiceImpl {
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
     private final DOMDataBroker dataBroker;
+    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
 
     public RestconfDataServiceImpl(final DatabindProvider databindProvider,
             final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
@@ -246,9 +247,9 @@ public final class RestconfDataServiceImpl {
                 final var notifName = notification.argument();
 
                 writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
-                    createYangNotifiStream(moduleName, notifName, NotificationOutputType.XML));
+                    createYangNotifiStream(listenersBroker, moduleName, notifName, NotificationOutputType.XML));
                 writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
-                    createYangNotifiStream(moduleName, notifName, NotificationOutputType.JSON));
+                    createYangNotifiStream(listenersBroker, moduleName, notifName, NotificationOutputType.JSON));
             });
         }
 
@@ -259,10 +260,9 @@ public final class RestconfDataServiceImpl {
         }
     }
 
-    private static NotificationListenerAdapter createYangNotifiStream(final String moduleName, final QName notifName,
-            final NotificationOutputType outputType) {
+    private static NotificationListenerAdapter createYangNotifiStream(final ListenersBroker listenersBroker,
+            final String moduleName, final QName notifName, final NotificationOutputType outputType) {
         final var streamName = createNotificationStreamName(moduleName, notifName.getLocalName(), outputType);
-        final var listenersBroker = ListenersBroker.getInstance();
 
         final var existing = listenersBroker.notificationListenerFor(streamName);
         return existing != null ? existing

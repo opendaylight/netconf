@@ -161,7 +161,8 @@ public final class RestconfInvokeOperationsServiceImpl {
         final var mountPoint = context.getMountPoint();
         if (mountPoint == null) {
             if (CreateDataChangeEventSubscription.QNAME.equals(rpcName)) {
-                future = Futures.immediateFuture(CreateStreamUtil.createDataChangeNotifiStream(input, schemaContext));
+                future = Futures.immediateFuture(CreateStreamUtil.createDataChangeNotifiStream(
+                    streamUtils.listenersBroker(), input, schemaContext));
             } else if (SubscribeDeviceNotification.QNAME.equals(rpcName)) {
                 final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
                 future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, input,

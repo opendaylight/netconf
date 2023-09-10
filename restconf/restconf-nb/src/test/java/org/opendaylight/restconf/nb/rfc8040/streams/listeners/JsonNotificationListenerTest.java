@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 public class JsonNotificationListenerTest extends AbstractNotificationListenerTest {
     private static final Logger LOG = LoggerFactory.getLogger(JsonNotificationListenerTest.class);
 
+    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+
     @Test
     public void notifi_leafTest() throws Exception {
         final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-leaf"));
@@ -159,10 +161,10 @@ public class JsonNotificationListenerTest extends AbstractNotificationListenerTe
         return ImmutableNodes.leafNode(leafQName, "value");
     }
 
-    private static String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi)
+    private String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
-        final var notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
-                schemaPathNotifi, "json-stream", NotificationOutputType.JSON);
+        final var notifiAdapter = listenersBroker.registerNotificationListener(schemaPathNotifi, "json-stream",
+            NotificationOutputType.JSON);
         return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }
 }
