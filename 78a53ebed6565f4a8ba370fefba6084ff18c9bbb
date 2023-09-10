@@ -16,6 +16,24 @@
       "message": "This doesn\u0027t seem to work for `child-nodes-only` when a list is removed.\n\nFor example, when there is a single NETCONF node configured in the `topology-netconf` topology and the node is deleted, hence the whole `node` list is removed from the datastore, a notification like this is generated (the event subscription target path is `/network-topology:network-topology`):\n```\n{\n    \"ietf-restconf:notification\": {\n        \"event-time\": \"2023-09-08T21:45:23.665615291Z\",\n        \"sal-remote:data-changed-notification\": {\n            \"data-change-event\": [\n                {\n                    \"path\": \"/network-topology:network-topology/topology[topology-id\u003d\u0027topology-netconf\u0027]\",\n                    \"operation\": \"deleted\"\n                }\n            ]\n        }\n    }\n}\n```\n\nThe dataPath has `network-topology, topology, topology[topology-id\u003d\u0027topology-netconf\u0027], node` but `node` is lost after it is processed in `scalarValue()`. And the `path` misleadingly points to the `topology-netconf` topology entry.",
       "revId": "78a53ebed6565f4a8ba370fefba6084ff18c9bbb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84969f7b_c7b23772",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/JsonDataTreeCandidateSerializer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-10T15:10:13Z",
+      "side": 1,
+      "message": "Ah, right, so this is even more broken than expected 😭 ListenerAdapter has to also mind which nodes have their path exactly representable in instance-identifier encoding.",
+      "parentUuid": "e2fb22a4_a94286da",
+      "revId": "78a53ebed6565f4a8ba370fefba6084ff18c9bbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
