@@ -19,6 +19,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 abstract class AbstractOperationInputBodyTest extends AbstractInstanceIdentifierTest {
     private static final NodeIdentifier INPUT_NID = new NodeIdentifier(QName.create(CONT_QNAME, "input"));
@@ -52,4 +53,23 @@ abstract class AbstractOperationInputBodyTest extends AbstractInstanceIdentifier
     }
 
     abstract OperationInputBody testEmptyBody();
+
+    @Test
+    public final void testRpcModuleInput() throws Exception {
+        final var rpcTest = QName.create("invoke:rpc:module", "2013-12-03", "rpc-test");
+        final var stack = SchemaInferenceStack.of(YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc"));
+        stack.enterSchemaTree(rpcTest);
+
+        final var body = testRpcModuleInputBody();
+
+        assertEquals(Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(QName.create(rpcTest, "input")))
+            .withChild(Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(QName.create(rpcTest, "cont")))
+                .withChild(ImmutableNodes.leafNode(QName.create(rpcTest, "lf"), "lf-test"))
+                .build())
+            .build(), body.toContainerNode(stack.toInference()));
+    }
+
+    abstract OperationInputBody testRpcModuleInputBody();
 }

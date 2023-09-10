@@ -24,4 +24,16 @@ public class JsonOperationInputBodyTest extends AbstractOperationInputBodyTest {
     OperationInputBody testEmptyBody() {
         return new JsonOperationInputBody(InputStream.nullInputStream());
     }
+
+    @Override
+    OperationInputBody testRpcModuleInputBody() {
+        return new JsonOperationInputBody(stringInputStream("""
+            {
+              "invoke-rpc-module:input" : {
+                "cont" : {
+                  "lf" : "lf-test"
+                }
+              }
+            }"""));
+    }
 }
