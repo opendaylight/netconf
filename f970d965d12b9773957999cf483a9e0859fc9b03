@@ -79,6 +79,29 @@
       },
       "revId": "f970d965d12b9773957999cf483a9e0859fc9b03",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e604153_18867e8c",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSubsystemSessionListener.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-11T19:22:37Z",
+      "side": 1,
+      "message": "try-catch should cover minimum required surface",
+      "range": {
+        "startLine": 39,
+        "startChar": 14,
+        "endLine": 39,
+        "endChar": 35
+      },
+      "revId": "f970d965d12b9773957999cf483a9e0859fc9b03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
