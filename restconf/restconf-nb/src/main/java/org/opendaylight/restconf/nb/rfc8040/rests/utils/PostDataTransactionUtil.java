@@ -24,7 +24,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +57,27 @@ public final class PostDataTransactionUtil {
         TransactionUtil.syncCommit(submitData(path, data, strategy, schemaContext, params), "POST", path);
     }
 
+    public static DataSchemaNode checkListAndOrderedType(final EffectiveModelContext ctx,
+            final YangInstanceIdentifier path) {
+        final var dataSchemaNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow().dataSchemaNode();
+
+        final String message;
+        if (dataSchemaNode instanceof ListSchemaNode listSchema) {
+            if (listSchema.isUserOrdered()) {
+                return listSchema;
+            }
+            message = "Insert parameter can be used only with ordered-by user list.";
+        } else if (dataSchemaNode instanceof LeafListSchemaNode leafListSchema) {
+            if (leafListSchema.isUserOrdered()) {
+                return leafListSchema;
+            }
+            message = "Insert parameter can be used only with ordered-by user leaf-list.";
+        } else {
+            message = "Insert parameter can be used only with list or leaf-list";
+        }
+        throw new RestconfDocumentedException(message, ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+    }
+
     /**
      * Post data by type.
      *
@@ -74,7 +99,7 @@ public final class PostDataTransactionUtil {
         }
 
         final var parentPath = path.coerceParent();
-        PutDataTransactionUtil.checkListAndOrderedType(schemaContext, parentPath);
+        checkListAndOrderedType(schemaContext, parentPath);
         final var grandParentPath = parentPath.coerceParent();
 
         return switch (insert) {

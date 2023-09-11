@@ -29,7 +29,6 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -125,8 +124,8 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        PutDataTransactionUtil.putData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA,
-            new NetconfRestconfStrategy(netconfService), WriteDataParams.empty());
+        new NetconfRestconfStrategy(netconfService).putData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA,
+            WriteDataParams.empty());
         verify(netconfService).lock();
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
@@ -141,8 +140,8 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        PutDataTransactionUtil.putData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA,
-            new NetconfRestconfStrategy(netconfService), WriteDataParams.empty());
+        new NetconfRestconfStrategy(netconfService).putData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA,
+            WriteDataParams.empty());
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
             Optional.empty());
@@ -155,8 +154,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        PutDataTransactionUtil.putData(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA, new NetconfRestconfStrategy(netconfService),
-            WriteDataParams.empty());
+        new NetconfRestconfStrategy(netconfService).putData(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA, WriteDataParams.empty());
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
     }
@@ -169,8 +167,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        PutDataTransactionUtil.putData(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA, new NetconfRestconfStrategy(netconfService),
-            WriteDataParams.empty());
+        new NetconfRestconfStrategy(netconfService).putData(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA, WriteDataParams.empty());
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
     }
@@ -182,8 +179,8 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        PutDataTransactionUtil.putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, JUKEBOX_SCHEMA,
-            new NetconfRestconfStrategy(netconfService), WriteDataParams.empty());
+        new NetconfRestconfStrategy(netconfService).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, JUKEBOX_SCHEMA,
+            WriteDataParams.empty());
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
@@ -197,8 +194,8 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        PutDataTransactionUtil.putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, JUKEBOX_SCHEMA,
-            new NetconfRestconfStrategy(netconfService), WriteDataParams.empty());
+        new NetconfRestconfStrategy(netconfService).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, JUKEBOX_SCHEMA,
+            WriteDataParams.empty());
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
