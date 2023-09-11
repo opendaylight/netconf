@@ -16,6 +16,24 @@
       "message": "Conclusion. The correct answer is option C.\n\nhttps://blogs.oracle.com/javamagazine/post/java-record-compact-canonical-constructor",
       "revId": "523f175fb4c5a267149e9542df9198d5745e50de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5db9284b_13956781",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Discriminator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-11T06:39:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "275d96d6_85f1eb7d",
+      "revId": "523f175fb4c5a267149e9542df9198d5745e50de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
