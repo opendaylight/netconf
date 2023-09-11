@@ -33,7 +33,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
@@ -246,8 +245,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPostContainerData() {
-        testPostContainerDataStrategy().postData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA,
-            WriteDataParams.empty());
+        testPostContainerDataStrategy().postData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA, null);
     }
 
     abstract @NonNull RestconfStrategy testPostContainerDataStrategy();
@@ -255,7 +253,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     public final void testPostListData() {
         testPostListDataStrategy(BAND_ENTRY, PLAYLIST_IID.node(BAND_ENTRY.name())).postData(PLAYLIST_IID, PLAYLIST,
-            JUKEBOX_SCHEMA, WriteDataParams.empty());
+            JUKEBOX_SCHEMA, null);
     }
 
     abstract @NonNull RestconfStrategy testPostListDataStrategy(MapEntryNode entryNode, YangInstanceIdentifier node);
@@ -265,8 +263,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         final var domException = new DOMException((short) 414, "Post request failed");
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> testPostDataFailStrategy(domException).postData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA,
-                WriteDataParams.empty()));
+            () -> testPostDataFailStrategy(domException).postData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA, null));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
     }
