@@ -42,6 +42,7 @@ public class RestconfDocumentedException extends WebApplicationException {
 
     private final List<RestconfError> errors;
     private final Status status;
+    private final String identifier;
 
     /**
      * Constructs an instance with an error message. The error type defaults to APPLICATION and the error tag defaults
@@ -137,6 +138,7 @@ public class RestconfDocumentedException extends WebApplicationException {
         }
 
         status = null;
+        identifier = null;
     }
 
     /**
@@ -155,6 +157,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      */
     public RestconfDocumentedException(final Status status) {
         errors = List.of();
+        identifier = null;
         this.status = requireNonNull(status, "Status can't be null");
     }
 
@@ -162,12 +165,21 @@ public class RestconfDocumentedException extends WebApplicationException {
         super(cause, ErrorTags.statusOf(error.getErrorTag()));
         errors = List.of(error);
         status = null;
+        identifier = null;
     }
 
     public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
         super(cause, ErrorTags.statusOf(errors.get(0).getErrorTag()));
         this.errors = List.copyOf(errors);
         status = null;
+        identifier = null;
+    }
+
+    public RestconfDocumentedException(final Throwable cause, final RestconfError error, final String identifier) {
+        super(cause, ErrorTags.statusOf(error.getErrorTag()));
+        errors = List.of(error);
+        status = null;
+        this.identifier = identifier;
     }
 
     public static RestconfDocumentedException decodeAndThrow(final String message,
@@ -273,5 +285,9 @@ public class RestconfDocumentedException extends WebApplicationException {
     @Override
     public String getMessage() {
         return "errors: " + errors + (status != null ? ", status: " + status : "");
+    }
+
+    public String identifier() {
+        return identifier;
     }
 }

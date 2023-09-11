@@ -512,7 +512,7 @@ public final class RestconfDataServiceImpl {
             path = path.node(arg);
         }
 
-        strategy.postData(path, data, insert);
+        strategy.postData(path, data, insert, uriInfo.getPathParameters(false).getFirst("identifier"));
         return Response.created(resolveLocation(uriInfo, path, modelContext, data)).build();
     }
 

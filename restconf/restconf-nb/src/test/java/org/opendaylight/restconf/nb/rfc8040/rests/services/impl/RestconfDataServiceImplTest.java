@@ -93,6 +93,9 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
             .withChild(CONT_PLAYER)
             .withChild(Builders.mapBuilder().withNodeIdentifier(PLAYLIST_NID).build())
             .build();
+    private static final MultivaluedHashMap<String, String> PATH_PARAMETERS = new MultivaluedHashMap<>() {{
+            put("identifier", null);
+        }};
 
     private RestconfDataServiceImpl dataService;
 
@@ -332,6 +335,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
             Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME)).build());
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+        doReturn(PATH_PARAMETERS).when(uriInfo).getPathParameters(any(Boolean.class));
 
         final var response = dataService.postDataJSON(new ByteArrayInputStream("""
             {
@@ -349,7 +353,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
-
+        doReturn(PATH_PARAMETERS).when(uriInfo).getPathParameters(any(Boolean.class));
         final var response = dataService.postDataJSON("example-jukebox:jukebox", new ByteArrayInputStream("""
             {
               "example-jukebox:playlist" : {
