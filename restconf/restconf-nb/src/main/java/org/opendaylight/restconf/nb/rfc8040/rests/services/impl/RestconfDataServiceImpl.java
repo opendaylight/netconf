@@ -392,7 +392,7 @@ public final class RestconfDataServiceImpl {
      * @return {@link Response}
      */
     @POST
-    @Path("/data/{identifier:.+}")
+    @Path("/data")
     @Consumes({
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
