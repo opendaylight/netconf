@@ -19,6 +19,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ final class TransactionUtil {
     }
 
     static @NonNull RestconfDocumentedException decodeException(final Throwable ex, final String txType,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path, final EffectiveModelContext context) {
         if (ex instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
             // or override it with new generic message. We search for NetconfDocumentedException that was send from
@@ -64,11 +65,11 @@ final class TransactionUtil {
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
                         return new RestconfDocumentedException(ex, new RestconfError(ErrorType.PROTOCOL,
-                            ErrorTag.DATA_EXISTS, "Data already exists", path));
+                            ErrorTag.DATA_EXISTS, "Data already exists", path), context);
                     } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
                         return new RestconfDocumentedException(ex, new RestconfError(ErrorType.PROTOCOL,
-                            ErrorTag.DATA_MISSING, "Data does not exist", path));
+                            ErrorTag.DATA_MISSING, "Data does not exist", path), context);
                     }
                 } else if (error instanceof NetconfDocumentedException netconfError) {
                     return new RestconfDocumentedException(netconfError.getMessage(), netconfError.getErrorType(),
