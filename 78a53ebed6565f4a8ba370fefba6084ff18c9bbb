@@ -70,6 +70,24 @@
       "parentUuid": "d394e76a_0b55bb68",
       "revId": "78a53ebed6565f4a8ba370fefba6084ff18c9bbb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f889a134_ea69858c",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/JsonDataTreeCandidateSerializer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-09-11T00:43:43Z",
+      "side": 1,
+      "message": "Once the incorrect `Path` of one of the `postDataJSON()` methods is fixed, the patch 107783 seems to work - when the last item is removed the path points to the last item that\u0027s just removed instead of the parent of the list or leaf-list. 👍",
+      "parentUuid": "ec1e5ca4_5a78dd6f",
+      "revId": "78a53ebed6565f4a8ba370fefba6084ff18c9bbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
