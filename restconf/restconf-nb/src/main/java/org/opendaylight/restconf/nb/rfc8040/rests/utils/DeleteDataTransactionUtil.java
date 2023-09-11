@@ -17,6 +17,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransacti
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,8 @@ public final class DeleteDataTransactionUtil {
      * @param strategy object that perform the actual DS operations
      * @return {@link Response}
      */
-    public static Response deleteData(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
+    public static Response deleteData(final RestconfStrategy strategy, final YangInstanceIdentifier path,
+            final EffectiveModelContext context) {
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
         try {
             transaction.delete(path);
@@ -49,7 +51,7 @@ public final class DeleteDataTransactionUtil {
         final FluentFuture<? extends CommitInfo> future = transaction.commit();
         final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(future, DELETE_TX_TYPE, response, path);
+        FutureCallbackTx.addCallback(future, DELETE_TX_TYPE, response, path, context);
         return response.build();
     }
 

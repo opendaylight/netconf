@@ -70,7 +70,7 @@ public final class PutDataTransactionUtil {
         final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy,
             payload.getData(), params);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, responseFactory, path);
+        FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, responseFactory, path, schemaContext);
         return responseFactory.build();
     }
 

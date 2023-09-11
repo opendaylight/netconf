@@ -39,6 +39,7 @@ import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DeleteDataTransactionUtilTest {
@@ -48,6 +49,8 @@ public class DeleteDataTransactionUtilTest {
     private DOMDataBroker mockDataBroker;
     @Mock
     private NetconfDataTreeService netconfService;
+    @Mock
+    private EffectiveModelContext context;
 
     @Before
     public void init() {
@@ -95,15 +98,16 @@ public class DeleteDataTransactionUtilTest {
         deleteFail(new NetconfRestconfStrategy(netconfService));
     }
 
-    private static void delete(final RestconfStrategy strategy) {
-        final Response response = DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.empty());
+    private void delete(final RestconfStrategy strategy) {
+        final Response response = DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.empty(),
+            context);
         // assert success
         assertEquals("Not expected response received", Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
-    private static void deleteFail(final RestconfStrategy strategy) {
+    private void deleteFail(final RestconfStrategy strategy) {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.empty()));
+            () -> DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.empty(), context));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
