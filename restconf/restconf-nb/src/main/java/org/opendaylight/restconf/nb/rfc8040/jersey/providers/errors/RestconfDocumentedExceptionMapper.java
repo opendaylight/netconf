@@ -42,6 +42,7 @@ import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
@@ -130,7 +131,8 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         try (var outputStream = new ByteArrayOutputStream();
              var streamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
              var jsonWriter = JsonWriterFactory.createJsonWriter(streamWriter, DEFAULT_INDENT_SPACES_NUM)) {
-            final var currentDatabindContext = databindProvider.currentContext();
+            final var currentDatabindContext = exception.modelContext() != null
+                ? DatabindContext.ofModel(exception.modelContext()) : databindProvider.currentContext();
             jsonWriter.beginObject();
             final var errors = exception.getErrors();
             if (errors != null && !errors.isEmpty()) {

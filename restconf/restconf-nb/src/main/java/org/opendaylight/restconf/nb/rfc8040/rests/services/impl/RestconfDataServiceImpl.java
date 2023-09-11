@@ -252,9 +252,11 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), Optional.of(mountPointService));
 
+        final EffectiveModelContext schemaContextRef = databindProvider.currentContext().modelContext();
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        return DeleteDataTransactionUtil.deleteData(strategy, instanceIdentifier.getInstanceIdentifier());
+        return DeleteDataTransactionUtil.deleteData(strategy, instanceIdentifier.getInstanceIdentifier(),
+            schemaContextRef);
     }
 
     @Override

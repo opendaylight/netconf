@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -39,9 +40,14 @@ import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DeleteDataTransactionUtilTest {
+    private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
+
+    private EffectiveModelContext schema;
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -50,7 +56,9 @@ public class DeleteDataTransactionUtilTest {
     private NetconfDataTreeService netconfService;
 
     @Before
-    public void init() {
+    public void init() throws Exception {
+        schema =
+            YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
@@ -95,15 +103,15 @@ public class DeleteDataTransactionUtilTest {
         deleteFail(new NetconfRestconfStrategy(netconfService));
     }
 
-    private static void delete(final RestconfStrategy strategy) {
-        final Response response = DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.of());
+    private void delete(final RestconfStrategy strategy) {
+        final Response response = DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.of(), schema);
         // assert success
         assertEquals("Not expected response received", Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
-    private static void deleteFail(final RestconfStrategy strategy) {
+    private void deleteFail(final RestconfStrategy strategy) {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.of()));
+            () -> DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.of(), schema));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
