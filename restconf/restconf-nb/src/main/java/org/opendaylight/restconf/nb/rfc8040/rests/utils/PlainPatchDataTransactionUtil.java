@@ -63,7 +63,7 @@ public final class PlainPatchDataTransactionUtil {
         final ResponseFactory response = new ResponseFactory(Status.OK);
 
         // closes transactionChain if any, may throw
-        FutureCallbackTx.addCallback(future, PatchDataTransactionUtil.PATCH_TX_TYPE, response, path);
+        FutureCallbackTx.addCallback(future, PatchDataTransactionUtil.PATCH_TX_TYPE, response, path, schemaContext);
         return response.build();
     }
 }

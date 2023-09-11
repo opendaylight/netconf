@@ -9,7 +9,6 @@ package org.opendaylight.restconf.common.errors;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +24,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
@@ -37,11 +37,14 @@ import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
  * @author Thomas Pantelis
  */
 public class RestconfDocumentedException extends WebApplicationException {
-    @Serial
+    @java.io.Serial
     private static final long serialVersionUID = 2L;
 
     private final List<RestconfError> errors;
     private final Status status;
+
+    // FIXME: this field should be non-null
+    private final transient @Nullable EffectiveModelContext modelContext;
 
     /**
      * Constructs an instance with an error message. The error type defaults to APPLICATION and the error tag defaults
@@ -137,6 +140,7 @@ public class RestconfDocumentedException extends WebApplicationException {
         }
 
         status = null;
+        modelContext = null;
     }
 
     /**
@@ -155,6 +159,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      */
     public RestconfDocumentedException(final Status status) {
         errors = List.of();
+        modelContext = null;
         this.status = requireNonNull(status, "Status can't be null");
     }
 
@@ -162,12 +167,22 @@ public class RestconfDocumentedException extends WebApplicationException {
         super(cause, ErrorTags.statusOf(error.getErrorTag()));
         errors = List.of(error);
         status = null;
+        modelContext = null;
     }
 
     public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
         super(cause, ErrorTags.statusOf(errors.get(0).getErrorTag()));
         this.errors = List.copyOf(errors);
         status = null;
+        modelContext = null;
+    }
+
+    public RestconfDocumentedException(final Throwable cause, final RestconfError error,
+            final EffectiveModelContext modelContext) {
+        super(cause, ErrorTags.statusOf(error.getErrorTag()));
+        errors = List.of(error);
+        status = null;
+        this.modelContext = requireNonNull(modelContext);
     }
 
     public static RestconfDocumentedException decodeAndThrow(final String message,
@@ -260,6 +275,16 @@ public class RestconfDocumentedException extends WebApplicationException {
             errorList.add(new RestconfError(rpcError));
         }
         return errorList;
+    }
+
+    /**
+     * Reference to {@link EffectiveModelContext} in which this exception was generated. This method will return
+     * {@code null} if this exception was serialized or if the context is not available.
+     *
+     * @return Reference model context
+     */
+    public @Nullable EffectiveModelContext modelContext() {
+        return modelContext;
     }
 
     public List<RestconfError> getErrors() {
