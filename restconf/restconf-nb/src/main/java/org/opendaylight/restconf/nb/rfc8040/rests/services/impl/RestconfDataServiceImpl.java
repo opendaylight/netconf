@@ -84,7 +84,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSu
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
@@ -498,7 +497,7 @@ public final class RestconfDataServiceImpl {
             path = path.node(arg);
         }
 
-        PostDataTransactionUtil.postData(path, data, strategy, context, params);
+        strategy.postData(path, data, context, params);
         return Response.created(resolveLocation(uriInfo, path, context, data)).build();
     }
 

@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil.checkItemDoesNotExists;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
@@ -86,13 +85,13 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
                 BatchedExistenceCheck.start(verifyNotNull(rwTx), CONFIGURATION, path, children);
 
             for (final NormalizedNode child : children) {
-                final YangInstanceIdentifier childPath = path.node(child.name());
+                final var childPath = path.node(child.name());
                 verifyNotNull(rwTx).put(CONFIGURATION, childPath, child);
             }
             // ... finally collect existence checks and abort the transaction if any of them failed.
             checkExistence(path, check);
         } else {
-            checkItemDoesNotExists(verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
+            RestconfStrategy.checkItemDoesNotExists(verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
             TransactionUtil.ensureParentsByMerge(path, schemaContext, this);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }

@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -26,18 +27,26 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.TransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.yang.common.Empty;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Baseline execution strategy for various RESTCONF operations.
@@ -63,6 +72,8 @@ public abstract class RestconfStrategy {
          */
         REPLACED;
     }
+
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
 
     RestconfStrategy() {
         // Hidden on purpose
@@ -121,7 +132,7 @@ public abstract class RestconfStrategy {
      * @param path the data object path
      * @return a FluentFuture containing the result of the check
      */
-    public abstract ListenableFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path);
+    abstract ListenableFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
      * Delete data from the configuration datastore. If the data does not exist, this operation will fail, as outlined
@@ -194,7 +205,7 @@ public abstract class RestconfStrategy {
         final ListenableFuture<? extends CommitInfo> commitFuture;
         if (insert != null) {
             final var parentPath = path.coerceParent();
-            PostDataTransactionUtil.checkListAndOrderedType(context, parentPath);
+            checkListAndOrderedType(context, parentPath);
             commitFuture = insertAndCommit(path, data, insert, params.point(), parentPath, context);
         } else {
             commitFuture = replaceAndCommit(prepareWriteExecution(), path, data, context);
@@ -273,5 +284,160 @@ public abstract class RestconfStrategy {
             final YangInstanceIdentifier path, final NormalizedNode data, final EffectiveModelContext context) {
         tx.replace(path, data, context);
         return tx.commit();
+    }
+
+    /**
+     * Check mount point and prepare variables for post data. Close {@link DOMTransactionChain} if any inside of object
+     * {@link RestconfStrategy} provided as a parameter.
+     *
+     * @param path          path
+     * @param data          data
+     * @param schemaContext reference to actual {@link EffectiveModelContext}
+     * @param params        {@link WriteDataParams}
+     */
+    public void postData(final YangInstanceIdentifier path, final NormalizedNode data,
+            final EffectiveModelContext schemaContext, final WriteDataParams params) {
+        TransactionUtil.syncCommit(submitData(path, data, schemaContext, params), "POST", path);
+    }
+
+    private static DataSchemaNode checkListAndOrderedType(final EffectiveModelContext ctx,
+            final YangInstanceIdentifier path) {
+        final var dataSchemaNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow().dataSchemaNode();
+
+        final String message;
+        if (dataSchemaNode instanceof ListSchemaNode listSchema) {
+            if (listSchema.isUserOrdered()) {
+                return listSchema;
+            }
+            message = "Insert parameter can be used only with ordered-by user list.";
+        } else if (dataSchemaNode instanceof LeafListSchemaNode leafListSchema) {
+            if (leafListSchema.isUserOrdered()) {
+                return leafListSchema;
+            }
+            message = "Insert parameter can be used only with ordered-by user leaf-list.";
+        } else {
+            message = "Insert parameter can be used only with list or leaf-list";
+        }
+        throw new RestconfDocumentedException(message, ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+    }
+
+    /**
+     * Post data by type.
+     *
+     * @param path          path
+     * @param data          data
+     * @param schemaContext schema context of data
+     * @param point         query parameter
+     * @param insert        query parameter
+     * @return {@link FluentFuture}
+     */
+    private ListenableFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
+            final NormalizedNode data, final EffectiveModelContext schemaContext, final WriteDataParams params) {
+        final var transaction = prepareWriteExecution();
+        final var insert = params.insert();
+        if (insert == null) {
+            return makePost(path, data, schemaContext, transaction);
+        }
+
+        final var parentPath = path.coerceParent();
+        checkListAndOrderedType(schemaContext, parentPath);
+        final var grandParentPath = parentPath.coerceParent();
+
+        return switch (insert) {
+            case FIRST -> {
+                final var readData = transaction.readList(grandParentPath);
+                if (readData == null || readData.isEmpty()) {
+                    transaction.replace(path, data, schemaContext);
+                } else {
+                    checkItemDoesNotExists(exists(LogicalDatastoreType.CONFIGURATION, path), path);
+                    transaction.remove(grandParentPath);
+                    transaction.replace(path, data, schemaContext);
+                    transaction.replace(grandParentPath, readData, schemaContext);
+                }
+                yield transaction.commit();
+            }
+            case LAST -> makePost(path, data, schemaContext, transaction);
+            case BEFORE -> {
+                final var readData = transaction.readList(grandParentPath);
+                if (readData == null || readData.isEmpty()) {
+                    transaction.replace(path, data, schemaContext);
+                } else {
+                    checkItemDoesNotExists(exists(LogicalDatastoreType.CONFIGURATION, path), path);
+                    insertWithPointPost(path, data, schemaContext, params.getPoint(), readData, true, transaction);
+                }
+                yield transaction.commit();
+            }
+            case AFTER -> {
+                final var readData = transaction.readList(grandParentPath);
+                if (readData == null || readData.isEmpty()) {
+                    transaction.replace(path, data, schemaContext);
+                } else {
+                    checkItemDoesNotExists(exists(LogicalDatastoreType.CONFIGURATION, path), path);
+                    insertWithPointPost(path, data, schemaContext, params.getPoint(), readData, false, transaction);
+                }
+                yield transaction.commit();
+            }
+        };
+    }
+
+    private static void insertWithPointPost(final YangInstanceIdentifier path, final NormalizedNode data,
+                                            final EffectiveModelContext schemaContext, final PointParam point,
+                                            final NormalizedNodeContainer<?> readList, final boolean before,
+                                            final RestconfTransaction transaction) {
+        final YangInstanceIdentifier parent = path.coerceParent().coerceParent();
+        transaction.remove(parent);
+        final var pointArg = YangInstanceIdentifierDeserializer.create(schemaContext, point.value()).path
+            .getLastPathArgument();
+        int lastItemPosition = 0;
+        for (var nodeChild : readList.body()) {
+            if (nodeChild.name().equals(pointArg)) {
+                break;
+            }
+            lastItemPosition++;
+        }
+        if (!before) {
+            lastItemPosition++;
+        }
+        int lastInsertedPosition = 0;
+        final var emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, parent);
+        transaction.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
+        for (var nodeChild : readList.body()) {
+            if (lastInsertedPosition == lastItemPosition) {
+                transaction.replace(path, data, schemaContext);
+            }
+            final YangInstanceIdentifier childPath = parent.node(nodeChild.name());
+            transaction.replace(childPath, nodeChild, schemaContext);
+            lastInsertedPosition++;
+        }
+    }
+
+    private static ListenableFuture<? extends CommitInfo> makePost(final YangInstanceIdentifier path,
+            final NormalizedNode data, final EffectiveModelContext schemaContext,
+            final RestconfTransaction transaction) {
+        try {
+            transaction.create(path, data, schemaContext);
+        } catch (RestconfDocumentedException e) {
+            // close transaction if any and pass exception further
+            transaction.cancel();
+            throw e;
+        }
+
+        return transaction.commit();
+    }
+
+    /**
+     * Check if items do NOT already exists at specified {@code path}.
+     *
+     * @param existsFuture if checked data exists
+     * @param path         Path to be checked
+     * @throws RestconfDocumentedException if data already exists.
+     */
+    static void checkItemDoesNotExists(final ListenableFuture<Boolean> existsFuture,
+            final YangInstanceIdentifier path) {
+        if (TransactionUtil.syncAccess(existsFuture, path)) {
+            LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
+            throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
+                path);
+        }
     }
 }
