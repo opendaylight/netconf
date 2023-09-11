@@ -38,6 +38,22 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
 public abstract class RestconfStrategy {
+    /**
+     * Result of a {@code PUT} request as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>. The definition makes it
+     * clear that the logical operation is {@code create-or-replace}.
+     */
+    public enum CreateOrReplaceResult {
+        /**
+         * A new resource has been created.
+         */
+        CREATED,
+        /*
+         * An existing resources has been replaced.
+         */
+        REPLACED;
+    }
+
     RestconfStrategy() {
         // Hidden on purpose
     }

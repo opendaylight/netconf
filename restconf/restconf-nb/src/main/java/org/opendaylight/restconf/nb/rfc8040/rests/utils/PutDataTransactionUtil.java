@@ -16,6 +16,7 @@ import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.CreateOrReplaceResult;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -35,22 +36,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * Util class for put data to DS.
  */
 public final class PutDataTransactionUtil {
-    /**
-     * Result of a {@code PUT} request as defined in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>. The definition makes it
-     * clear that the logical operation is {@code create-or-replace}.
-     */
-    public enum CreateOrReplaceResult {
-        /**
-         * A new resource has been created.
-         */
-        CREATED,
-        /*
-         * An existing resources has been replaced.
-         */
-        REPLACED;
-    }
-
     private PutDataTransactionUtil() {
         // Hidden on purpose
     }
