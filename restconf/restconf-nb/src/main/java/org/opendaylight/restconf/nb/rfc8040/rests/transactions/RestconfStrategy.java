@@ -248,7 +248,7 @@ public abstract class RestconfStrategy {
             commitFuture = replaceAndCommit(prepareWriteExecution(), path, data);
         }
 
-        TransactionUtil.syncCommit(commitFuture, "PUT", path);
+        TransactionUtil.syncCommit(commitFuture, "PUT", path, null);
         return exists ? CreateOrReplaceResult.REPLACED : CreateOrReplaceResult.CREATED;
     }
 
@@ -352,7 +352,7 @@ public abstract class RestconfStrategy {
      * @param insert  {@link Insert}
      */
     public final void postData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final @Nullable Insert insert) {
+            final @Nullable Insert insert, final String identifier) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
             final var parentPath = path.coerceParent();
@@ -361,7 +361,7 @@ public abstract class RestconfStrategy {
         } else {
             future = createAndCommit(prepareWriteExecution(), path, data);
         }
-        TransactionUtil.syncCommit(future, "POST", path);
+        TransactionUtil.syncCommit(future, "POST", path, identifier);
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
@@ -485,7 +485,7 @@ public abstract class RestconfStrategy {
         final var patchId = patch.patchId();
         if (noError) {
             try {
-                TransactionUtil.syncCommit(tx.commit(), "PATCH", null);
+                TransactionUtil.syncCommit(tx.commit(), "PATCH", null, null);
             } catch (RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 return new PatchStatusContext(modelContext, patchId, List.copyOf(editCollection), false, e.getErrors());

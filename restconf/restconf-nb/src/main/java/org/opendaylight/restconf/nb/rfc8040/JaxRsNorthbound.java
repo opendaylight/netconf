@@ -106,16 +106,14 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .addUrlPattern("/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new RestconfApplication(databindProvider, mountPointService, dataBroker, rpcService, actionService,
-                        notificationService, schemaService, streamsConfiguration))
-                    .build())
+                        notificationService, schemaService, streamsConfiguration)).build())
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/" + SSE_SUBPATH + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(
-                    new DataStreamApplication(databindProvider,
-                        new RestconfDataStreamServiceImpl(scheduledThreadPool, streamsConfiguration)))
-                    .build())
+                    new DataStreamApplication(databindProvider, mountPointService,
+                        new RestconfDataStreamServiceImpl(scheduledThreadPool, streamsConfiguration))).build())
                 .name("notificationServlet")
                 .asyncSupported(true)
                 .build())

@@ -27,6 +27,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Mockito;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
@@ -56,7 +58,8 @@ public class RestconfDocumentedExceptionMapperTest {
         final var schemaContext = YangParserTestUtils.parseYangResources(
                 RestconfDocumentedExceptionMapperTest.class, "/restconf/impl/ietf-restconf@2017-01-26.yang",
                 "/instanceidentifier/yang/instance-identifier-patch-module.yang");
-        exceptionMapper = new RestconfDocumentedExceptionMapper(() -> DatabindContext.ofModel(schemaContext));
+        exceptionMapper = new RestconfDocumentedExceptionMapper(() -> DatabindContext.ofModel(schemaContext),
+            Mockito.mock(DOMMountPointService.class));
     }
 
     /**

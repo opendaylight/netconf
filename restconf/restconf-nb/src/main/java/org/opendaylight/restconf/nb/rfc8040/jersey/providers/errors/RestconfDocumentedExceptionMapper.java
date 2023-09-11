@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -64,6 +65,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     static final QName ERROR_INFO_QNAME = qnameOf("error-info");
 
     private final DatabindProvider databindProvider;
+    private final DOMMountPointService mountPointService;
 
     @Context
     private HttpHeaders headers;
@@ -73,8 +75,10 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      *
      * @param databindProvider A {@link DatabindProvider}
      */
-    public RestconfDocumentedExceptionMapper(final DatabindProvider databindProvider) {
+    public RestconfDocumentedExceptionMapper(final DatabindProvider databindProvider,
+            final DOMMountPointService mountPointService) {
         this.databindProvider = requireNonNull(databindProvider);
+        this.mountPointService = requireNonNull(mountPointService);
     }
 
     @Override
