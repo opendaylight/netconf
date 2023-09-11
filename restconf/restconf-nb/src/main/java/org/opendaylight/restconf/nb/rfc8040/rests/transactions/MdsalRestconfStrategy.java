@@ -102,9 +102,9 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public ListenableFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    ListenableFuture<Boolean> exists(final YangInstanceIdentifier path) {
         try (var tx = dataBroker.newReadOnlyTransaction()) {
-            return tx.exists(store, path);
+            return tx.exists(LogicalDatastoreType.CONFIGURATION, path);
         }
     }
 }

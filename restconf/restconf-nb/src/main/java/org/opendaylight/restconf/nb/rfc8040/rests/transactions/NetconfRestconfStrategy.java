@@ -79,8 +79,8 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public ListenableFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        return Futures.transform(remapException(read(store, path)),
+    ListenableFuture<Boolean> exists(final YangInstanceIdentifier path) {
+        return Futures.transform(remapException(netconfService.getConfig(path)),
             optionalNode -> optionalNode != null && optionalNode.isPresent(),
             MoreExecutors.directExecutor());
     }
