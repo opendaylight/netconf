@@ -35,9 +35,9 @@ import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
-import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
@@ -181,13 +181,13 @@ public final class QueryParams {
         return new ReadDataParams(content, depth, fields, withDefaults, prettyPrint);
     }
 
-    public static @NonNull WriteDataParams newWriteDataParams(final UriInfo uriInfo) {
+    public static @Nullable Insert parseInsert(final UriInfo uriInfo) {
         InsertParam insert = null;
         PointParam point = null;
 
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            final String paramName = entry.getKey();
-            final List<String> paramValues = entry.getValue();
+        for (var entry : uriInfo.getQueryParameters().entrySet()) {
+            final var paramName = entry.getKey();
+            final var paramValues = entry.getValue();
 
             try {
                 switch (paramName) {
@@ -207,7 +207,7 @@ public final class QueryParams {
         }
 
         try {
-            return WriteDataParams.of(insert, point);
+            return Insert.of(insert, point);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);
         }
