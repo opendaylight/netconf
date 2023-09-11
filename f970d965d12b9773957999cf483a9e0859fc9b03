@@ -16,6 +16,69 @@
       "message": "looks ok",
       "revId": "f970d965d12b9773957999cf483a9e0859fc9b03",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9eab4bae_46961ae6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-11T19:21:02Z",
+      "side": 1,
+      "message": "Also needs to be rebased",
+      "revId": "f970d965d12b9773957999cf483a9e0859fc9b03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b019a22a_479ec65a",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSubsystemFactory.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-11T19:21:02Z",
+      "side": 1,
+      "message": "\u0027this factory\u0027",
+      "range": {
+        "startLine": 19,
+        "startChar": 40,
+        "endLine": 19,
+        "endChar": 47
+      },
+      "revId": "f970d965d12b9773957999cf483a9e0859fc9b03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59219a04_4b0ee64d",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSubsystemFactory.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-11T19:21:02Z",
+      "side": 1,
+      "message": "please do not introduce new \u0027get\u0027 methods:\n- this is expected to be immutable, so there is no setter\n- Java Beans naming is so 90s, we are in the 21st century\n- this could be implemented by a record and the naming mismatch is just pure overhead",
+      "range": {
+        "startLine": 23,
+        "startChar": 20,
+        "endLine": 23,
+        "endChar": 23
+      },
+      "revId": "f970d965d12b9773957999cf483a9e0859fc9b03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
