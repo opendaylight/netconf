@@ -228,7 +228,7 @@ public abstract class RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path));
+                future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path, modelContext));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -264,7 +264,7 @@ public abstract class RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                ret.setFailure(TransactionUtil.decodeException(cause, "PUT", path));
+                ret.setFailure(TransactionUtil.decodeException(cause, "PUT", path, modelContext));
             }
         }, MoreExecutors.directExecutor());
 
@@ -391,7 +391,7 @@ public abstract class RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                ret.setFailure(TransactionUtil.decodeException(cause, "POST", path));
+                ret.setFailure(TransactionUtil.decodeException(cause, "POST", path, modelContext));
             }
         }, MoreExecutors.directExecutor());
 
@@ -533,7 +533,7 @@ public abstract class RestconfStrategy {
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false,
-                    TransactionUtil.decodeException(cause, "PATCH", null).getErrors()));
+                    TransactionUtil.decodeException(cause, "PATCH", null, modelContext).getErrors()));
             }
         }, MoreExecutors.directExecutor());
 
