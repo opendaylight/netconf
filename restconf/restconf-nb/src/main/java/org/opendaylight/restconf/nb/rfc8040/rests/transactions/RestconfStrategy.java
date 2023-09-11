@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -16,12 +17,14 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
@@ -178,75 +181,81 @@ public abstract class RestconfStrategy {
      * Check mount point and prepare variables for put data to DS. Close {@link DOMTransactionChain} if any
      * inside of object {@link RestconfStrategy} provided as a parameter if any.
      *
-     * @param path          path of data
-     * @param data          data
-     * @param schemaContext reference to {@link EffectiveModelContext}
-     * @param params        {@link WriteDataParams}
+     * @param path    path of data
+     * @param data    data
+     * @param context reference to {@link EffectiveModelContext}
+     * @param params  {@link WriteDataParams}
      * @return A {@link CreateOrReplaceResult}
      */
     public @NonNull CreateOrReplaceResult putData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext schemaContext, final WriteDataParams params) {
+            final EffectiveModelContext context, final WriteDataParams params) {
         final var exists = TransactionUtil.syncAccess(exists(LogicalDatastoreType.CONFIGURATION, path), path);
-        TransactionUtil.syncCommit(submitData(path, schemaContext, data, params), "PUT", path);
+
+        final var insert = params.insert();
+        final ListenableFuture<? extends CommitInfo> commitFuture;
+        if (insert != null) {
+            final var parentPath = path.coerceParent();
+            PostDataTransactionUtil.checkListAndOrderedType(context, parentPath);
+            commitFuture = insertAndCommit(path, data, insert, params.point(), parentPath, context);
+        } else {
+            commitFuture = replaceAndCommit(prepareWriteExecution(), path, data, context);
+        }
+
+        TransactionUtil.syncCommit(commitFuture, "PUT", path);
         return exists ? CreateOrReplaceResult.REPLACED : CreateOrReplaceResult.CREATED;
     }
 
     /**
      * Put data to DS.
      *
-     * @param path          path of data
-     * @param schemaContext {@link SchemaContext}
-     * @param data          data
-     * @param params        {@link WriteDataParams}
+     * @param path    path of data
+     * @param data    data
+     * @param insert  {@link InsertParam}
+     * @param point   {@link PointParam}, potentially null
+     * @param context {@link SchemaContext}
      * @return A {@link ListenableFuture}
      */
-    private ListenableFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
-            final EffectiveModelContext schemaContext, final NormalizedNode data, final WriteDataParams params) {
-        final var transaction = prepareWriteExecution();
-        final var insert = params.insert();
-        if (insert == null) {
-            return makePut(path, schemaContext, transaction, data);
-        }
-
-        final var parentPath = path.coerceParent();
-        PostDataTransactionUtil.checkListAndOrderedType(schemaContext, parentPath);
+    private ListenableFuture<? extends CommitInfo> insertAndCommit(final YangInstanceIdentifier path,
+            final NormalizedNode data, final @NonNull InsertParam insert, final @Nullable PointParam point,
+            final YangInstanceIdentifier parentPath, final EffectiveModelContext context) {
+        final var tx = prepareWriteExecution();
 
         return switch (insert) {
             case FIRST -> {
-                final var readData = transaction.readList(parentPath);
+                final var readData = tx.readList(parentPath);
                 if (readData == null || readData.isEmpty()) {
-                    yield makePut(path, schemaContext, transaction, data);
+                    yield replaceAndCommit(tx, path, data, context);
                 }
-                transaction.remove(parentPath);
-                transaction.replace(path, data, schemaContext);
-                transaction.replace(parentPath, readData, schemaContext);
-                yield transaction.commit();
+                tx.remove(parentPath);
+                tx.replace(path, data, context);
+                tx.replace(parentPath, readData, context);
+                yield tx.commit();
             }
-            case LAST -> makePut(path, schemaContext, transaction, data);
+            case LAST -> replaceAndCommit(tx, path, data, context);
             case BEFORE -> {
-                final var readData = transaction.readList(parentPath);
+                final var readData = tx.readList(parentPath);
                 if (readData == null || readData.isEmpty()) {
-                    yield makePut(path, schemaContext, transaction, data);
+                    yield replaceAndCommit(tx, path, data, context);
                 }
-                insertWithPointPut(transaction, path, data, schemaContext, params.getPoint(), readData, true);
-                yield transaction.commit();
+                insertWithPointPut(tx, path, data, verifyNotNull(point), readData, true, context);
+                yield tx.commit();
             }
             case AFTER -> {
-                final var readData = transaction.readList(parentPath);
+                final var readData = tx.readList(parentPath);
                 if (readData == null || readData.isEmpty()) {
-                    yield makePut(path, schemaContext, transaction, data);
+                    yield replaceAndCommit(tx, path, data, context);
                 }
-                insertWithPointPut(transaction, path, data, schemaContext, params.getPoint(), readData, false);
-                yield transaction.commit();
+                insertWithPointPut(tx, path, data, verifyNotNull(point), readData, false, context);
+                yield tx.commit();
             }
         };
     }
 
-    private static void insertWithPointPut(final RestconfTransaction transaction, final YangInstanceIdentifier path,
-            final NormalizedNode data, final EffectiveModelContext schemaContext, final PointParam point,
-            final NormalizedNodeContainer<?> readList, final boolean before) {
-        transaction.remove(path.getParent());
-        final var pointArg = YangInstanceIdentifierDeserializer.create(schemaContext, point.value()).path
+    private static void insertWithPointPut(final RestconfTransaction tx, final YangInstanceIdentifier path,
+            final NormalizedNode data, final @NonNull PointParam point, final NormalizedNodeContainer<?> readList,
+            final boolean before, final EffectiveModelContext context) {
+        tx.remove(path.getParent());
+        final var pointArg = YangInstanceIdentifierDeserializer.create(context, point.value()).path
             .getLastPathArgument();
         int lastItemPosition = 0;
         for (var nodeChild : readList.body()) {
@@ -259,22 +268,21 @@ public abstract class RestconfStrategy {
             lastItemPosition++;
         }
         int lastInsertedPosition = 0;
-        final var emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
-        transaction.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
+        final var emptySubtree = ImmutableNodes.fromInstanceId(context, path.getParent());
+        tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
-                transaction.replace(path, data, schemaContext);
+                tx.replace(path, data, context);
             }
             final var childPath = path.coerceParent().node(nodeChild.name());
-            transaction.replace(childPath, nodeChild, schemaContext);
+            tx.replace(childPath, nodeChild, context);
             lastInsertedPosition++;
         }
     }
 
-    private static ListenableFuture<? extends CommitInfo> makePut(final YangInstanceIdentifier path,
-            final EffectiveModelContext schemaContext, final RestconfTransaction transaction,
-            final NormalizedNode data) {
-        transaction.replace(path, data, schemaContext);
-        return transaction.commit();
+    private static ListenableFuture<? extends CommitInfo> replaceAndCommit(final RestconfTransaction tx,
+            final YangInstanceIdentifier path, final NormalizedNode data, final EffectiveModelContext context) {
+        tx.replace(path, data, context);
+        return tx.commit();
     }
 }
