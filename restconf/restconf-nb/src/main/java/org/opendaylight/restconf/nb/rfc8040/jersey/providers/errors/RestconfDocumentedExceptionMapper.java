@@ -11,10 +11,12 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.$YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.gson.stream.JsonWriter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -29,11 +31,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -41,9 +46,15 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;;
+import org.opendaylight.yangtools.yang.data.util.NormalizedNodeStreamWriterStack;
+import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +75,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     static final QName ERROR_INFO_QNAME = qnameOf("error-info");
 
     private final DatabindProvider databindProvider;
+    private final DOMMountPointService mountPointService;
 
     @Context
     private HttpHeaders headers;
@@ -73,8 +85,10 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      *
      * @param databindProvider A {@link DatabindProvider}
      */
-    public RestconfDocumentedExceptionMapper(final DatabindProvider databindProvider) {
+    public RestconfDocumentedExceptionMapper(final DatabindProvider databindProvider,
+            final DOMMountPointService mountPointService) {
         this.databindProvider = requireNonNull(databindProvider);
+        this.mountPointService = requireNonNull(mountPointService);
     }
 
     @Override
@@ -95,7 +109,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         final String serializedResponseBody;
         final MediaType responseMediaType = transformToResponseMediaType(getSupportedMediaType());
         if (MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE.equals(responseMediaType)) {
-            serializedResponseBody = serializeErrorsContainerToJson(errorsContainer);
+            serializedResponseBody = serializeErrorsContainerToJson(exception);
         } else {
             serializedResponseBody = serializeErrorsContainerToXml(errorsContainer);
         }
@@ -166,12 +180,59 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * @param errorsContainer To be serialized errors container.
      * @return JSON representation of the errors container.
      */
-    private String serializeErrorsContainerToJson(final ContainerNode errorsContainer) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             OutputStreamWriter streamStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
-        ) {
-            return writeNormalizedNode(errorsContainer, outputStream,
-                new JsonStreamWriterWithDisabledValidation(databindProvider.currentContext(), streamStreamWriter));
+    private String serializeErrorsContainerToJson(final RestconfDocumentedException exception) {
+        var currentDatabindContext = databindProvider.currentContext();
+        if (exception.identifier() != null && !exception.identifier().isEmpty()) {
+            final var identifierContext = ParserIdentifier.toInstanceIdentifier(exception.identifier(),
+                databindProvider.currentContext().modelContext(), mountPointService);
+            if (identifierContext.getMountPoint() != null) {
+                currentDatabindContext = DatabindContext.ofModel(identifierContext.getSchemaContext());
+            }
+        }
+        try (var writer = new StringWriter();
+            var jsonWriter = new JsonWriter(writer))
+        {
+            jsonWriter.beginObject()
+                .name(Errors.QNAME.getLocalName()).beginObject()
+                    .name(Error.QNAME.getLocalName()).beginArray();
+            for (final RestconfError error : exception.getErrors()) {
+                jsonWriter.beginObject()
+                    .name(ERROR_TYPE_QNAME.getLocalName()).value(error.getErrorType().elementBody())
+                    .name(ERROR_TAG_QNAME.getLocalName()).value(error.getErrorTag().elementBody());
+                // filling in optional fields
+                if (error.getErrorMessage() != null) {
+                    jsonWriter.name(ERROR_MESSAGE_QNAME.getLocalName()).value(error.getErrorMessage());
+                }
+                if (error.getErrorAppTag() != null) {
+                    jsonWriter.name(ERROR_APP_TAG_QNAME.getLocalName()).value(error.getErrorAppTag());
+                }
+                if (error.getErrorInfo() != null) {
+                    // Oddly, error-info is defined as an empty container in the restconf yang. Apparently the
+                    // intention is for implementors to define their own data content so we'll just treat it as a leaf
+                    // with string data.
+                    jsonWriter.name(ERROR_INFO_QNAME.getLocalName()).value(error.getErrorInfo());
+                }
+                if (error.getErrorPath() != null) {
+                    jsonWriter.name((ERROR_PATH_QNAME.getLocalName()));
+
+                    final var schemaInferenceStack = SchemaInferenceStack.of(databindProvider.currentContext().modelContext());
+                    schemaInferenceStack.enterGrouping(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Errors.QNAME);
+                    schemaInferenceStack.enterSchemaTree(Errors.QNAME);
+                    schemaInferenceStack.enterSchemaTree(Error.QNAME);
+                    final var normalizedNodeStreamWriterStack2 = NormalizedNodeStreamWriterStack.of(schemaInferenceStack.toInference());
+                    normalizedNodeStreamWriterStack2.startLeafNode(NodeIdentifier.create(ERROR_PATH_QNAME));
+
+                    final var lastNode = error.getErrorPath().getLastPathArgument().getNodeType();
+                    final var nestedWriter = JSONNormalizedNodeStreamWriter
+                        .createNestedWriter(currentDatabindContext.jsonCodecs(), normalizedNodeStreamWriterStack2,
+                        lastNode.getNamespace(), jsonWriter);
+                    nestedWriter.scalarValue(error.getErrorPath());
+
+                    jsonWriter.endObject();
+                }
+            }
+            jsonWriter.endArray().endObject().endObject();
+            return writer.toString();
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output JSON writers", e);
         }

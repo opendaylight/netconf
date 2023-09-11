@@ -377,7 +377,8 @@ public final class RestconfDataServiceImpl {
         final var req = bindResourceRequest(identifier, body);
 
         return switch (
-            PutDataTransactionUtil.putData(req.path(), req.data(), req.modelContext(), req.strategy(), params)) {
+            PutDataTransactionUtil.putData(req.path(), req.data(), req.modelContext(), req.strategy(), params,
+                identifier)) {
             // Note: no Location header, as it matches the request path
             case CREATED -> Response.status(Status.CREATED).build();
             case REPLACED -> Response.noContent().build();
@@ -498,8 +499,8 @@ public final class RestconfDataServiceImpl {
         for (var arg : payload.prefix()) {
             path = path.node(arg);
         }
-
-        PostDataTransactionUtil.postData(path, data, strategy, context, params);
+        final var identifier = uriInfo.getPathParameters(false).getFirst("identifier");
+        PostDataTransactionUtil.postData(path, data, strategy, context, params, identifier);
         return Response.created(resolveLocation(uriInfo, path, context, data)).build();
     }
 

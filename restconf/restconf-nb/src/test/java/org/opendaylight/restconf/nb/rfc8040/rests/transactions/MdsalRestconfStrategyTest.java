@@ -116,7 +116,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
         PutDataTransactionUtil.putData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA,
-            new MdsalRestconfStrategy(mockDataBroker), WriteDataParams.empty());
+            new MdsalRestconfStrategy(mockDataBroker), WriteDataParams.empty(), null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
     }
@@ -130,7 +130,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
         PutDataTransactionUtil.putData(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA, new MdsalRestconfStrategy(mockDataBroker),
-            WriteDataParams.empty());
+            WriteDataParams.empty(), null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
     }
@@ -145,7 +145,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
         PutDataTransactionUtil.putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, JUKEBOX_SCHEMA,
-            new MdsalRestconfStrategy(mockDataBroker), WriteDataParams.empty());
+            new MdsalRestconfStrategy(mockDataBroker), WriteDataParams.empty(), null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
     }

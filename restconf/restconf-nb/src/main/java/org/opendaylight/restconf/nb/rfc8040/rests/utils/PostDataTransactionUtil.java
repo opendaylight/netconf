@@ -49,8 +49,10 @@ public final class PostDataTransactionUtil {
      * @param params        {@link WriteDataParams}
      */
     public static void postData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final RestconfStrategy strategy, final EffectiveModelContext schemaContext, final WriteDataParams params) {
-        TransactionUtil.syncCommit(submitData(path, data, strategy, schemaContext, params), "POST", path);
+            final RestconfStrategy strategy, final EffectiveModelContext schemaContext, final WriteDataParams params,
+            final String identifier) {
+        TransactionUtil.syncCommit(submitData(path, data, strategy, schemaContext, params), "POST", path,
+            identifier);
     }
 
     /**

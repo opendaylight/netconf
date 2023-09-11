@@ -67,9 +67,10 @@ public final class PutDataTransactionUtil {
      * @return A {@link CreateOrReplaceResult}
      */
     public static @NonNull CreateOrReplaceResult putData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext schemaContext, final RestconfStrategy strategy, final WriteDataParams params) {
+            final EffectiveModelContext schemaContext, final RestconfStrategy strategy, final WriteDataParams params,
+            final String identifier) {
         final var exists = TransactionUtil.syncAccess(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
-        TransactionUtil.syncCommit(submitData(path, schemaContext, strategy, data, params), "PUT", path);
+        TransactionUtil.syncCommit(submitData(path, schemaContext, strategy, data, params), "PUT", path, identifier);
         return exists ? CreateOrReplaceResult.REPLACED : CreateOrReplaceResult.CREATED;
     }
 

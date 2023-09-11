@@ -248,7 +248,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     public final void testPostContainerData() {
         PostDataTransactionUtil.postData(JUKEBOX_IID, EMPTY_JUKEBOX, testPostContainerDataStrategy(), JUKEBOX_SCHEMA,
-            WriteDataParams.empty());
+            WriteDataParams.empty(), "");
     }
 
     abstract @NonNull RestconfStrategy testPostContainerDataStrategy();
@@ -257,7 +257,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     public final void testPostListData() {
         PostDataTransactionUtil.postData(PLAYLIST_IID, PLAYLIST,
             testPostListDataStrategy(BAND_ENTRY, PLAYLIST_IID.node(BAND_ENTRY.name())), JUKEBOX_SCHEMA,
-            WriteDataParams.empty());
+            WriteDataParams.empty(), "");
     }
 
     abstract @NonNull RestconfStrategy testPostListDataStrategy(MapEntryNode entryNode, YangInstanceIdentifier node);
@@ -268,7 +268,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> PostDataTransactionUtil.postData(JUKEBOX_IID, EMPTY_JUKEBOX,
-                testPostDataFailStrategy(domException), JUKEBOX_SCHEMA, WriteDataParams.empty()));
+                testPostDataFailStrategy(domException), JUKEBOX_SCHEMA, WriteDataParams.empty(), ""));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
     }

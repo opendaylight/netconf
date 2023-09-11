@@ -117,7 +117,7 @@ public final class PatchDataTransactionUtil {
         // if no errors then submit transaction, otherwise cancel
         if (noError) {
             try {
-                TransactionUtil.syncCommit(transaction.commit(), PATCH_TX_TYPE, null);
+                TransactionUtil.syncCommit(transaction.commit(), PATCH_TX_TYPE, null, null);
             } catch (RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 return new PatchStatusContext(context.getPatchId(), List.copyOf(editCollection), false, e.getErrors());
