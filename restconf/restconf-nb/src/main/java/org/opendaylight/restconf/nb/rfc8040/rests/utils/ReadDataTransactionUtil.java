@@ -315,7 +315,7 @@ public final class ReadDataTransactionUtil {
     private static NormalizedNode extractReadData(final RestconfStrategy strategy,
             final YangInstanceIdentifier path, final ListenableFuture<Optional<NormalizedNode>> dataFuture) {
         final var dataFactory = new NormalizedNodeFactory();
-        FutureCallbackTx.addCallback(dataFuture, "READ", dataFactory, path);
+        FutureCallbackTx.addCallback(dataFuture, "READ", dataFactory, path, null);
         return dataFactory.build();
     }
 
