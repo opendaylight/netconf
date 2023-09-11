@@ -50,16 +50,14 @@ public final class WriteDataParams implements Immutable {
                 throw new IllegalArgumentException(
                     "Insert parameter " + insert.paramValue() + " cannot be used without a Point parameter.");
             }
-        } else {
+        } else if (insert != InsertParam.BEFORE && insert != InsertParam.AFTER) {
             // https://www.rfc-editor.org/rfc/rfc8040#section-4.8.6:
             // [when "point" parameter is present and]
             //        If the "insert" query parameter is not present or has a value other
             //        than "before" or "after", then a "400 Bad Request" status-line is
             //        returned.
-            if (insert != InsertParam.BEFORE && insert != InsertParam.AFTER) {
-                throw new IllegalArgumentException(
-                    "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
-            }
+            throw new IllegalArgumentException(
+                "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
         }
 
         return new WriteDataParams(insert, point);
@@ -74,6 +72,7 @@ public final class WriteDataParams implements Immutable {
     }
 
     @Beta
+    @Deprecated(forRemoval = true)
     // FIXME: it seems callers' structure should be able to cater with just point() and insert()
     public @NonNull PointParam getPoint() {
         return verifyNotNull(point);
