@@ -54,7 +54,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                future.setFailure(TransactionUtil.decodeException(cause, "DELETE", path));
+                future.setFailure(TransactionUtil.decodeException(cause, "DELETE", path, modelContext()));
             }
         }, MoreExecutors.directExecutor());
     }

@@ -228,7 +228,7 @@ public abstract class RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path));
+                future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path, modelContext));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -254,7 +254,7 @@ public abstract class RestconfStrategy {
             commitFuture = replaceAndCommit(prepareWriteExecution(), path, data);
         }
 
-        TransactionUtil.syncCommit(commitFuture, "PUT", path);
+        TransactionUtil.syncCommit(commitFuture, "PUT", path, modelContext);
         return exists ? CreateOrReplaceResult.REPLACED : CreateOrReplaceResult.CREATED;
     }
 
@@ -367,7 +367,7 @@ public abstract class RestconfStrategy {
         } else {
             future = createAndCommit(prepareWriteExecution(), path, data);
         }
-        TransactionUtil.syncCommit(future, "POST", path);
+        TransactionUtil.syncCommit(future, "POST", path, modelContext);
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
@@ -505,7 +505,7 @@ public abstract class RestconfStrategy {
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false,
-                    TransactionUtil.decodeException(cause, "PATCH", null).getErrors()));
+                    TransactionUtil.decodeException(cause, "PATCH", null, modelContext).getErrors()));
             }
         }, MoreExecutors.directExecutor());
 
