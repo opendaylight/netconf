@@ -371,11 +371,11 @@ public final class RestconfDataServiceImpl {
     }
 
     private Response putData(final @Nullable String identifier, final UriInfo uriInfo, final ResourceBody body) {
-        final var params = QueryParams.newWriteDataParams(uriInfo);
+        final var insert = QueryParams.parseInsert(uriInfo);
         final var req = bindResourceRequest(identifier, body);
 
         return switch (
-            req.strategy().putData(req.path(), req.data(), req.modelContext(), params)) {
+            req.strategy().putData(req.path(), req.data(), req.modelContext(), insert)) {
             // Note: no Location header, as it matches the request path
             case CREATED -> Response.status(Status.CREATED).build();
             case REPLACED -> Response.noContent().build();
@@ -486,7 +486,7 @@ public final class RestconfDataServiceImpl {
     }
 
     private Response postData(final InstanceIdentifierContext iid, final ChildBody body, final UriInfo uriInfo) {
-        final var params = QueryParams.newWriteDataParams(uriInfo);
+        final var insert = QueryParams.parseInsert(uriInfo);
         final var strategy = getRestconfStrategy(iid.getMountPoint());
         final var context = iid.getSchemaContext();
         var path = iid.getInstanceIdentifier();
@@ -497,7 +497,7 @@ public final class RestconfDataServiceImpl {
             path = path.node(arg);
         }
 
-        strategy.postData(path, data, context, params);
+        strategy.postData(path, data, context, insert);
         return Response.created(resolveLocation(uriInfo, path, context, data)).build();
     }
 

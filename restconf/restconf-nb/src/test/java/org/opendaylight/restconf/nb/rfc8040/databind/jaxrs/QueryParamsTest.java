@@ -77,11 +77,11 @@ public class QueryParamsTest {
     public void checkParametersTypesNegativeTest() {
         assertUnknownParam(QueryParams::newNotificationQueryParams);
         assertUnknownParam(QueryParams::newReadDataParams);
-        assertUnknownParam(QueryParams::newWriteDataParams);
+        assertUnknownParam(QueryParams::parseInsert);
 
         assertInvalidParam(QueryParams::newNotificationQueryParams, ContentParam.ALL);
         assertInvalidParam(QueryParams::newReadDataParams, InsertParam.LAST);
-        assertInvalidParam(QueryParams::newWriteDataParams, ContentParam.ALL);
+        assertInvalidParam(QueryParams::parseInsert, ContentParam.ALL);
     }
 
     /**

@@ -23,12 +23,11 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
+import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.TransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -192,19 +191,18 @@ public abstract class RestconfStrategy {
      * @param path    path of data
      * @param data    data
      * @param context reference to {@link EffectiveModelContext}
-     * @param params  {@link WriteDataParams}
+     * @param insert  {@link Insert}
      * @return A {@link CreateOrReplaceResult}
      */
     public @NonNull CreateOrReplaceResult putData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext context, final WriteDataParams params) {
+            final EffectiveModelContext context, final @Nullable Insert insert) {
         final var exists = TransactionUtil.syncAccess(exists(path), path);
 
-        final var insert = params.insert();
         final ListenableFuture<? extends CommitInfo> commitFuture;
         if (insert != null) {
             final var parentPath = path.coerceParent();
             checkListAndOrderedType(context, parentPath);
-            commitFuture = insertAndCommitPut(path, data, insert, params.point(), parentPath, context);
+            commitFuture = insertAndCommitPut(path, data, insert, parentPath, context);
         } else {
             commitFuture = replaceAndCommit(prepareWriteExecution(), path, data, context);
         }
@@ -214,11 +212,11 @@ public abstract class RestconfStrategy {
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPut(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull InsertParam insert, final @Nullable PointParam point,
-            final YangInstanceIdentifier parentPath, final EffectiveModelContext context) {
+            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parentPath,
+            final EffectiveModelContext context) {
         final var tx = prepareWriteExecution();
 
-        return switch (insert) {
+        return switch (insert.insert()) {
             case FIRST -> {
                 final var readData = tx.readList(parentPath);
                 if (readData == null || readData.isEmpty()) {
@@ -235,7 +233,7 @@ public abstract class RestconfStrategy {
                 if (readData == null || readData.isEmpty()) {
                     yield replaceAndCommit(tx, path, data, context);
                 }
-                insertWithPointPut(tx, path, data, verifyNotNull(point), readData, true, context);
+                insertWithPointPut(tx, path, data, verifyNotNull(insert.point()), readData, true, context);
                 yield tx.commit();
             }
             case AFTER -> {
@@ -243,7 +241,7 @@ public abstract class RestconfStrategy {
                 if (readData == null || readData.isEmpty()) {
                     yield replaceAndCommit(tx, path, data, context);
                 }
-                insertWithPointPut(tx, path, data, verifyNotNull(point), readData, false, context);
+                insertWithPointPut(tx, path, data, verifyNotNull(insert.point()), readData, false, context);
                 yield tx.commit();
             }
         };
@@ -311,16 +309,15 @@ public abstract class RestconfStrategy {
      * @param path    path
      * @param data    data
      * @param context reference to actual {@link EffectiveModelContext}
-     * @param params  {@link WriteDataParams}
+     * @param insert  {@link Insert}
      */
     public final void postData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext context, final WriteDataParams params) {
-        final var insert = params.insert();
+            final EffectiveModelContext context, final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
             final var parentPath = path.coerceParent();
             checkListAndOrderedType(context, parentPath);
-            future = insertAndCommitPost(path, data, insert, params.point(), parentPath, context);
+            future = insertAndCommitPost(path, data, insert, parentPath, context);
         } else {
             future = createAndCommit(prepareWriteExecution(), path, data, context);
         }
@@ -328,12 +325,12 @@ public abstract class RestconfStrategy {
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull InsertParam insert, final @Nullable PointParam point,
-            final YangInstanceIdentifier parent, final EffectiveModelContext context) {
+            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parent,
+            final EffectiveModelContext context) {
         final var grandParent = parent.coerceParent();
         final var tx = prepareWriteExecution();
 
-        return switch (insert) {
+        return switch (insert.insert()) {
             case FIRST -> {
                 final var readData = tx.readList(grandParent);
                 if (readData == null || readData.isEmpty()) {
@@ -353,7 +350,8 @@ public abstract class RestconfStrategy {
                     tx.replace(path, data, context);
                 } else {
                     checkItemDoesNotExists(exists(path), path);
-                    insertWithPointPost(tx, path, data, verifyNotNull(point), readData, grandParent, true, context);
+                    insertWithPointPost(tx, path, data, verifyNotNull(insert.point()), readData, grandParent, true,
+                        context);
                 }
                 yield tx.commit();
             }
@@ -363,7 +361,8 @@ public abstract class RestconfStrategy {
                     tx.replace(path, data, context);
                 } else {
                     checkItemDoesNotExists(exists(path), path);
-                    insertWithPointPost(tx, path, data, verifyNotNull(point), readData, grandParent, false, context);
+                    insertWithPointPost(tx, path, data, verifyNotNull(insert.point()), readData, grandParent, false,
+                        context);
                 }
                 yield tx.commit();
             }
