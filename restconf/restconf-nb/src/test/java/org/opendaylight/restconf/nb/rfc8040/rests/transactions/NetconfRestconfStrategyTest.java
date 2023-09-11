@@ -125,7 +125,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, EMPTY_JUKEBOX, null, null);
         verify(netconfService).lock();
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
@@ -140,7 +140,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, EMPTY_JUKEBOX, null, null);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
             Optional.empty());
@@ -153,7 +153,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(GAP_IID, GAP_LEAF, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(GAP_IID, GAP_LEAF, null, null);
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
     }
@@ -166,7 +166,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(GAP_IID, GAP_LEAF, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(GAP_IID, GAP_LEAF, null, null);
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
     }
@@ -178,7 +178,8 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null,
+            null);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
@@ -192,7 +193,8 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null,
+            null);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());

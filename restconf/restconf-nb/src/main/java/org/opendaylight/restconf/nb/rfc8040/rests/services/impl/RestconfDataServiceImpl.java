@@ -386,9 +386,10 @@ public final class RestconfDataServiceImpl {
         final var context = ParserIdentifier.toInstanceIdentifier(identifier, localModel, mountPointService);
         final var insert = QueryParams.parseInsert(context.getSchemaContext(), uriInfo);
         final var req = bindResourceRequest(context, body);
+        final var deviceContext = (context.getMountPoint() != null) ? context.getSchemaContext() : null;
 
         return switch (
-            req.strategy().putData(req.path(), req.data(), insert)) {
+            req.strategy().putData(req.path(), req.data(), insert, deviceContext)) {
             // Note: no Location header, as it matches the request path
             case CREATED -> Response.status(Status.CREATED).build();
             case REPLACED -> Response.noContent().build();
@@ -507,12 +508,13 @@ public final class RestconfDataServiceImpl {
         var path = parentPath;
         final var payload = body.toPayload(path, inference);
         final var data = payload.body();
+        final var deviceContext = (mountPoint != null) ? modelContext : null;
 
         for (var arg : payload.prefix()) {
             path = path.node(arg);
         }
 
-        strategy.postData(path, data, insert);
+        strategy.postData(path, data, insert, deviceContext);
         return Response.created(resolveLocation(uriInfo, path, modelContext, data)).build();
     }
 
@@ -785,7 +787,8 @@ public final class RestconfDataServiceImpl {
     @VisibleForTesting
     @NonNull PatchStatusContext yangPatchData(final @NonNull EffectiveModelContext modelContext,
             final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint) {
-        return getRestconfStrategy(modelContext, mountPoint).patchData(patch);
+        final var deviceContext = (mountPoint != null) ? modelContext : null;
+        return getRestconfStrategy(modelContext, mountPoint).patchData(patch, deviceContext);
     }
 
     private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,

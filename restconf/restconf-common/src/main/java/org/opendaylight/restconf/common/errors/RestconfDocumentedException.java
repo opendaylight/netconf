@@ -25,6 +25,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
@@ -42,6 +43,7 @@ public class RestconfDocumentedException extends WebApplicationException {
 
     private final List<RestconfError> errors;
     private final Status status;
+    private final transient EffectiveModelContext deviceContext;
 
     /**
      * Constructs an instance with an error message. The error type defaults to APPLICATION and the error tag defaults
@@ -137,6 +139,7 @@ public class RestconfDocumentedException extends WebApplicationException {
         }
 
         status = null;
+        deviceContext = null;
     }
 
     /**
@@ -155,6 +158,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      */
     public RestconfDocumentedException(final Status status) {
         errors = List.of();
+        deviceContext = null;
         this.status = requireNonNull(status, "Status can't be null");
     }
 
@@ -162,12 +166,22 @@ public class RestconfDocumentedException extends WebApplicationException {
         super(cause, ErrorTags.statusOf(error.getErrorTag()));
         errors = List.of(error);
         status = null;
+        deviceContext = null;
     }
 
     public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
         super(cause, ErrorTags.statusOf(errors.get(0).getErrorTag()));
         this.errors = List.copyOf(errors);
         status = null;
+        deviceContext = null;
+    }
+
+    public RestconfDocumentedException(final Throwable cause, final RestconfError error,
+            final EffectiveModelContext deviceContext) {
+        super(cause, ErrorTags.statusOf(error.getErrorTag()));
+        errors = List.of(error);
+        status = null;
+        this.deviceContext = deviceContext;
     }
 
     public static RestconfDocumentedException decodeAndThrow(final String message,
@@ -273,5 +287,9 @@ public class RestconfDocumentedException extends WebApplicationException {
     @Override
     public String getMessage() {
         return "errors: " + errors + (status != null ? ", status: " + status : "");
+    }
+
+    public EffectiveModelContext getDeviceContext() {
+        return deviceContext;
     }
 }

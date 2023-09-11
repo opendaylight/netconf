@@ -242,7 +242,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPostContainerData() {
-        testPostContainerDataStrategy().postData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
+        testPostContainerDataStrategy().postData(JUKEBOX_IID, EMPTY_JUKEBOX, null, null);
     }
 
     abstract @NonNull RestconfStrategy testPostContainerDataStrategy();
@@ -250,7 +250,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     public final void testPostListData() {
         testPostListDataStrategy(BAND_ENTRY, PLAYLIST_IID.node(BAND_ENTRY.name())).postData(PLAYLIST_IID, PLAYLIST,
-            null);
+            null, null);
     }
 
     abstract @NonNull RestconfStrategy testPostListDataStrategy(MapEntryNode entryNode, YangInstanceIdentifier node);
@@ -260,7 +260,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         final var domException = new DOMException((short) 414, "Post request failed");
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> testPostDataFailStrategy(domException).postData(JUKEBOX_IID, EMPTY_JUKEBOX, null));
+            () -> testPostDataFailStrategy(domException).postData(JUKEBOX_IID, EMPTY_JUKEBOX, null, null));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
     }
@@ -329,7 +329,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     public final void testDeleteNonexistentData() {
         final var patchStatusContext = deleteNonexistentDataTestStrategy().patchData(new PatchContext("patchD",
-            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))));
+            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))), null);
         assertFalse(patchStatusContext.ok());
     }
 
@@ -467,7 +467,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
-        final var patchStatusContext = strategy.patchData(patchContext);
+        final var patchStatusContext = strategy.patchData(patchContext, null);
         for (var entity : patchStatusContext.editCollection()) {
             if (failed) {
                 assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());

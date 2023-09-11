@@ -112,7 +112,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        new MdsalRestconfStrategy(JUKEBOX_SCHEMA, mockDataBroker).putData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
+        new MdsalRestconfStrategy(JUKEBOX_SCHEMA, mockDataBroker).putData(JUKEBOX_IID, EMPTY_JUKEBOX, null, null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
     }
@@ -125,7 +125,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        new MdsalRestconfStrategy(JUKEBOX_SCHEMA, mockDataBroker).putData(GAP_IID, GAP_LEAF, null);
+        new MdsalRestconfStrategy(JUKEBOX_SCHEMA, mockDataBroker).putData(GAP_IID, GAP_LEAF, null, null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
     }
@@ -140,7 +140,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        new MdsalRestconfStrategy(JUKEBOX_SCHEMA, mockDataBroker).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
+        new MdsalRestconfStrategy(JUKEBOX_SCHEMA, mockDataBroker).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null, null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
     }

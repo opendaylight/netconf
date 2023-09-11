@@ -236,7 +236,7 @@ public abstract class RestconfStrategy {
      * @return A {@link CreateOrReplaceResult}
      */
     public final @NonNull CreateOrReplaceResult putData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final @Nullable Insert insert) {
+            final @Nullable Insert insert, final @Nullable EffectiveModelContext deviceContext) {
         final var exists = TransactionUtil.syncAccess(exists(path), path);
 
         final ListenableFuture<? extends CommitInfo> commitFuture;
@@ -248,7 +248,7 @@ public abstract class RestconfStrategy {
             commitFuture = replaceAndCommit(prepareWriteExecution(), path, data);
         }
 
-        TransactionUtil.syncCommit(commitFuture, "PUT", path);
+        TransactionUtil.syncCommit(commitFuture, "PUT", path, deviceContext);
         return exists ? CreateOrReplaceResult.REPLACED : CreateOrReplaceResult.CREATED;
     }
 
@@ -352,7 +352,7 @@ public abstract class RestconfStrategy {
      * @param insert  {@link Insert}
      */
     public final void postData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final @Nullable Insert insert) {
+            final @Nullable Insert insert, final @Nullable EffectiveModelContext deviceContext) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
             final var parentPath = path.coerceParent();
@@ -361,7 +361,7 @@ public abstract class RestconfStrategy {
         } else {
             future = createAndCommit(prepareWriteExecution(), path, data);
         }
-        TransactionUtil.syncCommit(future, "POST", path);
+        TransactionUtil.syncCommit(future, "POST", path, deviceContext);
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
@@ -412,7 +412,8 @@ public abstract class RestconfStrategy {
      * @param patch Patch context to be processed
      * @return {@link PatchStatusContext}
      */
-    public final @NonNull PatchStatusContext patchData(final PatchContext patch) {
+    public final @NonNull PatchStatusContext patchData(final PatchContext patch,
+            final @Nullable EffectiveModelContext deviceContext) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var tx = prepareWriteExecution();
 
@@ -485,7 +486,7 @@ public abstract class RestconfStrategy {
         final var patchId = patch.patchId();
         if (noError) {
             try {
-                TransactionUtil.syncCommit(tx.commit(), "PATCH", null);
+                TransactionUtil.syncCommit(tx.commit(), "PATCH", null, deviceContext);
             } catch (RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 return new PatchStatusContext(modelContext, patchId, List.copyOf(editCollection), false, e.getErrors());
