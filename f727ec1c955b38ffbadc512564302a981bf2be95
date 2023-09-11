@@ -16,6 +16,24 @@
       "message": "Make a constant from this and use text block.",
       "revId": "f727ec1c955b38ffbadc512564302a981bf2be95",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fb176ff_b28c521a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-09-11T07:55:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "936d4316_85e779ba",
+      "revId": "f727ec1c955b38ffbadc512564302a981bf2be95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
