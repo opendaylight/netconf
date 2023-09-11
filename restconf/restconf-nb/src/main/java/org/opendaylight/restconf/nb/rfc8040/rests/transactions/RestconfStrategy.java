@@ -22,7 +22,6 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
@@ -188,8 +187,7 @@ public abstract class RestconfStrategy {
     }
 
     /**
-     * Check mount point and prepare variables for put data to DS. Close {@link DOMTransactionChain} if any
-     * inside of object {@link RestconfStrategy} provided as a parameter if any.
+     * Check mount point and prepare variables for put data to DS.
      *
      * @param path    path of data
      * @param data    data
@@ -308,8 +306,7 @@ public abstract class RestconfStrategy {
     }
 
     /**
-     * Check mount point and prepare variables for post data. Close {@link DOMTransactionChain} if any inside of object
-     * {@link RestconfStrategy} provided as a parameter.
+     * Check mount point and prepare variables for post data.
      *
      * @param path          path
      * @param data          data
