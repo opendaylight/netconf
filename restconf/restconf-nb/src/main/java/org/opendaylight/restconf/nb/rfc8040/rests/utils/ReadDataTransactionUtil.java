@@ -7,12 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -289,9 +287,9 @@ public final class ReadDataTransactionUtil {
      *                              in {@link RestconfStrategy} if any
      * @return {@link NormalizedNode}
      */
-    static @Nullable NormalizedNode readDataViaTransaction(final @NonNull RestconfStrategy strategy,
+    private static @Nullable NormalizedNode readDataViaTransaction(final @NonNull RestconfStrategy strategy,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        return extractReadData(path, strategy.read(store, path));
+        return TransactionUtil.syncAccess(strategy.read(store, path), path).orElse(null);
     }
 
     /**
@@ -309,12 +307,7 @@ public final class ReadDataTransactionUtil {
     private static @Nullable NormalizedNode readDataViaTransaction(final @NonNull RestconfStrategy strategy,
             final @NonNull LogicalDatastoreType store, final @NonNull YangInstanceIdentifier path,
             final @NonNull List<YangInstanceIdentifier> fields) {
-        return extractReadData(path, strategy.read(store, path, fields));
-    }
-
-    private static @Nullable NormalizedNode extractReadData(final YangInstanceIdentifier path,
-            final ListenableFuture<Optional<NormalizedNode>> dataFuture) {
-        return TransactionUtil.syncAccess(dataFuture, path).orElse(null);
+        return TransactionUtil.syncAccess(strategy.read(store, path, fields), path).orElse(null);
     }
 
     /**
