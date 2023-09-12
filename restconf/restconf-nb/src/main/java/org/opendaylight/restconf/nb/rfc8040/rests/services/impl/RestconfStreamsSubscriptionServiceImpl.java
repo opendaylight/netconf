@@ -20,6 +20,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.subscribe.to.notification.rev161028.Notifi;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -50,10 +51,10 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
             final DOMNotificationService notificationService, final DatabindProvider databindProvider,
-            final StreamsConfiguration configuration) {
+            final ListenersBroker listenersBroker, final StreamsConfiguration configuration) {
         handlersHolder = new HandlersHolder(dataBroker, notificationService, databindProvider);
-        streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
-                : SubscribeToStreamUtil.webSockets();
+        streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents(listenersBroker)
+                : SubscribeToStreamUtil.webSockets(listenersBroker);
     }
 
     @Override
