@@ -18,7 +18,7 @@ import java.net.URI;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer.WebSocketFactory;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
@@ -27,19 +27,20 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class WebSocketFactoryTest {
-
     private static final String REGISTERED_STREAM_NAME = "data-change-event-subscription/"
             + "toaster:toaster/datastore=CONFIGURATION/scope=SUBTREE";
     private static final YangInstanceIdentifier TOASTER_YIID = YangInstanceIdentifier.builder()
             .node(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"))
             .build();
 
-    private final WebSocketFactory webSocketFactory = new WebSocketFactory(mock(ScheduledExecutorService.class),
-            5000, 2000);
+    private final ListenersBroker listenersBroker = new ListenersBroker();
 
-    @BeforeClass
-    public static void prepareListenersBroker() {
-        ListenersBroker.getInstance().registerDataChangeListener(TOASTER_YIID, REGISTERED_STREAM_NAME,
+    private final WebSocketFactory webSocketFactory = new WebSocketFactory(mock(ScheduledExecutorService.class),
+        listenersBroker, 5000, 2000);
+
+    @Before
+    public void prepareListenersBroker() {
+        listenersBroker.registerDataChangeListener(TOASTER_YIID, REGISTERED_STREAM_NAME,
                 NotificationOutputTypeGrouping.NotificationOutputType.JSON);
     }
 

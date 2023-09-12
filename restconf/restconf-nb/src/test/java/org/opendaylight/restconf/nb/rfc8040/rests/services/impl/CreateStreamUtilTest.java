@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class CreateStreamUtilTest {
     private static EffectiveModelContext SCHEMA_CTX;
 
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private final ListenersBroker listenersBroker = new ListenersBroker();
 
     @BeforeClass
     public static void setUp() {
