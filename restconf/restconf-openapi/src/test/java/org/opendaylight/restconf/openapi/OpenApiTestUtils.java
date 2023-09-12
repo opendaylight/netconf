@@ -19,11 +19,28 @@ public final class OpenApiTestUtils {
     }
 
     /**
-     * Get path parameters name for {@code path}.
+     * Get path parameters names for {@code path} for GET operation.
+     *
+     * @return {@link List} of parameters excluding `content` parameter
+     */
+    public static List<String> getPathGetParameters(final Map<String, Path> paths, final String path) {
+        final var params = new ArrayList<String>();
+        paths.get(path).get().parameters().elements()
+            .forEachRemaining(p -> {
+                final String name = p.get("name").asText();
+                if (!"content".equals(name)) {
+                    params.add(name);
+                }
+            });
+        return params;
+    }
+
+    /**
+     * Get path parameters names for {@code path} for POST operation.
      *
      * @return {@link List} of parameters
      */
-    public static List<String> getPathParameters(final Map<String, Path> paths, final String path) {
+    public static List<String> getPathPostParameters(final Map<String, Path> paths, final String path) {
         final var params = new ArrayList<String>();
         paths.get(path).post().parameters().elements()
             .forEachRemaining(p -> params.add(p.get("name").asText()));
