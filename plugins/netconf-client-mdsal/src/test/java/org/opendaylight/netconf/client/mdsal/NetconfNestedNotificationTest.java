@@ -8,13 +8,10 @@
 package org.opendaylight.netconf.client.mdsal;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -25,8 +22,6 @@ import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
@@ -41,11 +36,12 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testNestedNotificationToNotificationFunction() throws Exception {
-        final EffectiveModelContext schemaContext =
-                getNotificationSchemaContext(Collections.singleton("/schemas/nested-notification.yang"));
+        final var context = YangParserTestUtils.parseYangResources(
+            NetconfNestedNotificationTest.class, "/schemas/nested-notification.yang");
+
         final NetconfMessage notificationMessage = prepareNotification("/nested-notification-payload.xml");
         NetconfMessageTransformer messageTransformer = new NetconfMessageTransformer(
-            MountPointContext.of(schemaContext), true, BASE_SCHEMAS.getBaseSchema());
+            MountPointContext.of(context), true, BASE_SCHEMAS.getBaseSchema());
         final DOMNotification domNotification = messageTransformer.toNotification(notificationMessage);
         final ContainerNode root = domNotification.getBody();
         assertNotNull(root);
@@ -55,13 +51,6 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
                 ((DOMEvent) domNotification).getEventInstant());
         assertEquals(Absolute.of(INTERFACES_QNAME, INTERFACE_QNAME, INTERFACE_ENABLED_NOTIFICATION_QNAME),
                 domNotification.getType());
-    }
-
-    private EffectiveModelContext getNotificationSchemaContext(final Collection<String> yangResources) {
-        final EffectiveModelContext context = YangParserTestUtils.parseYangResources(getClass(), yangResources);
-        final Collection<? extends Module> modules = context.getModules();
-        assertFalse(modules.isEmpty());
-        return context;
     }
 
     private NetconfMessage prepareNotification(final String notificationPayloadPath) throws IOException, SAXException {

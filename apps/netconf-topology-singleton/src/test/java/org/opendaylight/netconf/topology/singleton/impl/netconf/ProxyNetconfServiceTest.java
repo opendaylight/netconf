@@ -20,7 +20,7 @@ import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -292,7 +292,7 @@ public class ProxyNetconfServiceTest {
         throws InterruptedException, ExecutionException, TimeoutException {
         final ListenableFuture<?> submit = netconf.commit();
         masterActor.expectMsgClass(CommitRequest.class);
-        masterActor.reply(new InvokeRpcMessageReply(null, Collections.emptyList()));
+        masterActor.reply(new InvokeRpcMessageReply(null, List.of()));
         submit.get(5, TimeUnit.SECONDS);
     }
 

@@ -13,8 +13,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -275,12 +273,13 @@ public final class TesttoolParameters {
             checkArgument(schemasDir.isDirectory(), "Schemas dir has to be a directory");
             checkArgument(schemasDir.canRead(), "Schemas dir has to be readable");
 
-            final File[] filesArray = schemasDir.listFiles();
-            final List<File> files = filesArray != null ? Arrays.asList(filesArray) : Collections.emptyList();
-            for (final File file : files) {
-                checkArgument(file.canRead(), "Files in schemas dir has to be readable");
-                checkArgument(file.getName().endsWith(YangConstants.RFC6020_YANG_FILE_EXTENSION),
+            final var filesArray = schemasDir.listFiles();
+            if (filesArray != null) {
+                for (var file : filesArray) {
+                    checkArgument(file.canRead(), "Files in schemas dir has to be readable");
+                    checkArgument(file.getName().endsWith(YangConstants.RFC6020_YANG_FILE_EXTENSION),
                         "Files in schemas dir has to be YANG files");
+                }
             }
         }
         if (rpcConfig != null) {
@@ -292,9 +291,8 @@ public final class TesttoolParameters {
 
     @Override
     public String toString() {
-        final List<Field> fields = Arrays.asList(this.getClass().getDeclaredFields());
         final StringJoiner joiner = new StringJoiner(", \n", "TesttoolParameters{", "}\n");
-        fields.stream()
+        Arrays.stream(getClass().getDeclaredFields())
                 .filter(field -> field.getAnnotation(Arg.class) != null)
                 .map(this::getFieldString)
                 .forEach(joiner::add);

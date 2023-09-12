@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.custommonkey.xmlunit.Diff;
@@ -97,7 +96,7 @@ public class FieldsSchemalessRpcStructureTransformerTest {
         final FieldsFilter filter = FieldsFilter.of(rootPath, List.of(leaf1Field, leaf3Field, key1Field));
 
         final DOMSourceAnyxmlNode filterStructure = (DOMSourceAnyxmlNode) transformer.toFilterStructure(
-                Collections.singletonList(filter));
+                List.of(filter));
         final Diff diff = getDiff("one-root-filter.xml", filterStructure);
         assertTrue(diff.similar());
     }
@@ -111,7 +110,7 @@ public class FieldsSchemalessRpcStructureTransformerTest {
         final YangInstanceIdentifier lxField = YangInstanceIdentifier.of(LX_NID);
 
         final FieldsFilter filter1 = FieldsFilter.of(c1RootPath, List.of(c2Field, leaf2Field));
-        final FieldsFilter filter2 = FieldsFilter.of(cxRootPath, Collections.singletonList(lxField));
+        final FieldsFilter filter2 = FieldsFilter.of(cxRootPath, List.of(lxField));
         final DOMSourceAnyxmlNode filterStructure = (DOMSourceAnyxmlNode) transformer.toFilterStructure(
                 List.of(filter1, filter2));
         final Diff diff = getDiff("two-roots-filter.xml", filterStructure);

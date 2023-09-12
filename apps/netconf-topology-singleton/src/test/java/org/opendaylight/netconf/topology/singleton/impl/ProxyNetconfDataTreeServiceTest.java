@@ -21,7 +21,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.InetSocketAddress;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
@@ -234,7 +234,7 @@ public class ProxyNetconfDataTreeServiceTest {
         masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
         masterActor.reply(new Status.Success(masterActor.ref()));
         masterActor.expectMsgClass(LockRequest.class);
-        masterActor.reply(new InvokeRpcMessageReply(null, Collections.emptyList()));
+        masterActor.reply(new InvokeRpcMessageReply(null, List.of()));
         Futures.whenAllComplete(lock).run(() -> {
             assertTrue(lock.isDone());
             assertNotNull(Futures.getUnchecked(lock));

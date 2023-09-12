@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -283,7 +283,7 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
 
     private Collection<Device> getDevicesAsList() {
         AllowedDevices devices = getDevices();
-        return devices == null ? Collections.emptyList() : devices.nonnullDevice().values();
+        return devices == null ? List.of() : devices.nonnullDevice().values();
     }
 
     @Override
