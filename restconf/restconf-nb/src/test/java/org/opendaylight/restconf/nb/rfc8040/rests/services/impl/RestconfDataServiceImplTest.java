@@ -409,18 +409,18 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPatchData() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final PatchContext patch = new PatchContext(iidContext, List.of(
+        final var patch = new PatchContext("test patch id", List.of(
             new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
             new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, EMPTY_JUKEBOX),
-            new PatchEntity("delete data", Operation.Delete, GAP_IID)), "test patch id");
+            new PatchEntity("delete data", Operation.Delete, GAP_IID)));
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
-        final PatchStatusContext status = dataService.yangPatchData(iidContext, patch);
+        final var status = dataService.yangPatchData(InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID),
+            patch);
         assertTrue(status.ok());
         assertEquals(3, status.editCollection().size());
         assertEquals("replace data", status.editCollection().get(1).getEditId());
@@ -428,19 +428,18 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPatchDataMountPoint() throws Exception {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint,
-            JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final PatchContext patch = new PatchContext(iidContext, List.of(
+        final var iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint, JUKEBOX_SCHEMA, JUKEBOX_IID);
+        final var patch = new PatchContext("test patch id", List.of(
             new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
             new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, EMPTY_JUKEBOX),
-            new PatchEntity("delete data", Operation.Delete, GAP_IID)), "test patch id");
+            new PatchEntity("delete data", Operation.Delete, GAP_IID)));
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
 
-        final PatchStatusContext status = dataService.yangPatchData(iidContext, patch);
+        final var status = dataService.yangPatchData(iidContext, patch);
         assertTrue(status.ok());
         assertEquals(3, status.editCollection().size());
         assertNull(status.globalErrors());
@@ -448,11 +447,10 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPatchDataDeleteNotExist() {
-        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final PatchContext patch = new PatchContext(iidContext, List.of(
+        final PatchContext patch = new PatchContext("test patch id", List.of(
             new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
             new PatchEntity("remove data", Operation.Remove, GAP_IID),
-            new PatchEntity("delete data", Operation.Delete, GAP_IID)), "test patch id");
+            new PatchEntity("delete data", Operation.Delete, GAP_IID)));
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(immediateFalseFluentFuture())
@@ -460,6 +458,8 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(readWrite).cancel();
+
+        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
         final PatchStatusContext status = dataService.yangPatchData(iidContext, patch);
 
         assertFalse(status.ok());
