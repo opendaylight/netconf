@@ -21,7 +21,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchResult;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
@@ -38,7 +38,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
     }
 
     @Override
-    public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
+    public void writeTo(final PatchResult patchStatusContext, final Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
             throws IOException {
@@ -51,7 +51,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         }
     }
 
-    private static void writeDocument(final XMLStreamWriter writer, final PatchStatusContext context)
+    private static void writeDocument(final XMLStreamWriter writer, final PatchResult context)
             throws XMLStreamException {
         writer.writeStartElement("", "yang-patch-status", XML_NAMESPACE);
         writer.writeStartElement("patch-id");

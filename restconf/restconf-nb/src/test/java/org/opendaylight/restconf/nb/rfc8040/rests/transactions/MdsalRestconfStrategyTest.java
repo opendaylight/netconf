@@ -32,7 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchResult;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -200,7 +200,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     }
 
     @Override
-    void assertTestDeleteNonexistentData(final PatchStatusContext status) {
+    void assertTestDeleteNonexistentData(final PatchResult status) {
         final var editCollection = status.editCollection();
         assertEquals(1, editCollection.size());
         final var editErrors = editCollection.get(0).getEditErrors();

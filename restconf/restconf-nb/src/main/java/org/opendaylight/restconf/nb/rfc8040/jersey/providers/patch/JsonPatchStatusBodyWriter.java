@@ -20,7 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchResult;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -29,7 +29,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 @Produces(MediaTypes.APPLICATION_YANG_DATA_JSON)
 public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
     @Override
-    public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
+    public void writeTo(final PatchResult patchStatusContext, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
         final var jsonWriter = createJsonWriter(entityStream);

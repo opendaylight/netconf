@@ -59,8 +59,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchRequest;
+import org.opendaylight.restconf.common.patch.PatchResult;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
@@ -672,7 +672,7 @@ public final class RestconfDataServiceImpl {
      *
      * @param identifier path to target
      * @param body YANG Patch body
-     * @return {@link PatchStatusContext}
+     * @return {@link PatchResult}
      */
     @PATCH
     @Path("/data/{identifier:.+}")
@@ -681,7 +681,7 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchDataXML(@Encoded @PathParam("identifier") final String identifier,
+    public PatchResult yangPatchDataXML(@Encoded @PathParam("identifier") final String identifier,
             final InputStream body) {
         try (var xmlBody = new XmlPatchBody(body)) {
             return yangPatchData(identifier, xmlBody);
@@ -693,7 +693,7 @@ public final class RestconfDataServiceImpl {
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param body YANG Patch body
-     * @return {@link PatchStatusContext}
+     * @return {@link PatchResult}
      */
     @PATCH
     @Path("/data")
@@ -702,7 +702,7 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchDataXML(final InputStream body) {
+    public PatchResult yangPatchDataXML(final InputStream body) {
         try (var xmlBody = new XmlPatchBody(body)) {
             return yangPatchData(xmlBody);
         }
@@ -714,7 +714,7 @@ public final class RestconfDataServiceImpl {
      *
      * @param identifier path to target
      * @param body YANG Patch body
-     * @return {@link PatchStatusContext}
+     * @return {@link PatchResult}
      */
     @PATCH
     @Path("/data/{identifier:.+}")
@@ -723,7 +723,7 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchDataJSON(@Encoded @PathParam("identifier") final String identifier,
+    public PatchResult yangPatchDataJSON(@Encoded @PathParam("identifier") final String identifier,
             final InputStream body) {
         try (var jsonBody = new JsonPatchBody(body)) {
             return yangPatchData(identifier, jsonBody);
@@ -735,7 +735,7 @@ public final class RestconfDataServiceImpl {
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param body YANG Patch body
-     * @return {@link PatchStatusContext}
+     * @return {@link PatchResult}
      */
     @PATCH
     @Path("/data")
@@ -744,23 +744,23 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchDataJSON(final InputStream body) {
+    public PatchResult yangPatchDataJSON(final InputStream body) {
         try (var jsonBody = new JsonPatchBody(body)) {
             return yangPatchData(jsonBody);
         }
     }
 
-    private PatchStatusContext yangPatchData(final @NonNull PatchBody body) {
+    private PatchResult yangPatchData(final @NonNull PatchBody body) {
         return yangPatchData(InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext().modelContext()),
             body);
     }
 
-    private PatchStatusContext yangPatchData(final String identifier, final @NonNull PatchBody body) {
+    private PatchResult yangPatchData(final String identifier, final @NonNull PatchBody body) {
         return yangPatchData(ParserIdentifier.toInstanceIdentifier(identifier,
                 databindProvider.currentContext().modelContext(), mountPointService), body);
     }
 
-    private PatchStatusContext yangPatchData(final @NonNull InstanceIdentifierContext targetResource,
+    private PatchResult yangPatchData(final @NonNull InstanceIdentifierContext targetResource,
             final @NonNull PatchBody body) {
         try {
             return yangPatchData(targetResource, body.toPatchContext(targetResource));
@@ -772,7 +772,7 @@ public final class RestconfDataServiceImpl {
     }
 
     @VisibleForTesting
-    PatchStatusContext yangPatchData(final InstanceIdentifierContext targetResource, final PatchContext context) {
+    PatchResult yangPatchData(final InstanceIdentifierContext targetResource, final PatchRequest context) {
         return getRestconfStrategy(targetResource.getMountPoint()).patchData(context,
             targetResource.getSchemaContext());
     }

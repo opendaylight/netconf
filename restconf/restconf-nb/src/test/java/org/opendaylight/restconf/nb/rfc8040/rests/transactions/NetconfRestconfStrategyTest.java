@@ -27,7 +27,7 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchResult;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -231,7 +231,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Override
-    void assertTestDeleteNonexistentData(final PatchStatusContext status) {
+    void assertTestDeleteNonexistentData(final PatchResult status) {
         final var globalErrors = status.globalErrors();
         assertEquals(1, globalErrors.size());
         final var globalError = globalErrors.get(0);
