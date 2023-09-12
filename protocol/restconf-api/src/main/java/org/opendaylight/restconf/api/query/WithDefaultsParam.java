@@ -11,28 +11,32 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 
 /**
  * Enumeration of possible {@code with-defaults} parameter values as defined by
- * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8.9">RFC8040, section 4.8.9</a>.
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8.9">RFC8040, section 4.8.9</a>. This is an equivalent
+ * of with-defaults retrieval mode as defined by
+ * <a href="https://www.rfc-editor.org/rfc/rfc6243#section-3">RFC6243 section 3</a> and expressed as the
+ * {@code typedef with-defaults-mode}} in the corresponding YANG model.
  */
 public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
     /**
      * Data nodes set to the YANG default by the client are reported.
      */
-    EXPLICIT("explicit"),
+    EXPLICIT(WithDefaultsMode.Explicit),
     /**
      * All data nodes are reported.
      */
-    REPORT_ALL("report-all"),
+    REPORT_ALL(WithDefaultsMode.ReportAll),
     /**
      * All data nodes are reported, and defaults are tagged.
      */
-    REPORT_ALL_TAGGED("report-all-tagged"),
+    REPORT_ALL_TAGGED(WithDefaultsMode.ReportAllTagged),
     /**
      * Data nodes set to the YANG default are not reported.
      */
-    TRIM("trim");
+    TRIM(WithDefaultsMode.Trim);
 
     // API consistency: must not be confused with enum constants
     @SuppressWarnings("checkstyle:ConstantName")
@@ -40,10 +44,23 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
 
     private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:with-defaults:1.0");
 
-    private final @NonNull String uriValue;
+    private final @NonNull WithDefaultsMode mode;
 
-    WithDefaultsParam(final String uriValue) {
-        this.uriValue = requireNonNull(uriValue);
+    WithDefaultsParam(final WithDefaultsMode mode) {
+        this.mode = requireNonNull(mode);
+    }
+
+    public static @NonNull WithDefaultsParam of(final WithDefaultsMode mode) {
+        return switch (mode) {
+            case Explicit -> EXPLICIT;
+            case ReportAll -> REPORT_ALL;
+            case ReportAllTagged -> REPORT_ALL_TAGGED;
+            case Trim -> TRIM;
+        };
+    }
+
+    public static @NonNull WithDefaultsParam forUriValue(final String uriValue) {
+        return of(WithDefaultsMode.ofName(uriValue));
     }
 
     @Override
@@ -58,18 +75,11 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
 
     @Override
     public String paramValue() {
-        return uriValue;
+        return mode.getName();
     }
 
-    public static @NonNull WithDefaultsParam forUriValue(final String uriValue) {
-        return switch (uriValue) {
-            case "explicit" -> EXPLICIT;
-            case "report-all" -> REPORT_ALL;
-            case "report-all-tagged" -> REPORT_ALL_TAGGED;
-            case "trim" -> TRIM;
-            default -> throw new IllegalArgumentException(
-                "Value can be 'explicit', 'report-all', 'report-all-tagged' or 'trim', not '" + uriValue + "'");
-        };
+    public @NonNull WithDefaultsMode mode() {
+        return mode;
     }
 
     public static @NonNull URI capabilityUri() {
