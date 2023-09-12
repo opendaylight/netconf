@@ -20,7 +20,6 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -56,9 +55,9 @@ public class RestconfStreamsSubscriptionServiceImplTest {
             + "toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
 
     private static EffectiveModelContext MODEL_CONTEXT;
-    // FIXME: NETCONF-1104: this should be non-static and set up for each test separately
-    private static ListenersBroker LISTENERS_BROKER;
 
+    @Mock
+    private ListenersBroker listenersBroker;
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
@@ -74,22 +73,16 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     @BeforeClass
     public static void beforeClass() {
         MODEL_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/notifications");
+    }
 
+    @Before
+    public void before() {
         final String name =
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
         final ListenerAdapter adapter = new ListenerAdapter(YangInstanceIdentifier.of(
             QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster")),
-            name, NotificationOutputType.JSON);
-        LISTENERS_BROKER = ListenersBroker.getInstance();
-        LISTENERS_BROKER.setDataChangeListeners(Map.of(name, adapter));
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        if (LISTENERS_BROKER != null) {
-            LISTENERS_BROKER.setDataChangeListeners(Map.of());
-            LISTENERS_BROKER = null;
-        }
+            name, NotificationOutputType.JSON, listenersBroker);
+        doReturn(Map.of(name, adapter)).when(listenersBroker).setDataChangeListeners(any());
     }
 
     @Before
@@ -116,7 +109,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Test
     public void testSubscribeToStreamSSE() {
-        LISTENERS_BROKER.registerDataChangeListener(
+        listenersBroker.registerDataChangeListener(
                 IdentifierCodec.deserialize("toaster:toaster/toasterStatus", MODEL_CONTEXT),
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                 NotificationOutputType.XML);
@@ -132,7 +125,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Test
     public void testSubscribeToStreamWS() {
-        LISTENERS_BROKER.registerDataChangeListener(
+        listenersBroker.registerDataChangeListener(
                 IdentifierCodec.deserialize("toaster:toaster/toasterStatus", MODEL_CONTEXT),
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                 NotificationOutputType.XML);
