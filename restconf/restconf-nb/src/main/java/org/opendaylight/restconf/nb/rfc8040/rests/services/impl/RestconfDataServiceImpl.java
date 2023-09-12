@@ -124,17 +124,20 @@ public final class RestconfDataServiceImpl {
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
     private final DOMDataBroker dataBroker;
+    private final ListenersBroker listenersBroker;
 
     public RestconfDataServiceImpl(final DatabindProvider databindProvider,
             final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
-            final DOMActionService actionService, final StreamsConfiguration configuration) {
+            final DOMActionService actionService, final ListenersBroker listenersBroker,
+            final StreamsConfiguration configuration) {
         this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
         restconfStrategy = new MdsalRestconfStrategy(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         this.actionService = requireNonNull(actionService);
+        this.listenersBroker = requireNonNull(listenersBroker);
         streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
     }
@@ -254,10 +257,9 @@ public final class RestconfDataServiceImpl {
         }
     }
 
-    private static NotificationListenerAdapter createYangNotifiStream(final String moduleName, final QName notifName,
+    private NotificationListenerAdapter createYangNotifiStream(final String moduleName, final QName notifName,
             final NotificationOutputType outputType) {
         final var streamName = createNotificationStreamName(moduleName, notifName.getLocalName(), outputType);
-        final var listenersBroker = ListenersBroker.getInstance();
 
         final var existing = listenersBroker.notificationListenerFor(streamName);
         return existing != null ? existing

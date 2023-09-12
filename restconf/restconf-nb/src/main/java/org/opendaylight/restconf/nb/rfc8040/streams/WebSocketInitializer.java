@@ -38,6 +38,7 @@ public final class WebSocketInitializer extends WebSocketServlet {
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
     private final int idleTimeoutMillis;
+    private final transient ListenersBroker listenersBroker;
 
     /**
      * Creation of the web-socket initializer.
@@ -46,12 +47,13 @@ public final class WebSocketInitializer extends WebSocketServlet {
      * @param configuration          Web-socket configuration holder.
      */
     @Inject
-    public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool,
+    public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool, final ListenersBroker listenersBroker,
             final StreamsConfiguration configuration) {
         executorService = scheduledThreadPool.getExecutor();
         maximumFragmentLength = configuration.maximumFragmentLength();
         heartbeatInterval = configuration.heartbeatInterval();
         idleTimeoutMillis = configuration.idleTimeout();
+        this.listenersBroker = listenersBroker;
     }
 
     /**
@@ -62,7 +64,8 @@ public final class WebSocketInitializer extends WebSocketServlet {
     @Override
     public void configure(final WebSocketServletFactory factory) {
         factory.getPolicy().setIdleTimeout(idleTimeoutMillis);
-        factory.setCreator(new WebSocketFactory(executorService, maximumFragmentLength, heartbeatInterval));
+        factory.setCreator(new WebSocketFactory(executorService, maximumFragmentLength, heartbeatInterval,
+            listenersBroker));
     }
 
     /**
@@ -73,8 +76,7 @@ public final class WebSocketInitializer extends WebSocketServlet {
         private static final Logger LOG = LoggerFactory.getLogger(WebSocketFactory.class);
 
         private final ScheduledExecutorService executorService;
-        // FIXME: inject this reference
-        private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+        private final transient ListenersBroker listenersBroker;
         private final int maximumFragmentLength;
         private final int heartbeatInterval;
 
@@ -87,10 +89,11 @@ public final class WebSocketInitializer extends WebSocketServlet {
          * @param heartbeatInterval     Interval in milliseconds between sending of ping control frames.
          */
         WebSocketFactory(final ScheduledExecutorService executorService, final int maximumFragmentLength,
-                final int heartbeatInterval) {
+                final int heartbeatInterval, final ListenersBroker listenersBroker) {
             this.executorService = executorService;
             this.maximumFragmentLength = maximumFragmentLength;
             this.heartbeatInterval = heartbeatInterval;
+            this.listenersBroker = listenersBroker;
         }
 
         /**

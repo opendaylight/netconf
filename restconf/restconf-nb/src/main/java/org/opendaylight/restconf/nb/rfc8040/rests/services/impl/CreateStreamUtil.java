@@ -109,7 +109,7 @@ final class CreateStreamUtil {
      */
     // FIXME: this really should be a normal RPC implementation
     static DOMRpcResult createDataChangeNotifiStream(final ContainerNode input,
-            final EffectiveModelContext refSchemaCtx) {
+            final EffectiveModelContext refSchemaCtx, final ListenersBroker listenersBroker) {
         // parsing out of container with settings and path
         final YangInstanceIdentifier path = preparePath(input);
 
@@ -123,7 +123,7 @@ final class CreateStreamUtil {
         final String streamName = streamNameBuilder.toString();
 
         // registration of the listener
-        ListenersBroker.getInstance().registerDataChangeListener(path, streamName, outputType);
+        listenersBroker.registerDataChangeListener(path, streamName, outputType);
 
         // building of output
         return new DefaultDOMRpcResult(Builders.containerBuilder()
@@ -142,7 +142,8 @@ final class CreateStreamUtil {
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
     static DOMRpcResult createDeviceNotificationListener(final String baseUrl, final ContainerNode input,
-            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService) {
+            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService,
+            final ListenersBroker listenersBroker) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
         final YangInstanceIdentifier path =
@@ -182,7 +183,7 @@ final class CreateStreamUtil {
                 ErrorTag.OPERATION_FAILED);
         }
 
-        final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
+        final DeviceNotificationListenerAdaptor notificationListenerAdapter = listenersBroker
             .registerDeviceNotificationListener(deviceName, prepareOutputType(input), mountModelContext,
                 mountPointService, mountPoint.getIdentifier());
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);

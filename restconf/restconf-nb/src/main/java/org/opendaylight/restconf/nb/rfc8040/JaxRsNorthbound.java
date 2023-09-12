@@ -34,6 +34,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -79,12 +80,13 @@ public final class JaxRsNorthbound implements AutoCloseable {
             @Reference final DOMMountPointService mountPointService,
             @Reference final DOMNotificationService notificationService, @Reference final DOMRpcService rpcService,
             @Reference final DOMSchemaService schemaService, @Reference final DatabindProvider databindProvider,
+            @Reference final ListenersBroker listenersBroker,
             final Configuration configuration) throws ServletException {
         this(webServer, webContextSecurer, servletSupport, filterAdapterConfiguration, actionService, dataBroker,
             mountPointService, notificationService, rpcService, schemaService, databindProvider,
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.idle$_$timeout(),
-                configuration.heartbeat$_$interval(), configuration.use$_$sse()));
+            listenersBroker, new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
+                configuration.idle$_$timeout(), configuration.heartbeat$_$interval(), configuration.use$_$sse()));
     }
 
     public JaxRsNorthbound(final WebServer webServer, final WebContextSecurer webContextSecurer,
@@ -93,7 +95,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             final DOMMountPointService mountPointService, final DOMNotificationService notificationService,
             final DOMRpcService rpcService, final DOMSchemaService schemaService,
             final DatabindProvider databindProvider,
-            final String pingNamePrefix, final int pingMaxThreadCount,
+            final String pingNamePrefix, final int pingMaxThreadCount, final ListenersBroker listenersBroker,
             final StreamsConfiguration streamsConfiguration) throws ServletException {
         final var scheduledThreadPool = new ScheduledThreadPoolWrapper(pingMaxThreadCount,
             new NamingThreadPoolFactory(pingNamePrefix));
@@ -106,21 +108,22 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .addUrlPattern("/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new RestconfApplication(databindProvider, mountPointService, dataBroker, rpcService, actionService,
-                        notificationService, schemaService, streamsConfiguration)).build())
+                        notificationService, schemaService, listenersBroker, streamsConfiguration)).build())
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/" + SSE_SUBPATH + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new DataStreamApplication(databindProvider, mountPointService,
-                        new RestconfDataStreamServiceImpl(scheduledThreadPool, streamsConfiguration))).build())
+                        new RestconfDataStreamServiceImpl(scheduledThreadPool, listenersBroker, streamsConfiguration)))
+                    .build())
                 .name("notificationServlet")
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/" + DATA_SUBSCRIPTION + "/*")
                 .addUrlPattern("/" + NOTIFICATION_STREAM + "/*")
-                .servlet(new WebSocketInitializer(scheduledThreadPool, streamsConfiguration))
+                .servlet(new WebSocketInitializer(scheduledThreadPool, listenersBroker, streamsConfiguration))
                 .build())
 
             // Allows user to add javax.servlet.Filter(s) in front of REST services

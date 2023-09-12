@@ -25,6 +25,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperatio
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 
 @Singleton
 public class RestconfApplication extends AbstractRestconfApplication {
@@ -32,12 +33,13 @@ public class RestconfApplication extends AbstractRestconfApplication {
             final RestconfStreamsSubscriptionService streamSubscription, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
-            final StreamsConfiguration configuration) {
+            final ListenersBroker listenersBroker, final StreamsConfiguration configuration) {
         super(databindProvider, mountPointService, List.of(
             streamSubscription,
             new RestconfDataServiceImpl(databindProvider, dataBroker, mountPointService, streamSubscription,
-                actionService, configuration),
-            new RestconfInvokeOperationsServiceImpl(databindProvider, rpcService, mountPointService, configuration),
+                actionService, listenersBroker, configuration),
+            new RestconfInvokeOperationsServiceImpl(databindProvider, rpcService, mountPointService, listenersBroker,
+                configuration),
             new RestconfOperationsServiceImpl(databindProvider, mountPointService),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
             new RestconfImpl(databindProvider)));
@@ -47,10 +49,11 @@ public class RestconfApplication extends AbstractRestconfApplication {
     public RestconfApplication(final DatabindProvider databindProvider, final DOMMountPointService mountPointService,
             final DOMDataBroker dataBroker, final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
-            final StreamsConfiguration configuration) {
+            final ListenersBroker listenersBroker, final StreamsConfiguration configuration) {
         this(databindProvider, mountPointService,
             new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider,
-                configuration),
-            dataBroker, rpcService, actionService, notificationService, domSchemaService, configuration);
+                listenersBroker, configuration),
+            dataBroker, rpcService, actionService, notificationService, domSchemaService, listenersBroker,
+            configuration);
     }
 }

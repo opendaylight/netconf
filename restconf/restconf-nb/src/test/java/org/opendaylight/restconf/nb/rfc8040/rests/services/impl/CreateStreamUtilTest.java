@@ -18,9 +18,11 @@ import java.util.function.Function;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -41,6 +43,9 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class CreateStreamUtilTest {
     private static EffectiveModelContext SCHEMA_CTX;
 
+    @Mock
+    private ListenersBroker listenersBroker;
+
     @BeforeClass
     public static void setUp() {
         SCHEMA_CTX = YangParserTestUtils.parseYangResourceDirectory("/streams");
@@ -50,7 +55,7 @@ public class CreateStreamUtilTest {
     public void createStreamTest() {
         final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(
             prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster", "path"),
-            SCHEMA_CTX);
+            SCHEMA_CTX, listenersBroker);
         assertEquals(List.of(), result.errors());
         assertEquals(prepareDomPayload("create-data-change-event-subscription",
             RpcDefinition::getOutput,
@@ -63,7 +68,7 @@ public class CreateStreamUtilTest {
         final var payload = prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput,
             "String value", "path");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> CreateStreamUtil.createDataChangeNotifiStream(payload, SCHEMA_CTX)).getErrors();
+            () -> CreateStreamUtil.createDataChangeNotifiStream(payload, SCHEMA_CTX, listenersBroker)).getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
@@ -76,7 +81,7 @@ public class CreateStreamUtilTest {
         final var payload = prepareDomPayload("create-data-change-event-subscription2", RpcDefinition::getInput,
             "toaster", "path2");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> CreateStreamUtil.createDataChangeNotifiStream(payload, SCHEMA_CTX)).getErrors();
+            () -> CreateStreamUtil.createDataChangeNotifiStream(payload, SCHEMA_CTX, listenersBroker)).getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.getErrorType());

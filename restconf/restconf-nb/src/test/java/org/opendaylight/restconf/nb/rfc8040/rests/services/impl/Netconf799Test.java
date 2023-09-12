@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import com.google.common.util.concurrent.Futures;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -30,6 +31,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -50,6 +52,8 @@ public class Netconf799Test extends AbstractInstanceIdentifierTest {
     private static final QName INPUT_QNAME = QName.create(CONT_QNAME, "input");
     private static final QName OUTPUT_QNAME = QName.create(CONT_QNAME, "output");
     private static final YangInstanceIdentifier ACTION_YII = YangInstanceIdentifier.of(CONT_QNAME).node(CONT1_QNAME);
+    @Mock
+    private ListenersBroker listenersBroker;
 
     @Test
     public void testInvokeAction() {
@@ -62,7 +66,8 @@ public class Netconf799Test extends AbstractInstanceIdentifierTest {
 
         final RestconfDataServiceImpl dataService = new RestconfDataServiceImpl(
             () -> DatabindContext.ofModel(IID_SCHEMA), mockDataBroker, mock(DOMMountPointService.class),
-            mock(RestconfStreamsSubscriptionService.class), actionService, new StreamsConfiguration(0, 1, 0, false));
+            mock(RestconfStreamsSubscriptionService.class), actionService, listenersBroker,
+            new StreamsConfiguration(0, 1, 0, false));
 
         final var nodeAndStack = DataSchemaContextTree.from(IID_SCHEMA).enterPath(ACTION_YII).orElseThrow();
         final var node = nodeAndStack.node().dataSchemaNode();

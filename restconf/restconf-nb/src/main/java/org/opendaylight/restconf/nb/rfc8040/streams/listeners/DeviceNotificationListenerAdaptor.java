@@ -33,15 +33,17 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
     private final @NonNull EffectiveModelContext effectiveModel;
     private final @NonNull DOMMountPointService mountPointService;
     private final @NonNull YangInstanceIdentifier instanceIdentifier;
+    private final @NonNull ListenersBroker listenersBroker;
 
     private ListenerRegistration<DOMMountPointListener> reg;
 
     public DeviceNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType,
             final EffectiveModelContext effectiveModel, final DOMMountPointService mountPointService,
-            final YangInstanceIdentifier path) {
-        super(streamName, outputType);
+            final YangInstanceIdentifier path, final ListenersBroker listenersBroker) {
+        super(streamName, outputType, listenersBroker);
         this.effectiveModel = requireNonNull(effectiveModel);
         this.mountPointService = requireNonNull(mountPointService);
+        this.listenersBroker = requireNonNull(listenersBroker);
         instanceIdentifier = requireNonNull(path);
     }
 
@@ -84,7 +86,7 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
                     }
                 }
             });
-            ListenersBroker.getInstance().removeAndCloseDeviceNotificationListener(this);
+            listenersBroker.removeAndCloseDeviceNotificationListener(this);
             resetListenerRegistration();
         }
     }

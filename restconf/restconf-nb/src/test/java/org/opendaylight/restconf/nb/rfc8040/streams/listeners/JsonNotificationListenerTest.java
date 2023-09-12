@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -33,6 +34,9 @@ import org.slf4j.LoggerFactory;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class JsonNotificationListenerTest extends AbstractNotificationListenerTest {
     private static final Logger LOG = LoggerFactory.getLogger(JsonNotificationListenerTest.class);
+
+    @Mock
+    private static ListenersBroker listenersBroker;
 
     @Test
     public void notifi_leafTest() throws Exception {
@@ -161,8 +165,8 @@ public class JsonNotificationListenerTest extends AbstractNotificationListenerTe
 
     private static String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
-        final var notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
-                schemaPathNotifi, "json-stream", NotificationOutputType.JSON);
+        final var notifiAdapter = listenersBroker.registerNotificationListener(schemaPathNotifi, "json-stream",
+            NotificationOutputType.JSON);
         return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }
 }

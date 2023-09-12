@@ -116,13 +116,14 @@ abstract class SubscribeToStreamUtil {
      * @return Stream location for listening.
      */
     final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder,
+            final ListenersBroker listenersBroker) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         if (isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
-        final NotificationListenerAdapter notificationListenerAdapter = ListenersBroker.getInstance()
+        final NotificationListenerAdapter notificationListenerAdapter = listenersBroker
             .notificationListenerFor(streamName);
         if (notificationListenerAdapter == null) {
             throw new RestconfDocumentedException(String.format("Stream with name %s was not found.", streamName),
@@ -158,7 +159,8 @@ abstract class SubscribeToStreamUtil {
      * @return Location for listening.
      */
     final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder,
+            final ListenersBroker listenersBroker) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
 
         final String datastoreParam = mapOfValues.get(RestconfStreamsConstants.DATASTORE_PARAM_NAME);
@@ -176,7 +178,7 @@ abstract class SubscribeToStreamUtil {
         }
 
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        final ListenerAdapter listener = ListenersBroker.getInstance().dataChangeListenerFor(streamName);
+        final ListenerAdapter listener = listenersBroker.dataChangeListenerFor(streamName);
         if (listener == null) {
             throw new RestconfDocumentedException("No listener found for stream " + streamName,
                 ErrorType.APPLICATION, ErrorTag.DATA_MISSING);

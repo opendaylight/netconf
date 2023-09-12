@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -30,6 +31,9 @@ import org.xmlunit.assertj.XmlAssert;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class XmlNotificationListenerTest extends AbstractNotificationListenerTest {
+    @Mock
+    private static ListenersBroker listenersBroker;
+
     @Test
     public void notifi_leafTest() throws Exception {
         final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-leaf"));
@@ -45,8 +49,8 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
         final String result = prepareXmlResult(notificationData, schemaPathNotifi);
 
         final String control = "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">"
-                + "<eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-leaf xmlns=\"notifi:mod\">"
-                + "<lf>value</lf></notifi-leaf></notification>";
+            + "<eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-leaf xmlns=\"notifi:mod\">"
+            + "<lf>value</lf></notifi-leaf></notification>";
 
         assertXmlMatches(result, control);
     }
@@ -67,8 +71,8 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
         final String result = prepareXmlResult(notificationData, schemaPathNotifi);
 
         final String control = "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">"
-                + "<eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-cont xmlns=\"notifi:mod\">"
-                + "<cont><lf>value</lf></cont></notifi-cont></notification>";
+            + "<eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-cont xmlns=\"notifi:mod\">"
+            + "<cont><lf>value</lf></cont></notifi-cont></notification>";
 
         assertXmlMatches(result, control);
     }
@@ -92,8 +96,8 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
         final String result = prepareXmlResult(notificationData, schemaPathNotifi);
 
         final String control = "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">"
-                + "<eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-list xmlns=\"notifi:mod\">"
-                + "<lst><lf>value</lf></lst></notifi-list></notification>";
+            + "<eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-list xmlns=\"notifi:mod\">"
+            + "<lst><lf>value</lf></lst></notifi-list></notification>";
 
         assertXmlMatches(result, control);
     }
@@ -113,8 +117,8 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
         final String result = prepareXmlResult(notificationData, schemaPathNotifi);
 
         final String control = "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">"
-                + "<eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-grp xmlns=\"notifi:mod\">"
-                + "<lf>value</lf></notifi-grp></notification>";
+            + "<eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-grp xmlns=\"notifi:mod\">"
+            + "<lf>value</lf></notifi-grp></notification>";
 
         assertXmlMatches(result, control);
     }
@@ -134,18 +138,18 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
         final String result = prepareXmlResult(notificationData, schemaPathNotifi);
 
         final String control = "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">"
-                + "<eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-augm xmlns=\"notifi:mod\">"
-                + "<lf-augm>value</lf-augm></notifi-augm></notification>";
+            + "<eventTime>2020-06-29T14:23:46.086855+02:00</eventTime><notifi-augm xmlns=\"notifi:mod\">"
+            + "<lf-augm>value</lf-augm></notifi-augm></notification>";
 
         assertXmlMatches(result, control);
     }
 
     private static void assertXmlMatches(final String result, final String control) {
         XmlAssert.assertThat(result).and(control)
-                // text values have localName null but we want to compare those, ignore only nodes that have localName
-                // with eventTime value
-                .withNodeFilter(node -> node.getLocalName() == null || !node.getLocalName().equals("eventTime"))
-                .areSimilar();
+            // text values have localName null but we want to compare those, ignore only nodes that have localName
+            // with eventTime value
+            .withNodeFilter(node -> node.getLocalName() == null || !node.getLocalName().equals("eventTime"))
+            .areSimilar();
     }
 
     private static MapEntryNode mockMapEntry(final QName entryQName, final LeafNode<String> leaf) {
@@ -168,8 +172,8 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
 
     private static String prepareXmlResult(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
-        final var notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
-                schemaPathNotifi, "xml-stream", NotificationOutputType.XML);
+        final var notifiAdapter = listenersBroker.registerNotificationListener(schemaPathNotifi, "xml-stream",
+            NotificationOutputType.XML);
         return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }
 }
