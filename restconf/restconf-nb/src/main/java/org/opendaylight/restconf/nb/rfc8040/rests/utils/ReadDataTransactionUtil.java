@@ -81,12 +81,18 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-                                                    final @NonNull YangInstanceIdentifier path,
-                                                    final @NonNull RestconfStrategy strategy,
-                                                    final WithDefaultsParam withDefa,
-                                                    final EffectiveModelContext ctx) {
+            final @NonNull YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy,
+            final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
         return switch (content) {
-            case ALL -> readAllData(strategy, path, withDefa, ctx);
+            case ALL -> {
+                // PREPARE STATE DATA NODE
+                final var stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
+                // PREPARE CONFIG DATA NODE
+                final var configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
+
+                yield mergeConfigAndSTateDataIfNeeded(stateDataNode, withDefa == null ? configDataNode
+                    : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
+            }
             case CONFIG -> {
                 final var read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
                 yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
@@ -112,7 +118,17 @@ public final class ReadDataTransactionUtil {
             final @Nullable WithDefaultsParam withDefa, @NonNull final EffectiveModelContext ctx,
             final @NonNull List<YangInstanceIdentifier> fields) {
         return switch (content) {
-            case ALL -> readAllData(strategy, path, withDefa, ctx, fields);
+            case ALL -> {
+                // PREPARE STATE DATA NODE
+                final var stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path,
+                    fields);
+                // PREPARE CONFIG DATA NODE
+                final var configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
+                    fields);
+
+                yield mergeConfigAndSTateDataIfNeeded(stateDataNode, withDefa == null ? configDataNode
+                    : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
+            }
             case CONFIG -> {
                 final var read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, fields);
                 yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
@@ -308,49 +324,6 @@ public final class ReadDataTransactionUtil {
             final @NonNull LogicalDatastoreType store, final @NonNull YangInstanceIdentifier path,
             final @NonNull List<YangInstanceIdentifier> fields) {
         return TransactionUtil.syncAccess(strategy.read(store, path, fields), path).orElse(null);
-    }
-
-    /**
-     * Read config and state data, then map them. Close {@link DOMTransactionChain} inside of object
-     * {@link RestconfStrategy} provided as a parameter if any.
-     *
-     * @param strategy {@link RestconfStrategy} - object that perform the actual DS operations
-     * @param withDefa with-defaults parameter
-     * @param ctx      schema context
-     * @return {@link NormalizedNode}
-     */
-    private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
-            final YangInstanceIdentifier path, final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
-        // PREPARE STATE DATA NODE
-        final var stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
-        // PREPARE CONFIG DATA NODE
-        final var configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
-
-        return mergeConfigAndSTateDataIfNeeded(stateDataNode,
-            withDefa == null ? configDataNode : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
-    }
-
-    /**
-     * Read config and state data with selected subtrees that should only be read, then map them.
-     * Close {@link DOMTransactionChain} inside of object {@link RestconfStrategy} provided as a parameter.
-     *
-     * @param strategy {@link RestconfStrategy} - object that perform the actual DS operations
-     * @param path     parent path to selected fields
-     * @param withDefa with-defaults parameter
-     * @param ctx      schema context
-     * @param fields   paths to selected subtrees which should be read, relative to to the parent path
-     * @return {@link NormalizedNode}
-     */
-    private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
-            final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
-            final @NonNull EffectiveModelContext ctx, final @NonNull List<YangInstanceIdentifier> fields) {
-        // PREPARE STATE DATA NODE
-        final var stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, fields);
-        // PREPARE CONFIG DATA NODE
-        final var configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, fields);
-
-        return mergeConfigAndSTateDataIfNeeded(stateDataNode,
-            withDefa == null ? configDataNode : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
     }
 
     private static NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
