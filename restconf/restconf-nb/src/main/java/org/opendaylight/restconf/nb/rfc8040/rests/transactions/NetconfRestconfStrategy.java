@@ -38,7 +38,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    protected void delete(final SettableRestconfFuture<Empty> future, final YangInstanceIdentifier path) {
+    void delete(final SettableRestconfFuture<Empty> future, final YangInstanceIdentifier path) {
         final var tx = prepareWriteExecution();
         tx.delete(path);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
@@ -55,12 +55,12 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public RestconfTransaction prepareWriteExecution() {
+    RestconfTransaction prepareWriteExecution() {
         return new NetconfRestconfTransaction(netconfService);
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
+    ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         return switch (store) {
             case CONFIGURATION -> netconfService.getConfig(path);
@@ -69,7 +69,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
+    ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
         return switch (store) {
             case CONFIGURATION -> netconfService.getConfig(path, fields);
