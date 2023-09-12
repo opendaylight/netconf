@@ -10,6 +10,7 @@ module org.opendaylight.restconf.api {
     exports org.opendaylight.restconf.api.query;
 
     requires transitive com.google.common;
+    requires transitive org.opendaylight.yang.gen.ietf.netconf.with.defaults.rfc6243;
     requires transitive org.opendaylight.yang.gen.ietf.yang.types.rfc6991;
     requires transitive org.opendaylight.yangtools.concepts;
     requires transitive org.opendaylight.yangtools.yang.common;
