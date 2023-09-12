@@ -149,6 +149,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
+    private final ListenersBroker listenersBroker = new ListenersBroker();
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
     private DatabindProvider databindProvider;
@@ -177,8 +178,9 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
         ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
                 final NotificationOutputType outputType, final boolean leafNodesOnly,
-                final boolean skipNotificationData, final boolean changedLeafNodesOnly, final boolean childNodesOnly) {
-            super(path, streamName, outputType);
+                final boolean skipNotificationData, final boolean changedLeafNodesOnly, final boolean childNodesOnly,
+                final ListenersBroker listenersBroker) {
+            super(path, streamName, outputType, listenersBroker);
             setQueryParams(NotificationQueryParams.of(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
                 leafNodesOnly ? LeafNodesOnlyParam.of(true) : null,
                 skipNotificationData ? SkipNotificationDataParam.of(true) : null,
@@ -235,7 +237,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     @Test
     public void testJsonNotifsLeaves() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
-            true, false, false, false);
+            true, false, false, false, listenersBroker);
         adapter.setCloseVars(domDataBroker, databindProvider);
 
         final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
@@ -276,7 +278,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     @Test
     public void testJsonNotifsChangedLeaves() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
-                false, false, true, false);
+                false, false, true, false, listenersBroker);
         adapter.setCloseVars(domDataBroker, databindProvider);
 
         final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
@@ -325,7 +327,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     @Test
     public void testJsonChildNodesOnly() throws Exception {
         final var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-            NotificationOutputType.JSON, false, false, false, true);
+            NotificationOutputType.JSON, false, false, false, true, listenersBroker);
         adapter.setCloseVars(domDataBroker, databindProvider);
 
         final var changeService = domDataBroker.getExtensions()
@@ -361,7 +363,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     @Test
     public void testXmlLeavesOnly() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
-            true, false, false, false);
+            true, false, false, false, listenersBroker);
         adapter.setCloseVars(domDataBroker, databindProvider);
 
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
@@ -413,7 +415,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     @Test
     public void testXmlChangedLeavesOnly() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
-                false, false, true, false);
+                false, false, true, false, listenersBroker);
         adapter.setCloseVars(domDataBroker, databindProvider);
 
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
@@ -473,7 +475,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     @Test
     public void testXmlChildNodesOnly() throws Exception {
         final var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-            NotificationOutputType.XML, false, false, false, true);
+            NotificationOutputType.XML, false, false, false, true, listenersBroker);
         adapter.setCloseVars(domDataBroker, databindProvider);
 
         final var changeService = domDataBroker.getExtensions()
@@ -579,7 +581,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private void jsonNotifications(final YangInstanceIdentifier pathYiid, final boolean skipData,
             final String jsonNotifCreate, final String jsonNotifUpdate, final String jsonNotifDelete) throws Exception {
         final var adapter = new ListenerAdapterTester(pathYiid, "Casey",
-                NotificationOutputType.JSON, false, skipData, false, false);
+                NotificationOutputType.JSON, false, skipData, false, false, listenersBroker);
         adapter.setCloseVars(domDataBroker, databindProvider);
 
         final var changeService = domDataBroker.getExtensions()
@@ -610,7 +612,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private void xmlNotifications(final YangInstanceIdentifier pathYiid, final boolean skipData,
             final String xmlNotifCreate, final String xmlNotifUpdate, final String xmlNotifDelete) throws Exception {
         final var adapter = new ListenerAdapterTester(pathYiid, "Casey", NotificationOutputType.XML,
-                false, skipData, false, false);
+                false, skipData, false, false, listenersBroker);
         adapter.setCloseVars(domDataBroker, databindProvider);
 
         final var changeService = domDataBroker.getExtensions()

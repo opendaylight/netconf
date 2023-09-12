@@ -9,13 +9,13 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.StampedLock;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
@@ -25,6 +25,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,17 +34,12 @@ import org.slf4j.LoggerFactory;
  * This singleton class is responsible for creation, removal and searching for {@link ListenerAdapter} or
  * {@link NotificationListenerAdapter} listeners.
  */
-// FIXME: NETCONF-1104: this should be a component
 // FIXME: furthermore, this should be tied to ietf-restconf-monitoring, as the Strings used in its maps are stream
 //        names. We essentially need a component which deals with allocation of stream names and their lifecycle and
 //        the contents of /restconf-state/streams.
+@Singleton
+@Component(service = ListenersBroker.class, immediate = true)
 public final class ListenersBroker {
-    // FIXME: NETCONF-1104: remove this class
-    @Deprecated(since = "7.0.0")
-    private static final class Holder {
-        static final ListenersBroker INSTANCE = new ListenersBroker();
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(ListenersBroker.class);
 
     private final StampedLock dataChangeListenersLock = new StampedLock();
@@ -52,19 +49,10 @@ public final class ListenersBroker {
     private final BiMap<String, NotificationListenerAdapter> notificationListeners = HashBiMap.create();
     private final BiMap<String, DeviceNotificationListenerAdaptor> deviceNotificationListeners = HashBiMap.create();
 
-    private ListenersBroker() {
-        // FIXME: NETCONF-1104: this constructor should be a public thing
-    }
+    @Inject
+    @Activate
+    public ListenersBroker() {
 
-    /**
-     * Creation of the singleton listeners broker.
-     *
-     * @return Reusable instance of {@link ListenersBroker}.
-     */
-    // FIXME: NETCONF-1104: remove this method
-    @Deprecated(since = "7.0.0")
-    public static ListenersBroker getInstance() {
-        return Holder.INSTANCE;
     }
 
     /**
@@ -159,7 +147,7 @@ public final class ListenersBroker {
         final long stamp = dataChangeListenersLock.writeLock();
         try {
             return dataChangeListeners.computeIfAbsent(streamName,
-                stream -> new ListenerAdapter(path, stream, outputType));
+                stream -> new ListenerAdapter(path, stream, outputType, this));
         } finally {
             dataChangeListenersLock.unlockWrite(stamp);
         }
@@ -183,7 +171,7 @@ public final class ListenersBroker {
         final long stamp = notificationListenersLock.writeLock();
         try {
             return notificationListeners.computeIfAbsent(streamName,
-                stream -> new NotificationListenerAdapter(schemaPath, stream, outputType));
+                stream -> new NotificationListenerAdapter(schemaPath, stream, outputType, this));
         } finally {
             notificationListenersLock.unlockWrite(stamp);
         }
@@ -207,7 +195,7 @@ public final class ListenersBroker {
         try {
             return deviceNotificationListeners.computeIfAbsent(streamName,
                 stream -> new DeviceNotificationListenerAdaptor(streamName, outputType, refSchemaCtx,
-                    mountPointService, path));
+                    mountPointService, path, this));
         } finally {
             deviceNotificationListenersLock.unlockWrite(stamp);
         }
@@ -406,16 +394,5 @@ public final class ListenersBroker {
             result = result.substring(0, result.length() - 1);
         }
         return result;
-    }
-
-    @VisibleForTesting
-    public synchronized void setDataChangeListeners(final Map<String, ListenerAdapter> listenerAdapterCollection) {
-        final long stamp = dataChangeListenersLock.writeLock();
-        try {
-            dataChangeListeners.clear();
-            dataChangeListeners.putAll(listenerAdapterCollection);
-        } finally {
-            dataChangeListenersLock.unlockWrite(stamp);
-        }
     }
 }

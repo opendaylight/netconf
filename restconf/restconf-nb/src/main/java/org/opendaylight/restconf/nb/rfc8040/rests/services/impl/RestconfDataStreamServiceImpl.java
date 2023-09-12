@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,15 +42,16 @@ import org.slf4j.LoggerFactory;
 public final class RestconfDataStreamServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataStreamServiceImpl.class);
 
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private final ListenersBroker listenersBroker;
     private final ScheduledExecutorService executorService;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
     @Inject
     public RestconfDataStreamServiceImpl(final ScheduledThreadPool scheduledThreadPool,
-            final StreamsConfiguration configuration) {
+            final ListenersBroker listenersBroker, final StreamsConfiguration configuration) {
         executorService = scheduledThreadPool.getExecutor();
+        this.listenersBroker = requireNonNull(listenersBroker);
         heartbeatInterval = configuration.heartbeatInterval();
         maximumFragmentLength = configuration.maximumFragmentLength();
     }
