@@ -20,132 +20,127 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
- * Interface for base and additional operations for netconf (e.g. get, get-config, edit-config, (un)lock, commit etc).
- * &lt;edit-config&gt; operation is extended according it's attributes (merge, replace, create, delete, remove).
- * According to RFC-6241.
+ * Interface for base and additional operations for NETCONF (e.g. {@code get}, {@code get-config}, {@code edit-config},
+ * {@code lock}, {@code unlock}, {@code commit}, etc).
+ * The {@code <edit-config>} operation is extended according its attributes (merge, replace, create, delete, remove), as
+ * per RFC6241.
  */
 public interface NetconfDataTreeService extends DOMService {
     /**
-     * The &lt;lock&gt; operation.
-     * Allows the client to lock the entire configuration datastore system of a device.
+     * Return device identifier.
      *
-     * @return result of &lt;lock&gt; operation
+     * @return Device's identifier, must not be {@code null}.
+     */
+    @NonNull Object getDeviceId();
+
+    /**
+     * The {@code <lock>} operation. Allows the client to lock the entire configuration datastore system of a device.
+     *
+     * @return result of {@code <lock>} operation
      */
     @CheckReturnValue
     ListenableFuture<? extends DOMRpcResult> lock();
 
     /**
-     * The &lt;unlock&gt; operation.
-     * Used to release a configuration lock, previously obtained with the &lt;lock&gt; operation.
+     * The {@code <lock>} operation. Used to release a configuration lock, previously obtained with the {@code <lock>}
+     * operation.
      *
-     * @return result of &lt;unlock&gt; operation
+     * @return result of {@code <unlock>} operation
      */
     @CheckReturnValue
     ListenableFuture<? extends DOMRpcResult> unlock();
 
     /**
-     * The &lt;discard-changes&gt; operation.
-     * If device supports :candidate capability, discards any uncommitted changes by resetting
-     * the candidate configuration with the content of the running configuration.
+     * The {@code <discard-changes>} operation. If device supports {@code :candidate} capability, discards any
+     * uncommitted changes by resetting the candidate configuration with the content of the running configuration.
      *
-     * @return result of &lt;discard-changes&gt; operation
+     * @return result of {@code <discard-changes>} operation
      */
     ListenableFuture<? extends DOMRpcResult> discardChanges();
 
     /**
-     * The &lt;get&gt; operation.
-     * Retrieve running configuration and device state information.
+     * The {@code <get>} operation. Retrieve running configuration and device state information.
      *
-     * @return result of &lt;get&gt; operation
+     * @return result of {@code <get>} operation
      */
     ListenableFuture<Optional<NormalizedNode>> get(YangInstanceIdentifier path);
 
     /**
-     * The &lt;get&gt; operation with specific fields that are read from device.
+     * The {@code <get>} operation with specific fields that are read from device.
      *
      * @param path   path to data
      * @param fields list of fields (paths relative to parent path)
-     * @return result of &lt;get&gt; operation
+     * @return result of {@code <get>} operation
      */
     ListenableFuture<Optional<NormalizedNode>> get(YangInstanceIdentifier path, List<YangInstanceIdentifier> fields);
 
     /**
-     * The &lt;get-config&gt; operation.
-     * Retrieve all or part of a specified configuration datastore.
+     * The {@code <get-config>} operation. Retrieve all or part of a specified configuration datastore.
      *
-     * @return result of &lt;get-config&gt; operation
+     * @return result of {@code <get-config>} operation
      */
     ListenableFuture<Optional<NormalizedNode>> getConfig(YangInstanceIdentifier path);
 
     /**
-     * The &lt;get-config&gt; operation with specified fields that are read from device.
+     * The {@code <get-config>} operation with specified fields that are read from device.
      *
-     * @return result of &lt;get-config&gt; operation
+     * @return result of {@code <get-config>} operation
      */
     ListenableFuture<Optional<NormalizedNode>> getConfig(YangInstanceIdentifier path,
         List<YangInstanceIdentifier> fields);
 
     /**
-     * The &lt;edit-config&gt; operation with "merge" attribute.
-     * The configuration data identified by the element containing this attribute is merged with the configuration
-     * at the corresponding level in the configuration datastore.
+     * The {@code <edit-config>} operation with {@code merge} attribute. The configuration data identified by the
+     * element containing this attribute is merged with the configuration at the corresponding level in the
+     * configuration datastore.
      *
-     * @return result of &lt;edit-config&gt; operation
+     * @return result of {@code <edit-config>} operation
      */
     ListenableFuture<? extends DOMRpcResult> merge(LogicalDatastoreType store, YangInstanceIdentifier path,
         NormalizedNode data, Optional<EffectiveOperation> defaultOperation);
 
     /**
-     * The &lt;edit-config&gt; operation with "replace" attribute.
-     * The configuration data identified by the element containing this attribute replaces any related configuration
-     * in the configuration datastore.
+     * The {@code <edit-config>} operation with {@code replace} attribute. The configuration data identified by the
+     * element containing this attribute replaces any related configuration in the configuration datastore.
      *
-     * @return result of &lt;edit-config&gt; operation
+     * @return result of {@code <edit-config>} operation
      */
     ListenableFuture<? extends DOMRpcResult> replace(LogicalDatastoreType store, YangInstanceIdentifier path,
         NormalizedNode data, Optional<EffectiveOperation> defaultOperation);
 
     /**
-     * The &lt;edit-config&gt; operation with "create" attribute.
-     * The configuration data identified by the element containing this attribute is added to the configuration if
-     * and only if the configuration data does not already exist in the configuration datastore.
+     * The {@code <edit-config>} operation with {@code create} attribute. The configuration data identified by the
+     * element containing this attribute is added to the configuration if and only if the configuration data does not
+     * already exist in the configuration datastore.
      *
-     * @return result of &lt;edit-config&gt; operation
+     * @return result of{@code <edit-config>} operation
      */
     ListenableFuture<? extends DOMRpcResult> create(LogicalDatastoreType store, YangInstanceIdentifier path,
         NormalizedNode data, Optional<EffectiveOperation> defaultOperation);
 
     /**
-     * The &lt;edit-config&gt; operation with "create" attribute.
-     * The configuration data identified by the element containing this attribute is deleted from the configuration
-     * if and only if the configuration data currently exists in the configuration datastore.
+     * The {@code <edit-config>} operation with {@code create} attribute. The configuration data identified by the
+     * element containing this attribute is deleted from the configuration if and only if the configuration data
+     * currently exists in the configuration datastore.
      *
-     * @return result of &lt;edit-config&gt; operation
+     * @return result of {@code <edit-config>} operation
      */
     ListenableFuture<? extends DOMRpcResult> delete(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
-     * The &lt;edit-config&gt; operation with "create" attribute.
-     * The configuration data identified by the element containing this attribute is deleted from the configuration
-     * if the configuration data currently exists in the configuration datastore.
+     * The {@code <edit-config>} operation with {@code create} attribute. The configuration data identified by the
+     * element containing this attribute is deleted from the configuration if the configuration data currently exists
+     * in the configuration datastore.
      *
-     * @return result of &lt;edit-config&gt; operation
+     * @return result of {@code <edit-config>} operation
      */
     ListenableFuture<? extends DOMRpcResult> remove(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
-     * The &lt;commit&gt; operation.
-     * If device supports :candidate capability, commit the candidate configuration as the device's
-     * new current configuration.
+     * The {@code <commit>} operation. If device supports {@code :candidate} capability, commit the candidate
+     * configuration as the device's new current configuration.
      *
-     * @return result of &lt;commit&gt; operation
+     * @return result of {@code <commit>} operation
      */
     ListenableFuture<? extends DOMRpcResult> commit();
-
-    /**
-     * Return device identifier.
-     *
-     * @return Device's identifier, must not be null.
-     */
-    @NonNull Object getDeviceId();
 }
