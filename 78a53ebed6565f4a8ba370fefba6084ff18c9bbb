@@ -88,6 +88,24 @@
       "parentUuid": "ec1e5ca4_5a78dd6f",
       "revId": "78a53ebed6565f4a8ba370fefba6084ff18c9bbb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ceb77b2_73e9935b",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/JsonDataTreeCandidateSerializer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-12T16:42:25Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f889a134_ea69858c",
+      "revId": "78a53ebed6565f4a8ba370fefba6084ff18c9bbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
