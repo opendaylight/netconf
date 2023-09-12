@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9228929_8b3d8c43",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-12T11:42:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9eab4bae_46961ae6",
+      "revId": "f970d965d12b9773957999cf483a9e0859fc9b03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b019a22a_479ec65a",
@@ -48,6 +66,30 @@
       "writtenOn": "2023-09-11T19:21:02Z",
       "side": 1,
       "message": "\u0027this factory\u0027",
+      "range": {
+        "startLine": 19,
+        "startChar": 40,
+        "endLine": 19,
+        "endChar": 47
+      },
+      "revId": "f970d965d12b9773957999cf483a9e0859fc9b03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b267ab9_861c3b60",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSubsystemFactory.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-12T11:42:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b019a22a_479ec65a",
       "range": {
         "startLine": 19,
         "startChar": 40,
@@ -81,6 +123,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f65163d2_7f2a34f6",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSubsystemFactory.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-12T11:42:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59219a04_4b0ee64d",
+      "range": {
+        "startLine": 23,
+        "startChar": 20,
+        "endLine": 23,
+        "endChar": 23
+      },
+      "revId": "f970d965d12b9773957999cf483a9e0859fc9b03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e604153_18867e8c",
@@ -94,6 +160,30 @@
       "writtenOn": "2023-09-11T19:22:37Z",
       "side": 1,
       "message": "try-catch should cover minimum required surface",
+      "range": {
+        "startLine": 39,
+        "startChar": 14,
+        "endLine": 39,
+        "endChar": 35
+      },
+      "revId": "f970d965d12b9773957999cf483a9e0859fc9b03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a5dcbdb_d67e2585",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSubsystemSessionListener.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-12T11:42:02Z",
+      "side": 1,
+      "message": "of 3 operations the only one which does not throw IOException is `.onClose(...)`\nmoving single line out of try-catch block will require additional check for \nvariable being initialized, as result there will be just +4 lines of code.\nseems unreasonable",
+      "parentUuid": "3e604153_18867e8c",
       "range": {
         "startLine": 39,
         "startChar": 14,
