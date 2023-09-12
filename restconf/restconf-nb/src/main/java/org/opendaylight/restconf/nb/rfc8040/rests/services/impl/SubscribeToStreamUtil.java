@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Splitter;
 import java.net.URI;
@@ -47,11 +46,7 @@ abstract class SubscribeToStreamUtil {
      * Implementation of SubscribeToStreamUtil for Server-sent events.
      */
     private static final class ServerSentEvents extends SubscribeToStreamUtil {
-        static final ServerSentEvents INSTANCE = new ServerSentEvents(ListenersBroker.getInstance());
-
-        private ServerSentEvents(final ListenersBroker listenersBroker) {
-            super(listenersBroker);
-        }
+        static final ServerSentEvents INSTANCE = new ServerSentEvents();
 
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
@@ -65,11 +60,7 @@ abstract class SubscribeToStreamUtil {
      * Implementation of SubscribeToStreamUtil for Web sockets.
      */
     private static final class WebSockets extends SubscribeToStreamUtil {
-        static final WebSockets INSTANCE = new WebSockets(ListenersBroker.getInstance());
-
-        private WebSockets(final ListenersBroker listenersBroker) {
-            super(listenersBroker);
-        }
+        static final WebSockets INSTANCE = new WebSockets();
 
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
@@ -92,10 +83,8 @@ abstract class SubscribeToStreamUtil {
     private static final Logger LOG = LoggerFactory.getLogger(SubscribeToStreamUtil.class);
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
-    private final @NonNull ListenersBroker listenersBroker;
-
-    SubscribeToStreamUtil(final ListenersBroker listenersBroker) {
-        this.listenersBroker = requireNonNull(listenersBroker);
+    SubscribeToStreamUtil() {
+        // Hidden on purpose
     }
 
     static SubscribeToStreamUtil serverSentEvents() {
@@ -104,10 +93,6 @@ abstract class SubscribeToStreamUtil {
 
     static SubscribeToStreamUtil webSockets() {
         return WebSockets.INSTANCE;
-    }
-
-    public final @NonNull ListenersBroker listenersBroker() {
-        return listenersBroker;
     }
 
     /**
@@ -130,7 +115,8 @@ abstract class SubscribeToStreamUtil {
      * @return Stream location for listening.
      */
     final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder,
+            final ListenersBroker listenersBroker) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         if (isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -170,7 +156,8 @@ abstract class SubscribeToStreamUtil {
      * @return Location for listening.
      */
     final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder,
+            final ListenersBroker listenersBroker) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
 
         final String datastoreParam = mapOfValues.get(RestconfStreamsConstants.DATASTORE_PARAM_NAME);

@@ -33,8 +33,7 @@ import org.slf4j.LoggerFactory;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class JsonNotificationListenerTest extends AbstractNotificationListenerTest {
     private static final Logger LOG = LoggerFactory.getLogger(JsonNotificationListenerTest.class);
-
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private static final ListenersBroker listenersBroker = new ListenersBroker();
 
     @Test
     public void notifi_leafTest() throws Exception {

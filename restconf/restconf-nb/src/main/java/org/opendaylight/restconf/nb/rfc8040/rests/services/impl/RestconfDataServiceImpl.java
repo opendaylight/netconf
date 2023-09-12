@@ -136,7 +136,7 @@ public final class RestconfDataServiceImpl {
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
     private final DOMDataBroker dataBroker;
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private final ListenersBroker listenersBroker;
 
     @SuppressWarnings("unused")
     private volatile RestconfStrategy localStrategy;
@@ -144,7 +144,8 @@ public final class RestconfDataServiceImpl {
     public RestconfDataServiceImpl(final DatabindProvider databindProvider,
             final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
-            final DOMActionService actionService, final StreamsConfiguration configuration) {
+            final DOMActionService actionService, final StreamsConfiguration configuration,
+            final ListenersBroker listenersBroker) {
         this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
@@ -152,6 +153,7 @@ public final class RestconfDataServiceImpl {
         this.actionService = requireNonNull(actionService);
         streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
+        this.listenersBroker = listenersBroker;
     }
 
     /**

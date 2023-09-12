@@ -40,9 +40,9 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CreateStreamUtilTest {
-    private static EffectiveModelContext SCHEMA_CTX;
+    private static final ListenersBroker listenersBroker = new ListenersBroker();
 
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private static EffectiveModelContext SCHEMA_CTX;
 
     @BeforeClass
     public static void setUp() {
