@@ -35,12 +35,11 @@ final class BatchedExistenceCheck {
         outstanding = total;
     }
 
-    static BatchedExistenceCheck start(final DOMDataTreeReadOperations tx,
-                                       final LogicalDatastoreType datastore, final YangInstanceIdentifier parentPath,
-                                       final Collection<? extends NormalizedNode> children) {
-        final BatchedExistenceCheck ret = new BatchedExistenceCheck(children.size());
-        for (NormalizedNode child : children) {
-            final YangInstanceIdentifier path = parentPath.node(child.name());
+    static BatchedExistenceCheck start(final DOMDataTreeReadOperations tx, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier parentPath, final Collection<? extends NormalizedNode> children) {
+        final var ret = new BatchedExistenceCheck(children.size());
+        for (var child : children) {
+            final var path = parentPath.node(child.name());
             tx.exists(datastore, path).addCallback(new FutureCallback<Boolean>() {
                 @Override
                 public void onSuccess(final Boolean result) {
