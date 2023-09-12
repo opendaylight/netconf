@@ -30,7 +30,7 @@ import org.xmlunit.assertj.XmlAssert;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class XmlNotificationListenerTest extends AbstractNotificationListenerTest {
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private static final ListenersBroker LISTENERS_BROCKER = new ListenersBroker();
 
     @Test
     public void notifi_leafTest() throws Exception {
@@ -170,7 +170,7 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
 
     private String prepareXmlResult(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
-        final var notifiAdapter = listenersBroker.registerNotificationListener(schemaPathNotifi, "xml-stream",
+        final var notifiAdapter = LISTENERS_BROCKER.registerNotificationListener(schemaPathNotifi, "xml-stream",
             NotificationOutputType.XML);
         return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }

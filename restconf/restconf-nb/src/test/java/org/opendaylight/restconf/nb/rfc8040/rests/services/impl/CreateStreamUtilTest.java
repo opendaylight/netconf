@@ -40,9 +40,9 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CreateStreamUtilTest {
-    private static EffectiveModelContext SCHEMA_CTX;
+    private static final ListenersBroker LISTENERS_BROCKER = new ListenersBroker();
 
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private static EffectiveModelContext SCHEMA_CTX;
 
     @BeforeClass
     public static void setUp() {
@@ -51,7 +51,7 @@ public class CreateStreamUtilTest {
 
     @Test
     public void createStreamTest() {
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(listenersBroker,
+        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(LISTENERS_BROCKER,
             prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster", "path"),
             SCHEMA_CTX);
         assertEquals(List.of(), result.errors());
@@ -66,7 +66,7 @@ public class CreateStreamUtilTest {
         final var payload = prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput,
             "String value", "path");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> CreateStreamUtil.createDataChangeNotifiStream(listenersBroker, payload, SCHEMA_CTX)).getErrors();
+            () -> CreateStreamUtil.createDataChangeNotifiStream(LISTENERS_BROCKER, payload, SCHEMA_CTX)).getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
@@ -79,7 +79,7 @@ public class CreateStreamUtilTest {
         final var payload = prepareDomPayload("create-data-change-event-subscription2", RpcDefinition::getInput,
             "toaster", "path2");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> CreateStreamUtil.createDataChangeNotifiStream(listenersBroker, payload, SCHEMA_CTX)).getErrors();
+            () -> CreateStreamUtil.createDataChangeNotifiStream(LISTENERS_BROCKER, payload, SCHEMA_CTX)).getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
