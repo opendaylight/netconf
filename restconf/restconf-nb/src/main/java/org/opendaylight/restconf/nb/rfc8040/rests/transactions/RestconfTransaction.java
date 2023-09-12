@@ -83,9 +83,7 @@ public abstract class RestconfTransaction {
      */
     public abstract void replace(YangInstanceIdentifier path, NormalizedNode data, EffectiveModelContext schemaContext);
 
-    // FIXME: NETCONF-1107: this method should not be exposed once we expose proper methods for
-    //        {Post,Put}TransactionUtil.submitData()
-    public final @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) {
+    final @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) {
         return (NormalizedNodeContainer<?>) TransactionUtil.syncAccess(read(path), path).orElse(null);
     }
 
