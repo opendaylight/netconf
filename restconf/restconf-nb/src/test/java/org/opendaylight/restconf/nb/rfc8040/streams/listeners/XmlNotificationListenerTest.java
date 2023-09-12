@@ -30,7 +30,7 @@ import org.xmlunit.assertj.XmlAssert;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class XmlNotificationListenerTest extends AbstractNotificationListenerTest {
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private static ListenersBroker listenersBroker = new ListenersBroker();
 
     @Test
     public void notifi_leafTest() throws Exception {
