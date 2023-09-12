@@ -19,7 +19,6 @@ import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.TransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -76,7 +75,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final var emptySubTree = ImmutableNodes.fromInstanceId(context, path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
-            TransactionUtil.ensureParentsByMerge(path, context, this);
+            ensureParentsByMerge(path, context);
 
             final var children = ((DistinctNodeContainer<?, ?>) data).body();
             final var check = BatchedExistenceCheck.start(verifyNotNull(rwTx), CONFIGURATION, path, children);
@@ -89,7 +88,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             checkExistence(path, check);
         } else {
             RestconfStrategy.checkItemDoesNotExists(verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
-            TransactionUtil.ensureParentsByMerge(path, context, this);
+            ensureParentsByMerge(path, context);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
     }
@@ -100,14 +99,14 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final var emptySubtree = ImmutableNodes.fromInstanceId(context, path);
             merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
-            TransactionUtil.ensureParentsByMerge(path, context, this);
+            ensureParentsByMerge(path, context);
 
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = path.node(child.name());
                 verifyNotNull(rwTx).put(CONFIGURATION, childPath, child);
             }
         } else {
-            TransactionUtil.ensureParentsByMerge(path, context, this);
+            ensureParentsByMerge(path, context);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
     }

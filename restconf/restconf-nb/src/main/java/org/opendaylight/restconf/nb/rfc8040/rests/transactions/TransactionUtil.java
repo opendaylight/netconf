@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.utils;
+package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -18,61 +17,20 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Util class for common methods of transactions.
  */
-public final class TransactionUtil {
+final class TransactionUtil {
     private static final Logger LOG = LoggerFactory.getLogger(TransactionUtil.class);
 
     private TransactionUtil() {
         // Hidden on purpose
-    }
-
-    /**
-     * Merged parents of data.
-     *
-     * @param path          path of data
-     * @param schemaContext {@link SchemaContext}
-     * @param transaction   A handle to a set of DS operations
-     */
-    // FIXME: this method should only be invoked in MdsalRestconfStrategy, and even then only if we are crossing
-    //        an implicit list.
-    public static void ensureParentsByMerge(final YangInstanceIdentifier path,
-                                            final EffectiveModelContext schemaContext,
-                                            final RestconfTransaction transaction) {
-        final var normalizedPathWithoutChildArgs = new ArrayList<PathArgument>();
-        YangInstanceIdentifier rootNormalizedPath = null;
-
-        final var it = path.getPathArguments().iterator();
-
-        while (it.hasNext()) {
-            final var pathArgument = it.next();
-            if (rootNormalizedPath == null) {
-                rootNormalizedPath = YangInstanceIdentifier.of(pathArgument);
-            }
-
-            if (it.hasNext()) {
-                normalizedPathWithoutChildArgs.add(pathArgument);
-            }
-        }
-
-        if (normalizedPathWithoutChildArgs.isEmpty()) {
-            return;
-        }
-
-        transaction.merge(rootNormalizedPath,
-            ImmutableNodes.fromInstanceId(schemaContext, YangInstanceIdentifier.of(normalizedPathWithoutChildArgs)));
     }
 
     /**
@@ -84,7 +42,7 @@ public final class TransactionUtil {
      * @return The accessed value
      * @throws RestconfDocumentedException if commit fails
      */
-    public static <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path) {
+    static <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path) {
         try {
             return future.get();
         } catch (ExecutionException e) {
@@ -103,7 +61,7 @@ public final class TransactionUtil {
      * @param path Modified path
      * @throws RestconfDocumentedException if commit fails
      */
-    public static void syncCommit(final ListenableFuture<? extends CommitInfo> future, final String txType,
+    static void syncCommit(final ListenableFuture<? extends CommitInfo> future, final String txType,
             final YangInstanceIdentifier path) {
         try {
             future.get();
@@ -117,7 +75,7 @@ public final class TransactionUtil {
         LOG.trace("Transaction({}) SUCCESSFUL", txType);
     }
 
-    public static @NonNull RestconfDocumentedException decodeException(final Throwable throwable,
+    static @NonNull RestconfDocumentedException decodeException(final Throwable throwable,
             final String txType, final YangInstanceIdentifier path) {
         return decodeException(throwable, throwable, txType, path);
     }

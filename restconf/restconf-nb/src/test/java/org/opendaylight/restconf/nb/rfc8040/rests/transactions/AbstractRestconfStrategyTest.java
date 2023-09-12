@@ -33,7 +33,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -469,7 +468,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      */
     private @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) {
-        return ReadDataTransactionUtil.readData(content, path, strategy, null, mockSchemaContext);
+        return strategy.readData(content, path, null, mockSchemaContext);
     }
 
     private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
