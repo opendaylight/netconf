@@ -47,7 +47,6 @@ abstract class SubscribeToStreamUtil {
      * Implementation of SubscribeToStreamUtil for Server-sent events.
      */
     private static final class ServerSentEvents extends SubscribeToStreamUtil {
-        static final ServerSentEvents INSTANCE = new ServerSentEvents(ListenersBroker.getInstance());
 
         private ServerSentEvents(final ListenersBroker listenersBroker) {
             super(listenersBroker);
@@ -65,7 +64,6 @@ abstract class SubscribeToStreamUtil {
      * Implementation of SubscribeToStreamUtil for Web sockets.
      */
     private static final class WebSockets extends SubscribeToStreamUtil {
-        static final WebSockets INSTANCE = new WebSockets(ListenersBroker.getInstance());
 
         private WebSockets(final ListenersBroker listenersBroker) {
             super(listenersBroker);
@@ -98,12 +96,12 @@ abstract class SubscribeToStreamUtil {
         this.listenersBroker = requireNonNull(listenersBroker);
     }
 
-    static SubscribeToStreamUtil serverSentEvents() {
-        return ServerSentEvents.INSTANCE;
+    static SubscribeToStreamUtil serverSentEvents(final ListenersBroker listenersBroker) {
+        return new ServerSentEvents(listenersBroker);
     }
 
-    static SubscribeToStreamUtil webSockets() {
-        return WebSockets.INSTANCE;
+    static SubscribeToStreamUtil webSockets(final ListenersBroker listenersBroker) {
+        return new WebSockets(listenersBroker);
     }
 
     public final @NonNull ListenersBroker listenersBroker() {

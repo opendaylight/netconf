@@ -124,18 +124,20 @@ public final class RestconfDataServiceImpl {
     private final MdsalRestconfServer server;
     @Deprecated(forRemoval = true)
     private final DOMDataBroker dataBroker;
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private final ListenersBroker listenersBroker;
 
     public RestconfDataServiceImpl(final DatabindProvider databindProvider, final MdsalRestconfServer server,
             final DOMDataBroker dataBroker, final RestconfStreamsSubscriptionService delegRestconfSubscrService,
-            final DOMActionService actionService, final StreamsConfiguration configuration) {
+            final DOMActionService actionService, final ListenersBroker listenersBroker,
+            final StreamsConfiguration configuration) {
         this.databindProvider = requireNonNull(databindProvider);
         this.server = requireNonNull(server);
         this.dataBroker = requireNonNull(dataBroker);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         this.actionService = requireNonNull(actionService);
-        streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
-                : SubscribeToStreamUtil.webSockets();
+        this.listenersBroker = requireNonNull(listenersBroker);
+        streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents(listenersBroker)
+                : SubscribeToStreamUtil.webSockets(listenersBroker);
     }
 
     /**
@@ -246,9 +248,9 @@ public final class RestconfDataServiceImpl {
                 final var notifName = notification.argument();
 
                 writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
-                    createYangNotifiStream(listenersBroker, moduleName, notifName, NotificationOutputType.XML));
+                    createYangNotifiStream(moduleName, notifName, NotificationOutputType.XML));
                 writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
-                    createYangNotifiStream(listenersBroker, moduleName, notifName, NotificationOutputType.JSON));
+                    createYangNotifiStream(moduleName, notifName, NotificationOutputType.JSON));
             });
         }
 
@@ -259,8 +261,8 @@ public final class RestconfDataServiceImpl {
         }
     }
 
-    private static NotificationListenerAdapter createYangNotifiStream(final ListenersBroker listenersBroker,
-            final String moduleName, final QName notifName, final NotificationOutputType outputType) {
+    private NotificationListenerAdapter createYangNotifiStream(final String moduleName, final QName notifName,
+            final NotificationOutputType outputType) {
         final var streamName = createNotificationStreamName(moduleName, notifName.getLocalName(), outputType);
 
         final var existing = listenersBroker.notificationListenerFor(streamName);

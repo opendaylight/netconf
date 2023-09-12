@@ -54,6 +54,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
     private final EventFormatterFactory<T> formatterFactory;
     private final NotificationOutputType outputType;
     private final String streamName;
+    private final ListenersBroker listenersBroker;
 
     @GuardedBy("this")
     private final Set<StreamSessionHandler> subscribers = new HashSet<>();
@@ -66,12 +67,13 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
     private Instant stop = null;
 
     AbstractCommonSubscriber(final String streamName, final NotificationOutputType outputType,
-            final EventFormatterFactory<T> formatterFactory) {
+            final EventFormatterFactory<T> formatterFactory, final ListenersBroker listenersBroker) {
         this.streamName = requireNonNull(streamName);
         checkArgument(!streamName.isEmpty());
 
         this.outputType = requireNonNull(outputType);
         this.formatterFactory = requireNonNull(formatterFactory);
+        this.listenersBroker = requireNonNull(listenersBroker);
         formatter = formatterFactory.emptyFormatter();
     }
 
@@ -118,7 +120,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
         subscribers.remove(subscriber);
         LOG.debug("Subscriber {} is removed", subscriber);
         if (!hasSubscribers()) {
-            ListenersBroker.getInstance().removeAndCloseListener(this);
+            listenersBroker.removeAndCloseListener(this);
         }
     }
 

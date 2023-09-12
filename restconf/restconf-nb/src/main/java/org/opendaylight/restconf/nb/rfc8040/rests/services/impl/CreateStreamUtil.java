@@ -136,13 +136,14 @@ final class CreateStreamUtil {
      *
      * @param baseUrl base Url
      * @param input RPC input
-     * @param streamUtil stream utility
      * @param mountPointService dom mount point service
+     * @param listenersBroker {@link ListenersBroker}
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
     // FIXME: this should be an RPC invocation
     static ContainerNode createDeviceNotificationListener(final String baseUrl, final ContainerNode input,
-            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService) {
+            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService,
+            final ListenersBroker listenersBroker) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
         final YangInstanceIdentifier path =
@@ -182,7 +183,7 @@ final class CreateStreamUtil {
                 ErrorTag.OPERATION_FAILED);
         }
 
-        final DeviceNotificationListenerAdaptor notificationListenerAdapter = streamUtil.listenersBroker()
+        final DeviceNotificationListenerAdaptor notificationListenerAdapter = listenersBroker
             .registerDeviceNotificationListener(deviceName, prepareOutputType(input), mountModelContext,
                 mountPointService, mountPoint.getIdentifier());
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
