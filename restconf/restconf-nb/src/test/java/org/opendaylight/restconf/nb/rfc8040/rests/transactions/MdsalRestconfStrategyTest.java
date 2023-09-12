@@ -33,7 +33,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -337,8 +336,8 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
-        assertEquals(data, ReadDataTransactionUtil.readData(ContentParam.ALL, path,
-            new MdsalRestconfStrategy(mockDataBroker), WithDefaultsParam.TRIM, MODULES_SCHEMA));
+        assertEquals(data, new MdsalRestconfStrategy(mockDataBroker).readData(ContentParam.ALL, path,
+            WithDefaultsParam.TRIM, MODULES_SCHEMA));
     }
 
     @Test
@@ -368,8 +367,8 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
-        assertEquals(data, ReadDataTransactionUtil.readData(ContentParam.ALL, path,
-            new MdsalRestconfStrategy(mockDataBroker), WithDefaultsParam.TRIM, MODULES_SCHEMA));
+        assertEquals(data, new MdsalRestconfStrategy(mockDataBroker).readData(ContentParam.ALL, path,
+            WithDefaultsParam.TRIM, MODULES_SCHEMA));
     }
 
     @Test
@@ -392,7 +391,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
-        assertEquals(content, ReadDataTransactionUtil.readData(ContentParam.ALL, path,
-            new MdsalRestconfStrategy(mockDataBroker), WithDefaultsParam.TRIM, MODULES_SCHEMA));
+        assertEquals(content, new MdsalRestconfStrategy(mockDataBroker).readData(ContentParam.ALL, path,
+            WithDefaultsParam.TRIM, MODULES_SCHEMA));
     }
 }

@@ -83,7 +83,6 @@ import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
@@ -198,11 +197,11 @@ public final class RestconfDataServiceImpl {
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
         final NormalizedNode node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
-            node = ReadDataTransactionUtil.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                    strategy, readParams.withDefaults(), schemaContextRef, fieldPaths);
+            node = strategy.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
+                readParams.withDefaults(), schemaContextRef, fieldPaths);
         } else {
-            node = ReadDataTransactionUtil.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                    strategy, readParams.withDefaults(), schemaContextRef);
+            node = strategy.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
+                readParams.withDefaults(), schemaContextRef);
         }
 
         // FIXME: this is utter craziness, refactor it properly!
