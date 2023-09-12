@@ -21,89 +21,79 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @Provider
 @Produces(MediaTypes.APPLICATION_YANG_DATA_JSON)
 public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
     @Override
     public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
-                        final Annotation[] annotations, final MediaType mediaType,
-                        final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
-            throws IOException {
+            final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
+            final OutputStream entityStream) throws IOException {
+        final var jsonWriter = createJsonWriter(entityStream);
+        jsonWriter.beginObject().name("ietf-yang-patch:yang-patch-status")
+            .beginObject().name("patch-id").value(patchStatusContext.patchId());
 
-        final JsonWriter jsonWriter = createJsonWriter(entityStream);
-        jsonWriter.beginObject().name("ietf-yang-patch:yang-patch-status");
-        jsonWriter.beginObject();
-        jsonWriter.name("patch-id").value(patchStatusContext.patchId());
         if (patchStatusContext.ok()) {
             reportSuccess(jsonWriter);
-        } else {
-            if (patchStatusContext.globalErrors() != null) {
-                reportErrors(patchStatusContext.globalErrors(), jsonWriter);
-            }
+            jsonWriter.endObject().endObject().flush();
+        }
 
-            jsonWriter.name("edit-status");
-            jsonWriter.beginObject();
-            jsonWriter.name("edit");
-            jsonWriter.beginArray();
-            for (final PatchStatusEntity patchStatusEntity : patchStatusContext.editCollection()) {
-                jsonWriter.beginObject();
-                jsonWriter.name("edit-id").value(patchStatusEntity.getEditId());
-                if (patchStatusEntity.getEditErrors() != null) {
-                    reportErrors(patchStatusEntity.getEditErrors(), jsonWriter);
-                } else {
-                    if (patchStatusEntity.isOk()) {
-                        reportSuccess(jsonWriter);
-                    }
-                }
-                jsonWriter.endObject();
+        final var context = patchStatusContext.context();
+        final var globalErrors = patchStatusContext.globalErrors();
+        if (globalErrors != null) {
+            reportErrors(context, globalErrors, jsonWriter);
+        }
+
+        jsonWriter.name("edit-status").beginObject()
+        .name("edit").beginArray();
+        for (var editStatus : patchStatusContext.editCollection()) {
+            jsonWriter.beginObject().name("edit-id").value(editStatus.getEditId());
+
+            final var editErrors = editStatus.getEditErrors();
+            if (editErrors != null) {
+                reportErrors(context, editErrors, jsonWriter);
+            } else if (editStatus.isOk()) {
+                reportSuccess(jsonWriter);
             }
-            jsonWriter.endArray();
             jsonWriter.endObject();
         }
-        jsonWriter.endObject();
-        jsonWriter.endObject();
-        jsonWriter.flush();
+        jsonWriter.endArray().endObject().endObject().endObject().flush();
     }
 
     private static void reportSuccess(final JsonWriter jsonWriter) throws IOException {
         jsonWriter.name("ok").beginArray().nullValue().endArray();
     }
 
-    private static void reportErrors(final List<RestconfError> errors, final JsonWriter jsonWriter) throws IOException {
-        jsonWriter.name("errors");
-        jsonWriter.beginObject();
-        jsonWriter.name("error");
-        jsonWriter.beginArray();
+    private static void reportErrors(final EffectiveModelContext context, final List<RestconfError> errors,
+            final JsonWriter jsonWriter) throws IOException {
+        jsonWriter.name("errors").beginObject().name("error").beginArray();
 
-        for (final RestconfError restconfError : errors) {
-            jsonWriter.beginObject();
-            jsonWriter.name("error-type").value(restconfError.getErrorType().elementBody());
-            jsonWriter.name("error-tag").value(restconfError.getErrorTag().elementBody());
+        for (var restconfError : errors) {
+            jsonWriter.beginObject()
+                .name("error-type").value(restconfError.getErrorType().elementBody())
+                .name("error-tag").value(restconfError.getErrorTag().elementBody());
 
-            // optional node
-            if (restconfError.getErrorPath() != null) {
-                jsonWriter.name("error-path").value(restconfError.getErrorPath().toString());
+            final var errorPath = restconfError.getErrorPath();
+            if (errorPath != null) {
+                // FIXME: YangInstanceIdentifier.toString(), we should use a codec based on context
+                jsonWriter.name("error-path").value(errorPath.toString());
             }
-
-            // optional node
-            if (restconfError.getErrorMessage() != null) {
-                jsonWriter.name("error-message").value(restconfError.getErrorMessage());
+            final var errorMessage = restconfError.getErrorMessage();
+            if (errorMessage != null) {
+                jsonWriter.name("error-message").value(errorMessage);
             }
-
-            // optional node
-            if (restconfError.getErrorInfo() != null) {
-                jsonWriter.name("error-info").value(restconfError.getErrorInfo());
+            final var errorInfo = restconfError.getErrorInfo();
+            if (errorInfo != null) {
+                jsonWriter.name("error-info").value(errorInfo);
             }
 
             jsonWriter.endObject();
         }
 
-        jsonWriter.endArray();
-        jsonWriter.endObject();
+        jsonWriter.endArray().endObject();
     }
 
     private static JsonWriter createJsonWriter(final OutputStream entityStream) {

@@ -52,7 +52,8 @@ public final class JsonPatchBody extends PatchBody {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
             final var resultList = read(jsonReader, targetResource, patchId);
-            return new PatchContext(targetResource, resultList, patchId.get());
+            // Note: patchId side-effect of above
+            return new PatchContext(patchId.get(), resultList);
         }
     }
 

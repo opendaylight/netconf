@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
@@ -59,16 +58,9 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
         return null;
     }
 
-    final void checkPatchContext(final PatchContext patchContext) {
-        assertNotNull(patchContext.getData());
-
-        final var iid = patchContext.getInstanceIdentifierContext();
-        assertNotNull(iid);
-
-        assertNotNull(iid.getInstanceIdentifier());
-        assertNotNull(iid.getSchemaContext());
-        assertNotNull(iid.getSchemaNode());
-        assertSame(mountPoint(), iid.getMountPoint());
+    static final void checkPatchContext(final PatchContext patchContext) {
+        assertNotNull(patchContext.patchId());
+        assertNotNull(patchContext.entities());
     }
 
     final @NonNull PatchContext parse(final String uriPath, final String patchBody) throws IOException {
