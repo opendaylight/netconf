@@ -323,7 +323,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
               }
             }""");
         checkPatchContext(returnValue);
-        assertEquals(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf20"), returnValue.getData().get(0).getNode());
+        assertEquals(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf20"), returnValue.entities().get(0).getNode());
     }
 
     /**
@@ -398,7 +398,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
                     .withChild(ImmutableNodes.leafNode(MY_LEAF12_QNAME, "leaf-b"))
                     .build())
                 .build())
-            .build(), returnValue.getData().get(0).getNode());
+            .build(), returnValue.entities().get(0).getNode());
     }
 
     /**
@@ -440,7 +440,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
                     .withChild(ImmutableNodes.leafNode(MY_LEAF11_QNAME, "leaf-a"))
                     .withChild(ImmutableNodes.leafNode(MY_LEAF12_QNAME, "leaf-b"))
                     .build())
-            .build(), returnValue.getData().get(0).getNode());
+            .build(), returnValue.entities().get(0).getNode());
     }
 
     /**
@@ -471,7 +471,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
         assertEquals(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_AUG_QNAME))
             .withChild(ImmutableNodes.leafNode(LEAF_AUG_QNAME, "data"))
-            .build(), returnValue.getData().get(0).getNode());
+            .build(), returnValue.entities().get(0).getNode());
     }
 
     /**
@@ -507,7 +507,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
                 .withChild(ImmutableNodes.leafNode(KEY_LEAF_QNAME, "key"))
                 .withChild(ImmutableNodes.leafNode(DATA_LEAF_QNAME, "data"))
                 .build())
-            .build(), returnValue.getData().get(0).getNode());
+            .build(), returnValue.entities().get(0).getNode());
     }
 
     /**
@@ -539,7 +539,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
                 .withNodeIdentifier(new NodeWithValue<>(LEAF_SET_QNAME, "data1"))
                 .withValue("data1")
                 .build())
-            .build(), returnValue.getData().get(0).getNode());
+            .build(), returnValue.entities().get(0).getNode());
     }
 
     /**
@@ -575,7 +575,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
                 .withChild(ImmutableNodes.leafNode(LIST_LEAF1_QNAME, "data1"))
                 .withChild(ImmutableNodes.leafNode(LIST_LEAF2_QNAME, "data2"))
                 .build())
-            .build(), returnValue.getData().get(0).getNode());
+            .build(), returnValue.entities().get(0).getNode());
     }
 
     /**
@@ -606,6 +606,6 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
         assertEquals(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CHOICE_CONT_QNAME))
             .withChild(ImmutableNodes.leafNode(CASE_LEAF1_QNAME, "data"))
-            .build(), returnValue.getData().get(0).getNode());
+            .build(), returnValue.entities().get(0).getNode());
     }
 }

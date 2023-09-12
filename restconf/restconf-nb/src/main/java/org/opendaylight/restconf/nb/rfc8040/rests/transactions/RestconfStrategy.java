@@ -419,7 +419,7 @@ public abstract class RestconfStrategy {
         final var tx = prepareWriteExecution();
 
         boolean noError = true;
-        for (var patchEntity : patch.getData()) {
+        for (var patchEntity : patch.entities()) {
             if (noError) {
                 final var targetNode = patchEntity.getTargetNode();
                 final var editId = patchEntity.getEditId();
@@ -484,18 +484,19 @@ public abstract class RestconfStrategy {
         }
 
         // if no errors then submit transaction, otherwise cancel
+        final var patchId = patch.patchId();
         if (noError) {
             try {
                 TransactionUtil.syncCommit(tx.commit(), "PATCH", null);
             } catch (RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                return new PatchStatusContext(patch.getPatchId(), List.copyOf(editCollection), false, e.getErrors());
+                return new PatchStatusContext(context, patchId, List.copyOf(editCollection), false, e.getErrors());
             }
 
-            return new PatchStatusContext(patch.getPatchId(), List.copyOf(editCollection), true, null);
+            return new PatchStatusContext(context, patchId, List.copyOf(editCollection), true, null);
         } else {
             tx.cancel();
-            return new PatchStatusContext(patch.getPatchId(), List.copyOf(editCollection), false, null);
+            return new PatchStatusContext(context, patchId, List.copyOf(editCollection), false, null);
         }
     }
 

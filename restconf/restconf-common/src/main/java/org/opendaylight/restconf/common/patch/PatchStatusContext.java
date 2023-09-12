@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.common.patch;
 
 import static java.util.Objects.requireNonNull;
@@ -14,11 +13,14 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Holder of patch status context.
  */
 public record PatchStatusContext(
+    // FIXME: DatabindContext what we are not in our proper place
+    @NonNull EffectiveModelContext context,
     @NonNull String patchId,
     @NonNull List<PatchStatusEntity> editCollection,
     boolean ok,
@@ -26,6 +28,7 @@ public record PatchStatusContext(
 
     public PatchStatusContext {
         requireNonNull(patchId);
+        requireNonNull(context);
         requireNonNull(editCollection);
     }
 }

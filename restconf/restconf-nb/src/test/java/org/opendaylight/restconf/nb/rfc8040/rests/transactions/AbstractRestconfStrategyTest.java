@@ -27,7 +27,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.restconf.api.query.ContentParam;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
@@ -300,22 +299,20 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
                 .build())
             .build();
 
-        patch(new PatchContext(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, ARTIST_IID.node(NAME_QNAME)),
+        patch(new PatchContext("patchRMRm",
             List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_IID, buildArtistList),
                 new PatchEntity("edit2", Operation.Merge, ARTIST_IID, buildArtistList),
-                new PatchEntity("edit3", Operation.Remove, ARTIST_IID)),
-            "patchRMRm"), testPatchDataReplaceMergeAndRemoveStrategy(), false);
+                new PatchEntity("edit3", Operation.Remove, ARTIST_IID))),
+            testPatchDataReplaceMergeAndRemoveStrategy(), false);
     }
 
     abstract @NonNull RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy();
 
     @Test
     public final void testPatchDataCreateAndDelete() {
-        patch(new PatchContext(InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
-            List.of(new PatchEntity("edit1", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
-                new PatchEntity("edit2", Operation.Delete, CREATE_AND_DELETE_TARGET)),
-            "patchCD"),
+        patch(new PatchContext("patchCD", List.of(
+            new PatchEntity("edit1", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
+            new PatchEntity("edit2", Operation.Delete, CREATE_AND_DELETE_TARGET))),
             testPatchDataCreateAndDeleteStrategy(), true);
     }
 
@@ -323,8 +320,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPatchMergePutContainer() {
-        patch(new PatchContext(InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
-            List.of(new PatchEntity("edit1", Operation.Merge, PLAYER_IID, EMPTY_JUKEBOX)), "patchM"),
+        patch(new PatchContext("patchM", List.of(new PatchEntity("edit1", Operation.Merge, PLAYER_IID, EMPTY_JUKEBOX))),
             testPatchMergePutContainerStrategy(), false);
     }
 
@@ -332,9 +328,8 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testDeleteNonexistentData() {
-        final var patchStatusContext = deleteNonexistentDataTestStrategy().patchData(new PatchContext(
-            InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
-            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET)), "patchD"), JUKEBOX_SCHEMA);
+        final var patchStatusContext = deleteNonexistentDataTestStrategy().patchData(new PatchContext("patchD",
+            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))), JUKEBOX_SCHEMA);
         assertFalse(patchStatusContext.ok());
     }
 
