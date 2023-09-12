@@ -74,7 +74,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public void cancel() {
+    void cancel() {
         resultsFutures.clear();
         executeWithLogging(netconfService::discardChanges);
         executeWithLogging(netconfService::unlock);
@@ -127,7 +127,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public ListenableFuture<? extends @NonNull CommitInfo> commit() {
+    ListenableFuture<? extends @NonNull CommitInfo> commit() {
         final SettableFuture<CommitInfo> commitResult = SettableFuture.create();
 
         // First complete all resultsFutures and merge them ...

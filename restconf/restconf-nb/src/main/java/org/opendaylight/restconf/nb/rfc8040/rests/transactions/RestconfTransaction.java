@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.Beta;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -32,8 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 // FIXME: it seems the first two operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
-@Beta
-public abstract class RestconfTransaction {
+abstract class RestconfTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransaction.class);
 
     RestconfTransaction() {
@@ -44,21 +42,21 @@ public abstract class RestconfTransaction {
      * Rollback changes and unlock the datastore.
      */
     // FIXME: this looks synchronous, but it should not be
-    public abstract void cancel();
+    abstract void cancel();
 
     /**
      * Confirm previous operations.
      *
      * @return a FluentFuture containing the result of the commit information
      */
-    public abstract ListenableFuture<? extends @NonNull CommitInfo> commit();
+    abstract ListenableFuture<? extends @NonNull CommitInfo> commit();
 
     /**
      * Delete data from the datastore.
      *
      * @param path the data object path
      */
-    public final void delete(final YangInstanceIdentifier path) {
+    final void delete(final YangInstanceIdentifier path) {
         LOG.trace("Delete {}", path);
         deleteImpl(requireNonNull(path));
     }
@@ -70,7 +68,7 @@ public abstract class RestconfTransaction {
      *
      * @param path the data object path
      */
-    public final void remove(final YangInstanceIdentifier path) {
+    final void remove(final YangInstanceIdentifier path) {
         LOG.trace("Remove {}", path);
         removeImpl(requireNonNull(path));
     }
@@ -83,7 +81,7 @@ public abstract class RestconfTransaction {
      * @param path the data object path
      * @param data the data object to be merged to the specified path
      */
-    public final void merge(final YangInstanceIdentifier path, final NormalizedNode data) {
+    final void merge(final YangInstanceIdentifier path, final NormalizedNode data) {
         LOG.trace("Merge {}", path);
         LOG.trace(Markers.confidential(), "Merge with {}", data.prettyTree());
         mergeImpl(requireNonNull(path), data);
@@ -98,7 +96,7 @@ public abstract class RestconfTransaction {
      * @param data    the data object to be merged to the specified path
      * @param context static view of compiled yang files
      */
-    public final void create(final YangInstanceIdentifier path, final NormalizedNode data,
+    final void create(final YangInstanceIdentifier path, final NormalizedNode data,
             final EffectiveModelContext context) {
         LOG.trace("Create {}", path);
         LOG.trace(Markers.confidential(), "Create as {}", data.prettyTree());
@@ -115,7 +113,7 @@ public abstract class RestconfTransaction {
      * @param data    the data object to be merged to the specified path
      * @param context static view of compiled yang files
      */
-    public final void replace(final YangInstanceIdentifier path, final NormalizedNode data,
+    final void replace(final YangInstanceIdentifier path, final NormalizedNode data,
             final EffectiveModelContext context) {
         LOG.trace("Replace {}", path);
         LOG.trace(Markers.confidential(), "Replace with {}", data.prettyTree());
@@ -164,5 +162,4 @@ public abstract class RestconfTransaction {
         merge(rootNormalizedPath,
             ImmutableNodes.fromInstanceId(context, YangInstanceIdentifier.of(normalizedPathWithoutChildArgs)));
     }
-
 }

@@ -43,12 +43,12 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public RestconfTransaction prepareWriteExecution() {
+    RestconfTransaction prepareWriteExecution() {
         return new MdsalRestconfTransaction(dataBroker);
     }
 
     @Override
-    protected void delete(final SettableRestconfFuture<Empty> future, final YangInstanceIdentifier path) {
+    void delete(final SettableRestconfFuture<Empty> future, final YangInstanceIdentifier path) {
         final var tx = dataBroker.newReadWriteTransaction();
         tx.exists(CONFIGURATION, path).addCallback(new FutureCallback<>() {
             @Override
@@ -87,7 +87,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
+    ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         try (var tx = dataBroker.newReadOnlyTransaction()) {
             return tx.read(store, path);
@@ -95,8 +95,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
+    ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+            final List<YangInstanceIdentifier> fields) {
         return Futures.immediateFailedFuture(new UnsupportedOperationException(
                 "Reading of selected subtrees is currently not supported in: " + MdsalRestconfStrategy.class));
     }

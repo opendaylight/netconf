@@ -137,7 +137,7 @@ public abstract class RestconfStrategy {
      * @return A {@link RestconfTransaction}. This transaction needs to be either committed or canceled before doing
      *         anything else.
      */
-    public abstract RestconfTransaction prepareWriteExecution();
+    abstract RestconfTransaction prepareWriteExecution();
 
     /**
      * Read data from the datastore.
@@ -146,7 +146,7 @@ public abstract class RestconfStrategy {
      * @param path the data object path
      * @return a ListenableFuture containing the result of the read
      */
-    public abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store,
+    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store,
         YangInstanceIdentifier path);
 
     /**
@@ -157,7 +157,7 @@ public abstract class RestconfStrategy {
      * @param fields paths to selected fields relative to parent path
      * @return a ListenableFuture containing the result of the read
      */
-    public abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store,
+    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store,
             YangInstanceIdentifier path, List<YangInstanceIdentifier> fields);
 
     /**
@@ -184,7 +184,7 @@ public abstract class RestconfStrategy {
         return ret;
     }
 
-    protected abstract void delete(@NonNull SettableRestconfFuture<Empty> future, @NonNull YangInstanceIdentifier path);
+    abstract void delete(@NonNull SettableRestconfFuture<Empty> future, @NonNull YangInstanceIdentifier path);
 
     /**
      * Merge data into the configuration datastore, as outlined in
@@ -620,6 +620,27 @@ public abstract class RestconfStrategy {
         };
     }
 
+    private @Nullable NormalizedNode readDataViaTransaction(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path) {
+        return TransactionUtil.syncAccess(read(store, path), path).orElse(null);
+    }
+
+    /**
+     * Read specific type of data {@link LogicalDatastoreType} via transaction in {@link RestconfStrategy} with
+     * specified subtrees that should only be read.
+     *
+     * @param store                 datastore type
+     * @param path                  parent path to selected fields
+     * @param closeTransactionChain if it is set to {@code true}, after transaction it will close transactionChain
+     *                              in {@link RestconfStrategy} if any
+     * @param fields                paths to selected subtrees which should be read, relative to to the parent path
+     * @return {@link NormalizedNode}
+     */
+    private @Nullable NormalizedNode readDataViaTransaction(final @NonNull LogicalDatastoreType store,
+            final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields) {
+        return TransactionUtil.syncAccess(read(store, path, fields), path).orElse(null);
+    }
+
     private static NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData,
             final YangInstanceIdentifier path, final WithDefaultsMode defaultsMode, final EffectiveModelContext ctx) {
         final boolean trim = switch (defaultsMode) {
@@ -775,27 +796,6 @@ public abstract class RestconfStrategy {
             throw new NoSuchElementException("Cannot resolve child " + childId + " in " + ctxNode);
         }
         return childCtx;
-    }
-
-    private @Nullable NormalizedNode readDataViaTransaction(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
-        return TransactionUtil.syncAccess(read(store, path), path).orElse(null);
-    }
-
-    /**
-     * Read specific type of data {@link LogicalDatastoreType} via transaction in {@link RestconfStrategy} with
-     * specified subtrees that should only be read.
-     *
-     * @param store                 datastore type
-     * @param path                  parent path to selected fields
-     * @param closeTransactionChain if it is set to {@code true}, after transaction it will close transactionChain
-     *                              in {@link RestconfStrategy} if any
-     * @param fields                paths to selected subtrees which should be read, relative to to the parent path
-     * @return {@link NormalizedNode}
-     */
-    private @Nullable NormalizedNode readDataViaTransaction(final @NonNull LogicalDatastoreType store,
-            final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields) {
-        return TransactionUtil.syncAccess(read(store, path, fields), path).orElse(null);
     }
 
     private static NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
