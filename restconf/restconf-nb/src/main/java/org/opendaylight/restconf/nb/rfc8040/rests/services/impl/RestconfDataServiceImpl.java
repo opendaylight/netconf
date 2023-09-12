@@ -83,7 +83,6 @@ import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
@@ -775,7 +774,7 @@ public final class RestconfDataServiceImpl {
 
     @VisibleForTesting
     PatchStatusContext yangPatchData(final InstanceIdentifierContext targetResource, final PatchContext context) {
-        return PatchDataTransactionUtil.patchData(context, getRestconfStrategy(targetResource.getMountPoint()),
+        return getRestconfStrategy(targetResource.getMountPoint()).patchData(context,
             targetResource.getSchemaContext());
     }
 
