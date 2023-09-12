@@ -33,7 +33,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -334,10 +333,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testDeleteNonexistentData() {
-        final var patchStatusContext = PatchDataTransactionUtil.patchData(new PatchContext(
+        final var patchStatusContext = deleteNonexistentDataTestStrategy().patchData(new PatchContext(
             InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, GAP_IID),
-            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET)), "patchD"),
-            deleteNonexistentDataTestStrategy(), JUKEBOX_SCHEMA);
+            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET)), "patchD"), JUKEBOX_SCHEMA);
         assertFalse(patchStatusContext.ok());
     }
 
@@ -475,7 +473,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
-        final var patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, strategy, JUKEBOX_SCHEMA);
+        final var patchStatusContext = strategy.patchData(patchContext, JUKEBOX_SCHEMA);
         for (var entity : patchStatusContext.editCollection()) {
             if (failed) {
                 assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());
