@@ -11,7 +11,6 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
@@ -52,39 +51,37 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public void delete(final YangInstanceIdentifier path) {
-        if (!TransactionUtil.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
+    void deleteImpl(final YangInstanceIdentifier path) {
+        if (TransactionUtil.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
+            rwTx.delete(CONFIGURATION, path);
+        } else {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
             throw new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
                 path);
         }
-
-        rwTx.delete(CONFIGURATION, path);
     }
 
     @Override
-    public void remove(final YangInstanceIdentifier path) {
+    void removeImpl(final YangInstanceIdentifier path) {
         verifyNotNull(rwTx).delete(CONFIGURATION, path);
     }
 
     @Override
-    public void merge(final YangInstanceIdentifier path, final NormalizedNode data) {
+    void mergeImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         verifyNotNull(rwTx).merge(CONFIGURATION, path, data);
     }
 
     @Override
-    public void create(final YangInstanceIdentifier path, final NormalizedNode data,
-                       final EffectiveModelContext schemaContext) {
+    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data, final EffectiveModelContext context) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            final var emptySubTree = ImmutableNodes.fromInstanceId(context, path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, this);
+            TransactionUtil.ensureParentsByMerge(path, context, this);
 
-            final Collection<? extends NormalizedNode> children = ((DistinctNodeContainer<?, ?>) data).body();
-            final BatchedExistenceCheck check =
-                BatchedExistenceCheck.start(verifyNotNull(rwTx), CONFIGURATION, path, children);
+            final var children = ((DistinctNodeContainer<?, ?>) data).body();
+            final var check = BatchedExistenceCheck.start(verifyNotNull(rwTx), CONFIGURATION, path, children);
 
-            for (final NormalizedNode child : children) {
+            for (var child : children) {
                 final var childPath = path.node(child.name());
                 verifyNotNull(rwTx).put(CONFIGURATION, childPath, child);
             }
@@ -92,25 +89,25 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             checkExistence(path, check);
         } else {
             RestconfStrategy.checkItemDoesNotExists(verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, this);
+            TransactionUtil.ensureParentsByMerge(path, context, this);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
     }
 
     @Override
-    public void replace(final YangInstanceIdentifier path, final NormalizedNode data,
-                        final EffectiveModelContext schemaContext) {
+    void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data,
+            final EffectiveModelContext context) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            final var emptySubtree = ImmutableNodes.fromInstanceId(context, path);
             merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, this);
+            TransactionUtil.ensureParentsByMerge(path, context, this);
 
-            for (final NormalizedNode child : ((NormalizedNodeContainer<?>) data).body()) {
-                final YangInstanceIdentifier childPath = path.node(child.name());
+            for (var child : ((NormalizedNodeContainer<?>) data).body()) {
+                final var childPath = path.node(child.name());
                 verifyNotNull(rwTx).put(CONFIGURATION, childPath, child);
             }
         } else {
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, this);
+            TransactionUtil.ensureParentsByMerge(path, context, this);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
     }
