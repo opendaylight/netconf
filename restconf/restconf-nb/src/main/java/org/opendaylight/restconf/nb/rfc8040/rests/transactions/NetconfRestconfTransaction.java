@@ -81,29 +81,28 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public void delete(final YangInstanceIdentifier path) {
+    void deleteImpl(final YangInstanceIdentifier path) {
         enqueueOperation(() -> netconfService.delete(CONFIGURATION, path));
     }
 
     @Override
-    public void remove(final YangInstanceIdentifier path) {
+    void removeImpl(final YangInstanceIdentifier path) {
         enqueueOperation(() -> netconfService.remove(CONFIGURATION, path));
     }
 
     @Override
-    public void merge(final YangInstanceIdentifier path, final NormalizedNode data) {
+    void mergeImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         enqueueOperation(() -> netconfService.merge(CONFIGURATION, path, data, Optional.empty()));
     }
 
     @Override
-    public void create(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext schemaContext) {
+    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data, final EffectiveModelContext context) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            final var emptySubTree = ImmutableNodes.fromInstanceId(context, path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
 
-            for (final NormalizedNode child : ((NormalizedNodeContainer<?>) data).body()) {
-                final YangInstanceIdentifier childPath = path.node(child.name());
+            for (var child : ((NormalizedNodeContainer<?>) data).body()) {
+                final var childPath = path.node(child.name());
                 enqueueOperation(() -> netconfService.create(CONFIGURATION, childPath, child, Optional.empty()));
             }
         } else {
@@ -112,14 +111,14 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public void replace(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext schemaContext) {
+    void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data,
+            final EffectiveModelContext context) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            final var emptySubTree = ImmutableNodes.fromInstanceId(context, path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
 
-            for (final NormalizedNode child : ((NormalizedNodeContainer<?>) data).body()) {
-                final YangInstanceIdentifier childPath = path.node(child.name());
+            for (var child : ((NormalizedNodeContainer<?>) data).body()) {
+                final var childPath = path.node(child.name());
                 enqueueOperation(() -> netconfService.replace(CONFIGURATION, childPath, child, Optional.empty()));
             }
         } else {
