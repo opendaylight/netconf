@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serial;
@@ -38,6 +40,8 @@ public final class WebSocketInitializer extends WebSocketServlet {
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
     private final int idleTimeoutMillis;
+    @SuppressFBWarnings(value = "SE_BAD_FIELD", justification = "Required for session mgmt")
+    private final ListenersBroker listenersBroker;
 
     /**
      * Creation of the web-socket initializer.
@@ -47,8 +51,9 @@ public final class WebSocketInitializer extends WebSocketServlet {
      */
     @Inject
     public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool,
-            final StreamsConfiguration configuration) {
+            final ListenersBroker listenersBroker, final StreamsConfiguration configuration) {
         executorService = scheduledThreadPool.getExecutor();
+        this.listenersBroker = requireNonNull(listenersBroker);
         maximumFragmentLength = configuration.maximumFragmentLength();
         heartbeatInterval = configuration.heartbeatInterval();
         idleTimeoutMillis = configuration.idleTimeout();
@@ -62,7 +67,8 @@ public final class WebSocketInitializer extends WebSocketServlet {
     @Override
     public void configure(final WebSocketServletFactory factory) {
         factory.getPolicy().setIdleTimeout(idleTimeoutMillis);
-        factory.setCreator(new WebSocketFactory(executorService, maximumFragmentLength, heartbeatInterval));
+        factory.setCreator(new WebSocketFactory(executorService, listenersBroker, maximumFragmentLength,
+            heartbeatInterval));
     }
 
     /**
@@ -73,8 +79,7 @@ public final class WebSocketInitializer extends WebSocketServlet {
         private static final Logger LOG = LoggerFactory.getLogger(WebSocketFactory.class);
 
         private final ScheduledExecutorService executorService;
-        // FIXME: inject this reference
-        private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+        private final ListenersBroker listenersBroker;
         private final int maximumFragmentLength;
         private final int heartbeatInterval;
 
@@ -86,9 +91,10 @@ public final class WebSocketInitializer extends WebSocketServlet {
          *                              (exceeded message length leads to fragmentation of messages).
          * @param heartbeatInterval     Interval in milliseconds between sending of ping control frames.
          */
-        WebSocketFactory(final ScheduledExecutorService executorService, final int maximumFragmentLength,
-                final int heartbeatInterval) {
+        WebSocketFactory(final ScheduledExecutorService executorService, final ListenersBroker listenersBroker,
+                final int maximumFragmentLength, final int heartbeatInterval) {
             this.executorService = executorService;
+            this.listenersBroker = listenersBroker;
             this.maximumFragmentLength = maximumFragmentLength;
             this.heartbeatInterval = heartbeatInterval;
         }
