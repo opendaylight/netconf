@@ -9,29 +9,18 @@ package org.opendaylight.restconf.common.patch;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
-public class PatchContext {
-    private final InstanceIdentifierContext context;
-    private final List<PatchEntity> data;
-    private final String patchId;
-
-    public PatchContext(final InstanceIdentifierContext context, final List<PatchEntity> data, final String patchId) {
-        this.context = requireNonNull(context);
-        this.data = requireNonNull(data);
-        this.patchId = requireNonNull(patchId);
+@NonNullByDefault
+public record PatchContext(String patchId, ImmutableList<PatchEntity> entities) {
+    public PatchContext {
+        requireNonNull(patchId);
+        requireNonNull(entities);
     }
 
-    public InstanceIdentifierContext getInstanceIdentifierContext() {
-        return context;
-    }
-
-    public List<PatchEntity> getData() {
-        return data;
-    }
-
-    public String getPatchId() {
-        return patchId;
+    public PatchContext(final String patchId, final List<PatchEntity> entities) {
+        this(patchId, ImmutableList.copyOf(entities));
     }
 }

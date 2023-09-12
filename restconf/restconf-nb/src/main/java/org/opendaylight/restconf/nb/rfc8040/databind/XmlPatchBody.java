@@ -59,7 +59,7 @@ public final class XmlPatchBody extends PatchBody {
 
     private static @NonNull PatchContext parse(final InstanceIdentifierContext targetResource, final Document doc)
             throws XMLStreamException, IOException, SAXException, URISyntaxException {
-        final var resultCollection = new ArrayList<PatchEntity>();
+        final var entities = ImmutableList.<PatchEntity>builder();
         final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final var editNodes = doc.getElementsByTagName("edit");
         final var schemaTree = DataSchemaContextTree.from(targetResource.getSchemaContext());
@@ -93,16 +93,16 @@ public final class XmlPatchBody extends PatchBody {
                 final var result = resultHolder.getResult().data();
                 // for lists allow to manipulate with list items through their parent
                 if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                    resultCollection.add(new PatchEntity(editId, oper, targetII.getParent(), result));
+                    entities.add(new PatchEntity(editId, oper, targetII.getParent(), result));
                 } else {
-                    resultCollection.add(new PatchEntity(editId, oper, targetII, result));
+                    entities.add(new PatchEntity(editId, oper, targetII, result));
                 }
             } else {
-                resultCollection.add(new PatchEntity(editId, oper, targetII));
+                entities.add(new PatchEntity(editId, oper, targetII));
             }
         }
 
-        return new PatchContext(targetResource, ImmutableList.copyOf(resultCollection), patchId);
+        return new PatchContext(patchId, entities.build());
     }
 
     /**
