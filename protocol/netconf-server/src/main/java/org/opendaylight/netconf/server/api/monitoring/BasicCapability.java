@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.server.api.monitoring;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -48,7 +48,7 @@ public class BasicCapability implements Capability {
 
     @Override
     public Collection<String> getLocation() {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

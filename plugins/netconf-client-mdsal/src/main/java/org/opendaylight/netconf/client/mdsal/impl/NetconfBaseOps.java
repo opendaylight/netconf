@@ -42,7 +42,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -294,7 +293,7 @@ public final class NetconfBaseOps {
         final ContainerNode rpcInput;
         if (nonEmptyFilter(filterPath).isPresent()) {
             rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, transformer.toFilterStructure(
-                    Collections.singletonList(FieldsFilter.of(filterPath.orElseThrow(), fields))));
+                    List.of(FieldsFilter.of(filterPath.orElseThrow(), fields))));
         } else if (containsEmptyPath(fields)) {
             rpcInput = GET_RPC_CONTENT;
         } else {
