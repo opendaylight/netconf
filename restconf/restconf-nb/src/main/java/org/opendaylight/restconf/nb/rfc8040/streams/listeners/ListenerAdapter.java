@@ -48,8 +48,8 @@ public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTre
      */
     @VisibleForTesting
     public ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
-            final NotificationOutputType outputType) {
-        super(streamName, outputType, getFormatterFactory(outputType));
+            final NotificationOutputType outputType, final ListenersBroker listenersBroker) {
+        super(streamName, outputType, getFormatterFactory(outputType), listenersBroker);
         this.path = requireNonNull(path);
     }
 

@@ -18,6 +18,7 @@ import java.util.function.Function;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -42,7 +43,8 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class CreateStreamUtilTest {
     private static EffectiveModelContext SCHEMA_CTX;
 
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    @Mock
+    private ListenersBroker listenersBroker;
 
     @BeforeClass
     public static void setUp() {
