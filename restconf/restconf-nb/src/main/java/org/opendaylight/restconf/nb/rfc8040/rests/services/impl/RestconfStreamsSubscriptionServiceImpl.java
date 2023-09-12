@@ -21,6 +21,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.subscribe.to.notification.rev161028.Notifi;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -40,6 +41,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     private final SubscribeToStreamUtil streamUtils;
     private final HandlersHolder handlersHolder;
+    private final ListenersBroker listenersBroker;
 
     /**
      * Initialize holder of handlers with holders as parameters.
@@ -51,10 +53,11 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
             final DOMNotificationService notificationService, final DatabindProvider databindProvider,
-            final StreamsConfiguration configuration) {
+            final StreamsConfiguration configuration, final ListenersBroker listenersBroker) {
         handlersHolder = new HandlersHolder(dataBroker, notificationService, databindProvider);
         streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
+        this.listenersBroker = listenersBroker;
     }
 
     @Override
@@ -63,9 +66,9 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         final URI response;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            response = streamUtils.subscribeToDataStream(identifier, uriInfo, params, handlersHolder);
+            response = streamUtils.subscribeToDataStream(identifier, uriInfo, params, handlersHolder, listenersBroker);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-            response = streamUtils.subscribeToYangStream(identifier, uriInfo, params, handlersHolder);
+            response = streamUtils.subscribeToYangStream(identifier, uriInfo, params, handlersHolder, listenersBroker);
         } else {
             final String msg = "Bad type of notification of sal-remote";
             LOG.warn(msg);
