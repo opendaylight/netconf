@@ -35,6 +35,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfSer
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -80,12 +81,13 @@ public final class JaxRsNorthbound implements AutoCloseable {
             @Reference final DOMMountPointService mountPointService,
             @Reference final DOMNotificationService notificationService, @Reference final DOMRpcService rpcService,
             @Reference final DOMSchemaService schemaService, @Reference final DatabindProvider databindProvider,
-            @Reference final MdsalRestconfServer server, final Configuration configuration) throws ServletException {
+            @Reference final MdsalRestconfServer server, @Reference final ListenersBroker listenersBroker,
+            final Configuration configuration) throws ServletException {
         this(webServer, webContextSecurer, servletSupport, filterAdapterConfiguration, actionService, dataBroker,
             mountPointService, notificationService, rpcService, schemaService, databindProvider, server,
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.idle$_$timeout(),
-                configuration.heartbeat$_$interval(), configuration.use$_$sse()));
+            listenersBroker, configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
+            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
+                configuration.idle$_$timeout(), configuration.heartbeat$_$interval(), configuration.use$_$sse()));
     }
 
     public JaxRsNorthbound(final WebServer webServer, final WebContextSecurer webContextSecurer,
@@ -94,7 +96,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             final DOMMountPointService mountPointService, final DOMNotificationService notificationService,
             final DOMRpcService rpcService, final DOMSchemaService schemaService,
             final DatabindProvider databindProvider, final MdsalRestconfServer server,
-            final String pingNamePrefix, final int pingMaxThreadCount,
+            final ListenersBroker listenersBroker, final String pingNamePrefix, final int pingMaxThreadCount,
             final StreamsConfiguration streamsConfiguration) throws ServletException {
         final var scheduledThreadPool = new ScheduledThreadPoolWrapper(pingMaxThreadCount,
             new NamingThreadPoolFactory(pingNamePrefix));
@@ -107,7 +109,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .addUrlPattern("/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new RestconfApplication(databindProvider, server, mountPointService, dataBroker, rpcService,
-                        actionService, notificationService, schemaService, streamsConfiguration))
+                        actionService, notificationService, schemaService, listenersBroker, streamsConfiguration))
                     .build())
                 .asyncSupported(true)
                 .build())
@@ -115,7 +117,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .addUrlPattern("/" + SSE_SUBPATH + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new DataStreamApplication(databindProvider,
-                        new RestconfDataStreamServiceImpl(scheduledThreadPool, streamsConfiguration)))
+                        new RestconfDataStreamServiceImpl(scheduledThreadPool, listenersBroker, streamsConfiguration)))
                     .build())
                 .name("notificationServlet")
                 .asyncSupported(true)
@@ -123,7 +125,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/" + DATA_SUBSCRIPTION + "/*")
                 .addUrlPattern("/" + NOTIFICATION_STREAM + "/*")
-                .servlet(new WebSocketInitializer(scheduledThreadPool, streamsConfiguration))
+                .servlet(new WebSocketInitializer(scheduledThreadPool, listenersBroker, streamsConfiguration))
                 .build())
 
             // Allows user to add javax.servlet.Filter(s) in front of REST services

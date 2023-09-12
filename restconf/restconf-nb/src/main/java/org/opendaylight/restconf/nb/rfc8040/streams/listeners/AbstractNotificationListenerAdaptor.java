@@ -29,8 +29,9 @@ abstract class AbstractNotificationListenerAdaptor extends AbstractCommonSubscri
     private static final NotificationFormatterFactory JSON_FORMATTER_FACTORY =
         JSONNotificationFormatter.createFactory(JSONCodecFactorySupplier.RFC7951);
 
-    AbstractNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType) {
-        super(streamName, outputType, getFormatterFactory(outputType));
+    AbstractNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType,
+            final ListenersBroker listenersBroker) {
+        super(streamName, outputType, getFormatterFactory(outputType), listenersBroker);
     }
 
     private static NotificationFormatterFactory getFormatterFactory(final NotificationOutputType outputType) {

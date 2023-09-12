@@ -45,6 +45,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -89,7 +90,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     public void setup() {
         server = new MdsalRestconfServer(dataBroker, rpcService, mountPointService);
         invokeOperationsService = new RestconfInvokeOperationsServiceImpl(() -> CONTEXT, server, mountPointService,
-            new StreamsConfiguration(0, 1, 0, false));
+            new ListenersBroker(), new StreamsConfiguration(0, 1, 0, false));
     }
 
     @Test

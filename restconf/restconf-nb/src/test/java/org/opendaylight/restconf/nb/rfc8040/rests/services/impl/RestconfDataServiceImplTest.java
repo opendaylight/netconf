@@ -62,6 +62,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -91,8 +92,6 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
             .withChild(Builders.mapBuilder().withNodeIdentifier(PLAYLIST_NID).build())
             .build();
 
-    private RestconfDataServiceImpl dataService;
-
     @Mock
     private UriInfo uriInfo;
     @Mock
@@ -118,6 +117,8 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     @Mock
     private AsyncResponse asyncResponse;
 
+    private RestconfDataServiceImpl dataService;
+
     @Before
     public void setUp() throws Exception {
         doReturn(Set.of()).when(queryParamenters).entrySet();
@@ -131,7 +132,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
         dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA),
             new MdsalRestconfServer(dataBroker, rpcService, mountPointService), dataBroker, delegRestconfSubscrService,
-            actionService, new StreamsConfiguration(0, 1, 0, false));
+            actionService, new ListenersBroker(), new StreamsConfiguration(0, 1, 0, false));
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
