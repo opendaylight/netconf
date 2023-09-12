@@ -65,6 +65,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSu
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -93,6 +94,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
             .withChild(CONT_PLAYER)
             .withChild(Builders.mapBuilder().withNodeIdentifier(PLAYLIST_NID).build())
             .build();
+    private static final ListenersBroker LISTENERS_BROCKER = new ListenersBroker();
 
     private RestconfDataServiceImpl dataService;
 
@@ -135,7 +137,8 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
 
         dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA), dataBroker,
-                mountPointService, delegRestconfSubscrService, actionService, new StreamsConfiguration(0, 1, 0, false));
+                mountPointService, delegRestconfSubscrService, actionService, LISTENERS_BROCKER,
+                new StreamsConfiguration(0, 1, 0, false));
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)

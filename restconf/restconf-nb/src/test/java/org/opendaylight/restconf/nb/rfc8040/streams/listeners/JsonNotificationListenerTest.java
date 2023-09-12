@@ -33,8 +33,7 @@ import org.slf4j.LoggerFactory;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class JsonNotificationListenerTest extends AbstractNotificationListenerTest {
     private static final Logger LOG = LoggerFactory.getLogger(JsonNotificationListenerTest.class);
-
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private static final ListenersBroker LISTENERS_BROCKER = new ListenersBroker();
 
     @Test
     public void notifi_leafTest() throws Exception {
@@ -163,7 +162,7 @@ public class JsonNotificationListenerTest extends AbstractNotificationListenerTe
 
     private String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
-        final var notifiAdapter = listenersBroker.registerNotificationListener(schemaPathNotifi, "json-stream",
+        final var notifiAdapter = LISTENERS_BROCKER.registerNotificationListener(schemaPathNotifi, "json-stream",
             NotificationOutputType.JSON);
         return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }

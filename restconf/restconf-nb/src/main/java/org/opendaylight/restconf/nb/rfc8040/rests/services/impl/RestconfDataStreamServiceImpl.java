@@ -40,17 +40,18 @@ import org.slf4j.LoggerFactory;
 public final class RestconfDataStreamServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataStreamServiceImpl.class);
 
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private final ListenersBroker listenersBroker;
     private final ScheduledExecutorService executorService;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
     @Inject
     public RestconfDataStreamServiceImpl(final ScheduledThreadPool scheduledThreadPool,
-            final StreamsConfiguration configuration) {
+            final ListenersBroker listenersBroker, final StreamsConfiguration configuration) {
         executorService = scheduledThreadPool.getExecutor();
         heartbeatInterval = configuration.heartbeatInterval();
         maximumFragmentLength = configuration.maximumFragmentLength();
+        this.listenersBroker = listenersBroker;
     }
 
     /**

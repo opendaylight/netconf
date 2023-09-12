@@ -33,13 +33,14 @@ public class WebSocketFactoryTest {
     private static final YangInstanceIdentifier TOASTER_YIID = YangInstanceIdentifier.builder()
             .node(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"))
             .build();
+    private static final ListenersBroker LISTENERS_BROCKER = new ListenersBroker();
 
     private final WebSocketFactory webSocketFactory = new WebSocketFactory(mock(ScheduledExecutorService.class),
-            5000, 2000);
+        5000, 2000, LISTENERS_BROCKER);
 
     @BeforeClass
     public static void prepareListenersBroker() {
-        ListenersBroker.getInstance().registerDataChangeListener(TOASTER_YIID, REGISTERED_STREAM_NAME,
+        LISTENERS_BROCKER.registerDataChangeListener(TOASTER_YIID, REGISTERED_STREAM_NAME,
                 NotificationOutputTypeGrouping.NotificationOutputType.JSON);
     }
 

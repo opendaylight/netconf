@@ -26,6 +26,7 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -34,6 +35,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class Netconf799Test extends AbstractInstanceIdentifierTest {
     private static final QName OUTPUT_QNAME = QName.create(CONT_QNAME, "output");
+    private static final ListenersBroker LISTENERS_BROCKER = new ListenersBroker();
 
     @Mock
     private DOMDataBroker dataBroker;
@@ -52,7 +54,7 @@ public class Netconf799Test extends AbstractInstanceIdentifierTest {
 
         final var dataService = new RestconfDataServiceImpl(
             () -> DatabindContext.ofModel(IID_SCHEMA), dataBroker, mountPointService, restconfStreamSubService,
-            actionService, new StreamsConfiguration(0, 1, 0, false));
+            actionService, LISTENERS_BROCKER, new StreamsConfiguration(0, 1, 0, false));
 
         final var response = dataService.postDataJSON("instance-identifier-module:cont/cont1/reset",
             stringInputStream("""
