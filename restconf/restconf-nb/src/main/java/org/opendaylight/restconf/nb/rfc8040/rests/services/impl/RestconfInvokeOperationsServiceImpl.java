@@ -47,6 +47,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
@@ -72,14 +73,17 @@ public final class RestconfInvokeOperationsServiceImpl {
     private final DOMRpcService rpcService;
     private final DOMMountPointService mountPointService;
     private final SubscribeToStreamUtil streamUtils;
+    private final ListenersBroker listenersBroker;
 
     public RestconfInvokeOperationsServiceImpl(final DatabindProvider databindProvider, final DOMRpcService rpcService,
-            final DOMMountPointService mountPointService, final StreamsConfiguration configuration) {
+            final DOMMountPointService mountPointService, final StreamsConfiguration configuration,
+            final ListenersBroker listenersBroker) {
         this.databindProvider = requireNonNull(databindProvider);
         this.rpcService = requireNonNull(rpcService);
         this.mountPointService = requireNonNull(mountPointService);
         streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
             : SubscribeToStreamUtil.webSockets();
+        this.listenersBroker = listenersBroker;
     }
 
     /**
@@ -162,11 +166,11 @@ public final class RestconfInvokeOperationsServiceImpl {
         if (mountPoint == null) {
             if (CreateDataChangeEventSubscription.QNAME.equals(rpcName)) {
                 future = Futures.immediateFuture(CreateStreamUtil.createDataChangeNotifiStream(
-                    streamUtils.listenersBroker(), input, schemaContext));
+                    listenersBroker, input, schemaContext));
             } else if (SubscribeDeviceNotification.QNAME.equals(rpcName)) {
                 final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
                 future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, input,
-                    streamUtils, mountPointService));
+                    streamUtils, mountPointService, listenersBroker));
             } else {
                 future = invokeRpc(input, rpcName, rpcService);
             }
