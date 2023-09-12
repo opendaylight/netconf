@@ -21,6 +21,7 @@ import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -76,13 +77,13 @@ public final class ReadDataTransactionUtil {
      * @param content        type of data to read (config, state, all)
      * @param path           the path to read
      * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
-     * @param withDefa       value of with-defaults parameter
+     * @param defaultsMode   value of with-defaults parameter
      * @param ctx            schema context
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy,
-            final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
+            final WithDefaultsParam defaultsMode, final EffectiveModelContext ctx) {
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
@@ -90,12 +91,12 @@ public final class ReadDataTransactionUtil {
                 // PREPARE CONFIG DATA NODE
                 final var configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
 
-                yield mergeConfigAndSTateDataIfNeeded(stateDataNode, withDefa == null ? configDataNode
-                    : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
+                yield mergeConfigAndSTateDataIfNeeded(stateDataNode, defaultsMode == null ? configDataNode
+                    : prepareDataByParamWithDef(configDataNode, path, defaultsMode.mode(), ctx));
             }
             case CONFIG -> {
                 final var read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
-                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
+                yield defaultsMode == null ? read : prepareDataByParamWithDef(read, path, defaultsMode.mode(), ctx);
             }
             case NONCONFIG -> readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
         };
@@ -127,23 +128,23 @@ public final class ReadDataTransactionUtil {
                     fields);
 
                 yield mergeConfigAndSTateDataIfNeeded(stateDataNode, withDefa == null ? configDataNode
-                    : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
+                    : prepareDataByParamWithDef(configDataNode, path, withDefa.mode(), ctx));
             }
             case CONFIG -> {
                 final var read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, fields);
-                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
+                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa.mode(), ctx);
             }
             case NONCONFIG -> readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, fields);
         };
     }
 
     private static NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData,
-            final YangInstanceIdentifier path, final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
-        final boolean trim = switch (withDefa) {
-            case TRIM -> true;
-            case EXPLICIT -> false;
-            case REPORT_ALL, REPORT_ALL_TAGGED -> throw new RestconfDocumentedException(
-                "Unsupported with-defaults value " + withDefa.paramValue());
+            final YangInstanceIdentifier path, final WithDefaultsMode defaultsMode, final EffectiveModelContext ctx) {
+        final boolean trim = switch (defaultsMode) {
+            case Trim -> true;
+            case Explicit -> false;
+            case ReportAll, ReportAllTagged -> throw new RestconfDocumentedException(
+                "Unsupported with-defaults value " + defaultsMode.getName());
         };
 
         final var ctxNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
