@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchRequest;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
@@ -27,14 +27,14 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         super(inputStream);
     }
 
-    public final @NonNull PatchContext toPatchContext(final @NonNull InstanceIdentifierContext targetResource)
+    public final @NonNull PatchRequest toPatchContext(final @NonNull InstanceIdentifierContext targetResource)
             throws IOException {
         try (var is = acquireStream()) {
             return toPatchContext(targetResource, is);
         }
     }
 
-    abstract @NonNull PatchContext toPatchContext(@NonNull InstanceIdentifierContext targetResource,
+    abstract @NonNull PatchRequest toPatchContext(@NonNull InstanceIdentifierContext targetResource,
         @NonNull InputStream inputStream) throws IOException;
 
     static final YangInstanceIdentifier parsePatchTarget(final InstanceIdentifierContext targetResource,

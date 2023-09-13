@@ -12,7 +12,6 @@ import java.util.List;
 import org.opendaylight.restconf.common.errors.RestconfError;
 
 public class PatchStatusEntity {
-
     private final String editId;
     private final List<RestconfError> editErrors;
     private final boolean ok;
