@@ -16,7 +16,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
@@ -24,8 +23,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yang.gen.v1.subscribe.to.notification.rev161028.Notifi;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,19 +72,9 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         // prepare node with value of location
         return NormalizedNodePayload.ofLocation(
-            prepareIIDSubsStreamOutput(handlersHolder.getDatabindProvider().currentContext().modelContext()),
+            Inference.ofDataTreePath(handlersHolder.getDatabindProvider().currentContext().modelContext(),
+                Notifi.QNAME, LOCATION_QNAME),
             LOCATION_NODEID, response);
-    }
-
-    /**
-     * Prepare InstanceIdentifierContext for Location leaf.
-     *
-     * @param schemaHandler Schema context handler.
-     * @return InstanceIdentifier of Location leaf.
-     */
-    private static InstanceIdentifierContext prepareIIDSubsStreamOutput(final EffectiveModelContext modelContext) {
-        return InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.ofDataTreePath(modelContext, Notifi.QNAME, LOCATION_QNAME));
     }
 
     /**
