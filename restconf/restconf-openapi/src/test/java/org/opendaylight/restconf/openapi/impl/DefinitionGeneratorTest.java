@@ -63,4 +63,26 @@ public final class DefinitionGeneratorTest {
         assertEquals("0000-00-00T00:00:00Z", properties.get("login-date-time").get("example").asText());
         assertEquals("0.0.0.0", properties.get("ipv4-address").get("example").asText());
     }
+
+    @Test
+    public void testIdentity() throws IOException {
+        final var module = context.findModule("toaster", Revision.of("2009-11-20")).orElseThrow();
+        final var schemas = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(schemas);
+
+        // correct number of schemas generated
+        assertEquals(3, schemas.size());
+        final var makeToast = schemas.get("toaster_make-toast_input").properties().get("toasterToastType");
+
+        assertEquals("wheat-bread", makeToast.get("default").asText());
+        assertEquals("toast-type", makeToast.get("example").asText());
+        assertEquals("string", makeToast.get("type").asText());
+        assertEquals("""
+                This variable informs the toaster of the type of
+                      material that is being toasted. The toaster
+                      uses this information, combined with
+                      toasterDoneness, to compute for how
+                      long the material must be toasted to achieve
+                      the required doneness.""", makeToast.get("description").asText());
+    }
 }
