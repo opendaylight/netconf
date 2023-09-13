@@ -16,52 +16,53 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * A RFC8040 overlay from our marriage to NormalizedNodeContext. This represents a NormalizedNode along with further
  * messy details needed to deal with the payload.
  */
 public final class NormalizedNodePayload {
-    private final InstanceIdentifierContext context;
     private final @NonNull ImmutableMap<String, Object> headers;
     private final @NonNull QueryParameters writerParameters;
+    private final @NonNull Inference inference;
     private final NormalizedNode data;
 
-    private NormalizedNodePayload(final InstanceIdentifierContext context, final NormalizedNode data,
+    private NormalizedNodePayload(final Inference inference, final NormalizedNode data,
             final QueryParameters writerParameters, final ImmutableMap<String, Object> headers) {
-        this.context = context;
+        this.inference = requireNonNull(inference);
         this.data = data;
         this.writerParameters = requireNonNull(writerParameters);
         this.headers = requireNonNull(headers);
     }
 
-    public static @NonNull NormalizedNodePayload empty(final InstanceIdentifierContext path) {
-        return new NormalizedNodePayload(requireNonNull(path), null, QueryParameters.empty(), ImmutableMap.of());
+    public static @NonNull NormalizedNodePayload empty(final Inference inference) {
+        return new NormalizedNodePayload(inference, null, QueryParameters.empty(), ImmutableMap.of());
     }
 
-    public static @NonNull NormalizedNodePayload of(final InstanceIdentifierContext path, final NormalizedNode data) {
-        return new NormalizedNodePayload(requireNonNull(path), requireNonNull(data), QueryParameters.empty(),
-            ImmutableMap.of());
+    public static @NonNull NormalizedNodePayload of(final Inference inference, final NormalizedNode data) {
+        return new NormalizedNodePayload(inference, requireNonNull(data), QueryParameters.empty(), ImmutableMap.of());
     }
 
-    public static @NonNull NormalizedNodePayload ofNullable(final InstanceIdentifierContext path,
-            final NormalizedNode data) {
-        return data == null ? empty(path) : of(path, data);
+    public static @NonNull NormalizedNodePayload ofNullable(final Inference inference, final NormalizedNode data) {
+        return data == null ? empty(inference) : of(inference, data);
     }
 
-    public static @NonNull NormalizedNodePayload ofLocation(final InstanceIdentifierContext path,
-            final NodeIdentifier leafId, final URI location) {
-        return new NormalizedNodePayload(requireNonNull(path), ImmutableNodes.leafNode(leafId, location.toString()),
+    // FIXME: can we get rid of this, please? Whoever is using this should be setting a Response instead
+    @Deprecated
+    public static @NonNull NormalizedNodePayload ofLocation(final Inference inference, final NodeIdentifier leafId,
+            final URI location) {
+        return new NormalizedNodePayload(inference, ImmutableNodes.leafNode(leafId, location.toString()),
             QueryParameters.empty(), ImmutableMap.of("Location", location));
     }
 
-    public static Object ofReadData(final InstanceIdentifierContext path, final NormalizedNode data,
+    public static Object ofReadData(final Inference inference, final NormalizedNode data,
             final QueryParameters parameters) {
-        return new NormalizedNodePayload(requireNonNull(path), requireNonNull(data), parameters, ImmutableMap.of());
+        return new NormalizedNodePayload(inference, requireNonNull(data), parameters, ImmutableMap.of());
     }
 
-    public InstanceIdentifierContext getInstanceIdentifierContext() {
-        return context;
+    public @NonNull Inference inference() {
+        return inference;
     }
 
     public @Nullable NormalizedNode getData() {

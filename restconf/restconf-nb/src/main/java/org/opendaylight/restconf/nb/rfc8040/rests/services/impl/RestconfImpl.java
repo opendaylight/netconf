@@ -15,7 +15,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Restconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
@@ -61,7 +60,7 @@ public final class RestconfImpl {
         stack.enterDataTree(Restconf.QNAME);
         stack.enterDataTree(YANG_LIBRARY_VERSION);
 
-        return NormalizedNodePayload.of(InstanceIdentifierContext.ofStack(stack),
+        return NormalizedNodePayload.of(stack.toInference(),
             ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION));
     }
 }
