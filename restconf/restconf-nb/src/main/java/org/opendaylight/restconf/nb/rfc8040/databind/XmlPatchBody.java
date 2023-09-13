@@ -19,8 +19,8 @@ import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchEntity;
+import org.opendaylight.restconf.common.patch.PatchRequest;
+import org.opendaylight.restconf.common.patch.PatchRequest.Edit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -46,7 +46,7 @@ public final class XmlPatchBody extends PatchBody {
     }
 
     @Override
-    PatchContext toPatchContext(final InstanceIdentifierContext targetResource, final InputStream inputStream)
+    PatchRequest toPatchContext(final InstanceIdentifierContext targetResource, final InputStream inputStream)
             throws IOException {
         try {
             return parse(targetResource, UntrustedXML.newDocumentBuilder().parse(inputStream));
@@ -57,9 +57,9 @@ public final class XmlPatchBody extends PatchBody {
         }
     }
 
-    private static @NonNull PatchContext parse(final InstanceIdentifierContext targetResource, final Document doc)
+    private static @NonNull PatchRequest parse(final InstanceIdentifierContext targetResource, final Document doc)
             throws XMLStreamException, IOException, SAXException, URISyntaxException {
-        final var entities = ImmutableList.<PatchEntity>builder();
+        final var entities = ImmutableList.<Edit>builder();
         final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final var editNodes = doc.getElementsByTagName("edit");
         final var schemaTree = DataSchemaContextTree.from(targetResource.getSchemaContext());
@@ -93,16 +93,16 @@ public final class XmlPatchBody extends PatchBody {
                 final var result = resultHolder.getResult().data();
                 // for lists allow to manipulate with list items through their parent
                 if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                    entities.add(new PatchEntity(editId, oper, targetII.getParent(), result));
+                    entities.add(new Edit(editId, oper, targetII.getParent(), result));
                 } else {
-                    entities.add(new PatchEntity(editId, oper, targetII, result));
+                    entities.add(new Edit(editId, oper, targetII, result));
                 }
             } else {
-                entities.add(new PatchEntity(editId, oper, targetII));
+                entities.add(new Edit(editId, oper, targetII));
             }
         }
 
-        return new PatchContext(patchId, entities.build());
+        return new PatchRequest(patchId, entities.build());
     }
 
     /**

@@ -37,7 +37,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
-import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchRequest;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
@@ -408,26 +408,26 @@ public abstract class RestconfStrategy {
     }
 
     /**
-     * Process edit operations of one {@link PatchContext}.
+     * Process edit operations of one {@link PatchRequest}.
      *
      * @param patch    Patch context to be processed
      * @param context  Global schema context
      * @return {@link PatchStatusContext}
      */
-    public final @NonNull PatchStatusContext patchData(final PatchContext patch, final EffectiveModelContext context) {
+    public final @NonNull PatchStatusContext patchData(final PatchRequest patch, final EffectiveModelContext context) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var tx = prepareWriteExecution();
 
         boolean noError = true;
         for (var patchEntity : patch.entities()) {
             if (noError) {
-                final var targetNode = patchEntity.getTargetNode();
-                final var editId = patchEntity.getEditId();
+                final var targetNode = patchEntity.target();
+                final var editId = patchEntity.editId();
 
-                switch (patchEntity.getOperation()) {
+                switch (patchEntity.operation()) {
                     case Create:
                         try {
-                            tx.create(targetNode, patchEntity.getNode(), context);
+                            tx.create(targetNode, patchEntity.node(), context);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
@@ -446,7 +446,7 @@ public abstract class RestconfStrategy {
                     case Merge:
                         try {
                             tx.ensureParentsByMerge(targetNode, context);
-                            tx.merge(targetNode, patchEntity.getNode());
+                            tx.merge(targetNode, patchEntity.node());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
@@ -455,7 +455,7 @@ public abstract class RestconfStrategy {
                         break;
                     case Replace:
                         try {
-                            tx.replace(targetNode, patchEntity.getNode(), context);
+                            tx.replace(targetNode, patchEntity.node(), context);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));

@@ -59,7 +59,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchRequest;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
@@ -772,7 +772,7 @@ public final class RestconfDataServiceImpl {
     }
 
     @VisibleForTesting
-    PatchStatusContext yangPatchData(final InstanceIdentifierContext targetResource, final PatchContext context) {
+    PatchStatusContext yangPatchData(final InstanceIdentifierContext targetResource, final PatchRequest context) {
         return getRestconfStrategy(targetResource.getMountPoint()).patchData(context,
             targetResource.getSchemaContext());
     }
