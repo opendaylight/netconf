@@ -13,6 +13,7 @@ import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import java.io.IOException;
@@ -101,21 +102,10 @@ public final class JsonPatchBody extends PatchBody {
         return edits.build();
     }
 
-    /**
-     * Switch value of parsed JsonToken.NAME and read edit definition or patch id.
-     *
-     * @param name value of token
-     * @param edit PatchEdit instance
-     * @param in JsonReader reader
-     * @param path InstanceIdentifierContext context
-     * @param codec Draft11StringModuleInstanceIdentifierCodec codec
-     * @param resultCollection collection of parsed edits
-     * @throws IOException if operation fails
-     */
+    // Switch value of parsed JsonToken.NAME and read edit definition or patch id
     private static void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
             final @NonNull JsonReader in, final @NonNull YangInstanceIdentifier urlPath,
-            final @NonNull DataSchemaContextTree schemaTree,
-            final ImmutableList.@NonNull Builder<PatchEntity> resultCollection,
+            final @NonNull DataSchemaContextTree schemaTree, final @NonNull Builder<PatchEntity> resultCollection,
             final @NonNull AtomicReference<String> patchId) throws IOException {
         switch (name) {
             case "edit":
@@ -144,15 +134,7 @@ public final class JsonPatchBody extends PatchBody {
         }
     }
 
-    /**
-     * Read one patch edit object from Json input.
-     *
-     * @param edit PatchEdit instance to be filled with read data
-     * @param in JsonReader reader
-     * @param path InstanceIdentifierContext path context
-     * @param codec Draft11StringModuleInstanceIdentifierCodec codec
-     * @throws IOException if operation fails
-     */
+    // Read one patch edit object from JSON input
     private static void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
             final @NonNull YangInstanceIdentifier urlPath, final @NonNull DataSchemaContextTree schemaTree)
                 throws IOException {
