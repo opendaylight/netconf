@@ -105,6 +105,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -423,7 +424,8 @@ public final class RestconfDataServiceImpl {
         }
 
         try (var jsonBody = new JsonChildBody(body)) {
-            return postData(instanceIdentifier, jsonBody, uriInfo);
+            return postData(instanceIdentifier.inference(), instanceIdentifier.getInstanceIdentifier(), jsonBody,
+                uriInfo, instanceIdentifier.getMountPoint());
         }
     }
 
@@ -464,30 +466,31 @@ public final class RestconfDataServiceImpl {
     })
     public Response postDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo) {
-        final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
+        final var iid = ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), mountPointService);
-        if (instanceIdentifier.getSchemaNode() instanceof ActionDefinition) {
+        if (iid.getSchemaNode() instanceof ActionDefinition) {
             try (var xmlBody = new XmlOperationInputBody(body)) {
-                return invokeAction(instanceIdentifier, xmlBody);
+                return invokeAction(iid, xmlBody);
             }
         }
 
         try (var xmlBody = new XmlChildBody(body)) {
-            return postData(instanceIdentifier, xmlBody, uriInfo);
+            return postData(iid.inference(), iid.getInstanceIdentifier(), xmlBody, uriInfo, iid.getMountPoint());
         }
     }
 
     private Response postData(final ChildBody body, final UriInfo uriInfo) {
-        return postData(InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext().modelContext()), body,
-            uriInfo);
+        return postData(Inference.ofDataTreePath(databindProvider.currentContext().modelContext()),
+            YangInstanceIdentifier.of(), body, uriInfo, null);
     }
 
-    private Response postData(final InstanceIdentifierContext iid, final ChildBody body, final UriInfo uriInfo) {
+    private Response postData(final Inference inference, final YangInstanceIdentifier parentPath, final ChildBody body,
+            final UriInfo uriInfo, final @Nullable DOMMountPoint mountPoint) {
         final var insert = QueryParams.parseInsert(uriInfo);
-        final var strategy = getRestconfStrategy(iid.getMountPoint());
-        final var context = iid.getSchemaContext();
-        var path = iid.getInstanceIdentifier();
-        final var payload = body.toPayload(path, iid.inference());
+        final var strategy = getRestconfStrategy(mountPoint);
+        final var context = inference.getEffectiveModelContext();
+        var path = parentPath;
+        final var payload = body.toPayload(path, inference);
         final var data = payload.body();
 
         for (var arg : payload.prefix()) {
