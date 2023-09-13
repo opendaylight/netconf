@@ -38,7 +38,6 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStr
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -60,7 +59,6 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
                         final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders,
                         final OutputStream entityStream) throws IOException, WebApplicationException {
-        final InstanceIdentifierContext pathContext = context.getInstanceIdentifierContext();
         if (context.getData() == null) {
             return;
         }
@@ -78,21 +76,18 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
             if (prettyPrint != null && prettyPrint.value()) {
                 xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
             }
-        } catch (final XMLStreamException | FactoryConfigurationError e) {
+        } catch (XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
-        final NormalizedNode data = context.getData();
 
-        writeNormalizedNode(xmlWriter,  pathContext, data, context.getWriterParameters().depth(),
-                context.getWriterParameters().fields());
+        writeNormalizedNode(xmlWriter, context.getInstanceIdentifierContext(), context.getData(),
+            context.getWriterParameters().depth(), context.getWriterParameters().fields());
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter,
             final InstanceIdentifierContext pathContext, final NormalizedNode data, final DepthParam depth,
             final List<Set<QName>> fields) throws IOException {
-        final RestconfNormalizedNodeWriter nnWriter;
-        final SchemaNode schemaNode = pathContext.getSchemaNode();
-
+        final var schemaNode = pathContext.getSchemaNode();
         if (schemaNode instanceof RpcDefinition rpc) {
             // RpcDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit initial output
             // declaration.
@@ -100,16 +95,18 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
             stack.enterSchemaTree(rpc.getQName());
             stack.enterSchemaTree(rpc.getOutput().getQName());
 
-            nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
+            final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
+            nnWriter.flush();
         } else if (schemaNode instanceof ActionDefinition action) {
             // ActionDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit initial output
             // declaration.
             final var stack = pathContext.inference().toSchemaInferenceStack();
             stack.enterSchemaTree(action.getOutput().getQName());
 
-            nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
+            final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
+            nnWriter.flush();
         } else {
             final var stack = pathContext.inference().toSchemaInferenceStack();
             final boolean isRoot;
@@ -119,8 +116,8 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
             } else {
                 isRoot = true;
             }
-            nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
 
+            final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
             if (data instanceof MapEntryNode mapEntry) {
                 // Restconf allows returning one list item. We need to wrap it
                 // in map node in order to serialize it properly
@@ -134,9 +131,8 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
             } else {
                 nnWriter.write(data);
             }
+            nnWriter.flush();
         }
-
-        nnWriter.flush();
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
