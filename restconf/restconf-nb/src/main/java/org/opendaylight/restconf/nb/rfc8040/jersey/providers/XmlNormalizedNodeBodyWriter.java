@@ -9,16 +9,12 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import javax.xml.XMLConstants;
 import javax.xml.stream.FactoryConfigurationError;
@@ -29,7 +25,7 @@ import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -43,7 +39,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 
 @Provider
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
+public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
     private static final XMLOutputFactory XML_FACTORY;
 
     static {
@@ -52,27 +48,13 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
     }
 
     @Override
-    public void writeTo(final NormalizedNodePayload context,
-                        final Class<?> type,
-                        final Type genericType,
-                        final Annotation[] annotations,
-                        final MediaType mediaType,
-                        final MultivaluedMap<String, Object> httpHeaders,
-                        final OutputStream entityStream) throws IOException, WebApplicationException {
-        if (context.getData() == null) {
-            return;
-        }
-        if (httpHeaders != null) {
-            for (var entry : context.getNewHeaders().entrySet()) {
-                httpHeaders.add(entry.getKey(), entry.getValue());
-            }
-        }
-
+    void writeTo(final InstanceIdentifierContext context, final QueryParameters writerParameters,
+            final NormalizedNode data, final OutputStream entityStream) throws IOException {
         XMLStreamWriter xmlWriter;
         try {
             xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
 
-            final var prettyPrint = context.getWriterParameters().prettyPrint();
+            final var prettyPrint = writerParameters.prettyPrint();
             if (prettyPrint != null && prettyPrint.value()) {
                 xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
             }
@@ -80,8 +62,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
             throw new IllegalStateException(e);
         }
 
-        writeNormalizedNode(xmlWriter, context.getInstanceIdentifierContext(), context.getData(),
-            context.getWriterParameters().depth(), context.getWriterParameters().fields());
+        writeNormalizedNode(xmlWriter, context, data, writerParameters.depth(), writerParameters.fields());
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter,
