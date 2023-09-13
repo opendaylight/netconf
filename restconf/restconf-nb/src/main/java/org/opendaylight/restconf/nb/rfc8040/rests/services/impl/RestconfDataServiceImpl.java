@@ -751,30 +751,33 @@ public final class RestconfDataServiceImpl {
     }
 
     private PatchStatusContext yangPatchData(final @NonNull PatchBody body) {
-        return yangPatchData(InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext().modelContext()),
-            body);
+        final var context = databindProvider.currentContext().modelContext();
+        return yangPatchData(context, parsePatchBody(context, YangInstanceIdentifier.of(), body), null);
     }
 
     private PatchStatusContext yangPatchData(final String identifier, final @NonNull PatchBody body) {
-        return yangPatchData(ParserIdentifier.toInstanceIdentifier(identifier,
-                databindProvider.currentContext().modelContext(), mountPointService), body);
+        final var iid = ParserIdentifier.toInstanceIdentifier(requireNonNull(identifier),
+            databindProvider.currentContext().modelContext(), mountPointService);
+        final var context = iid.getSchemaContext();
+        return yangPatchData(context, parsePatchBody(context, iid.getInstanceIdentifier(), body), iid.getMountPoint());
     }
 
-    private PatchStatusContext yangPatchData(final @NonNull InstanceIdentifierContext targetResource,
-            final @NonNull PatchBody body) {
+
+    @VisibleForTesting
+    @NonNull PatchStatusContext yangPatchData(final @NonNull EffectiveModelContext context,
+            final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint) {
+        return getRestconfStrategy(mountPoint).patchData(patch, context);
+    }
+
+    private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,
+            final @NonNull YangInstanceIdentifier urlPath, final @NonNull PatchBody body) {
         try {
-            return yangPatchData(targetResource, body.toPatchContext(targetResource));
+            return body.toPatchContext(context, urlPath);
         } catch (IOException e) {
             LOG.debug("Error parsing YANG Patch input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, e);
         }
-    }
-
-    @VisibleForTesting
-    PatchStatusContext yangPatchData(final InstanceIdentifierContext targetResource, final PatchContext context) {
-        return getRestconfStrategy(targetResource.getMountPoint()).patchData(context,
-            targetResource.getSchemaContext());
     }
 
     @VisibleForTesting

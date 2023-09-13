@@ -60,7 +60,6 @@ import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
@@ -419,8 +418,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
-        final var status = dataService.yangPatchData(InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID),
-            patch);
+        final var status = dataService.yangPatchData(JUKEBOX_SCHEMA, patch, null);
         assertTrue(status.ok());
         assertEquals(3, status.editCollection().size());
         assertEquals("replace data", status.editCollection().get(1).getEditId());
@@ -428,7 +426,6 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPatchDataMountPoint() throws Exception {
-        final var iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint, JUKEBOX_SCHEMA, JUKEBOX_IID);
         final var patch = new PatchContext("test patch id", List.of(
             new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
             new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, EMPTY_JUKEBOX),
@@ -439,7 +436,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
 
-        final var status = dataService.yangPatchData(iidContext, patch);
+        final var status = dataService.yangPatchData(JUKEBOX_SCHEMA, patch, mountPoint);
         assertTrue(status.ok());
         assertEquals(3, status.editCollection().size());
         assertNull(status.globalErrors());
@@ -459,8 +456,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(readWrite).cancel();
 
-        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final PatchStatusContext status = dataService.yangPatchData(iidContext, patch);
+        final PatchStatusContext status = dataService.yangPatchData(JUKEBOX_SCHEMA, patch, null);
 
         assertFalse(status.ok());
         assertEquals(3, status.editCollection().size());

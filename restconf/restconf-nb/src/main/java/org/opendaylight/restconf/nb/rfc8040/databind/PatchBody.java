@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * A YANG Patch body.
@@ -27,34 +27,32 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         super(inputStream);
     }
 
-    public final @NonNull PatchContext toPatchContext(final @NonNull InstanceIdentifierContext targetResource)
-            throws IOException {
+    public final @NonNull PatchContext toPatchContext(final @NonNull EffectiveModelContext context,
+            final @NonNull YangInstanceIdentifier urlPath) throws IOException {
         try (var is = acquireStream()) {
-            return toPatchContext(targetResource, is);
+            return toPatchContext(context, urlPath, is);
         }
     }
 
-    abstract @NonNull PatchContext toPatchContext(@NonNull InstanceIdentifierContext targetResource,
-        @NonNull InputStream inputStream) throws IOException;
+    abstract @NonNull PatchContext toPatchContext(@NonNull EffectiveModelContext context,
+        @NonNull YangInstanceIdentifier urlPath, @NonNull InputStream inputStream) throws IOException;
 
-    static final YangInstanceIdentifier parsePatchTarget(final InstanceIdentifierContext targetResource,
-            final String target) {
-        final var urlPath = targetResource.getInstanceIdentifier();
+    static final YangInstanceIdentifier parsePatchTarget(final EffectiveModelContext context,
+            final YangInstanceIdentifier urlPath, final String target) {
         if (target.equals("/")) {
             verify(!urlPath.isEmpty(),
                 "target resource of URI must not be a datastore resource when target is '/'");
             return urlPath;
         }
 
-        final var schemaContext = targetResource.getSchemaContext();
         final String targetUrl;
         if (urlPath.isEmpty()) {
             targetUrl = target.startsWith("/") ? target.substring(1) : target;
         } else {
-            targetUrl = IdentifierCodec.serialize(urlPath, schemaContext) + target;
+            targetUrl = IdentifierCodec.serialize(urlPath, context) + target;
         }
 
-        return ParserIdentifier.toInstanceIdentifier(targetUrl, schemaContext, null).getInstanceIdentifier();
+        return ParserIdentifier.toInstanceIdentifier(targetUrl, context, null).getInstanceIdentifier();
     }
 
     /**
