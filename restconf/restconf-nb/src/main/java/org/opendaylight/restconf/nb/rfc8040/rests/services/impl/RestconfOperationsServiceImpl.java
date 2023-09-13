@@ -63,7 +63,7 @@ public final class RestconfOperationsServiceImpl {
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
     public String getOperationJSON(@PathParam("identifier") final String identifier) {
         return OperationsContent.JSON.bodyFor(ParserIdentifier.toInstanceIdentifier(identifier,
-            databindProvider.currentContext().modelContext(), mountPointService));
+            databindProvider.currentContext().modelContext(), mountPointService).inference());
     }
 
     /**
@@ -89,6 +89,6 @@ public final class RestconfOperationsServiceImpl {
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public String getOperationXML(@PathParam("identifier") final String identifier) {
         return OperationsContent.XML.bodyFor(ParserIdentifier.toInstanceIdentifier(identifier,
-            databindProvider.currentContext().modelContext(), mountPointService));
+            databindProvider.currentContext().modelContext(), mountPointService).inference());
     }
 }
