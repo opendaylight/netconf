@@ -18,13 +18,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierTest {
@@ -32,14 +32,14 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
     public void testWriteEmptyRootContainer() throws IOException {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
 
-        final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalRoot(schemaContext),
+        final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(Inference.ofDataTreePath(schemaContext),
             Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build());
 
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final XmlNormalizedNodeBodyWriter xmlWriter = new XmlNormalizedNodeBodyWriter();
         xmlWriter.writeTo(nodePayload, null, null, null, MediaType.APPLICATION_XML_TYPE, null, output);
 
+        // FIXME: NETCONF-855: this is wrong, the namespace should be 'urn:ietf:params:xml:ns:yang:ietf-restconf'
         assertEquals("<data xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"></data>",
             output.toString(StandardCharsets.UTF_8));
     }
@@ -47,7 +47,7 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
     @Test
     public void testRootContainerWrite() throws IOException {
         final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalRoot(IID_SCHEMA),
+            Inference.ofDataTreePath(IID_SCHEMA),
             Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME))
                 .withChild(Builders.containerBuilder()
