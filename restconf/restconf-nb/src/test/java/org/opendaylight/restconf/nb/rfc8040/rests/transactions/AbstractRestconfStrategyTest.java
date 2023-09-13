@@ -28,9 +28,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchEntity;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.Patch;
+import org.opendaylight.restconf.common.patch.Patch.Edit;
+import org.opendaylight.restconf.common.patch.PatchStatus;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -299,10 +299,10 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
                 .build())
             .build();
 
-        patch(new PatchContext("patchRMRm",
-            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_IID, buildArtistList),
-                new PatchEntity("edit2", Operation.Merge, ARTIST_IID, buildArtistList),
-                new PatchEntity("edit3", Operation.Remove, ARTIST_IID))),
+        patch(new Patch("patchRMRm", List.of(
+            new Edit("edit1", Operation.Replace, ARTIST_IID, buildArtistList),
+            new Edit("edit2", Operation.Merge, ARTIST_IID, buildArtistList),
+            new Edit("edit3", Operation.Remove, ARTIST_IID))),
             testPatchDataReplaceMergeAndRemoveStrategy(), false);
     }
 
@@ -310,9 +310,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPatchDataCreateAndDelete() {
-        patch(new PatchContext("patchCD", List.of(
-            new PatchEntity("edit1", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
-            new PatchEntity("edit2", Operation.Delete, CREATE_AND_DELETE_TARGET))),
+        patch(new Patch("patchCD", List.of(
+            new Edit("edit1", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
+            new Edit("edit2", Operation.Delete, CREATE_AND_DELETE_TARGET))),
             testPatchDataCreateAndDeleteStrategy(), true);
     }
 
@@ -320,7 +320,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPatchMergePutContainer() {
-        patch(new PatchContext("patchM", List.of(new PatchEntity("edit1", Operation.Merge, PLAYER_IID, EMPTY_JUKEBOX))),
+        patch(new Patch("patchM", List.of(new Edit("edit1", Operation.Merge, PLAYER_IID, EMPTY_JUKEBOX))),
             testPatchMergePutContainerStrategy(), false);
     }
 
@@ -328,14 +328,14 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testDeleteNonexistentData() {
-        final var patchStatusContext = deleteNonexistentDataTestStrategy().patchData(new PatchContext("patchD",
-            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))), JUKEBOX_SCHEMA);
+        final var patchStatusContext = deleteNonexistentDataTestStrategy().patchData(new Patch("patchD",
+            List.of(new Edit("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))), JUKEBOX_SCHEMA);
         assertFalse(patchStatusContext.ok());
     }
 
     abstract @NonNull RestconfStrategy deleteNonexistentDataTestStrategy();
 
-    abstract void assertTestDeleteNonexistentData(@NonNull PatchStatusContext status);
+    abstract void assertTestDeleteNonexistentData(@NonNull PatchStatus status);
 
     @Test
     public final void readDataConfigTest() {
@@ -466,7 +466,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         return strategy.readData(content, path, null, mockSchemaContext);
     }
 
-    private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
+    private static void patch(final Patch patchContext, final RestconfStrategy strategy, final boolean failed) {
         final var patchStatusContext = strategy.patchData(patchContext, JUKEBOX_SCHEMA);
         for (var entity : patchStatusContext.editCollection()) {
             if (failed) {

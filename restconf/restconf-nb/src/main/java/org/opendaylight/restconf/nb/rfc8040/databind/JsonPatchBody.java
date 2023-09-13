@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchEntity;
+import org.opendaylight.restconf.common.patch.Patch;
+import org.opendaylight.restconf.common.patch.Patch.Edit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -47,20 +47,20 @@ public final class JsonPatchBody extends PatchBody {
     }
 
     @Override
-    PatchContext toPatchContext(final InstanceIdentifierContext targetResource, final InputStream inputStream)
+    Patch toPatchContext(final InstanceIdentifierContext targetResource, final InputStream inputStream)
             throws IOException {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
             final var resultList = read(jsonReader, targetResource, patchId);
             // Note: patchId side-effect of above
-            return new PatchContext(patchId.get(), resultList);
+            return new Patch(patchId.get(), resultList);
         }
     }
 
-    private static ImmutableList<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext path,
+    private static ImmutableList<Edit> read(final JsonReader in, final InstanceIdentifierContext path,
             final AtomicReference<String> patchId) throws IOException {
         final var schemaTree = DataSchemaContextTree.from(path.getSchemaContext());
-        final var edits = ImmutableList.<PatchEntity>builder();
+        final var edits = ImmutableList.<Edit>builder();
         final var edit = new PatchEdit();
 
         while (in.hasNext()) {
@@ -115,7 +115,7 @@ public final class JsonPatchBody extends PatchBody {
     private static void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
             final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext path,
             final @NonNull DataSchemaContextTree schemaTree,
-            final ImmutableList.@NonNull Builder<PatchEntity> resultCollection,
+            final ImmutableList.@NonNull Builder<Edit> resultCollection,
             final @NonNull AtomicReference<String> patchId) throws IOException {
         switch (name) {
             case "edit":
@@ -324,11 +324,11 @@ public final class JsonPatchBody extends PatchBody {
      * @param edit Instance of PatchEdit
      * @return PatchEntity Patch entity
      */
-    private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) {
+    private static Edit prepareEditOperation(final @NonNull PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
             && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
             if (!requiresValue(edit.getOperation())) {
-                return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
+                return new Edit(edit.getId(), edit.getOperation(), edit.getTarget());
             }
 
             // for lists allow to manipulate with list items through their parent
@@ -339,7 +339,7 @@ public final class JsonPatchBody extends PatchBody {
                 targetNode = edit.getTarget();
             }
 
-            return new PatchEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
+            return new Edit(edit.getId(), edit.getOperation(), targetNode, edit.getData());
         }
 
         throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);

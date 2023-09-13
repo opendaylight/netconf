@@ -37,8 +37,8 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
-import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.Patch;
+import org.opendaylight.restconf.common.patch.PatchStatus;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
@@ -408,26 +408,26 @@ public abstract class RestconfStrategy {
     }
 
     /**
-     * Process edit operations of one {@link PatchContext}.
+     * Process edit operations of one {@link Patch}.
      *
      * @param patch    Patch context to be processed
      * @param context  Global schema context
-     * @return {@link PatchStatusContext}
+     * @return {@link PatchStatus}
      */
-    public final @NonNull PatchStatusContext patchData(final PatchContext patch, final EffectiveModelContext context) {
+    public final @NonNull PatchStatus patchData(final Patch patch, final EffectiveModelContext context) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var tx = prepareWriteExecution();
 
         boolean noError = true;
-        for (var patchEntity : patch.entities()) {
+        for (var patchEntity : patch.edits()) {
             if (noError) {
-                final var targetNode = patchEntity.getTargetNode();
-                final var editId = patchEntity.getEditId();
+                final var targetNode = patchEntity.target();
+                final var editId = patchEntity.editId();
 
-                switch (patchEntity.getOperation()) {
+                switch (patchEntity.operation()) {
                     case Create:
                         try {
-                            tx.create(targetNode, patchEntity.getNode(), context);
+                            tx.create(targetNode, patchEntity.node(), context);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
@@ -446,7 +446,7 @@ public abstract class RestconfStrategy {
                     case Merge:
                         try {
                             tx.ensureParentsByMerge(targetNode, context);
-                            tx.merge(targetNode, patchEntity.getNode());
+                            tx.merge(targetNode, patchEntity.node());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
@@ -455,7 +455,7 @@ public abstract class RestconfStrategy {
                         break;
                     case Replace:
                         try {
-                            tx.replace(targetNode, patchEntity.getNode(), context);
+                            tx.replace(targetNode, patchEntity.node(), context);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
@@ -490,13 +490,13 @@ public abstract class RestconfStrategy {
                 TransactionUtil.syncCommit(tx.commit(), "PATCH", null);
             } catch (RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                return new PatchStatusContext(context, patchId, List.copyOf(editCollection), false, e.getErrors());
+                return new PatchStatus(context, patchId, List.copyOf(editCollection), false, e.getErrors());
             }
 
-            return new PatchStatusContext(context, patchId, List.copyOf(editCollection), true, null);
+            return new PatchStatus(context, patchId, List.copyOf(editCollection), true, null);
         } else {
             tx.cancel();
-            return new PatchStatusContext(context, patchId, List.copyOf(editCollection), false, null);
+            return new PatchStatus(context, patchId, List.copyOf(editCollection), false, null);
         }
     }
 

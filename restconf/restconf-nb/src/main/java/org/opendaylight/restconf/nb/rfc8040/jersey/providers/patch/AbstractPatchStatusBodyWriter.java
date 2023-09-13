@@ -11,12 +11,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyWriter;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchStatus;
 
-abstract class AbstractPatchStatusBodyWriter implements MessageBodyWriter<PatchStatusContext> {
+abstract class AbstractPatchStatusBodyWriter implements MessageBodyWriter<PatchStatus> {
     @Override
     public final boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations,
             final MediaType mediaType) {
-        return type.equals(PatchStatusContext.class);
+        return type.equals(PatchStatus.class);
     }
 }

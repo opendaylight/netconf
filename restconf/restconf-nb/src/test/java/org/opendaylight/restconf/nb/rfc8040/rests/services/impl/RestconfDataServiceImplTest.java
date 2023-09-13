@@ -56,9 +56,8 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchEntity;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.Patch;
+import org.opendaylight.restconf.common.patch.Patch.Edit;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -409,10 +408,10 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPatchData() {
-        final var patch = new PatchContext("test patch id", List.of(
-            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
-            new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, EMPTY_JUKEBOX),
-            new PatchEntity("delete data", Operation.Delete, GAP_IID)));
+        final var patch = new Patch("test patch id", List.of(
+            new Edit("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
+            new Edit("replace data", Operation.Replace, JUKEBOX_IID, EMPTY_JUKEBOX),
+            new Edit("delete data", Operation.Delete, GAP_IID)));
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(immediateFalseFluentFuture())
@@ -429,10 +428,10 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     @Test
     public void testPatchDataMountPoint() throws Exception {
         final var iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint, JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final var patch = new PatchContext("test patch id", List.of(
-            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
-            new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, EMPTY_JUKEBOX),
-            new PatchEntity("delete data", Operation.Delete, GAP_IID)));
+        final var patch = new Patch("test patch id", List.of(
+            new Edit("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
+            new Edit("replace data", Operation.Replace, JUKEBOX_IID, EMPTY_JUKEBOX),
+            new Edit("delete data", Operation.Delete, GAP_IID)));
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(immediateFalseFluentFuture())
@@ -447,10 +446,10 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testPatchDataDeleteNotExist() {
-        final PatchContext patch = new PatchContext("test patch id", List.of(
-            new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
-            new PatchEntity("remove data", Operation.Remove, GAP_IID),
-            new PatchEntity("delete data", Operation.Delete, GAP_IID)));
+        final var patch = new Patch("test patch id", List.of(
+            new Edit("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
+            new Edit("remove data", Operation.Remove, GAP_IID),
+            new Edit("delete data", Operation.Delete, GAP_IID)));
 
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(immediateFalseFluentFuture())
@@ -460,7 +459,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(true).when(readWrite).cancel();
 
         final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, JUKEBOX_IID);
-        final PatchStatusContext status = dataService.yangPatchData(iidContext, patch);
+        final var status = dataService.yangPatchData(iidContext, patch);
 
         assertFalse(status.ok());
         assertEquals(3, status.editCollection().size());

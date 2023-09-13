@@ -26,7 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -58,12 +58,12 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
         return null;
     }
 
-    static final void checkPatchContext(final PatchContext patchContext) {
+    static final void checkPatchContext(final Patch patchContext) {
         assertNotNull(patchContext.patchId());
-        assertNotNull(patchContext.entities());
+        assertNotNull(patchContext.edits());
     }
 
-    final @NonNull PatchContext parse(final String uriPath, final String patchBody) throws IOException {
+    final @NonNull Patch parse(final String uriPath, final String patchBody) throws IOException {
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
             return body.toPatchContext(ParserIdentifier.toInstanceIdentifier(uriPath, IID_SCHEMA, mountPointService));
         }

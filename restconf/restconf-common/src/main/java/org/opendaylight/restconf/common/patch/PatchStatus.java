@@ -18,7 +18,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 /**
  * Holder of patch status context.
  */
-public record PatchStatusContext(
+public record PatchStatus(
     // FIXME: DatabindContext when we are in our proper place
     @NonNull EffectiveModelContext context,
     @NonNull String patchId,
@@ -26,7 +26,7 @@ public record PatchStatusContext(
     boolean ok,
     @Nullable List<RestconfError> globalErrors) {
 
-    public PatchStatusContext {
+    public PatchStatus {
         requireNonNull(patchId);
         requireNonNull(context);
         requireNonNull(editCollection);
