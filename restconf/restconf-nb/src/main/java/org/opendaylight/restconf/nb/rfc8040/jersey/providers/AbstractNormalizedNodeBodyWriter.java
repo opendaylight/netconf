@@ -47,8 +47,7 @@ abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<Nor
         }
 
         final var output = requireNonNull(entityStream);
-        final var iidContext = context.getInstanceIdentifierContext();
-        final var stack = iidContext.inference().toSchemaInferenceStack();
+        final var stack = context.inference().toSchemaInferenceStack();
         // FIXME: this dispatch is here to handle codec transition to 'output', but that should be completely okay with
         //        the instantiation path we are using (based in Inference).
         if (!stack.isEmpty()) {
