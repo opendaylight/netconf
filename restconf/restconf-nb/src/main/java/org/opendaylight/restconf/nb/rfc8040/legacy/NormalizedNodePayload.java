@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -22,8 +23,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
  */
 public final class NormalizedNodePayload {
     private final InstanceIdentifierContext context;
-    private final ImmutableMap<String, Object> headers;
-    private final QueryParameters writerParameters;
+    private final @NonNull ImmutableMap<String, Object> headers;
+    private final @NonNull QueryParameters writerParameters;
     private final NormalizedNode data;
 
     private NormalizedNodePayload(final InstanceIdentifierContext context, final NormalizedNode data,
@@ -63,7 +64,7 @@ public final class NormalizedNodePayload {
         return context;
     }
 
-    public NormalizedNode getData() {
+    public @Nullable NormalizedNode getData() {
         return data;
     }
 
@@ -73,11 +74,11 @@ public final class NormalizedNodePayload {
      * @return map of headers
      */
     // FIXME: this is only used for redirect on subscribe
-    public ImmutableMap<String, Object> getNewHeaders() {
+    public @NonNull ImmutableMap<String, Object> getNewHeaders() {
         return headers;
     }
 
-    public QueryParameters getWriterParameters() {
+    public @NonNull QueryParameters getWriterParameters() {
         return writerParameters;
     }
 }
