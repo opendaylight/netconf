@@ -15,13 +15,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
@@ -32,16 +32,12 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -58,82 +54,77 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
                         final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders,
                         final OutputStream entityStream) throws IOException, WebApplicationException {
-        final NormalizedNode data = context.getData();
-        if (data == null) {
+        if (context.getData() == null) {
             return;
         }
 
-        final InstanceIdentifierContext identifierCtx = context.getInstanceIdentifierContext();
-        final var pretty = context.getWriterParameters().prettyPrint();
-
-        try (JsonWriter jsonWriter = createJsonWriter(entityStream, pretty == null ? false : pretty.value())) {
-            jsonWriter.beginObject();
-            writeNormalizedNode(jsonWriter, identifierCtx, data,
-                    context.getWriterParameters().depth(), context.getWriterParameters().fields());
-            jsonWriter.endObject();
-            jsonWriter.flush();
-        }
-
         if (httpHeaders != null) {
-            for (final Map.Entry<String, Object> entry : context.getNewHeaders().entrySet()) {
+            for (var entry : context.getNewHeaders().entrySet()) {
                 httpHeaders.add(entry.getKey(), entry.getValue());
             }
+        }
+
+        final var pretty = context.getWriterParameters().prettyPrint();
+        try (var jsonWriter = createJsonWriter(entityStream, pretty == null ? false : pretty.value())) {
+            jsonWriter.beginObject();
+            writeNormalizedNode(jsonWriter, context.getInstanceIdentifierContext(), context.getData(),
+                context.getWriterParameters().depth(), context.getWriterParameters().fields());
+            jsonWriter.endObject();
+            jsonWriter.flush();
         }
     }
 
     private static void writeNormalizedNode(final JsonWriter jsonWriter, final InstanceIdentifierContext context,
             final NormalizedNode data, final DepthParam depth, final List<Set<QName>> fields) throws IOException {
-        final SchemaNode schemaNode = context.getSchemaNode();
-        final RestconfNormalizedNodeWriter nnWriter;
+        final var schemaNode = context.getSchemaNode();
         if (schemaNode instanceof RpcDefinition rpc) {
+            // RpcDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit initial output
+            // declaration
             final var stack = SchemaInferenceStack.of(context.getSchemaContext());
             stack.enterSchemaTree(rpc.getQName());
             stack.enterSchemaTree(rpc.getOutput().getQName());
 
-            // RpcDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit initial output
-            // declaration
-            nnWriter = createNormalizedNodeWriter(
-                    context,
-                    stack.toInference(),
-                    jsonWriter,
-                    depth,
-                    fields);
-            final Module module = context.getSchemaContext().findModule(data.name().getNodeType().getModule())
-                .orElseThrow();
-            jsonWriter.name(module.getName() + ":output");
+            jsonWriter.name(stack.currentModule().argument().getLocalName() + ":output");
             jsonWriter.beginObject();
+
+            final var nnWriter = createNormalizedNodeWriter(context, stack.toInference(), jsonWriter, depth, fields,
+                rpc.getQName().getNamespace());
             writeChildren(nnWriter, (ContainerNode) data);
+            nnWriter.flush();
+
             jsonWriter.endObject();
         } else if (schemaNode instanceof ActionDefinition action) {
+            // FIXME: why is this different from RPC?!
+
             // ActionDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit initial output
             // declaration
             final var stack = context.inference().toSchemaInferenceStack();
             stack.enterSchemaTree(action.getOutput().getQName());
 
-            nnWriter = createNormalizedNodeWriter(context, stack.toInference(), jsonWriter, depth, fields);
-            final Module module = context.getSchemaContext().findModule(data.name().getNodeType().getModule())
-                .orElseThrow();
-            jsonWriter.name(module.getName() + ":output");
+            jsonWriter.name(stack.currentModule().argument().getLocalName() + ":output");
             jsonWriter.beginObject();
+
+            final var nnWriter = createNormalizedNodeWriter(context, stack.toInference(), jsonWriter, depth, fields,
+                null);
             writeChildren(nnWriter, (ContainerNode) data);
+            nnWriter.flush();
+
             jsonWriter.endObject();
         } else {
             final var stack = context.inference().toSchemaInferenceStack();
             if (!stack.isEmpty()) {
                 stack.exit();
             }
-            nnWriter = createNormalizedNodeWriter(context, stack.toInference(), jsonWriter, depth, fields);
 
-            if (data instanceof MapEntryNode mapEntry) {
-                // Restconf allows returning one list item. We need to wrap it
-                // in map node in order to serialize it properly
-                nnWriter.write(ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).withChild(mapEntry).build());
-            } else {
-                nnWriter.write(data);
-            }
+            // RESTCONF allows returning one list item. We need to wrap it in map node in order to serialize it properly
+            final var toSerialize = data instanceof MapEntryNode mapEntry
+                ? ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).withChild(mapEntry).build() : data;
+
+            final var nnWriter = createNormalizedNodeWriter(context, stack.toInference(), jsonWriter, depth, fields,
+                null);
+            nnWriter.write(toSerialize);
+            nnWriter.flush();
         }
-
-        nnWriter.flush();
     }
 
     private static void writeChildren(final RestconfNormalizedNodeWriter nnWriter, final ContainerNode data)
@@ -143,37 +134,19 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
         }
     }
 
-    private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(
-            final InstanceIdentifierContext context, final Inference inference, final JsonWriter jsonWriter,
-            final DepthParam depth, final List<Set<QName>> fields) {
-
-        final SchemaNode schema = context.getSchemaNode();
-        final JSONCodecFactory codecs = getCodecFactory(context);
-
-        final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
-                codecs, inference, initialNamespaceFor(schema), jsonWriter);
-
-        return ParameterAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
-    }
-
-    private static XMLNamespace initialNamespaceFor(final SchemaNode schema) {
-        if (schema instanceof RpcDefinition) {
-            return schema.getQName().getNamespace();
-        }
-        // For top-level elements we always want to use namespace prefix, hence use a null initial namespace
-        return null;
+    private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final InstanceIdentifierContext context,
+            final Inference inference, final JsonWriter jsonWriter, final DepthParam depth,
+            final List<Set<QName>> fields, final @Nullable XMLNamespace initialNamespace) {
+        // TODO: Performance: Cache JSON Codec factory and schema context
+        final var codecs = JSONCodecFactorySupplier.RFC7951.getShared(context.getSchemaContext());
+        return ParameterAwareNormalizedNodeWriter.forStreamWriter(
+            JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, inference,
+                initialNamespace, jsonWriter), depth, fields);
     }
 
     private static JsonWriter createJsonWriter(final OutputStream entityStream, final boolean prettyPrint) {
-        if (prettyPrint) {
-            return JsonWriterFactory.createJsonWriter(
-                    new OutputStreamWriter(entityStream, StandardCharsets.UTF_8), DEFAULT_INDENT_SPACES_NUM);
-        }
-        return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
-    }
-
-    private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext context) {
-        // TODO: Performance: Cache JSON Codec factory and schema context
-        return JSONCodecFactorySupplier.RFC7951.getShared(context.getSchemaContext());
+        final var outputWriter = new OutputStreamWriter(entityStream, StandardCharsets.UTF_8);
+        return prettyPrint ? JsonWriterFactory.createJsonWriter(outputWriter, DEFAULT_INDENT_SPACES_NUM)
+            : JsonWriterFactory.createJsonWriter(outputWriter);
     }
 }
