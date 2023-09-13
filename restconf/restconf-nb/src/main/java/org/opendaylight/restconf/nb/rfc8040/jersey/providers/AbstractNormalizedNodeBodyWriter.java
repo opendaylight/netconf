@@ -17,10 +17,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<NormalizedNodePayload> {
     @Override
@@ -43,10 +46,27 @@ abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<Nor
             }
         }
 
-        writeTo(context.getInstanceIdentifierContext(), context.getWriterParameters(), data,
-            requireNonNull(entityStream));
+        final var output = requireNonNull(entityStream);
+        final var iidContext = context.getInstanceIdentifierContext();
+        final var stack = iidContext.inference().toSchemaInferenceStack();
+        // FIXME: this dispatch is here to handle codec transition to 'output', but that should be completely okay with
+        //        the instantiation path we are using (based in Inference).
+        if (!stack.isEmpty()) {
+            final var stmt = stack.currentStatement();
+            if (stmt instanceof RpcEffectiveStatement rpc) {
+                stack.enterSchemaTree(rpc.output().argument());
+                writeOperationOutput(stack, context.getWriterParameters(), (ContainerNode) data, output);
+            } else if (stmt instanceof ActionEffectiveStatement action) {
+                stack.enterSchemaTree(action.output().argument());
+                writeOperationOutput(stack, context.getWriterParameters(), (ContainerNode) data, output);
+            }
+        }
+        writeData(stack, context.getWriterParameters(), data, output);
     }
 
-    abstract void writeTo(@NonNull InstanceIdentifierContext context, @NonNull QueryParameters writerParameters,
+    abstract void writeOperationOutput(@NonNull SchemaInferenceStack stack, @NonNull QueryParameters writerParameters,
+        @NonNull ContainerNode output, @NonNull OutputStream entityStream) throws IOException;
+
+    abstract void writeData(@NonNull SchemaInferenceStack stack, @NonNull QueryParameters writerParameters,
         @NonNull NormalizedNode data, @NonNull OutputStream entityStream) throws IOException;
 }
