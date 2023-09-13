@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -101,7 +100,7 @@ enum OperationsContent {
      * @param context Context to use
      * @return Content of HTTP GET operation as a String
      */
-    public final @NonNull String bodyFor(final @Nullable EffectiveModelContext context) {
+    public final @NonNull String bodyFor(final EffectiveModelContext context) {
         if (isEmptyContext(context)) {
             // No modules, or defensive return empty content
             return emptyBody;
@@ -142,9 +141,6 @@ enum OperationsContent {
     }
 
     private static boolean isEmptyContext(final EffectiveModelContext context) {
-        if (context == null) {
-            return true;
-        }
         return context.getModuleStatements().isEmpty();
     }
 
