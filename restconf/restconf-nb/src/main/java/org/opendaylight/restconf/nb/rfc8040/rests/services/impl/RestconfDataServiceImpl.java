@@ -78,7 +78,6 @@ import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
@@ -182,9 +181,9 @@ public final class RestconfDataServiceImpl {
 
         final EffectiveModelContext schemaContextRef = databindProvider.currentContext().modelContext();
         // FIXME: go through
-        final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, schemaContextRef, mountPointService);
-        final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
+        final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier, schemaContextRef,
+            mountPointService);
+        final var mountPoint = instanceIdentifier.getMountPoint();
 
         // FIXME: this looks quite crazy, why do we even have it?
         if (mountPoint == null && identifier != null && identifier.contains(STREAMS_PATH)
@@ -192,9 +191,9 @@ public final class RestconfDataServiceImpl {
             createAllYangNotificationStreams(schemaContextRef, uriInfo);
         }
 
-        final QueryParameters queryParams = QueryParams.newQueryParameters(readParams, instanceIdentifier);
-        final List<YangInstanceIdentifier> fieldPaths = queryParams.fieldPaths();
-        final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
+        final var queryParams = QueryParams.newQueryParameters(readParams, instanceIdentifier);
+        final var fieldPaths = queryParams.fieldPaths();
+        final var strategy = getRestconfStrategy(mountPoint);
         final NormalizedNode node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
             node = strategy.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
