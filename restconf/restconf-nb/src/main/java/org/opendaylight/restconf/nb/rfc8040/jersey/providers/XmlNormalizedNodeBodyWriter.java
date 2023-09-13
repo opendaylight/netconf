@@ -10,8 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Set;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -21,10 +19,10 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.opendaylight.restconf.api.query.DepthParam;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -32,8 +30,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -48,79 +44,62 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
     }
 
     @Override
-    void writeTo(final InstanceIdentifierContext context, final QueryParameters writerParameters,
-            final NormalizedNode data, final OutputStream entityStream) throws IOException {
-        XMLStreamWriter xmlWriter;
+    void writeOperationOutput(final SchemaInferenceStack stack, final QueryParameters writerParameters,
+            final ContainerNode output, final OutputStream entityStream) throws IOException {
+        // RpcDefinition/ActionDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit
+        // initial output declaration.
+        final var xmlWriter = createXmlWriter(entityStream, writerParameters.prettyPrint());
+        final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), writerParameters);
+        writeElements(xmlWriter, nnWriter, output);
+        nnWriter.flush();
+    }
+
+    @Override
+    void writeData(final SchemaInferenceStack stack, final QueryParameters writerParameters, final NormalizedNode data,
+            final OutputStream entityStream) throws IOException {
+        final boolean isRoot;
+        if (!stack.isEmpty()) {
+            stack.exit();
+            isRoot = false;
+        } else {
+            isRoot = true;
+        }
+
+        final var xmlWriter = createXmlWriter(entityStream, writerParameters.prettyPrint());
+        final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), writerParameters);
+        if (data instanceof MapEntryNode mapEntry) {
+            // Restconf allows returning one list item. We need to wrap it
+            // in map node in order to serialize it properly
+            nnWriter.write(ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).addChild(mapEntry).build());
+        } else if (isRoot) {
+            if (data instanceof ContainerNode container && container.isEmpty()) {
+                writeEmptyDataNode(xmlWriter, container);
+            } else {
+                writeAndWrapInDataNode(xmlWriter, nnWriter, data);
+            }
+        } else {
+            nnWriter.write(data);
+        }
+        nnWriter.flush();
+    }
+
+    private static XMLStreamWriter createXmlWriter(final OutputStream entityStream,
+            final @Nullable PrettyPrintParam prettyPrint) {
+        final XMLStreamWriter xmlWriter;
         try {
             xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
-
-            final var prettyPrint = writerParameters.prettyPrint();
-            if (prettyPrint != null && prettyPrint.value()) {
-                xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
-            }
         } catch (XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
 
-        writeNormalizedNode(xmlWriter, context, data, writerParameters.depth(), writerParameters.fields());
-    }
-
-    private static void writeNormalizedNode(final XMLStreamWriter xmlWriter,
-            final InstanceIdentifierContext pathContext, final NormalizedNode data, final DepthParam depth,
-            final List<Set<QName>> fields) throws IOException {
-        final var schemaNode = pathContext.getSchemaNode();
-        if (schemaNode instanceof RpcDefinition rpc) {
-            // RpcDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit initial output
-            // declaration.
-            final var stack = SchemaInferenceStack.of(pathContext.getSchemaContext());
-            stack.enterSchemaTree(rpc.getQName());
-            stack.enterSchemaTree(rpc.getOutput().getQName());
-
-            final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
-            writeElements(xmlWriter, nnWriter, (ContainerNode) data);
-            nnWriter.flush();
-        } else if (schemaNode instanceof ActionDefinition action) {
-            // ActionDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit initial output
-            // declaration.
-            final var stack = pathContext.inference().toSchemaInferenceStack();
-            stack.enterSchemaTree(action.getOutput().getQName());
-
-            final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
-            writeElements(xmlWriter, nnWriter, (ContainerNode) data);
-            nnWriter.flush();
-        } else {
-            final var stack = pathContext.inference().toSchemaInferenceStack();
-            final boolean isRoot;
-            if (!stack.isEmpty()) {
-                stack.exit();
-                isRoot = false;
-            } else {
-                isRoot = true;
-            }
-
-            final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), depth, fields);
-            if (data instanceof MapEntryNode mapEntry) {
-                // Restconf allows returning one list item. We need to wrap it
-                // in map node in order to serialize it properly
-                nnWriter.write(ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).addChild(mapEntry).build());
-            } else if (isRoot) {
-                if (data instanceof ContainerNode container && container.isEmpty()) {
-                    writeEmptyDataNode(xmlWriter, container);
-                } else {
-                    writeAndWrapInDataNode(xmlWriter, nnWriter, data);
-                }
-            } else {
-                nnWriter.write(data);
-            }
-            nnWriter.flush();
-        }
+        return prettyPrint != null && prettyPrint.value() ? new IndentingXMLStreamWriter(xmlWriter) : xmlWriter;
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
-            final Inference inference, final DepthParam depth,
-            final List<Set<QName>> fields) {
+            final Inference inference, final QueryParameters writerParameters) {
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(
-            XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, inference), depth, fields);
+            XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, inference),
+            writerParameters.depth(), writerParameters.fields());
     }
 
     private static void writeAndWrapInDataNode(final XMLStreamWriter xmlWriter,
