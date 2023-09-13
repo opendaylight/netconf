@@ -11,22 +11,18 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -43,32 +39,16 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 
 @Provider
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
+public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
 
     @Override
-    public void writeTo(final NormalizedNodePayload context,
-                        final Class<?> type,
-                        final Type genericType,
-                        final Annotation[] annotations,
-                        final MediaType mediaType,
-                        final MultivaluedMap<String, Object> httpHeaders,
-                        final OutputStream entityStream) throws IOException, WebApplicationException {
-        if (context.getData() == null) {
-            return;
-        }
-
-        if (httpHeaders != null) {
-            for (var entry : context.getNewHeaders().entrySet()) {
-                httpHeaders.add(entry.getKey(), entry.getValue());
-            }
-        }
-
-        final var pretty = context.getWriterParameters().prettyPrint();
+    void writeTo(final InstanceIdentifierContext context, final QueryParameters writerParameters,
+            final NormalizedNode data, final OutputStream entityStream) throws IOException {
+        final var pretty = writerParameters.prettyPrint();
         try (var jsonWriter = createJsonWriter(entityStream, pretty == null ? false : pretty.value())) {
             jsonWriter.beginObject();
-            writeNormalizedNode(jsonWriter, context.getInstanceIdentifierContext(), context.getData(),
-                context.getWriterParameters().depth(), context.getWriterParameters().fields());
+            writeNormalizedNode(jsonWriter, context, data, writerParameters.depth(), writerParameters.fields());
             jsonWriter.endObject();
             jsonWriter.flush();
         }
