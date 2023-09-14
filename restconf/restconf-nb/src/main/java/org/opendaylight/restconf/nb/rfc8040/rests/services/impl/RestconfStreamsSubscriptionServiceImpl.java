@@ -73,7 +73,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         return Response.ok()
             .location(location)
-            .entity(NormalizedNodePayload.of(
+            .entity(new NormalizedNodePayload(
                 Inference.ofDataTreePath(handlersHolder.getDatabindProvider().currentContext().modelContext(),
                     Notifi.QNAME, LOCATION_QNAME),
                 ImmutableNodes.leafNode(LOCATION_NODEID, location.toString())))

@@ -60,7 +60,7 @@ public final class RestconfImpl {
         stack.enterDataTree(Restconf.QNAME);
         stack.enterDataTree(YANG_LIBRARY_VERSION);
 
-        return NormalizedNodePayload.of(stack.toInference(),
+        return new NormalizedNodePayload(stack.toInference(),
             ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION));
     }
 }

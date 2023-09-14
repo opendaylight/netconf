@@ -32,7 +32,7 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
     public void testWriteEmptyRootContainer() throws IOException {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
 
-        final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(Inference.ofDataTreePath(schemaContext),
+        final NormalizedNodePayload nodePayload = new NormalizedNodePayload(Inference.ofDataTreePath(schemaContext),
             Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build());
 
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -46,7 +46,7 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
 
     @Test
     public void testRootContainerWrite() throws IOException {
-        final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
+        final NormalizedNodePayload nodePayload = new NormalizedNodePayload(
             Inference.ofDataTreePath(IID_SCHEMA),
             Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME))

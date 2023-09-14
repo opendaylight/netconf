@@ -106,7 +106,7 @@ public class RestconfInvokeOperationsServiceImplTest {
             """.getBytes(StandardCharsets.UTF_8)), mock(UriInfo.class), ar);
         verify(ar).resume(response.capture());
 
-        assertSame(result, response.getValue().getData());
+        assertSame(result, response.getValue().data());
     }
 
     @Test

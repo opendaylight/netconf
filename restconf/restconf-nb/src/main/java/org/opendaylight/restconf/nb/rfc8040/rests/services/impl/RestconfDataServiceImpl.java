@@ -221,14 +221,14 @@ public final class RestconfDataServiceImpl {
             case ALL, CONFIG -> {
                 final QName type = node.name().getNodeType();
                 yield Response.status(Status.OK)
-                    .entity(NormalizedNodePayload.ofReadData(instanceIdentifier.inference(), node, queryParams))
+                    .entity(new NormalizedNodePayload(instanceIdentifier.inference(), node, queryParams))
                     .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null) + "-"
                         + type.getLocalName() + '"')
                     .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                     .build();
             }
             case NONCONFIG -> Response.status(Status.OK)
-                .entity(NormalizedNodePayload.ofReadData(instanceIdentifier.inference(), node, queryParams))
+                .entity(new NormalizedNodePayload(instanceIdentifier.inference(), node, queryParams))
                 .build();
         };
     }
@@ -820,10 +820,10 @@ public final class RestconfDataServiceImpl {
         final var result = checkActionResponse(response);
 
         final var resultData = result != null ? result.getOutput().orElse(null) : null;
-        if (resultData != null && resultData.isEmpty()) {
+        if (resultData == null || resultData.isEmpty()) {
             return Response.status(Status.NO_CONTENT).build();
         }
-        return Response.status(Status.OK).entity(NormalizedNodePayload.ofNullable(inference, resultData)).build();
+        return Response.status(Status.OK).entity(new NormalizedNodePayload(inference, resultData)).build();
     }
 
     /**

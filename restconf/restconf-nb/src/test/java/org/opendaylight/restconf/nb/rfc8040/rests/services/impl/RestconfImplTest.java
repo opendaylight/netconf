@@ -19,6 +19,6 @@ public class RestconfImplTest {
         final var context = YangParserTestUtils.parseYangResourceDirectory("/restconf/impl");
         final var restconfImpl = new RestconfImpl(() -> DatabindContext.ofModel(context));
         final var libraryVersion = restconfImpl.getLibraryVersion();
-        assertEquals("2019-01-04", libraryVersion.getData().body());
+        assertEquals("2019-01-04", libraryVersion.data().body());
     }
 }
