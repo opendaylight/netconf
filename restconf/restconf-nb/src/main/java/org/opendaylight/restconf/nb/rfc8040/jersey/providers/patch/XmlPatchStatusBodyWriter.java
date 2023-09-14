@@ -25,6 +25,8 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @Provider
 @Produces(MediaTypes.APPLICATION_YANG_DATA_XML)
@@ -62,7 +64,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             writer.writeEmptyElement("ok");
         } else {
             if (context.globalErrors() != null) {
-                reportErrors(context.globalErrors(), writer);
+                reportErrors(context.context(), context.globalErrors(), writer);
             }
             writer.writeStartElement("edit-status");
             for (final PatchStatusEntity patchStatusEntity : context.editCollection()) {
@@ -71,11 +73,9 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
                 writer.writeCharacters(patchStatusEntity.getEditId());
                 writer.writeEndElement();
                 if (patchStatusEntity.getEditErrors() != null) {
-                    reportErrors(patchStatusEntity.getEditErrors(), writer);
-                } else {
-                    if (patchStatusEntity.isOk()) {
-                        writer.writeEmptyElement("ok");
-                    }
+                    reportErrors(context.context(), patchStatusEntity.getEditErrors(), writer);
+                } else if (patchStatusEntity.isOk()) {
+                    writer.writeEmptyElement("ok");
                 }
                 writer.writeEndElement();
             }
@@ -87,8 +87,8 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         writer.flush();
     }
 
-    private static void reportErrors(final List<RestconfError> errors, final XMLStreamWriter writer)
-            throws XMLStreamException {
+    private static void reportErrors(final EffectiveModelContext modelContext, final List<RestconfError> errors,
+            final XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement("errors");
 
         for (final RestconfError restconfError : errors) {
@@ -103,7 +103,8 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             // optional node
             if (restconfError.getErrorPath() != null) {
                 writer.writeStartElement("error-path");
-                writer.writeCharacters(restconfError.getErrorPath().toString());
+                XmlCodecFactory.create(modelContext).
+                    instanceIdentifierSerializer().writeValue(restconfError.getErrorPath(), writer);
                 writer.writeEndElement();
             }
 

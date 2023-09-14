@@ -22,6 +22,7 @@ import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -41,10 +42,10 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             jsonWriter.endObject().endObject().flush();
         }
 
-        final var context = patchStatusContext.context();
+        final var modelContext = patchStatusContext.context();
         final var globalErrors = patchStatusContext.globalErrors();
         if (globalErrors != null) {
-            reportErrors(context, globalErrors, jsonWriter);
+            reportErrors(modelContext, globalErrors, jsonWriter);
         }
 
         jsonWriter.name("edit-status").beginObject()
@@ -54,7 +55,7 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
             final var editErrors = editStatus.getEditErrors();
             if (editErrors != null) {
-                reportErrors(context, editErrors, jsonWriter);
+                reportErrors(modelContext, editErrors, jsonWriter);
             } else if (editStatus.isOk()) {
                 reportSuccess(jsonWriter);
             }
@@ -78,8 +79,9 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
             final var errorPath = restconfError.getErrorPath();
             if (errorPath != null) {
-                // FIXME: YangInstanceIdentifier.toString(), we should use a codec based on context
-                jsonWriter.name("error-path").value(errorPath.toString());
+                jsonWriter.name("error-path");
+                JSONCodecFactorySupplier.RFC7951.getShared(context).
+                    instanceIdentifierSerializer().writeValue(path, jsonWriter);
             }
             final var errorMessage = restconfError.getErrorMessage();
             if (errorMessage != null) {
