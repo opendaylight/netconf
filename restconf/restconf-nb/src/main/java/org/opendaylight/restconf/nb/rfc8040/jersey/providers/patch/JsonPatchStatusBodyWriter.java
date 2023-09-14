@@ -23,7 +23,9 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @Provider
 @Produces(MediaTypes.APPLICATION_YANG_DATA_JSON)
@@ -41,9 +43,10 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         if (patchStatusContext.isOk()) {
             reportSuccess(jsonWriter);
         } else {
+            final var modelContext = patchStatusContext.getContext();
             final var globalErrors = patchStatusContext.getGlobalErrors();
             if (globalErrors != null) {
-                reportErrors(globalErrors, jsonWriter);
+                reportErrors(modelContext, globalErrors, jsonWriter);
             } else {
                 jsonWriter.name("edit-status").beginObject();
                 jsonWriter.name("edit");
@@ -52,7 +55,7 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
                     jsonWriter.beginObject();
                     jsonWriter.name("edit-id").value(patchStatusEntity.getEditId());
                     if (patchStatusEntity.getEditErrors() != null) {
-                        reportErrors(patchStatusEntity.getEditErrors(), jsonWriter);
+                        reportErrors(modelContext, patchStatusEntity.getEditErrors(), jsonWriter);
                     } else if (patchStatusEntity.isOk()) {
                         reportSuccess(jsonWriter);
                     }
@@ -71,7 +74,8 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         jsonWriter.name("ok").beginArray().nullValue().endArray();
     }
 
-    private static void reportErrors(final List<RestconfError> errors, final JsonWriter jsonWriter) throws IOException {
+    private static void reportErrors(final EffectiveModelContext context,
+            final List<RestconfError> errors, final JsonWriter jsonWriter) throws IOException {
         jsonWriter.name("errors");
         jsonWriter.beginObject();
         jsonWriter.name("error");
@@ -83,8 +87,11 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             jsonWriter.name("error-tag").value(restconfError.getErrorTag().elementBody());
 
             // optional node
-            if (restconfError.getErrorPath() != null) {
-                jsonWriter.name("error-path").value(restconfError.getErrorPath().toString());
+            final var errorPath = restconfError.getErrorPath();
+            if (errorPath != null) {
+                jsonWriter.name("error-path");
+                JSONCodecFactorySupplier.RFC7951.getShared(context).instanceIdentifierCodec()
+                    .writeValue(jsonWriter, errorPath);
             }
 
             // optional node
