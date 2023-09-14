@@ -52,7 +52,7 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
             targetUrl = IdentifierCodec.serialize(urlPath, context) + target;
         }
 
-        return ParserIdentifier.toInstanceIdentifier(targetUrl, context, null).getInstanceIdentifier();
+        return ParserIdentifier.toInstanceIdentifier(targetUrl, context, null).path();
     }
 
     /**

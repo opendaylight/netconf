@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
+import org.opendaylight.restconf.nb.rfc8040.databind.RequestUrl;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -37,10 +38,9 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     private static final QNameModule Q_NAME_MODULE_FOO = QNameModule.create(
         XMLNamespace.of("urn:foo"), Revision.of("2023-03-27"));
 
-    private InstanceIdentifierContext identifierJukebox;
+    private RequestUrl identifierJukebox;
     private InstanceIdentifierContext identifierTestServices;
     private InstanceIdentifierContext identifierFoo;
-
 
     // container augmented library
     protected static final QName AUGMENTED_LIBRARY_Q_NAME = QName.create(Q_NAME_MODULE_AUGMENTED_JUKEBOX,
@@ -113,7 +113,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
             YangParserTestUtils.parseYangResourceDirectory("/same-qname-nodes"), FOO_Q_NAME));
     }
 
-    protected abstract List<T> translateFields(InstanceIdentifierContext context, FieldsParam fields);
+    protected abstract List<T> translateFields(@NonNull RequestUrl context, FieldsParam fields);
 
     /**
      * Test parse fields parameter containing only one child selected.

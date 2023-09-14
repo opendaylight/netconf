@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -28,6 +29,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.RequestUrl;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -39,6 +41,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,22 +74,19 @@ public final class ParserIdentifier {
      * {@link InstanceIdentifierContext} is prepared with reference of {@link DOMMountPoint} and its
      * own {@link SchemaContext}.
      *
-     * @param identifier
-     *           - path identifier
-     * @param schemaContext
-     *           - controller schema context
-     * @param mountPointService
-     *           - mount point service
+     * @param identifier path identifier
+     * @param context - controller schema context
+     * @param mountPointService mount point service
      * @return {@link InstanceIdentifierContext}
      */
     // FIXME: NETCONF-631: this method should not be here, it should be a static factory in InstanceIdentifierContext:
     //
     //        @NonNull InstanceIdentifierContext forUrl(identifier, schemaContexxt, mountPointService)
     //
-    public static InstanceIdentifierContext toInstanceIdentifier(final String identifier,
-            final EffectiveModelContext schemaContext, final @Nullable DOMMountPointService mountPointService) {
+    public static @NonNull RequestUrl toInstanceIdentifier(final String identifier,
+            final EffectiveModelContext context, final @Nullable DOMMountPointService mountPointService) {
         if (identifier == null || !identifier.contains(MOUNT)) {
-            return createIIdContext(schemaContext, identifier, null);
+            return createIIdContext(context, identifier, null);
         }
         if (mountPointService == null) {
             throw new RestconfDocumentedException("Mount point service is not available");
@@ -94,7 +94,7 @@ public final class ParserIdentifier {
 
         final Iterator<String> pathsIt = MP_SPLITTER.split(identifier).iterator();
         final String mountPointId = pathsIt.next();
-        final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContext);
+        final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, context);
         final DOMMountPoint mountPoint = mountPointService.getMountPoint(mountPath)
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
                     ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
@@ -109,21 +109,20 @@ public final class ParserIdentifier {
      * and {@link SchemaContext}, {@link DOMMountPoint}.
      *
      * @param url Invocation URL
-     * @param schemaContext SchemaContext in which the path is to be interpreted in
+     * @param context SchemaContext in which the path is to be interpreted in
      * @param mountPoint A mount point handle, if the URL is being interpreted relative to a mount point
      * @return {@link InstanceIdentifierContext}
      * @throws RestconfDocumentedException if the path cannot be resolved
      */
-    private static InstanceIdentifierContext createIIdContext(final EffectiveModelContext schemaContext,
-            final String url, final @Nullable DOMMountPoint mountPoint) {
+    private static RequestUrl createIIdContext(final EffectiveModelContext context, final String url,
+            final @Nullable DOMMountPoint mountPoint) {
         // First things first: an empty path means data invocation on SchemaContext
         if (url == null) {
-            return mountPoint != null ? InstanceIdentifierContext.ofMountPointRoot(mountPoint, schemaContext)
-                : InstanceIdentifierContext.ofLocalRoot(schemaContext);
+            return new RequestUrl(Inference.ofDataTreePath(context), YangInstanceIdentifier.of(), mountPoint);
         }
 
-        final var result = YangInstanceIdentifierDeserializer.create(schemaContext, url);
-        return InstanceIdentifierContext.ofPath(result.stack, result.node, result.path, mountPoint);
+        final var result = YangInstanceIdentifierDeserializer.create(context, url);
+        return new RequestUrl(result.stack.toInference(), result.path, mountPoint);
     }
 
     /**
@@ -210,11 +209,11 @@ public final class ParserIdentifier {
 
                 pathBuilder.append(current);
             }
-            final InstanceIdentifierContext point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
+            final var request = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
                 requireNonNull(domMountPointService));
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
-            final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
+            final EffectiveModelContext context = coerceModelContext(request.mountPoint());
             final Module module = context.findModule(moduleName, revision).orElse(null);
             return new SchemaExportContext(context, module, sourceProvider);
         }
