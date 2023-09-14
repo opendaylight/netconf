@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65835d69_c708ec3c",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/patch/PatchStatusContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-14T09:51:52Z",
+      "side": 1,
+      "message": "EffectiveModelContext is not serializable and hence this record is not. It never can be.",
+      "range": {
+        "startLine": 29,
+        "startChar": 48,
+        "endLine": 29,
+        "endChar": 71
+      },
+      "revId": "e2a6cd333382d01b817a646b74496a1a5aa70e75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
