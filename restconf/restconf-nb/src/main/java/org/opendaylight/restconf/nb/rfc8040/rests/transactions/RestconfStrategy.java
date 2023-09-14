@@ -382,7 +382,10 @@ public abstract class RestconfStrategy {
                 }
                 yield tx.commit();
             }
-            case LAST -> createAndCommit(tx, path, data);
+            case LAST -> {
+                checkItemDoesNotExists(exists(path), path);
+                yield createAndCommit(tx, path, data);
+            }
             case BEFORE -> {
                 final var readData = tx.readList(grandParent);
                 if (readData == null || readData.isEmpty()) {
