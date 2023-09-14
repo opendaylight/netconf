@@ -89,7 +89,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
     private @NonNull NormalizedNode parse(final String uriPath, final InputStream patchBody) throws IOException {
         try (var body = bodyConstructor.apply(patchBody)) {
             final var context = ParserIdentifier.toInstanceIdentifier(uriPath, MODEL_CONTEXT, mountPointService);
-            return body.toNormalizedNode(context.getInstanceIdentifier(), context.inference(), context.getSchemaNode());
+            return body.toNormalizedNode(context.path(), context.inference(), context.context().dataSchemaNode());
         }
     }
 

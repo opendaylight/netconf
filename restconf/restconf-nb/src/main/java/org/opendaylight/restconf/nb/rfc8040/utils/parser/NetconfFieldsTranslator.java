@@ -21,7 +21,7 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.RequestUrl;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -33,7 +33,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -92,25 +91,19 @@ public final class NetconfFieldsTranslator {
      * @return {@link List} of {@link YangInstanceIdentifier} that are relative to the last {@link PathArgument}
      *     of provided {@code identifier}
      */
-    public static @NonNull List<YangInstanceIdentifier> translate(
-            final @NonNull InstanceIdentifierContext identifier, final @NonNull FieldsParam input) {
-        final var parsed = parseFields(identifier, input);
-        return parsed.stream().map(NetconfFieldsTranslator::buildPath).toList();
+    public static @NonNull List<YangInstanceIdentifier> translate(final @NonNull RequestUrl request,
+            final @NonNull FieldsParam input) {
+        return parseFields(request, input).stream().map(NetconfFieldsTranslator::buildPath).toList();
     }
 
-    private static @NonNull Set<LinkedPathElement> parseFields(final @NonNull InstanceIdentifierContext identifier,
+    private static @NonNull Set<LinkedPathElement> parseFields(final @NonNull RequestUrl request,
             final @NonNull FieldsParam input) {
-        final DataSchemaContext startNode;
-        try {
-            startNode = DataSchemaContext.of((DataSchemaNode) identifier.getSchemaNode());
-        } catch (IllegalStateException e) {
-            throw new RestconfDocumentedException(
-                "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
-        }
-
+        final var inference = request.inference();
         final var parsed = new HashSet<LinkedPathElement>();
-        processSelectors(parsed, identifier.getSchemaContext(), identifier.getSchemaNode().getQName().getModule(),
-            new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
+        processSelectors(parsed, inference.getEffectiveModelContext(),
+            // FIXME: shortcut SchemaInference stack somehow?
+            inference.toSchemaInferenceStack().currentModule().localQNameModule(),
+            new LinkedPathElement(null, List.of(), request.context()), input.nodeSelectors());
 
         return parsed;
     }

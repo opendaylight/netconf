@@ -158,7 +158,7 @@ public final class RestconfInvokeOperationsServiceImpl {
         final var rpcName = context.getSchemaNode().getQName();
 
         final ListenableFuture<? extends DOMRpcResult> future;
-        final var mountPoint = context.getMountPoint();
+        final var mountPoint = context.mountPoint();
         if (mountPoint == null) {
             if (CreateDataChangeEventSubscription.QNAME.equals(rpcName)) {
                 future = Futures.immediateFuture(CreateStreamUtil.createDataChangeNotifiStream(
