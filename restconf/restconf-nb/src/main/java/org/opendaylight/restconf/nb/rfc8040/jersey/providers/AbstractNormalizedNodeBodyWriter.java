@@ -36,11 +36,6 @@ abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<Nor
     public final void writeTo(final NormalizedNodePayload context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
-        final var data = context.getData();
-        if (data == null) {
-            return;
-        }
-
         final var output = requireNonNull(entityStream);
         final var stack = context.inference().toSchemaInferenceStack();
         // FIXME: this dispatch is here to handle codec transition to 'output', but that should be completely okay with
@@ -49,13 +44,13 @@ abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<Nor
             final var stmt = stack.currentStatement();
             if (stmt instanceof RpcEffectiveStatement rpc) {
                 stack.enterSchemaTree(rpc.output().argument());
-                writeOperationOutput(stack, context.getWriterParameters(), (ContainerNode) data, output);
+                writeOperationOutput(stack, context.writerParameters(), (ContainerNode) context.data(), output);
             } else if (stmt instanceof ActionEffectiveStatement action) {
                 stack.enterSchemaTree(action.output().argument());
-                writeOperationOutput(stack, context.getWriterParameters(), (ContainerNode) data, output);
+                writeOperationOutput(stack, context.writerParameters(), (ContainerNode) context.data(), output);
             }
         }
-        writeData(stack, context.getWriterParameters(), data, output);
+        writeData(stack, context.writerParameters(), context.data(), output);
     }
 
     abstract void writeOperationOutput(@NonNull SchemaInferenceStack stack, @NonNull QueryParameters writerParameters,

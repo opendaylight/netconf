@@ -157,7 +157,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
         assertNotNull(response);
         assertEquals(200, response.getStatus());
-        assertEquals(EMPTY_JUKEBOX, ((NormalizedNodePayload) response.getEntity()).getData());
+        assertEquals(EMPTY_JUKEBOX, ((NormalizedNodePayload) response.getEntity()).data());
     }
 
     @Test
@@ -173,7 +173,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         assertNotNull(response);
         assertEquals(200, response.getStatus());
 
-        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).data();
         assertTrue(data instanceof ContainerNode);
         final Collection<DataContainerChild> rootNodes = ((ContainerNode) data).body();
         assertEquals(1, rootNodes.size());
@@ -207,7 +207,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         assertEquals(200, response.getStatus());
 
         // response must contain all child nodes from config and operational containers merged in one container
-        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).data();
         assertTrue(data instanceof ContainerNode);
         assertEquals(3, ((ContainerNode) data).size());
         assertNotNull(((ContainerNode) data).childByArg(CONT_PLAYER.name()));
@@ -251,7 +251,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         assertEquals(200, response.getStatus());
 
         // response must contain only config data
-        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).data();
 
         // config data present
         assertNotNull(((ContainerNode) data).childByArg(CONT_PLAYER.name()));
@@ -279,7 +279,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         assertEquals(200, response.getStatus());
 
         // response must contain only operational data
-        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).data();
 
         // state data present
         assertNotNull(((ContainerNode) data).childByArg(CONT_PLAYER.name()));

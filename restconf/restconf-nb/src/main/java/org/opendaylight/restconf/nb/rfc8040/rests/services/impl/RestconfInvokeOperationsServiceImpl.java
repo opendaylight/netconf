@@ -188,7 +188,7 @@ public final class RestconfInvokeOperationsServiceImpl {
                 if (resultData == null || resultData.isEmpty()) {
                     ar.resume(new WebApplicationException(Status.NO_CONTENT));
                 } else {
-                    ar.resume(NormalizedNodePayload.of(context.inference(), resultData));
+                    ar.resume(new NormalizedNodePayload(context.inference(), resultData));
                 }
             }
 
