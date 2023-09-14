@@ -17,15 +17,14 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.RequestUrl;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.ParameterAwareNormalizedNodeWriter;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -48,21 +47,16 @@ public final class WriterFieldsTranslator {
      * Translate a {@link FieldsParam} to a complete list of child nodes organized into levels, suitable for use with
      * {@link ParameterAwareNormalizedNodeWriter}.
      *
-     * @param identifier identifier context created from request URI
+     * @param request identifier context created from request URI
      * @param input input value of fields parameter
      * @return {@link List} of levels; each level contains set of {@link QName}
      */
-    public static @NonNull List<Set<QName>> translate(final @NonNull InstanceIdentifierContext identifier,
+    public static @NonNull List<Set<QName>> translate(final @NonNull RequestUrl request,
             final @NonNull FieldsParam input) {
-        final DataSchemaContext startNode = DataSchemaContext.of((DataSchemaNode) identifier.getSchemaNode());
-        if (startNode == null) {
-            throw new RestconfDocumentedException(
-                    "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-
+        final var startNode = request.context();
         final var parsed = new ArrayList<Set<QName>>();
-        processSelectors(parsed, identifier.getSchemaContext(), identifier.getSchemaNode().getQName().getModule(),
-            startNode, input.nodeSelectors(), 0);
+        processSelectors(parsed, request.inference().getEffectiveModelContext(),
+            startNode.dataSchemaNode().getQName().getModule(), startNode, input.nodeSelectors(), 0);
         return parsed;
     }
 

@@ -67,7 +67,7 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
         final var iid = ParserIdentifier.toInstanceIdentifier(uriPath, IID_SCHEMA, mountPointService);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
-            return body.toPatchContext(iid.getSchemaContext(), iid.getInstanceIdentifier());
+            return body.toPatchContext(iid.inference().getEffectiveModelContext(), iid.path());
         }
     }
 }
