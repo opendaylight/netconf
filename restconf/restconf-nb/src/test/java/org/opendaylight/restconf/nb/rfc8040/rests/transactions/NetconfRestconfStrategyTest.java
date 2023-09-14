@@ -55,7 +55,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Override
     RestconfStrategy testDeleteDataStrategy() {
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
@@ -63,7 +63,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFailedFuture(new TransactionCommitFailedException(
             "Commit of transaction " + this + " failed", new NetconfDocumentedException("id",
                 ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR)))).when(netconfService).commit();
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
@@ -71,33 +71,35 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .create(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
     RestconfStrategy testPostListDataStrategy(final MapEntryNode entryNode, final YangInstanceIdentifier node) {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            // FIXME: exact match
             .merge(any(), any(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).create(
             LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
     RestconfStrategy testPostDataFailStrategy(final DOMException domException) {
         doReturn(immediateFailedFluentFuture(domException)).when(netconfService)
+            // FIXME: exact match
             .create(any(), any(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
     RestconfStrategy testPatchContainerDataStrategy() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),any(),
             any());
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
@@ -105,7 +107,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
@@ -113,7 +115,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(),any(),any());
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Test
@@ -123,7 +125,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        new NetconfRestconfStrategy(netconfService).putData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
         verify(netconfService).lock();
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
@@ -138,7 +140,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX, Optional.empty());
 
-        new NetconfRestconfStrategy(netconfService).putData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX,
             Optional.empty());
@@ -151,7 +153,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        new NetconfRestconfStrategy(netconfService).putData(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(GAP_IID, GAP_LEAF, null);
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
     }
@@ -164,7 +166,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
 
-        new NetconfRestconfStrategy(netconfService).putData(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(GAP_IID, GAP_LEAF, null);
         verify(netconfService).getConfig(GAP_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF, Optional.empty());
     }
@@ -176,7 +178,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        new NetconfRestconfStrategy(netconfService).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, JUKEBOX_SCHEMA, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
@@ -190,7 +192,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS, Optional.empty());
 
-        new NetconfRestconfStrategy(netconfService).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, JUKEBOX_SCHEMA, null);
+        new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService).putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
@@ -201,8 +203,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .remove(LogicalDatastoreType.CONFIGURATION, ARTIST_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            // FIXME: exact match
             .replace(any(), any(), any(), any());
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
@@ -211,12 +214,12 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
             .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, CREATE_AND_DELETE_TARGET);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
     RestconfStrategy testPatchMergePutContainerStrategy() {
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
@@ -227,7 +230,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
             .when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, CREATE_AND_DELETE_TARGET);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService);
     }
 
     @Override
@@ -242,62 +245,62 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     @Override
     RestconfStrategy readDataConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
     RestconfStrategy readAllHavingOnlyConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).get(PATH);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
     RestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(netconfService).get(PATH_2);
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(PATH_2);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
     RestconfStrategy readDataNonConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(netconfService).get(PATH_2);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
     RestconfStrategy readContainerDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
         doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(netconfService).get(PATH);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
     RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(netconfService).getConfig(PATH);
         doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(netconfService).get(PATH);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
     RestconfStrategy readListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(LIST_DATA))).when(netconfService).get(PATH_3);
         doReturn(immediateFluentFuture(Optional.of(LIST_DATA_2))).when(netconfService).getConfig(PATH_3);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
     RestconfStrategy readOrderedListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_1))).when(netconfService).get(PATH_3);
         doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_2))).when(netconfService).getConfig(PATH_3);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
     RestconfStrategy readUnkeyedListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_1))).when(netconfService).get(PATH_3);
         doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_2))).when(netconfService).getConfig(PATH_3);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
@@ -306,7 +309,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
             .get(LEAF_SET_NODE_PATH);
         doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_2))).when(netconfService)
             .getConfig(LEAF_SET_NODE_PATH);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
@@ -315,12 +318,12 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
             .get(LEAF_SET_NODE_PATH);
         doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_2))).when(netconfService)
             .getConfig(LEAF_SET_NODE_PATH);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 
     @Override
     RestconfStrategy readDataWrongPathOrNoContentTestStrategy() {
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(PATH_2);
-        return new NetconfRestconfStrategy(netconfService);
+        return new NetconfRestconfStrategy(mockSchemaContext, netconfService);
     }
 }

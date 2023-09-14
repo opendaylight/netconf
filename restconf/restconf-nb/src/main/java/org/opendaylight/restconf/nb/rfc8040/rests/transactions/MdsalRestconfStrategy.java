@@ -28,6 +28,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Implementation of RESTCONF operations using {@link DOMTransactionChain} and related concepts.
@@ -38,13 +39,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final DOMDataBroker dataBroker;
 
-    public MdsalRestconfStrategy(final DOMDataBroker dataBroker) {
+    public MdsalRestconfStrategy(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker) {
+        super(modelContext);
         this.dataBroker = requireNonNull(dataBroker);
     }
 
     @Override
     RestconfTransaction prepareWriteExecution() {
-        return new MdsalRestconfTransaction(dataBroker);
+        return new MdsalRestconfTransaction(modelContext(), dataBroker);
     }
 
     @Override

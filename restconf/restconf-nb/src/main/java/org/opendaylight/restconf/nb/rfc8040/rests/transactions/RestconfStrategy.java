@@ -110,25 +110,35 @@ public abstract class RestconfStrategy {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
 
-    RestconfStrategy() {
-        // Hidden on purpose
+    private final @NonNull EffectiveModelContext modelContext;
+
+    RestconfStrategy(final EffectiveModelContext modelContext) {
+        this.modelContext = requireNonNull(modelContext);
     }
 
     /**
      * Look up the appropriate strategy for a particular mount point.
      *
+     * @param modelContext {@link EffectiveModelContext} of target mount point
      * @param mountPoint Target mount point
      * @return A strategy, or null if the mount point does not expose a supported interface
-     * @throws NullPointerException if {@code mountPoint} is null
+     * @throws NullPointerException if any argument is {@code null}
      */
-    public static Optional<RestconfStrategy> forMountPoint(final DOMMountPoint mountPoint) {
-        final Optional<RestconfStrategy> netconf = mountPoint.getService(NetconfDataTreeService.class)
-            .map(NetconfRestconfStrategy::new);
-        if (netconf.isPresent()) {
-            return netconf;
+    public static @Nullable RestconfStrategy forMountPoint(final EffectiveModelContext modelContext,
+            final DOMMountPoint mountPoint) {
+        final var netconfService = mountPoint.getService(NetconfDataTreeService.class);
+        if (netconfService.isPresent()) {
+            return new NetconfRestconfStrategy(modelContext, netconfService.orElseThrow());
         }
+        final var dataBroker = mountPoint.getService(DOMDataBroker.class);
+        if (dataBroker.isPresent()) {
+            return new MdsalRestconfStrategy(modelContext, dataBroker.orElseThrow());
+        }
+        return null;
+    }
 
-        return mountPoint.getService(DOMDataBroker.class).map(MdsalRestconfStrategy::new);
+    public final @NonNull EffectiveModelContext modelContext() {
+        return modelContext;
     }
 
     /**
@@ -146,8 +156,7 @@ public abstract class RestconfStrategy {
      * @param path the data object path
      * @return a ListenableFuture containing the result of the read
      */
-    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store,
-        YangInstanceIdentifier path);
+    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
      * Read data selected using fields from the datastore.
@@ -157,8 +166,8 @@ public abstract class RestconfStrategy {
      * @param fields paths to selected fields relative to parent path
      * @return a ListenableFuture containing the result of the read
      */
-    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store,
-            YangInstanceIdentifier path, List<YangInstanceIdentifier> fields);
+    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path,
+        List<YangInstanceIdentifier> fields);
 
     /**
      * Check if data already exists in the configuration datastore.
@@ -192,23 +201,20 @@ public abstract class RestconfStrategy {
      *
      * @param path Path to merge
      * @param data Data to merge
-     * @param context Corresponding EffectiveModelContext
      * @return A {@link RestconfFuture}
      * @throws NullPointerException if any argument is {@code null}
      */
-    public final @NonNull RestconfFuture<Empty> merge(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext context) {
+    public final @NonNull RestconfFuture<Empty> merge(final YangInstanceIdentifier path, final NormalizedNode data) {
         final var ret = new SettableRestconfFuture<Empty>();
-        merge(ret, requireNonNull(path), requireNonNull(data), requireNonNull(context));
+        merge(ret, requireNonNull(path), requireNonNull(data));
         return ret;
     }
 
-    private void merge(final @NonNull SettableRestconfFuture<Empty> future,
-            final @NonNull YangInstanceIdentifier path, final @NonNull NormalizedNode data,
-            final @NonNull EffectiveModelContext context) {
+    private void merge(final @NonNull SettableRestconfFuture<Empty> future, final @NonNull YangInstanceIdentifier path,
+            final @NonNull NormalizedNode data) {
         final var tx = prepareWriteExecution();
         // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
-        tx.ensureParentsByMerge(path, context);
+        tx.ensureParentsByMerge(path);
         tx.merge(path, data);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
@@ -228,21 +234,20 @@ public abstract class RestconfStrategy {
      *
      * @param path    path of data
      * @param data    data
-     * @param context reference to {@link EffectiveModelContext}
      * @param insert  {@link Insert}
      * @return A {@link CreateOrReplaceResult}
      */
-    public @NonNull CreateOrReplaceResult putData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext context, final @Nullable Insert insert) {
+    public final @NonNull CreateOrReplaceResult putData(final YangInstanceIdentifier path, final NormalizedNode data,
+            final @Nullable Insert insert) {
         final var exists = TransactionUtil.syncAccess(exists(path), path);
 
         final ListenableFuture<? extends CommitInfo> commitFuture;
         if (insert != null) {
             final var parentPath = path.coerceParent();
-            checkListAndOrderedType(context, parentPath);
-            commitFuture = insertAndCommitPut(path, data, insert, parentPath, context);
+            checkListAndOrderedType(parentPath);
+            commitFuture = insertAndCommitPut(path, data, insert, parentPath);
         } else {
-            commitFuture = replaceAndCommit(prepareWriteExecution(), path, data, context);
+            commitFuture = replaceAndCommit(prepareWriteExecution(), path, data);
         }
 
         TransactionUtil.syncCommit(commitFuture, "PUT", path);
@@ -250,46 +255,46 @@ public abstract class RestconfStrategy {
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPut(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parentPath,
-            final EffectiveModelContext context) {
+            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parentPath) {
         final var tx = prepareWriteExecution();
 
         return switch (insert.insert()) {
             case FIRST -> {
                 final var readData = tx.readList(parentPath);
                 if (readData == null || readData.isEmpty()) {
-                    yield replaceAndCommit(tx, path, data, context);
+                    yield replaceAndCommit(tx, path, data);
                 }
                 tx.remove(parentPath);
-                tx.replace(path, data, context);
-                tx.replace(parentPath, readData, context);
+                tx.replace(path, data);
+                tx.replace(parentPath, readData);
                 yield tx.commit();
             }
-            case LAST -> replaceAndCommit(tx, path, data, context);
+            case LAST -> replaceAndCommit(tx, path, data);
             case BEFORE -> {
                 final var readData = tx.readList(parentPath);
                 if (readData == null || readData.isEmpty()) {
-                    yield replaceAndCommit(tx, path, data, context);
+                    yield replaceAndCommit(tx, path, data);
                 }
-                insertWithPointPut(tx, path, data, verifyNotNull(insert.point()), readData, true, context);
+                insertWithPointPut(tx, path, data, verifyNotNull(insert.point()), readData, true);
                 yield tx.commit();
             }
             case AFTER -> {
                 final var readData = tx.readList(parentPath);
                 if (readData == null || readData.isEmpty()) {
-                    yield replaceAndCommit(tx, path, data, context);
+                    yield replaceAndCommit(tx, path, data);
                 }
-                insertWithPointPut(tx, path, data, verifyNotNull(insert.point()), readData, false, context);
+                insertWithPointPut(tx, path, data, verifyNotNull(insert.point()), readData, false);
                 yield tx.commit();
             }
         };
     }
 
-    private static void insertWithPointPut(final RestconfTransaction tx, final YangInstanceIdentifier path,
+    private void insertWithPointPut(final RestconfTransaction tx, final YangInstanceIdentifier path,
             final NormalizedNode data, final @NonNull PointParam point, final NormalizedNodeContainer<?> readList,
-            final boolean before, final EffectiveModelContext context) {
+            final boolean before) {
         tx.remove(path.getParent());
-        final var pointArg = YangInstanceIdentifierDeserializer.create(context, point.value()).path
+        // FIXME: this should have happened sooner
+        final var pointArg = YangInstanceIdentifierDeserializer.create(modelContext, point.value()).path
             .getLastPathArgument();
         int lastItemPosition = 0;
         for (var nodeChild : readList.body()) {
@@ -302,27 +307,28 @@ public abstract class RestconfStrategy {
             lastItemPosition++;
         }
         int lastInsertedPosition = 0;
-        final var emptySubtree = ImmutableNodes.fromInstanceId(context, path.getParent());
+        final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext, path.getParent());
         tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
-                tx.replace(path, data, context);
+                tx.replace(path, data);
             }
             final var childPath = path.coerceParent().node(nodeChild.name());
-            tx.replace(childPath, nodeChild, context);
+            tx.replace(childPath, nodeChild);
             lastInsertedPosition++;
         }
     }
 
     private static ListenableFuture<? extends CommitInfo> replaceAndCommit(final RestconfTransaction tx,
-            final YangInstanceIdentifier path, final NormalizedNode data, final EffectiveModelContext context) {
-        tx.replace(path, data, context);
+            final YangInstanceIdentifier path, final NormalizedNode data) {
+        tx.replace(path, data);
         return tx.commit();
     }
 
-    private static DataSchemaNode checkListAndOrderedType(final EffectiveModelContext ctx,
-            final YangInstanceIdentifier path) {
-        final var dataSchemaNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow().dataSchemaNode();
+    private DataSchemaNode checkListAndOrderedType(final YangInstanceIdentifier path) {
+        // FIXME: we have this available in InstanceIdentifierContext
+        final var dataSchemaNode = DataSchemaContextTree.from(modelContext).findChild(path).orElseThrow()
+            .dataSchemaNode();
 
         final String message;
         if (dataSchemaNode instanceof ListSchemaNode listSchema) {
@@ -346,25 +352,23 @@ public abstract class RestconfStrategy {
      *
      * @param path    path
      * @param data    data
-     * @param context reference to actual {@link EffectiveModelContext}
      * @param insert  {@link Insert}
      */
     public final void postData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext context, final @Nullable Insert insert) {
+            final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
             final var parentPath = path.coerceParent();
-            checkListAndOrderedType(context, parentPath);
-            future = insertAndCommitPost(path, data, insert, parentPath, context);
+            checkListAndOrderedType(parentPath);
+            future = insertAndCommitPost(path, data, insert, parentPath);
         } else {
-            future = createAndCommit(prepareWriteExecution(), path, data, context);
+            future = createAndCommit(prepareWriteExecution(), path, data);
         }
         TransactionUtil.syncCommit(future, "POST", path);
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parent,
-            final EffectiveModelContext context) {
+            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parent) {
         final var grandParent = parent.coerceParent();
         final var tx = prepareWriteExecution();
 
@@ -372,35 +376,33 @@ public abstract class RestconfStrategy {
             case FIRST -> {
                 final var readData = tx.readList(grandParent);
                 if (readData == null || readData.isEmpty()) {
-                    tx.replace(path, data, context);
+                    tx.replace(path, data);
                 } else {
                     checkItemDoesNotExists(exists(path), path);
                     tx.remove(grandParent);
-                    tx.replace(path, data, context);
-                    tx.replace(grandParent, readData, context);
+                    tx.replace(path, data);
+                    tx.replace(grandParent, readData);
                 }
                 yield tx.commit();
             }
-            case LAST -> createAndCommit(tx, path, data, context);
+            case LAST -> createAndCommit(tx, path, data);
             case BEFORE -> {
                 final var readData = tx.readList(grandParent);
                 if (readData == null || readData.isEmpty()) {
-                    tx.replace(path, data, context);
+                    tx.replace(path, data);
                 } else {
                     checkItemDoesNotExists(exists(path), path);
-                    insertWithPointPost(tx, path, data, verifyNotNull(insert.point()), readData, grandParent, true,
-                        context);
+                    insertWithPointPost(tx, path, data, verifyNotNull(insert.point()), readData, grandParent, true);
                 }
                 yield tx.commit();
             }
             case AFTER -> {
                 final var readData = tx.readList(grandParent);
                 if (readData == null || readData.isEmpty()) {
-                    tx.replace(path, data, context);
+                    tx.replace(path, data);
                 } else {
                     checkItemDoesNotExists(exists(path), path);
-                    insertWithPointPost(tx, path, data, verifyNotNull(insert.point()), readData, grandParent, false,
-                        context);
+                    insertWithPointPost(tx, path, data, verifyNotNull(insert.point()), readData, grandParent, false);
                 }
                 yield tx.commit();
             }
@@ -410,11 +412,10 @@ public abstract class RestconfStrategy {
     /**
      * Process edit operations of one {@link PatchContext}.
      *
-     * @param patch    Patch context to be processed
-     * @param context  Global schema context
+     * @param patch Patch context to be processed
      * @return {@link PatchStatusContext}
      */
-    public final @NonNull PatchStatusContext patchData(final PatchContext patch, final EffectiveModelContext context) {
+    public final @NonNull PatchStatusContext patchData(final PatchContext patch) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var tx = prepareWriteExecution();
 
@@ -427,7 +428,7 @@ public abstract class RestconfStrategy {
                 switch (patchEntity.getOperation()) {
                     case Create:
                         try {
-                            tx.create(targetNode, patchEntity.getNode(), context);
+                            tx.create(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
@@ -445,7 +446,7 @@ public abstract class RestconfStrategy {
                         break;
                     case Merge:
                         try {
-                            tx.ensureParentsByMerge(targetNode, context);
+                            tx.ensureParentsByMerge(targetNode);
                             tx.merge(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
@@ -455,7 +456,7 @@ public abstract class RestconfStrategy {
                         break;
                     case Replace:
                         try {
-                            tx.replace(targetNode, patchEntity.getNode(), context);
+                            tx.replace(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(editId, false, e.getErrors()));
@@ -490,21 +491,22 @@ public abstract class RestconfStrategy {
                 TransactionUtil.syncCommit(tx.commit(), "PATCH", null);
             } catch (RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                return new PatchStatusContext(context, patchId, List.copyOf(editCollection), false, e.getErrors());
+                return new PatchStatusContext(modelContext, patchId, List.copyOf(editCollection), false, e.getErrors());
             }
 
-            return new PatchStatusContext(context, patchId, List.copyOf(editCollection), true, null);
+            return new PatchStatusContext(modelContext, patchId, List.copyOf(editCollection), true, null);
         } else {
             tx.cancel();
-            return new PatchStatusContext(context, patchId, List.copyOf(editCollection), false, null);
+            return new PatchStatusContext(modelContext, patchId, List.copyOf(editCollection), false, null);
         }
     }
 
-    private static void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
+    private void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
             final NormalizedNode data, final PointParam point, final NormalizedNodeContainer<?> readList,
-            final YangInstanceIdentifier grandParentPath, final boolean before, final EffectiveModelContext context) {
+            final YangInstanceIdentifier grandParentPath, final boolean before) {
         tx.remove(grandParentPath);
-        final var pointArg = YangInstanceIdentifierDeserializer.create(context, point.value()).path
+        // FIXME: this should have happened sooner
+        final var pointArg = YangInstanceIdentifierDeserializer.create(modelContext, point.value()).path
             .getLastPathArgument();
         int lastItemPosition = 0;
         for (var nodeChild : readList.body()) {
@@ -517,22 +519,22 @@ public abstract class RestconfStrategy {
             lastItemPosition++;
         }
         int lastInsertedPosition = 0;
-        final var emptySubtree = ImmutableNodes.fromInstanceId(context, grandParentPath);
+        final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext, grandParentPath);
         tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
-                tx.replace(path, data, context);
+                tx.replace(path, data);
             }
             final YangInstanceIdentifier childPath = grandParentPath.node(nodeChild.name());
-            tx.replace(childPath, nodeChild, context);
+            tx.replace(childPath, nodeChild);
             lastInsertedPosition++;
         }
     }
 
     private static ListenableFuture<? extends CommitInfo> createAndCommit(final RestconfTransaction tx,
-            final YangInstanceIdentifier path, final NormalizedNode data, final EffectiveModelContext context) {
+            final YangInstanceIdentifier path, final NormalizedNode data) {
         try {
-            tx.create(path, data, context);
+            tx.create(path, data);
         } catch (RestconfDocumentedException e) {
             // close transaction if any and pass exception further
             tx.cancel();
@@ -562,15 +564,13 @@ public abstract class RestconfStrategy {
      * Read specific type of data from data store via transaction. Close {@link DOMTransactionChain} if any
      * inside of object {@link RestconfStrategy} provided as a parameter.
      *
-     * @param content        type of data to read (config, state, all)
-     * @param path           the path to read
-     * @param defaultsMode   value of with-defaults parameter
-     * @param ctx            schema context
+     * @param content      type of data to read (config, state, all)
+     * @param path         the path to read
+     * @param defaultsMode value of with-defaults parameter
      * @return {@link NormalizedNode}
      */
     public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode,
-            final EffectiveModelContext ctx) {
+            final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) {
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
@@ -579,11 +579,12 @@ public abstract class RestconfStrategy {
                 final var configDataNode = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path);
 
                 yield mergeConfigAndSTateDataIfNeeded(stateDataNode, defaultsMode == null ? configDataNode
-                    : prepareDataByParamWithDef(configDataNode, path, defaultsMode.mode(), ctx));
+                    : prepareDataByParamWithDef(configDataNode, path, defaultsMode.mode()));
             }
             case CONFIG -> {
                 final var read = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path);
-                yield defaultsMode == null ? read : prepareDataByParamWithDef(read, path, defaultsMode.mode(), ctx);
+                yield defaultsMode == null ? read
+                    : prepareDataByParamWithDef(read, path, defaultsMode.mode());
             }
             case NONCONFIG -> readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path);
         };
@@ -593,16 +594,15 @@ public abstract class RestconfStrategy {
      * Read specific type of data from data store via transaction with specified subtrees that should only be read.
      * Close {@link DOMTransactionChain} inside of object {@link RestconfStrategy} provided as a parameter.
      *
-     * @param content        type of data to read (config, state, all)
-     * @param path           the parent path to read
-     * @param withDefa       value of with-defaults parameter
-     * @param ctx            schema context
-     * @param fields         paths to selected subtrees which should be read, relative to to the parent path
+     * @param content  type of data to read (config, state, all)
+     * @param path     the parent path to read
+     * @param withDefa value of with-defaults parameter
+     * @param fields   paths to selected subtrees which should be read, relative to to the parent path
      * @return {@link NormalizedNode}
      */
     public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
-            final @NonNull EffectiveModelContext ctx, final @NonNull List<YangInstanceIdentifier> fields) {
+            final @NonNull List<YangInstanceIdentifier> fields) {
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
@@ -611,11 +611,11 @@ public abstract class RestconfStrategy {
                 final var configDataNode = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path, fields);
 
                 yield mergeConfigAndSTateDataIfNeeded(stateDataNode, withDefa == null ? configDataNode
-                    : prepareDataByParamWithDef(configDataNode, path, withDefa.mode(), ctx));
+                    : prepareDataByParamWithDef(configDataNode, path, withDefa.mode()));
             }
             case CONFIG -> {
                 final var read = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path, fields);
-                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa.mode(), ctx);
+                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa.mode());
             }
             case NONCONFIG -> readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path, fields);
         };
@@ -642,8 +642,8 @@ public abstract class RestconfStrategy {
         return TransactionUtil.syncAccess(read(store, path, fields), path).orElse(null);
     }
 
-    private static NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData,
-            final YangInstanceIdentifier path, final WithDefaultsMode defaultsMode, final EffectiveModelContext ctx) {
+    private NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData, final YangInstanceIdentifier path,
+            final WithDefaultsMode defaultsMode) {
         final boolean trim = switch (defaultsMode) {
             case Trim -> true;
             case Explicit -> false;
@@ -651,7 +651,8 @@ public abstract class RestconfStrategy {
                 "Unsupported with-defaults value " + defaultsMode.getName());
         };
 
-        final var ctxNode = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
+        // FIXME: we have this readily available in InstanceIdentifierContext
+        final var ctxNode = DataSchemaContextTree.from(modelContext).findChild(path).orElseThrow();
         if (readData instanceof ContainerNode container) {
             final var builder = Builders.containerBuilder().withNodeIdentifier(container.name());
             buildCont(builder, container.body(), ctxNode, trim);
@@ -999,5 +1000,4 @@ public abstract class RestconfStrategy {
         configMap.entrySet().stream().filter(x -> stateMap.containsKey(x.getKey())).forEach(
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
     }
-
 }

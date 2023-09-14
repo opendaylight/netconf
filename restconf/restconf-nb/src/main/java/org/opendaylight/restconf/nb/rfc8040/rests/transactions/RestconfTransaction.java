@@ -22,7 +22,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +33,10 @@ import org.slf4j.LoggerFactory;
 abstract class RestconfTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransaction.class);
 
-    RestconfTransaction() {
-        // Hidden on purpose
+    final @NonNull EffectiveModelContext modelContext;
+
+    RestconfTransaction(final EffectiveModelContext modelContext) {
+        this.modelContext = requireNonNull(modelContext);
     }
 
     /**
@@ -94,35 +95,28 @@ abstract class RestconfTransaction {
      *
      * @param path    the data object path
      * @param data    the data object to be merged to the specified path
-     * @param context static view of compiled yang files
      */
-    final void create(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext context) {
+    final void create(final YangInstanceIdentifier path, final NormalizedNode data) {
         LOG.trace("Create {}", path);
         LOG.trace(Markers.confidential(), "Create as {}", data.prettyTree());
-        createImpl(requireNonNull(path), data, requireNonNull(context));
+        createImpl(requireNonNull(path), data);
     }
 
-    abstract void createImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data,
-        @NonNull EffectiveModelContext context);
+    abstract void createImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data);
 
     /**
      * Replace a piece of data at the specified path.
      *
      * @param path    the data object path
      * @param data    the data object to be merged to the specified path
-     * @param context static view of compiled yang files
      */
-    final void replace(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext context) {
+    final void replace(final YangInstanceIdentifier path, final NormalizedNode data) {
         LOG.trace("Replace {}", path);
         LOG.trace(Markers.confidential(), "Replace with {}", data.prettyTree());
-        replaceImpl(requireNonNull(path), data, requireNonNull(context));
+        replaceImpl(requireNonNull(path), data);
     }
 
-    abstract void replaceImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data,
-        @NonNull EffectiveModelContext context);
-
+    abstract void replaceImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data);
 
     final @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) {
         return (NormalizedNodeContainer<?>) TransactionUtil.syncAccess(read(path), path).orElse(null);
@@ -134,11 +128,10 @@ abstract class RestconfTransaction {
      * Merge parents of data.
      *
      * @param path    path of data
-     * @param context {@link SchemaContext}
      */
     // FIXME: this method should only be invoked in MdsalRestconfStrategy, and even then only if we are crossing
     //        an implicit list.
-    final void ensureParentsByMerge(final YangInstanceIdentifier path, final EffectiveModelContext context) {
+    final void ensureParentsByMerge(final YangInstanceIdentifier path) {
         final var normalizedPathWithoutChildArgs = new ArrayList<PathArgument>();
         YangInstanceIdentifier rootNormalizedPath = null;
 
@@ -160,6 +153,6 @@ abstract class RestconfTransaction {
         }
 
         merge(rootNormalizedPath,
-            ImmutableNodes.fromInstanceId(context, YangInstanceIdentifier.of(normalizedPathWithoutChildArgs)));
+            ImmutableNodes.fromInstanceId(modelContext, YangInstanceIdentifier.of(normalizedPathWithoutChildArgs)));
     }
 }

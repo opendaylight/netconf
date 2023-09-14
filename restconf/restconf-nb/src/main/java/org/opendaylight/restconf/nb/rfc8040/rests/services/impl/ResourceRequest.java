@@ -13,19 +13,16 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * A request to a resource identified by the URL path.
  */
 record ResourceRequest(
         @NonNull RestconfStrategy strategy,
-        @NonNull EffectiveModelContext modelContext,
         @NonNull YangInstanceIdentifier path,
         @NonNull NormalizedNode data) {
     ResourceRequest {
         requireNonNull(strategy);
-        requireNonNull(modelContext);
         requireNonNull(path);
         requireNonNull(data);
     }
