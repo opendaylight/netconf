@@ -381,8 +381,10 @@ public final class RestconfDataServiceImpl {
     }
 
     private Response putData(final @Nullable String identifier, final UriInfo uriInfo, final ResourceBody body) {
-        final var insert = QueryParams.parseInsert(uriInfo);
-        final var req = bindResourceRequest(identifier, body);
+        final var localModel = databindProvider.currentContext().modelContext();
+        final var context = ParserIdentifier.toInstanceIdentifier(identifier, localModel, mountPointService);
+        final var insert = QueryParams.parseInsert(context.getSchemaContext(), uriInfo);
+        final var req = bindResourceRequest(context, body);
 
         return switch (
             req.strategy().putData(req.path(), req.data(), insert)) {
@@ -498,8 +500,8 @@ public final class RestconfDataServiceImpl {
 
     private Response postData(final Inference inference, final YangInstanceIdentifier parentPath, final ChildBody body,
             final UriInfo uriInfo, final @Nullable DOMMountPoint mountPoint) {
-        final var insert = QueryParams.parseInsert(uriInfo);
         final var modelContext = inference.getEffectiveModelContext();
+        final var insert = QueryParams.parseInsert(modelContext, uriInfo);
         final var strategy = getRestconfStrategy(modelContext, mountPoint);
         var path = parentPath;
         final var payload = body.toPayload(path, inference);
@@ -653,7 +655,10 @@ public final class RestconfDataServiceImpl {
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     private void plainPatchData(final @Nullable String identifier, final ResourceBody body, final AsyncResponse ar) {
-        final var req = bindResourceRequest(identifier, body);
+        final var req = bindResourceRequest(
+            ParserIdentifier.toInstanceIdentifier(identifier, databindProvider.currentContext().modelContext(),
+                mountPointService),
+            body);
         final var future = req.strategy().merge(req.path(), req.data());
 
         Futures.addCallback(future, new FutureCallback<>() {
@@ -669,10 +674,8 @@ public final class RestconfDataServiceImpl {
         }, MoreExecutors.directExecutor());
     }
 
-    private @NonNull ResourceRequest bindResourceRequest(final @Nullable String identifier, final ResourceBody body) {
-        final var dataBind = databindProvider.currentContext();
-        final var context = ParserIdentifier.toInstanceIdentifier(identifier, dataBind.modelContext(),
-            mountPointService);
+    private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext context,
+            final ResourceBody body) {
         final var inference = context.inference();
         final var path = context.getInstanceIdentifier();
         final var data = body.toNormalizedNode(path, inference, context.getSchemaNode());

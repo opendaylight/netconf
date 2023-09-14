@@ -32,7 +32,6 @@ import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -60,12 +59,12 @@ public class QueryParamsTest {
      */
     @Test
     public void optionalParamMultipleTest() {
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> QueryParams.optionalParam(ContentParam.uriName, List.of("config", "nonconfig", "all")));
-        final List<RestconfError> errors = ex.getErrors();
+        final var errors = ex.getErrors();
         assertEquals(1, errors.size());
 
-        final RestconfError error = errors.get(0);
+        final var error = errors.get(0);
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
     }
@@ -77,11 +76,13 @@ public class QueryParamsTest {
     public void checkParametersTypesNegativeTest() {
         assertUnknownParam(QueryParams::newNotificationQueryParams);
         assertUnknownParam(QueryParams::newReadDataParams);
-        assertUnknownParam(QueryParams::parseInsert);
+        assertUnknownParam(uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo));
 
         assertInvalidParam(QueryParams::newNotificationQueryParams, ContentParam.ALL);
         assertInvalidParam(QueryParams::newReadDataParams, InsertParam.LAST);
-        assertInvalidParam(QueryParams::parseInsert, ContentParam.ALL);
+        assertInvalidParam(
+            uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo),
+            ContentParam.ALL);
     }
 
     /**
