@@ -61,7 +61,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
@@ -178,9 +177,8 @@ public final class RestconfDataServiceImpl {
     })
     public Response readData(@Encoded @PathParam("identifier") final String identifier,
             @Context final UriInfo uriInfo) {
-        final ReadDataParams readParams = QueryParams.newReadDataParams(uriInfo);
-
-        final EffectiveModelContext schemaContextRef = databindProvider.currentContext().modelContext();
+        final var readParams = QueryParams.newReadDataParams(uriInfo);
+        final var schemaContextRef = databindProvider.currentContext().modelContext();
         // FIXME: go through
         final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier, schemaContextRef,
             mountPointService);
@@ -198,10 +196,10 @@ public final class RestconfDataServiceImpl {
         final NormalizedNode node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
             node = strategy.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                readParams.withDefaults(), schemaContextRef, fieldPaths);
+                readParams.withDefaults(), instanceIdentifier.getSchemaContext(), fieldPaths);
         } else {
             node = strategy.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                readParams.withDefaults(), schemaContextRef);
+                readParams.withDefaults(), instanceIdentifier.getSchemaContext());
         }
 
         // FIXME: this is utter craziness, refactor it properly!
