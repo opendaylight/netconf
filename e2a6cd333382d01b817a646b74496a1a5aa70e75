@@ -46,6 +46,30 @@
       },
       "revId": "e2a6cd333382d01b817a646b74496a1a5aa70e75",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b555d60c_ca8e0624",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/patch/PatchStatusContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-09-14T13:53:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3017a666_2bc66291",
+      "range": {
+        "startLine": 29,
+        "startChar": 48,
+        "endLine": 29,
+        "endChar": 71
+      },
+      "revId": "e2a6cd333382d01b817a646b74496a1a5aa70e75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
