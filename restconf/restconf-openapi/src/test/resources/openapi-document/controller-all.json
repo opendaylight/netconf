@@ -20,21 +20,21 @@
         "requestBody": {
           "description": "cancel-toast_input",
           "content": {
+            "application/xml": {
+              "schema": {
+                "xml": {
+                  "name": "input",
+                  "namespace": "http://netconfcentral.org/ns/toaster"
+                },
+                "type": "object"
+              }
+            },
             "application/json": {
               "schema": {
                 "properties": {
                   "input": {
                     "type": "object"
                   }
-                },
-                "type": "object"
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "xml": {
-                  "name": "input",
-                  "namespace": "http://netconfcentral.org/ns/toaster"
                 },
                 "type": "object"
               }
@@ -74,6 +74,11 @@
           "200": {
             "description": "200",
             "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster_toaster"
+                }
+              },
               "application/json": {
                 "schema": {
                   "properties": {
@@ -82,11 +87,6 @@
                       "type": "object"
                     }
                   }
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/toaster_toaster"
                 }
               }
             }
@@ -103,6 +103,11 @@
         "requestBody": {
           "description": "toaster",
           "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_toaster"
+              }
+            },
             "application/json": {
               "schema": {
                 "properties": {
@@ -112,20 +117,15 @@
                   }
                 }
               }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/toaster_toaster"
-              }
             }
           }
         },
         "responses": {
-          "204": {
-            "description": "Updated"
-          },
           "201": {
             "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
           }
         },
         "description": "Top-level container for all toaster database objects.",
@@ -139,12 +139,12 @@
         "requestBody": {
           "description": "toaster",
           "content": {
-            "application/json": {
+            "application/xml": {
               "schema": {
                 "$ref": "#/components/schemas/toaster_toaster"
               }
             },
-            "application/xml": {
+            "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/toaster_toaster"
               }
@@ -180,11 +180,6 @@
         "requestBody": {
           "description": "toaster",
           "content": {
-            "application/yang-data+xml": {
-              "schema": {
-                "$ref": "#/components/schemas/toaster_toaster"
-              }
-            },
             "application/yang-data+json": {
               "schema": {
                 "properties": {
@@ -194,15 +189,20 @@
                   }
                 }
               }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_toaster"
+              }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "204": {
             "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
           }
         },
         "description": "Top-level container for all toaster database objects.",
@@ -218,6 +218,11 @@
         "requestBody": {
           "description": "make-toast_input",
           "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_make-toast_input"
+              }
+            },
             "application/json": {
               "schema": {
                 "properties": {
@@ -226,11 +231,6 @@
                     "type": "object"
                   }
                 }
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/toaster_make-toast_input"
               }
             }
           }
@@ -253,6 +253,11 @@
         "requestBody": {
           "description": "restock-toaster_input",
           "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_restock-toaster_input"
+              }
+            },
             "application/json": {
               "schema": {
                 "properties": {
@@ -261,11 +266,6 @@
                     "type": "object"
                   }
                 }
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/toaster_restock-toaster_input"
               }
             }
           }
@@ -282,56 +282,6 @@
   },
   "components": {
     "schemas": {
-      "hash-brown": {
-        "enum": [
-          "hash-brown"
-        ],
-        "description": "Hash browned potatos.",
-        "title": "hash-brown",
-        "type": "string"
-      },
-      "toaster_make-toast_input": {
-        "properties": {
-          "toasterDoneness": {
-            "default": 5,
-            "description": "This variable controls how well-done is the\nensuing toast. It should be on a scale of 1 to 10.\nToast made at 10 generally is considered unfit\nfor human consumption; toast made at 1 is warmed\nlightly.",
-            "type": "integer",
-            "example": 1,
-            "format": "int64"
-          },
-          "toasterToastType": {
-            "$ref": "#/components/schemas/toast-type"
-          }
-        },
-        "xml": {
-          "name": "input",
-          "namespace": "http://netconfcentral.org/ns/toaster"
-        },
-        "title": "toaster_make-toast_input",
-        "type": "object"
-      },
-      "toast-type": {
-        "enum": [
-          "toast-type",
-          "wheat-bread",
-          "frozen-bagel",
-          "white-bread",
-          "wonder-bread",
-          "hash-brown",
-          "frozen-waffle"
-        ],
-        "description": "Base for all bread types supported by the toaster.\nNew bread types not listed here nay be added in the\nfuture.",
-        "title": "toast-type",
-        "type": "string"
-      },
-      "frozen-bagel": {
-        "enum": [
-          "frozen-bagel"
-        ],
-        "description": "Frozen bagel.",
-        "title": "frozen-bagel",
-        "type": "string"
-      },
       "toaster_restock-toaster_input": {
         "properties": {
           "amountOfBreadToStock": {
@@ -348,37 +298,28 @@
         "title": "toaster_restock-toaster_input",
         "type": "object"
       },
-      "frozen-waffle": {
-        "enum": [
-          "frozen-waffle"
-        ],
-        "description": "Frozen waffle.",
-        "title": "frozen-waffle",
-        "type": "string"
-      },
-      "white-bread": {
-        "enum": [
-          "white-bread"
-        ],
-        "description": "White bread.",
-        "title": "white-bread",
-        "type": "string"
-      },
-      "wheat-bread": {
-        "enum": [
-          "wheat-bread"
-        ],
-        "description": "Wheat bread.",
-        "title": "wheat-bread",
-        "type": "string"
-      },
-      "wonder-bread": {
-        "enum": [
-          "wonder-bread"
-        ],
-        "description": "Wonder bread.",
-        "title": "wonder-bread",
-        "type": "string"
+      "toaster_make-toast_input": {
+        "properties": {
+          "toasterDoneness": {
+            "default": 5,
+            "description": "This variable controls how well-done is the\nensuing toast. It should be on a scale of 1 to 10.\nToast made at 10 generally is considered unfit\nfor human consumption; toast made at 1 is warmed\nlightly.",
+            "type": "integer",
+            "example": 1,
+            "format": "int64"
+          },
+          "toasterToastType": {
+            "default": "wheat-bread",
+            "description": "This variable informs the toaster of the type of\nmaterial that is being toasted. The toaster\nuses this information, combined with\ntoasterDoneness, to compute for how\nlong the material must be toasted to achieve\nthe required doneness.",
+            "type": "string",
+            "example": "toast-type"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "http://netconfcentral.org/ns/toaster"
+        },
+        "title": "toaster_make-toast_input",
+        "type": "object"
       },
       "toaster_toaster": {
         "properties": {
