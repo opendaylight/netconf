@@ -9,11 +9,11 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.net.URI;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -23,6 +23,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yang.gen.v1.subscribe.to.notification.rev161028.Notifi;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,25 +57,27 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     }
 
     @Override
-    public NormalizedNodePayload subscribeToStream(final String identifier, final UriInfo uriInfo) {
-        final NotificationQueryParams params = QueryParams.newNotificationQueryParams(uriInfo);
+    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
+        final var params = QueryParams.newNotificationQueryParams(uriInfo);
 
-        final URI response;
+        final URI location;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            response = streamUtils.subscribeToDataStream(identifier, uriInfo, params, handlersHolder);
+            location = streamUtils.subscribeToDataStream(identifier, uriInfo, params, handlersHolder);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-            response = streamUtils.subscribeToYangStream(identifier, uriInfo, params, handlersHolder);
+            location = streamUtils.subscribeToYangStream(identifier, uriInfo, params, handlersHolder);
         } else {
             final String msg = "Bad type of notification of sal-remote";
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg);
         }
 
-        // prepare node with value of location
-        return NormalizedNodePayload.ofLocation(
-            Inference.ofDataTreePath(handlersHolder.getDatabindProvider().currentContext().modelContext(),
-                Notifi.QNAME, LOCATION_QNAME),
-            LOCATION_NODEID, response);
+        return Response.ok()
+            .location(location)
+            .entity(NormalizedNodePayload.of(
+                Inference.ofDataTreePath(handlersHolder.getDatabindProvider().currentContext().modelContext(),
+                    Notifi.QNAME, LOCATION_QNAME),
+                ImmutableNodes.leafNode(LOCATION_NODEID, location.toString())))
+            .build();
     }
 
     /**

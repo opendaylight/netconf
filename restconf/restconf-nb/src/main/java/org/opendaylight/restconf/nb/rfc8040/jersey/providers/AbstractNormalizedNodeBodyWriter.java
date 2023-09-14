@@ -40,11 +40,6 @@ abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<Nor
         if (data == null) {
             return;
         }
-        if (httpHeaders != null) {
-            for (var entry : context.getNewHeaders().entrySet()) {
-                httpHeaders.add(entry.getKey(), entry.getValue());
-            }
-        }
 
         final var output = requireNonNull(entityStream);
         final var stack = context.inference().toSchemaInferenceStack();

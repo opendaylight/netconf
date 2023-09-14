@@ -12,6 +12,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
@@ -25,13 +26,12 @@ public interface RestconfStreamsSubscriptionService {
      *
      * @param identifier name of stream
      * @param uriInfo URI info
-     * @return {@link NormalizedNodePayload}
+     * @return a response containing {@link NormalizedNodePayload}
      */
     // FIXME: this is a REST violation: GET does not transfer state! This should work in terms of
     //        https://www.rfc-editor.org/rfc/rfc8639#section-2.4, i.e. when we have that, aggressively deprecate
     //        and remove this special case. Besides it routes to a very bad thing in RestconfDataServiceImpl
     @GET
     @Path("data/" + RestconfStreamsConstants.STREAMS_PATH  + "/stream/{identifier:.+}")
-    NormalizedNodePayload subscribeToStream(@Encoded @PathParam("identifier") String identifier,
-            @Context UriInfo uriInfo);
+    Response subscribeToStream(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 }
