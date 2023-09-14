@@ -22,6 +22,30 @@
       },
       "revId": "e2a6cd333382d01b817a646b74496a1a5aa70e75",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3017a666_2bc66291",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/patch/PatchStatusContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-14T10:47:40Z",
+      "side": 1,
+      "message": "Ok, we will go different way: lets have @NonNull String patchId, @NonNull, List\u003cPatchStatusEntity\u003e editCollection,boolean ok, @Nullable List\u003cRestconfError\u003e globalErrors as fileds in YangPatchDocumentedException.\n\nThose fields will be written by YangPatchExceptionMapper by using controller context the same way as its done for RestconfDocumentedException(s).",
+      "parentUuid": "65835d69_c708ec3c",
+      "range": {
+        "startLine": 29,
+        "startChar": 48,
+        "endLine": 29,
+        "endChar": 71
+      },
+      "revId": "e2a6cd333382d01b817a646b74496a1a5aa70e75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
