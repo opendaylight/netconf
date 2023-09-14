@@ -24,6 +24,7 @@ import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Implementation of RESTCONF operations on top of a raw NETCONF backend.
@@ -33,7 +34,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 public final class NetconfRestconfStrategy extends RestconfStrategy {
     private final NetconfDataTreeService netconfService;
 
-    public NetconfRestconfStrategy(final NetconfDataTreeService netconfService) {
+    public NetconfRestconfStrategy(final EffectiveModelContext modelContext,
+            final NetconfDataTreeService netconfService) {
+        super(modelContext);
         this.netconfService = requireNonNull(netconfService);
     }
 
@@ -56,7 +59,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     @Override
     RestconfTransaction prepareWriteExecution() {
-        return new NetconfRestconfTransaction(netconfService);
+        return new NetconfRestconfTransaction(modelContext(), netconfService);
     }
 
     @Override

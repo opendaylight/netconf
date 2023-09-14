@@ -64,7 +64,6 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -470,11 +469,11 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
     @Test
     public void testGetRestconfStrategy() {
-        RestconfStrategy restconfStrategy = dataService.getRestconfStrategy(mountPoint);
+        var restconfStrategy = dataService.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint);
         assertTrue(restconfStrategy instanceof MdsalRestconfStrategy);
 
         doReturn(Optional.of(netconfService)).when(mountPoint).getService(NetconfDataTreeService.class);
-        restconfStrategy = dataService.getRestconfStrategy(mountPoint);
+        restconfStrategy = dataService.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint);
         assertTrue(restconfStrategy instanceof NetconfRestconfStrategy);
     }
 }

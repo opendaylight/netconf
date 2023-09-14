@@ -54,8 +54,10 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     private volatile boolean isLocked = false;
 
-    NetconfRestconfTransaction(final NetconfDataTreeService netconfService) {
+    NetconfRestconfTransaction(final EffectiveModelContext modelContext, final NetconfDataTreeService netconfService) {
+        super(modelContext);
         this.netconfService = requireNonNull(netconfService);
+
         final var lockResult = netconfService.lock();
         Futures.addCallback(lockResult, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -96,9 +98,9 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data, final EffectiveModelContext context) {
+    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = ImmutableNodes.fromInstanceId(context, path);
+            final var emptySubTree = ImmutableNodes.fromInstanceId(modelContext, path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
 
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
@@ -111,10 +113,9 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext context) {
+    void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = ImmutableNodes.fromInstanceId(context, path);
+            final var emptySubTree = ImmutableNodes.fromInstanceId(modelContext, path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
 
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {

@@ -37,7 +37,8 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     private DOMDataTreeReadWriteTransaction rwTx;
 
-    MdsalRestconfTransaction(final DOMDataBroker dataBroker) {
+    MdsalRestconfTransaction(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker) {
+        super(modelContext);
         rwTx = dataBroker.newReadWriteTransaction();
     }
 
@@ -71,11 +72,11 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data, final EffectiveModelContext context) {
+    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = ImmutableNodes.fromInstanceId(context, path);
+            final var emptySubTree = ImmutableNodes.fromInstanceId(modelContext, path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
-            ensureParentsByMerge(path, context);
+            ensureParentsByMerge(path);
 
             final var children = ((DistinctNodeContainer<?, ?>) data).body();
             final var check = BatchedExistenceCheck.start(verifyNotNull(rwTx), CONFIGURATION, path, children);
@@ -88,25 +89,24 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             checkExistence(path, check);
         } else {
             RestconfStrategy.checkItemDoesNotExists(verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
-            ensureParentsByMerge(path, context);
+            ensureParentsByMerge(path);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
     }
 
     @Override
-    void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data,
-            final EffectiveModelContext context) {
+    void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubtree = ImmutableNodes.fromInstanceId(context, path);
+            final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext, path);
             merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
-            ensureParentsByMerge(path, context);
+            ensureParentsByMerge(path);
 
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
                 final var childPath = path.node(child.name());
                 verifyNotNull(rwTx).put(CONFIGURATION, childPath, child);
             }
         } else {
-            ensureParentsByMerge(path, context);
+            ensureParentsByMerge(path);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
     }

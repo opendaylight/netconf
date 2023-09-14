@@ -21,6 +21,8 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -116,15 +118,27 @@ import org.slf4j.LoggerFactory;
 public final class RestconfDataServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
+    private static final VarHandle LOCAL_STRATEGY;
+
+    static {
+        try {
+            LOCAL_STRATEGY = MethodHandles.lookup()
+                .findVarHandle(RestconfDataServiceImpl.class, "localStrategy", RestconfStrategy.class);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
     private final DatabindProvider databindProvider;
-    private final MdsalRestconfStrategy restconfStrategy;
     private final DOMMountPointService mountPointService;
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
     private final DOMDataBroker dataBroker;
     private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+
+    @SuppressWarnings("unused")
+    private volatile RestconfStrategy localStrategy;
 
     public RestconfDataServiceImpl(final DatabindProvider databindProvider,
             final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
@@ -132,7 +146,6 @@ public final class RestconfDataServiceImpl {
             final DOMActionService actionService, final StreamsConfiguration configuration) {
         this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
-        restconfStrategy = new MdsalRestconfStrategy(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         this.actionService = requireNonNull(actionService);
@@ -192,14 +205,15 @@ public final class RestconfDataServiceImpl {
 
         final var queryParams = QueryParams.newQueryParameters(readParams, instanceIdentifier);
         final var fieldPaths = queryParams.fieldPaths();
-        final var strategy = getRestconfStrategy(mountPoint);
+        // FIXME:the model context should be coming from instanceIdentifier!
+        final var strategy = getRestconfStrategy(schemaContextRef, mountPoint);
         final NormalizedNode node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
             node = strategy.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                readParams.withDefaults(), instanceIdentifier.getSchemaContext(), fieldPaths);
+                readParams.withDefaults(), fieldPaths);
         } else {
             node = strategy.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                readParams.withDefaults(), instanceIdentifier.getSchemaContext());
+                readParams.withDefaults());
         }
 
         // FIXME: this is utter craziness, refactor it properly!
@@ -371,7 +385,7 @@ public final class RestconfDataServiceImpl {
         final var req = bindResourceRequest(identifier, body);
 
         return switch (
-            req.strategy().putData(req.path(), req.data(), req.modelContext(), insert)) {
+            req.strategy().putData(req.path(), req.data(), insert)) {
             // Note: no Location header, as it matches the request path
             case CREATED -> Response.status(Status.CREATED).build();
             case REPLACED -> Response.noContent().build();
@@ -485,8 +499,8 @@ public final class RestconfDataServiceImpl {
     private Response postData(final Inference inference, final YangInstanceIdentifier parentPath, final ChildBody body,
             final UriInfo uriInfo, final @Nullable DOMMountPoint mountPoint) {
         final var insert = QueryParams.parseInsert(uriInfo);
-        final var strategy = getRestconfStrategy(mountPoint);
-        final var context = inference.getEffectiveModelContext();
+        final var modelContext = inference.getEffectiveModelContext();
+        final var strategy = getRestconfStrategy(modelContext, mountPoint);
         var path = parentPath;
         final var payload = body.toPayload(path, inference);
         final var data = payload.body();
@@ -495,8 +509,8 @@ public final class RestconfDataServiceImpl {
             path = path.node(arg);
         }
 
-        strategy.postData(path, data, context, insert);
-        return Response.created(resolveLocation(uriInfo, path, context, data)).build();
+        strategy.postData(path, data, insert);
+        return Response.created(resolveLocation(uriInfo, path, modelContext, data)).build();
     }
 
     /**
@@ -532,7 +546,8 @@ public final class RestconfDataServiceImpl {
             @Suspended final AsyncResponse ar) {
         final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), mountPointService);
-        final var strategy = getRestconfStrategy(instanceIdentifier.getMountPoint());
+        final var strategy = getRestconfStrategy(instanceIdentifier.getSchemaContext(),
+            instanceIdentifier.getMountPoint());
 
         Futures.addCallback(strategy.delete(instanceIdentifier.getInstanceIdentifier()), new FutureCallback<>() {
             @Override
@@ -639,7 +654,7 @@ public final class RestconfDataServiceImpl {
      */
     private void plainPatchData(final @Nullable String identifier, final ResourceBody body, final AsyncResponse ar) {
         final var req = bindResourceRequest(identifier, body);
-        final var future = req.strategy().merge(req.path(), req.data(), req.modelContext());
+        final var future = req.strategy().merge(req.path(), req.data());
 
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
@@ -662,7 +677,7 @@ public final class RestconfDataServiceImpl {
         final var path = context.getInstanceIdentifier();
         final var data = body.toNormalizedNode(path, inference, context.getSchemaNode());
 
-        return new ResourceRequest(getRestconfStrategy(context.getMountPoint()), inference.getEffectiveModelContext(),
+        return new ResourceRequest(getRestconfStrategy(inference.getEffectiveModelContext(), context.getMountPoint()),
             path, data);
     }
 
@@ -764,9 +779,9 @@ public final class RestconfDataServiceImpl {
 
 
     @VisibleForTesting
-    @NonNull PatchStatusContext yangPatchData(final @NonNull EffectiveModelContext context,
+    @NonNull PatchStatusContext yangPatchData(final @NonNull EffectiveModelContext modelContext,
             final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint) {
-        return getRestconfStrategy(mountPoint).patchData(patch, context);
+        return getRestconfStrategy(modelContext, mountPoint).patchData(patch);
     }
 
     private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,
@@ -781,16 +796,31 @@ public final class RestconfDataServiceImpl {
     }
 
     @VisibleForTesting
-    RestconfStrategy getRestconfStrategy(final DOMMountPoint mountPoint) {
+    @NonNull RestconfStrategy getRestconfStrategy(final EffectiveModelContext modelContext,
+            final @Nullable DOMMountPoint mountPoint) {
         if (mountPoint == null) {
-            return restconfStrategy;
+            return localStrategy(modelContext);
         }
 
-        return RestconfStrategy.forMountPoint(mountPoint).orElseThrow(() -> {
-            LOG.warn("Mount point {} does not expose a suitable access interface", mountPoint.getIdentifier());
-            return new RestconfDocumentedException("Could not find a supported access interface in mount point "
-                + mountPoint.getIdentifier());
-        });
+        final var ret = RestconfStrategy.forMountPoint(modelContext, mountPoint);
+        if (ret == null) {
+            final var mountId = mountPoint.getIdentifier();
+            LOG.warn("Mount point {} does not expose a suitable access interface", mountId);
+            throw new RestconfDocumentedException("Could not find a supported access interface in mount point "
+                + mountId);
+        }
+        return ret;
+    }
+
+    private @NonNull RestconfStrategy localStrategy(final EffectiveModelContext modelContext) {
+        final var local = (RestconfStrategy) LOCAL_STRATEGY.getAcquire(this);
+        if (local != null && modelContext.equals(local.modelContext())) {
+            return local;
+        }
+
+        final var created = new MdsalRestconfStrategy(modelContext, dataBroker);
+        LOCAL_STRATEGY.setRelease(this, created);
+        return created;
     }
 
     /**

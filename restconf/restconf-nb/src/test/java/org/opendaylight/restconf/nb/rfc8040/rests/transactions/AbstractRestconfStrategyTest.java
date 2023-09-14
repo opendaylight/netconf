@@ -208,7 +208,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         new NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
 
     @Mock
-    private EffectiveModelContext mockSchemaContext;
+    EffectiveModelContext mockSchemaContext;
     @Mock
     private UriInfo uriInfo;
 
@@ -242,7 +242,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPostContainerData() {
-        testPostContainerDataStrategy().postData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA, null);
+        testPostContainerDataStrategy().postData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
     }
 
     abstract @NonNull RestconfStrategy testPostContainerDataStrategy();
@@ -250,7 +250,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     public final void testPostListData() {
         testPostListDataStrategy(BAND_ENTRY, PLAYLIST_IID.node(BAND_ENTRY.name())).postData(PLAYLIST_IID, PLAYLIST,
-            JUKEBOX_SCHEMA, null);
+            null);
     }
 
     abstract @NonNull RestconfStrategy testPostListDataStrategy(MapEntryNode entryNode, YangInstanceIdentifier node);
@@ -260,7 +260,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         final var domException = new DOMException((short) 414, "Post request failed");
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> testPostDataFailStrategy(domException).postData(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA, null));
+            () -> testPostDataFailStrategy(domException).postData(JUKEBOX_IID, EMPTY_JUKEBOX, null));
         assertEquals(1, ex.getErrors().size());
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
     }
@@ -269,21 +269,21 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPatchContainerData() {
-        testPatchContainerDataStrategy().merge(JUKEBOX_IID, EMPTY_JUKEBOX, JUKEBOX_SCHEMA).getOrThrow();
+        testPatchContainerDataStrategy().merge(JUKEBOX_IID, EMPTY_JUKEBOX).getOrThrow();
     }
 
     abstract @NonNull RestconfStrategy testPatchContainerDataStrategy();
 
     @Test
     public final void testPatchLeafData() {
-        testPatchLeafDataStrategy().merge(GAP_IID, GAP_LEAF, JUKEBOX_SCHEMA).getOrThrow();
+        testPatchLeafDataStrategy().merge(GAP_IID, GAP_LEAF).getOrThrow();
     }
 
     abstract @NonNull RestconfStrategy testPatchLeafDataStrategy();
 
     @Test
     public final void testPatchListData() {
-        testPatchListDataStrategy().merge(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST, JUKEBOX_SCHEMA).getOrThrow();
+        testPatchListDataStrategy().merge(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST).getOrThrow();
     }
 
     abstract @NonNull RestconfStrategy testPatchListDataStrategy();
@@ -329,7 +329,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     public final void testDeleteNonexistentData() {
         final var patchStatusContext = deleteNonexistentDataTestStrategy().patchData(new PatchContext("patchD",
-            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))), JUKEBOX_SCHEMA);
+            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))));
         assertFalse(patchStatusContext.ok());
     }
 
@@ -461,13 +461,13 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      * @param strategy       {@link RestconfStrategy} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    private @Nullable NormalizedNode readData(final @NonNull ContentParam content,
+    private static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) {
-        return strategy.readData(content, path, null, mockSchemaContext);
+        return strategy.readData(content, path, null);
     }
 
     private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
-        final var patchStatusContext = strategy.patchData(patchContext, JUKEBOX_SCHEMA);
+        final var patchStatusContext = strategy.patchData(patchContext);
         for (var entity : patchStatusContext.editCollection()) {
             if (failed) {
                 assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());
