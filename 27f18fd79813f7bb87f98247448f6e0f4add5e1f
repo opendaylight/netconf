@@ -46,6 +46,23 @@
       },
       "revId": "27f18fd79813f7bb87f98247448f6e0f4add5e1f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4adf907_adf40e1f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Schema.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-14T07:44:02Z",
+      "side": 1,
+      "message": "This will not help you to make this instance immutable either. User can use record\u0027s default constructor.\n\nYou can use something like this:\nrecord Data(String name, Integer age, List\u003cString\u003e address) {\n\n        public Data {\n            address \u003d address \u003d\u003d null ? null : List.copyOf(address);\n        }\n\n        private Data(final Builder builder) {\n            this(builder.name, builder.age, builder.address);\n        }\n\n        static class Builder {\n            private String name;\n            private Integer age;\n            private List\u003cString\u003e address;\n\n            Builder name(String name) {\n                this.name \u003d name;\n                return this;\n            }\n\n            Builder age(Integer age) {\n                this.age \u003d age;\n                return this;\n            }\n\n            Builder address(List\u003cString\u003e address) {\n                this.address \u003d address;\n                return this;\n            }\n\n            Data build() {\n                return new Data(this);\n            }\n        }\n    }",
+      "revId": "27f18fd79813f7bb87f98247448f6e0f4add5e1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
