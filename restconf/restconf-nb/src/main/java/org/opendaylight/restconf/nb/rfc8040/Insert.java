@@ -9,12 +9,15 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.yangtools.concepts.Immutable;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 
 /**
  * Parser and holder of query parameters from uriInfo for data and datastore modification operations.
@@ -25,15 +28,24 @@ import org.opendaylight.yangtools.concepts.Immutable;
 //                 have a @NonNull PointParam then and there will not be an insert field. We can also ditch toString(),
 //                 as the records will do the right thing.
 public final class Insert implements Immutable {
-    private final @NonNull InsertParam insert;
-    private final @Nullable PointParam point;
+    @Beta
+    @NonNullByDefault
+    @FunctionalInterface
+    public interface PointParser {
 
-    private Insert(final InsertParam insert, final PointParam point) {
-        this.insert = requireNonNull(insert);
-        this.point = point;
+        PathArgument parseValue(String value);
     }
 
-    public static @Nullable Insert forParams(final @Nullable InsertParam insert, final @Nullable PointParam point) {
+    private final @NonNull InsertParam insert;
+    private final @Nullable PathArgument pointArg;
+
+    private Insert(final InsertParam insert, final PathArgument pointArg) {
+        this.insert = requireNonNull(insert);
+        this.pointArg = pointArg;
+    }
+
+    public static @Nullable Insert forParams(final @Nullable InsertParam insert, final @Nullable PointParam point,
+            final PointParser pointParser) {
         if (insert == null) {
             if (point != null) {
                 throw invalidPointIAE();
@@ -51,7 +63,7 @@ public final class Insert implements Immutable {
                     throw new IllegalArgumentException(
                         "Insert parameter " + insert.paramValue() + " cannot be used without a Point parameter.");
                 }
-                yield new Insert(insert, point);
+                yield new Insert(insert, pointParser.parseValue(point.value()));
             }
             case FIRST, LAST -> {
                 // https://www.rfc-editor.org/rfc/rfc8040#section-4.8.6:
@@ -76,16 +88,16 @@ public final class Insert implements Immutable {
         return insert;
     }
 
-    public @Nullable PointParam point() {
-        return point;
+    public @Nullable PathArgument pointArg() {
+        return pointArg;
     }
 
     @Override
     public String toString() {
         final var helper = MoreObjects.toStringHelper(this).add("insert", insert.paramValue());
-        final var local = point;
+        final var local = pointArg;
         if (local != null) {
-            helper.add("point", local.value());
+            helper.add("point", pointArg);
         }
         return helper.toString();
     }

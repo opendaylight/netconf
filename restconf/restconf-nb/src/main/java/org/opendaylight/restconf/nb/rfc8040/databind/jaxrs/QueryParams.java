@@ -41,8 +41,10 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @Beta
 public final class QueryParams {
@@ -54,6 +56,7 @@ public final class QueryParams {
         InsertParam.uriName, PointParam.uriName,
         // Notifications
         FilterParam.uriName, StartTimeParam.uriName, StopTimeParam.uriName,
+        // ODL extensions
         LeafNodesOnlyParam.uriName, SkipNotificationDataParam.uriName, ChangedLeafNodesOnlyParam.uriName,
         ChildNodesOnlyParam.uriName);
 
@@ -181,7 +184,7 @@ public final class QueryParams {
         return new ReadDataParams(content, depth, fields, withDefaults, prettyPrint);
     }
 
-    public static @Nullable Insert parseInsert(final UriInfo uriInfo) {
+    public static @Nullable Insert parseInsert(final EffectiveModelContext modelContext, final UriInfo uriInfo) {
         InsertParam insert = null;
         PointParam point = null;
 
@@ -207,7 +210,12 @@ public final class QueryParams {
         }
 
         try {
-            return Insert.forParams(insert, point);
+            return Insert.forParams(insert, point,
+                // TODO: instead of a EffectiveModelContext, we should have received
+                //       YangInstanceIdentifierDeserializer.Result, from which we can use to seed the parser. This
+                //       call-site should not support 'yang-ext:mount' and should just reuse DataSchemaContextTree,
+                //       saving a lookup
+                value -> YangInstanceIdentifierDeserializer.create(modelContext, value).path.getLastPathArgument());
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);
         }

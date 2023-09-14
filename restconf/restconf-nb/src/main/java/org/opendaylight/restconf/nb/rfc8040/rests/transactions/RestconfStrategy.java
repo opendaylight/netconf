@@ -31,7 +31,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.ContentParam;
-import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -41,7 +40,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -275,7 +273,7 @@ public abstract class RestconfStrategy {
                 if (readData == null || readData.isEmpty()) {
                     yield replaceAndCommit(tx, path, data);
                 }
-                insertWithPointPut(tx, path, data, verifyNotNull(insert.point()), readData, true);
+                insertWithPointPut(tx, path, data, verifyNotNull(insert.pointArg()), readData, true);
                 yield tx.commit();
             }
             case AFTER -> {
@@ -283,19 +281,17 @@ public abstract class RestconfStrategy {
                 if (readData == null || readData.isEmpty()) {
                     yield replaceAndCommit(tx, path, data);
                 }
-                insertWithPointPut(tx, path, data, verifyNotNull(insert.point()), readData, false);
+                insertWithPointPut(tx, path, data, verifyNotNull(insert.pointArg()), readData, false);
                 yield tx.commit();
             }
         };
     }
 
     private void insertWithPointPut(final RestconfTransaction tx, final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull PointParam point, final NormalizedNodeContainer<?> readList,
+            final NormalizedNode data, final @NonNull PathArgument pointArg, final NormalizedNodeContainer<?> readList,
             final boolean before) {
         tx.remove(path.getParent());
-        // FIXME: this should have happened sooner
-        final var pointArg = YangInstanceIdentifierDeserializer.create(modelContext, point.value()).path
-            .getLastPathArgument();
+
         int lastItemPosition = 0;
         for (var nodeChild : readList.body()) {
             if (nodeChild.name().equals(pointArg)) {
@@ -306,6 +302,7 @@ public abstract class RestconfStrategy {
         if (!before) {
             lastItemPosition++;
         }
+
         int lastInsertedPosition = 0;
         final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext, path.getParent());
         tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
@@ -392,7 +389,7 @@ public abstract class RestconfStrategy {
                     tx.replace(path, data);
                 } else {
                     checkItemDoesNotExists(exists(path), path);
-                    insertWithPointPost(tx, path, data, verifyNotNull(insert.point()), readData, grandParent, true);
+                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, grandParent, true);
                 }
                 yield tx.commit();
             }
@@ -402,7 +399,7 @@ public abstract class RestconfStrategy {
                     tx.replace(path, data);
                 } else {
                     checkItemDoesNotExists(exists(path), path);
-                    insertWithPointPost(tx, path, data, verifyNotNull(insert.point()), readData, grandParent, false);
+                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, grandParent, false);
                 }
                 yield tx.commit();
             }
@@ -502,12 +499,10 @@ public abstract class RestconfStrategy {
     }
 
     private void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
-            final NormalizedNode data, final PointParam point, final NormalizedNodeContainer<?> readList,
+            final NormalizedNode data, final PathArgument pointArg, final NormalizedNodeContainer<?> readList,
             final YangInstanceIdentifier grandParentPath, final boolean before) {
         tx.remove(grandParentPath);
-        // FIXME: this should have happened sooner
-        final var pointArg = YangInstanceIdentifierDeserializer.create(modelContext, point.value()).path
-            .getLastPathArgument();
+
         int lastItemPosition = 0;
         for (var nodeChild : readList.body()) {
             if (nodeChild.name().equals(pointArg)) {
@@ -518,6 +513,7 @@ public abstract class RestconfStrategy {
         if (!before) {
             lastItemPosition++;
         }
+
         int lastInsertedPosition = 0;
         final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext, grandParentPath);
         tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
@@ -525,8 +521,7 @@ public abstract class RestconfStrategy {
             if (lastInsertedPosition == lastItemPosition) {
                 tx.replace(path, data);
             }
-            final YangInstanceIdentifier childPath = grandParentPath.node(nodeChild.name());
-            tx.replace(childPath, nodeChild);
+            tx.replace(grandParentPath.node(nodeChild.name()), nodeChild);
             lastInsertedPosition++;
         }
     }
