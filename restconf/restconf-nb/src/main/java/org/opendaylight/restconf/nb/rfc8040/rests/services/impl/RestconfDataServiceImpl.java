@@ -820,10 +820,10 @@ public final class RestconfDataServiceImpl {
         final var result = checkActionResponse(response);
 
         final var resultData = result != null ? result.getOutput().orElse(null) : null;
-        if (resultData != null && resultData.isEmpty()) {
+        if (resultData == null || resultData.isEmpty()) {
             return Response.status(Status.NO_CONTENT).build();
         }
-        return Response.status(Status.OK).entity(NormalizedNodePayload.ofNullable(inference, resultData)).build();
+        return Response.status(Status.OK).entity(NormalizedNodePayload.of(inference, resultData)).build();
     }
 
     /**
