@@ -54,7 +54,7 @@ public class RestconfStateStreamsTest {
     @Test
     public void toStreamEntryNodeTest() throws Exception {
         final YangInstanceIdentifier path = ParserIdentifier.toInstanceIdentifier(
-                "nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
+                "nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).path();
         final Instant start = Instant.now();
         final String outputType = "XML";
         final URI uri = new URI("uri");

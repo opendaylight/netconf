@@ -67,10 +67,11 @@ public class ParserIdentifierTest {
             "parser-identifier-included:list-1=name,2016-06-02/parser-identifier:augment-leaf";
 
     private static final String TEST_IDENT_OTHERS_RESULT =
-            "/(parser:identifier:included?revision=2016-06-02)list-1/list-1"
-            + "[{(parser:identifier:included?revision=2016-06-02)name=name, "
-            + "(parser:identifier:included?revision=2016-06-02)revision=2016-06-02}]"
-            + "/(parser:identifier?revision=2016-06-02)augment-leaf";
+            """
+    	/(parser:identifier:included?revision=2016-06-02)list-1/list-1\
+    	[{(parser:identifier:included?revision=2016-06-02)name=name,\s\
+    	(parser:identifier:included?revision=2016-06-02)revision=2016-06-02}]\
+    	/(parser:identifier?revision=2016-06-02)augment-leaf""";
 
     // invalid test identifier
     private static final String INVALID_TEST_IDENT =
@@ -145,7 +146,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierTest() {
         final var context = ParserIdentifier.toInstanceIdentifier(TEST_IDENT, SCHEMA_CONTEXT, null);
-        assertEquals(TEST_IDENT_RESULT, context.getInstanceIdentifier().toString());
+        assertEquals(TEST_IDENT_RESULT, context.path().toString());
     }
 
     /**
@@ -155,7 +156,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierOtherModulesTest() {
         final var context = ParserIdentifier.toInstanceIdentifier(TEST_IDENT_OTHERS, SCHEMA_CONTEXT, null);
-        assertEquals(TEST_IDENT_OTHERS_RESULT, context.getInstanceIdentifier().toString());
+        assertEquals(TEST_IDENT_OTHERS_RESULT, context.path().toString());
     }
 
     /**
@@ -165,9 +166,9 @@ public class ParserIdentifierTest {
     public void toInstanceIdentifierMountPointTest() {
         final var context = ParserIdentifier.toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + TEST_IDENT, SCHEMA_CONTEXT,
             mountPointService);
-        assertEquals(TEST_IDENT_RESULT.toString(), context.getInstanceIdentifier().toString());
-        assertEquals(mountPoint, context.getMountPoint());
-        assertEquals(SCHEMA_CONTEXT_ON_MOUNT_POINT, context.getSchemaContext());
+        assertEquals(TEST_IDENT_RESULT.toString(), context.path().toString());
+        assertEquals(mountPoint, context.mountPoint());
+        assertEquals(SCHEMA_CONTEXT_ON_MOUNT_POINT, context.inference().getEffectiveModelContext());
     }
 
     /**
@@ -177,7 +178,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierNullIdentifierTest() {
         final var context = ParserIdentifier.toInstanceIdentifier(null, SCHEMA_CONTEXT, null);
-        assertEquals(YangInstanceIdentifier.of(), context.getInstanceIdentifier());
+        assertEquals(YangInstanceIdentifier.of(), context.path());
     }
 
     /**
@@ -195,7 +196,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierEmptyIdentifierTest() {
         final var context = ParserIdentifier.toInstanceIdentifier("", SCHEMA_CONTEXT, null);
-        assertEquals(YangInstanceIdentifier.of(), context.getInstanceIdentifier());
+        assertEquals(YangInstanceIdentifier.of(), context.path());
     }
 
     /**
@@ -546,14 +547,14 @@ public class ParserIdentifierTest {
         final var result = ParserIdentifier.toInstanceIdentifier(INVOKE_RPC, SCHEMA_CONTEXT, null);
 
         // RPC schema node
-        final QName rpcQName = result.getSchemaNode().getQName();
+        final QName rpcQName = result.context().dataSchemaNode().getQName();
         assertEquals("invoke:rpc:module", rpcQName.getModule().getNamespace().toString());
         assertEquals("rpc-test", rpcQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(INVOKE_RPC, SCHEMA_CONTEXT), result.getInstanceIdentifier());
-        assertEquals(null, result.getMountPoint());
-        assertEquals(SCHEMA_CONTEXT, result.getSchemaContext());
+        assertEquals(IdentifierCodec.deserialize(INVOKE_RPC, SCHEMA_CONTEXT), result.path());
+        assertEquals(null, result.mountPoint());
+        assertEquals(SCHEMA_CONTEXT, result.inference().getEffectiveModelContext());
     }
 
     /**
@@ -568,14 +569,14 @@ public class ParserIdentifierTest {
             mountPointService);
 
         // RPC schema node
-        final QName rpcQName = result.getSchemaNode().getQName();
+        final QName rpcQName = result.context().dataSchemaNode().getQName();
         assertEquals("invoke:rpc:module", rpcQName.getModule().getNamespace().toString());
         assertEquals("rpc-test", rpcQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(INVOKE_RPC, SCHEMA_CONTEXT), result.getInstanceIdentifier());
-        assertEquals(mountPoint, result.getMountPoint());
-        assertEquals(SCHEMA_CONTEXT_ON_MOUNT_POINT, result.getSchemaContext());
+        assertEquals(IdentifierCodec.deserialize(INVOKE_RPC, SCHEMA_CONTEXT), result.path());
+        assertEquals(mountPoint, result.mountPoint());
+        assertEquals(SCHEMA_CONTEXT_ON_MOUNT_POINT, result.inference().getEffectiveModelContext());
     }
 
     /**
@@ -587,14 +588,14 @@ public class ParserIdentifierTest {
         final var result = ParserIdentifier.toInstanceIdentifier(INVOKE_ACTION, SCHEMA_CONTEXT, null);
 
         // Action schema node
-        final QName actionQName = result.getSchemaNode().getQName();
+        final QName actionQName = result.context().dataSchemaNode().getQName();
         assertEquals("https://example.com/ns/example-actions", actionQName.getModule().getNamespace().toString());
         assertEquals("reset", actionQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(INVOKE_ACTION, SCHEMA_CONTEXT), result.getInstanceIdentifier());
-        assertNull(result.getMountPoint());
-        assertSame(SCHEMA_CONTEXT, result.getSchemaContext());
+        assertEquals(IdentifierCodec.deserialize(INVOKE_ACTION, SCHEMA_CONTEXT), result.path());
+        assertNull(result.mountPoint());
+        assertSame(SCHEMA_CONTEXT, result.inference().getEffectiveModelContext());
     }
 
     /**
@@ -607,13 +608,13 @@ public class ParserIdentifierTest {
             SCHEMA_CONTEXT, mountPointService);
 
         // Action schema node
-        final QName actionQName = result.getSchemaNode().getQName();
+        final QName actionQName = result.context().dataSchemaNode().getQName();
         assertEquals("https://example.com/ns/example-actions", actionQName.getModule().getNamespace().toString());
         assertEquals("reset", actionQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(INVOKE_ACTION, SCHEMA_CONTEXT), result.getInstanceIdentifier());
-        assertEquals(mountPoint, result.getMountPoint());
-        assertEquals(SCHEMA_CONTEXT_ON_MOUNT_POINT, result.getSchemaContext());
+        assertEquals(IdentifierCodec.deserialize(INVOKE_ACTION, SCHEMA_CONTEXT), result.path());
+        assertEquals(mountPoint, result.mountPoint());
+        assertEquals(SCHEMA_CONTEXT_ON_MOUNT_POINT, result.inference().getEffectiveModelContext());
     }
 }
