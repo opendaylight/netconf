@@ -134,13 +134,15 @@ public final class PatchDataTransactionUtil {
             } catch (final RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false,
-                        Lists.newArrayList(e.getErrors()));
+                        Lists.newArrayList(e.getErrors()), schemaContext);
             }
 
-            return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true, null);
+            return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true, null,
+                schemaContext);
         } else {
             transaction.cancel();
-            return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
+            return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false, null,
+                schemaContext);
         }
     }
 
