@@ -9,6 +9,8 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static java.util.Objects.requireNonNull;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
@@ -19,14 +21,29 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 /**
  * An immutable context holding a consistent view of things related to data bind operations.
  */
-public record DatabindContext(
-        @NonNull MountPointContext mountContext,
-        @NonNull JSONCodecFactory jsonCodecs,
-        @NonNull XmlCodecFactory xmlCodecs) {
-    public DatabindContext {
-        requireNonNull(mountContext);
-        requireNonNull(jsonCodecs);
-        requireNonNull(xmlCodecs);
+public final class DatabindContext {
+    private static final VarHandle JSON_CODECS;
+    private static final VarHandle XML_CODECS;
+
+    static {
+        final var lookup = MethodHandles.lookup();
+        try {
+            JSON_CODECS = lookup.findVarHandle(DatabindContext.class, "jsonCodecs", JSONCodecFactory.class);
+            XML_CODECS = lookup.findVarHandle(DatabindContext.class, "xmlCodecs", XmlCodecFactory.class);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
+    private final @NonNull MountPointContext mountContext;
+
+    @SuppressWarnings("unused")
+    private volatile JSONCodecFactory jsonCodecs;
+    @SuppressWarnings("unused")
+    private volatile XmlCodecFactory xmlCodecs;
+
+    private DatabindContext(final @NonNull MountPointContext mountContext) {
+        this.mountContext = requireNonNull(mountContext);
     }
 
     public static @NonNull DatabindContext ofModel(final EffectiveModelContext modelContext) {
@@ -34,12 +51,32 @@ public record DatabindContext(
     }
 
     public static @NonNull DatabindContext ofMountPoint(final MountPointContext mountContext) {
-        return new DatabindContext(mountContext,
-            JSONCodecFactorySupplier.RFC7951.getShared(mountContext.getEffectiveModelContext()),
-            XmlCodecFactory.create(mountContext));
+        return new DatabindContext(mountContext);
     }
 
     public @NonNull EffectiveModelContext modelContext() {
         return mountContext.getEffectiveModelContext();
+    }
+
+    public @NonNull JSONCodecFactory jsonCodecs() {
+        final var existing = (JSONCodecFactory) JSON_CODECS.getAcquire(this);
+        return existing != null ? existing : createJsonCodecs();
+    }
+
+    private @NonNull JSONCodecFactory createJsonCodecs() {
+        final var created = JSONCodecFactorySupplier.RFC7951.getShared(mountContext.getEffectiveModelContext());
+        final var witness = (JSONCodecFactory) JSON_CODECS.compareAndExchangeRelease(this, null, created);
+        return witness != null ? witness : created;
+    }
+
+    public @NonNull XmlCodecFactory xmlCodecs() {
+        final var existing = (XmlCodecFactory) XML_CODECS.getAcquire(this);
+        return existing != null ? existing : createXmlCodecs();
+    }
+
+    private @NonNull XmlCodecFactory createXmlCodecs() {
+        final var created = XmlCodecFactory.create(mountContext);
+        final var witness = (XmlCodecFactory) XML_CODECS.compareAndExchangeRelease(this, null, created);
+        return witness != null ? witness : created;
     }
 }
