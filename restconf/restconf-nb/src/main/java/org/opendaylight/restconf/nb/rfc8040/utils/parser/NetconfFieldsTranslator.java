@@ -21,7 +21,9 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.DataMode;
+import org.opendaylight.restconf.nb.rfc8040.databind.ResourceMode;
+import org.opendaylight.restconf.nb.rfc8040.databind.RootMode;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -33,7 +35,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -92,25 +94,28 @@ public final class NetconfFieldsTranslator {
      * @return {@link List} of {@link YangInstanceIdentifier} that are relative to the last {@link PathArgument}
      *     of provided {@code identifier}
      */
-    public static @NonNull List<YangInstanceIdentifier> translate(
-            final @NonNull InstanceIdentifierContext identifier, final @NonNull FieldsParam input) {
-        final var parsed = parseFields(identifier, input);
+    public static @NonNull List<YangInstanceIdentifier> translate(final @NonNull DataMode reqPath,
+            final @NonNull FieldsParam input) {
+        final var parsed = parseFields(reqPath, input);
         return parsed.stream().map(NetconfFieldsTranslator::buildPath).toList();
     }
 
-    private static @NonNull Set<LinkedPathElement> parseFields(final @NonNull InstanceIdentifierContext identifier,
+    private static @NonNull Set<LinkedPathElement> parseFields(final @NonNull DataMode reqPath,
             final @NonNull FieldsParam input) {
         final DataSchemaContext startNode;
-        try {
-            startNode = DataSchemaContext.of((DataSchemaNode) identifier.getSchemaNode());
-        } catch (IllegalStateException e) {
-            throw new RestconfDocumentedException(
-                "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
+        if (reqPath instanceof ResourceMode resource) {
+            startNode = resource.dataContext();
+        } else if (reqPath instanceof RootMode root) {
+            startNode = DataSchemaContextTree.from(root.inference().getEffectiveModelContext()).getRoot();
+        } else {
+            throw new IllegalStateException("Unhandled path " + reqPath);
         }
 
+        final var inference = reqPath.inference();
         final var parsed = new HashSet<LinkedPathElement>();
-        processSelectors(parsed, identifier.getSchemaContext(), identifier.getSchemaNode().getQName().getModule(),
-            new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
+        processSelectors(parsed, inference.getEffectiveModelContext(),
+            startNode.dataSchemaNode().getQName().getModule(), new LinkedPathElement(null, List.of(), startNode),
+            input.nodeSelectors());
 
         return parsed;
     }

@@ -37,7 +37,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.DataMode;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
@@ -119,16 +119,15 @@ public final class QueryParams {
         }
     }
 
-    public static QueryParameters newQueryParameters(final ReadDataParams params,
-            final InstanceIdentifierContext identifier) {
+    public static QueryParameters newQueryParameters(final DataMode reqPath, final ReadDataParams params) {
         final var fields = params.fields();
         if (fields == null) {
             return QueryParameters.of(params);
         }
 
-        return identifier.getMountPoint() != null
-            ? QueryParameters.ofFieldPaths(params, NetconfFieldsTranslator.translate(identifier, fields))
-                : QueryParameters.ofFields(params, WriterFieldsTranslator.translate(identifier, fields));
+        return reqPath.mountPoint() != null
+            ? QueryParameters.ofFieldPaths(params, NetconfFieldsTranslator.translate(reqPath, fields))
+                : QueryParameters.ofFields(params, WriterFieldsTranslator.translate(reqPath, fields));
     }
 
     /**

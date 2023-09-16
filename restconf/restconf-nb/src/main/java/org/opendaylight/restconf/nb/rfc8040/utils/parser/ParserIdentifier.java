@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -83,9 +84,9 @@ public final class ParserIdentifier {
     //
     //        @NonNull InstanceIdentifierContext forUrl(identifier, schemaContexxt, mountPointService)
     //
-    public static InstanceIdentifierContext toInstanceIdentifier(final String identifier,
+    public static @NonNull InstanceIdentifierContext toInstanceIdentifier(final String identifier,
             final EffectiveModelContext schemaContext, final @Nullable DOMMountPointService mountPointService) {
-        if (identifier == null || !identifier.contains(MOUNT)) {
+        if (!identifier.contains(MOUNT)) {
             return createIIdContext(schemaContext, identifier, null);
         }
         if (mountPointService == null) {
@@ -114,14 +115,8 @@ public final class ParserIdentifier {
      * @return {@link InstanceIdentifierContext}
      * @throws RestconfDocumentedException if the path cannot be resolved
      */
-    private static InstanceIdentifierContext createIIdContext(final EffectiveModelContext schemaContext,
+    private static @NonNull InstanceIdentifierContext createIIdContext(final EffectiveModelContext schemaContext,
             final String url, final @Nullable DOMMountPoint mountPoint) {
-        // First things first: an empty path means data invocation on SchemaContext
-        if (url == null) {
-            return mountPoint != null ? InstanceIdentifierContext.ofMountPointRoot(mountPoint, schemaContext)
-                : InstanceIdentifierContext.ofLocalRoot(schemaContext);
-        }
-
         final var result = YangInstanceIdentifierDeserializer.create(schemaContext, url);
         return InstanceIdentifierContext.ofPath(result.stack, result.node, result.path, mountPoint);
     }
