@@ -16,9 +16,11 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.List;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -35,8 +37,8 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     private final NetconfDataTreeService netconfService;
 
     public NetconfRestconfStrategy(final EffectiveModelContext modelContext,
-            final NetconfDataTreeService netconfService) {
-        super(modelContext);
+            final NetconfDataTreeService netconfService, final @Nullable DOMRpcService rpcService) {
+        super(modelContext, rpcService);
         this.netconfService = requireNonNull(netconfService);
     }
 
