@@ -15,25 +15,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Container that provides access to the data-model specific operations supported by the server.
  */
 @Path("/")
 public final class RestconfOperationsServiceImpl {
-    private final DatabindProvider databindProvider;
     private final MdsalRestconfServer server;
 
-    /**
-     * Set {@link DatabindProvider} for getting actual {@link EffectiveModelContext}.
-     *
-     * @param databindProvider a {@link DatabindProvider}
-     * @param server a {@link MdsalRestconfServer}
-     */
-    public RestconfOperationsServiceImpl(final DatabindProvider databindProvider, final MdsalRestconfServer server) {
-        this.databindProvider = requireNonNull(databindProvider);
+    public RestconfOperationsServiceImpl(final MdsalRestconfServer server) {
         this.server = requireNonNull(server);
     }
 
@@ -46,8 +36,7 @@ public final class RestconfOperationsServiceImpl {
     @Path("/operations")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
     public String getOperationsJSON() {
-        return OperationsContent.JSON.bodyFor(
-            server.bindRequestRoot(databindProvider.currentContext()).inference());
+        return OperationsContent.JSON.bodyFor(server.bindRoot().inference());
     }
 
     /**
@@ -60,8 +49,7 @@ public final class RestconfOperationsServiceImpl {
     @Path("/operations/{identifier:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
     public String getOperationJSON(@PathParam("identifier") final String identifier) {
-        return OperationsContent.JSON.bodyFor(
-            server.bindRequestPath(databindProvider.currentContext(), identifier).inference());
+        return OperationsContent.JSON.bodyFor(server.bindResource(identifier).inference());
     }
 
     /**
@@ -73,8 +61,7 @@ public final class RestconfOperationsServiceImpl {
     @Path("/operations")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public String getOperationsXML() {
-        return OperationsContent.XML.bodyFor(
-            server.bindRequestRoot(databindProvider.currentContext()).inference());
+        return OperationsContent.XML.bodyFor(server.bindRoot().inference());
     }
 
     /**
@@ -87,7 +74,6 @@ public final class RestconfOperationsServiceImpl {
     @Path("/operations/{identifier:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public String getOperationXML(@PathParam("identifier") final String identifier) {
-        return OperationsContent.XML.bodyFor(
-            server.bindRequestPath(databindProvider.currentContext(), identifier).inference());
+        return OperationsContent.XML.bodyFor(server.bindResource(identifier).inference());
     }
 }
