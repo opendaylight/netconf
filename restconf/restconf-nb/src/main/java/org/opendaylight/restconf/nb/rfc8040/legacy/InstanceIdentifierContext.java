@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.legacy;
 
-import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -74,26 +73,6 @@ public abstract class InstanceIdentifierContext {
         }
     }
 
-    private static final class WithoutDataPath extends InstanceIdentifierContext {
-        private final @NonNull SchemaInferenceStack stack;
-
-        private WithoutDataPath(final SchemaNode schemaNode, final DOMMountPoint mountPoint,
-                final SchemaInferenceStack stack) {
-            super(schemaNode, mountPoint);
-            this.stack = requireNonNull(stack);
-        }
-
-        @Override
-        public Inference inference() {
-            return stack.toInference();
-        }
-
-        @Override
-        public @Nullable YangInstanceIdentifier getInstanceIdentifier() {
-            return null;
-        }
-    }
-
     private final @NonNull SchemaNode schemaNode;
     private final @Nullable DOMMountPoint mountPoint;
 
@@ -110,26 +89,6 @@ public abstract class InstanceIdentifierContext {
     public static @NonNull InstanceIdentifierContext ofLocalPath(final EffectiveModelContext context,
             final YangInstanceIdentifier path) {
         return DataPath.of(context, path, null);
-    }
-
-    // Invocations of various identifier-less details
-    public static @NonNull InstanceIdentifierContext ofStack(final SchemaInferenceStack stack) {
-        return ofStack(stack, null);
-    }
-
-    // Invocations of various identifier-less details, potentially having a mount point
-    public static @NonNull InstanceIdentifierContext ofStack(final SchemaInferenceStack stack,
-            final @Nullable DOMMountPoint mountPoint) {
-        final SchemaNode schemaNode;
-        if (!stack.isEmpty()) {
-            final var stmt = stack.currentStatement();
-            verify(stmt instanceof SchemaNode, "Unexpected statement %s", stmt);
-            schemaNode = (SchemaNode) stmt;
-        } else {
-            schemaNode = stack.getEffectiveModelContext();
-        }
-
-        return new WithoutDataPath(schemaNode, mountPoint, stack);
     }
 
     public static @NonNull InstanceIdentifierContext ofPath(final SchemaInferenceStack stack,
@@ -163,5 +122,5 @@ public abstract class InstanceIdentifierContext {
 
     public abstract @NonNull Inference inference();
 
-    public abstract @Nullable YangInstanceIdentifier getInstanceIdentifier();
+    public abstract @NonNull YangInstanceIdentifier getInstanceIdentifier();
 }

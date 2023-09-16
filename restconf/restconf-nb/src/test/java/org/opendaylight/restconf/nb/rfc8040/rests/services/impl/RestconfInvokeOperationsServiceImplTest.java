@@ -87,8 +87,8 @@ public class RestconfInvokeOperationsServiceImplTest {
 
     @Before
     public void setup() {
-        server = new MdsalRestconfServer(dataBroker, rpcService, mountPointService);
-        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(() -> CONTEXT, server, mountPointService,
+        server = new MdsalRestconfServer(() -> CONTEXT, dataBroker, rpcService, mountPointService);
+        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(server, mountPointService,
             new StreamsConfiguration(0, 1, 0, false));
     }
 
