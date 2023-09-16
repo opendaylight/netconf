@@ -31,6 +31,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
@@ -79,9 +80,9 @@ public final class JaxRsNorthbound implements AutoCloseable {
             @Reference final DOMMountPointService mountPointService,
             @Reference final DOMNotificationService notificationService, @Reference final DOMRpcService rpcService,
             @Reference final DOMSchemaService schemaService, @Reference final DatabindProvider databindProvider,
-            final Configuration configuration) throws ServletException {
+            @Reference final MdsalRestconfServer server, final Configuration configuration) throws ServletException {
         this(webServer, webContextSecurer, servletSupport, filterAdapterConfiguration, actionService, dataBroker,
-            mountPointService, notificationService, rpcService, schemaService, databindProvider,
+            mountPointService, notificationService, rpcService, schemaService, databindProvider, server,
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.idle$_$timeout(),
                 configuration.heartbeat$_$interval(), configuration.use$_$sse()));
@@ -92,7 +93,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             final DOMActionService actionService, final DOMDataBroker dataBroker,
             final DOMMountPointService mountPointService, final DOMNotificationService notificationService,
             final DOMRpcService rpcService, final DOMSchemaService schemaService,
-            final DatabindProvider databindProvider,
+            final DatabindProvider databindProvider, final MdsalRestconfServer server,
             final String pingNamePrefix, final int pingMaxThreadCount,
             final StreamsConfiguration streamsConfiguration) throws ServletException {
         final var scheduledThreadPool = new ScheduledThreadPoolWrapper(pingMaxThreadCount,
@@ -105,8 +106,8 @@ public final class JaxRsNorthbound implements AutoCloseable {
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
                 .servlet(servletSupport.createHttpServletBuilder(
-                    new RestconfApplication(databindProvider, mountPointService, dataBroker, rpcService, actionService,
-                        notificationService, schemaService, streamsConfiguration))
+                    new RestconfApplication(databindProvider, server, mountPointService, dataBroker, rpcService,
+                        actionService, notificationService, schemaService, streamsConfiguration))
                     .build())
                 .asyncSupported(true)
                 .build())
