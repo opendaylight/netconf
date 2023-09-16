@@ -135,9 +135,10 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
 
-        dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA),
-            new MdsalRestconfServer(dataBroker, rpcService, mountPointService), dataBroker, delegRestconfSubscrService,
-            actionService, new StreamsConfiguration(0, 1, 0, false));
+        dataService = new RestconfDataServiceImpl(
+            new MdsalRestconfServer(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA), dataBroker, rpcService,
+                mountPointService),
+            dataBroker, delegRestconfSubscrService, actionService, new StreamsConfiguration(0, 1, 0, false));
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
