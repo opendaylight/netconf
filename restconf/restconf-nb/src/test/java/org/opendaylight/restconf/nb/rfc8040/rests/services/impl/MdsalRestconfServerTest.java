@@ -26,6 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -43,12 +44,14 @@ public class MdsalRestconfServerTest extends AbstractJukeboxTest {
     private NetconfDataTreeService netconfService;
     @Mock
     private DOMRpcService rpcService;
+    @Mock
+    private DatabindProvider databindProvider;
 
     private MdsalRestconfServer server;
 
     @Before
     public void before() {
-        server = new MdsalRestconfServer(dataBroker, rpcService, mountPointService);
+        server = new MdsalRestconfServer(databindProvider, dataBroker, rpcService, mountPointService);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
     }
 

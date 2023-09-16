@@ -11,8 +11,8 @@ import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.restconf.Data;
@@ -29,8 +29,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.KeyEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.ListEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
     // TODO: pass down DatabindContext corresponding to inference
     @SuppressWarnings("checkstyle:illegalCatch")
     public @NonNull NormalizedNode toNormalizedNode(final @NonNull YangInstanceIdentifier path,
-            final @NonNull Inference inference, final @NonNull SchemaNode schemaNode) {
+            final @NonNull Inference inference) {
         final var expected = path.isEmpty() ? DATA_NID : path.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
         try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
@@ -84,7 +84,7 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
         }
 
         validTopLevelNodeName(expected, data);
-        validateListKeysEqualityInPayloadAndUri(schemaNode, path, data);
+        validateListKeysEqualityInPayloadAndUri(inference, path, data);
 
         return data;
     }
@@ -115,17 +115,21 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
      * @throws RestconfDocumentedException if key values or key count in payload and URI isn't equal
      */
     @VisibleForTesting
-    static final void validateListKeysEqualityInPayloadAndUri(final SchemaNode schemaNode,
+    static final void validateListKeysEqualityInPayloadAndUri(final Inference inference,
             final YangInstanceIdentifier path, final NormalizedNode data) {
-        if (schemaNode instanceof ListSchemaNode listSchema
-            && path.getLastPathArgument() instanceof NodeIdentifierWithPredicates nip
-            && data instanceof MapEntryNode mapEntry) {
-            isEqualUriAndPayloadKeyValues(nip.asMap(), mapEntry, listSchema.getKeyDefinition());
+        if (!inference.isEmpty()) {
+            final var lastStmt = inference.toSchemaInferenceStack().currentStatement();
+            if (lastStmt instanceof ListEffectiveStatement list
+                && path.getLastPathArgument() instanceof NodeIdentifierWithPredicates nip
+                && data instanceof MapEntryNode mapEntry) {
+                isEqualUriAndPayloadKeyValues(nip.asMap(), mapEntry,
+                    list.findFirstEffectiveSubstatementArgument(KeyEffectiveStatement.class).orElse(Set.of()));
+            }
         }
     }
 
     private static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
-            final List<QName> keyDefinitions) {
+            final Set<QName> keyDefinitions) {
         final var mutableCopyUriKeyValues = new HashMap<>(uriKeyValues);
         for (var keyDefinition : keyDefinitions) {
             final var uriKeyValue = RestconfDocumentedException.throwIfNull(
