@@ -12,8 +12,8 @@ import static org.junit.Assert.assertThrows;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 public class ResourceBodyTest extends AbstractJukeboxTest {
     @Test
@@ -35,7 +35,7 @@ public class ResourceBodyTest extends AbstractJukeboxTest {
             .node(PLAYLIST_QNAME)
             .nodeWithKey(PLAYLIST_QNAME, NAME_QNAME, "name of band")
             .build();
-        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, path);
-        ResourceBody.validateListKeysEqualityInPayloadAndUri(iidContext.getSchemaNode(), path, BAND_ENTRY);
+        ResourceBody.validateListKeysEqualityInPayloadAndUri(
+            Inference.ofDataTreePath(JUKEBOX_SCHEMA, JUKEBOX_QNAME, PLAYER_QNAME), path, BAND_ENTRY);
     }
 }
