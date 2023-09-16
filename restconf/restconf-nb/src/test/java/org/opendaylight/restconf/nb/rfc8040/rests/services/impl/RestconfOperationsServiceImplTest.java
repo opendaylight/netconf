@@ -19,8 +19,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.module._1.rev140101.Module1Data;
@@ -61,6 +63,10 @@ public class RestconfOperationsServiceImplTest {
     private DOMMountPoint mountPoint;
     @Mock
     private DOMSchemaService schemaService;
+    @Mock
+    private DOMDataBroker dataBroker;
+    @Mock
+    private DOMRpcService rpcService;
 
     private RestconfOperationsServiceImpl opService;
 
@@ -75,7 +81,9 @@ public class RestconfOperationsServiceImplTest {
         doReturn(SCHEMA).when(schemaService).getGlobalContext();
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
-        opService = new RestconfOperationsServiceImpl(() -> DatabindContext.ofModel(SCHEMA), mountPointService);
+
+        opService = new RestconfOperationsServiceImpl(() -> DatabindContext.ofModel(SCHEMA),
+            new MdsalRestconfServer(dataBroker, rpcService, mountPointService));
     }
 
     @Test
